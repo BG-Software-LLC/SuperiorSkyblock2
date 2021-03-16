@@ -16,13 +16,13 @@ public final class PlaceholdersUpgradeCostLoader implements UpgradeCostLoader {
             throw new UpgradeCostLoadException("The field 'price' is missing from the section.");
         if (!upgradeSection.contains("placeholder"))
             throw new UpgradeCostLoadException("The field 'placeholder' is missing from the section.");
-        if (!upgradeSection.contains("take-command"))
-            throw new UpgradeCostLoadException("The field 'take-command' is missing from the section.");
+        if (!upgradeSection.contains("withdraw-commands"))
+            throw new UpgradeCostLoadException("The field 'withdraw-commands' is missing from the section.");
 
         return new PlaceholdersUpgradeCost(
                 BigDecimal.valueOf(upgradeSection.getDouble("price")),
                 upgradeSection.getString("placeholder"),
-                upgradeSection.getStringList("take-command")
+                upgradeSection.getStringList("withdraw-commands")
         );
     }
 
