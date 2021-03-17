@@ -32,9 +32,9 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
+import com.bgsoftware.common.reflection.ReflectConstructor;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectConstructor;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
 import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;

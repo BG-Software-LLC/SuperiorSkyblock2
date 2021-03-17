@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.utils.tags;
 
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectMethod;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 

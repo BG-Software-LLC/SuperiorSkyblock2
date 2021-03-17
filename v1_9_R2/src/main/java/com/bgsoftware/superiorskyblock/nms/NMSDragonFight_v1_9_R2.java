@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.google.common.collect.Sets;
 import net.minecraft.server.v1_9_R2.AxisAlignedBB;
 import net.minecraft.server.v1_9_R2.BlockPosition;
@@ -67,19 +67,22 @@ public final class NMSDragonFight_v1_9_R2 implements NMSDragonFight {
     private static final ReflectField<IDragonController> DRAGON_PHASE = new ReflectField<>(DragonControllerManager.class, IDragonController.class, "currentDragonController");
     private static final ReflectField<BossBattleServer> BATTLE_BOSS_SERVER = new ReflectField<>(EnderDragonBattle.class, BossBattleServer.class, "c");
 
-    private static final ReflectField<Map<String, Class<? extends Entity>>> ENTITY_TYPES_C = new ReflectField<>(EntityTypes.class, Map.class, "c");
-    private static final ReflectField<Map<Class<? extends Entity>, String>> ENTITY_TYPES_D = new ReflectField<>(EntityTypes.class, Map.class, "d");
-    private static final ReflectField<Map<Integer, Class<? extends Entity>>> ENTITY_TYPES_E = new ReflectField<>(EntityTypes.class, Map.class, "e");
-    private static final ReflectField<Map<Class<? extends Entity>, Integer>> ENTITY_TYPES_F = new ReflectField<>(EntityTypes.class, Map.class, "f");
-    private static final ReflectField<Map<String, Integer>> ENTITY_TYPES_G = new ReflectField<>(EntityTypes.class, Map.class, "g");
-
     private static final Map<UUID, EnderDragonBattle> activeBattles = new HashMap<>();
 
     static {
+        ReflectField<Map<String, Class<? extends Entity>>> ENTITY_TYPES_C = new ReflectField<>(EntityTypes.class, Map.class, "c");
         ENTITY_TYPES_C.get(null).put("EnderDragon", IslandEntityEnderDragon.class);
+
+        ReflectField<Map<Class<? extends Entity>, String>> ENTITY_TYPES_D = new ReflectField<>(EntityTypes.class, Map.class, "d");
         ENTITY_TYPES_D.get(null).put(IslandEntityEnderDragon.class, "EnderDragon");
+
+        ReflectField<Map<Integer, Class<? extends Entity>>> ENTITY_TYPES_E = new ReflectField<>(EntityTypes.class, Map.class, "e");
         ENTITY_TYPES_E.get(null).put(63, IslandEntityEnderDragon.class);
+
+        ReflectField<Map<Class<? extends Entity>, Integer>> ENTITY_TYPES_F = new ReflectField<>(EntityTypes.class, Map.class, "f");
         ENTITY_TYPES_F.get(null).put(IslandEntityEnderDragon.class, 63);
+
+        ReflectField<Map<String, Integer>> ENTITY_TYPES_G = new ReflectField<>(EntityTypes.class, Map.class, "g");
         ENTITY_TYPES_G.get(null).put("EnderDragon", 63);
     }
 

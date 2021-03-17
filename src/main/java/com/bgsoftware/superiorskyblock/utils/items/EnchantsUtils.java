@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import org.bukkit.enchantments.Enchantment;
 
 public final class EnchantsUtils {

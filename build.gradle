@@ -18,6 +18,10 @@ subprojects {
         maven { url 'https://repo.bg-software.com/repository/public-libs/' }
     }
 
+    dependencies {
+        compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:latest"
+    }
+
     shadowJar {
         archiveFileName = "${project.name}.jar"
         destinationDirectory = file("../archive/")
@@ -55,6 +59,7 @@ dependencies {
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
+    implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'

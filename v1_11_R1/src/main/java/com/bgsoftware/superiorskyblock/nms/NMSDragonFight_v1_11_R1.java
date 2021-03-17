@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.reflections.ReflectField;
 import com.google.common.collect.Sets;
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.BlockPosition;
