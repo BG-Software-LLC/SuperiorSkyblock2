@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
@@ -74,6 +75,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static SuperiorSkyblockPlugin plugin;
+
+    private final Updater updater = new Updater(this, "superiorskyblock2");
 
     private final GridHandler gridHandler = new GridHandler(this);
     private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this);
@@ -190,10 +193,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
-            if (Updater.isOutdated()) {
+            if (updater.isOutdated()) {
                 log("");
-                log("A new version is available (v" + Updater.getLatestVersion() + ")!");
-                log("Version's description: \"" + Updater.getVersionDescription() + "\"");
+                log("A new version is available (v" + updater.getLatestVersion() + ")!");
+                log("Version's description: \"" + updater.getVersionDescription() + "\"");
                 log("");
             }
 
@@ -266,6 +269,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             dataHandler.closeConnection();
             Registry.clearCache();
         }
+    }
+
+    public Updater getUpdater() {
+        return updater;
     }
 
     private boolean loadNMSAdapter(){
