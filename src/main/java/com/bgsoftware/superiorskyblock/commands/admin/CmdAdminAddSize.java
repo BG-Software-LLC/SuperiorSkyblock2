@@ -72,7 +72,10 @@ public final class CmdAdminAddSize implements IAdminIslandCommand {
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setIslandSize(island.getIslandSize() + size)));
+        Executor.data(() -> {
+            islands.forEach(island -> island.setIslandSize(island.getIslandSize() + size));
+            Executor.sync(() -> islands.forEach(Island::updateBorder));
+        });
 
         if(islands.size() > 1)
             Locale.CHANGED_ISLAND_SIZE_ALL.send(sender);
@@ -83,8 +86,6 @@ public final class CmdAdminAddSize implements IAdminIslandCommand {
 
         if(plugin.getSettings().buildOutsideIsland)
             Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
-
-        islands.forEach(Island::updateBorder);
     }
 
 }
