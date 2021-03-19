@@ -256,6 +256,25 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
+    public void cancelAllIslandPreviews() {
+        if(!Bukkit.isPrimaryThread()){
+            Executor.sync(this::cancelAllIslandPreviews);
+            return;
+        }
+
+        islandPreviews.values().forEach(islandPreview -> {
+            SuperiorPlayer superiorPlayer = islandPreview.getPlayer();
+            superiorPlayer.runIfOnline(player -> {
+                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                // We don't wait for the teleport to happen, as this method is called when the server is disabled.
+                // Therefore, we can't wait for the async task to occur.
+                player.setGameMode(GameMode.SURVIVAL);
+                PlayerChat.remove(player);
+            });
+        });
+    }
+
+    @Override
     public IslandPreview getIslandPreview(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return islandPreviews.get(superiorPlayer.getUniqueId());
@@ -622,6 +641,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void disablePlugin(){
         this.pluginDisable = true;
+        cancelAllIslandPreviews();
     }
 
     public void loadGrid(ResultSet resultSet) throws SQLException {

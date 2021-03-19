@@ -73,6 +73,11 @@ public interface GridManager {
     void cancelIslandPreview(SuperiorPlayer superiorPlayer);
 
     /**
+     * Cancel all active island previews.
+     */
+    void cancelAllIslandPreviews();
+
+    /**
      * Check if a player has an ongoing island preview task.
      * @param superiorPlayer The player to check.
      */
