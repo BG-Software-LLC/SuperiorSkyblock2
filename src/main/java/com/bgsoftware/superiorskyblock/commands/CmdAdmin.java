@@ -44,6 +44,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminChest(), false);
         registerCommand(new CmdAdminClearGenerator(), false);
         registerCommand(new CmdAdminClose(), false);
+        registerCommand(new CmdAdminCmdAll(), false);
         registerCommand(new CmdAdminCount(), false);
         registerCommand(new CmdAdminDebug(), false);
         registerCommand(new CmdAdminDelWarp(), false);

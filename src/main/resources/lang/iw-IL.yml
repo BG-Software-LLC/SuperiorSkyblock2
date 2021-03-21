@@ -106,6 +106,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: תומכ
 COMMAND_ARGUMENT_BIOME: 'biome'
+COMMAND_ARGUMENT_COMMAND: 'command...'
 COMMAND_ARGUMENT_DISCORD: '...דרוקסיד'
 COMMAND_ARGUMENT_EFFECT: 'potion-effect'
 COMMAND_ARGUMENT_EMAIL: ליימיא
@@ -163,6 +164,7 @@ COMMAND_DESCRIPTION_ADMIN_BYPASS: הפיקע בצמ ףילחהל.
 COMMAND_DESCRIPTION_ADMIN_CHEST: 'Open island''s chest of another island.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Clear generator rates for a specific island.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: רוביצל יא רוגסל.
+COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: 'Check a block count on a specific island.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 'Toggle debug outputs.'
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
@@ -336,6 +338,8 @@ GENERATOR_UPDATED_NAME: '&e&lיא | &7החלצהב ןכדוע {1} יאה לש ר
   לש תומכה.'
 GENERATOR_UPDATED_ALL: '&e&lיא | &7החלצהב ןכדוע םייאה לכ לש רוטארנגב {0} רמוחה
   לש תומכה.'
+GLOBAL_COMMAND_EXECUTED: '&e&lIsland | &7Successfully executed the command on {0}''s island members!'
+GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIsland | &7Successfully executed the command on the island members of {0}!'
 GLOBAL_MESSAGE_SENT: '&e&lיא | &7{0} לש יאה לש םינקחשל החלצהב החלשנ העדוהה!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lיא | &7{0} יאה לש םינקחשל החלצהב החלשנ העדוהה!'
 GLOBAL_TITLE_SENT: '&e&lIsland | &7Successfully sent to {0}''s island members the title!'

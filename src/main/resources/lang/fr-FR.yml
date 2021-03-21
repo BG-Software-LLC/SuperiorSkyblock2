@@ -98,6 +98,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome
+COMMAND_ARGUMENT_COMMAND: 'command...'
 COMMAND_ARGUMENT_DISCORD: discord
 COMMAND_ARGUMENT_EFFECT: effet-de-potion
 COMMAND_ARGUMENT_EMAIL: email
@@ -162,6 +163,7 @@ COMMAND_DESCRIPTION_ADMIN_BYPASS: Activer/Désactiver le mode bypass.
 COMMAND_DESCRIPTION_ADMIN_CHEST: Ouvrir le stockage de l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Réinitialiser le taux des générateurs pour l'île spécifié.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.
+COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Vérifier le nombre de blocs sur lîle spécifiée.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
@@ -320,6 +322,8 @@ GENERATOR_CLEARED_NAME: '&e&lIle | &7Nettoyage des taux des générateurs pour l
 GENERATOR_CLEARED_ALL: '&e&lIle | &7Nettoyage des taux des générateurs de toutes les îles.'
 GENERATOR_UPDATED: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
+GLOBAL_COMMAND_EXECUTED: '&e&lIsland | &7Successfully executed the command on {0}''s island members!'
+GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIsland | &7Successfully executed the command on the island members of {0}!'
 GENERATOR_UPDATED_ALL: '&e&lIle | &7Taux du générateur modifié sur {0} pour toutes les îles.'
 GLOBAL_MESSAGE_SENT: '&e&lIle | &7Message envoyé à tous les membres de l''île de {0} !'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIle | &7Message envoyé à tous les membres de l''île {0} !'

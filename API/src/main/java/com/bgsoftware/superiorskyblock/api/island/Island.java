@@ -671,6 +671,15 @@ public interface Island extends Comparable<Island> {
     void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers);
 
     /**
+     * Execute a command on all the members of the island.
+     * You can use {player-name} as a placeholder for the member's name.
+     * @param command The command to execute.
+     * @param onlyOnlineMembers Whether or not the command should be executed only for online members.
+     * @param ignoredMembers An array of ignored members.
+     */
+    void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers);
+
+    /**
      * Checks whether or not the island is being recalculated currently.
      */
     boolean isBeingRecalculated();

@@ -666,6 +666,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers) {
+
+    }
+
+    @Override
     public boolean isBeingRecalculated() {
         return false;
     }

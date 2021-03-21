@@ -101,6 +101,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma
+COMMAND_ARGUMENT_COMMAND: 'command...'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: effetto-pozione
 COMMAND_ARGUMENT_EMAIL: email
@@ -158,6 +159,7 @@ COMMAND_DESCRIPTION_ADMIN_BYPASS: Attiva/disattiva la modalità bypass.
 COMMAND_DESCRIPTION_ADMIN_CHEST: Apri il baule di un'altra isola.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Cancella i tassi del generatore per un'isola specifica.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Chiudi un'isola al pubblico.
+COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Controlla un conteggio dei blocchi su un'isola specifica.
 COMMAND_DESCRIPTION_ADMIN_DEBUG: Attiva o disattiva i messaggi di Debug.
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Elimina un warp per un'isola.
@@ -323,6 +325,8 @@ GENERATOR_CLEARED_NAME: '&e&lIsola | &7Cancellati con successo gli importi del g
 GENERATOR_CLEARED_ALL: '&e&lIsola | &7Cancellati con successo gli importi del generatore per tutte le isole.'
 GENERATOR_UPDATED: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola di {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} sull''isola {1}.'
+GLOBAL_COMMAND_EXECUTED: '&e&lIsland | &7Successfully executed the command on {0}''s island members!'
+GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIsland | &7Successfully executed the command on the island members of {0}!'
 GENERATOR_UPDATED_ALL: '&e&lIsola | &7Aggiornato con successo la percentuale di generazione di {0} in tutte le isole.'
 GLOBAL_MESSAGE_SENT: '&e&lIsola | &7Il messaggio è stato inviato correttamente ai membri dell''isola di {0}!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIsola | &7Il messaggio è stato inviato correttamente ai membri dell''isola di {0}!'

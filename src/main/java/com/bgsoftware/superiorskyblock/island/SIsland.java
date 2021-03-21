@@ -1594,6 +1594,20 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers) {
+        Preconditions.checkNotNull(command, "command parameter cannot be null.");
+        Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
+
+        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+
+        SuperiorSkyblockPlugin.debug("Action: Execute Command, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Command: " + command);
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && (!onlyOnlineMembers || superiorPlayer.isOnline()))
+                .forEach(superiorPlayer -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", superiorPlayer.getName())));
+    }
+
+    @Override
     public boolean isBeingRecalculated() {
         return beingRecalculated.get();
     }
