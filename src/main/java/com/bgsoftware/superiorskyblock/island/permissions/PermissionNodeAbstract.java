@@ -48,12 +48,6 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     @Override
     public abstract PermissionNodeAbstract clone();
 
-    public String getAsStatementString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        privileges.entries().forEach(entry -> stringBuilder.append(";").append(entry.getKey().getName()).append(":").append(entry.getValue().toString()));
-        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
-    }
-
     protected boolean isDefault(IslandPrivilege islandPrivilege){
         return false;
     }

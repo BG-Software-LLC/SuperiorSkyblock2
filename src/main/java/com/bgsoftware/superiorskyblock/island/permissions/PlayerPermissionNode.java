@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
@@ -37,6 +39,22 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         return getStatus(IslandPrivileges.ALL) == PrivilegeStatus.ENABLED || getStatus(islandPrivilege) == PrivilegeStatus.ENABLED;
     }
 
+    @Override
+    public PermissionNodeAbstract clone() {
+        return new PlayerPermissionNode(privileges, superiorPlayer, island);
+    }
+
+    public JsonArray serialize() {
+        JsonArray permsArray = new JsonArray();
+        privileges.entries().forEach(entry -> {
+            JsonObject permObject = new JsonObject();
+            permObject.addProperty("privilege", entry.getKey().getName());
+            permObject.addProperty("status", entry.getValue().toString());
+            permsArray.add(permObject);
+        });
+        return permsArray;
+    }
+
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
         PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
 
@@ -44,11 +62,6 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
             return PrivilegeStatus.ENABLED;
 
         return privileges.get(islandPrivilege, PrivilegeStatus.DISABLED);
-    }
-
-    @Override
-    public PermissionNodeAbstract clone() {
-        return new PlayerPermissionNode(privileges, superiorPlayer, island);
     }
 
     public static class EmptyPlayerPermissionNode extends PlayerPermissionNode{

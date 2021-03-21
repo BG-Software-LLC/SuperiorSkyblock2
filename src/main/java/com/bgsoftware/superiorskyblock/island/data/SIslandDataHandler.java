@@ -305,7 +305,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     public void saveSettings() {
         if(loadingIsland) return;
         Query.ISLAND_SET_SETTINGS.getStatementHolder(this)
-                .setString(IslandSerializer.serializeSettings(island.getAllSettings()))
+                .setString(IslandSerializer.serializeIslandFlags(island.getAllSettings()))
                 .setString(island.getOwner().getUniqueId().toString())
                 .execute(true);
     }
@@ -414,7 +414,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getDescription())
                 .setString(IslandSerializer.serializeRatings(island.getRatings()))
                 .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
-                .setString(IslandSerializer.serializeSettings(island.getAllSettings()))
+                .setString(IslandSerializer.serializeIslandFlags(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
                 .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
                 .setString(island.getGeneratedSchematicsFlag() + "")
@@ -478,7 +478,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getDescription())
                 .setString(IslandSerializer.serializeRatings(island.getRatings()))
                 .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
-                .setString(IslandSerializer.serializeSettings(island.getAllSettings()))
+                .setString(IslandSerializer.serializeIslandFlags(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
                 .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
                 .setString(island.getGeneratedSchematicsFlag() + "")

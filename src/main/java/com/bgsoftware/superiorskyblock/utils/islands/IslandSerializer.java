@@ -15,14 +15,18 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -30,166 +34,230 @@ import java.util.UUID;
 
 public final class IslandSerializer {
 
+    private static final Gson gson = new GsonBuilder().create();
+
     private IslandSerializer(){
 
     }
 
-    public static String serializePlayers(Collection<SuperiorPlayer> collection) {
-        StringBuilder builder = new StringBuilder();
-        collection.forEach(superiorPlayer -> builder.append(",").append(superiorPlayer.getUniqueId().toString()));
-        return builder.toString();
+    public static String serializePlayers(Collection<SuperiorPlayer> playersCollection) {
+        JsonArray playersArray = new JsonArray();
+        playersCollection.forEach(superiorPlayer -> playersArray.add(new JsonPrimitive(
+                superiorPlayer.getUniqueId().toString())));
+        return gson.toJson(playersArray);
     }
 
-    public static String serializePlayersWithTimes(Collection<Pair<SuperiorPlayer, Long>> collection) {
-        StringBuilder builder = new StringBuilder();
-        collection.forEach(pair -> builder.append(",").append(pair.getKey().getUniqueId().toString()).append(";").append(pair.getValue()));
-        return builder.toString();
+    public static String serializePlayersWithTimes(Collection<Pair<SuperiorPlayer, Long>> playersCollection) {
+        JsonArray playersArray = new JsonArray();
+        playersCollection.forEach(pair -> {
+            JsonObject playerObject = new JsonObject();
+            playerObject.addProperty("uuid", pair.getKey().getUniqueId().toString());
+            playerObject.addProperty("lastTimeRecorded", pair.getValue());
+            playersArray.add(playerObject);
+        });
+        return gson.toJson(playersArray);
     }
 
     public static String serializePermissions(Map<SuperiorPlayer, PermissionNode> playerPermissions, Map<IslandPrivilege, PlayerRole> playerRoles){
-        StringBuilder permissionNodes = new StringBuilder();
-        playerPermissions.forEach((key, value) -> permissionNodes.append(",").append(key.getUniqueId().toString())
-                .append("=").append(((PlayerPermissionNode) value).getAsStatementString()));
+        JsonObject globalObject = new JsonObject();
+        JsonArray playersArray = new JsonArray(), rolesArray = new JsonArray();
+        globalObject.add("players", playersArray);
+        globalObject.add("roles", rolesArray);
 
-        Registry<PlayerRole, Set<IslandPrivilege>> reorderRoles = Registry.createRegistry();
-        playerRoles.forEach((key, value) -> reorderRoles.computeIfAbsent(value, s -> new HashSet<>()).add(key));
+        playerPermissions.forEach((superiorPlayer, permissionNode) -> {
+            JsonObject playerObject = new JsonObject();
+            playerObject.addProperty("uuid", superiorPlayer.getUniqueId().toString());
+            playerObject.add("permissions", ((PlayerPermissionNode) permissionNode).serialize());
+            playersArray.add(playerObject);
+        });
 
-        reorderRoles.entries().forEach(entry ->
-                permissionNodes.append(",").append(entry.getKey().getId()).append("=").append(getAsStatementString(entry.getValue())));
+        Map<PlayerRole, Set<IslandPrivilege>> roleToPrivileges = new HashMap<>();
+        playerRoles.forEach((islandPrivilege, playerRole) -> roleToPrivileges
+                .computeIfAbsent(playerRole, s -> new HashSet<>()).add(islandPrivilege));
 
-        reorderRoles.delete();
+        roleToPrivileges.forEach((playerRole, islandPrivileges) -> {
+            JsonObject roleObject = new JsonObject();
+            JsonArray permsArray = new JsonArray();
 
-        return permissionNodes.toString();
+            roleObject.addProperty("id", playerRole.getId());
+            roleObject.add("permissions", permsArray);
+            islandPrivileges.forEach(islandPrivilege -> permsArray.add(new JsonPrimitive(islandPrivilege.getName())));
+
+            rolesArray.add(roleObject);
+        });
+
+        return gson.toJson(globalObject);
     }
 
-    private static String getAsStatementString(Set<IslandPrivilege> islandPrivileges){
-        StringBuilder stringBuilder = new StringBuilder();
-        islandPrivileges.forEach(privilege -> stringBuilder.append(";").append(privilege.getName()).append(":").append("1"));
-        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
+
+    public static String serializeBlockCounts(Map<Key, BigInteger> blockCounts){
+        JsonArray blockCountsArray = new JsonArray();
+        blockCounts.forEach((key, amount) -> {
+            JsonObject blockCountObject = new JsonObject();
+            blockCountObject.addProperty("id", key.toString());
+            blockCountObject.addProperty("amount", amount.toString());
+            blockCountsArray.add(blockCountObject);
+        });
+        return gson.toJson(blockCountsArray);
     }
 
-    public static String serializeBlockCounts(Map<Key, BigInteger> blocks){
-        StringBuilder blockCounts = new StringBuilder();
-        blocks.forEach((blockKey, amount) ->
-                blockCounts.append(";").append(blockKey).append("=").append(amount));
-        return blockCounts.length() == 0 ? "" : blockCounts.toString().substring(1);
+    public static String serializeBlockLimits(Map<Key, Integer> blockLimits){
+        JsonArray blockLimitsArray = new JsonArray();
+        blockLimits.forEach((key, limit) -> {
+            JsonObject blockLimitObject = new JsonObject();
+            blockLimitObject.addProperty("id", key.toString());
+            blockLimitObject.addProperty("limit", limit);
+            blockLimitsArray.add(blockLimitObject);
+        });
+        return gson.toJson(blockLimitsArray);
     }
 
-    public static String serializeBlockLimits(Map<Key, Integer> blocks){
-        StringBuilder blockLimits = new StringBuilder();
-        blocks.forEach((blockKey, integer) ->
-                blockLimits.append(",").append(blockKey).append("=").append(integer));
-        return blockLimits.length() == 0 ? "" : blockLimits.toString().substring(1);
-    }
-
-    public static String serializeEntityLimits(Map<Key, Integer> entities){
-        StringBuilder entityLimits = new StringBuilder();
-        entities.forEach((entityKey, integer) ->
-                entityLimits.append(",").append(entityKey).append("=").append(integer));
-        return entityLimits.length() == 0 ? "" : entityLimits.toString().substring(1);
+    public static String serializeEntityLimits(Map<Key, Integer> entityLimits){
+        JsonArray entityLimitsArray = new JsonArray();
+        entityLimits.forEach((key, limit) -> {
+            JsonObject entityLimitObject = new JsonObject();
+            entityLimitObject.addProperty("id", key.toString());
+            entityLimitObject.addProperty("limit", limit);
+            entityLimitsArray.add(entityLimitObject);
+        });
+        return gson.toJson(entityLimitsArray);
     }
 
     public static String serializeUpgrades(Map<String, Integer> upgrades){
-        StringBuilder upgradesBuilder = new StringBuilder();
-        upgrades.forEach((upgrade, level) ->
-                upgradesBuilder.append(",").append(upgrade).append("=").append(level));
-        return upgradesBuilder.toString();
+        JsonArray upgradesArray = new JsonArray();
+        upgrades.forEach((upgrade, level) -> {
+            JsonObject upgradeObject = new JsonObject();
+            upgradeObject.addProperty("upgrade", upgrade);
+            upgradeObject.addProperty("level", level);
+            upgradesArray.add(upgradeObject);
+        });
+        return gson.toJson(upgradesArray);
     }
 
-    public static String serializeWarps(Map<String, IslandWarp> warps){
-        StringBuilder warpsBuilder = new StringBuilder();
-        warps.values().forEach(islandWarp -> {
-            String warpName = islandWarp.getCategory() == null ? islandWarp.getName() :
-                    islandWarp.getCategory().getName() + "-" + islandWarp.getName();
-            warpsBuilder.append(";").append(warpName).append("=")
-                    .append(FileUtils.fromLocation(islandWarp.getLocation())).append("=").append(islandWarp.hasPrivateFlag());
+    public static String serializeWarps(Map<String, IslandWarp> islandWarps){
+        JsonArray warpsArray = new JsonArray();
+        islandWarps.values().forEach(islandWarp -> {
+            JsonObject warpObject = new JsonObject();
+            warpObject.addProperty("name", islandWarp.getName());
+            if(islandWarp.getCategory() != null)
+                warpObject.addProperty("category", islandWarp.getCategory().getName());
+            warpObject.addProperty("location", FileUtils.fromLocation(islandWarp.getLocation()));
+            warpObject.addProperty("private", islandWarp.hasPrivateFlag() ? 1 : 0);
             if(islandWarp.getRawIcon() != null)
-                warpsBuilder.append("=").append(ItemUtils.serializeItem(islandWarp.getRawIcon()));
+                warpObject.addProperty("icon", ItemUtils.serializeItem(islandWarp.getRawIcon()));
+            warpsArray.add(warpObject);
         });
-        return warpsBuilder.length() == 0 ? "" : warpsBuilder.toString().substring(1);
+        return gson.toJson(warpsArray);
     }
 
     public static String serializeRatings(Map<UUID, Rating> ratings){
-        StringBuilder ratingsBuilder = new StringBuilder();
-        ratings.forEach((uuid, rating) ->
-                ratingsBuilder.append(";").append(uuid).append("=").append(rating.getValue()));
-        return ratingsBuilder.length() == 0 ? "" : ratingsBuilder.toString().substring(1);
+        JsonArray ratingsArray = new JsonArray();
+        ratings.forEach((player, rating) -> {
+            JsonObject ratingObject = new JsonObject();
+            ratingObject.addProperty("player", player.toString());
+            ratingObject.addProperty("rating", rating.getValue());
+            ratingsArray.add(ratingObject);
+        });
+        return gson.toJson(ratingsArray);
     }
 
 
     public static String serializeMissions(Map<Mission<?>, Integer> missions){
-        StringBuilder missionsBuilder = new StringBuilder();
-        missions.forEach((key, value) -> missionsBuilder.append(";").append(key).append("=").append(value));
-        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+        JsonArray missionsArray = new JsonArray();
+        missions.forEach((mission, finishCount) -> {
+            JsonObject missionObject = new JsonObject();
+            missionObject.addProperty("name", mission.getName());
+            missionObject.addProperty("finishCount", finishCount);
+            missionsArray.add(missionObject);
+        });
+        return gson.toJson(missionsArray);
     }
 
-    public static String serializeSettings(Map<IslandFlag, Byte> islandSettings){
-        StringBuilder missionsBuilder = new StringBuilder();
-        islandSettings.forEach((key, value) -> missionsBuilder.append(";").append(key.getName()).append("=").append(value));
-        return missionsBuilder.length() == 0 ? "" : missionsBuilder.toString().substring(1);
+    public static String serializeIslandFlags(Map<IslandFlag, Byte> islandFlags){
+        JsonArray islandFlagsArray = new JsonArray();
+        islandFlags.entrySet().stream().filter(entry -> entry.getValue() == 1)
+                .forEach(entry -> islandFlagsArray.add(new JsonPrimitive(entry.getKey().getName())));
+        return gson.toJson(islandFlagsArray);
     }
 
     public static String serializeGenerator(Map<Key, Integer>[] cobbleGenerators){
-        StringBuilder generatorsBuilder = new StringBuilder();
-        for(int i = 0; i < cobbleGenerators.length; i++) {
-            StringBuilder generatorBuilder = new StringBuilder();
+        JsonArray generatorWorldsArray = new JsonArray();
+
+        for(int i = 0; i < cobbleGenerators.length; i++){
             World.Environment environment = World.Environment.values()[i];
-            cobbleGenerators[i].forEach((key, value) ->
-                    generatorBuilder.append(",").append(key).append("=").append(value));
-            generatorsBuilder.append(";").append(environment).append(":")
-                    .append(generatorBuilder.length() == 0 ? "" : generatorBuilder.toString().substring(1));
+            JsonObject generatorWorldObject = new JsonObject();
+            JsonArray ratesArray = new JsonArray();
+
+            generatorWorldObject.addProperty("env", environment.name());
+            generatorWorldObject.add("rates", ratesArray);
+
+            cobbleGenerators[i].forEach((key, value) -> {
+                JsonObject rateObject = new JsonObject();
+                rateObject.addProperty("id", key.toString());
+                rateObject.addProperty("rate", value);
+                ratesArray.add(rateObject);
+            });
         }
-        return generatorsBuilder.length() == 0 ? "" : generatorsBuilder.toString().substring(1);
+
+        return gson.toJson(generatorWorldsArray);
     }
 
     public static String serializeLocations(Map<World.Environment, Location> locations){
-        StringBuilder locationsBuilder = new StringBuilder();
-        for(Map.Entry<World.Environment, Location> entry : locations.entrySet()){
-            Location loc = entry.getValue();
-            String locationString = loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw() + "," + loc.getPitch();
-            locationsBuilder.append(";").append(entry.getKey().name().toLowerCase()).append("=").append(locationString);
-        }
-        return locationsBuilder.length() == 0 ? "" : locationsBuilder.substring(1);
+        JsonArray locationsArray = new JsonArray();
+        locations.forEach((env, location) -> {
+            JsonObject locationObject = new JsonObject();
+            locationObject.addProperty("env", env.name());
+            locationObject.addProperty("location", FileUtils.fromLocation(location));
+            locationsArray.add(locationObject);
+        });
+        return gson.toJson(locationsArray);
     }
 
     public static String serializeEffects(Map<PotionEffectType, Integer> effects){
-        StringBuilder islandEffects = new StringBuilder();
-        effects.forEach((potionEffectType, level) ->
-                islandEffects.append(",").append(potionEffectType.getName()).append("=").append(level));
-        return islandEffects.length() == 0 ? "" : islandEffects.toString().substring(1);
+        JsonArray effectsArray = new JsonArray();
+        effects.forEach((potionEffectType, level) -> {
+            JsonObject effectObject = new JsonObject();
+            effectObject.addProperty("type", potionEffectType.getName());
+            effectObject.addProperty("level", level);
+            effectsArray.add(effectObject);
+        });
+        return gson.toJson(effectsArray);
     }
 
-    public static String serializeIslandChest(SyncedObject<IslandChest[]> islandChest){
-        return islandChest.readAndGet(IslandSerializer::serializeIslandChest);
-    }
-
-    public static String serializeIslandChest(IslandChest[] islandChest){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(IslandChest _islandChest : islandChest) {
-            if(_islandChest != null) {
-                stringBuilder.append("\n").append(ItemUtils.serialize(_islandChest.getContents()));
+    public static String serializeIslandChest(IslandChest[] islandChests){
+        JsonArray islandChestsArray = new JsonArray();
+        for (IslandChest islandChest : islandChests) {
+            if(islandChest != null) {
+                JsonObject islandChestObject = new JsonObject();
+                islandChestObject.addProperty("index", islandChest.getIndex());
+                islandChestObject.addProperty("contents", ItemUtils.serialize(islandChest.getContents()));
+                islandChestsArray.add(islandChestObject);
             }
         }
-
-        return stringBuilder.length() == 0 ? "" : stringBuilder.substring(1);
+        return gson.toJson(islandChestsArray);
     }
 
-    public static String serializeRoleLimits(Map<PlayerRole, Integer> roles){
-        StringBuilder rolelimits = new StringBuilder();
-        roles.forEach((playerRole, limit) ->
-                rolelimits.append(",").append(playerRole.getId()).append("=").append(limit));
-        return rolelimits.length() == 0 ? "" : rolelimits.toString().substring(1);
+    public static String serializeRoleLimits(Map<PlayerRole, Integer> roleLimits){
+        JsonArray roleLimitsArray = new JsonArray();
+        roleLimits.forEach((role, limit) -> {
+            JsonObject roleLimitObject = new JsonObject();
+            roleLimitObject.addProperty("id", role.getId());
+            roleLimitObject.addProperty("limit", limit);
+            roleLimitsArray.add(roleLimitObject);
+        });
+        return gson.toJson(roleLimitsArray);
     }
 
     public static String serializeWarpCategories(Map<String, WarpCategory> warpCategories){
-        StringBuilder warpCategoriesBuilder = new StringBuilder();
-        warpCategories.values().forEach(warpCategory ->
-            warpCategoriesBuilder.append(";").append(warpCategory.getName()).append("=")
-                    .append(warpCategory.getSlot()).append("=")
-                    .append(ItemUtils.serializeItem(warpCategory.getRawIcon()))
-        );
-        return warpCategoriesBuilder.length() == 0 ? "" : warpCategoriesBuilder.toString().substring(1);
+        JsonArray warpCategoriesArray = new JsonArray();
+        warpCategories.values().forEach(warpCategory -> {
+            JsonObject warpCategoryObject = new JsonObject();
+            warpCategoryObject.addProperty("name", warpCategory.getName());
+            warpCategoryObject.addProperty("slot", warpCategory.getSlot());
+            warpCategoryObject.addProperty("icon", ItemUtils.serializeItem(warpCategory.getRawIcon()));
+            warpCategoriesArray.add(warpCategoryObject);
+        });
+        return gson.toJson(warpCategoriesArray);
     }
 
 }
