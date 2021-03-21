@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
@@ -17,7 +18,14 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     protected final Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, "");
+        this(superiorPlayer, island, (JsonArray) null);
+    }
+
+    public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, JsonArray permsArray){
+        this.superiorPlayer = superiorPlayer;
+        this.island = island;
+        if(permsArray != null)
+            deserialize(permsArray);
     }
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, String permissions){
@@ -48,11 +56,22 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         JsonArray permsArray = new JsonArray();
         privileges.entries().forEach(entry -> {
             JsonObject permObject = new JsonObject();
-            permObject.addProperty("privilege", entry.getKey().getName());
+            permObject.addProperty("name", entry.getKey().getName());
             permObject.addProperty("status", entry.getValue().toString());
             permsArray.add(permObject);
         });
         return permsArray;
+    }
+
+    private void deserialize(JsonArray permsArray){
+        for(JsonElement permElement : permsArray){
+            try {
+                JsonObject permObject = permElement.getAsJsonObject();
+                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
+                PrivilegeStatus privilegeStatus = PrivilegeStatus.valueOf(permObject.get("status").getAsString());
+                privileges.add(islandPrivilege, privilegeStatus);
+            }catch (Exception ignored){}
+        }
     }
 
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {

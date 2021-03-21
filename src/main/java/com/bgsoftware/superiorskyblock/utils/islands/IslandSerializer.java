@@ -127,7 +127,7 @@ public final class IslandSerializer {
         JsonArray upgradesArray = new JsonArray();
         upgrades.forEach((upgrade, level) -> {
             JsonObject upgradeObject = new JsonObject();
-            upgradeObject.addProperty("upgrade", upgrade);
+            upgradeObject.addProperty("name", upgrade);
             upgradeObject.addProperty("level", level);
             upgradesArray.add(upgradeObject);
         });
@@ -197,6 +197,8 @@ public final class IslandSerializer {
                 rateObject.addProperty("rate", value);
                 ratesArray.add(rateObject);
             });
+
+            generatorWorldsArray.add(generatorWorldObject);
         }
 
         return gson.toJson(generatorWorldsArray);

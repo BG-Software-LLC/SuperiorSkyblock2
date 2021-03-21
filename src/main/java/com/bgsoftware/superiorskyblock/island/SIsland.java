@@ -213,7 +213,7 @@ public final class SIsland implements Island {
             IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
             IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
             IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-            IslandDeserializer.deserializeSettings(resultSet.getString("settings"), this.islandSettings);
+            IslandDeserializer.deserializeIslandFlags(resultSet.getString("settings"), this.islandSettings);
             IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
             IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
             IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
