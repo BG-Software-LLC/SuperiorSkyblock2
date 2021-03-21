@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature Requests
+    url: https://github.com/OmerBenGera/SuperiorSkyblock2/discussions
+    about: Create feature requests, any posted in issue tracker will be removed.
