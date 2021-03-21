@@ -55,7 +55,7 @@ public final class IslandSerializer {
         playerRoles.forEach((key, value) -> reorderRoles.computeIfAbsent(value, s -> new HashSet<>()).add(key));
 
         reorderRoles.entries().forEach(entry ->
-                permissionNodes.append(",").append(entry.getKey().toString()).append("=").append(getAsStatementString(entry.getValue())));
+                permissionNodes.append(",").append(entry.getKey().getId()).append("=").append(getAsStatementString(entry.getValue())));
 
         reorderRoles.delete();
 
