@@ -208,8 +208,10 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission){
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return mission.getRequiredMissions().stream().allMatch(_mission ->
-                _mission != null && hasCompleted(superiorPlayer, plugin.getMissions().getMission(_mission)));
+        return mission.getRequiredMissions().stream().allMatch(_mission -> {
+            Mission<?> missionToCheck = _mission == null ? null : plugin.getMissions().getMission(_mission);
+            return missionToCheck != null && hasCompleted(superiorPlayer, missionToCheck);
+        });
     }
 
     @Override
