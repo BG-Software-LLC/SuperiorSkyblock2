@@ -66,6 +66,8 @@ public final class SQLHelper {
                 config.setConnectionTimeout(10000);
                 config.setIdleTimeout(600000);
                 config.setMaxLifetime(1800000);
+                config.addDataSourceProperty("characterEncoding","utf8");
+                config.addDataSourceProperty("useUnicode","true");
 
                 dataSource = new HikariDataSource(config);
 
