@@ -50,7 +50,7 @@ public final class IslandDeserializer {
     }
 
     private static <T> T decode(String raw, Class<T> typeOf) throws JsonSyntaxException {
-        if(raw == null) throw new JsonSyntaxException("");
+        if(raw == null || raw.isEmpty()) throw new JsonSyntaxException("");
         return gson.fromJson(raw, typeOf);
     }
 
@@ -252,7 +252,7 @@ public final class IslandDeserializer {
         try{
             JsonArray generatorWorldsArray = decode(generator, JsonArray.class);
             generatorWorldsArray.forEach(generatorWorldElement -> {
-                JsonObject generatorWorldObject = generatorWorldsArray.getAsJsonObject();
+                JsonObject generatorWorldObject = generatorWorldElement.getAsJsonObject();
                 try{
                     int i = World.Environment.valueOf(generatorWorldObject.get("env").getAsString()).ordinal();
                     generatorWorldObject.getAsJsonArray("rates").forEach(rateElement -> {
