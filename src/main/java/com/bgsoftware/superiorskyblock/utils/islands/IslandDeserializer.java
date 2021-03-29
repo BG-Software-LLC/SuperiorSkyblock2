@@ -343,8 +343,8 @@ public final class IslandDeserializer {
                 WarpCategory warpCategory = island.getWarpCategory(name);
 
                 if(warpCategory != null){
+                    if(warpCategory.getWarps().isEmpty()) {
                         island.deleteCategory(warpCategory);
-                        if(warpCategory.getWarps().isEmpty()){
                         return;
                     }
 
