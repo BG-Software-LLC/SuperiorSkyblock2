@@ -137,11 +137,8 @@ public final class IslandDeserializer {
                     return;
 
                 WarpCategory warpCategory = null;
-                if(warpObject.has("category")){
-                    String warpCategoryName = IslandUtils.getWarpName(warpObject.get("category").getAsString());
-                    if(!warpCategoryName.isEmpty())
-                        warpCategory = island.createWarpCategory(warpCategoryName);
-                }
+                if(warpObject.has("category"))
+                    warpCategory = island.createWarpCategory(warpObject.get("category").getAsString());
 
                 Location location = FileUtils.toLocation(warpObject.get("location").getAsString());
                 boolean privateWarp = warpObject.get("private").getAsInt() == 1;
@@ -238,9 +235,11 @@ public final class IslandDeserializer {
         try{
             JsonArray islandFlagsArray = decode(settings, JsonArray.class);
             islandFlagsArray.forEach(islandFlagElement -> {
+                JsonObject islandFlagObject = islandFlagElement.getAsJsonObject();
                 try{
-                    IslandFlag islandFlag = IslandFlag.getByName(islandFlagElement.getAsString());
-                    islandFlags.add(islandFlag, (byte) 1);
+                    IslandFlag islandFlag = IslandFlag.getByName(islandFlagObject.get("name").getAsString());
+                    byte status = islandFlagObject.get("status").getAsByte();
+                    islandFlags.add(islandFlag, status);
                 }catch (Exception ignored){}
             });
         }catch (JsonSyntaxException ex){
@@ -255,11 +254,11 @@ public final class IslandDeserializer {
                 JsonObject generatorWorldObject = generatorWorldElement.getAsJsonObject();
                 try{
                     int i = World.Environment.valueOf(generatorWorldObject.get("env").getAsString()).ordinal();
-                    generatorWorldObject.getAsJsonArray("rates").forEach(rateElement -> {
-                        JsonObject rateObject = rateElement.getAsJsonObject();
-                        Key blockKey = Key.of(rateObject.get("id").getAsString());
-                        int rate = rateObject.get("rate").getAsInt();
-                        cobbleGenerator[i].write(_cobbleGenerator ->
+                    generatorWorldObject.getAsJsonArray("rates").forEach(generatorElement -> {
+                        JsonObject generatorObject = generatorElement.getAsJsonObject();
+                        Key blockKey = Key.of(generatorObject.get("id").getAsString());
+                        int rate = generatorObject.get("rate").getAsInt();
+                        (cobbleGenerator[i] = SyncedObject.of(new KeyMap<>())).write(_cobbleGenerator ->
                                 _cobbleGenerator.put(blockKey, new UpgradeValue<>(rate, n -> n < 0)));
                     });
                 }catch (Exception ignored){}
@@ -344,8 +343,8 @@ public final class IslandDeserializer {
                 WarpCategory warpCategory = island.getWarpCategory(name);
 
                 if(warpCategory != null){
-                    if(warpCategory.getWarps().isEmpty()){
                         island.deleteCategory(warpCategory);
+                        if(warpCategory.getWarps().isEmpty()){
                         return;
                     }
 

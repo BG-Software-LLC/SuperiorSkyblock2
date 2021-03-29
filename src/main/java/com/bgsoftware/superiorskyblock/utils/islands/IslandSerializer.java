@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -175,8 +176,12 @@ public final class IslandSerializer {
 
     public static String serializeIslandFlags(Map<IslandFlag, Byte> islandFlags){
         JsonArray islandFlagsArray = new JsonArray();
-        islandFlags.entrySet().stream().filter(entry -> entry.getValue() == 1)
-                .forEach(entry -> islandFlagsArray.add(new JsonPrimitive(entry.getKey().getName())));
+        islandFlags.forEach((islandFlag, status) -> {
+            JsonObject islandFlagObject = new JsonObject();
+            islandFlagObject.addProperty("name", islandFlag.getName());
+            islandFlagObject.addProperty("status", status);
+            islandFlagsArray.add(islandFlagObject);
+        });
         return gson.toJson(islandFlagsArray);
     }
 
@@ -260,6 +265,24 @@ public final class IslandSerializer {
             warpCategoriesArray.add(warpCategoryObject);
         });
         return gson.toJson(warpCategoriesArray);
+    }
+
+    public static String serializeDirtyChunks(Set<ChunkPosition> dirtyChunks){
+        JsonObject dirtyChunksObject = new JsonObject();
+        dirtyChunks.forEach(chunkPosition -> {
+            JsonArray dirtyChunksArray;
+
+            if(dirtyChunksObject.has(chunkPosition.getWorldName())){
+                dirtyChunksArray = dirtyChunksObject.getAsJsonArray(chunkPosition.getWorldName());
+            }
+            else{
+                dirtyChunksArray = new JsonArray();
+                dirtyChunksObject.add(chunkPosition.getWorldName(), dirtyChunksArray);
+            }
+
+            dirtyChunksArray.add(new JsonPrimitive(chunkPosition.getX() + "," + chunkPosition.getZ()));
+        });
+        return gson.toJson(dirtyChunksObject);
     }
 
 }

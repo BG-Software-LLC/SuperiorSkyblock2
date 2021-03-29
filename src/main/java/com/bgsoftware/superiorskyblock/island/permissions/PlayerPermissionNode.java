@@ -68,7 +68,7 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
             try {
                 JsonObject permObject = permElement.getAsJsonObject();
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
-                PrivilegeStatus privilegeStatus = PrivilegeStatus.valueOf(permObject.get("status").getAsString());
+                PrivilegeStatus privilegeStatus = PrivilegeStatus.of(permObject.get("status").getAsString());
                 privileges.add(islandPrivilege, privilegeStatus);
             }catch (Exception ignored){}
         }
