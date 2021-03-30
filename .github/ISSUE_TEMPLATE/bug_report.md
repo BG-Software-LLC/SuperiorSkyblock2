@@ -2,7 +2,7 @@
 name: Bug report
 about: Report a bug in the plugin
 title: ''
-labels: Bug Report, Needs investigation
+labels: Bug Report, Pending
 assignees: OmerBenGera
 
 ---
