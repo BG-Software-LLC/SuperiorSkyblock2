@@ -35,6 +35,7 @@ import net.minecraft.server.v1_15_R1.ChunkConverter;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_15_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_15_R1.ChunkSection;
+import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.GameRules;
 import net.minecraft.server.v1_15_R1.HeightMap;
@@ -416,7 +417,10 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
             Arrays.fill(chunk.getSections(), Chunk.a);
 
             for(int i = 0; i < chunk.entitySlices.length; i++) {
-                chunk.entitySlices[i].forEach(entity -> entity.dead = true);
+                chunk.entitySlices[i].forEach(entity -> {
+                    if(!(entity instanceof EntityHuman))
+                        entity.dead = true;
+                });
                 chunk.entitySlices[i] = new UnsafeList<>();
             }
 

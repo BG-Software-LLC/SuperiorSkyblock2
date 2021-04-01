@@ -415,7 +415,10 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
 
             if(chunk instanceof Chunk) {
                 for(int i = 0; i < ((Chunk) chunk).entitySlices.length; i++) {
-                    ((Chunk) chunk).entitySlices[i].forEach(entity -> entity.dead = true);
+                    ((Chunk) chunk).entitySlices[i].forEach(entity -> {
+                        if(!(entity instanceof EntityHuman))
+                            entity.dead = true;
+                    });
                     ((Chunk) chunk).entitySlices[i] = new UnsafeList<>();
                 }
 

@@ -36,6 +36,7 @@ import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R2.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.Entity;
+import net.minecraft.server.v1_16_R2.EntityHuman;
 import net.minecraft.server.v1_16_R2.EnumSkyBlock;
 import net.minecraft.server.v1_16_R2.GameRules;
 import net.minecraft.server.v1_16_R2.HeightMap;
@@ -432,7 +433,10 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
 
             try {
                 for(int i = 0; i < chunk.entitySlices.length; i++) {
-                    chunk.entitySlices[i].forEach(entity -> entity.dead = true);
+                    chunk.entitySlices[i].forEach(entity -> {
+                        if(!(entity instanceof EntityHuman))
+                            entity.dead = true;
+                    });
                     chunk.entitySlices[i] = new UnsafeList<>();
                 }
             }catch (Throwable ex){
@@ -440,7 +444,10 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
                     Collection[] arr = ENTITY_SLICE_ARRAY.get(chunk);
                     for(int i = 0; i < arr.length; i++) {
                         // noinspection unchecked
-                        arr[i].forEach(entity -> ((Entity) entity).dead = true);
+                        arr[i].forEach(entity -> {
+                            if(!(entity instanceof EntityHuman))
+                                ((Entity) entity).dead = true;
+                        });
                         arr[i] = new net.minecraft.server.v1_16_R2.EntitySlice<>(Entity.class);
                     }
                 }catch (Exception ex2){

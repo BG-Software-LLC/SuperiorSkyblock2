@@ -271,7 +271,10 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
             Arrays.fill(chunk.getSections(), Chunk.a);
 
             for(int i = 0; i < chunk.entitySlices.length; i++) {
-                chunk.entitySlices[i].forEach(entity -> entity.dead = true);
+                chunk.entitySlices[i].forEach(entity -> {
+                    if(!(entity instanceof EntityHuman))
+                        entity.dead = true;
+                });
                 chunk.entitySlices[i] = new UnsafeList<>();
             }
 

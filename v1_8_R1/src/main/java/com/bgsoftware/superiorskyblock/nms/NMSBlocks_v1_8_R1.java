@@ -23,6 +23,7 @@ import net.minecraft.server.v1_8_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R1.ChunkProviderServer;
 import net.minecraft.server.v1_8_R1.ChunkSection;
 import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R1.EntityHuman;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.EnumSkyBlock;
 import net.minecraft.server.v1_8_R1.IBlockData;
@@ -300,7 +301,10 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
 
             for(int i = 0; i < chunk.entitySlices.length; i++) {
                 // noinspection unchecked
-                chunk.entitySlices[i].forEach(entity -> ((Entity) entity).dead = true);
+                chunk.entitySlices[i].forEach(entity -> {
+                    if(!(entity instanceof EntityHuman))
+                        ((Entity) entity).dead = true;
+                });
                 chunk.entitySlices[i] = new UnsafeList<>();
             }
 
