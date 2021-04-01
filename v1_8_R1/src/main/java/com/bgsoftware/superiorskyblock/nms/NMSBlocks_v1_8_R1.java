@@ -22,6 +22,8 @@ import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R1.ChunkProviderServer;
 import net.minecraft.server.v1_8_R1.ChunkSection;
+import net.minecraft.server.v1_8_R1.Entity;
+import net.minecraft.server.v1_8_R1.EntityHuman;
 import net.minecraft.server.v1_8_R1.EntityPlayer;
 import net.minecraft.server.v1_8_R1.EnumSkyBlock;
 import net.minecraft.server.v1_8_R1.IBlockData;
@@ -297,8 +299,14 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
             Arrays.fill(chunk.getSections(), null);
 
-            for(int i = 0; i < chunk.entitySlices.length; i++)
+            for(int i = 0; i < chunk.entitySlices.length; i++) {
+                // noinspection unchecked
+                chunk.entitySlices[i].forEach(entity -> {
+                    if(!(entity instanceof EntityHuman))
+                        ((Entity) entity).dead = true;
+                });
                 chunk.entitySlices[i] = new UnsafeList<>();
+            }
 
             //noinspection all
             new HashSet<>((Set<BlockPosition>) chunk.tileEntities.keySet()).forEach(chunk.world::t);

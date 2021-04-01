@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -9,6 +11,8 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import me.mrCookieSlime.Slimefun.cscorelib2.config.Config;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionManager;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionModule;
@@ -20,7 +24,11 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Map;
+
 public final class SlimefunHook implements ProtectionModule, Listener {
+
+    private static final ReflectField<Map<Location, Config>> BLOCK_STORAGE_STORAGE = new ReflectField<>(BlockStorage.class, Map.class, "storage");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -78,6 +86,22 @@ public final class SlimefunHook implements ProtectionModule, Listener {
             e.setCancelled(true);
         else
             BlocksListener.handleBlockBreak(plugin, e.getBlock());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onChunkWipe(IslandChunkResetEvent e){
+        BlockStorage blockStorage = BlockStorage.getStorage(e.getWorld());
+
+        if(blockStorage == null)
+            return;
+
+        Map<Location, Config> storageMap = BLOCK_STORAGE_STORAGE.get(blockStorage);
+
+        if(storageMap == null)
+            return;
+
+        storageMap.keySet().stream().filter(location -> location.getBlockX() >> 4 == e.getChunkX() &&
+                location.getBlockZ() >> 4 == e.getChunkZ()).forEach(BlockStorage::clearBlockInfo);
     }
 
     public static void register(SuperiorSkyblockPlugin plugin){
