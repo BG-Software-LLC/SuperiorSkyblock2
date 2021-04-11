@@ -15,8 +15,6 @@ import java.util.function.Predicate;
 
 public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingType> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private static final Predicate<Island> ISLANDS_PREDICATE = island -> !island.isIgnored();
 
     private final Registry<IslandPosition, Island> islandsByPositions = createRegistry();
@@ -39,7 +37,7 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
         Location islandLocation = island.getCenter(World.Environment.NORMAL);
         islandsByPositions.add(IslandPosition.of(islandLocation), island);
 
-        if(plugin.getProviders().hasCustomWorldsSupport()){
+        if(SuperiorSkyblockPlugin.getPlugin().getProviders().hasCustomWorldsSupport()){
             runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
                     location -> islandsByPositions.add(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
@@ -58,7 +56,7 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
             Location islandLocation = island.getCenter(World.Environment.NORMAL);
             islandsByPositions.remove(IslandPosition.of(islandLocation));
 
-            if(plugin.getProviders().hasCustomWorldsSupport()){
+            if(SuperiorSkyblockPlugin.getPlugin().getProviders().hasCustomWorldsSupport()){
                 runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
                         location -> islandsByPositions.remove(IslandPosition.of(location)));
                 runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
