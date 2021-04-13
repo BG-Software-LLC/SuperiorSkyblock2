@@ -22,6 +22,8 @@ import java.sql.*;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.bgsoftware.superiorskyblock.island.SIsland.ISLAND_ENVIRONMENTS;
+
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
 
@@ -350,7 +352,7 @@ public final class DataHandler extends AbstractHandler {
         for(int i = 0; i < plugin.getSettings().defaultGenerator.length; i++) {
             if(plugin.getSettings().defaultGenerator[i] != null) {
                 StringBuilder generatorBuilder = new StringBuilder();
-                World.Environment environment = World.Environment.values()[i];
+                World.Environment environment = ISLAND_ENVIRONMENTS[i];
                 plugin.getSettings().defaultGenerator[i].forEach((key, value) ->
                         generatorBuilder.append(",").append(key).append("=").append(value));
                 generatorsBuilder.append(";").append(environment).append(":")

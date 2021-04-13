@@ -13,6 +13,8 @@ import org.bukkit.World;
 
 import java.util.Map;
 
+import static com.bgsoftware.superiorskyblock.island.SIsland.ISLAND_ENVIRONMENTS;
+
 public final class SIslandDataHandler extends DatabaseObject implements IslandDataHandler {
 
     private final Island island;
@@ -507,7 +509,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
 
     private Map<Key, Integer>[] getIslandGenerators(){
         Map<Key, Integer>[] customGeneratorAmounts = new Map[3];
-        for(World.Environment environment : World.Environment.values())
+        for(World.Environment environment : ISLAND_ENVIRONMENTS)
             customGeneratorAmounts[environment.ordinal()] = island.getCustomGeneratorAmounts(environment);
         return customGeneratorAmounts;
     }

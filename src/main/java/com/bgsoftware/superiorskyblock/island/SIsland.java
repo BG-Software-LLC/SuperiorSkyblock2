@@ -109,7 +109,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
-    private static final World.Environment[] ISLAND_ENVIRONMENTS = new World.Environment[]{
+    public static final World.Environment[] ISLAND_ENVIRONMENTS = new World.Environment[]{
             World.Environment.NORMAL,
             World.Environment.NETHER,
             World.Environment.THE_END
@@ -795,7 +795,7 @@ public final class SIsland implements Island {
     public List<Chunk> getAllChunks(boolean onlyProtected){
         List<Chunk> chunks = new ArrayList<>();
 
-        for(World.Environment environment : World.Environment.values()) {
+        for(World.Environment environment : ISLAND_ENVIRONMENTS) {
             try {
                 chunks.addAll(getAllChunks(environment, onlyProtected));
             }catch(NullPointerException ignored){}
@@ -825,7 +825,7 @@ public final class SIsland implements Island {
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
         List<Chunk> chunks = new ArrayList<>();
 
-        for(World.Environment environment : World.Environment.values()) {
+        for(World.Environment environment : ISLAND_ENVIRONMENTS) {
             try {
                 chunks.addAll(getLoadedChunks(environment, onlyProtected, noEmptyChunks));
             }catch(NullPointerException ignored){}
@@ -2163,7 +2163,7 @@ public final class SIsland implements Island {
     }
 
     public void syncUpgrades(boolean overrideCustom){
-        for(World.Environment environment : World.Environment.values())
+        for(World.Environment environment : ISLAND_ENVIRONMENTS)
             clearGeneratorAmounts(environment);
         clearEffects();
         clearBlockLimits();
@@ -2412,7 +2412,7 @@ public final class SIsland implements Island {
 
         AtomicInteger amountOfEntities = new AtomicInteger(0);
 
-        for(World.Environment environment : World.Environment.values()){
+        for(World.Environment environment : ISLAND_ENVIRONMENTS){
             try{
                 chunks.addAll(getAllChunksAsync(environment, true, true, chunk ->
                         amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())

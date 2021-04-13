@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.bgsoftware.superiorskyblock.island.SIsland.ISLAND_ENVIRONMENTS;
+
 public final class IslandSerializer {
 
     private static final Gson gson = new GsonBuilder().create();
@@ -189,7 +191,7 @@ public final class IslandSerializer {
         JsonArray generatorWorldsArray = new JsonArray();
 
         for(int i = 0; i < cobbleGenerators.length; i++){
-            World.Environment environment = World.Environment.values()[i];
+            World.Environment environment = ISLAND_ENVIRONMENTS[i];
             JsonObject generatorWorldObject = new JsonObject();
             JsonArray ratesArray = new JsonArray();
 
