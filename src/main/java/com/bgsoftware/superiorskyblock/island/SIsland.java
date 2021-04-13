@@ -109,6 +109,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
+    private static final World.Environment[] ISLAND_ENVIRONMENTS = new World.Environment[]{
+            World.Environment.NORMAL,
+            World.Environment.NETHER,
+            World.Environment.THE_END
+    };
+
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
 
@@ -716,7 +722,7 @@ public final class SIsland implements Island {
     public Map<World.Environment, Location> getTeleportLocations(){
         return teleportLocations.readAndGet(teleportLocations -> {
             Map<World.Environment, Location> map = new HashMap<>();
-            for (World.Environment env : World.Environment.values()) {
+            for (World.Environment env : ISLAND_ENVIRONMENTS) {
                 if(teleportLocations[env.ordinal()] != null)
                     map.put(env, teleportLocations[env.ordinal()]);
             }
