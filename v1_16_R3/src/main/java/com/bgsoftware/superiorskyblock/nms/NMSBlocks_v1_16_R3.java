@@ -25,7 +25,6 @@ import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
 import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.BlockProperties;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
@@ -139,7 +138,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
         fieldNameToName.put("aK", "slab-type");
 
         try{
-            for(Field field : BlockProperties.class.getFields()){
+            // Fixes BlockProperties being private-class in some versions of Yatopia causing illegal access errors.
+            Class<?> blockPropertiesClass = Class.forName("net.minecraft.server.v1_16_R3.BlockProperties");
+            for(Field field : blockPropertiesClass.getFields()){
                 Object value = field.get(null);
                 if(value instanceof IBlockState) {
                     register(fieldNameToName.getOrDefault(field.getName(), ((IBlockState) value).getName()),
