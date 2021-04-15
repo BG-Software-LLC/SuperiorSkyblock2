@@ -100,7 +100,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
                     for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                         entityLimits.put(entity.toUpperCase(), new UpgradeValue<>(levelSection.getInt("entity-limits." + entity), true));
                 }
-                KeyMap<UpgradeValue<Integer>>[] generatorRates = new KeyMap[3];
+                KeyMap<UpgradeValue<Integer>>[] generatorRates = new KeyMap[World.Environment.values().length];
                 if(levelSection.contains("generator-rates")){
                     for(String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
                         try{
