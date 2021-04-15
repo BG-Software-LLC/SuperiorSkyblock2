@@ -109,12 +109,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
-    public static final World.Environment[] ISLAND_ENVIRONMENTS = new World.Environment[]{
-            World.Environment.NORMAL,
-            World.Environment.NETHER,
-            World.Environment.THE_END
-    };
-
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
 
@@ -163,7 +157,7 @@ public final class SIsland implements Island {
     private final SyncedObject<BigDecimal> bonusLevel = SyncedObject.of(BigDecimal.ZERO);
     private final SyncedObject<String> discord = SyncedObject.of("None");
     private final SyncedObject<String> paypal = SyncedObject.of("None");
-    private final SyncedObject<Location[]> teleportLocations = SyncedObject.of(new Location[3]);
+    private final SyncedObject<Location[]> teleportLocations = SyncedObject.of(new Location[World.Environment.values().length]);
     private final SyncedObject<Location> visitorsLocation = SyncedObject.of(null);
     private final SyncedObject<Boolean> locked = SyncedObject.of(false);
     private final SyncedObject<String> islandName = SyncedObject.of("");
@@ -187,7 +181,7 @@ public final class SIsland implements Island {
 
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits = SyncedObject.of(new KeyMap<>());
     @SuppressWarnings("all")
-    private final SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGeneratorValues = new SyncedObject[3];
+    private final SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGeneratorValues = new SyncedObject[World.Environment.values().length];
     private final SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits = SyncedObject.of(new KeyMap<>());
     private final SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects = SyncedObject.of(new HashMap<>());
 
@@ -722,7 +716,7 @@ public final class SIsland implements Island {
     public Map<World.Environment, Location> getTeleportLocations(){
         return teleportLocations.readAndGet(teleportLocations -> {
             Map<World.Environment, Location> map = new HashMap<>();
-            for (World.Environment env : ISLAND_ENVIRONMENTS) {
+            for (World.Environment env : World.Environment.values()) {
                 if(teleportLocations[env.ordinal()] != null)
                     map.put(env, teleportLocations[env.ordinal()]);
             }
@@ -795,7 +789,7 @@ public final class SIsland implements Island {
     public List<Chunk> getAllChunks(boolean onlyProtected){
         List<Chunk> chunks = new ArrayList<>();
 
-        for(World.Environment environment : ISLAND_ENVIRONMENTS) {
+        for(World.Environment environment : World.Environment.values()) {
             try {
                 chunks.addAll(getAllChunks(environment, onlyProtected));
             }catch(NullPointerException ignored){}
@@ -825,7 +819,7 @@ public final class SIsland implements Island {
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
         List<Chunk> chunks = new ArrayList<>();
 
-        for(World.Environment environment : ISLAND_ENVIRONMENTS) {
+        for(World.Environment environment : World.Environment.values()) {
             try {
                 chunks.addAll(getLoadedChunks(environment, onlyProtected, noEmptyChunks));
             }catch(NullPointerException ignored){}
@@ -2163,7 +2157,7 @@ public final class SIsland implements Island {
     }
 
     public void syncUpgrades(boolean overrideCustom){
-        for(World.Environment environment : ISLAND_ENVIRONMENTS)
+        for(World.Environment environment : World.Environment.values())
             clearGeneratorAmounts(environment);
         clearEffects();
         clearBlockLimits();
@@ -2412,7 +2406,7 @@ public final class SIsland implements Island {
 
         AtomicInteger amountOfEntities = new AtomicInteger(0);
 
-        for(World.Environment environment : ISLAND_ENVIRONMENTS){
+        for(World.Environment environment : World.Environment.values()){
             try{
                 chunks.addAll(getAllChunksAsync(environment, true, true, chunk ->
                         amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())

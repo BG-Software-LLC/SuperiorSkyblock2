@@ -23,8 +23,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static com.bgsoftware.superiorskyblock.island.SIsland.ISLAND_ENVIRONMENTS;
-
 public final class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
@@ -232,7 +230,7 @@ public final class CmdAdminShow implements IAdminIslandCommand {
 
         // Island generator rates
         if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)){
-            for(World.Environment environment : ISLAND_ENVIRONMENTS) {
+            for(World.Environment environment : World.Environment.values()) {
                 StringBuilder generatorString = new StringBuilder();
                 for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
                     Key key = Key.of(entry.getKey());

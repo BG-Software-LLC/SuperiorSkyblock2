@@ -339,7 +339,7 @@ public final class SettingsHandler extends AbstractHandler {
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         defaultSettings = cfg.getStringList("default-settings");
-        defaultGenerator = new KeyMap[3];
+        defaultGenerator = new KeyMap[World.Environment.values().length];
         if(cfg.isConfigurationSection("default-values.generator")){
             for(String env : cfg.getConfigurationSection("default-values.generator").getKeys(false)){
                 try{
