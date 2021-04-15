@@ -52,7 +52,7 @@ public final class SkinsRestorerHook {
             try {
                 SkinStorage skinStorage = SkinsRestorer.getInstance().getSkinStorage();
                 return (Property) skinStorage.getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
-            }catch (SkinRequestException ex){
+            }catch (SkinRequestException | NullPointerException ex){
                 return null;
             }
         }
