@@ -63,12 +63,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class GridHandler extends AbstractHandler implements GridManager {
 
-    private final IslandRegistry islands = new IslandRegistry();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Registry<UUID, IslandPreview> islandPreviews = Registry.createRegistry();
     private final Set<UUID> customWorlds = Sets.newHashSet();
     private final StackedBlocksHandler stackedBlocks;
+    private final IslandRegistry islands;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -84,6 +84,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public GridHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
         stackedBlocks = new StackedBlocksHandler(plugin);
+        islands = new IslandRegistry(plugin);
     }
 
     @Override
