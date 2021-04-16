@@ -4,6 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.properties.Property;
+import net.skinsrestorer.shared.storage.Config;
+import net.skinsrestorer.shared.storage.Locale;
+import net.skinsrestorer.shared.storage.MySQL;
 import org.bukkit.Bukkit;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
@@ -61,12 +64,40 @@ public final class SkinsRestorerHook {
 
     private static final class SkinsRestorerNew implements ISkinsRestorer {
 
+        private final net.skinsrestorer.bukkit.SkinsRestorer instance;
+
+        public SkinsRestorerNew(){
+            instance = net.skinsrestorer.bukkit.SkinsRestorer.getInstance();
+            if(instance.isBungeeEnabled()){
+                // We want to adjust config options to also work if bungee mode is enabled
+
+                Config.load(instance.getConfigPath(), instance.getResource("config.yml"));
+                Locale.load(instance.getConfigPath());
+
+                if (Config.MYSQL_ENABLED) {
+                    try {
+                        MySQL mysql = new MySQL(
+                                Config.MYSQL_HOST,
+                                Config.MYSQL_PORT,
+                                Config.MYSQL_DATABASE,
+                                Config.MYSQL_USERNAME,
+                                Config.MYSQL_PASSWORD,
+                                Config.MYSQL_CONNECTIONOPTIONS
+                        );
+                        mysql.openConnection();
+                        mysql.createTable();
+                        instance.getSkinStorage().setMysql(mysql);
+                    } catch (Exception ignored) { }
+                } else {
+                    instance.getSkinStorage().loadFolders(instance.getDataFolder());
+                }
+            }
+        }
+
         @Override
         public Property getSkin(SuperiorPlayer superiorPlayer) {
             try {
-                net.skinsrestorer.shared.storage.SkinStorage skinStorage =
-                        net.skinsrestorer.bukkit.SkinsRestorer.getInstance().getSkinStorage();
-                return (Property) skinStorage.getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
+                return (Property) instance.getSkinStorage().getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
             }catch (net.skinsrestorer.shared.exception.SkinRequestException ex){
                 return null;
             }
