@@ -80,7 +80,8 @@ public final class EntityUtils {
         if(entityEquipment == null)
             entityEquipment = plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment());
 
-        return contains(entityEquipment, itemStack);
+        return Arrays.stream(entityEquipment).anyMatch(equipmentItem -> equipmentItem != null &&
+                equipmentItem.getType() == itemStack.getType());
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity){
@@ -145,15 +146,6 @@ public final class EntityUtils {
         Class<? extends Entity> entityClass = entityType.getEntityClass();
         return entityClass != null && (Creature.class.isAssignableFrom(entityType.getEntityClass()) ||
                 Ambient.class.isAssignableFrom(entityType.getEntityClass()));
-    }
-
-    private static <T> boolean contains(T[] arr, T val){
-        for(T element : arr){
-            if(val.equals(element))
-                return true;
-        }
-
-        return false;
     }
 
 }
