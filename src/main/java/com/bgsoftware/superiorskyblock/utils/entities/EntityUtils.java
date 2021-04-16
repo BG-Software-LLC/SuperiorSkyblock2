@@ -111,18 +111,6 @@ public final class EntityUtils {
                 Key.of("MINECART" + (key.getSubKey().isEmpty() ? "" : ":" + key.getSubKey())) : key;
     }
 
-    public static EntityType getEntityTypeOrUnknown(com.bgsoftware.superiorskyblock.api.key.Key key){
-        try{
-            return EntityType.valueOf(key.toString());
-        }catch (Exception ex){
-            try{
-                return EntityType.valueOf(key.getGlobalKey());
-            }catch (Exception ignored) {}
-        }
-
-        return EntityType.UNKNOWN;
-    }
-
     public static boolean canHaveLimit(EntityType entityType){
         Class<?> entityClass = entityType.getEntityClass();
         return entityType.name().contains("MINECART") || (entityClass != null &&
