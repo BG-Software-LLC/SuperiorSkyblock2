@@ -65,6 +65,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -1239,7 +1240,8 @@ public final class SIsland implements Island {
         Executor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(calculatedChunk -> {
                 // We want to remove spawners from the chunkInfo, as it will be used later
-                calculatedChunk.getBlockCounts().remove(Key.of(Materials.SPAWNER.toBukkitType().name()));
+                calculatedChunk.getBlockCounts().removeIf(key ->
+                        key.getGlobalKey().equals(ConstantKeys.MOB_SPAWNER.getGlobalKey()));
 
                 // Load block counts
                 handleBlocksPlace(calculatedChunk.getBlockCounts(), false, blockCounts, islandWorth, islandLevel);
