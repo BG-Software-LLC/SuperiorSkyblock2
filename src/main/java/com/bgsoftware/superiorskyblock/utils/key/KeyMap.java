@@ -8,6 +8,7 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock.api.key.Key, V> implements Map<com.bgsoftware.superiorskyblock.api.key.Key, V> {
@@ -62,6 +63,10 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
     @Override
     public V remove(Object key) {
         return registry.remove(key + "");
+    }
+
+    public boolean removeIf(Predicate<com.bgsoftware.superiorskyblock.api.key.Key> predicate){
+        return registry.removeIf(str -> predicate.test(Key.of(str)));
     }
 
     public V get(ItemStack itemStack) {
