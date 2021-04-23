@@ -69,7 +69,7 @@ public final class CmdAdminSetBiome implements IAdminIslandCommand {
         if(biome == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> island.setBiome(biome)));
+        islands.forEach(island -> island.setBiome(biome));
 
         if(islands.size() > 1)
             Locale.CHANGED_BIOME_ALL.send(sender, StringUtils.format(biome.name()));
