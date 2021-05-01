@@ -744,14 +744,14 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(block);
+        island.handleBlockBreak(block, plugin.getNMSBlocks().getDefaultAmount(block));
 
         EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
 
         for(BlockFace nearbyFace : NEARBY_BLOCKS){
-            Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
-            if(!nearbyBlock.getGlobalKey().equals("AIR"))
-                nearbyBlocks.put(nearbyFace, nearbyBlock);
+            Key nearbyBlockKey = Key.of(block.getRelative(nearbyFace));
+            if(!nearbyBlockKey.getGlobalKey().equals("AIR"))
+                nearbyBlocks.put(nearbyFace, nearbyBlockKey);
         }
 
         Executor.sync(() -> {
@@ -761,8 +761,9 @@ public final class BlocksListener implements Listener {
             for(BlockFace nearbyFace : NEARBY_BLOCKS){
                 Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
                 Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
-                if(oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock))
+                if(oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
                     island.handleBlockBreak(oldNearbyBlock, 1);
+                }
             }
         }, 2L);
     }

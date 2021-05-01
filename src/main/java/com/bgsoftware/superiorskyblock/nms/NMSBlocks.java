@@ -82,4 +82,6 @@ public interface NMSBlocks {
         return block.getType().name().contains("WATER");
     }
 
+    int getDefaultAmount(Block block);
+
 }

@@ -23,6 +23,7 @@ import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockBed;
 import net.minecraft.server.v1_13_R2.BlockPosition;
 import net.minecraft.server.v1_13_R2.BlockProperties;
+import net.minecraft.server.v1_13_R2.BlockPropertySlabType;
 import net.minecraft.server.v1_13_R2.BlockStateBoolean;
 import net.minecraft.server.v1_13_R2.BlockStateEnum;
 import net.minecraft.server.v1_13_R2.BlockStateInteger;
@@ -50,6 +51,7 @@ import net.minecraft.server.v1_13_R2.PlayerChunkMap;
 import net.minecraft.server.v1_13_R2.PlayerConnection;
 import net.minecraft.server.v1_13_R2.ProtoChunk;
 import net.minecraft.server.v1_13_R2.ProtoChunkExtension;
+import net.minecraft.server.v1_13_R2.TagsBlock;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntitySign;
 import net.minecraft.server.v1_13_R2.TileEntityTypes;
@@ -388,9 +390,17 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
                             Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
+                            int blockAmount = 1;
+
+                            if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
+                                    blockData.get(BlockProperties.au) == BlockPropertySlabType.DOUBLE) {
+                                blockAmount = 2;
+                                blockData = blockData.set(BlockProperties.au, BlockPropertySlabType.BOTTOM);
+                            }
+
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
                             Key blockKey = Key.of(type.name(), location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                             if (type == Material.SPAWNER) {
                                 spawnersLocations.add(location);
                             }
@@ -574,6 +584,20 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         BlockData blockData = block.getBlockData();
 
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.Block block) {
+        IBlockData blockData = ((CraftBlock) block).getNMS();
+        Block nmsBlock =  blockData.getBlock();
+
+        // Checks for double slabs
+        if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
+                blockData.get(BlockProperties.au) == BlockPropertySlabType.DOUBLE) {
+            return 2;
+        }
+
+        return 1;
     }
 
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){

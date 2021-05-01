@@ -16,6 +16,8 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BlockDoubleStep;
+import net.minecraft.server.v1_12_R1.BlockDoubleStepAbstract;
 import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.Chunk;
@@ -29,6 +31,7 @@ import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.IChunkLoader;
 import net.minecraft.server.v1_12_R1.ITickable;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.Packet;
 import net.minecraft.server.v1_12_R1.PacketPlayOutBlockChange;
@@ -251,10 +254,22 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
                             Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
+                            int blockAmount = 1;
+
+                            if(blockData.getBlock() instanceof BlockDoubleStep) {
+                                blockAmount = 2;
+                                // Converts the block data to a regular slab
+                                MinecraftKey blockKey = Block.REGISTRY.b(blockData.getBlock());
+                                blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
+                                        .replace("double_", ""))).getBlockData()
+                                        .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                            }
+
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
                             short data = (short) blockData.getBlock().toLegacyData(blockData);
                             Key blockKey = Key.of(type, data, location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                             if (type == Material.MOB_SPAWNER) {
                                 spawnersLocations.add(location);
                             }
@@ -397,6 +412,21 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
 
             System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
         }
+    }
+
+    @Override
+    public int getDefaultAmount(org.bukkit.block.Block block) {
+        Location blockLocation = block.getLocation();
+        IBlockData blockData = ((CraftWorld) block.getWorld()).getHandle().getType(new BlockPosition(
+                blockLocation.getBlockX(), blockLocation.getBlockY(), blockLocation.getBlockZ()));
+        Block nmsBlock =  blockData.getBlock();
+
+        // Checks for double slabs
+        if(nmsBlock instanceof BlockDoubleStep) {
+            return 2;
+        }
+
+        return 1;
     }
 
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
