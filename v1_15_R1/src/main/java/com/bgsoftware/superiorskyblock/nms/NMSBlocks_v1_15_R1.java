@@ -639,7 +639,7 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
 
         // Checks for double slabs
         if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
-                blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
+                blockData.get(BlockProperties.aD) == BlockPropertySlabType.DOUBLE) {
             return 2;
         }
 
