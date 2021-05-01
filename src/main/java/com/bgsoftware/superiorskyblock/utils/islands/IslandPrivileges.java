@@ -47,6 +47,7 @@ public final class IslandPrivileges {
     public static IslandPrivilege MINECART_PLACE = IslandPrivilege.getByName("MINECART_PLACE");
     public static IslandPrivilege MONSTER_DAMAGE = IslandPrivilege.getByName("MONSTER_DAMAGE");
     public static IslandPrivilege MONSTER_SPAWN = IslandPrivilege.getByName("MONSTER_SPAWN");
+    public static IslandPrivilege NAME_ENTITY = IslandPrivilege.getByName("NAME_ENTITY");
     public static IslandPrivilege OPEN_ISLAND = IslandPrivilege.getByName("OPEN_ISLAND");
     public static IslandPrivilege PAINTING = IslandPrivilege.getByName("PAINTING");
     public static IslandPrivilege PAYPAL_SHOW = IslandPrivilege.getByName("PAYPAL_SHOW");

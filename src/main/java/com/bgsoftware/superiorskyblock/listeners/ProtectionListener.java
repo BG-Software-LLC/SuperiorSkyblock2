@@ -808,6 +808,9 @@ public final class ProtectionListener implements Listener {
                 plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
             islandPrivilege = IslandPrivileges.ANIMAL_BREED;
         }
+        else if(usedItem != null && usedItem.getType() == Material.NAME_TAG){
+            islandPrivilege = IslandPrivileges.NAME_ENTITY;
+        }
         else if(e.getRightClicked() instanceof Villager){
             islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
             closeInventory = true;
