@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.handlers.ModulesHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
@@ -90,6 +91,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final CommandsHandler commandsHandler = new CommandsHandler(this);
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
+    private final ModulesHandler modulesHandler = new ModulesHandler(this);
 
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
@@ -159,6 +161,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();
+
+            modulesHandler.loadData();
 
             EventsCaller.callPluginInitializeEvent(this);
 
