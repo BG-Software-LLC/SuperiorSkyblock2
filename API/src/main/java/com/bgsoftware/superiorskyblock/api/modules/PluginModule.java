@@ -31,10 +31,14 @@ public abstract class PluginModule {
     }
 
     public final void initModule(File dataFolder){
-        if(moduleName != null)
-            throw new RuntimeException("This module was already initialized.");
+        if(this.dataFolder != null)
+            throw new RuntimeException("The module " + moduleName + " was already initialized.");
 
         this.dataFolder = dataFolder;
+
+        if(!dataFolder.exists() && !dataFolder.mkdirs())
+            throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
+
     }
 
 }
