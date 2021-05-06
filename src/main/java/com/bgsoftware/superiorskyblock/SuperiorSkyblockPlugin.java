@@ -29,7 +29,8 @@ import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.DragonListener;
-import com.bgsoftware.superiorskyblock.listeners.GeneratorsListener;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.modules.generators.listeners.GeneratorsListener;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
@@ -176,6 +177,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
 
             reloadPlugin(true);
+
+            loadModules();
 
             try {
                 safeEventsRegister(new BlocksListener(this));
@@ -621,6 +624,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("VALUABLE_BREAK");
         IslandPrivilege.register("VILLAGER_TRADING");
         IslandPrivilege.register("WITHDRAW_MONEY");
+    }
+
+    private void loadModules(){
+        modulesHandler.registerModule(BuiltinModules.GENERATORS);
     }
 
     private void loadUpgradeCostLoaders(){

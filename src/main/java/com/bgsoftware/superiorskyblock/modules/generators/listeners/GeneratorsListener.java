@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.listeners;
+package com.bgsoftware.superiorskyblock.modules.generators.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -31,9 +31,6 @@ public final class GeneratorsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFormEvent(BlockFromToEvent e){
-        if(!plugin.getSettings().generators)
-            return;
-        
         Block block = e.getToBlock();
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
