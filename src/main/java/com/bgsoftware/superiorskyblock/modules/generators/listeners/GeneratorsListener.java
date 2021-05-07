@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.modules.generators.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.modules.generators.GeneratorsModule;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import org.bukkit.Material;
@@ -24,13 +25,18 @@ public final class GeneratorsListener implements Listener {
     };
 
     private final SuperiorSkyblockPlugin plugin;
+    private final GeneratorsModule module;
 
-    public GeneratorsListener(SuperiorSkyblockPlugin plugin){
+    public GeneratorsListener(SuperiorSkyblockPlugin plugin, GeneratorsModule module){
         this.plugin = plugin;
+        this.module = module;
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFormEvent(BlockFromToEvent e){
+        if(!module.enabled)
+            return;
+
         Block block = e.getToBlock();
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());

@@ -30,7 +30,6 @@ import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.DragonListener;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
-import com.bgsoftware.superiorskyblock.modules.generators.listeners.GeneratorsListener;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
@@ -186,7 +185,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new CustomEventsListener(this));
                 if(settingsHandler.endDragonFight)
                     safeEventsRegister(new DragonListener(this));
-                safeEventsRegister(new GeneratorsListener(this));
                 safeEventsRegister(new MenusListener(this));
                 safeEventsRegister(new PlayersListener(this));
                 safeEventsRegister(new ProtectionListener(this));
@@ -377,7 +375,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         blockValuesHandler.loadData();
         upgradesHandler.loadData();
-        missionsHandler.loadData();
 
         Locale.reload();
 
@@ -404,6 +401,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     return;
             }
         }
+
+        modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
 
         Executor.sync(() -> {
             for(Player player : Bukkit.getOnlinePlayers()) {

@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.modules;
 
-import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.modules.generators.GeneratorsModule;
 
 public final class BuiltinModules {
@@ -9,6 +8,6 @@ public final class BuiltinModules {
 
     }
 
-    public static final PluginModule GENERATORS = new GeneratorsModule();
+    public static final GeneratorsModule GENERATORS = new GeneratorsModule();
 
 }

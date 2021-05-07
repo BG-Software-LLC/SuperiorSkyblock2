@@ -16,6 +16,8 @@ public abstract class PluginModule {
 
     public abstract void onEnable(SuperiorSkyblock plugin);
 
+    public abstract void onReload(SuperiorSkyblock plugin);
+
     public abstract void onDisable();
 
     public final String getName() {
@@ -38,6 +40,11 @@ public abstract class PluginModule {
 
         if(!dataFolder.exists() && !dataFolder.mkdirs())
             throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
+
+        onPluginInit();
+    }
+
+    protected void onPluginInit(){
 
     }
 
