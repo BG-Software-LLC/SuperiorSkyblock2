@@ -16,7 +16,7 @@ public final class GeneratorsModule extends BuiltinModule {
     private boolean enabled = true;
 
     public GeneratorsModule(){
-        super("Generators");
+        super("generators");
     }
 
     @Override
