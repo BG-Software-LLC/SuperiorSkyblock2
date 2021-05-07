@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -228,22 +229,24 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append(Locale.ISLAND_INFO_ADMIN_BLOCKS_LIMITS.getMessage(locale, blocksString));
         }
 
-        // Island generator rates
-        if(!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)){
-            for(World.Environment environment : World.Environment.values()) {
-                StringBuilder generatorString = new StringBuilder();
-                for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
-                    Key key = Key.of(entry.getKey());
-                    generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                            StringUtils.format(entry.getKey()),
-                            StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
-                            island.getGeneratorAmount(key, environment))
-                    );
-                    if (!island.getCustomGeneratorAmounts(environment).containsKey(key))
-                        generatorString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-                    generatorString.append("\n");
+        if(BuiltinModules.GENERATORS.isEnabled()) {
+            // Island generator rates
+            if (!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)) {
+                for (World.Environment environment : World.Environment.values()) {
+                    StringBuilder generatorString = new StringBuilder();
+                    for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
+                        Key key = Key.of(entry.getKey());
+                        generatorString.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
+                                StringUtils.format(entry.getKey()),
+                                StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
+                                island.getGeneratorAmount(key, environment))
+                        );
+                        if (!island.getCustomGeneratorAmounts(environment).containsKey(key))
+                            generatorString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                        generatorString.append("\n");
+                    }
+                    infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString, StringUtils.format(environment.name())));
                 }
-                infoMessage.append(Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString, StringUtils.format(environment.name())));
             }
         }
 

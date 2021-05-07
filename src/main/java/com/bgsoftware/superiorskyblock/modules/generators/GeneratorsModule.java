@@ -3,6 +3,9 @@ package com.bgsoftware.superiorskyblock.modules.generators;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModule;
+import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminAddGenerator;
+import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminClearGenerator;
+import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminSetGenerator;
 import com.bgsoftware.superiorskyblock.modules.generators.listeners.GeneratorsListener;
 import org.bukkit.Bukkit;
 
@@ -10,7 +13,7 @@ import java.io.File;
 
 public final class GeneratorsModule extends BuiltinModule {
 
-    public boolean enabled = true;
+    private boolean enabled = true;
 
     public GeneratorsModule(){
         super("Generators");
@@ -19,6 +22,11 @@ public final class GeneratorsModule extends BuiltinModule {
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
         Bukkit.getPluginManager().registerEvents(new GeneratorsListener(plugin, this), plugin);
+        if(enabled){
+            plugin.getCommands().registerAdminCommand(new CmdAdminAddGenerator());
+            plugin.getCommands().registerAdminCommand(new CmdAdminClearGenerator());
+            plugin.getCommands().registerAdminCommand(new CmdAdminSetGenerator());
+        }
     }
 
     @Override
@@ -47,6 +55,11 @@ public final class GeneratorsModule extends BuiltinModule {
             }
         }
 
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
     protected void updateConfig(){

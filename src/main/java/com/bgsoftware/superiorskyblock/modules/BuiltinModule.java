@@ -56,6 +56,8 @@ public abstract class BuiltinModule extends PluginModule {
 
     public abstract void onDisable();
 
+    public abstract boolean isEnabled();
+
     protected abstract void updateConfig();
 
 }
