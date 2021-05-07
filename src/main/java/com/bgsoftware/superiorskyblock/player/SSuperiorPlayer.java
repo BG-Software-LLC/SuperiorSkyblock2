@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer_Old;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
@@ -728,7 +727,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
 
         // We want to convert the data of the missions data file
-        Executor.async(() -> FileUtils.replaceString(new File(plugin.getDataFolder(), "missions/_data.yml"),
+        Executor.async(() -> FileUtils.replaceString(new File(plugin.getDataFolder(), "modules/missions/data.yml"),
                 otherPlayer.getUniqueId() + "", uuid + ""));
 
         playerDataHandler.executeUpdateStatement(true);

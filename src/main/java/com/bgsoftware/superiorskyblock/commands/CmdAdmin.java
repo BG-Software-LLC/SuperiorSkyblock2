@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.command.CommandSender;

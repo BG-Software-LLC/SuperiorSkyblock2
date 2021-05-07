@@ -1,8 +1,9 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.modules.missions.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;

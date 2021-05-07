@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -50,24 +51,13 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @Override
-    @SuppressWarnings({"deprecation", "ResultOfMethodCallIgnored"})
+    @SuppressWarnings("deprecation")
     public void loadData(){
-        File missionsDict = new File(plugin.getDataFolder(), "missions");
-        File file = new File(plugin.getDataFolder(), "missions/missions.yml");
+        if(!BuiltinModules.MISSIONS.isEnabled())
+            return;
 
-        if(!missionsDict.exists())
-            missionsDict.mkdirs();
-
-        FileUtils.copyResource("missions/BlocksMissions");
-        FileUtils.copyResource("missions/CraftingMissions");
-        FileUtils.copyResource("missions/EnchantingMissions");
-        FileUtils.copyResource("missions/IslandMissions");
-        FileUtils.copyResource("missions/ItemsMissions");
-        FileUtils.copyResource("missions/KillsMissions");
-        FileUtils.copyResource("missions/StatisticsMissions");
-
-        if(!file.exists())
-            FileUtils.saveResource("missions/missions.yml");
+        File missionsDict = BuiltinModules.MISSIONS.getDataFolder();
+        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "config.yml");
 
         YamlConfiguration cfg = new YamlConfiguration();
 
@@ -80,12 +70,12 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         List<Mission<?>> missionsToLoad = new ArrayList<>();
 
-        for(String missionName : cfg.getConfigurationSection("").getKeys(false)){
+        for (String missionName : cfg.getConfigurationSection("missions").getKeys(false)) {
             ConfigurationSection missionSection = cfg.getConfigurationSection(missionName);
             try {
                 Mission<?> mission = missionMap.get(missionName.toLowerCase());
 
-                if(mission == null) {
+                if (mission == null) {
                     File missionJar = new File(missionsDict, missionSection.getString("mission-file") + ".jar");
                     Optional<Class<?>> missionClass = FileUtils.getClasses(missionJar.toURL(), Mission.class).stream().findFirst();
 
@@ -108,7 +98,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 missionDataMap.add(mission, new MissionData(mission, missionSection));
 
                 SuperiorSkyblockPlugin.log("Registered mission " + missionName);
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
                 new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
             }
@@ -357,7 +347,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void saveMissionsData() {
-        File file = new File(plugin.getDataFolder(), "missions/_data.yml");
+        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
 
         if(!file.exists()){
             try {
@@ -392,7 +382,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     public void loadMissionsData(List<Mission<?>> missionsList) {
         Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
 
-        File file = new File(plugin.getDataFolder(), "missions/_data.yml");
+        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
 
         if(!file.exists()){
             try {
@@ -483,7 +473,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
             if(section.contains("rewards.items")){
                 for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                    ItemStack itemStack = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("rewards.items." + key)).build();
+                    ItemStack itemStack = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key)).build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
                     this.itemRewards.add(itemStack);
                 }
@@ -491,9 +481,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
             this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-            this.notCompleted = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.not-completed"));
-            this.canComplete = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.can-complete"));
-            this.completed = FileUtils.getItemStack("missions.yml", section.getConfigurationSection("icons.completed"));
+            this.notCompleted = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
+            this.canComplete = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
+            this.completed = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
         }
 
         @Override

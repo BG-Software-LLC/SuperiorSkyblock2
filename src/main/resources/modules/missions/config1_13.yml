@@ -1,0 +1,578 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+enabled: true
+
+# All the missions of the plugin
+missions:
+  woodcutter:
+    mission-file: BlocksMissions
+    island: false
+    auto-reward: false
+    rewards:
+      items:
+        '1':
+          type: OAK_SAPLING
+          amount: 16
+      commands:
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission WoodCutter!'
+    required-blocks:
+      '1':
+        types:
+          - 'OAK_LOG'
+          - 'SPRUCE_LOG'
+          - 'BIRCH_LOG'
+          - 'JUNGLE_LOG'
+          - 'ACACIA_LOG'
+          - 'DARK_OAK_LOG'
+        amount: 320
+    reset-after-finish: true
+    only-natural-blocks: true
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aWood Cutter'
+        lore:
+          - '&7Cut 320 logs.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x320 Logs'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7x16 Oak Saplings'
+          - ''
+          - '&6Cut Logs: &7{1}/320'
+          - '&6Progress: &7{0}%'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aWood Cutter'
+        lore:
+          - '&7Cut 320 logs.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x320 Logs'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7x16 Oak Saplings'
+          - ''
+          - '&6Cut Logs: &7320/320'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aWood Cutter'
+        lore:
+          - '&7Cut 320 logs.'
+          - ''
+          - '&6Cut Logs: &7320/320'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Already Claimed.'
+
+  cobble-miner:
+    mission-file: BlocksMissions
+    island: false
+    auto-reward: false
+    disband-reset: true
+    reset-amount: 2
+    rewards:
+      commands:
+        - 'eco give %player% 500'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission CobbleMiner!'
+    required-blocks:
+      '1':
+        types:
+          - 'COBBLESTONE'
+        amount: 48
+    reset-after-finish: true
+    only-natural-blocks: true
+    required-missions:
+      - 'woodcutter'
+    only-show-if-required-completed: true
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aCobble Miner'
+        lore:
+          - '&7Mine 48 cobblestone.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x48 Cobblestone'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$500'
+          - ''
+          - '&6Mined Blocks: &7{1}/48'
+          - '&6Progress: &7{0}%'
+          - '&6Times Completed: &7{2}/2'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aCobble Miner'
+        lore:
+          - '&7Mine 48 cobblestone.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x48 Cobblestone'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$500'
+          - ''
+          - '&6Mined Blocks: &748/48'
+          - '&6Progress: &7100%'
+          - '&6Times Completed: &7{2}/2'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aCobble Miner'
+        lore:
+          - '&7Mine 48 cobblestone.'
+          - ''
+          - '&6Mined Blocks: &748/48'
+          - '&6Progress: &7100%'
+          - '&6Times Completed: &72/2'
+          - '&a&l ✔ &7Already Claimed.'
+
+  birthday:
+    mission-file: CraftingMissions
+    island: false
+    auto-reward: false
+    rewards:
+      commands:
+        - 'eco give %player% 150'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Birthday!'
+    craftings:
+      '1':
+        type: CAKE
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aBirthday'
+        lore:
+          - '&7Bake a cake!'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x1 Cake'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$150'
+          - ''
+          - '&6Progress: &7{0}%'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aBirthday'
+        lore:
+          - '&7Bake a cake!'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x1 Cake'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$150'
+          - ''
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aBirthday'
+        lore:
+          - '&7Bake a cake!'
+          - ''
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Already Claimed.'
+
+  first-island:
+    mission-file: IslandMissions
+    island: false
+    auto-reward: true
+    rewards:
+      items:
+        '1':
+          type: DIAMOND
+          amount: 8
+      commands:
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission First Island!'
+    events:
+      - IslandCreateEvent
+      - IslandJoinEvent
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aFirst Island'
+        lore:
+          - '&7Join or create your first island!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7x8 Diamonds'
+          - ''
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aFirst Island'
+        lore:
+          - '&7Join or create your first island!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7x8 Diamonds'
+          - ''
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aFirst Island'
+        lore:
+          - '&7Join or create your first island!'
+          - ''
+          - '&a&l ✔ &7Already Claimed.'
+
+  first-invite:
+    mission-file: IslandMissions
+    island: false
+    auto-reward: true
+    rewards:
+      commands:
+        - 'eco give %player% 200'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission First Invite!'
+    events:
+      - IslandInviteEvent-Target
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aFirst Invite'
+        lore:
+          - '&7Get your first invite to an island!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$200'
+          - ''
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aFirst Invite'
+        lore:
+          - '&7Get your first invite to an island!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$200'
+          - ''
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aFirst Invite'
+        lore:
+          - '&7Get your first invite to an island!'
+          - ''
+          - '&a&l ✔ &7Already Claimed.'
+
+  mobs-killer:
+    mission-file: KillsMissions
+    island: false
+    auto-reward: true
+    rewards:
+      commands:
+        - 'eco give %player% 300'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Mobs Killer!'
+    required-entities:
+      '1':
+        types:
+          - ALL
+        amount: 50
+    reset-after-finish: true
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aMobs Killer'
+        lore:
+          - '&7Kill 50 mobs!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$300'
+          - ''
+          - '&6Kills: &7{1}/50'
+          - '&6Progress: &7{0}%'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aMobs Killer'
+        lore:
+          - '&7Kill 50 mobs!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$300'
+          - ''
+          - '&6Kills: &750/50'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aMobs Killer'
+        lore:
+          - '&7Kill 50 mobs!'
+          - ''
+          - '&6Kills: &750/50'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Already Claimed.'
+
+  enchanter:
+    mission-file: EnchantingMissions
+    island: false
+    auto-reward: true
+    rewards:
+      commands:
+        - 'eco give %player% 1500'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Enchanter!'
+    enchanted-placeholder: '&a✔'
+    not-enchanted-placeholder: '&c✘'
+    required-enchants:
+      '1':
+        types:
+          - CHAINMAIL_HELMET
+          - DIAMOND_HELMET
+          - GOLD_HELMET
+          - IRON_HELMET
+          - LEATHER_HELMET
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+      '2':
+        types:
+          - CHAINMAIL_CHESTPLATE
+          - DIAMOND_CHESTPLATE
+          - GOLD_CHESTPLATE
+          - IRON_CHESTPLATE
+          - LEATHER_CHESTPLATE
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+      '3':
+        types:
+          - CHAINMAIL_LEGGINGS
+          - DIAMOND_LEGGINGS
+          - GOLD_LEGGINGS
+          - IRON_LEGGINGS
+          - LEATHER_LEGGINGS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+      '4':
+        types:
+          - CHAINMAIL_BOOTS
+          - DIAMOND_BOOTS
+          - GOLD_BOOTS
+          - IRON_BOOTS
+          - LEATHER_BOOTS
+        enchants:
+          PROTECTION_ENVIRONMENTAL: 4
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aEnchanter'
+        lore:
+          - '&7Enchant a Protection IV armor!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$1500'
+          - ''
+          - '&6Helmet: {enchanted_diamond_helmet}'
+          - '&6Chestplate: {enchanted_diamond_chestplate}'
+          - '&6Leggings: {enchanted_diamond_leggings}'
+          - '&6Boots: {enchanted_diamond_boots}'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aEnchanter'
+        lore:
+          - '&7Enchant a Protection IV armor!'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$1500'
+          - ''
+          - '&6Helmet: &a✔'
+          - '&6Chestplate: &a✔'
+          - '&6Leggings: &a✔'
+          - '&6Boots: &a✔'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aEnchanter'
+        lore:
+          - '&7Enchant a Protection IV armor!'
+          - ''
+          - '&6Helmet: &a✔'
+          - '&6Chestplate: &a✔'
+          - '&6Leggings: &a✔'
+          - '&6Boots: &a✔'
+          - '&a&l ✔ &7Already Claimed.'
+
+  add-member:
+    mission-file: IslandMissions
+    island: true
+    auto-reward: true
+    rewards:
+      commands:
+        - 'eco give %player% 10000'
+        - 'is admin msgall %player% &e&lMission | &7Successfully finished the mission Add Member!'
+    events:
+      - IslandJoinEvent
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aAdd Member'
+        lore:
+          - '&7Add your first member to the island.'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7None'
+          - ''
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aAdd Member'
+        lore:
+          - '&7Add your first member to the island.'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7None'
+          - ''
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aAdd Member'
+        lore:
+          - '&7Add your first member to the island.'
+          - ''
+          - '&a&l ✔ &7Already Claimed.'
+
+  10k-worth:
+    mission-file: IslandMissions
+    island: true
+    auto-reward: true
+    rewards:
+      commands:
+        - 'is admin msgall %player% &e&lMission | &7You reached island worth 10,000!'
+    events:
+      - IslandWorthUpdateEvent
+    success-check: 'event.getOldWorth() <= 10000 && event.getNewWorth() > 10000'
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aReach 10k'
+        lore:
+          - '&7Reach island worth of 10,000.'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$10,000'
+          - ''
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aReach 10k'
+        lore:
+          - '&7Reach island worth of 10,000.'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$10,000'
+          - ''
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aReach 10k'
+        lore:
+          - '&7Reach island worth of 10,000.'
+          - ''
+          - '&a&l ✔ &7Already Claimed.'
+
+  dragon-killer:
+    mission-file: ItemsMissions
+    island: false
+    auto-reward: true
+    rewards:
+      commands:
+        - 'eco give %player% 10000'
+        - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Dragon Killer!'
+    required-items:
+      '1':
+        types:
+          - 'DRAGON_EGG'
+        amount: 1
+    icons:
+      not-completed:
+        type: PAPER
+        name: '&aDragon Killer'
+        lore:
+          - '&7Hold the ender dragon''s egg.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x1 Dragon Egg'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$10,000'
+          - ''
+          - '&6Collected Eggs: &70/1'
+          - '&6Progress: &7{0}%'
+          - '&c&l ✘ &7Not Completed'
+      can-complete:
+        type: PAPER
+        name: '&aDragon Killer'
+        lore:
+          - '&7Hold the ender dragon''s egg.'
+          - ''
+          - '&6Required Materials:'
+          - '&8 - &7x1 Dragon Egg'
+          - ''
+          - '&6Rewards:'
+          - '&8 - &7$10,000'
+          - ''
+          - '&6Collected Eggs: &71/1'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Click to redeem your reward.'
+        enchants:
+          DURABILITY: 1
+        flags:
+          - HIDE_ENCHANTS
+      completed:
+        type: MAP
+        name: '&aDragon Killer'
+        lore:
+          - '&7Hold the ender dragon''s egg.'
+          - ''
+          - '&6Collected Eggs: &71/1'
+          - '&6Progress: &7100%'
+          - '&a&l ✔ &7Already Claimed.'

@@ -34,7 +34,7 @@ public abstract class BuiltinModule extends PluginModule {
         config = CommentedConfiguration.loadConfiguration(configFile);
 
         try {
-            config.syncWithConfig(configFile, FileUtils.getResource("modules/generators.yml"));
+            config.syncWithConfig(configFile, FileUtils.getResource("modules/" + getName() + "/config.yml"));
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -46,8 +46,7 @@ public abstract class BuiltinModule extends PluginModule {
         File configFile = new File(getDataFolder(), "config.yml");
 
         if(!configFile.exists())
-            FileUtils.saveResource("modules/" + getName() + "/config.yml",
-                    "modules/" + getName().toLowerCase() + ".yml");
+            FileUtils.saveResource("modules/" + getName() + "/config.yml");
 
         return configFile;
     }
