@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.admin.*;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.command.CommandSender;
@@ -48,7 +47,6 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminDebug(), false);
         registerCommand(new CmdAdminDelWarp(), false);
         registerCommand(new CmdAdminDemote(), false);
-        registerCommand(new CmdAdminDeposit(), false);
         registerCommand(new CmdAdminDisband(), false);
         registerCommand(new CmdAdminIgnore(), false);
         registerCommand(new CmdAdminJoin(), false);
@@ -101,7 +99,6 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminTitleAll(), false);
         registerCommand(new CmdAdminUnignore(), false);
         registerCommand(new CmdAdminUnlockWorld(), false);
-        registerCommand(new CmdAdminWithdraw(), false);
     }
 
     @Override

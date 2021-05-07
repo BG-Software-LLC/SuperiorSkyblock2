@@ -34,6 +34,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -306,9 +307,9 @@ public final class SIsland implements Island {
 
             this.lastInterest.set(resultSet.getLong("lastInterest"));
 
-            if (plugin.getSettings().bankInterestEnabled) {
+            if (BuiltinModules.BANK.bankInterestEnabled) {
                 long currentTime = System.currentTimeMillis() / 1000;
-                long ticksToNextInterest = (plugin.getSettings().bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
+                long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
                 if (ticksToNextInterest <= 0) {
                     giveInterest(true);
                 } else {
@@ -1176,8 +1177,9 @@ public final class SIsland implements Island {
             }).forEach(superiorPlayer::resetMission);
         });
 
-        if(plugin.getSettings().disbandRefund > 0)
-            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance().multiply(BigDecimal.valueOf(plugin.getSettings().disbandRefund)));
+        if(BuiltinModules.BANK.disbandRefund > 0)
+            plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()
+                    .multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund)));
 
         plugin.getMissions().getAllMissions().forEach(this::resetMission);
 
@@ -1672,14 +1674,14 @@ public final class SIsland implements Island {
     public boolean giveInterest(boolean checkOnlineOwner) {
         long currentTime = System.currentTimeMillis() / 1000;
 
-        if(checkOnlineOwner && plugin.getSettings().bankInterestRecentActive > 0 &&
-                currentTime - owner.getLastTimeStatus() > plugin.getSettings().bankInterestRecentActive)
+        if(checkOnlineOwner && BuiltinModules.BANK.bankInterestRecentActive > 0 &&
+                currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive)
             return false;
 
         SuperiorSkyblockPlugin.debug("Action: Give Bank Interest, Island: " + owner.getName());
 
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
-        BigDecimal balanceToGive = balance.multiply(new BigDecimal(plugin.getSettings().bankInterestPercentage / 100D));
+        BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
         islandBank.giveMoneyRaw(balanceToGive);
 
         updateLastInterest(currentTime);
@@ -1695,7 +1697,7 @@ public final class SIsland implements Island {
     @Override
     public long getNextInterest() {
         long currentTime = System.currentTimeMillis() / 1000;
-        return plugin.getSettings().bankInterestInterval - (currentTime - lastInterest.get());
+        return BuiltinModules.BANK.bankInterestInterval - (currentTime - lastInterest.get());
     }
 
     /*
@@ -2003,7 +2005,7 @@ public final class SIsland implements Island {
 
     @Override
     public BigDecimal getWorth() {
-        double bankWorthRate = plugin.getSettings().bankWorthRate;
+        double bankWorthRate = BuiltinModules.BANK.bankWorthRate;
         BigDecimal islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
         BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
                 islandBank.multiply(BigDecimal.valueOf(bankWorthRate)));
@@ -3559,8 +3561,8 @@ public final class SIsland implements Island {
     }
 
     private void updateLastInterest(long lastInterest){
-        if(plugin.getSettings().bankInterestEnabled) {
-            long ticksToNextInterest = plugin.getSettings().bankInterestInterval * 20;
+        if(BuiltinModules.BANK.bankInterestEnabled) {
+            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20;
             Executor.sync(() -> giveInterest(true), ticksToNextInterest);
         }
 

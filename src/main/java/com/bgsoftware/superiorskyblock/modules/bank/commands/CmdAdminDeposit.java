@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.modules.bank.commands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;

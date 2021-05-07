@@ -108,9 +108,11 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
         }
 
-        // Island balance
-        if(!Locale.ISLAND_INFO_BANK.isEmpty(locale))
-            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getIslandBank().getBalance())).append("\n");
+        if(BuiltinModules.BANK.isEnabled()) {
+            // Island balance
+            if (!Locale.ISLAND_INFO_BANK.isEmpty(locale))
+                infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getIslandBank().getBalance())).append("\n");
+        }
 
         // Island bonus worth
         if(!Locale.ISLAND_INFO_BONUS.isEmpty(locale))

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -233,7 +234,7 @@ public final class SIslandBank implements IslandBank {
     }
 
     private void addTransaction(BankTransaction bankTransaction, boolean save){
-        if(!plugin.getSettings().bankLogs)
+        if(!BuiltinModules.BANK.bankLogs)
             return;
 
         UUID senderUUID = bankTransaction.getPlayer();

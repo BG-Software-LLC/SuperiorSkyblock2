@@ -77,7 +77,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
-    public final double bankWorthRate;
     public final String islandWorldName;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
@@ -111,7 +110,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean leaveConfirm;
     public final String spawnersProvider;
     public final boolean disbandInventoryClear;
-    public final double disbandRefund;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -170,11 +168,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
     public final Registry<String, Location> islandPreviewLocations;
-    public final boolean bankLogs;
-    public final boolean bankInterestEnabled;
-    public final int bankInterestInterval;
-    public final int bankInterestPercentage;
-    public final int bankInterestRecentActive;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
@@ -286,8 +279,6 @@ public final class SettingsHandler extends AbstractHandler {
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
-        int bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
-        this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
         islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
@@ -326,7 +317,6 @@ public final class SettingsHandler extends AbstractHandler {
         leaveConfirm = cfg.getBoolean("leave-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
-        disbandRefund = Math.max(0, Math.min(100, cfg.getDouble("disband-refund"))) / 100D;
         islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
         islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
@@ -444,11 +434,6 @@ public final class SettingsHandler extends AbstractHandler {
             for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
                 islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
         }
-        bankLogs = cfg.getBoolean("bank-logs", true);
-        bankInterestEnabled = cfg.getBoolean("bank-interest.enabled", true);
-        bankInterestInterval = cfg.getInt("bank-interest.interval", 86400);
-        bankInterestPercentage = cfg.getInt("bank-interest.percentage", 10);
-        bankInterestRecentActive = cfg.getInt("bank-interest.recent-active", 86400);
         tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);

@@ -6,9 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CmdAccept;
 import com.bgsoftware.superiorskyblock.commands.CmdAdmin;
-import com.bgsoftware.superiorskyblock.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.commands.CmdBan;
-import com.bgsoftware.superiorskyblock.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.commands.CmdBiome;
 import com.bgsoftware.superiorskyblock.commands.CmdBorder;
 import com.bgsoftware.superiorskyblock.commands.CmdChest;
@@ -19,7 +17,6 @@ import com.bgsoftware.superiorskyblock.commands.CmdCounts;
 import com.bgsoftware.superiorskyblock.commands.CmdCreate;
 import com.bgsoftware.superiorskyblock.commands.CmdDelWarp;
 import com.bgsoftware.superiorskyblock.commands.CmdDemote;
-import com.bgsoftware.superiorskyblock.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.commands.CmdDisband;
 import com.bgsoftware.superiorskyblock.commands.CmdExpel;
 import com.bgsoftware.superiorskyblock.commands.CmdFly;
@@ -60,7 +57,6 @@ import com.bgsoftware.superiorskyblock.commands.CmdVisit;
 import com.bgsoftware.superiorskyblock.commands.CmdVisitors;
 import com.bgsoftware.superiorskyblock.commands.CmdWarp;
 import com.bgsoftware.superiorskyblock.commands.CmdWarps;
-import com.bgsoftware.superiorskyblock.commands.CmdWithdraw;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
@@ -114,9 +110,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         registerCommand(new CmdAccept(), false);
         registerCommand((adminCommand = new CmdAdmin(this)), false);
-        registerCommand(new CmdBalance(), false);
         registerCommand(new CmdBan(), false);
-        registerCommand(new CmdBank(), false);
         registerCommand(new CmdBiome(), false);
         registerCommand(new CmdBorder(), false);
         registerCommand(new CmdChest(), false);
@@ -127,7 +121,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdCreate(), false);
         registerCommand(new CmdDelWarp(), false);
         registerCommand(new CmdDemote(), false);
-        registerCommand(new CmdDeposit(), false);
         registerCommand(new CmdDisband(), false);
         registerCommand(new CmdExpel(), false);
         registerCommand(new CmdFly(), false);
@@ -168,7 +161,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdVisitors(), false);
         registerCommand(new CmdWarp(), false);
         registerCommand(new CmdWarps(), false);
-        registerCommand(new CmdWithdraw(), false);
 
         loadCommands();
     }

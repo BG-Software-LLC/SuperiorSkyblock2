@@ -1,13 +1,14 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.modules.bank.commands;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -15,26 +16,26 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdWithdraw implements ISuperiorCommand {
+public final class CmdDeposit implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("withdraw");
+        return Collections.singletonList("deposit");
     }
 
     @Override
     public String getPermission() {
-        return "superior.island.withdraw";
+        return "superior.island.deposit";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+        return "deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_WITHDRAW.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_DEPOSIT.getMessage(locale);
     }
 
     @Override
@@ -63,18 +64,19 @@ public final class CmdWithdraw implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
+        BigDecimal moneyInBank = plugin.getProviders().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
-            amount = island.getIslandBank().getBalance();
+            amount = moneyInBank;
         }
 
         else try{
-            amount = new BigDecimal(args[1]);
+            amount = BigDecimal.valueOf(Double.parseDouble(args[1]));
         }catch(IllegalArgumentException ignored){}
 
-        BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction, -1, amount);
+        BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
+        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction, 0, amount);
     }
 
     @Override

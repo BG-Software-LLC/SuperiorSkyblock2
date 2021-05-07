@@ -1,45 +1,45 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.modules.bank.commands;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdDeposit implements ISuperiorCommand {
+public final class CmdBank implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("deposit");
+        return Collections.singletonList("bank");
     }
 
     @Override
     public String getPermission() {
-        return "superior.island.deposit";
+        return "superior.island.bank";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "deposit <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+        return "bank";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_DEPOSIT.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_BANK.getMessage(locale) + "[logs]";
     }
 
     @Override
     public int getMinArgs() {
-        return 2;
+        return 1;
     }
 
     @Override
@@ -63,19 +63,12 @@ public final class CmdDeposit implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        BigDecimal moneyInBank = plugin.getProviders().getBalance(superiorPlayer);
-        BigDecimal amount = BigDecimal.valueOf(-1);
-
-        if(args[1].equalsIgnoreCase("all") || args[1].equals("*")){
-            amount = moneyInBank;
+        if(args.length == 2 && args[1].equalsIgnoreCase("logs")){
+            MenuBankLogs.openInventory(superiorPlayer, null, island);
         }
-
-        else try{
-            amount = BigDecimal.valueOf(Double.parseDouble(args[1]));
-        }catch(IllegalArgumentException ignored){}
-
-        BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
-        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction, 0, amount);
+        else {
+            MenuIslandBank.openInventory(superiorPlayer, null, island);
+        }
     }
 
     @Override

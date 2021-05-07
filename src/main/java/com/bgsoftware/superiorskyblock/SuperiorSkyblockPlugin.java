@@ -629,6 +629,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private void loadModules(){
         modulesHandler.registerModule(BuiltinModules.GENERATORS);
         modulesHandler.registerModule(BuiltinModules.MISSIONS);
+        modulesHandler.registerModule(BuiltinModules.BANK);
     }
 
     private void loadUpgradeCostLoaders(){
