@@ -34,7 +34,7 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
-import com.bgsoftware.superiorskyblock.listeners.UpgradesListener;
+import com.bgsoftware.superiorskyblock.modules.upgrades.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
@@ -189,7 +189,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new PlayersListener(this));
                 safeEventsRegister(new ProtectionListener(this));
                 safeEventsRegister(new SettingsListener(this));
-                safeEventsRegister(new UpgradesListener(this));
             }catch (RuntimeException ex){
                 shouldEnable = false;
                 new HandlerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
@@ -630,6 +629,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         modulesHandler.registerModule(BuiltinModules.GENERATORS);
         modulesHandler.registerModule(BuiltinModules.MISSIONS);
         modulesHandler.registerModule(BuiltinModules.BANK);
+        modulesHandler.registerModule(BuiltinModules.UPGRADES);
     }
 
     private void loadUpgradeCostLoaders(){

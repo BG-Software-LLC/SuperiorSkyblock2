@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.modules.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -8,26 +7,27 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminAddMobDrops implements IAdminIslandCommand {
+public final class CmdAdminSetMobDrops implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("addmobdrops");
+        return Collections.singletonList("setmobdrops");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.addmobdrops";
+        return "superior.admin.setmobdrops";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin addmobdrops <" +
+        return "admin setmobdrops <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
@@ -36,7 +36,7 @@ public final class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_MOB_DROPS.getMessage(locale);
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
         double multiplier = arguments.getKey();
 
-        Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(island.getMobDropsMultiplier() + multiplier)));
+        Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(multiplier)));
 
         if(islands.size() > 1)
             Locale.CHANGED_MOB_DROPS_ALL.send(sender);

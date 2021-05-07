@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.modules.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -13,21 +13,21 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminAddCropGrowth implements IAdminIslandCommand {
+public final class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("addcropgrowth");
+        return Collections.singletonList("addspawnerrates");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.addcropgrowth";
+        return "superior.admin.addspawnerrates";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin addcropgrowth <" +
+        return "admin addspawnerrates <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
@@ -36,7 +36,7 @@ public final class CmdAdminAddCropGrowth implements IAdminIslandCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES.getMessage(locale);
     }
 
     @Override
@@ -68,14 +68,14 @@ public final class CmdAdminAddCropGrowth implements IAdminIslandCommand {
 
         double multiplier = arguments.getKey();
 
-        Executor.data(() -> islands.forEach(island -> island.setCropGrowthMultiplier(island.getCropGrowthMultiplier() + multiplier)));
+        Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(island.getSpawnerRatesMultiplier() + multiplier)));
 
         if(islands.size() > 1)
-            Locale.CHANGED_CROP_GROWTH_ALL.send(sender);
+            Locale.CHANGED_SPAWNER_RATES_ALL.send(sender);
         else if(targetPlayer == null)
-            Locale.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
+            Locale.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
+            Locale.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
     }
 
 }

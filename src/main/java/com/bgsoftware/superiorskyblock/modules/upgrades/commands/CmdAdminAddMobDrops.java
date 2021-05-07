@@ -1,49 +1,52 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.modules.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminSyncUpgrades implements IAdminIslandCommand {
+public final class CmdAdminAddMobDrops implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("syncupgrades");
+        return Collections.singletonList("addmobdrops");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.syncupgrades";
+        return "superior.admin.addmobdrops";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin syncupgrades <" +
+        return "admin addmobdrops <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
-
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_MOB_DROPS.getMessage(locale);
     }
 
     @Override
     public int getMinArgs() {
-        return 3;
+        return 4;
     }
 
     @Override
     public int getMaxArgs() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -58,14 +61,21 @@ public final class CmdAdminSyncUpgrades implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        islands.forEach(Island::syncUpgrades);
+        Pair<Double, Boolean> arguments = CommandArguments.getMultiplier(sender, args[3]);
+
+        if(!arguments.getValue())
+            return;
+
+        double multiplier = arguments.getKey();
+
+        Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(island.getMobDropsMultiplier() + multiplier)));
 
         if(islands.size() > 1)
-            Locale.SYNC_UPGRADES_ALL.send(sender);
+            Locale.CHANGED_MOB_DROPS_ALL.send(sender);
         else if(targetPlayer == null)
-            Locale.SYNC_UPGRADES_NAME.send(sender, islands.get(0).getName());
+            Locale.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.SYNC_UPGRADES.send(sender, targetPlayer.getName());
+            Locale.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());
     }
 
 }

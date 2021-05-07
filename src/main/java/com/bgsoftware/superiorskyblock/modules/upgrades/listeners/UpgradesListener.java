@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.listeners;
+package com.bgsoftware.superiorskyblock.modules.upgrades.listeners;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;

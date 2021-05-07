@@ -134,13 +134,15 @@ public final class CmdAdminShow implements IAdminIslandCommand {
         if(!Locale.ISLAND_INFO_PAYPAL.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_PAYPAL.getMessage(locale, island.getPaypal())).append("\n");
 
-        // Island upgrades
-        if(!Locale.ISLAND_INFO_ADMIN_UPGRADES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.isEmpty(locale)){
-            StringBuilder upgradesString = new StringBuilder();
-            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
-                upgradesString.append(Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(locale, upgrade.getName(), island.getUpgradeLevel(upgrade).getLevel())).append("\n");
+        if(BuiltinModules.UPGRADES.isEnabled()) {
+            // Island upgrades
+            if (!Locale.ISLAND_INFO_ADMIN_UPGRADES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.isEmpty(locale)) {
+                StringBuilder upgradesString = new StringBuilder();
+                for (Upgrade upgrade : plugin.getUpgrades().getUpgrades()) {
+                    upgradesString.append(Locale.ISLAND_INFO_ADMIN_UPGRADE_LINE.getMessage(locale, upgrade.getName(), island.getUpgradeLevel(upgrade).getLevel())).append("\n");
+                }
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_UPGRADES.getMessage(locale, upgradesString));
             }
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_UPGRADES.getMessage(locale, upgradesString));
         }
 
         // Island admin size
@@ -183,28 +185,30 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             infoMessage.append("\n");
         }
 
-        // Island spawners multiplier
-        if(!Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty(locale)) {
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(locale, island.getSpawnerRatesMultiplier()));
-            if(island.getSpawnerRatesRaw() != island.getSpawnerRatesMultiplier())
-                infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+        if(BuiltinModules.UPGRADES.isEnabled()) {
+            // Island spawners multiplier
+            if (!Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.isEmpty(locale)) {
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER.getMessage(locale, island.getSpawnerRatesMultiplier()));
+                if (island.getSpawnerRatesRaw() != island.getSpawnerRatesMultiplier())
+                    infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                infoMessage.append("\n");
+            }
 
-        // Island drops multiplier
-        if(!Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty(locale)) {
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.getMessage(locale, island.getMobDropsMultiplier()));
-            if(island.getMobDropsRaw() != island.getMobDropsMultiplier())
-                infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
-        }
+            // Island drops multiplier
+            if (!Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.isEmpty(locale)) {
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_DROPS_MULTIPLIER.getMessage(locale, island.getMobDropsMultiplier()));
+                if (island.getMobDropsRaw() != island.getMobDropsMultiplier())
+                    infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                infoMessage.append("\n");
+            }
 
-        // Island crops multiplier
-        if(!Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.isEmpty(locale)) {
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.getMessage(locale, island.getCropGrowthMultiplier()));
-            if(island.getCropGrowthRaw() != island.getCropGrowthMultiplier())
-                infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
-            infoMessage.append("\n");
+            // Island crops multiplier
+            if (!Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.isEmpty(locale)) {
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_CROPS_MULTIPLIER.getMessage(locale, island.getCropGrowthMultiplier()));
+                if (island.getCropGrowthRaw() != island.getCropGrowthMultiplier())
+                    infoMessage.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
+                infoMessage.append("\n");
+            }
         }
 
         // Island entity limits
@@ -252,13 +256,15 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             }
         }
 
-        // Island effects
-        if(!Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.isEmpty(locale)){
-            StringBuilder blocksString = new StringBuilder();
-            for(Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()){
-                blocksString.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale, StringUtils.format(entry.getKey().getName()), entry.getValue())).append("\n");
+        if(BuiltinModules.UPGRADES.isEnabled()) {
+            // Island effects
+            if (!Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.isEmpty(locale)) {
+                StringBuilder blocksString = new StringBuilder();
+                for (Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()) {
+                    blocksString.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale, StringUtils.format(entry.getKey().getName()), entry.getValue())).append("\n");
+                }
+                infoMessage.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
             }
-            infoMessage.append(Locale.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
         }
 
         // Island entity limits

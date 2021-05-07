@@ -5,32 +5,9 @@
 ##                                                  ##
 ######################################################
 
-# In this file you can manage all of the upgrades of the server.
-#
-# Here is some information about the built-in upgrades:
-# Crop Growth: Will make your crop grow faster than usual.
-# Spawner Rates: Will make your spawners spawn faster than usual.
-# Mob Drops: Will make your entities drop more items than usual.
-# Hoppers Limit: Will limit the amount of hoppers in your island.
-#
-# You can use the following placeholders in commands:
-# %player% - the name of the player.
-# %leader% - the name of the leader.
-# All PlaceholderAPI placeholders.
-#
-# Here is an example of how to create a custom upgrade:
-# upgrades:
-#   upgrade-name:                     // Custom name for your upgrade. Will be used as an identifier for the upgrade (also in commands)
-#     '1':                            // The level of the upgrade. Level 1 is the default one. Make sure you add ''.
-#       price: 100.0                  // The price for ranking up to the next upgrade.
-#       commands:                     // A list of commands to be executed from console. Use %player% for player's name.
-#       - 'give %player% diamond 1'
-#       - 'island admin setupgrade %player% upgrade-name 2'     // You need to execute this command manually.
-#     '2':
-#       price: 0.0
-#       commands:
-#       - 'island admin msg %player% &cReached maximum level!'  // If you don't call the setupgrade command, it's like the player didn't level up.
+enabled: true
 
+# All the upgrades of the plugin
 upgrades:
   hoppers-limit:
     '1':

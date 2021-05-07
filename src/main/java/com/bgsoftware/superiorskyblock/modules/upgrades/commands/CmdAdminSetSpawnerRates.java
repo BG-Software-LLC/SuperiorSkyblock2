@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.commands.admin;
+package com.bgsoftware.superiorskyblock.modules.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -8,26 +7,27 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
+public final class CmdAdminSetSpawnerRates implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("addspawnerrates");
+        return Collections.singletonList("setspawnerrates");
     }
 
     @Override
     public String getPermission() {
-        return "superior.admin.addspawnerrates";
+        return "superior.admin.setspawnerrates";
     }
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin addspawnerrates <" +
+        return "admin setspawnerrates <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
@@ -36,7 +36,7 @@ public final class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES.getMessage(locale);
+        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage(locale);
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
         double multiplier = arguments.getKey();
 
-        Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(island.getSpawnerRatesMultiplier() + multiplier)));
+        Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(multiplier)));
 
         if(islands.size() > 1)
             Locale.CHANGED_SPAWNER_RATES_ALL.send(sender);
