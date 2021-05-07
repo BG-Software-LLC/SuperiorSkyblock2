@@ -60,7 +60,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     public void unregisterModule(PluginModule pluginModule) {
         String moduleName = pluginModule.getName().toLowerCase();
 
-        Preconditions.checkState(!modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " is not registered in the plugin anymore.");
+        Preconditions.checkState(modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " is not registered in the plugin anymore.");
 
         pluginModule.onDisable();
 

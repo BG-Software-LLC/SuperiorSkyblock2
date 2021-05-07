@@ -2,14 +2,18 @@ package com.bgsoftware.superiorskyblock.modules.missions;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModule;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class MissionsModule extends BuiltinModule {
 
@@ -31,7 +35,8 @@ public final class MissionsModule extends BuiltinModule {
 
     @Override
     public void onDisable() {
-
+        if(enabled)
+            plugin.getMissions().saveMissionsData();
     }
 
     @Override
@@ -101,6 +106,20 @@ public final class MissionsModule extends BuiltinModule {
 
     protected void updateConfig(){
         enabled = config.getBoolean("enabled");
+
+        if(enabled) {
+            List<Mission<?>> missionsToLoad = new ArrayList<>();
+
+            for (String missionName : config.getConfigurationSection("missions").getKeys(false)) {
+                ConfigurationSection missionSection = config.getConfigurationSection("missions." + missionName);
+                Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
+                if (mission != null)
+                    missionsToLoad.add(mission);
+
+            }
+
+            plugin.getMissions().loadMissionsData(missionsToLoad);
+        }
     }
 
 }

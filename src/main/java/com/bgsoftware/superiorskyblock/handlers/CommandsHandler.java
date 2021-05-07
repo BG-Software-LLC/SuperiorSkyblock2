@@ -29,8 +29,6 @@ import com.bgsoftware.superiorskyblock.commands.CmdKick;
 import com.bgsoftware.superiorskyblock.commands.CmdLang;
 import com.bgsoftware.superiorskyblock.commands.CmdLeave;
 import com.bgsoftware.superiorskyblock.commands.CmdMembers;
-import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMission;
-import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.commands.CmdName;
 import com.bgsoftware.superiorskyblock.commands.CmdOpen;
 import com.bgsoftware.superiorskyblock.commands.CmdPanel;
@@ -139,8 +137,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdLang(), false);
         registerCommand(new CmdLeave(), false);
         registerCommand(new CmdMembers(), false);
-        registerCommand(new CmdMission(), false);
-        registerCommand(new CmdMissions(), false);
         registerCommand(new CmdName(), false);
         registerCommand(new CmdOpen(), false);
         registerCommand(new CmdPanel(), false);

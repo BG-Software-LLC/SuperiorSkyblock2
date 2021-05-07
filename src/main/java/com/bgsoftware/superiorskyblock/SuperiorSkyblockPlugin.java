@@ -245,7 +245,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         ChunksProvider.stop();
         try {
             dataHandler.saveDatabase(false);
-            missionsHandler.saveMissionsData();
 
             gridHandler.disablePlugin();
 
@@ -255,6 +254,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             playersHandler.savePlayers();
             gridHandler.saveIslands();
             gridHandler.saveStackedBlocks();
+
+            modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
 
             Bukkit.getOnlinePlayers().forEach(player -> {
                 SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);

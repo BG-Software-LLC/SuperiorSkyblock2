@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -27,9 +26,7 @@ import javax.annotation.Nullable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -51,60 +48,10 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void loadData(){
         if(!BuiltinModules.MISSIONS.isEnabled())
             return;
 
-        File missionsDict = BuiltinModules.MISSIONS.getDataFolder();
-        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "config.yml");
-
-        YamlConfiguration cfg = new YamlConfiguration();
-
-        try {
-            FileInputStream stream = new FileInputStream(file);
-            cfg.load((new InputStreamReader(stream, Charsets.UTF_8)));
-        }catch(Exception ex){
-            cfg = YamlConfiguration.loadConfiguration(file);
-        }
-
-        List<Mission<?>> missionsToLoad = new ArrayList<>();
-
-        for (String missionName : cfg.getConfigurationSection("missions").getKeys(false)) {
-            ConfigurationSection missionSection = cfg.getConfigurationSection(missionName);
-            try {
-                Mission<?> mission = missionMap.get(missionName.toLowerCase());
-
-                if (mission == null) {
-                    File missionJar = new File(missionsDict, missionSection.getString("mission-file") + ".jar");
-                    Optional<Class<?>> missionClass = FileUtils.getClasses(missionJar.toURL(), Mission.class).stream().findFirst();
-
-                    if (!missionClass.isPresent())
-                        throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
-
-                    boolean islandMission = missionSection.getBoolean("island", false);
-                    List<String> requiredMissions = missionSection.getStringList("required-missions");
-                    List<String> requiredChecks = missionSection.getStringList("required-checks");
-
-                    boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
-                            missionSection.getBoolean("only-show-if-required-completed");
-
-                    mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
-                    mission.load(plugin, missionSection);
-                    missionMap.add(missionName.toLowerCase(), mission);
-                    missionsToLoad.add(mission);
-                }
-
-                missionDataMap.add(mission, new MissionData(mission, missionSection));
-
-                SuperiorSkyblockPlugin.log("Registered mission " + missionName);
-            } catch (Exception ex) {
-                SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
-                new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
-            }
-        }
-
-        Executor.sync(() -> loadMissionsData(missionsToLoad), 10L);
         Executor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
     }
 
@@ -376,6 +323,44 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @Override
     public void loadMissionsData() {
         loadMissionsData(getAllMissions());
+    }
+
+    @SuppressWarnings("deprecation")
+    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection){
+        Mission<?> newMission = null;
+
+        try {
+            Mission<?> mission = plugin.getMissions().getMission(missionName);
+
+            if (mission == null) {
+                File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
+                Optional<Class<?>> missionClass = FileUtils.getClasses(missionJar.toURL(), Mission.class).stream().findFirst();
+
+                if (!missionClass.isPresent())
+                    throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
+
+                boolean islandMission = missionSection.getBoolean("island", false);
+                List<String> requiredMissions = missionSection.getStringList("required-missions");
+                List<String> requiredChecks = missionSection.getStringList("required-checks");
+
+                boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
+                        missionSection.getBoolean("only-show-if-required-completed");
+
+                mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
+                mission.load(plugin, missionSection);
+                missionMap.add(missionName.toLowerCase(), mission);
+                newMission = mission;
+            }
+
+            missionDataMap.add(mission, new MissionsHandler.MissionData(mission, missionSection));
+
+            SuperiorSkyblockPlugin.log("Registered mission " + missionName);
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
+            new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+        }
+
+        return newMission;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
