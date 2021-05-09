@@ -168,9 +168,27 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     }
 
     @Override
+    public void unregisterCommand(SuperiorCommand superiorCommand) {
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
+
+        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
+        String label = aliases.get(0).toLowerCase();
+        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
+
+        subCommands.remove(label);
+        aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
+    }
+
+    @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
         adminCommand.registerCommand(superiorCommand, true);
+    }
+
+    @Override
+    public void unregisterAdminCommand(SuperiorCommand superiorCommand) {
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
+        adminCommand.unregisterCommand(superiorCommand);
     }
 
     @Override

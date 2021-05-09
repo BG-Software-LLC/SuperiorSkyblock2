@@ -98,6 +98,12 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         if(moduleData != null){
             if(moduleData.listeners != null)
                 Arrays.stream(moduleData.listeners).forEach(HandlerList::unregisterAll);
+
+            if(moduleData.commands != null)
+                Arrays.stream(moduleData.commands).forEach(plugin.getCommands()::unregisterCommand);
+
+            if(moduleData.adminCommands != null)
+                Arrays.stream(moduleData.adminCommands).forEach(plugin.getCommands()::unregisterAdminCommand);
         }
 
         modulesMap.remove(moduleName);

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -251,6 +252,17 @@ public final class CmdAdmin implements ISuperiorCommand {
             subCommands.clear();
             superiorCommands.forEach(s -> subCommands.add(s.getAliases().get(0), s));
         }
+    }
+
+    public void unregisterCommand(SuperiorCommand superiorCommand) {
+        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
+
+        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
+        String label = aliases.get(0).toLowerCase();
+        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
+
+        subCommands.remove(label);
+        aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
     }
 
     public List<SuperiorCommand> getSubCommands() {
