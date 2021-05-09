@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
@@ -86,8 +87,10 @@ public final class CmdShow implements ISuperiorCommand {
             double rating = island.getTotalRating();
             infoMessage.append(Locale.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
         }
-        if(!Locale.ISLAND_INFO_BANK.isEmpty(locale))
-            infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getIslandBank().getBalance())).append("\n");
+        if(BuiltinModules.BANK.isEnabled()) {
+            if (!Locale.ISLAND_INFO_BANK.isEmpty(locale))
+                infoMessage.append(Locale.ISLAND_INFO_BANK.getMessage(locale, island.getIslandBank().getBalance())).append("\n");
+        }
         if(!Locale.ISLAND_INFO_WORTH.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
         if(!Locale.ISLAND_INFO_DISCORD.isEmpty(locale) && island.hasPermission(sender, IslandPrivileges.DISCORD_SHOW))
