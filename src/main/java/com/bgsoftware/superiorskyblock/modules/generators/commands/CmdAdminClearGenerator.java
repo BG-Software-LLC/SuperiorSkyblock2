@@ -61,7 +61,7 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        World.Environment environment = args.length == 4 ? World.Environment.NORMAL : CommandArguments.getEnvironment(sender, args[3]);
+        World.Environment environment = args.length == 3 ? World.Environment.NORMAL : CommandArguments.getEnvironment(sender, args[3]);
 
         if(environment == null)
             return;
