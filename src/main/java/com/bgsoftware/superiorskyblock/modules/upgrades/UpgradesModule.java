@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.modules.upgrades;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
@@ -26,9 +27,9 @@ import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
@@ -49,24 +50,26 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if(!enabled)
-            return;
+    }
 
-        plugin.getCommands().registerAdminCommand(new CmdAdminAddCropGrowth());
-        plugin.getCommands().registerAdminCommand(new CmdAdminAddEffect());
-        plugin.getCommands().registerAdminCommand(new CmdAdminAddMobDrops());
-        plugin.getCommands().registerAdminCommand(new CmdAdminAddSpawnerRates());
-        plugin.getCommands().registerAdminCommand(new CmdAdminRankup());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSetCropGrowth());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSetEffect());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSetMobDrops());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSetSpawnerRates());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSetUpgrade());
-        plugin.getCommands().registerAdminCommand(new CmdAdminSyncUpgrades());
-        plugin.getCommands().registerCommand(new CmdRankup());
-        plugin.getCommands().registerCommand(new CmdUpgrade());
+    @Override
+    public Listener[] getModuleListeners() {
+        return new Listener[] {new UpgradesListener(plugin)};
+    }
 
-        Bukkit.getPluginManager().registerEvents(new UpgradesListener(plugin), plugin);
+    @Override
+    public SuperiorCommand[] getSuperiorCommands() {
+        return new SuperiorCommand[] {new CmdRankup(), new CmdUpgrade()};
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorAdminCommands() {
+        return new SuperiorCommand[] {
+                new CmdAdminAddCropGrowth(), new CmdAdminAddEffect(), new CmdAdminAddMobDrops(),
+                new CmdAdminAddSpawnerRates(), new CmdAdminRankup(), new CmdAdminSetCropGrowth(),
+                new CmdAdminSetEffect(), new CmdAdminSetMobDrops(), new CmdAdminSetSpawnerRates(),
+                new CmdAdminSetUpgrade(), new CmdAdminSyncUpgrades()
+        };
     }
 
     @Override

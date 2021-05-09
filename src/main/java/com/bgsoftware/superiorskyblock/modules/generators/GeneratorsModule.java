@@ -2,12 +2,13 @@ package com.bgsoftware.superiorskyblock.modules.generators;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModule;
 import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminAddGenerator;
 import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminClearGenerator;
 import com.bgsoftware.superiorskyblock.modules.generators.commands.CmdAdminSetGenerator;
 import com.bgsoftware.superiorskyblock.modules.generators.listeners.GeneratorsListener;
-import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 
@@ -21,17 +22,25 @@ public final class GeneratorsModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-        Bukkit.getPluginManager().registerEvents(new GeneratorsListener(plugin, this), plugin);
-        if(enabled){
-            plugin.getCommands().registerAdminCommand(new CmdAdminAddGenerator());
-            plugin.getCommands().registerAdminCommand(new CmdAdminClearGenerator());
-            plugin.getCommands().registerAdminCommand(new CmdAdminSetGenerator());
-        }
+    }
+
+    @Override
+    public Listener[] getModuleListeners() {
+        return new Listener[] {new GeneratorsListener(plugin, this)};
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorCommands() {
+        return null;
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorAdminCommands() {
+        return new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
     }
 
     @Override
     public void onDisable() {
-
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.modules;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -19,6 +21,12 @@ public abstract class PluginModule {
     public abstract void onEnable(SuperiorSkyblock plugin);
 
     public abstract void onReload(SuperiorSkyblock plugin);
+
+    public abstract Listener[] getModuleListeners();
+
+    public abstract SuperiorCommand[] getSuperiorCommands();
+
+    public abstract SuperiorCommand[] getSuperiorAdminCommands();
 
     public abstract void onDisable();
 

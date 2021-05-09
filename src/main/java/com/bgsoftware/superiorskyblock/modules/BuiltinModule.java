@@ -3,8 +3,10 @@ package com.bgsoftware.superiorskyblock.modules;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 
@@ -52,6 +54,12 @@ public abstract class BuiltinModule extends PluginModule {
     }
 
     public abstract void onEnable(SuperiorSkyblockPlugin plugin);
+
+    public abstract Listener[] getModuleListeners();
+
+    public abstract SuperiorCommand[] getSuperiorCommands();
+
+    public abstract SuperiorCommand[] getSuperiorAdminCommands();
 
     public abstract void onDisable();
 

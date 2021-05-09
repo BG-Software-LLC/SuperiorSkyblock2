@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.modules.bank;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModule;
 import com.bgsoftware.superiorskyblock.modules.bank.commands.CmdAdminDeposit;
 import com.bgsoftware.superiorskyblock.modules.bank.commands.CmdAdminWithdraw;
@@ -10,6 +11,7 @@ import com.bgsoftware.superiorskyblock.modules.bank.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.modules.bank.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.modules.bank.commands.CmdWithdraw;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 
@@ -31,15 +33,22 @@ public final class BankModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if(!enabled)
-            return;
 
-        plugin.getCommands().registerAdminCommand(new CmdAdminDeposit());
-        plugin.getCommands().registerAdminCommand(new CmdAdminWithdraw());
-        plugin.getCommands().registerCommand(new CmdBalance());
-        plugin.getCommands().registerCommand(new CmdBank());
-        plugin.getCommands().registerCommand(new CmdDeposit());
-        plugin.getCommands().registerCommand(new CmdWithdraw());
+    }
+
+    @Override
+    public Listener[] getModuleListeners() {
+        return null;
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorCommands() {
+        return new SuperiorCommand[] {new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorAdminCommands() {
+        return new SuperiorCommand[]{new CmdAdminDeposit(), new CmdAdminWithdraw()};
     }
 
     @Override

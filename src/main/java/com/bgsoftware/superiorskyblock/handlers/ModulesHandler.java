@@ -1,21 +1,27 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
 public final class ModulesHandler extends AbstractHandler implements ModulesManager {
 
     private final static Registry<String, PluginModule> modulesMap = Registry.createRegistry();
+    private final static Registry<PluginModule, ModuleData> modulesData = Registry.createRegistry();
     private final File modulesFolder;
 
     public ModulesHandler(SuperiorSkyblockPlugin plugin){
@@ -47,6 +53,28 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
             pluginModule.onEnable(plugin);
 
+            Listener[] listeners = pluginModule.getModuleListeners();
+            SuperiorCommand[] commands = pluginModule.getSuperiorCommands();
+            SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands();
+
+            if(listeners != null || commands != null || adminCommands != null)
+                modulesData.add(pluginModule, new ModuleData(listeners, commands, adminCommands));
+
+            if(listeners != null){
+                for(Listener listener : listeners)
+                    Bukkit.getPluginManager().registerEvents(listener, plugin);
+            }
+
+            if(commands != null){
+                for(SuperiorCommand command : commands)
+                    plugin.getCommands().registerCommand(command);
+            }
+
+            if(adminCommands != null){
+                for(SuperiorCommand adminCommand : adminCommands)
+                    plugin.getCommands().registerAdminCommand(adminCommand);
+            }
+
             SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
                     " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
@@ -70,6 +98,13 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
 
         pluginModule.onDisable();
+
+        ModuleData moduleData = modulesData.remove(pluginModule);
+
+        if(moduleData != null){
+            if(moduleData.listeners != null)
+                Arrays.stream(moduleData.listeners).forEach(HandlerList::unregisterAll);
+        }
 
         modulesMap.remove(moduleName);
     }
@@ -125,6 +160,20 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         }
 
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
+    }
+
+    private static class ModuleData {
+
+        private final Listener[] listeners;
+        private final SuperiorCommand[] commands;
+        private final SuperiorCommand[] adminCommands;
+
+        private ModuleData(Listener[] listeners, SuperiorCommand[] commands, SuperiorCommand[] adminCommands){
+            this.listeners = listeners;
+            this.commands = commands;
+            this.adminCommands = adminCommands;
+        }
+
     }
 
 }

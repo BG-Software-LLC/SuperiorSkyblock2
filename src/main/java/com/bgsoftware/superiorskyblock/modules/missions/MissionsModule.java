@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.modules.missions;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModule;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission;
@@ -10,6 +11,7 @@ import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,10 +30,6 @@ public final class MissionsModule extends BuiltinModule {
         if(!enabled)
             return;
 
-        plugin.getCommands().registerAdminCommand(new CmdAdminMission());
-        plugin.getCommands().registerCommand(new CmdMission());
-        plugin.getCommands().registerCommand(new CmdMissions());
-
         List<Mission<?>> missionsToLoad = new ArrayList<>();
 
         for (String missionName : config.getConfigurationSection("missions").getKeys(false)) {
@@ -43,6 +41,21 @@ public final class MissionsModule extends BuiltinModule {
         }
 
         plugin.getMissions().loadMissionsData(missionsToLoad);
+    }
+
+    @Override
+    public Listener[] getModuleListeners() {
+        return null;
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorCommands() {
+        return new SuperiorCommand[] {new CmdMission(), new CmdMissions()};
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorAdminCommands() {
+        return new SuperiorCommand[] {new CmdAdminMission()};
     }
 
     @Override
