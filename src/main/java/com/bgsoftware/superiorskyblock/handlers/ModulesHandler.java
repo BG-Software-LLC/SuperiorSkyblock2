@@ -3,11 +3,15 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.util.Collection;
+import java.util.Optional;
 
 public final class ModulesHandler extends AbstractHandler implements ModulesManager {
 
@@ -22,6 +26,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     @Override
     public void loadData() {
         if(!modulesFolder.exists())
+            //noinspection ResultOfMethodCallIgnored
             modulesFolder.mkdirs();
     }
 
@@ -75,6 +80,49 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     @Override
     public Collection<PluginModule> getModules() {
         return modulesMap.values();
+    }
+
+    public void loadExternalModules(){
+        File[] folderFiles = modulesFolder.listFiles();
+
+        if(folderFiles != null) {
+            for (File file : folderFiles) {
+                if(!file.getName().endsWith(".jar"))
+                    continue;
+
+                String moduleName = file.getName().replace(".jar", "");
+
+                try {
+                    //noinspection deprecation
+                    Optional<Class<?>> moduleClass = FileUtils.getClasses(file.toURL(), PluginModule.class).stream().findFirst();
+
+                    if (!moduleClass.isPresent())
+                        throw new NullPointerException("The module " + moduleName + " is not valid.");
+
+                    PluginModule pluginModule = createInstance(moduleClass.get());
+
+                    registerModule(pluginModule);
+                }catch (Exception ex){
+                    SuperiorSkyblockPlugin.log("Couldn't register module " + moduleName + ": ");
+                    new HandlerLoadException(ex, "Couldn't register module " + moduleName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                }
+            }
+        }
+    }
+
+    private PluginModule createInstance(Class<?> clazz) throws Exception{
+        Preconditions.checkArgument(PluginModule.class.isAssignableFrom(clazz), "Class " + clazz + " is not a PluginModule.");
+
+        for(Constructor<?> constructor : clazz.getConstructors()){
+            if(constructor.getParameterCount() == 0) {
+                if(!constructor.isAccessible())
+                    constructor.setAccessible(true);
+
+                return (PluginModule) constructor.newInstance();
+            }
+        }
+
+        throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
     }
 
 }
