@@ -26,7 +26,7 @@ public final class GeneratorsModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners() {
-        return new Listener[] {new GeneratorsListener(plugin, this)};
+        return !enabled ? null : new Listener[] {new GeneratorsListener(plugin, this)};
     }
 
     @Override
@@ -36,7 +36,7 @@ public final class GeneratorsModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands() {
-        return new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
+        return !enabled ? null : new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
     }
 
     @Override

@@ -50,12 +50,12 @@ public final class MissionsModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorCommands() {
-        return new SuperiorCommand[] {new CmdMission(), new CmdMissions()};
+        return !enabled ? null : new SuperiorCommand[] {new CmdMission(), new CmdMissions()};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands() {
-        return new SuperiorCommand[] {new CmdAdminMission()};
+        return !enabled ? null : new SuperiorCommand[] {new CmdAdminMission()};
     }
 
     @Override

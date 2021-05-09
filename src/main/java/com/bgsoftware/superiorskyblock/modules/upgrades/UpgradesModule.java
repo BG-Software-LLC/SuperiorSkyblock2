@@ -54,17 +54,17 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners() {
-        return new Listener[] {new UpgradesListener(plugin)};
+        return !enabled ? null : new Listener[] {new UpgradesListener(plugin)};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorCommands() {
-        return new SuperiorCommand[] {new CmdRankup(), new CmdUpgrade()};
+        return !enabled ? null : new SuperiorCommand[] {new CmdRankup(), new CmdUpgrade()};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands() {
-        return new SuperiorCommand[] {
+        return !enabled ? null : new SuperiorCommand[] {
                 new CmdAdminAddCropGrowth(), new CmdAdminAddEffect(), new CmdAdminAddMobDrops(),
                 new CmdAdminAddSpawnerRates(), new CmdAdminRankup(), new CmdAdminSetCropGrowth(),
                 new CmdAdminSetEffect(), new CmdAdminSetMobDrops(), new CmdAdminSetSpawnerRates(),

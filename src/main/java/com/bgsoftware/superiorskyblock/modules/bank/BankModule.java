@@ -43,12 +43,12 @@ public final class BankModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorCommands() {
-        return new SuperiorCommand[] {new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
+        return !enabled ? null : new SuperiorCommand[] {new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands() {
-        return new SuperiorCommand[]{new CmdAdminDeposit(), new CmdAdminWithdraw()};
+        return !enabled ? null : new SuperiorCommand[]{new CmdAdminDeposit(), new CmdAdminWithdraw()};
     }
 
     @Override
