@@ -31,6 +31,18 @@ public final class MissionsModule extends BuiltinModule {
         plugin.getCommands().registerAdminCommand(new CmdAdminMission());
         plugin.getCommands().registerCommand(new CmdMission());
         plugin.getCommands().registerCommand(new CmdMissions());
+
+        List<Mission<?>> missionsToLoad = new ArrayList<>();
+
+        for (String missionName : config.getConfigurationSection("missions").getKeys(false)) {
+            ConfigurationSection missionSection = config.getConfigurationSection("missions." + missionName);
+            Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
+            if (mission != null)
+                missionsToLoad.add(mission);
+
+        }
+
+        plugin.getMissions().loadMissionsData(missionsToLoad);
     }
 
     @Override
@@ -106,20 +118,6 @@ public final class MissionsModule extends BuiltinModule {
 
     protected void updateConfig(){
         enabled = config.getBoolean("enabled");
-
-        if(enabled) {
-            List<Mission<?>> missionsToLoad = new ArrayList<>();
-
-            for (String missionName : config.getConfigurationSection("missions").getKeys(false)) {
-                ConfigurationSection missionSection = config.getConfigurationSection("missions." + missionName);
-                Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
-                if (mission != null)
-                    missionsToLoad.add(mission);
-
-            }
-
-            plugin.getMissions().loadMissionsData(missionsToLoad);
-        }
     }
 
 }
