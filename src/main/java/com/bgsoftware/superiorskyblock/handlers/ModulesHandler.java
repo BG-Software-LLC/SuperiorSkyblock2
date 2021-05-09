@@ -48,7 +48,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             pluginModule.onEnable(plugin);
 
             SuperiorSkyblockPlugin.log("Finished enabling the module " + pluginModule.getName() +
-                    " (Took " + (System.currentTimeMillis() - startTime) + ")");
+                    " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
             modulesMap.add(moduleName, pluginModule);
         } catch (Exception ex){
