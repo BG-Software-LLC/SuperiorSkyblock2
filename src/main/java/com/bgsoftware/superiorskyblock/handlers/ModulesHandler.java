@@ -60,20 +60,14 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             if(listeners != null || commands != null || adminCommands != null)
                 modulesData.add(pluginModule, new ModuleData(listeners, commands, adminCommands));
 
-            if(listeners != null){
-                for(Listener listener : listeners)
-                    Bukkit.getPluginManager().registerEvents(listener, plugin);
-            }
+            if(listeners != null)
+                Arrays.stream(listeners).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, plugin));
 
-            if(commands != null){
-                for(SuperiorCommand command : commands)
-                    plugin.getCommands().registerCommand(command);
-            }
+            if(commands != null)
+                Arrays.stream(commands).forEach(plugin.getCommands()::registerCommand);
 
-            if(adminCommands != null){
-                for(SuperiorCommand adminCommand : adminCommands)
-                    plugin.getCommands().registerAdminCommand(adminCommand);
-            }
+            if(adminCommands != null)
+                Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
 
             SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
                     " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
