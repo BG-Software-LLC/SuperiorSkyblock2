@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 public interface ModulesManager {
@@ -12,6 +14,12 @@ public interface ModulesManager {
      * @param pluginModule The module to register.
      */
     void registerModule(PluginModule pluginModule);
+
+    /**
+     * Register a new module to the plugin from a file.
+     * @param moduleFile The module to register.
+     */
+    PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException;
 
     /**
      * Unregister a module from the plugin.

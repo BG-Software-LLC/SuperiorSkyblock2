@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
-import com.bgsoftware.superiorskyblock.modules.upgrades.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
@@ -479,6 +478,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public FactoriesHandler getFactory() {
         return factoriesHandler;
+    }
+
+    @Override
+    public ModulesHandler getModules() {
+        return modulesHandler;
     }
 
     public void setSettings(SettingsHandler settingsHandler){

@@ -12,7 +12,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
@@ -84,6 +86,26 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     }
 
     @Override
+    public PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException {
+        if(!moduleFile.getName().endsWith(".jar"))
+            throw new IllegalArgumentException("The given file is not a valid jar file.");
+
+        String moduleName = moduleFile.getName().replace(".jar", "");
+
+        //noinspection deprecation
+        Optional<Class<?>> moduleClass = FileUtils.getClasses(moduleFile.toURL(), PluginModule.class).stream().findFirst();
+
+        if (!moduleClass.isPresent())
+            throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
+
+        PluginModule pluginModule = createInstance(moduleClass.get());
+
+        registerModule(pluginModule);
+
+        return pluginModule;
+    }
+
+    @Override
     public void unregisterModule(PluginModule pluginModule) {
         String moduleName = pluginModule.getName().toLowerCase();
 
@@ -106,10 +128,13 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
                 Arrays.stream(moduleData.adminCommands).forEach(plugin.getCommands()::unregisterAdminCommand);
         }
 
+        pluginModule.disableModule();
+
         modulesMap.remove(moduleName);
     }
 
     @Override
+    @Nullable
     public PluginModule getModule(String name) {
         return modulesMap.get(name.toLowerCase());
     }
@@ -124,30 +149,19 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         if(folderFiles != null) {
             for (File file : folderFiles) {
-                if(!file.getName().endsWith(".jar"))
-                    continue;
-
-                String moduleName = file.getName().replace(".jar", "");
-
-                try {
-                    //noinspection deprecation
-                    Optional<Class<?>> moduleClass = FileUtils.getClasses(file.toURL(), PluginModule.class).stream().findFirst();
-
-                    if (!moduleClass.isPresent())
-                        throw new NullPointerException("The module " + moduleName + " is not valid.");
-
-                    PluginModule pluginModule = createInstance(moduleClass.get());
-
-                    registerModule(pluginModule);
-                }catch (Exception ex){
-                    SuperiorSkyblockPlugin.log("Couldn't register module " + moduleName + ": ");
-                    new HandlerLoadException(ex, "Couldn't register module " + moduleName + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                if(!file.isDirectory()) {
+                    try {
+                        registerModule(file);
+                    } catch (Exception ex) {
+                        SuperiorSkyblockPlugin.log("Couldn't register module " + file.getName() + ": ");
+                        new HandlerLoadException(ex, "Couldn't register module " + file.getName() + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                    }
                 }
             }
         }
     }
 
-    private PluginModule createInstance(Class<?> clazz) throws Exception{
+    private PluginModule createInstance(Class<?> clazz) throws ReflectiveOperationException {
         Preconditions.checkArgument(PluginModule.class.isAssignableFrom(clazz), "Class " + clazz + " is not a PluginModule.");
 
         for(Constructor<?> constructor : clazz.getConstructors()){

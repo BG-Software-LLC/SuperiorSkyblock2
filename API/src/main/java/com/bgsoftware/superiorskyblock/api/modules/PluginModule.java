@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 public abstract class PluginModule {
 
     private final String moduleName, authorName;
+    private boolean initialized = false;
     private File dataFolder;
     private Logger logger;
 
@@ -46,9 +47,15 @@ public abstract class PluginModule {
         return logger;
     }
 
+    public final boolean isInitialized(){
+        return initialized;
+    }
+
     public final void initModule(File dataFolder){
-        if(this.dataFolder != null)
+        if(initialized)
             throw new RuntimeException("The module " + moduleName + " was already initialized.");
+
+        initialized = true;
 
         this.dataFolder = dataFolder;
         this.logger = new ModuleLogger(this);
@@ -57,6 +64,10 @@ public abstract class PluginModule {
             throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
 
         onPluginInit();
+    }
+
+    public final void disableModule(){
+        initialized = false;
     }
 
     protected void onPluginInit(){

@@ -58,7 +58,7 @@ public final class BankModule extends BuiltinModule {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && isInitialized();
     }
 
     @Override

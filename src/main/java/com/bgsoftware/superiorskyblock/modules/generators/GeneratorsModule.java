@@ -68,7 +68,7 @@ public final class GeneratorsModule extends BuiltinModule {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && isInitialized();
     }
 
     protected void updateConfig(){

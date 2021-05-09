@@ -66,7 +66,7 @@ public final class MissionsModule extends BuiltinModule {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && isInitialized();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

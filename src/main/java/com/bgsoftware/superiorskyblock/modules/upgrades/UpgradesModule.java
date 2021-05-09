@@ -79,7 +79,7 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return enabled && isInitialized();
     }
 
     @Override
