@@ -43,11 +43,11 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         try {
             long startTime = System.currentTimeMillis();
 
-            SuperiorSkyblockPlugin.log("Enabling the module " + pluginModule.getName() + "...");
+            SuperiorSkyblockPlugin.log("&aEnabling the module " + pluginModule.getName() + "...");
 
             pluginModule.onEnable(plugin);
 
-            SuperiorSkyblockPlugin.log("Finished enabling the module " + pluginModule.getName() +
+            SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
                     " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
 
             modulesMap.add(moduleName, pluginModule);
@@ -66,6 +66,8 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         String moduleName = pluginModule.getName().toLowerCase();
 
         Preconditions.checkState(modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " is not registered in the plugin anymore.");
+
+        SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
 
         pluginModule.onDisable();
 
