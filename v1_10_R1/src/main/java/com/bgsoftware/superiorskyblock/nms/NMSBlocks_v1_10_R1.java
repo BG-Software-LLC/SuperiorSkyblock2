@@ -500,8 +500,9 @@ public final class NMSBlocks_v1_10_R1 implements NMSBlocks {
         }
 
         static void create(Island island, Chunk chunk){
-            if(!tickingChunks.containsKey(chunk.chunkKey)){
-                tickingChunks.put(chunk.chunkKey, new CropsTickingTileEntity(island, chunk));
+            long chunkKey = ChunkCoordIntPair.a(chunk.locX, chunk.locZ);
+            if(!tickingChunks.containsKey(chunkKey)){
+                tickingChunks.put(chunkKey, new CropsTickingTileEntity(island, chunk));
             }
         }
 
