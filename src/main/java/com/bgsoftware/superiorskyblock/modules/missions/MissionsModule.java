@@ -121,11 +121,7 @@ public final class MissionsModule extends BuiltinModule {
             if(oldDataFile.exists())
                 oldDataFile.renameTo(new File(getDataFolder(), "_data.yml"));
 
-            try {
-                org.apache.commons.io.FileUtils.deleteDirectory(oldMissionsFolder);
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+            FileUtils.deleteDirectory(oldMissionsFolder);
         }
     }
 
