@@ -44,22 +44,22 @@ public final class MissionsModule extends BuiltinModule {
     }
 
     @Override
-    public Listener[] getModuleListeners() {
+    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return null;
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorCommands() {
+    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[] {new CmdMission(), new CmdMissions()};
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorAdminCommands() {
+    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[] {new CmdAdminMission()};
     }
 
     @Override
-    public void onDisable() {
+    public void onDisable(SuperiorSkyblockPlugin plugin) {
         if(enabled)
             plugin.getMissions().saveMissionsData();
     }
@@ -71,8 +71,8 @@ public final class MissionsModule extends BuiltinModule {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    protected void onPluginInit() {
-        super.onPluginInit();
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
 
         FileUtils.copyResource("modules/missions/BlocksMissions");
         FileUtils.copyResource("modules/missions/CraftingMissions");
@@ -129,7 +129,8 @@ public final class MissionsModule extends BuiltinModule {
         }
     }
 
-    protected void updateConfig(){
+    @Override
+    protected void updateConfig(SuperiorSkyblockPlugin plugin){
         enabled = config.getBoolean("enabled");
     }
 

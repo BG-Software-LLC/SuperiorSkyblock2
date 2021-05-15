@@ -23,13 +23,13 @@ public abstract class PluginModule {
 
     public abstract void onReload(SuperiorSkyblock plugin);
 
-    public abstract Listener[] getModuleListeners();
+    public abstract void onDisable(SuperiorSkyblock plugin);
 
-    public abstract SuperiorCommand[] getSuperiorCommands();
+    public abstract Listener[] getModuleListeners(SuperiorSkyblock plugin);
 
-    public abstract SuperiorCommand[] getSuperiorAdminCommands();
+    public abstract SuperiorCommand[] getSuperiorCommands(SuperiorSkyblock plugin);
 
-    public abstract void onDisable();
+    public abstract SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblock plugin);
 
     public final String getName() {
         return moduleName;
@@ -51,7 +51,7 @@ public abstract class PluginModule {
         return initialized;
     }
 
-    public final void initModule(File dataFolder){
+    public final void initModule(SuperiorSkyblock plugin, File dataFolder){
         if(initialized)
             throw new RuntimeException("The module " + moduleName + " was already initialized.");
 
@@ -63,14 +63,14 @@ public abstract class PluginModule {
         if(!dataFolder.exists() && !dataFolder.mkdirs())
             throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
 
-        onPluginInit();
+        onPluginInit(plugin);
     }
 
     public final void disableModule(){
         initialized = false;
     }
 
-    protected void onPluginInit(){
+    protected void onPluginInit(SuperiorSkyblock plugin){
 
     }
 

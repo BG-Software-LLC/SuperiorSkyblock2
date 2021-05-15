@@ -53,17 +53,21 @@ public final class UpgradesModule extends BuiltinModule {
     }
 
     @Override
-    public Listener[] getModuleListeners() {
+    public void onDisable(SuperiorSkyblockPlugin plugin) {
+    }
+
+    @Override
+    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new Listener[] {new UpgradesListener(plugin)};
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorCommands() {
+    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[] {new CmdRankup(), new CmdUpgrade()};
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorAdminCommands() {
+    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[] {
                 new CmdAdminAddCropGrowth(), new CmdAdminAddEffect(), new CmdAdminAddMobDrops(),
                 new CmdAdminAddSpawnerRates(), new CmdAdminRankup(), new CmdAdminSetCropGrowth(),
@@ -73,17 +77,12 @@ public final class UpgradesModule extends BuiltinModule {
     }
 
     @Override
-    public void onDisable() {
-
-    }
-
-    @Override
     public boolean isEnabled() {
         return enabled && isInitialized();
     }
 
     @Override
-    protected void updateConfig() {
+    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
         enabled = config.getBoolean("enabled");
 
         if(enabled){
@@ -182,8 +181,8 @@ public final class UpgradesModule extends BuiltinModule {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    protected void onPluginInit() {
-        super.onPluginInit();
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
 
         File upgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
 

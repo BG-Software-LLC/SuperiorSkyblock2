@@ -46,7 +46,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         File dataFolder = new File(modulesFolder, pluginModule.getName());
 
-        pluginModule.initModule(dataFolder);
+        pluginModule.initModule(plugin, dataFolder);
 
         try {
             long startTime = System.currentTimeMillis();
@@ -55,9 +55,9 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
             pluginModule.onEnable(plugin);
 
-            Listener[] listeners = pluginModule.getModuleListeners();
-            SuperiorCommand[] commands = pluginModule.getSuperiorCommands();
-            SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands();
+            Listener[] listeners = pluginModule.getModuleListeners(plugin);
+            SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
+            SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
 
             if(listeners != null || commands != null || adminCommands != null)
                 modulesData.add(pluginModule, new ModuleData(listeners, commands, adminCommands));
@@ -81,7 +81,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
 
             // Calling onDisable so the plugin can unregister its data if needed
-            pluginModule.onDisable();
+            pluginModule.onDisable(plugin);
         }
     }
 
@@ -113,7 +113,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
 
-        pluginModule.onDisable();
+        pluginModule.onDisable(plugin);
 
         ModuleData moduleData = modulesData.remove(pluginModule);
 
