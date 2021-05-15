@@ -15,8 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import javax.script.Bindings;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.io.File;
 import java.math.BigDecimal;
@@ -24,7 +23,6 @@ import java.util.Map;
 
 public final class BlockValuesHandler extends AbstractHandler implements BlockValuesManager {
 
-    private static final ScriptEngine engine = new ScriptEngineManager(null).getEngineByName("JavaScript");
     private static final Bindings bindings = createBindings();
 
     private static final KeyMap<BigDecimal> customBlockValues = new KeyMap<>(), customBlockLevels = new KeyMap<>();
@@ -176,14 +174,15 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     public BigDecimal convertValueToLevel(BigDecimal value){
         try {
-            Object obj = engine.eval(plugin.getSettings().islandLevelFormula.replace("{}", value.toString()), bindings);
+            Object obj = plugin.getScriptEngine().eval(plugin.getSettings().islandLevelFormula
+                    .replace("{}", value.toString()), bindings);
 
             // Checking for division by 0
             if(obj.equals(Double.POSITIVE_INFINITY) || obj.equals(Double.NEGATIVE_INFINITY))
                 obj = 0D;
 
             return new BigDecimal(obj.toString());
-        }catch(Exception ex){
+        }catch(ScriptException ex){
             ex.printStackTrace();
             return value;
         }

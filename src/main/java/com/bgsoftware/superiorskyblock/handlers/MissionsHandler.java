@@ -23,8 +23,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -37,8 +36,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class MissionsHandler extends AbstractHandler implements MissionsManager {
-
-    private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final static Registry<String, Mission<?>> missionMap = Registry.createRegistry();
     private final static Registry<Mission<?>, MissionData> missionDataMap = Registry.createRegistry();
@@ -158,8 +155,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         return mission.getRequiredChecks().stream().allMatch(check -> {
             check = PlaceholderHook.parse(superiorPlayer, check);
             try {
-                return Boolean.parseBoolean(engine.eval(check) + "");
-            }catch(Throwable ex){
+                return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
+            }catch(ScriptException ex){
                 return false;
             }
         });

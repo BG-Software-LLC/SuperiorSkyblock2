@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
@@ -40,6 +41,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
 import com.bgsoftware.superiorskyblock.upgrades.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -65,6 +67,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.util.Optional;
@@ -95,6 +98,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
     private SettingsHandler settingsHandler = null;
+
+    private IScriptEngine scriptEngine = NashornEngine.getInstance();
 
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
@@ -483,6 +488,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public ModulesHandler getModules() {
         return modulesHandler;
+    }
+
+    @Override
+    public IScriptEngine getScriptEngine() {
+        return scriptEngine;
+    }
+
+    @Override
+    public void setScriptEngine(@Nullable IScriptEngine scriptEngine) {
+        this.scriptEngine = scriptEngine == null ? NashornEngine.getInstance() : scriptEngine;
     }
 
     public void setSettings(SettingsHandler settingsHandler){
