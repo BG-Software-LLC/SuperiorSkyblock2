@@ -37,23 +37,23 @@ public final class BankModule extends BuiltinModule {
     }
 
     @Override
-    public Listener[] getModuleListeners() {
+    public void onDisable(SuperiorSkyblockPlugin plugin) {
+
+    }
+
+    @Override
+    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return null;
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorCommands() {
+    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[] {new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorAdminCommands() {
+    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[]{new CmdAdminDeposit(), new CmdAdminWithdraw()};
-    }
-
-    @Override
-    public void onDisable() {
-
     }
 
     @Override
@@ -62,7 +62,7 @@ public final class BankModule extends BuiltinModule {
     }
 
     @Override
-    protected void updateConfig() {
+    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
         enabled = config.getBoolean("enabled");
         int bankWorthRate = config.getInt("bank-worth-rate", 1000);
         this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
@@ -75,8 +75,8 @@ public final class BankModule extends BuiltinModule {
     }
 
     @Override
-    protected void onPluginInit() {
-        super.onPluginInit();
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
 
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);

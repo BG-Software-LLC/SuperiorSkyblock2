@@ -25,27 +25,27 @@ public final class GeneratorsModule extends BuiltinModule {
     }
 
     @Override
-    public Listener[] getModuleListeners() {
+    public void onDisable(SuperiorSkyblockPlugin plugin) {
+    }
+
+    @Override
+    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new Listener[] {new GeneratorsListener(plugin, this)};
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorCommands() {
+    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
         return null;
     }
 
     @Override
-    public SuperiorCommand[] getSuperiorAdminCommands() {
+    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new SuperiorCommand[]{new CmdAdminAddGenerator(), new CmdAdminClearGenerator(), new CmdAdminSetGenerator()};
     }
 
     @Override
-    public void onDisable() {
-    }
-
-    @Override
-    protected void onPluginInit() {
-        super.onPluginInit();
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
 
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
@@ -71,7 +71,8 @@ public final class GeneratorsModule extends BuiltinModule {
         return enabled && isInitialized();
     }
 
-    protected void updateConfig(){
+    @Override
+    protected void updateConfig(SuperiorSkyblockPlugin plugin){
         enabled = config.getBoolean("enabled");
     }
 
