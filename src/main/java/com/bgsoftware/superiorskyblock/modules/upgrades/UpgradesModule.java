@@ -202,4 +202,10 @@ public final class UpgradesModule extends BuiltinModule {
             upgradesFile.delete();
         }
     }
+
+    @Override
+    protected String[] getIgnoredSections() {
+        return new String[] { "upgrades" };
+    }
+
 }

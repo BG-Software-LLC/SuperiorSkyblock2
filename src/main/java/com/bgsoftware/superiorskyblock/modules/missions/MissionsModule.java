@@ -130,4 +130,9 @@ public final class MissionsModule extends BuiltinModule {
         enabled = config.getBoolean("enabled");
     }
 
+    @Override
+    protected String[] getIgnoredSections() {
+        return new String[] { "missions" };
+    }
+
 }

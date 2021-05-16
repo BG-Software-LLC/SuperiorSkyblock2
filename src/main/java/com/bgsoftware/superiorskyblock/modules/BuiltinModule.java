@@ -58,7 +58,9 @@ public abstract class BuiltinModule extends PluginModule {
         config = CommentedConfiguration.loadConfiguration(configFile);
 
         try {
-            config.syncWithConfig(configFile, FileUtils.getResource("modules/" + getName() + "/config.yml"));
+            config.syncWithConfig(configFile,
+                    FileUtils.getResource("modules/" + getName() + "/config.yml"),
+                    getIgnoredSections());
         }catch (Exception ex){
             ex.printStackTrace();
         }
@@ -88,5 +90,9 @@ public abstract class BuiltinModule extends PluginModule {
     public abstract boolean isEnabled();
 
     protected abstract void updateConfig(SuperiorSkyblockPlugin plugin);
+
+    protected String[] getIgnoredSections(){
+        return new String[0];
+    }
 
 }
