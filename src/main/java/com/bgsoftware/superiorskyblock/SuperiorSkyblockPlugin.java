@@ -170,6 +170,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             EventsCaller.callPluginInitializeEvent(this);
 
+            reloadPlugin(true);
+
             try{
                 providersHandler.prepareWorlds();
             }catch (RuntimeException ex){
@@ -178,8 +180,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 Bukkit.shutdown();
                 return;
             }
-
-            reloadPlugin(true);
 
             try {
                 safeEventsRegister(new BlocksListener(this));
