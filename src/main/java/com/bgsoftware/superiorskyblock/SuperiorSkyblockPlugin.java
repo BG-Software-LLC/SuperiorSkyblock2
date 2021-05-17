@@ -181,8 +181,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             reloadPlugin(true);
 
-            loadModules();
-
             try {
                 safeEventsRegister(new BlocksListener(this));
                 safeEventsRegister(new ChunksListener(this));
@@ -376,13 +374,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         HeadUtils.readTextures(this);
 
         settingsHandler = new SettingsHandler(this);
+        commandsHandler.loadData();
+
+        if(loadGrid){
+            loadModules();
+        }
 
         blockValuesHandler.loadData();
         upgradesHandler.loadData();
 
         Locale.reload();
-
-        commandsHandler.loadData();
 
         if(loadGrid) {
             playersHandler.loadData();
@@ -406,7 +407,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             }
         }
 
-        modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
+        else{
+            modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
+        }
 
         Executor.sync(() -> {
             for(Player player : Bukkit.getOnlinePlayers()) {
