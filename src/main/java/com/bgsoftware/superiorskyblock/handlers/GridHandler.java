@@ -423,8 +423,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         sortIslands(sortingType, null);
     }
 
+    @Override
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+
         SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
+
         islands.sort(sortingType, () -> {
             MenuTopIslands.refreshMenus(sortingType);
             if(onFinish != null)

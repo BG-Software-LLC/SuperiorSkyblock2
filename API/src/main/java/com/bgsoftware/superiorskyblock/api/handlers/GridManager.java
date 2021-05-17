@@ -176,6 +176,13 @@ public interface GridManager {
     void sortIslands(SortingType sortingType);
 
     /**
+     * Sort the islands.
+     * @param sortingType The sorting type to use.
+     * @param onFinish Callback runnable.
+     */
+    void sortIslands(SortingType sortingType, @Nullable Runnable onFinish);
+
+    /**
      * Get the spawn island object.
      */
     Island getSpawnIsland();
