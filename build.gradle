@@ -138,12 +138,19 @@ shadowJar {
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
+task copyAPI(type: Copy) {
+    from './archive/API.jar'
+    into './target/'
+    rename('API.jar', rootProject.name + 'API.jar')
+}
+
 clean {
     delete file('./archive/')
 }
 
 build {
     dependsOn shadowJar
+    dependsOn copyAPI
     dependsOn clean
 }
 
