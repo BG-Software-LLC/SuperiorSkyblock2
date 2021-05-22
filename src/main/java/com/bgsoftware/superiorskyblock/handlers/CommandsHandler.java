@@ -164,9 +164,11 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         loadCommands();
 
-        Set<Runnable> pendingCommands = new HashSet<>(this.pendingCommands);
-        this.pendingCommands = null;
-        pendingCommands.forEach(Runnable::run);
+        if(this.pendingCommands != null) {
+            Set<Runnable> pendingCommands = new HashSet<>(this.pendingCommands);
+            this.pendingCommands = null;
+            pendingCommands.forEach(Runnable::run);
+        }
     }
 
     @Override
