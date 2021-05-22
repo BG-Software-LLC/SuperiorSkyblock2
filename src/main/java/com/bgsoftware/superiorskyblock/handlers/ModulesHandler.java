@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.handlers;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -19,6 +21,7 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class ModulesHandler extends AbstractHandler implements ModulesManager {
 
@@ -36,6 +39,12 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         if(!modulesFolder.exists())
             //noinspection ResultOfMethodCallIgnored
             modulesFolder.mkdirs();
+
+        registerModule(BuiltinModules.GENERATORS);
+        registerModule(BuiltinModules.MISSIONS);
+        registerModule(BuiltinModules.BANK);
+        registerModule(BuiltinModules.UPGRADES);
+        registerExternalModules();
     }
 
     @Override
@@ -48,6 +57,30 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         pluginModule.initModule(plugin, dataFolder);
 
+        modulesMap.add(moduleName, pluginModule);
+    }
+
+    @Override
+    public PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException {
+        if(!moduleFile.getName().endsWith(".jar"))
+            throw new IllegalArgumentException("The given file is not a valid jar file.");
+
+        String moduleName = moduleFile.getName().replace(".jar", "");
+
+        //noinspection deprecation
+        Optional<Class<?>> moduleClass = FileUtils.getClasses(moduleFile.toURL(), PluginModule.class).stream().findFirst();
+
+        if (!moduleClass.isPresent())
+            throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
+
+        PluginModule pluginModule = createInstance(moduleClass.get());
+
+        registerModule(pluginModule);
+
+        return pluginModule;
+    }
+
+    public void enableModule(PluginModule pluginModule){
         try {
             long startTime = System.currentTimeMillis();
 
@@ -73,8 +106,6 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
             SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
                     " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
-
-            modulesMap.add(moduleName, pluginModule);
         } catch (Exception ex){
             SuperiorSkyblockPlugin.log("&cAn error occurred while enabling the module " + pluginModule.getName() + ":");
             ex.printStackTrace();
@@ -85,24 +116,12 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         }
     }
 
-    @Override
-    public PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException {
-        if(!moduleFile.getName().endsWith(".jar"))
-            throw new IllegalArgumentException("The given file is not a valid jar file.");
+    public void enableModules(ModuleLoadTime moduleLoadTime){
+        filterModules(moduleLoadTime).forEach(this::enableModule);
+    }
 
-        String moduleName = moduleFile.getName().replace(".jar", "");
-
-        //noinspection deprecation
-        Optional<Class<?>> moduleClass = FileUtils.getClasses(moduleFile.toURL(), PluginModule.class).stream().findFirst();
-
-        if (!moduleClass.isPresent())
-            throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
-
-        PluginModule pluginModule = createInstance(moduleClass.get());
-
-        registerModule(pluginModule);
-
-        return pluginModule;
+    private Stream<PluginModule> filterModules(ModuleLoadTime moduleLoadTime){
+        return modulesMap.values().stream().filter(pluginModule -> pluginModule.getLoadTime() == moduleLoadTime);
     }
 
     @Override
@@ -144,7 +163,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         return modulesMap.values();
     }
 
-    public void loadExternalModules(){
+    public void registerExternalModules(){
         File[] folderFiles = modulesFolder.listFiles();
 
         if(folderFiles != null) {

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
@@ -30,7 +31,6 @@ import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
 import com.bgsoftware.superiorskyblock.listeners.DragonListener;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.listeners.MenusListener;
 import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
@@ -170,7 +170,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             EventsCaller.callPluginInitializeEvent(this);
 
-            reloadPlugin(true);
+            modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
             try{
                 providersHandler.prepareWorlds();
@@ -180,6 +180,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 Bukkit.shutdown();
                 return;
             }
+
+            reloadPlugin(true);
 
             try {
                 safeEventsRegister(new BlocksListener(this));
@@ -377,7 +379,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         commandsHandler.loadData();
 
         if(loadGrid){
-            loadModules();
+            modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
 
         blockValuesHandler.loadData();
@@ -408,6 +410,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
 
         else{
+            modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }
 
@@ -645,14 +649,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivilege.register("VALUABLE_BREAK");
         IslandPrivilege.register("VILLAGER_TRADING");
         IslandPrivilege.register("WITHDRAW_MONEY");
-    }
-
-    private void loadModules(){
-        modulesHandler.registerModule(BuiltinModules.GENERATORS);
-        modulesHandler.registerModule(BuiltinModules.MISSIONS);
-        modulesHandler.registerModule(BuiltinModules.BANK);
-        modulesHandler.registerModule(BuiltinModules.UPGRADES);
-        modulesHandler.loadExternalModules();
     }
 
     private void loadUpgradeCostLoaders(){

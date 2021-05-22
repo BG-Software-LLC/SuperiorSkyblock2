@@ -31,6 +31,10 @@ public abstract class PluginModule {
 
     public abstract SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblock plugin);
 
+    public ModuleLoadTime getLoadTime(){
+        return ModuleLoadTime.NORMAL;
+    }
+
     public final String getName() {
         return moduleName;
     }
