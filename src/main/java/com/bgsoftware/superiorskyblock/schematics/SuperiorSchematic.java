@@ -223,7 +223,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     private void readBlock(SchematicBlock block){
         int combinedId = block.getCombinedId();
-        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId) + ":" + plugin.getNMSBlocks().getData(combinedId));
+        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId) + "", plugin.getNMSBlocks().getData(combinedId) + "");
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 

@@ -243,7 +243,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     public Key getSpawnerKey(ItemStack itemStack){
-        return spawnersProvider != null ? Key.of(Materials.SPAWNER.toBukkitType() + ":" + spawnersProvider.getSpawnerType(itemStack)) : Key.of(itemStack);
+        return spawnersProvider == null ? Key.of(itemStack) :
+                Key.of(Materials.SPAWNER.toBukkitType() + "", spawnersProvider.getSpawnerType(itemStack) + "");
     }
 
     public Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition){
@@ -259,7 +260,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     public BigDecimal getPrice(Key key){
-        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey() + ":0") : key);
+        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey(), "0") : key);
     }
 
     public boolean isVanished(Player player){

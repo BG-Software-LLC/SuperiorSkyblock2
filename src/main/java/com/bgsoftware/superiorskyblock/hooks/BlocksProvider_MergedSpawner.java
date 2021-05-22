@@ -69,7 +69,7 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             int decreaseAmount = e.getOldCount() - e.getNewCount();
             if(island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnerType()), decreaseAmount);
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType() + ""), decreaseAmount);
         }
 
     }

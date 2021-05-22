@@ -46,6 +46,10 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
         return put(Key.of(key), value);
     }
 
+    public V put(String globalKey, String subKey, V value) {
+        return put(Key.of(globalKey, subKey), value);
+    }
+
     @Override
     public V put(com.bgsoftware.superiorskyblock.api.key.Key key, V value) {
         return registry.add(key.toString(), value);
@@ -55,7 +59,7 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
         if(registry.containsKey(key.toString()))
             return key;
         else if(registry.containsKey(key.getGlobalKey()))
-            return Key.of(key.getGlobalKey());
+            return Key.of(key.getGlobalKey(), "");
         else
             return key;
     }

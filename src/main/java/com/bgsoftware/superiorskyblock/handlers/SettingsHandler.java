@@ -218,9 +218,10 @@ public final class SettingsHandler extends AbstractHandler {
                 continue;
             }
 
-            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
+            String gloablKey = sections[0];
+            String subKey = sections.length == 2 ? "" : sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultBlockLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
+            defaultBlockLimits.put(Key.of(gloablKey, subKey), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultEntityLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.entity-limits")){
@@ -231,9 +232,10 @@ public final class SettingsHandler extends AbstractHandler {
                 continue;
             }
 
-            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
+            String gloablKey = sections[0];
+            String subKey = sections.length == 2 ? "" : sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultEntityLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
+            defaultEntityLimits.put(Key.of(gloablKey, subKey), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
@@ -260,9 +262,9 @@ public final class SettingsHandler extends AbstractHandler {
             String[] sections = line.split(":");
             try {
                 if (sections.length == 2)
-                    stackedBlocksLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    stackedBlocksLimits.put(Key.of(sections[0], ""), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
-                    stackedBlocksLimits.put(Key.of(sections[0] + ":" + sections[1]), Integer.parseInt(sections[2]));
+                    stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
             }catch(Exception ignored){}
         });
         stackedBlocksAutoPickup = cfg.getBoolean("stacked-blocks.auto-collect", false);
@@ -579,9 +581,10 @@ public final class SettingsHandler extends AbstractHandler {
         defaultGenerator[index] = new KeyMap<>();
         for(String line : lines){
             String[] sections = line.split(":");
-            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
+            String globalKey = sections[0];
+            String subKey = sections.length == 2 ? "" : sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator[index].put(key, new UpgradeValue<>(Integer.parseInt(percentage), true));
+            defaultGenerator[index].put(globalKey, subKey, new UpgradeValue<>(Integer.parseInt(percentage), true));
         }
     }
 

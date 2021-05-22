@@ -71,7 +71,7 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnerType().name());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType().name());
             int increaseAmount = e.getAmount();
 
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){

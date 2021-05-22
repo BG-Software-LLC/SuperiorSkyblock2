@@ -98,7 +98,7 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if(island != null) {
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getStack().getSpawner().getSpawnedType());
+                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
                 island.handleBlockPlace(spawnerKey, e.getIncreaseAmount());
             }
         }
@@ -108,7 +108,7 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if(island != null) {
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getStack().getSpawner().getSpawnedType());
+                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
                 island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
             }
         }

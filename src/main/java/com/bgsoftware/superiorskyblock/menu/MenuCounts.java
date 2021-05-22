@@ -183,10 +183,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
                 try {
                     //Checking if the material is valid
                     Material.valueOf(itemType);
-                    if (item.length == 2)
-                        blockKey = Key.of(item[0] + ":" + item[1]);
-                    else
-                        blockKey = Key.of(itemType);
+                    String subKey = item.length == 2 ? item[1] : "";
+                    blockKey = Key.of(item[0], subKey);
                 }catch(Throwable ignored){}
             }
 

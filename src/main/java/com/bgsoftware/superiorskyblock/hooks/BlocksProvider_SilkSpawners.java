@@ -48,14 +48,14 @@ public final class BlocksProvider_SilkSpawners implements BlocksProvider {
         public void onSpawnerPlace(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnedEntity()), 1);
+                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawnedEntity()), 1);
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
         }
 
     }

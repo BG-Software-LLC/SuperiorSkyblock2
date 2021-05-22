@@ -1256,7 +1256,7 @@ public final class SIsland implements Island {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
                     }
                     else{
-                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + spawnerInfo.getValue(), location);
+                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
                         handleBlockPlace(spawnerKey, spawnerInfo.getKey(), false, blockCounts, islandWorth, islandLevel);
                     }
                 }
@@ -1294,7 +1294,7 @@ public final class SIsland implements Island {
             for(Pair<Location, Integer> pair : spawnersToCheck){
                 try {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                    blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + creatureSpawner.getSpawnedType(), pair.getKey());
+                    blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", creatureSpawner.getSpawnedType() + "", pair.getKey());
                     blockCount = pair.getValue();
 
                     if(blockCount <= 0) {
@@ -1305,7 +1305,7 @@ public final class SIsland implements Island {
                             entityType = creatureSpawner.getSpawnedType().name();
 
                         blockCount = spawnerInfo.getKey();
-                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + ":" + entityType, pair.getKey());
+                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, pair.getKey());
                     }
 
                     handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
@@ -1857,7 +1857,7 @@ public final class SIsland implements Island {
 
         if(!rawKeyPlacements) {
             Key limitKey = blockLimits.readAndGet(map -> map.getKey(valueKey));
-            Key globalKey = Key.of(valueKey.getGlobalKey());
+            Key globalKey = Key.of(valueKey.getGlobalKey(), "");
             boolean limitCount = false;
 
             if (!limitKey.equals(valueKey)) {
@@ -1940,7 +1940,7 @@ public final class SIsland implements Island {
                 removeCounts(blockCounts, valueKey, amount);
 
                 com.bgsoftware.superiorskyblock.api.key.Key limitKey = blockLimits.readAndGet(map -> map.getKey(valueKey));
-                Key globalKey = Key.of(valueKey.getGlobalKey());
+                Key globalKey = Key.of(valueKey.getGlobalKey(), "");
                 boolean limitCount = false;
 
                 if (!limitKey.equals(valueKey)) {
@@ -2322,7 +2322,7 @@ public final class SIsland implements Island {
                     .compareTo(BigInteger.valueOf(blockLimit)) > 0;
 
         //Getting the global key values.
-        key = Key.of(key.getGlobalKey());
+        key = Key.of(key.getGlobalKey(), "");
         blockLimit = getBlockLimit(key);
 
         return blockLimit > IslandUtils.NO_LIMIT.get() && getBlockCountAsBigInteger(key)

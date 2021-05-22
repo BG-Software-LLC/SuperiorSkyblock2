@@ -53,14 +53,14 @@ public final class BlocksProvider_AdvancedSpawners implements BlocksProvider {
             Island island = plugin.getGrid().getIslandAt(location);
 
             if(island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getEntityType().toUpperCase()), e.getCountPlaced());
+                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountPlaced());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(AdvancedSpawnersBreakEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getEntityType().toUpperCase()), e.getCountBroken());
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountBroken());
         }
 
     }

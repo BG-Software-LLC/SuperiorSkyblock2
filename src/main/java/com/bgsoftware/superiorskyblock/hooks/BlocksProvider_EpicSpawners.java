@@ -73,7 +73,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
 
             SpawnerData spawnerData = e.getSpawner().getFirstStack().getSpawnerData();
 
-            Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
+            Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
             int increaseAmount = e.getSpawner().getFirstStack().getStackSize();
 
             if(spawnerData.isCustom()) {
@@ -108,7 +108,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
 
             int increaseAmount = e.getStackSize() - e.getOldStackSize();
 
@@ -133,7 +133,7 @@ public final class BlocksProvider_EpicSpawners implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getIdentifyingName());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getIdentifyingName());
 
             island.handleBlockBreak(blockKey, e.getSpawner().getFirstStack().getStackSize());
         }

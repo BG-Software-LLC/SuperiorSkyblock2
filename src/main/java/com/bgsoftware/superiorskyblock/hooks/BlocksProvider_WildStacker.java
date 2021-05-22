@@ -203,7 +203,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
             int increaseAmount = e.getSpawner().getStackAmount();
 
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
@@ -223,7 +223,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
             int increaseAmount = e.getTarget().getStackAmount();
 
             if(increaseAmount < 0){
@@ -243,7 +243,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
         public void onSpawnerUnstack(SpawnerUnstackEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if(island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType()), e.getAmount());
+                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + ""), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -253,7 +253,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
             if(island == null)
                 return;
 
-            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + ":" + e.getSpawner().getSpawnedType());
+            Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + "");
             int increaseAmount = e.getIncreaseAmount();
 
             if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
