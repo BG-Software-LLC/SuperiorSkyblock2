@@ -74,8 +74,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
@@ -83,6 +85,8 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
     private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
     private final Registry<UUID, Registry<String, Long>> commandsCooldown = Registry.createRegistry();
+
+    private Set<Runnable> pendingCommands = new HashSet<>();
 
     private CmdAdmin adminCommand = null;
     private String label = null;
@@ -159,6 +163,10 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdWarps(), false);
 
         loadCommands();
+
+        Set<Runnable> pendingCommands = new HashSet<>(this.pendingCommands);
+        this.pendingCommands = null;
+        pendingCommands.forEach(Runnable::run);
     }
 
     @Override
@@ -181,6 +189,11 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
+        if(pendingCommands != null){
+            pendingCommands.add(() -> registerAdminCommand(superiorCommand));
+            return;
+        }
+
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
         adminCommand.registerCommand(superiorCommand, true);
     }
@@ -211,6 +224,11 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     }
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
+        if(pendingCommands != null){
+            pendingCommands.add(() -> registerCommand(superiorCommand, sort));
+            return;
+        }
+
         List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase();
         aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
