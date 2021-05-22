@@ -29,6 +29,7 @@ import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
+import net.minecraft.server.v1_16_R3.BlockStepAbstract;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkConverter;
@@ -105,8 +106,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     private static final ReflectField<Collection[]> ENTITY_SLICE_ARRAY = new ReflectField<>(Chunk.class, null, "entitySlices");
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
 
-    private static final BlockStateEnum<BlockPropertySlabType> SLAB_TYPE_PROPERTY = BlockStateEnum.of("type", BlockPropertySlabType.class);
-
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
         fieldNameToName.put("F", "axis-empty");
@@ -144,6 +143,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
         try{
             // Fixes BlockProperties being private-class in some versions of Yatopia causing illegal access errors.
             Class<?> blockPropertiesClass = Class.forName("net.minecraft.server.v1_16_R3.BlockProperties");
+
             for(Field field : blockPropertiesClass.getFields()){
                 Object value = field.get(null);
                 if(value instanceof IBlockState) {
@@ -152,6 +152,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
                 }
             }
         }catch (Exception ignored){}
+
     }
 
     private static void register(String key, String fieldName, IBlockState<?> blockState){
@@ -392,9 +393,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
                             int blockAmount = 1;
 
                             if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(SLAB_TYPE_PROPERTY) == BlockPropertySlabType.DOUBLE) {
+                                    blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
                                 blockAmount = 2;
-                                blockData = blockData.set(SLAB_TYPE_PROPERTY, BlockPropertySlabType.BOTTOM);
+                                blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
                             }
 
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
@@ -673,7 +674,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
         // Checks for double slabs
         if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
-            blockData.get(SLAB_TYPE_PROPERTY) == BlockPropertySlabType.DOUBLE) {
+            blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
             return 2;
         }
 
