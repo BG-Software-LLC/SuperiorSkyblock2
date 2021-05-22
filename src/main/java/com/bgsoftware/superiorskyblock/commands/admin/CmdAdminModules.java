@@ -28,7 +28,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin modules <" + Locale.COMMAND_ARGUMENT_MODULE_NAME.getMessage(locale) + "> [load/unload]";
+        return "admin modules [<" + Locale.COMMAND_ARGUMENT_MODULE_NAME.getMessage(locale) + "> [load/unload]]";
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public int getMinArgs() {
-        return 3;
+        return 2;
     }
 
     @Override
@@ -53,58 +53,72 @@ public final class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        PluginModule pluginModule = plugin.getModules().getModule(args[2]);
+        if(args.length == 2){
+            StringBuilder modulesList = new StringBuilder();
+            java.util.Locale senderLocale = LocaleUtils.getLocale(sender);
+            String moduleSeparator = Locale.MODULES_LIST_SEPARATOR.getMessage(senderLocale);
 
-        if(args.length == 3){
-            if(pluginModule == null){
-                Locale.INVALID_MODULE.send(sender, args[2]);
-                return;
+            for(PluginModule pluginModule : plugin.getModules().getModules()){
+                modulesList.append(moduleSeparator).append(Locale.MODULES_LIST_MODULE_NAME
+                        .getMessage(senderLocale, pluginModule.getName(), pluginModule.getAuthor()));
             }
 
-            Locale.MODULE_INFO.send(sender, pluginModule.getName(), pluginModule.getAuthor(), "");
+            Locale.MODULES_LIST.send(sender, plugin.getModules().getModules().size(), modulesList.substring(moduleSeparator.length()));
         }
 
-        else{
-            String command = args[3].toLowerCase();
+        else {
+            PluginModule pluginModule = plugin.getModules().getModule(args[2]);
 
-            switch (command){
-                case "load":
-                    pluginModule = BuiltinModules.getBuiltinModule(args[2]);
+            if (args.length == 3) {
+                if (pluginModule == null) {
+                    Locale.INVALID_MODULE.send(sender, args[2]);
+                    return;
+                }
 
-                    if(pluginModule == null) {
-                        File moduleFile = new File(plugin.getDataFolder(), "modules/" + args[2] + ".jar");
-                        try {
-                            pluginModule = plugin.getModules().registerModule(moduleFile);
+                Locale.MODULE_INFO.send(sender, pluginModule.getName(), pluginModule.getAuthor(), "");
+            }
+
+            else {
+                String command = args[3].toLowerCase();
+
+                switch (command) {
+                    case "load":
+                        pluginModule = BuiltinModules.getBuiltinModule(args[2]);
+
+                        if (pluginModule == null) {
+                            File moduleFile = new File(plugin.getDataFolder(), "modules/" + args[2] + ".jar");
+                            try {
+                                pluginModule = plugin.getModules().registerModule(moduleFile);
+                                Locale.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
+                            } catch (Exception ex) {
+                                Locale.MODULE_LOADED_FAILURE.send(sender, args[2]);
+                                ex.printStackTrace();
+                            }
+                        } else {
+                            if (pluginModule.isInitialized()) {
+                                Locale.MODULE_ALREADY_INITIALIZED.send(sender);
+                                return;
+                            }
+
+                            plugin.getModules().registerModule(pluginModule);
                             Locale.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
-                        } catch (Exception ex) {
-                            Locale.MODULE_LOADED_FAILURE.send(sender, args[2]);
-                            ex.printStackTrace();
                         }
-                    }
-                    else{
-                        if(pluginModule.isInitialized()){
-                            Locale.MODULE_ALREADY_INITIALIZED.send(sender);
+
+                        break;
+                    case "unload":
+                        if (pluginModule == null) {
+                            Locale.INVALID_MODULE.send(sender, args[2]);
                             return;
                         }
 
-                        plugin.getModules().registerModule(pluginModule);
-                        Locale.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
-                    }
+                        plugin.getModules().unregisterModule(pluginModule);
 
-                    break;
-                case "unload":
-                    if(pluginModule == null){
-                        Locale.INVALID_MODULE.send(sender, args[2]);
-                        return;
-                    }
-
-                    plugin.getModules().unregisterModule(pluginModule);
-
-                    Locale.MODULE_UNLOADED_SUCCESS.send(sender);
-                    break;
-                default:
-                    Locale.COMMAND_USAGE.send(sender,plugin.getCommands().getLabel() + " " + getUsage(LocaleUtils.getLocale(sender)));
-                    break;
+                        Locale.MODULE_UNLOADED_SUCCESS.send(sender);
+                        break;
+                    default:
+                        Locale.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(LocaleUtils.getLocale(sender)));
+                        break;
+                }
             }
         }
 
