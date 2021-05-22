@@ -25,7 +25,6 @@ import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
 import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.BlockProperties;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
@@ -105,6 +104,8 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
     private static final ReflectField<Collection[]> ENTITY_SLICE_ARRAY = new ReflectField<>(Chunk.class, null, "entitySlices");
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
+
+    private static final BlockStateEnum<BlockPropertySlabType> SLAB_TYPE_PROPERTY = BlockStateEnum.of("type", BlockPropertySlabType.class);
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -391,9 +392,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
                             int blockAmount = 1;
 
                             if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
+                                    blockData.get(SLAB_TYPE_PROPERTY) == BlockPropertySlabType.DOUBLE) {
                                 blockAmount = 2;
-                                blockData = blockData.set(BlockProperties.aK, BlockPropertySlabType.BOTTOM);
+                                blockData = blockData.set(SLAB_TYPE_PROPERTY, BlockPropertySlabType.BOTTOM);
                             }
 
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
@@ -441,9 +442,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
         runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
             Arrays.fill(chunk.getSections(), Chunk.a);
-
-
-
 
             try {
                 for(int i = 0; i < chunk.entitySlices.length; i++) {
@@ -675,7 +673,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
         // Checks for double slabs
         if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
-            blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
+            blockData.get(SLAB_TYPE_PROPERTY) == BlockPropertySlabType.DOUBLE) {
             return 2;
         }
 
