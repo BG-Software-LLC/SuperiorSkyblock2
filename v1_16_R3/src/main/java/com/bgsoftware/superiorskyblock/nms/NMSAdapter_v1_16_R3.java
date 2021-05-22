@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_16_R3.BiomeBase;
@@ -54,18 +56,22 @@ import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
@@ -75,8 +81,8 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
     private static final ReflectField<Registry<BiomeBase>> BIOME_REGISTRY = new ReflectField<>(BiomeStorage.class, Registry.class, "registry", "g");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>("org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "portalTicks");
-    private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "getVolume");
-    private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "getPitch");
+    private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "a");
+    private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "b");
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -215,8 +221,8 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
         World world = ((CraftWorld) location.getWorld()).getHandle();
         SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
 
-        float volume = SOUND_VOLUME.isValid() ? SOUND_VOLUME.invoke(soundEffectType) : soundEffectType.a();
-        float pitch = SOUND_PITCH.isValid() ? SOUND_PITCH.invoke(soundEffectType) : soundEffectType.b();
+        float volume = SOUND_VOLUME.isValid() ? SOUND_VOLUME.invoke(soundEffectType) : soundEffectType.getVolume();
+        float pitch = SOUND_PITCH.isValid() ? SOUND_PITCH.invoke(soundEffectType) : soundEffectType.getPitch();
 
         world.playSound(null, blockPosition, soundEffectType.getPlaceSound(),
                 SoundCategory.BLOCKS,(volume + 1.0F) / 2.0F, pitch * 0.8F);
@@ -282,6 +288,30 @@ public final class NMSAdapter_v1_16_R3 implements NMSAdapter {
             @Override
             public boolean isCursed() {
                 return false;
+            }
+
+            public @NotNull Component displayName(int i) {
+                return null;
+            }
+
+            public boolean isTradeable() {
+                return false;
+            }
+
+            public boolean isDiscoverable() {
+                return false;
+            }
+
+            public @NotNull EnchantmentRarity getRarity() {
+                return null;
+            }
+
+            public float getDamageIncrease(int i, @NotNull EntityCategory entityCategory) {
+                return 0;
+            }
+
+            public @NotNull Set<EquipmentSlot> getActiveSlots() {
+                return null;
             }
         };
     }
