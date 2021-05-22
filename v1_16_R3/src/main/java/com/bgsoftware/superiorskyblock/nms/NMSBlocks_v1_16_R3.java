@@ -70,6 +70,7 @@ import net.minecraft.server.v1_16_R3.TileEntitySign;
 import net.minecraft.server.v1_16_R3.TileEntityTypes;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -154,13 +155,16 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             Class<?> blockPropertiesClass = Class.forName("net.minecraft.server.v1_16_R3.BlockProperties");
 
             for(Field field : blockPropertiesClass.getFields()){
+                field.setAccessible(true);
                 Object value = field.get(null);
                 if(value instanceof IBlockState) {
                     register(fieldNameToName.getOrDefault(field.getName(), ((IBlockState) value).getName()),
                             field.getName(), (IBlockState) value);
                 }
             }
-        }catch (Exception ignored){}
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
 
     }
 
@@ -322,6 +326,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             else{
                 BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
                 name = blockStateToName.get(key);
+                if(name == null){
+                    Bukkit.broadcastMessage("Invalid block state for " + key);
+                }
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
             }
 
