@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.modules.ModuleClassLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -67,8 +68,10 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         String moduleName = moduleFile.getName().replace(".jar", "");
 
+        ModuleClassLoader moduleClassLoader = new ModuleClassLoader(moduleFile);
+
         //noinspection deprecation
-        Optional<Class<?>> moduleClass = FileUtils.getClasses(moduleFile.toURL(), PluginModule.class).stream().findFirst();
+        Optional<Class<?>> moduleClass = FileUtils.getClasses(moduleFile.toURL(), PluginModule.class, moduleClassLoader).stream().findFirst();
 
         if (!moduleClass.isPresent())
             throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
