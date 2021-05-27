@@ -34,7 +34,7 @@ public final class CmdWarp implements ISuperiorCommand {
 		return "warp [" +
 				Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
 				Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
-                Locale.COMMAND_ARGUMENT_ISLAND_WARP.getMessage(locale) + "]";
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
 	}
 
 	@Override
