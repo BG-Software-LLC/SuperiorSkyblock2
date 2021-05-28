@@ -32,7 +32,7 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
         return "admin setupgrade <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_UPGRADE_NAME + "> <" +
+                Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + "> <" +
                 Locale.COMMAND_ARGUMENT_LEVEL.getMessage(locale) + ">";
     }
 
