@@ -18,7 +18,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -60,8 +59,10 @@ public final class IslandUtils {
         List<ChunkPosition> chunkCoords = new ArrayList<>();
 
         {
-            World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
-            chunkCoords.addAll(getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks));
+            if(plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+                World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
+                chunkCoords.addAll(getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks));
+            }
         }
 
         if(plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)){
@@ -98,8 +99,10 @@ public final class IslandUtils {
         List<CompletableFuture<Chunk>> chunkCoords = new ArrayList<>();
 
         {
-            World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
-            chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+            if(plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+                World normalWorld = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
+                chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+            }
         }
 
         if(plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)){

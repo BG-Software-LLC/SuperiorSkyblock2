@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -29,6 +30,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class SuperiorNPCPlayer implements SuperiorPlayer {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Entity npc;
 
@@ -153,7 +156,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Consumer<Boolean> teleportResult) {
-        teleport(island.getCenter(World.Environment.NORMAL), teleportResult);
+        teleport(island.getCenter(plugin.getSettings().defaultWorldEnvironment), teleportResult);
     }
 
     @Override

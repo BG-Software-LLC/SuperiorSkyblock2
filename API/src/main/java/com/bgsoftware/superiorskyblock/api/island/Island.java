@@ -403,6 +403,16 @@ public interface Island extends Comparable<Island> {
     boolean isInsideRange(Chunk chunk);
 
     /**
+     * Is the normal world enabled for the island?
+     */
+    boolean isNormalEnabled();
+
+    /**
+     * Enable/disable the normal world for the island.
+     */
+    void setNormalEnabled(boolean enabled);
+
+    /**
      * Is the nether world enabled for the island?
      */
     boolean isNetherEnabled();

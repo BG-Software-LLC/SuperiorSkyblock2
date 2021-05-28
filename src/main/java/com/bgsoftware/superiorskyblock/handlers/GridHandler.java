@@ -89,7 +89,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void loadData(){
-        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
+        lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName, 0, 100, 0);
         Executor.sync(this::updateSpawn);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
@@ -190,8 +190,14 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         if(updateGamemode)
                             player.setGameMode(GameMode.SURVIVAL);
                         superiorPlayer.teleport(island, result -> {
-                            if(result)
+                            if(result) {
                                 Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                                if(plugin.getSettings().defaultWorldEnvironment == World.Environment.THE_END){
+                                    plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                                    if(plugin.getSettings().endDragonFight)
+                                        plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
+                                }
+                            }
                         });
                     }
                 });
@@ -651,6 +657,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void loadGrid(ResultSet resultSet) throws SQLException {
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
+        if(!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)){
+            lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName,
+                    lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
+        }
 
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {

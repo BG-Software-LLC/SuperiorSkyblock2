@@ -270,8 +270,20 @@ visitors-sign:
 
 # Settings related to the island worlds.
 worlds:
+  # The default world that will be used.
+  # Use normal, nether or the_end.
+  # If nether or the_end are used but they are disabled below, they wi
+  default-world: normal
   # Set the name of the islands world.
-  normal-world: SuperiorWorld
+  world-name: SuperiorWorld
+  # Settings related to the normal world.
+  normal:
+    # Should the normal world be enabled?
+    enabled: true
+    # Should the normal be unlocked by default to islands?
+    unlock: true
+    # Should the schematics in this world will not be counted towards worth and level values?
+    schematic-offset: true
   # Settings related to the nether world.
   nether:
     # Should the nether world be enabled?
@@ -281,7 +293,7 @@ worlds:
     # Custom name for the nether world.
     # When empty, the name will be "<island-world>_nether"
     name: ''
-    # Should the schematic of nether will not be counted towards worth and level values?
+    # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
   end:
     # Should the end world be enabled?
@@ -291,7 +303,7 @@ worlds:
     # Custom name for the end world.
     # When empty, the name will be "<island-world>_the_end"
     name: ''
-    # Should the schematic of end will not be counted towards worth and level values?
+    # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
     # Should dragon fight be enabled? This will spawn dragons for each island.
     # This feature is in beta, expect bugs!

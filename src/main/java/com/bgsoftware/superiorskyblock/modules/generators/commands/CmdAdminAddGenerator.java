@@ -97,7 +97,8 @@ public final class CmdAdminAddGenerator implements IAdminIslandCommand {
             return;
         }
 
-        World.Environment environment = args.length == 5 ? World.Environment.NORMAL : CommandArguments.getEnvironment(sender, args[5]);
+        World.Environment environment = args.length == 5 ? plugin.getSettings().defaultWorldEnvironment :
+                CommandArguments.getEnvironment(sender, args[5]);
 
         if(environment == null)
             return;
