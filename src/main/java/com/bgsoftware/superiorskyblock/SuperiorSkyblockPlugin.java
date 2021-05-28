@@ -376,9 +376,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         HeadUtils.readTextures(this);
 
         settingsHandler = new SettingsHandler(this);
-        commandsHandler.loadData();
 
         if(loadGrid){
+            commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
 
