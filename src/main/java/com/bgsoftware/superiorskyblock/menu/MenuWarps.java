@@ -1,12 +1,16 @@
-package com.bgsoftware.superiorskyblock.menu;
+package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpManage;
+import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -46,7 +50,15 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             MenuWarpManage.openInventory(superiorPlayer, this, islandWarp);
         }
         else {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
+            simulateClick(superiorPlayer, warpCategory.getIsland(), islandWarp.getName());
+            Executor.sync(() -> {
+            	previousMove = false;
+            }, 1L);
+        }
+    }
+
+	public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String islandName) {
+        if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
                 if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().chargeOnWarp)) < 0){
                     Locale.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
                     return;
@@ -56,13 +68,11 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             }
 
             Executor.sync(() -> {
-                previousMove = false;
                 superiorPlayer.runIfOnline(Player::closeInventory);
-                warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
+                island.warpPlayer(superiorPlayer, islandName);
             }, 1L);
-        }
-    }
-
+	}
+    
     @Override
     protected void cloneAndOpen(SuperiorMenu previousMenu) {
         openInventory(superiorPlayer, previousMenu, warpCategory);
