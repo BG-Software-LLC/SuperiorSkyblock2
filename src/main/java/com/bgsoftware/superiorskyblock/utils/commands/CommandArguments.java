@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -213,6 +212,8 @@ public final class CommandArguments {
 
         try{
             multiplier = Double.parseDouble(argument);
+            // Makes sure the multiplier is rounded.
+            multiplier = Math.round(multiplier * 100) / 100D;
         }catch(IllegalArgumentException ex){
             Locale.INVALID_MULTIPLIER.send(sender, argument);
             status = false;
