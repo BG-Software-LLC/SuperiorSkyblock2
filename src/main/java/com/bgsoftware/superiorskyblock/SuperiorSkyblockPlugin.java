@@ -181,7 +181,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
-            reloadPlugin(true);
+            if(!reloadPlugin(true))
+                return;
 
             try {
                 safeEventsRegister(new BlocksListener(this));
@@ -372,7 +373,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return getGenerator();
     }
 
-    public void reloadPlugin(boolean loadGrid){
+    public boolean reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
         settingsHandler = new SettingsHandler(this);
@@ -405,7 +406,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 dataHandler.loadDataWithException();
             }catch(HandlerLoadException ex){
                 if(!HandlerLoadException.handle(ex))
-                    return;
+                    return false;
             }
         }
 
@@ -427,6 +428,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
 
         CalcTask.startTask();
+
+        return true;
     }
 
     @Override
