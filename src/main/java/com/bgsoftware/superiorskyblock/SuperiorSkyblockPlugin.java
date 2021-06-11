@@ -373,6 +373,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return getGenerator();
     }
 
+    private boolean checkScriptEngine(){
+        try{
+            scriptEngine.eval("1+1");
+            return true;
+        }catch (Exception ex){
+            return false;
+        }
+    }
+
     public boolean reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
@@ -381,6 +390,18 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if(loadGrid){
             commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
+        }
+
+        if(!checkScriptEngine()){
+            HandlerLoadException.handle(new HandlerLoadException(
+                    "It seems like the script engine of the plugin is corrupted.\n" +
+                    "This may occur by one of the following reasons:\n" +
+                    "1. You have a module/plugin that sets a custom script that doesn't work well.\n" +
+                    "2. You're using Java 16 without installing an external module engine.\n" +
+                    "If that's the case, check out the following link:\n" +
+                    "https://github.com/BG-Software-LLC/SuperiorSkyblock2-NashornEngine",
+                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN));
+            return false;
         }
 
         blockValuesHandler.loadData();
