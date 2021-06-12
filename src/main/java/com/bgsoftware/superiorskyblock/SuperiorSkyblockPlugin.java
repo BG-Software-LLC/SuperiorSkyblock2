@@ -181,8 +181,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
-            if(!reloadPlugin(true))
+            if(!reloadPlugin(true)) {
+                shouldEnable = false;
                 return;
+            }
 
             try {
                 safeEventsRegister(new BlocksListener(this));
