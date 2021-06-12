@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.hooks;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 public interface EconomyProvider {
@@ -16,16 +17,58 @@ public interface EconomyProvider {
      * Deposit money into a player's bank.
      * @param superiorPlayer The player to deposit money to.
      * @param amount The amount to deposit.
-     * @return The error message if needed. Otherwise, empty string.
+     * @return A result object for the transaction.
      */
-    String depositMoney(SuperiorPlayer superiorPlayer, double amount);
+    EconomyResult depositMoney(SuperiorPlayer superiorPlayer, double amount);
 
     /**
      * Withdraw money from a player's bank.
      * @param superiorPlayer The player to withdraw money from.
      * @param amount The amount to withdraw.
-     * @return The error message if needed. Otherwise, empty string.
+     * @return A result object for the transaction.
      */
-    String withdrawMoney(SuperiorPlayer superiorPlayer, double amount);
-    
+    EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount);
+
+    class EconomyResult {
+
+        private final String errorMessage;
+        private final double transactionMoney;
+
+        public EconomyResult(String errorMessage){
+            this(errorMessage, 0);
+        }
+
+        public EconomyResult(double transactionMoney){
+            this("", transactionMoney);
+        }
+
+        public EconomyResult(String errorMessage, double transactionMoney){
+            this.errorMessage = errorMessage;
+            this.transactionMoney = transactionMoney;
+        }
+
+        /**
+         * Get the error that occurred.
+         */
+        @Nullable
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        /**
+         * Get the amount of money involved in the transaction.
+         */
+        public double getTransactionMoney() {
+            return transactionMoney;
+        }
+
+        /**
+         * Check if the transaction has failed.
+         */
+        public boolean hasFailed(){
+            return errorMessage != null && !errorMessage.isEmpty();
+        }
+
+    }
+
 }

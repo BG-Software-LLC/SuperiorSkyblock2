@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island.bank;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
+import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -81,7 +82,9 @@ public final class SIslandBank implements IslandBank {
                     this.balance.get().add(amount).compareTo(island.getBankLimit()) > 0) {
                 failureReason = "Exceed bank limit";
             } else {
-                failureReason = plugin.getProviders().withdrawMoneyForBanks(superiorPlayer, amount);
+                EconomyProvider.EconomyResult result = plugin.getProviders().withdrawMoneyForBanks(superiorPlayer, amount);
+                failureReason = result.getErrorMessage();
+                amount = BigDecimal.valueOf(result.getTransactionMoney());
             }
         }
 
@@ -156,7 +159,9 @@ public final class SIslandBank implements IslandBank {
             EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
             if (commandsToExecute == null || commandsToExecute.isEmpty()) {
-                failureReason = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
+                EconomyProvider.EconomyResult result = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
+                failureReason = result.getErrorMessage();
+                withdrawAmount = BigDecimal.valueOf(result.getTransactionMoney());
             } else {
                 String currentBalance = balance.get().toString();
                 failureReason = "";

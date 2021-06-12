@@ -283,11 +283,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return economyProvider.getBalance(superiorPlayer);
     }
 
-    public String depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public EconomyProvider.EconomyResult depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            String error = economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
-            if(error != null && !error.isEmpty())
-                return error;
+            EconomyProvider.EconomyResult result = economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(result.hasFailed())
+                return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -295,11 +295,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return economyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public String withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public  EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            String error = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
-            if(error != null && !error.isEmpty())
-                return error;
+            EconomyProvider.EconomyResult result = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            if(result.hasFailed())
+                return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -307,7 +307,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
+    public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
         return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
@@ -359,11 +359,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return bankEconomyProvider.getBalance(superiorPlayer);
     }
 
-    public String depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public EconomyProvider.EconomyResult depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            String error = bankEconomyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
-            if(error != null && !error.isEmpty())
-                return error;
+            EconomyProvider.EconomyResult result = bankEconomyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(result.hasFailed())
+                return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -371,11 +371,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return bankEconomyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            String error = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
-            if(error != null && !error.isEmpty())
-                return error;
+            EconomyProvider.EconomyResult result = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
+            if(result.hasFailed())
+                return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -383,7 +383,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return withdrawMoneyForBanks(superiorPlayer, amount.doubleValue());
     }
 
-    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
+    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
         return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
     }
 

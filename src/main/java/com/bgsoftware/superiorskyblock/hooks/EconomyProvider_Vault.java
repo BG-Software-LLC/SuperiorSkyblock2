@@ -34,21 +34,31 @@ public final class EconomyProvider_Vault implements EconomyProvider {
     }
 
     @Override
-    public String depositMoney(SuperiorPlayer superiorPlayer, double amount) {
+    public EconomyResult depositMoney(SuperiorPlayer superiorPlayer, double amount) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        double currentMoney = getMoneyInBank(offlinePlayer);
+        double moneyBeforeDeposit = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.depositPlayer(offlinePlayer, amount);
-        return getMoneyInBank(offlinePlayer) == currentMoney ? "You have exceed the limit of your bank" : economyResponse.errorMessage;
+        double moneyInTransaction = getMoneyInBank(offlinePlayer) - moneyBeforeDeposit;
+
+        String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
+                moneyInTransaction == 0 ? "You have exceed the limit of your bank" : "";
+
+        return new EconomyResult(errorMessage, moneyInTransaction);
     }
 
     @Override
-    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
+    public EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
-        double currentMoney = getMoneyInBank(offlinePlayer);
+        double moneyBeforeWithdraw = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.withdrawPlayer(offlinePlayer, amount);
-        return getMoneyInBank(offlinePlayer) == currentMoney ? "Couldn't process the transaction" : economyResponse.errorMessage;
+        double moneyInTransaction = moneyBeforeWithdraw - getMoneyInBank(offlinePlayer);
+
+        String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
+                moneyInTransaction == 0 ? "Couldn't process the transaction" : "";
+
+        return new EconomyResult(errorMessage, moneyInTransaction);
     }
 
     private double getMoneyInBank(OfflinePlayer offlinePlayer) {

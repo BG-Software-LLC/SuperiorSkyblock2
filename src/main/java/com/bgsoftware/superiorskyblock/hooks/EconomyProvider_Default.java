@@ -15,13 +15,13 @@ public final class EconomyProvider_Default implements EconomyProvider {
     }
 
     @Override
-    public String depositMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return "&cServer doesn't have vault installed so transactions are disabled.";
+    public EconomyResult depositMoney(SuperiorPlayer superiorPlayer, double amount) {
+        return new EconomyResult("&cServer doesn't have vault installed so transactions are disabled.");
     }
 
     @Override
-    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return "&cServer doesn't have vault installed so transactions are disabled.";
+    public EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
+        return new EconomyResult("&cServer doesn't have vault installed so transactions are disabled.");
     }
 
 }
