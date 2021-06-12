@@ -51,7 +51,8 @@ public final class SIslandBank implements IslandBank {
         return balance.get();
     }
 
-    public void loadBalance(BigDecimal balance){
+    @Override
+    public void setBalance(BigDecimal balance) {
         setBalance(balance, false);
     }
 

@@ -15,6 +15,12 @@ public interface IslandBank {
     BigDecimal getBalance();
 
     /**
+     * Set the balance in the bank.
+     * This will not create any records, and used to load the balance from the database.
+     */
+    void setBalance(BigDecimal balance);
+
+    /**
      * Deposit money into the bank.
      * @param superiorPlayer The player that deposited the money.
      * @param amount The amount to deposit.

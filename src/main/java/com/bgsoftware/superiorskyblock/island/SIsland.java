@@ -24,13 +24,13 @@ import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
-import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
@@ -137,7 +137,7 @@ public final class SIsland implements Island {
      */
 
     private final IslandDataHandler islandDataHandler = new SIslandDataHandler(this);
-    private final SIslandBank islandBank = new SIslandBank(this);
+    private final IslandBank islandBank = plugin.getFactory().createIslandBank(this);
 
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
     private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
@@ -227,7 +227,7 @@ public final class SIsland implements Island {
             if (!resultSet.getString("uniqueVisitors").contains(";"))
                 islandDataHandler.saveUniqueVisitors();
 
-            parseNumbersSafe(() -> this.islandBank.loadBalance(new BigDecimal(resultSet.getString("islandBank"))));
+            parseNumbersSafe(() -> this.islandBank.setBalance(new BigDecimal(resultSet.getString("islandBank"))));
             parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
             this.islandSize.set(new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0));
             this.teamLimit.set(new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0));
@@ -1682,7 +1682,9 @@ public final class SIsland implements Island {
 
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
-        islandBank.giveMoneyRaw(balanceToGive);
+
+        islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
+        MenuIslandBank.refreshMenus(this);
 
         updateLastInterest(currentTime);
 
