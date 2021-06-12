@@ -61,7 +61,7 @@ public final class NMSHolograms_v1_17_R1 implements NMSHolograms {
 
         @Override
         public void removeHologram() {
-            super.die();
+            super.a(Entity.RemovalReason.b);
         }
 
         @Override
