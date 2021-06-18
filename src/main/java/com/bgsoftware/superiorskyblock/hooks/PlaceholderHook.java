@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -270,15 +269,15 @@ public abstract class PlaceholderHook {
 
                 else switch (subPlaceholder) {
                     case "center":
-                        return SBlockPosition.of(island.getCenter(World.Environment.NORMAL)).toString();
+                        return SBlockPosition.of(island.getCenter(plugin.getSettings().defaultWorldEnvironment)).toString();
                     case "x":
-                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockX());
+                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockX());
                     case "y":
-                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockY());
+                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockY());
                     case "z":
-                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockZ());
+                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockZ());
                     case "world":
-                        return island.getCenter(World.Environment.NORMAL).getWorld().getName();
+                        return island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld().getName();
                     case "team_size":
                         return String.valueOf(island.getIslandMembers(true).size());
                     case "team_size_online":

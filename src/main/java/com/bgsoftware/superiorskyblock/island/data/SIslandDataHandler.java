@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.data;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -14,6 +15,8 @@ import org.bukkit.World;
 import java.util.Map;
 
 public final class SIslandDataHandler extends DatabaseObject implements IslandDataHandler {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Island island;
     private boolean loadingIsland = false;
@@ -453,7 +456,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     public void executeInsertStatement(boolean async){
         Query.ISLAND_INSERT.getStatementHolder(this)
                 .setString(island.getOwner().getUniqueId().toString())
-                .setString(LocationUtils.getLocation(island.getCenter(World.Environment.NORMAL)))
+                .setString(LocationUtils.getLocation(island.getCenter(plugin.getSettings().defaultWorldEnvironment)))
                 .setString(IslandSerializer.serializeLocations(island.getTeleportLocations()))
                 .setString(IslandSerializer.serializePlayers(island.getIslandMembers(false)))
                 .setString(IslandSerializer.serializePlayers(island.getBannedPlayers()))

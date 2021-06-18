@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.Locale;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -80,7 +79,8 @@ public final class CmdShow implements ISuperiorCommand {
         if(!Locale.ISLAND_INFO_NAME.isEmpty(locale) && !island.getName().isEmpty())
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty(locale))
-            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(locale, SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
+            infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(locale,
+                    SBlockPosition.of(island.getCenter(plugin.getSettings().defaultWorldEnvironment)))).append("\n");
         if(!Locale.ISLAND_INFO_CREATION_TIME.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty(locale)) {

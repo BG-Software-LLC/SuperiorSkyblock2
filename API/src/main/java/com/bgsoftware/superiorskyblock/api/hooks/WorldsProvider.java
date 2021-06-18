@@ -54,6 +54,16 @@ public interface WorldsProvider {
     void prepareTeleport(Island island, Location location, Runnable finishCallback);
 
     /**
+     * Check whether or not normal worlds are enabled.
+     */
+    boolean isNormalEnabled();
+
+    /**
+     * Check whether or not normal worlds are unlocked for islands by default.
+     */
+    boolean isNormalUnlocked();
+
+    /**
      * Check whether or not nether worlds are enabled.
      */
     boolean isNetherEnabled();

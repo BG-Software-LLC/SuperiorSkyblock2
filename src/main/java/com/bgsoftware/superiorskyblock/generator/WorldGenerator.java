@@ -31,10 +31,10 @@ public final class WorldGenerator extends ChunkGenerator {
                     biomes.setBiome(x, z, Biome.PLAINS);
                 }
             }
+        }
 
-            if(chunkX == 0 && chunkZ == 0){
-                setBlock(blockSections, 0, 99, 0, 7);
-            }
+        if(chunkX == 0 && chunkZ == 0 && world.getEnvironment() == plugin.getSettings().defaultWorldEnvironment){
+            setBlock(blockSections, 0, 99, 0, 7);
         }
 
         return blockSections;
@@ -51,13 +51,12 @@ public final class WorldGenerator extends ChunkGenerator {
             }
             case NORMAL: {
                 plugin.getNMSAdapter().setBiome(biomes, Biome.PLAINS);
-
-                if (chunkX == 0 && chunkZ == 0) {
-                    chunkData.setBlock(0, 99, 0, Material.BEDROCK);
-                }
-
                 break;
             }
+        }
+
+        if(chunkX == 0 && chunkZ == 0 && world.getEnvironment() == plugin.getSettings().defaultWorldEnvironment){
+            chunkData.setBlock(0, 99, 0, Material.BEDROCK);
         }
 
         return chunkData;

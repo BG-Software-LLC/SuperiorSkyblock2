@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -100,7 +99,8 @@ public final class CmdExpel implements IPermissibleCommand {
         }
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
-        target.getLocation().setDirection(plugin.getGrid().getSpawnIsland().getCenter(World.Environment.NORMAL).getDirection());
+        target.getLocation().setDirection(plugin.getGrid().getSpawnIsland()
+                .getCenter(plugin.getSettings().defaultWorldEnvironment).getDirection());
         Locale.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Locale.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }

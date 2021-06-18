@@ -466,7 +466,7 @@ public final class PlayersListener implements Listener {
         if(e.getLocation().getWorld().getEnvironment() == World.Environment.THE_END &&
                 plugin.getGrid().isIslandsWorld(e.getLocation().getWorld())){
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-            if(island != null) {
+            if(island != null && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 Executor.sync(() -> TeleportUtils.teleport(e.getEntity(),
                         island.getTeleportLocation(World.Environment.NORMAL)), 5L);
             }
@@ -518,30 +518,28 @@ public final class PlayersListener implements Listener {
         if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
             return;
 
-        World.Environment environment = teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
+        World.Environment environment = from.getWorld().getEnvironment() != World.Environment.NORMAL ?
+                World.Environment.NORMAL : teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
                 World.Environment.NETHER : World.Environment.THE_END;
 
-        if(environment == player.getWorld().getEnvironment())
-            environment = World.Environment.NORMAL;
-
-        if((environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
+        if((environment == World.Environment.NORMAL && !island.isNormalEnabled()) ||
+                (environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
                 (environment == World.Environment.THE_END && !island.isEndEnabled())){
             if(!Locale.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
                 Locale.sendSchematicMessage(superiorPlayer, Locale.WORLD_NOT_UNLOCKED.getMessage(superiorPlayer.getUserLocale(), StringUtils.format(environment.name())));
             return;
         }
 
-        String envName = environment == World.Environment.NETHER ? "nether" : "the_end";
-        Location toTeleport = environment == World.Environment.NORMAL ? island.getTeleportLocation(environment) :
-                getLocationNoException(island, environment);
+        String envName = environment.name().toLowerCase();
+        Location toTeleport = getLocationNoException(island, environment);
 
-        boolean offsetSchematic = environment == World.Environment.NETHER ?
-                plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
+        boolean offsetSchematic = environment == World.Environment.NORMAL ? plugin.getSettings().normalSchematicOffset :
+                environment == World.Environment.NETHER ? plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
 
         boolean endPortal = environment == World.Environment.THE_END;
 
         if(toTeleport != null) {
-            if(environment != World.Environment.NORMAL && !island.wasSchematicGenerated(environment)){
+            if(!island.wasSchematicGenerated(environment)){
                 String schematicName = island.getSchematicName();
                 if(schematicName.isEmpty())
                     schematicName = plugin.getSchematics().getDefaultSchematic(environment);
@@ -558,11 +556,11 @@ public final class PlayersListener implements Listener {
                             island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
                         }
 
-                        if(endPortal)
+                        if(endPortal){
                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
-
-                        if(endPortal && plugin.getSettings().endDragonFight)
-                            plugin.getNMSDragonFight().startDragonBattle(island, toTeleport);
+                            if(plugin.getSettings().endDragonFight)
+                                plugin.getNMSDragonFight().startDragonBattle(island, toTeleport);
+                        }
 
                         handleTeleport(plugin, superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport));
                     }, Throwable::printStackTrace);

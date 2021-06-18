@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
@@ -77,7 +78,12 @@ public final class SettingsHandler extends AbstractHandler {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
+    public final World.Environment defaultWorldEnvironment;
+    public final String defaultWorldName;
     public final String islandWorldName;
+    public final boolean normalWorldEnabled;
+    public final boolean normalWorldUnlocked;
+    public final boolean normalSchematicOffset;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
     public final String netherWorldName;
@@ -176,7 +182,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final double chargeOnWarp;
     public final boolean publicWarps;
 
-    public SettingsHandler(SuperiorSkyblockPlugin plugin){
+    public SettingsHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         super(plugin);
 
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -281,7 +287,10 @@ public final class SettingsHandler extends AbstractHandler {
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
-        islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
+        islandWorldName = cfg.getString("worlds.world-name", "SuperiorWorld");
+        normalWorldEnabled = cfg.getBoolean("worlds.normal.enabled", true);
+        normalWorldUnlocked = cfg.getBoolean("worlds.normal.unlock", true);
+        normalSchematicOffset = cfg.getBoolean("worlds.normal.schematic-offset", true);
         netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = cfg.getString("worlds.nether.name", "");
@@ -293,6 +302,22 @@ public final class SettingsHandler extends AbstractHandler {
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = cfg.getBoolean("worlds.end.schematic-offset", true);
         endDragonFight = endWorldEnabled && cfg.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
+        String defaultWorldEnvironment = cfg.getString("worlds.default-world");
+        if(defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled){
+            this.defaultWorldEnvironment = World.Environment.NORMAL;
+            this.defaultWorldName = this.islandWorldName;
+        }
+        else if(defaultWorldEnvironment.equalsIgnoreCase("nether") && netherWorldEnabled){
+            this.defaultWorldEnvironment = World.Environment.NETHER;
+            this.defaultWorldName = this.netherWorldName;
+        }
+        else if(defaultWorldEnvironment.equalsIgnoreCase("the_end") && endWorldEnabled){
+            this.defaultWorldEnvironment = World.Environment.THE_END;
+            this.defaultWorldName = this.endWorldName;
+        }
+        else{
+            throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+        }
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
@@ -443,6 +468,10 @@ public final class SettingsHandler extends AbstractHandler {
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
         publicWarps = cfg.getBoolean("public-warps");
+        if(cfg.contains("worlds.normal-world")){
+            cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
+            cfg.set("worlds.normal-world", null);
+        }
     }
 
     @Override
@@ -465,7 +494,11 @@ public final class SettingsHandler extends AbstractHandler {
 
         cfg.save(file);
 
-        plugin.setSettings(new SettingsHandler(plugin));
+        try {
+            plugin.setSettings(new SettingsHandler(plugin));
+        }catch (HandlerLoadException ex){
+            HandlerLoadException.handle(ex);
+        }
     }
 
     private void convertData(YamlConfiguration cfg){

@@ -89,7 +89,7 @@ public final class SpawnIsland implements Island {
             return;
         }
 
-        Executor.sync(() -> biome = getCenter(World.Environment.NORMAL).getBlock().getBiome());
+        Executor.sync(() -> biome = getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock().getBiome());
     }
 
     @Override
@@ -268,13 +268,13 @@ public final class SpawnIsland implements Island {
     @Override
     public Map<World.Environment, Location> getTeleportLocations() {
         Map<World.Environment, Location> map = new HashMap<>();
-        map.put(World.Environment.NORMAL, center);
+        map.put(plugin.getSettings().defaultWorldEnvironment, center);
         return map;
     }
 
     @Override
     public Location getVisitorsLocation() {
-        return getCenter(World.Environment.NORMAL);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment);
     }
 
     @Override
@@ -294,7 +294,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        return getCenter(World.Environment.NORMAL).subtract(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandSize, 0, islandSize);
     }
 
     @Override
@@ -304,7 +304,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        return getCenter(World.Environment.NORMAL).add(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandSize, 0, islandSize);
     }
 
     @Override
@@ -319,7 +319,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return getAllChunks(World.Environment.NORMAL, onlyProtected);
+        return getAllChunks(plugin.getSettings().defaultWorldEnvironment, onlyProtected);
     }
 
     @Override
@@ -354,7 +354,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        return getLoadedChunks(World.Environment.NORMAL, onlyProtected, noEmptyChunks);
+        return getLoadedChunks(plugin.getSettings().defaultWorldEnvironment, onlyProtected, noEmptyChunks);
     }
 
     @Override
@@ -408,7 +408,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        if(!location.getWorld().equals(getCenter(World.Environment.NORMAL).getWorld()))
+        if(!location.getWorld().equals(getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -428,12 +428,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        if(!chunk.getWorld().equals(getCenter(World.Environment.NORMAL).getWorld()))
+        if(!chunk.getWorld().equals(getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
         return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
                 (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
+    }
+
+    @Override
+    public boolean isNormalEnabled() {
+        return false;
+    }
+
+    @Override
+    public void setNormalEnabled(boolean enabled) {
+
     }
 
     @Override

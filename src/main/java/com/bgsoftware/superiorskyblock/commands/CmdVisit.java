@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public final class CmdVisit implements ISuperiorCommand {
             if(!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getTeleportLocation(World.Environment.NORMAL);
+            visitLocation = targetIsland.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
             Locale.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 

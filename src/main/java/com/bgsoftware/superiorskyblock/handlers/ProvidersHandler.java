@@ -335,6 +335,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         worldsProvider.prepareTeleport(island, location, finishCallback);
     }
 
+    public boolean isNormalEnabled(){
+        return worldsProvider.isNormalEnabled();
+    }
+
+    public boolean isNormalUnlocked(){
+        return worldsProvider.isNormalUnlocked();
+    }
+
     public boolean isNetherEnabled(){
         return worldsProvider.isNetherEnabled();
     }

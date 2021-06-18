@@ -36,10 +36,12 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
     }
 
     public Island add(UUID uuid, Island island){
-        Location islandLocation = island.getCenter(World.Environment.NORMAL);
+        Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
         islandsByPositions.add(IslandPosition.of(islandLocation), island);
 
         if(plugin.getProviders().hasCustomWorldsSupport()){
+            runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
+                    location -> islandsByPositions.add(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
                     location -> islandsByPositions.add(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
@@ -55,10 +57,12 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
     public Island remove(UUID uuid){
         Island island = super.remove(uuid);
         if(island != null) {
-            Location islandLocation = island.getCenter(World.Environment.NORMAL);
+            Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
             islandsByPositions.remove(IslandPosition.of(islandLocation));
 
             if(plugin.getProviders().hasCustomWorldsSupport()){
+                runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
+                        location -> islandsByPositions.remove(IslandPosition.of(location)));
                 runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
                         location -> islandsByPositions.remove(IslandPosition.of(location)));
                 runWithCustomWorld(islandLocation, island, World.Environment.THE_END,

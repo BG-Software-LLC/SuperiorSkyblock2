@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -31,9 +32,17 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public void prepareWorlds() {
-        SettingsHandler settingsHandler = new SettingsHandler(plugin);
+        SettingsHandler settingsHandler;
+
+        try {
+            settingsHandler = new SettingsHandler(plugin);
+        }catch (HandlerLoadException ex){
+            return;
+        }
+
         Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty.toUpperCase());
-        loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
+        if(settingsHandler.normalWorldEnabled)
+            loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
         if(settingsHandler.netherWorldEnabled)
             loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
         if(settingsHandler.endWorldEnabled)
@@ -102,6 +111,16 @@ public final class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
         finishCallback.run();
+    }
+
+    @Override
+    public boolean isNormalEnabled() {
+        return plugin.getSettings().normalWorldEnabled;
+    }
+
+    @Override
+    public boolean isNormalUnlocked() {
+        return plugin.getSettings().normalWorldUnlocked;
     }
 
     @Override

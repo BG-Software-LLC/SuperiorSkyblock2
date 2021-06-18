@@ -294,7 +294,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
             nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
-            if(new SettingsHandler(this).endDragonFight)
+            if (new SettingsHandler(this).endDragonFight)
                 nmsDragonFight = (NMSDragonFight) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSDragonFight_" + version).newInstance();
             else
                 nmsDragonFight = new NMSDragonFight() {
@@ -323,6 +323,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
                     }
                 };
+            return true;
+        }catch (HandlerLoadException ignored){
             return true;
         }catch(Exception ex){
             log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
@@ -387,7 +389,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public boolean reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
-        settingsHandler = new SettingsHandler(this);
+        try {
+            settingsHandler = new SettingsHandler(this);
+        }catch (HandlerLoadException ex){
+            if(!HandlerLoadException.handle(ex))
+                return;
+        }
 
         if(loadGrid){
             commandsHandler.loadData();

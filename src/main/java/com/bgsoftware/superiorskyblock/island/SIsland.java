@@ -169,7 +169,7 @@ public final class SIsland implements Island {
     private final Registry<Mission<?>, Integer> completedMissions = Registry.createRegistry();
     private final SyncedObject<Biome> biome = SyncedObject.of(null);
     private final SyncedObject<Boolean> ignored = SyncedObject.of(false);
-    private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(8);
+    private final SyncedObject<Integer> generatedSchematics = SyncedObject.of(0);
     private final SyncedObject<String> schemName = SyncedObject.of("");
     private final SyncedObject<Integer> unlockedWorlds = SyncedObject.of(0);
     private final SyncedObject<Long> lastTimeUpdate = SyncedObject.of(-1L);
@@ -343,6 +343,7 @@ public final class SIsland implements Island {
         this.islandName.set(islandName);
         this.islandRawName.set(StringUtils.stripColors(islandName));
         this.schemName.set(schemName);
+        setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment, false);
 
         updateLastInterest(currentTime);
 
@@ -688,7 +689,7 @@ public final class SIsland implements Island {
         if(visitorsLocation == null)
             return null;
 
-        World world = plugin.getGrid().getIslandsWorld(this, World.Environment.NORMAL);
+        World world = plugin.getGrid().getIslandsWorld(this, plugin.getSettings().defaultWorldEnvironment);
         visitorsLocation.setWorld(world);
 
         return visitorsLocation;
@@ -761,25 +762,25 @@ public final class SIsland implements Island {
     @Override
     public Location getMinimum(){
         int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
-        return getCenter(World.Environment.NORMAL).subtract(islandDistance, 0, islandDistance);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMinimumProtected() {
         int islandSize = getIslandSize();
-        return getCenter(World.Environment.NORMAL).subtract(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandSize, 0, islandSize);
     }
 
     @Override
     public Location getMaximum(){
         int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
-        return getCenter(World.Environment.NORMAL).add(islandDistance, 0, islandDistance);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMaximumProtected() {
         int islandSize = getIslandSize();
-        return getCenter(World.Environment.NORMAL).add(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandSize, 0, islandSize);
     }
 
     @Override
@@ -931,6 +932,29 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public boolean isNormalEnabled() {
+        return plugin.getProviders().isNormalUnlocked() || (unlockedWorlds.get() & 4) == 4;
+    }
+
+    @Override
+    public void setNormalEnabled(boolean enabled) {
+        int unlockedWorlds = this.unlockedWorlds.get();
+
+        if(enabled){
+            SuperiorSkyblockPlugin.debug("Action: Enable Normal, Island: " + owner.getName());
+            unlockedWorlds |= 4;
+        }
+        else {
+            SuperiorSkyblockPlugin.debug("Action: Disable Normal, Island: " + owner.getName());
+            unlockedWorlds &= 3;
+        }
+
+        this.unlockedWorlds.set(unlockedWorlds);
+
+        islandDataHandler.saveUnlockedWorlds();
+    }
+
+    @Override
     public boolean isNetherEnabled() {
         return plugin.getProviders().isNetherUnlocked() || (unlockedWorlds.get() & 1) == 1;
     }
@@ -945,7 +969,7 @@ public final class SIsland implements Island {
         }
         else {
             SuperiorSkyblockPlugin.debug("Action: Disable Nether, Island: " + owner.getName());
-            unlockedWorlds &= 2;
+            unlockedWorlds &= 6;
         }
 
         this.unlockedWorlds.set(unlockedWorlds);
@@ -968,7 +992,7 @@ public final class SIsland implements Island {
         }
         else {
             SuperiorSkyblockPlugin.debug("Action: Disable End, Island: " + owner.getName());
-            unlockedWorlds &= 1;
+            unlockedWorlds &= 5;
         }
 
         this.unlockedWorlds.set(unlockedWorlds);
@@ -1435,7 +1459,7 @@ public final class SIsland implements Island {
             List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
 
             {
-                World normalWorld = getCenter(World.Environment.NORMAL).getWorld();
+                World normalWorld = getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
                 IslandUtils.getChunkCoords(this, normalWorld, false, false).forEach(chunkPosition ->
                         plugin.getNMSBlocks().setChunkBiome(chunkPosition, biome, playersToUpdate));
             }

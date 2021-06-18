@@ -302,10 +302,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         if(!isOnline())
             return;
 
-        Location islandTeleportLocation = island.getTeleportLocation(World.Environment.NORMAL);
+        Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
         assert islandTeleportLocation != null;
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
-        Block islandCenterBlock = island.getCenter(World.Environment.NORMAL).getBlock();
+        Block islandCenterBlock = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock();
 
         if(island instanceof SpawnIsland){
             SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
@@ -347,7 +347,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
          *   Finding a new block to teleport the player to.
          */
 
-        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(World.Environment.NORMAL, true, true, null)
+        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
+                plugin.getSettings().defaultWorldEnvironment, true, true, null)
                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
         Executor.createTask().runAsync(v -> {
