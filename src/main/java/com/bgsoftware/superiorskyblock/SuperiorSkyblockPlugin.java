@@ -393,7 +393,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             settingsHandler = new SettingsHandler(this);
         }catch (HandlerLoadException ex){
             if(!HandlerLoadException.handle(ex))
-                return;
+                return false;
         }
 
         if(loadGrid){
