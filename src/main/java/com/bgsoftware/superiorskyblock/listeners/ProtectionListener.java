@@ -22,6 +22,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Donkey;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
@@ -30,6 +31,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -816,6 +818,14 @@ public final class ProtectionListener implements Listener {
             closeInventory = true;
         }
         else if(e.getRightClicked() instanceof Horse){
+            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
+            closeInventory = true;
+        }
+        else if(e.getRightClicked() instanceof Mule){
+            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
+            closeInventory = true;
+        }
+        else if(e.getRightClicked() instanceof Donkey){
             islandPrivilege = IslandPrivileges.HORSE_INTERACT;
             closeInventory = true;
         }
