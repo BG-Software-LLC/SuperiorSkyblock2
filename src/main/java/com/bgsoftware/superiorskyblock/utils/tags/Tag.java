@@ -35,6 +35,7 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 import com.bgsoftware.common.reflection.ReflectConstructor;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;
@@ -160,8 +161,13 @@ public abstract class Tag<E> {
 
     protected static Class<?> getNNTClass(String nbtType){
         try{
-            String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-            return Class.forName("net.minecraft.server." + version + "." + nbtType);
+            if(ServerVersion.isAtLeast(ServerVersion.v1_17)) {
+                return Class.forName("net.minecraft.nbt." + nbtType);
+            }
+            else {
+                String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+                return Class.forName("net.minecraft.server." + version + "." + nbtType);
+            }
         }catch (Exception ex){
             ex.printStackTrace();
             return null;
