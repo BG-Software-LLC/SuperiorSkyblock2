@@ -817,15 +817,8 @@ public final class ProtectionListener implements Listener {
             islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
             closeInventory = true;
         }
-        else if(e.getRightClicked() instanceof Horse){
-            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
-            closeInventory = true;
-        }
-        else if(e.getRightClicked() instanceof Mule){
-            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
-            closeInventory = true;
-        }
-        else if(e.getRightClicked() instanceof Donkey){
+        else if(e.getRightClicked() instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && (
+                e.getRightClicked() instanceof Mule || e.getRightClicked() instanceof Donkey))){
             islandPrivilege = IslandPrivileges.HORSE_INTERACT;
             closeInventory = true;
         }
