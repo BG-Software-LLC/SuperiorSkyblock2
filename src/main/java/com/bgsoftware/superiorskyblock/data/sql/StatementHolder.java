@@ -1,11 +1,10 @@
-package com.bgsoftware.superiorskyblock.utils.database;
+package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,57 +13,20 @@ public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final EnumMap<Query, IncreasableInteger> queryCalls = new EnumMap<>(Query.class);
-
     private final List<Registry<Integer, Object>> batches = new ArrayList<>();
 
     private final String query;
-    private final DatabaseObject databaseObject;
-    private final Query queryEnum;
     private final Map<Integer, Object> values = new HashMap<>();
     private int currentIndex = 1;
 
     private boolean isBatch = false;
 
-    StatementHolder(DatabaseObject databaseObject, Query query){
+    public StatementHolder(String statement){
         String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        this.queryEnum = query;
-        this.query = query.getStatement().replace("{prefix}", prefix);
-        this.databaseObject = databaseObject == null ? DatabaseObject.NULL_DATA : databaseObject;
-        this.databaseObject.setModified(query);
+        this.query = statement.replace("{prefix}", prefix);
     }
 
-    public StatementHolder setString(String value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setInt(int value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setShort(short value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setLong(long value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setFloat(float value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setDouble(double value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
-    public StatementHolder setBoolean(boolean value){
+    public StatementHolder setObject(Object value){
         values.put(currentIndex++, value);
         return this;
     }
@@ -92,7 +54,6 @@ public final class StatementHolder {
 
             synchronized (SQLHelper.getMutex()) {
                 SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
-                queryCalls.computeIfAbsent(queryEnum, q -> new IncreasableInteger()).increase();
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     if (isBatch) {
                         if (batches.isEmpty()) {
@@ -125,22 +86,14 @@ public final class StatementHolder {
                         preparedStatement.executeUpdate();
                     }
 
-                    databaseObject.setUpdated(queryEnum);
                 }, ex -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
                     ex.printStackTrace();
-
-                    databaseObject.setUpdated(queryEnum);
                 });
             }
         } finally {
             values.clear();
-            databaseObject.setUpdated(queryEnum);
         }
-    }
-
-    public static EnumMap<Query, IncreasableInteger> getQueryCalls() {
-        return queryCalls;
     }
 
     private static class StringHolder{

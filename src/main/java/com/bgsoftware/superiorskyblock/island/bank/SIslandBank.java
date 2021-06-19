@@ -8,12 +8,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -128,11 +127,6 @@ public final class SIslandBank implements IslandBank {
         MenuBankLogs.refreshMenus(island);
 
         return bankTransaction;
-    }
-
-    public void giveMoneyRaw(BigDecimal amount){
-        setBalance(this.balance.get().add(amount), true);
-        MenuIslandBank.refreshMenus(island);
     }
 
     @Override
@@ -250,15 +244,7 @@ public final class SIslandBank implements IslandBank {
                 .write(transactions -> transactions.add(bankTransaction));
 
         if(save){
-            Query.TRANSACTION_INSERT.getStatementHolder((SIslandDataHandler) island.getDataHandler())
-                    .setString(island.getUniqueId().toString())
-                    .setString(senderUUID == null ? "" : senderUUID + "")
-                    .setString(bankTransaction.getAction().name())
-                    .setInt(bankTransaction.getPosition())
-                    .setString(bankTransaction.getTime() + "")
-                    .setString(bankTransaction.getFailureReason())
-                    .setString(bankTransaction.getAmount() + "")
-                    .execute(true);
+            IslandsDatabaseBridge.saveBankTransaction(island, bankTransaction);
         }
     }
 
@@ -266,10 +252,7 @@ public final class SIslandBank implements IslandBank {
         this.balance.set(balance);
 
         if(save){
-            Query.ISLAND_SET_BANK.getStatementHolder((SIslandDataHandler) island.getDataHandler())
-                    .setString(balance + "")
-                    .setString(island.getOwner().getUniqueId() + "")
-                    .execute(true);
+            IslandsDatabaseBridge.saveIslandBank(island);
         }
     }
 

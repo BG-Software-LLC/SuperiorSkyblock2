@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -272,7 +271,7 @@ public final class CustomEventsListener implements Listener {
         if(plugin.getSettings().stopLeaving && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
                 !fromIsland.isSpawn() && equalWorlds){
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setLeavingFlag(true);
+            superiorPlayer.setLeavingFlag(true);
             if(event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             return false;
@@ -325,8 +324,8 @@ public final class CustomEventsListener implements Listener {
             return;
 
         // This can happen after the leave event is cancelled.
-        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isLeavingFlag()){
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setLeavingFlag(false);
+        if(superiorPlayer.isLeavingFlag()){
+            superiorPlayer.setLeavingFlag(false);
             return;
         }
 
@@ -370,8 +369,8 @@ public final class CustomEventsListener implements Listener {
         if(equalIslands) {
             if(!equalWorlds) {
                 Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
-                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
-                Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
+                superiorPlayer.setImmunedToPortals(true);
+                Executor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
             }
             return;
         }
@@ -388,13 +387,13 @@ public final class CustomEventsListener implements Listener {
         if(!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)){
             Locale.ENTER_PVP_ISLAND.send(superiorPlayer);
             if(plugin.getSettings().immuneToPVPWhenTeleport) {
-                ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToPvP(true);
-                Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToPvP(false), 200L);
+                superiorPlayer.setImmunedToPvP(true);
+                Executor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);
             }
         }
 
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(true);
-        Executor.sync(() -> ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setImmunedToTeleport(false), 100L);
+        superiorPlayer.setImmunedToPortals(true);
+        Executor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
 
         if(plugin.getSettings().spawnProtection || !toIsland.isSpawn()) {
             if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {

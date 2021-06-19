@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -10,8 +11,9 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.data.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.data.SEmptyPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -19,8 +21,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -365,13 +369,59 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setImmunedToPvP(boolean immunedToPvP) {
+
+    }
+
+    @Override
+    public boolean isImmunedToPvP() {
+        return false;
+    }
+
+    @Override
+    public void setLeavingFlag(boolean leavingFlag) {
+
+    }
+
+    @Override
+    public boolean isLeavingFlag() {
+        return false;
+    }
+
+    @Override
+    public void setTeleportTask(@Nullable BukkitTask teleportTask) {
+
+    }
+
+    @Nullable
+    @Override
+    public BukkitTask getTeleportTask() {
+        return null;
+    }
+
+    @Override
+    public void setImmunedToPortals(boolean immuneToPortals) {
+
+    }
+
+    @Override
+    public boolean isImmunedToPortals() {
+        return false;
+    }
+
+    @Override
     public void merge(SuperiorPlayer other) {
 
     }
 
     @Override
     public PlayerDataHandler getDataHandler() {
-        return SEmptyPlayerDataHandler.getHandler();
+        return EmptyDataHandler.getInstance();
+    }
+
+    @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return EmptyDatabaseBridge.getInstance();
     }
 
 }

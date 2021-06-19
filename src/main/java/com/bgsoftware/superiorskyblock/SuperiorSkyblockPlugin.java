@@ -81,6 +81,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final Updater updater = new Updater(this, "superiorskyblock2");
 
+    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this);
     private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this);
     private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
@@ -92,7 +93,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
     private final CommandsHandler commandsHandler = new CommandsHandler(this);
     private final DataHandler dataHandler = new DataHandler(this);
-    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final ModulesHandler modulesHandler = new ModulesHandler(this);
 
     // The only handler that is initialized is this one, therefore it's not final.

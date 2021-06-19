@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.database;
+package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.zaxxer.hikari.HikariConfig;

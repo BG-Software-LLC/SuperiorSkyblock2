@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -1576,7 +1577,14 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the data handler of the object.
+     * @deprecated See getDatabaseBridge
      */
+    @Deprecated
     IslandDataHandler getDataHandler();
+
+    /**
+     * Get the current database bridge of the island.
+     */
+    DatabaseBridge getDatabaseBridge();
 
 }

@@ -1,0 +1,97 @@
+package com.bgsoftware.superiorskyblock.data.sql;
+
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+
+import java.util.UUID;
+
+public final class SQLDatabaseBridge implements DatabaseBridge {
+
+    private boolean shouldSaveData = false;
+    private final UUID objectId;
+    private final String idFilter;
+
+    public SQLDatabaseBridge(UUID objectId, String columnIdName){
+        this.objectId = objectId;
+        this.idFilter = columnIdName == null ? "" : String.format(" WHERE %s=?", columnIdName);
+    }
+
+    @Override
+    public void startSavingData() {
+        shouldSaveData = true;
+    }
+
+    @Override
+    public void updateObject(String table, Pair<String, Object>[] columns) {
+        if(!shouldSaveData)
+            return;
+
+        StringBuilder columnsBuilder = new StringBuilder();
+
+        for(Pair<String, Object> column : columns) {
+            if(columnsBuilder.length() != 0)
+                columnsBuilder.append(",");
+            columnsBuilder.append(column.getKey()).append("=?");
+        }
+
+        StatementHolder statementHolder = new StatementHolder(
+                String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder.toString(), idFilter)
+        );
+
+        for(Pair<String, Object> column : columns) {
+            statementHolder.setObject(column.getValue());
+        }
+
+        if(objectId != null){
+            statementHolder.setObject(objectId + "");
+        }
+
+        statementHolder.execute(true);
+    }
+
+    @Override
+    public void insertObject(String table, Pair<String, Object>... columns) {
+        if(!shouldSaveData)
+            return;
+
+        StringBuilder columnsBuilder = new StringBuilder();
+        StringBuilder valuesBuilder = new StringBuilder();
+
+        for(Pair<String, Object> column : columns) {
+            if(columnsBuilder.length() != 0)
+                columnsBuilder.append(",");
+            if(valuesBuilder.length() != 0)
+                valuesBuilder.append(",");
+            columnsBuilder.append(column.getKey());
+            valuesBuilder.append("?");
+        }
+
+        StatementHolder statementHolder = new StatementHolder(
+                String.format("INSERT INTO {prefix}%s (%s) VALUES(%s);", table,
+                        columnsBuilder.toString(), valuesBuilder.toString())
+        );
+
+        for(Pair<String, Object> column : columns) {
+            statementHolder.setObject(column.getValue());
+        }
+
+        statementHolder.execute(true);
+    }
+
+    @Override
+    public void deleteObject(String table) {
+        if(!shouldSaveData)
+            return;
+
+        StatementHolder statementHolder = new StatementHolder(
+                String.format("DELETE FROM {prefix}%s%s;", table, idFilter)
+        );
+
+        if(objectId != null){
+            statementHolder.setObject(objectId + "");
+        }
+
+        statementHolder.execute(true);
+    }
+
+}

@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
@@ -515,7 +514,7 @@ public final class PlayersListener implements Listener {
         if(cancellable != null)
             cancellable.setCancelled(true);
 
-        if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
+        if(superiorPlayer.isImmunedToPortals())
             return;
 
         World.Environment environment = from.getWorld().getEnvironment() != World.Environment.NORMAL ?
@@ -656,11 +655,11 @@ public final class PlayersListener implements Listener {
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        BukkitTask teleportTask = ((SPlayerDataHandler) superiorPlayer.getDataHandler()).getTeleportTask();
+        BukkitTask teleportTask = superiorPlayer.getTeleportTask();
 
         if(teleportTask != null){
             teleportTask.cancel();
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
+            superiorPlayer.setTeleportTask(null);
             Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 

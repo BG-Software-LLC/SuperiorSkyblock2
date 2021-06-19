@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -306,5 +307,15 @@ public interface GridManager {
      * This value is updated every minute, so it might not be 100% accurate.
      */
     BigDecimal getTotalLevel();
+
+    /**
+     * Get the location of the last island that was generated.
+     */
+    Location getLastIslandLocation();
+
+    /**
+     * Get the database-bridge of the grid.
+     */
+    DatabaseBridge getDatabaseBridge();
 
 }

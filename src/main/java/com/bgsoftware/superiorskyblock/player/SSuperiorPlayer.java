@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -12,7 +13,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
+import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -38,6 +40,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -59,7 +62,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Registry<Mission<?>, Integer> completedMissions = Registry.createRegistry();
-    private final SPlayerDataHandler playerDataHandler = new SPlayerDataHandler(this);
+    private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final UUID uuid;
 
     private UUID islandLeaderFromCache;
@@ -82,6 +85,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private int disbands;
     private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().defaultBorderColor, BorderColor.BLUE);
     private long lastTimeStatus = -1;
+
+    private boolean immuneToPvP = false;
+    private boolean immuneToPortals = false;
+    private boolean leavingFlag = false;
+
+    private BukkitTask teleportTask = null;
 
     public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
         uuid = UUID.fromString(resultSet.getString("player"));
@@ -139,9 +148,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
         this.textureValue = textureValue;
-        playerDataHandler.saveTextureValue();
+        PlayersDatabaseBridge.saveTextureValue(this);
     }
-
 
     @Override
     public void updateLastTimeStatus() {
@@ -149,7 +157,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
 
-        playerDataHandler.saveLastTimeStatus();
+        PlayersDatabaseBridge.saveLastTimeStatus(this);
     }
 
     @Override
@@ -162,7 +170,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Player player = asPlayer();
         if(player != null) {
             this.name = player.getName();
-            playerDataHandler.savePlayerName();
+            PlayersDatabaseBridge.savePlayerName(this);
         }
     }
 
@@ -433,7 +441,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(islandLeader, "islandLeader parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + islandLeader.getName());
         this.islandLeader = islandLeader;
-        playerDataHandler.saveIslandLeader();
+        PlayersDatabaseBridge.saveIslandLeader(this);
     }
 
     @Override
@@ -459,7 +467,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
-        playerDataHandler.savePlayerRole();
+        PlayersDatabaseBridge.savePlayerRole(this);
     }
 
     @Override
@@ -476,7 +484,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void setDisbands(int disbands) {
         SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
         this.disbands = Math.max(disbands, 0);
-        playerDataHandler.saveDisbands();
+        PlayersDatabaseBridge.saveDisbands(this);
     }
 
     /*
@@ -499,7 +507,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         this.userLocale = userLocale;
 
-        playerDataHandler.saveUserLocale();
+        PlayersDatabaseBridge.saveUserLocale(this);
     }
 
     @Override
@@ -511,7 +519,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
         SuperiorSkyblockPlugin.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
-        playerDataHandler.saveToggledBorder();
+        PlayersDatabaseBridge.saveToggledBorder(this);
     }
 
     @Override
@@ -572,7 +580,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
         SuperiorSkyblockPlugin.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
-        playerDataHandler.saveToggledPanel();
+        PlayersDatabaseBridge.saveToggledPanel(this);
     }
 
     @Override
@@ -594,7 +602,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void toggleIslandFly(){
         islandFly = !islandFly;
         SuperiorSkyblockPlugin.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
-        playerDataHandler.saveIslandFly();
+        PlayersDatabaseBridge.saveIslandFly(this);
     }
 
     @Override
@@ -618,7 +626,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(borderColor, "borderColor parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
         this.borderColor = borderColor;
-        playerDataHandler.saveBorderColor();
+        PlayersDatabaseBridge.saveBorderColor(this);
     }
 
     /*
@@ -656,7 +664,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
         completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
-        playerDataHandler.saveMissions();
+        PlayersDatabaseBridge.saveMissions(this);
     }
 
     @Override
@@ -673,7 +681,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         mission.clearData(this);
 
-        playerDataHandler.saveMissions();
+        PlayersDatabaseBridge.saveMissions(this);
     }
 
     @Override
@@ -710,6 +718,51 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
      */
 
     @Override
+    public void setImmunedToPvP(boolean immunedToPvP){
+        SuperiorSkyblockPlugin.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
+        this.immuneToPvP = immunedToPvP;
+    }
+
+    @Override
+    public boolean isImmunedToPvP(){
+        return immuneToPvP;
+    }
+
+    @Override
+    public void setLeavingFlag(boolean leavingFlag){
+        SuperiorSkyblockPlugin.debug("Action: Set Leaving Flag, Player: " + getName() + ", Flag: " + leavingFlag);
+        this.leavingFlag = leavingFlag;
+    }
+
+    @Override
+    public boolean isLeavingFlag() {
+        return leavingFlag;
+    }
+
+    @Override
+    public void setTeleportTask(BukkitTask teleportTask){
+        if(this.teleportTask != null)
+            this.teleportTask.cancel();
+        this.teleportTask = teleportTask;
+    }
+
+    @Override
+    public BukkitTask getTeleportTask(){
+        return teleportTask;
+    }
+
+    @Override
+    public void setImmunedToPortals(boolean immuneToTeleport){
+        SuperiorSkyblockPlugin.debug("Action: Set Portals Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
+        this.immuneToPortals = immuneToTeleport;
+    }
+
+    @Override
+    public boolean isImmunedToPortals(){
+        return immuneToPortals;
+    }
+
+    @Override
     public void merge(SuperiorPlayer otherPlayer){
         Preconditions.checkNotNull(otherPlayer, "otherPlayer parameter cannot be null.");
 
@@ -732,13 +785,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Executor.async(() -> FileUtils.replaceString(new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml"),
                 otherPlayer.getUniqueId() + "", uuid + ""));
 
-        playerDataHandler.executeUpdateStatement(true);
-        ((SPlayerDataHandler) otherPlayer.getDataHandler()).executeDeleteStatement(true);
+        PlayersDatabaseBridge.updatePlayer(this);
+        PlayersDatabaseBridge.deletePlayer(otherPlayer);
     }
 
     @Override
     public PlayerDataHandler getDataHandler() {
-        return playerDataHandler;
+        return EmptyDataHandler.getInstance();
+    }
+
+    @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return databaseBridge;
     }
 
     /*
@@ -769,7 +827,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             return target ? HitActionResult.TARGET_NOT_ONLINE : HitActionResult.NOT_ONLINE;
 
         // Checks for pvp warm-up
-        if(((SPlayerDataHandler) player.getDataHandler()).isImmunedToPvP())
+        if(player.isImmunedToPvP())
             return target ? HitActionResult.TARGET_PVP_WARMUP : HitActionResult.PVP_WARMUP;
 
         Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
