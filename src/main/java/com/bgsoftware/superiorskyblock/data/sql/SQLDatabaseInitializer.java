@@ -58,9 +58,8 @@ public final class SQLDatabaseInitializer {
         try {
             File file = new File(plugin.getDataFolder(), "database.db");
             if (!file.exists()) {
-                if (!file.getParentFile().mkdirs())
-                    throw new HandlerLoadException("Cannot create parent directories for database file",
-                            HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+                //noinspection ResultOfMethodCallIgnored
+                file.getParentFile().mkdirs();
                 if (!file.createNewFile())
                     throw new HandlerLoadException("Cannot create database file",
                             HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
