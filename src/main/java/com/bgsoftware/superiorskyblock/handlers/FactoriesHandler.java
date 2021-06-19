@@ -37,7 +37,7 @@ public final class FactoriesHandler implements FactoriesManager {
 
     @Override
     public void registerBanksFactory(BanksFactory banksFactory) {
-        Preconditions.checkNotNull(playersFactory, "banksFactory parameter cannot be null.");
+        Preconditions.checkNotNull(banksFactory, "banksFactory parameter cannot be null.");
         this.banksFactory = banksFactory;
     }
 
