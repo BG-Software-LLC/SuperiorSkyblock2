@@ -82,7 +82,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
         }
 
         StatementHolder statementHolder = new StatementHolder(
-                String.format("INSERT INTO {prefix}%s (%s) VALUES(%s);", table,
+                String.format("REPLACE INTO {prefix}%s (%s) VALUES(%s);", table,
                         columnsBuilder.toString(), valuesBuilder.toString())
         );
 
