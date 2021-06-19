@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.data.sql;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
@@ -14,6 +16,19 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     public SQLDatabaseBridge(UUID objectId, String columnIdName){
         this.objectId = objectId;
         this.idFilter = columnIdName == null ? "" : String.format(" WHERE %s=?", columnIdName);
+    }
+
+    @Override
+    public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
+        SQLHelper.executeQuery("SELECT * FROM {prefix}" + table + ";", resultSet -> {
+            while (resultSet.next()){
+                try {
+                    resultConsumer.accept(new ResultSetMapBridge(resultSet));
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

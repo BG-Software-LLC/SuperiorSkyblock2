@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
@@ -16,8 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -137,9 +136,11 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         return rolesById.keys().stream().sorted().map(rolesById::get).collect(Collectors.toList());
     }
 
-    public void loadPlayer(ResultSet resultSet) throws SQLException {
+    public SuperiorPlayer loadPlayer(DatabaseResult resultSet) {
         UUID player = UUID.fromString(resultSet.getString("player"));
-        players.add(player, plugin.getFactory().createPlayer(resultSet));
+        SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(resultSet);
+        players.add(player, superiorPlayer);
+        return superiorPlayer;
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer){

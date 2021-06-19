@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
@@ -98,8 +99,6 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -195,7 +194,7 @@ public final class SIsland implements Island {
     private final SyncedObject<UpgradeValue<BigDecimal>> bankLimit = SyncedObject.of(new UpgradeValue<>(new BigDecimal(-2), true));
     private final SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits = SyncedObject.of(new HashMap<>());
 
-    public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
+    public SIsland(GridHandler grid, DatabaseResult resultSet) {
         try {
             this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
             this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
@@ -3612,16 +3611,10 @@ public final class SIsland implements Island {
         return cobbleGeneratorValues;
     }
 
-    private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
+    private static void parseNumbersSafe(Runnable code) {
         try{
             code.run();
         }catch (NumberFormatException | NullPointerException ignored){}
-    }
-
-    private interface SafeRunnable{
-
-        void run() throws SQLException;
-
     }
 
 }

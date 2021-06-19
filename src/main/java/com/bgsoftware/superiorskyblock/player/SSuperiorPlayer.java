@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
@@ -45,8 +46,6 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -92,7 +91,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(ResultSet resultSet) throws SQLException {
+    public SSuperiorPlayer(DatabaseResult resultSet) {
         uuid = UUID.fromString(resultSet.getString("player"));
         islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
         name = resultSet.getString("name");

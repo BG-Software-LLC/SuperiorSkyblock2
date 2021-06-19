@@ -2,11 +2,10 @@ package com.bgsoftware.superiorskyblock.island.bank;
 
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public final class SBankTransaction implements BankTransaction {
@@ -29,7 +28,7 @@ public final class SBankTransaction implements BankTransaction {
         this.amount = amount;
     }
 
-    public SBankTransaction(ResultSet resultSet) throws SQLException {
+    public SBankTransaction(DatabaseResult resultSet) {
         String player = resultSet.getString("player");
         this.player = player == null || player.isEmpty() ? null  : UUID.fromString(player);
         this.bankAction = BankAction.valueOf(resultSet.getString("bankAction"));

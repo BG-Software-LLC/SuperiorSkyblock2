@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
@@ -17,8 +18,6 @@ import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public final class FactoriesHandler implements FactoriesManager {
@@ -52,7 +51,7 @@ public final class FactoriesHandler implements FactoriesManager {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 
-    public Island createIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
+    public Island createIsland(GridHandler grid, DatabaseResult resultSet) {
         SIsland island = new SIsland(grid, resultSet);
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
@@ -62,7 +61,7 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(ResultSet resultSet) throws SQLException {
+    public SuperiorPlayer createPlayer(DatabaseResult resultSet) {
         SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
@@ -82,13 +81,16 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public DatabaseBridge createDatabaseBridge(Island island){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge(island.getUniqueId(), "owner");
+        SQLDatabaseBridge databaseBridge = island == null ? new SQLDatabaseBridge(null, null) :
+                new SQLDatabaseBridge(island.getUniqueId(), "owner");
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge(superiorPlayer.getUniqueId(), "player");
+        SQLDatabaseBridge databaseBridge = superiorPlayer == null ?
+                new SQLDatabaseBridge(null, null) :
+                new SQLDatabaseBridge(superiorPlayer.getUniqueId(), "player");
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }

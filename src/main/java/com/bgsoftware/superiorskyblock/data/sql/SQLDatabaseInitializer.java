@@ -1,21 +1,13 @@
 package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.World;
 
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SQLDatabaseInitializer {
@@ -56,12 +48,6 @@ public final class SQLDatabaseInitializer {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
 
         addMissingColumns();
-
-        loadPlayers();
-        loadIslands();
-        loadGrid();
-        loadStackedBlocks();
-        loadBankTransactions();
     }
 
     public void close() {
@@ -184,107 +170,6 @@ public final class SQLDatabaseInitializer {
                 "amount TEXT," +
                 "item TEXT" +
                 ");");
-    }
-
-    private void loadPlayers() {
-        SuperiorSkyblockPlugin.log("Starting to load players...");
-
-        SQLHelper.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
-            boolean updateRoles = false;
-
-            while (resultSet.next()) {
-                plugin.getPlayers().loadPlayer(resultSet);
-
-                if (!updateRoles) {
-                    try {
-                        Integer.parseInt(resultSet.getString("islandRole"));
-                    } catch (NumberFormatException ex) {
-                        updateRoles = true;
-                    }
-                }
-            }
-
-            if (updateRoles) {
-                for (PlayerRole playerRole : plugin.getPlayers().getRoles()) {
-                    SQLHelper.executeUpdate("UPDATE {prefix}players SET islandRole = '" + playerRole.getId() + "' WHERE islandRole = '" + playerRole + "';");
-                }
-            }
-        });
-
-        SuperiorSkyblockPlugin.log("Finished players!");
-    }
-
-    private void loadIslands() {
-        SuperiorSkyblockPlugin.log("Starting to load islands...");
-
-        AtomicBoolean updateUUIDs = new AtomicBoolean(false);
-
-        SQLHelper.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
-            while (resultSet.next()) {
-                String uuidRaw = resultSet.getString("uuid");
-                if (!updateUUIDs.get() && (uuidRaw == null || uuidRaw.isEmpty()))
-                    updateUUIDs.set(true);
-                plugin.getGrid().createIsland(resultSet);
-            }
-        });
-
-        if (updateUUIDs.get()) {
-            plugin.getGrid().getIslands().forEach(IslandsDatabaseBridge::saveUniqueId);
-        }
-
-        SuperiorSkyblockPlugin.log("Finished islands!");
-    }
-
-    private void loadGrid() {
-        SuperiorSkyblockPlugin.log("Starting to load grid...");
-
-        SQLHelper.executeQuery("SELECT * FROM {prefix}grid;", resultSet -> {
-            if (resultSet.next()) {
-                plugin.getGrid().loadGrid(resultSet);
-            }
-        });
-
-        SuperiorSkyblockPlugin.log("Finished grid!");
-    }
-
-    private void loadStackedBlocks() {
-        SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
-
-        AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
-
-        SQLHelper.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
-            while (resultSet.next()) {
-                plugin.getGrid().loadStackedBlocks(resultSet);
-                String item = resultSet.getString("item");
-                if (item == null || item.isEmpty())
-                    updateBlockKeys.set(true);
-            }
-        });
-
-        if (updateBlockKeys.get()) {
-            Executor.sync(() -> plugin.getGrid().updateStackedBlockKeys());
-        }
-
-        SuperiorSkyblockPlugin.log("Finished stacked blocks!");
-    }
-
-    private void loadBankTransactions() {
-        if (BuiltinModules.BANK.bankLogs) {
-            SuperiorSkyblockPlugin.log("Starting to load bank transactions...");
-
-            SQLHelper.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
-                while (resultSet.next()) {
-                    try {
-                        Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
-                        if (island != null)
-                            ((SIslandBank) island.getIslandBank()).loadTransaction(new SBankTransaction(resultSet));
-                    } catch (Exception ignored) {
-                    }
-                }
-            });
-
-            SuperiorSkyblockPlugin.log("Finished bank transactions!");
-        }
     }
 
     private void addMissingColumns() {
@@ -415,7 +300,6 @@ public final class SQLDatabaseInitializer {
                 }
             }, Throwable::printStackTrace);
         } else {
-            //SQLHelper.buildStatement("SELECT data_type FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{prefix}" + table + "' AND column_name = '" + column + "';", preparedStatement -> {
             SQLHelper.buildStatement("SHOW FIELDS FROM {prefix}" + table + ";", preparedStatement -> {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {

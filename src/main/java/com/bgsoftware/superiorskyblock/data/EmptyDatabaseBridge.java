@@ -3,6 +3,9 @@ package com.bgsoftware.superiorskyblock.data;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
+import java.util.Map;
+import java.util.function.Consumer;
+
 public final class EmptyDatabaseBridge implements DatabaseBridge {
 
     private static final EmptyDatabaseBridge instance = new EmptyDatabaseBridge();
@@ -12,6 +15,11 @@ public final class EmptyDatabaseBridge implements DatabaseBridge {
     }
 
     private EmptyDatabaseBridge(){
+
+    }
+
+    @Override
+    public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
 
     }
 

@@ -2,7 +2,17 @@ package com.bgsoftware.superiorskyblock.api.data;
 
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
+import java.util.Map;
+import java.util.function.Consumer;
+
 public interface DatabaseBridge {
+
+    /**
+     * Load all the objects from the database.
+     * @param table: The table to load the objects from.
+     * @param resultConsumer Consumer that receives each object from the database.
+     */
+    void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer);
 
     /**
      * Start saving data for the object.
