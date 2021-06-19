@@ -166,6 +166,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             EnchantsUtils.registerGlowEnchantment();
 
+            try {
+                settingsHandler = new SettingsHandler(this);
+            } catch (HandlerLoadException ex) {
+                if (!HandlerLoadException.handle(ex)) {
+                    shouldEnable = false;
+                    return;
+                }
+            }
+
             modulesHandler.loadData();
 
             EventsCaller.callPluginInitializeEvent(this);
@@ -332,44 +341,54 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
     }
 
-    @SuppressWarnings("all")
     public ChunkGenerator getGenerator(){
         if(worldGenerator == null) {
-            File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
+            loadGeneratorFromFile();
+            if (worldGenerator == null)
+                worldGenerator = new WorldGenerator(settingsHandler.defaultWorldEnvironment);
+        }
 
-            if (!generatorFolder.exists()) {
-                generatorFolder.mkdirs();
-            } else {
-                try {
-                    outerLoop:
-                    for (File file : generatorFolder.listFiles()) {
+        return worldGenerator;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void loadGeneratorFromFile(){
+        File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
+
+        if(!generatorFolder.isDirectory()){
+            generatorFolder.delete();
+        }
+
+        if (!generatorFolder.exists()) {
+            generatorFolder.mkdirs();
+        }
+
+        else {
+            try {
+                File[] generatorsFilesList =  generatorFolder.listFiles();
+                if(generatorsFilesList != null) {
+                    for (File file : generatorsFilesList) {
                         Optional<Class<?>> generatorClassOptional = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
                         if (generatorClassOptional.isPresent()) {
                             Class<?> generatorClass = generatorClassOptional.get();
-                            for(Constructor<?> constructor : generatorClass.getConstructors()){
-                                if(constructor.getParameterCount() == 0){
+                            for (Constructor<?> constructor : generatorClass.getConstructors()) {
+                                if (constructor.getParameterCount() == 0) {
                                     worldGenerator = (ChunkGenerator) generatorClass.newInstance();
-                                    break outerLoop;
-                                }
-                                else if(constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
-                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)){
+                                    return;
+                                } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
+                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
                                     worldGenerator = (ChunkGenerator) constructor.newInstance(this);
-                                    break outerLoop;
+                                    return;
                                 }
                             }
                         }
                     }
-                } catch (Exception ex) {
-                    log("An error occurred while loading the generator:");
-                    ex.printStackTrace();
                 }
+            } catch (Exception ex) {
+                log("An error occurred while loading the generator:");
+                ex.printStackTrace();
             }
-
-            if (worldGenerator == null)
-                worldGenerator = new WorldGenerator();
         }
-
-        return worldGenerator;
     }
 
     @Override
@@ -389,14 +408,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public boolean reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
-        try {
-            settingsHandler = new SettingsHandler(this);
-        }catch (HandlerLoadException ex){
-            if(!HandlerLoadException.handle(ex))
-                return false;
+        if(!loadGrid) {
+            try {
+                settingsHandler = new SettingsHandler(this);
+            } catch (HandlerLoadException ex) {
+                if (!HandlerLoadException.handle(ex))
+                    return false;
+            }
         }
 
-        if(loadGrid){
+        else{
             commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
