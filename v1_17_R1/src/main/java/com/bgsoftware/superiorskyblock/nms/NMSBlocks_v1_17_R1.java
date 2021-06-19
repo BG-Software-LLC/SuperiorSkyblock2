@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.chat.IChatBaseComponent;
@@ -255,7 +256,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             chunk.setType(blockPosition, blockData, true, true);
         }
         else {
-            int indexY = blockPosition.getY() >> 4;
+            int indexY = chunk.getSectionIndex(blockPosition.getY());
 
             ChunkSection chunkSection = chunk.getSections()[indexY];
 
@@ -269,7 +270,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
 //                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
 //                }
 //                TODO: Paper
-                chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(SectionPosition.a(blockPosition.getY()));
             }
 
             int blockX = blockPosition.getX() & 15;
@@ -282,6 +283,8 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             chunk.j.get(HeightMap.Type.f).a(blockX, blockY, blockZ, blockData);
             chunk.j.get(HeightMap.Type.d).a(blockX, blockY, blockZ, blockData);
             chunk.j.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
+
+            chunk.markDirty();
         }
 
         if(tileEntity != null) {
