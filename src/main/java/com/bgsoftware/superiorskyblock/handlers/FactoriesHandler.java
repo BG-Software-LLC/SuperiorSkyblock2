@@ -82,7 +82,7 @@ public final class FactoriesHandler implements FactoriesManager {
 
     public DatabaseBridge createDatabaseBridge(Island island){
         SQLDatabaseBridge databaseBridge = island == null ? new SQLDatabaseBridge(null, null) :
-                new SQLDatabaseBridge(island.getUniqueId(), "owner");
+                new SQLDatabaseBridge(island::getUniqueId, "uuid");
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
@@ -90,7 +90,7 @@ public final class FactoriesHandler implements FactoriesManager {
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer){
         SQLDatabaseBridge databaseBridge = superiorPlayer == null ?
                 new SQLDatabaseBridge(null, null) :
-                new SQLDatabaseBridge(superiorPlayer.getUniqueId(), "player");
+                new SQLDatabaseBridge(superiorPlayer::getUniqueId, "player");
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }

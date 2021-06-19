@@ -6,15 +6,16 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
     private boolean shouldSaveData = false;
-    private final UUID objectId;
+    private final Supplier<UUID> objectIdSupplier;
     private final String idFilter;
 
-    public SQLDatabaseBridge(UUID objectId, String columnIdName){
-        this.objectId = objectId;
+    public SQLDatabaseBridge(Supplier<UUID> objectIdSupplier, String columnIdName){
+        this.objectIdSupplier = objectIdSupplier;
         this.idFilter = columnIdName == null ? "" : String.format(" WHERE %s=?", columnIdName);
     }
 
@@ -57,8 +58,8 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
             statementHolder.setObject(column.getValue());
         }
 
-        if(objectId != null){
-            statementHolder.setObject(objectId + "");
+        if(objectIdSupplier != null){
+            statementHolder.setObject(objectIdSupplier.get() + "");
         }
 
         statementHolder.execute(true);
@@ -102,8 +103,8 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 String.format("DELETE FROM {prefix}%s%s;", table, idFilter)
         );
 
-        if(objectId != null){
-            statementHolder.setObject(objectId + "");
+        if(objectIdSupplier != null){
+            statementHolder.setObject(objectIdSupplier.get() + "");
         }
 
         statementHolder.execute(true);
