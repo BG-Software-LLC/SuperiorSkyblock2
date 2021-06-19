@@ -468,10 +468,6 @@ public final class SettingsHandler extends AbstractHandler {
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
         publicWarps = cfg.getBoolean("public-warps");
-        if(cfg.contains("worlds.normal-world")){
-            cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
-            cfg.set("worlds.normal-world", null);
-        }
     }
 
     @Override
@@ -576,6 +572,10 @@ public final class SettingsHandler extends AbstractHandler {
         if(!cfg.contains("worlds.end")){
             cfg.set("worlds.end.enabled", cfg.getBoolean("worlds.end-world"));
             cfg.set("worlds.end.unlock", cfg.getBoolean("worlds.end-unlock"));
+        }
+        if(cfg.contains("worlds.normal-world")){
+            cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
+            cfg.set("worlds.normal-world", null);
         }
     }
 
