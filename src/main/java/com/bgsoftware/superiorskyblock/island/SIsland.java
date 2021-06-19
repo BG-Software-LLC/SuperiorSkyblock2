@@ -195,126 +195,124 @@ public final class SIsland implements Island {
     private final SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits = SyncedObject.of(new HashMap<>());
 
     public SIsland(GridHandler grid, DatabaseResult resultSet) {
+        this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
+        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
+        this.creationTime = resultSet.getLong("creationTime");
+        updateDatesFormatter();
+
+        IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
+        IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
+        IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
+        IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
+        IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
+        IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this);
+        IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
+        IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
+        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
+        IslandDeserializer.deserializeIslandFlags(resultSet.getString("settings"), this.islandSettings);
+        IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
+        IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
+        IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
+        IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
+        IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
+        IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
+        IslandDeserializer.deserializeWarpCategories(resultSet.getString("warpCategories"), this);
+
+        parseNumbersSafe(() -> this.islandBank.setBalance(new BigDecimal(resultSet.getString("islandBank"))));
+        parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
+        this.islandSize.set(new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0));
+        this.teamLimit.set(new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0));
+        this.warpsLimit.set(new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0));
+        this.cropGrowth.set(new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0));
+        this.spawnerRates.set(new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0));
+        this.mobDrops.set(new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0));
+        this.discord.set(resultSet.getString("discord"));
+        this.paypal.set(resultSet.getString("paypal"));
+        this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
+        this.locked.set(resultSet.getBoolean("locked"));
+        this.islandName.set(resultSet.getString("name"));
+        this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
+        this.description.set(resultSet.getString("description"));
+        this.ignored.set(resultSet.getBoolean("ignored"));
+        parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
+
+        String generatedSchematics = resultSet.getString("generatedSchematics");
         try {
-            this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
-            this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-            this.creationTime = resultSet.getLong("creationTime");
-            updateDatesFormatter();
+            this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
+        } catch (Exception ex) {
+            int n = 0;
 
-            IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
-            IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
-            IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
-            IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
-            IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
-            IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this);
-            IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
-            IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
-            IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-            IslandDeserializer.deserializeIslandFlags(resultSet.getString("settings"), this.islandSettings);
-            IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
-            IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
-            IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
-            IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
-            IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
-            IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
-            IslandDeserializer.deserializeWarpCategories(resultSet.getString("warpCategories"), this);
+            if (generatedSchematics.contains("normal"))
+                n |= 8;
+            if (generatedSchematics.contains("nether"))
+                n |= 4;
+            if (generatedSchematics.contains("the_end"))
+                n |= 3;
 
-            parseNumbersSafe(() -> this.islandBank.setBalance(new BigDecimal(resultSet.getString("islandBank"))));
-            parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
-            this.islandSize.set(new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0));
-            this.teamLimit.set(new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0));
-            this.warpsLimit.set(new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0));
-            this.cropGrowth.set(new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0));
-            this.spawnerRates.set(new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0));
-            this.mobDrops.set(new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0));
-            this.discord.set(resultSet.getString("discord"));
-            this.paypal.set(resultSet.getString("paypal"));
-            this.visitorsLocation.set(LocationUtils.getLocation(resultSet.getString("visitorsLocation")));
-            this.locked.set(resultSet.getBoolean("locked"));
-            this.islandName.set(resultSet.getString("name"));
-            this.islandRawName.set(StringUtils.stripColors(resultSet.getString("name")));
-            this.description.set(resultSet.getString("description"));
-            this.ignored.set(resultSet.getBoolean("ignored"));
-            parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
-
-            String generatedSchematics = resultSet.getString("generatedSchematics");
-            try {
-                this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
-            } catch (Exception ex) {
-                int n = 0;
-
-                if (generatedSchematics.contains("normal"))
-                    n |= 8;
-                if (generatedSchematics.contains("nether"))
-                    n |= 4;
-                if (generatedSchematics.contains("the_end"))
-                    n |= 3;
-
-                this.generatedSchematics.set(n);
-            }
-
-            this.schemName.set(resultSet.getString("schemName"));
-
-            String unlockedWorlds = resultSet.getString("unlockedWorlds");
-            try {
-                this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
-            } catch (Exception ex) {
-                int n = 0;
-
-                if (unlockedWorlds.contains("nether"))
-                    n |= 1;
-                if (unlockedWorlds.contains("the_end"))
-                    n |= 2;
-
-                this.unlockedWorlds.set(n);
-            }
-
-            this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
-            this.coopLimit.set(new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0));
-            String bankLimit = resultSet.getString("bankLimit");
-            parseNumbersSafe(() -> this.bankLimit.set(new UpgradeValue<>(new BigDecimal(bankLimit), i -> i.compareTo(new BigDecimal(-1)) < 0)));
-
-            String blockCounts = resultSet.getString("blockCounts");
-
-            Executor.sync(() -> {
-                try {
-                    rawKeyPlacements = true;
-                    IslandDeserializer.deserializeBlockCounts(blockCounts, this);
-                } finally {
-                    rawKeyPlacements = false;
-                }
-
-                if (this.blockCounts.readAndGet(Map::isEmpty))
-                    calcIslandWorth(null);
-            }, 5L);
-
-            ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
-
-            String uuidRaw = resultSet.getString("uuid");
-            if (uuidRaw == null || uuidRaw.isEmpty()) {
-                this.uuid = owner.getUniqueId();
-            } else {
-                this.uuid = UUID.fromString(uuidRaw);
-            }
-
-            this.lastInterest.set(resultSet.getLong("lastInterest"));
-
-            if (BuiltinModules.BANK.bankInterestEnabled) {
-                long currentTime = System.currentTimeMillis() / 1000;
-                long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
-                if (ticksToNextInterest <= 0) {
-                    giveInterest(true);
-                } else {
-                    Executor.sync(() -> giveInterest(true), ticksToNextInterest);
-                }
-            }
-
-            checkMembersDuplication();
-            updateOldUpgradeValues();
-            updateUpgrades();
-        } finally {
-            databaseBridge.startSavingData();
+            this.generatedSchematics.set(n);
         }
+
+        this.schemName.set(resultSet.getString("schemName"));
+
+        String unlockedWorlds = resultSet.getString("unlockedWorlds");
+        try {
+            this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
+        } catch (Exception ex) {
+            int n = 0;
+
+            if (unlockedWorlds.contains("nether"))
+                n |= 1;
+            if (unlockedWorlds.contains("the_end"))
+                n |= 2;
+
+            this.unlockedWorlds.set(n);
+        }
+
+        this.lastTimeUpdate.set(resultSet.getLong("lastTimeUpdate"));
+        this.coopLimit.set(new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0));
+        String bankLimit = resultSet.getString("bankLimit");
+        parseNumbersSafe(() -> this.bankLimit.set(new UpgradeValue<>(new BigDecimal(bankLimit), i -> i.compareTo(new BigDecimal(-1)) < 0)));
+
+        String blockCounts = resultSet.getString("blockCounts");
+
+        Executor.sync(() -> {
+            try {
+                rawKeyPlacements = true;
+                IslandDeserializer.deserializeBlockCounts(blockCounts, this);
+            } finally {
+                rawKeyPlacements = false;
+            }
+
+            if (this.blockCounts.readAndGet(Map::isEmpty))
+                calcIslandWorth(null);
+        }, 5L);
+
+        ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
+
+        String uuidRaw = resultSet.getString("uuid");
+        if (uuidRaw == null || uuidRaw.isEmpty()) {
+            this.uuid = owner.getUniqueId();
+        } else {
+            this.uuid = UUID.fromString(uuidRaw);
+        }
+
+        this.lastInterest.set(resultSet.getLong("lastInterest"));
+
+        if (BuiltinModules.BANK.bankInterestEnabled) {
+            long currentTime = System.currentTimeMillis() / 1000;
+            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest.get())) * 20;
+            if (ticksToNextInterest <= 0) {
+                giveInterest(true);
+            } else {
+                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            }
+        }
+
+        checkMembersDuplication();
+        updateOldUpgradeValues();
+        updateUpgrades();
+
+        databaseBridge.startSavingData();
     }
 
     @SuppressWarnings("WeakerAccess")
