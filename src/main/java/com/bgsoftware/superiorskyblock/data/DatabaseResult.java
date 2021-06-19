@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.data;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 public final class DatabaseResult {
@@ -32,7 +30,6 @@ public final class DatabaseResult {
         return getObject(key, Boolean.class, false);
     }
 
-    @NotNull
     private <T> T getObject(String key, Class<T> clazz, T def){
         Object value = resultSet.get(key);
         return value == null || !value.getClass().isAssignableFrom(clazz) ? def : clazz.cast(value);
