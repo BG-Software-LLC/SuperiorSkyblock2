@@ -48,6 +48,8 @@ public final class SQLDatabaseInitializer {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
 
         addMissingColumns();
+
+        createIndexes();
     }
 
     public void close() {
@@ -216,6 +218,12 @@ public final class SQLDatabaseInitializer {
         editColumn("banned", "islands", "LONGTEXT");
         editColumn("ratings", "islands", "LONGTEXT");
         editColumn("uniqueVisitors", "islands", "LONGTEXT");
+    }
+
+    private void createIndexes(){
+        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS islands_uuid_index ON islands(uuid)");
+        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS transactions_uuid_index ON bankTransactions(uuid)");
+        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS players_uuid_index ON players(player)");
     }
 
     private boolean containsGrid() {
