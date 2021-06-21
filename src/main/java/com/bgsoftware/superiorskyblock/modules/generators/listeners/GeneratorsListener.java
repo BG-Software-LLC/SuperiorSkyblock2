@@ -44,7 +44,7 @@ public final class GeneratorsListener implements Listener {
         if(island == null)
             return;
 
-        if(!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
+        if((!e.getBlock().getType().name().contains("LAVA") && !e.getBlock().getType().name().contains("FENCE")) || !hasWaterNearby(block))
             return;
 
         World.Environment environment = block.getWorld().getEnvironment();
