@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -164,7 +165,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
     @Override
     public Collection<PluginModule> getModules() {
-        return modulesMap.values();
+        return Collections.unmodifiableCollection(modulesMap.values());
     }
 
     public void registerExternalModules(){
