@@ -61,7 +61,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -74,17 +73,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
 
-    private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
-    private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
-    private final Registry<UUID, Registry<String, Long>> commandsCooldown = Registry.createRegistry();
+    private final Map<String, SuperiorCommand> subCommands = new HashMap<>();
+    private final Map<String, SuperiorCommand> aliasesToCommand = new HashMap<>();
+    private final Map<UUID, Map<String, Long>> commandsCooldown = new HashMap<>();
 
     private Set<Runnable> pendingCommands = new HashSet<>();
 
@@ -222,7 +223,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     private SuperiorCommand getCommand(String label){
         label = label.toLowerCase();
-        return subCommands.get(label, aliasesToCommand.get(label));
+        return subCommands.getOrDefault(label, aliasesToCommand.get(label));
     }
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
@@ -239,17 +240,17 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             subCommands.remove(label);
             aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
         }
-        subCommands.add(label, superiorCommand);
+        subCommands.put(label, superiorCommand);
 
         for(int i = 1; i < aliases.size(); i++){
-            aliasesToCommand.add(aliases.get(i).toLowerCase(), superiorCommand);
+            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
         }
 
         if(sort){
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
             subCommands.clear();
-            superiorCommands.forEach(s -> subCommands.add(s.getAliases().get(0), s));
+            superiorCommands.forEach(s -> subCommands.put(s.getAliases().get(0), s));
         }
     }
 
@@ -350,11 +351,11 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                         }
 
                         if(!commandsCooldown.containsKey(uuid)){
-                            commandsCooldown.add(uuid, Registry.createRegistry());
+                            commandsCooldown.put(uuid, new HashMap<>());
                         }
 
-                        Registry<String, Long> timedCommands = commandsCooldown.get(uuid);
-                        timedCommands.add(commandLabel, timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
+                        commandsCooldown.get(uuid).put(commandLabel,
+                                timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
                     }
 
                     command.execute(plugin, sender, args);

@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.utils.entities;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Ambient;
@@ -27,7 +26,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 public final class EntityUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final Registry<UUID, ItemStack[]> entityContent = Registry.createRegistry();
+    private static final Map<UUID, ItemStack[]> entityContent = new HashMap<>();
 
     private EntityUtils(){
 
@@ -85,7 +86,7 @@ public final class EntityUtils {
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity){
-        entityContent.add(livingEntity.getUniqueId(), plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment()));
+        entityContent.put(livingEntity.getUniqueId(), plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment()));
     }
 
     public static void clearEntityEquipment(LivingEntity livingEntity){

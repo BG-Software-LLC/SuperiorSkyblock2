@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,6 +23,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
@@ -121,7 +121,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarps, "warps.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarps, "warps.yml", cfg);
 
         menuWarps.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuWarps.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
@@ -133,8 +133,6 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
         SIslandWarp.DEFAULT_WARP_ICON = menuWarps.getFillItem(slots.get(0));
 
         editLore = cfg.getStringList("edit-lore");
-
-        charSlots.delete();
 
         menuWarps.markCompleted();
     }

@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -84,7 +84,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
@@ -102,8 +102,6 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             slots.add(-1);
 
         menuGlobalWarps.setSlots(slots);
-
-        charSlots.delete();
 
         menuGlobalWarps.markCompleted();
     }

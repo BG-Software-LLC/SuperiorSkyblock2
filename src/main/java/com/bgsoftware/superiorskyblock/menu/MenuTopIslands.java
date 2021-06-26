@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -28,8 +27,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -266,7 +267,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         int backButton = -1;
         char backButtonChar = cfg.getString("back", " ").charAt(0);
 
-        Registry<Character, List<Integer>> charSlots = Registry.createRegistry();
+        Map<Character, List<Integer>> charSlots = new HashMap<>();
 
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
@@ -297,7 +298,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     }
 
                     if(!charSlots.containsKey(ch))
-                        charSlots.add(ch, new ArrayList<>());
+                        charSlots.put(ch, new ArrayList<>());
 
                     charSlots.get(ch).add(slot);
 
@@ -347,8 +348,6 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         menuTopIslands.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuTopIslands.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuTopIslands.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuTopIslands.markCompleted();
     }

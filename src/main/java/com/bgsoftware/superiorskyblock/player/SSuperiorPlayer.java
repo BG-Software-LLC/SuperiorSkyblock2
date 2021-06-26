@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
@@ -51,6 +50,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -58,7 +58,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Registry<Mission<?>, Integer> completedMissions = Registry.createRegistry();
+    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final SPlayerDataHandler playerDataHandler = new SPlayerDataHandler(this);
     private final UUID uuid;
 
@@ -655,7 +655,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
-        completedMissions.add(mission, completedMissions.get(mission, 0) + 1);
+        completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
         playerDataHandler.saveMissions();
     }
 
@@ -664,8 +664,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
-        if(completedMissions.get(mission, 0) > 0) {
-            completedMissions.add(mission, completedMissions.get(mission) - 1);
+        if(completedMissions.getOrDefault(mission, 0) > 0) {
+            completedMissions.put(mission, completedMissions.get(mission) - 1);
         }
         else {
             completedMissions.remove(mission);
@@ -679,7 +679,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean hasCompletedMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.get(mission, 0) > 0;
+        return completedMissions.getOrDefault(mission, 0) > 0;
     }
 
     @Override
@@ -692,17 +692,17 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return completedMissions.get(mission, 0);
+        return completedMissions.getOrDefault(mission, 0);
     }
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new ArrayList<>(completedMissions.keys());
+        return Collections.unmodifiableList(new ArrayList<>(completedMissions.keySet()));
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts(){
-        return Collections.unmodifiableMap(completedMissions.toMap());
+        return Collections.unmodifiableMap(completedMissions);
     }
 
     /*

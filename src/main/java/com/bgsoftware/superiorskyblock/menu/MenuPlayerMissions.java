@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.missions.MissionUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,6 +18,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -133,7 +133,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
         sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         removeCompleted = cfg.getBoolean("remove-completed", false);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerMissions, "player-missions.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerMissions, "player-missions.yml", cfg);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 
@@ -148,8 +148,6 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
         menuPlayerMissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuPlayerMissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuPlayerMissions.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuPlayerMissions.markCompleted();
     }

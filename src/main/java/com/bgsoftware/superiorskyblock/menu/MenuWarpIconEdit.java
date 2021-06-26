@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuWarpIconEdit extends SuperiorMenu {
@@ -155,15 +155,13 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-icon-edit.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-icon-edit.yml", cfg);
 
         typeSlots = getSlots(cfg, "icon-type", charSlots);
         renameSlots = getSlots(cfg, "icon-rename", charSlots);
         loreSlots = getSlots(cfg, "icon-relore", charSlots);
         confirmSlots = getSlots(cfg, "icon-confirm", charSlots);
         iconSlots = getSlots(cfg, "icon-slots", charSlots);
-
-        charSlots.delete();
 
         menuWarpCategoryIconEdit.markCompleted();
     }

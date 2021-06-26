@@ -6,13 +6,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
 
@@ -68,14 +68,12 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
 
         menuCoops.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuCoops.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuCoops.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuCoops.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuCoops.markCompleted();
     }

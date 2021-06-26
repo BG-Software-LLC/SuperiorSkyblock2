@@ -6,12 +6,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuPlayerLanguage extends SuperiorMenu {
 
@@ -46,9 +46,9 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerLanguage, "player-language.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPlayerLanguage, "player-language.yml", cfg);
 
-        for(char ch : charSlots.keys()){
+        for(char ch : charSlots.keySet()){
             if(cfg.contains("items." + ch + ".language")) {
                 String language = cfg.getString("items." + ch + ".language");
                 for(int slot : charSlots.get(ch)) {
@@ -63,8 +63,6 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
                 }
             }
         }
-
-        charSlots.delete();
 
         menuPlayerLanguage.markCompleted();
     }

@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -23,6 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
@@ -113,7 +113,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
 
         ConfigurationSection settingsSection = cfg.getConfigurationSection("settings");
 
@@ -130,8 +130,6 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         menuSettings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuSettings.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuSettings.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuSettings.markCompleted();
     }

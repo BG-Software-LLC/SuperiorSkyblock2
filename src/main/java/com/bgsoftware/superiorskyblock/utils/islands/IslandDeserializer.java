@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import com.google.gson.*;
@@ -43,12 +42,16 @@ public final class IslandDeserializer {
     }
 
     public static void deserializePlayers(String members, SyncedObject<? extends Collection<SuperiorPlayer>> membersSetSync) {
+        membersSetSync.write(membersSet -> deserializePlayers(members, membersSet));
+    }
+
+    public static void deserializePlayers(String members, Collection<SuperiorPlayer> membersSet) {
         try {
             JsonArray playersArray = decode(members, JsonArray.class);
-            membersSetSync.write(membersSet -> playersArray.forEach(uuid ->
-                    membersSet.add(plugin.getPlayers().getSuperiorPlayer(UUID.fromString(uuid.getAsString())))));
+            playersArray.forEach(uuid ->
+                    membersSet.add(plugin.getPlayers().getSuperiorPlayer(UUID.fromString(uuid.getAsString()))));
         } catch (JsonSyntaxException ex) {
-            IslandDeserializer_Old.deserializePlayers(members, membersSetSync);
+            IslandDeserializer_Old.deserializePlayers(members, membersSet);
         }
     }
 
@@ -69,7 +72,10 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializePermissions(String permissions, Registry<SuperiorPlayer, PlayerPermissionNode> playerPermissions, Registry<IslandPrivilege, PlayerRole> rolePermissions, Island island) {
+    public static void deserializePermissions(String permissions,
+                                              Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions,
+                                              Map<IslandPrivilege, PlayerRole> rolePermissions,
+                                              Island island) {
         try {
             JsonObject globalObject = decode(permissions, JsonObject.class);
             JsonArray playersArray = globalObject.getAsJsonArray("players");
@@ -81,7 +87,7 @@ public final class IslandDeserializer {
                     UUID uuid = UUID.fromString(playerObject.get("uuid").getAsString());
                     SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
                     JsonArray permsArray = playerObject.getAsJsonArray("permissions");
-                    playerPermissions.add(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, permsArray));
+                    playerPermissions.put(superiorPlayer, new PlayerPermissionNode(superiorPlayer, island, permsArray));
                 } catch (Exception ignored) {
                 }
             });
@@ -92,7 +98,7 @@ public final class IslandDeserializer {
                 roleObject.getAsJsonArray("permissions").forEach(permElement -> {
                     try {
                         IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permElement.getAsString());
-                        rolePermissions.add(islandPrivilege, playerRole);
+                        rolePermissions.put(islandPrivilege, playerRole);
                     } catch (Exception ignored) {
                     }
                 });
@@ -102,7 +108,7 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeUpgrades(String upgrades, Registry<String, Integer> upgradesMap) {
+    public static void deserializeUpgrades(String upgrades, Map<String, Integer> upgradesMap) {
         try {
             JsonArray upgradesArray = decode(upgrades, JsonArray.class);
             upgradesArray.forEach(upgradeElement -> {
@@ -110,7 +116,7 @@ public final class IslandDeserializer {
                 String name = upgradeObject.get("name").getAsString();
                 int level = upgradeObject.get("level").getAsInt();
                 if (plugin.getUpgrades().getUpgrade(name) != null)
-                    upgradesMap.add(name, level);
+                    upgradesMap.put(name, level);
             });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeUpgrades(upgrades, upgradesMap);
@@ -159,35 +165,35 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeBlockLimits(String blocks, SyncedObject<KeyMap<UpgradeValue<Integer>>> blockLimits) {
+    public static void deserializeBlockLimits(String blocks, KeyMap<UpgradeValue<Integer>> blockLimits) {
         try {
             JsonArray blockLimitsArray = decode(blocks, JsonArray.class);
-            blockLimits.write(_blockLimits -> blockLimitsArray.forEach(blockLimitElement -> {
+            blockLimitsArray.forEach(blockLimitElement -> {
                 JsonObject blockLimitObject = blockLimitElement.getAsJsonObject();
                 Key blockKey = Key.of(blockLimitObject.get("id").getAsString());
                 int limit = blockLimitObject.get("limit").getAsInt();
-                _blockLimits.put(blockKey, new UpgradeValue<>(limit, i -> i < 0));
-            }));
+                blockLimits.put(blockKey, new UpgradeValue<>(limit, i -> i < 0));
+            });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeBlockLimits(blocks, blockLimits);
         }
     }
 
-    public static void deserializeEntityLimits(String entities, SyncedObject<KeyMap<UpgradeValue<Integer>>> entityLimits) {
+    public static void deserializeEntityLimits(String entities, KeyMap<UpgradeValue<Integer>> entityLimits) {
         try {
             JsonArray entityLimitsArray = decode(entities, JsonArray.class);
-            entityLimits.write(_entityLimits -> entityLimitsArray.forEach(entityLimitElement -> {
+            entityLimitsArray.forEach(entityLimitElement -> {
                 JsonObject entityLimitObject = entityLimitElement.getAsJsonObject();
                 Key entity = Key.of(entityLimitObject.get("id").getAsString());
                 int limit = entityLimitObject.get("limit").getAsInt();
-                _entityLimits.put(entity, new UpgradeValue<>(limit, i -> i < 0));
-            }));
+                entityLimits.put(entity, new UpgradeValue<>(limit, i -> i < 0));
+            });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeEntityLimits(entities, entityLimits);
         }
     }
 
-    public static void deserializeRatings(String ratings, Registry<UUID, Rating> ratingsMap) {
+    public static void deserializeRatings(String ratings, Map<UUID, Rating> ratingsMap) {
         try {
             JsonArray ratingsArray = decode(ratings, JsonArray.class);
             ratingsArray.forEach(ratingElement -> {
@@ -195,7 +201,7 @@ public final class IslandDeserializer {
                 try {
                     UUID uuid = UUID.fromString(ratingObject.get("player").getAsString());
                     Rating rating = Rating.valueOf(ratingObject.get("rating").getAsInt());
-                    ratingsMap.add(uuid, rating);
+                    ratingsMap.put(uuid, rating);
                 } catch (Exception ignored) {
                 }
             });
@@ -204,7 +210,7 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeMissions(String missions, Registry<Mission<?>, Integer> completedMissions) {
+    public static void deserializeMissions(String missions, Map<Mission<?>, Integer> completedMissions) {
         try {
             JsonArray missionsArray = decode(missions, JsonArray.class);
             missionsArray.forEach(missionElement -> {
@@ -216,14 +222,14 @@ public final class IslandDeserializer {
                 Mission<?> mission = plugin.getMissions().getMission(name);
 
                 if (mission != null)
-                    completedMissions.add(mission, finishCount);
+                    completedMissions.put(mission, finishCount);
             });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeMissions(missions, completedMissions);
         }
     }
 
-    public static void deserializeIslandFlags(String settings, Registry<IslandFlag, Byte> islandFlags) {
+    public static void deserializeIslandFlags(String settings, Map<IslandFlag, Byte> islandFlags) {
         try {
             JsonArray islandFlagsArray = decode(settings, JsonArray.class);
             islandFlagsArray.forEach(islandFlagElement -> {
@@ -231,7 +237,7 @@ public final class IslandDeserializer {
                 try {
                     IslandFlag islandFlag = IslandFlag.getByName(islandFlagObject.get("name").getAsString());
                     byte status = islandFlagObject.get("status").getAsByte();
-                    islandFlags.add(islandFlag, status);
+                    islandFlags.put(islandFlag, status);
                 } catch (Exception ignored) {
                 }
             });
@@ -240,7 +246,7 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeGenerators(String generator, SyncedObject<KeyMap<UpgradeValue<Integer>>>[] cobbleGenerator) {
+    public static void deserializeGenerators(String generator, KeyMap<UpgradeValue<Integer>>[] cobbleGenerator) {
         try {
             JsonArray generatorWorldsArray = decode(generator, JsonArray.class);
             generatorWorldsArray.forEach(generatorWorldElement -> {
@@ -251,8 +257,7 @@ public final class IslandDeserializer {
                         JsonObject generatorObject = generatorElement.getAsJsonObject();
                         Key blockKey = Key.of(generatorObject.get("id").getAsString());
                         int rate = generatorObject.get("rate").getAsInt();
-                        (cobbleGenerator[i] = SyncedObject.of(new KeyMap<>())).write(_cobbleGenerator ->
-                                _cobbleGenerator.put(blockKey, new UpgradeValue<>(rate, n -> n < 0)));
+                        (cobbleGenerator[i] = new KeyMap<>()).put(blockKey, new UpgradeValue<>(rate, n -> n < 0));
                     });
                 } catch (Exception ignored) {
                 }
@@ -262,39 +267,39 @@ public final class IslandDeserializer {
         }
     }
 
-    public static void deserializeLocations(String locationParam, SyncedObject<Location[]> locations) {
+    public static void deserializeLocations(String locationParam, SyncedObject<Location[]> locationsSync) {
         try {
             JsonArray locationsArray = decode(locationParam, JsonArray.class);
-            locations.write(_locations -> locationsArray.forEach(locationElement -> {
+            locationsSync.write(locations -> locationsArray.forEach(locationElement -> {
                 JsonObject locationObject = locationElement.getAsJsonObject();
                 try {
                     int i = World.Environment.valueOf(locationObject.get("env").getAsString()).ordinal();
-                    _locations[i] = FileUtils.toLocation(locationObject.get("location").getAsString());
+                    locations[i] = FileUtils.toLocation(locationObject.get("location").getAsString());
                 } catch (Exception ignored) {
                 }
             }));
         } catch (JsonSyntaxException ex) {
-            IslandDeserializer_Old.deserializeLocations(locationParam, locations);
+            IslandDeserializer_Old.deserializeLocations(locationParam, locationsSync);
         }
     }
 
-    public static void deserializeEffects(String effects, SyncedObject<Map<PotionEffectType, UpgradeValue<Integer>>> islandEffects) {
+    public static void deserializeEffects(String effects, Map<PotionEffectType, UpgradeValue<Integer>> islandEffects) {
         try {
             JsonArray effectsArray = decode(effects, JsonArray.class);
-            islandEffects.write(_islandEffects -> effectsArray.forEach(effectElement -> {
+            effectsArray.forEach(effectElement -> {
                 JsonObject effectObject = effectElement.getAsJsonObject();
                 PotionEffectType potionEffectType = PotionEffectType.getByName(effectObject.get("type").getAsString());
                 if (potionEffectType != null) {
                     int level = effectObject.get("level").getAsInt();
-                    _islandEffects.put(potionEffectType, new UpgradeValue<>(level, i -> i < 0));
+                    islandEffects.put(potionEffectType, new UpgradeValue<>(level, i -> i < 0));
                 }
-            }));
+            });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeEffects(effects, islandEffects);
         }
     }
 
-    public static void deserializeIslandChest(Island island, String islandChest, SyncedObject<IslandChest[]> islandChestSync) {
+    public static void deserializeIslandChest(Island island, String islandChest, SyncedObject<IslandChest[]> islandChestsSync) {
         try {
             JsonArray islandChestsArray = decode(islandChest, JsonArray.class);
             List<IslandChest> islandChestList = new ArrayList<>();
@@ -311,23 +316,23 @@ public final class IslandDeserializer {
 
             });
 
-            islandChestSync.set(islandChestList.toArray(new IslandChest[0]));
+            islandChestsSync.set(islandChestList.toArray(new IslandChest[0]));
         } catch (JsonSyntaxException ex) {
-            IslandDeserializer_Old.deserializeIslandChest(island, islandChest, islandChestSync);
+            IslandDeserializer_Old.deserializeIslandChest(island, islandChest, islandChestsSync);
         }
     }
 
-    public static void deserializeRoleLimits(String roles, SyncedObject<Map<PlayerRole, UpgradeValue<Integer>>> roleLimits) {
+    public static void deserializeRoleLimits(String roles, Map<PlayerRole, UpgradeValue<Integer>> roleLimits) {
         try {
             JsonArray roleLimitsArray = decode(roles, JsonArray.class);
-            roleLimits.write(_roleLimits -> roleLimitsArray.forEach(roleElement -> {
+            roleLimitsArray.forEach(roleElement -> {
                 JsonObject roleObject = roleElement.getAsJsonObject();
                 PlayerRole playerRole = SPlayerRole.fromId(roleObject.get("id").getAsInt());
                 if (playerRole != null) {
                     int limit = roleObject.get("limit").getAsInt();
-                    _roleLimits.put(playerRole, new UpgradeValue<>(limit, i -> i < 0));
+                    roleLimits.put(playerRole, new UpgradeValue<>(limit, i -> i < 0));
                 }
-            }));
+            });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeRoleLimits(roles, roleLimits);
         }

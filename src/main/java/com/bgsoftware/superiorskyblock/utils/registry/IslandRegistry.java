@@ -1,34 +1,45 @@
-package com.bgsoftware.superiorskyblock.registry;
+package com.bgsoftware.superiorskyblock.utils.registry;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.island.IslandPosition;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.utils.registry.SortedRegistry;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingType> {
+public final class IslandRegistry implements Iterable<Island> {
 
     private static final Predicate<Island> ISLANDS_PREDICATE = island -> !island.isIgnored();
 
-    private final Registry<IslandPosition, Island> islandsByPositions = createRegistry();
-    private final Registry<UUID, Island> islandsByUUID = createRegistry();
+    private final SortedRegistry<UUID, Island, SortingType> sortedIslands = new SortedRegistry<>();
+    private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
+    private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
     private final SuperiorSkyblockPlugin plugin;
 
     public IslandRegistry(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        SortingType.values().forEach(sortingType -> registerSortingType(sortingType, false, ISLANDS_PREDICATE));
+        SortingType.values().forEach(sortingType -> sortedIslands.registerSortingType(sortingType, false, ISLANDS_PREDICATE));
+    }
+
+    public Island get(UUID ownerUUID){
+        return sortedIslands.get(ownerUUID);
     }
 
     public Island get(Location location){
         Island island = islandsByPositions.get(IslandPosition.of(location));
         return island == null || !island.isInside(location) ? null : island;
+    }
+
+    public Island get(int index, SortingType sortingType){
+        return sortedIslands.get(index, sortingType);
     }
 
     public Island getByUUID(UUID uuid){
@@ -37,25 +48,24 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
 
     public Island add(UUID uuid, Island island){
         Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
-        islandsByPositions.add(IslandPosition.of(islandLocation), island);
+        islandsByPositions.put(IslandPosition.of(islandLocation), island);
 
         if(plugin.getProviders().hasCustomWorldsSupport()){
             runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
-                    location -> islandsByPositions.add(IslandPosition.of(location), island));
+                    location -> islandsByPositions.put(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
-                    location -> islandsByPositions.add(IslandPosition.of(location), island));
+                    location -> islandsByPositions.put(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
-                    location -> islandsByPositions.add(IslandPosition.of(location), island));
+                    location -> islandsByPositions.put(IslandPosition.of(location), island));
         }
 
-        islandsByUUID.add(island.getUniqueId(), island);
+        islandsByUUID.put(island.getUniqueId(), island);
 
-        return super.add(uuid, island);
+        return sortedIslands.put(uuid, island);
     }
 
-    @Override
     public Island remove(UUID uuid){
-        Island island = super.remove(uuid);
+        Island island = sortedIslands.remove(uuid);
         if(island != null) {
             Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
             islandsByPositions.remove(IslandPosition.of(islandLocation));
@@ -75,17 +85,38 @@ public final class IslandRegistry extends SortedRegistry<UUID, Island, SortingTy
     }
 
     public void sort(SortingType sortingType, Runnable onFinish) {
-        super.sort(sortingType, ISLANDS_PREDICATE, onFinish);
+        sortedIslands.sort(sortingType, ISLANDS_PREDICATE, onFinish);
     }
 
     public void registerSortingType(SortingType sortingType, boolean sort) {
-        super.registerSortingType(sortingType, sort, ISLANDS_PREDICATE);
+        sortedIslands.registerSortingType(sortingType, sort, ISLANDS_PREDICATE);
     }
 
     public void transferIsland(UUID oldOwner, UUID newOwner){
-        Island island = get(oldOwner);
-        remove(oldOwner);
-        add(newOwner, island);
+        Island island = sortedIslands.get(oldOwner);
+        sortedIslands.remove(oldOwner);
+        sortedIslands.put(newOwner, island);
+    }
+
+    public int size(){
+        return islandsByUUID.size();
+    }
+
+    public int indexOf(Island island, SortingType sortingType){
+        return sortedIslands.indexOf(island, sortingType);
+    }
+
+    public Iterator<Island> iterator(SortingType sortingType){
+        return sortedIslands.iterator(sortingType);
+    }
+
+    @Override
+    public Iterator<Island> iterator(){
+        return islandsByUUID.values().iterator();
+    }
+
+    public Collection<Island> values(){
+        return islandsByUUID.values();
     }
 
     private void runWithCustomWorld(Location islandLocation, Island island, World.Environment environment, Consumer<Location> onSuccess){

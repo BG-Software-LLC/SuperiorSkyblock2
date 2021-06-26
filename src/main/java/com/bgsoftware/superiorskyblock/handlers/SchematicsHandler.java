@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
@@ -51,7 +50,7 @@ import java.util.zip.GZIPOutputStream;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler extends AbstractHandler implements SchematicManager {
 
-    private final Registry<String, Schematic> schematics = Registry.createRegistry();
+    private final Map<String, Schematic> schematics = new HashMap<>();
 
     public SchematicsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -79,7 +78,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
             Schematic schematic = loadFromFile(schemName, schemFile);
             if(schematic != null) {
-                schematics.add(schemName, schematic);
+                schematics.put(schemName, schematic);
                 SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
                         (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
             }
@@ -97,12 +96,12 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     @Override
     public List<String> getSchematics(){
-        return Lists.newArrayList(schematics.keys());
+        return Lists.newArrayList(schematics.keySet());
     }
 
     public String getDefaultSchematic(World.Environment environment){
         String suffix = environment == World.Environment.NETHER ? "_nether" : "_the_end";
-        for(Map.Entry<String, Schematic> entry : schematics.entries()){
+        for(Map.Entry<String, Schematic> entry : schematics.entrySet()){
             if(getSchematic(entry.getKey() + suffix) != null)
                 return entry.getKey();
         }
@@ -218,7 +217,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
         SuperiorSchematic schematic = new SuperiorSchematic(schematicName, new CompoundTag(compoundValue));
-        schematics.add(schematicName, schematic);
+        schematics.put(schematicName, schematic);
         saveIntoFile(schematicName, schematic);
 
         if(runnable != null)

@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
@@ -109,7 +108,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean coopDamage;
     public final int disbandCount;
     public final boolean islandTopIncludeLeader;
-    public final Registry<String, String> defaultPlaceholders;
+    public final Map<String, String> defaultPlaceholders;
     public final boolean banConfirm;
     public final boolean disbandConfirm;
     public final boolean kickConfirm;
@@ -131,7 +130,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean disableRedstoneOffline;
     public final boolean disableRedstoneAFK;
     public final boolean disableSpawningAFK;
-    public final Registry<String, Pair<Integer, String>> commandsCooldown;
+    public final Map<String, Pair<Integer, String>> commandsCooldown;
     public final long upgradeCooldown;
     public final String numberFormat;
     public final String dateFormat;
@@ -140,9 +139,9 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean immuneToPVPWhenTeleport;
     public final List<String> blockedVisitorsCommands;
     public final boolean defaultContainersEnabled;
-    public final Registry<InventoryType, ListTag> defaultContainersContents;
+    public final Map<InventoryType, ListTag> defaultContainersContents;
     public final List<String> defaultSignLines;
-    public final Registry<String, List<String>> eventCommands;
+    public final Map<String, List<String>> eventCommands;
     public final long warpsWarmup;
     public final long homeWarmup;
     public final boolean liquidUpdate;
@@ -173,7 +172,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final int islandChestsDefaultSize;
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
-    public final Registry<String, Location> islandPreviewLocations;
+    public final Map<String, Location> islandPreviewLocations;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
@@ -334,10 +333,10 @@ public final class SettingsHandler extends AbstractHandler {
         coopDamage = cfg.getBoolean("coop-damage", true);
         disbandCount = cfg.getInt("disband-count", 5);
         islandTopIncludeLeader = cfg.getBoolean("island-top-include-leader", true);
-        defaultPlaceholders = Registry.createRegistry(cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
+        defaultPlaceholders = cfg.getStringList("default-placeholders").stream().collect(Collectors.toMap(
                 line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
                 line -> line.split(":")[1]
-        )));
+        ));
         banConfirm = cfg.getBoolean("ban-confirm");
         disbandConfirm = cfg.getBoolean("disband-confirm");
         kickConfirm = cfg.getBoolean("kick-confirm");
@@ -371,11 +370,11 @@ public final class SettingsHandler extends AbstractHandler {
         disableRedstoneOffline = cfg.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = cfg.getBoolean("afk-integrations.disable-redstone", false);
         disableSpawningAFK = cfg.getBoolean("afk-integrations.disable-spawning", true);
-        commandsCooldown = Registry.createRegistry();
+        commandsCooldown = new HashMap<>();
         for(String subCommand : cfg.getConfigurationSection("commands-cooldown").getKeys(false)){
             int cooldown = cfg.getInt("commands-cooldown." + subCommand + ".cooldown");
             String permission = cfg.getString("commands-cooldown." + subCommand + ".bypass-permission");
-            commandsCooldown.add(subCommand, new Pair<>(cooldown, permission));
+            commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
         }
         upgradeCooldown = cfg.getLong("upgrade-cooldown", -1L);
         numberFormat = cfg.getString("number-format", "en-US");
@@ -387,13 +386,13 @@ public final class SettingsHandler extends AbstractHandler {
         immuneToPVPWhenTeleport = cfg.getBoolean("immune-to-pvp-when-teleport", true);
         blockedVisitorsCommands = cfg.getStringList("blocked-visitors-commands");
         defaultContainersEnabled = cfg.getBoolean("default-containers.enabled", false);
-        defaultContainersContents = Registry.createRegistry();
+        defaultContainersContents = new HashMap<>();
         if(cfg.contains("default-containers.containers")) {
             for (String container : cfg.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
                     ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
-                    defaultContainersContents.add(containerType, items);
+                    defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = cfg.getConfigurationSection("default-containers.containers." + container);
                     for (String slot : containerSection.getKeys(false)) {
@@ -415,10 +414,10 @@ public final class SettingsHandler extends AbstractHandler {
             }
         }
         defaultSignLines = cfg.getStringList("default-signs");
-        eventCommands = Registry.createRegistry();
+        eventCommands = new HashMap<>();
         if(cfg.contains("event-commands")) {
             for (String eventName : cfg.getConfigurationSection("event-commands").getKeys(false)) {
-                eventCommands.add(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
+                eventCommands.put(eventName.toLowerCase(), cfg.getStringList("event-commands." + eventName));
             }
         }
         warpsWarmup = cfg.getLong("warps-warmup", 0);
@@ -456,10 +455,10 @@ public final class SettingsHandler extends AbstractHandler {
             }
         }
         valuableBlocks = new KeySet(cfg.getStringList("valuable-blocks"));
-        islandPreviewLocations = Registry.createRegistry();
+        islandPreviewLocations = new HashMap<>();
         if(cfg.isConfigurationSection("preview-islands")){
             for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
-                islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
+                islandPreviewLocations.put(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
         }
         tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
