@@ -64,7 +64,6 @@ import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.LightEngineGraph;
 import net.minecraft.world.phys.AxisAlignedBB;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -248,7 +247,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
 
         if((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) ||
                 blockData.getBlock() instanceof BlockBed) {
-            chunk.i.setTypeAndData(blockPosition, blockData, 3);
+            chunk.getWorld().setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
@@ -261,16 +260,16 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             ChunkSection chunkSection = chunk.getSections()[indexY];
 
             if (chunkSection == null) {
-//                try {
-//                    // Paper's constructor for ChunkSection for more optimized chunk sections.
-//                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
-//                }catch (Throwable ex){
-//                    // Spigot's constructor for ChunkSection
-//                    // noinspection deprecation
-//                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
-//                }
-//                TODO: Paper
-                chunkSection = chunk.getSections()[indexY] = new ChunkSection(SectionPosition.a(blockPosition.getY()));
+                int yOffset = SectionPosition.a(blockPosition.getY());
+                try {
+                    // Paper's constructor for ChunkSection for more optimized chunk sections.
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset, chunk, chunk.getWorld(), true);
+                }catch (Throwable ex){
+                    // Spigot's constructor for ChunkSection
+                    // noinspection deprecation
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset);
+                }
+                chunkSection = chunk.getSections()[indexY] = chunkSection;
             }
 
             int blockX = blockPosition.getX() & 15;
@@ -292,7 +291,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
             tileEntityCompound.setInt("z", blockPosition.getZ());
-            chunk.i.getTileEntity(blockPosition).load(tileEntityCompound);
+            chunk.getWorld().getTileEntity(blockPosition).load(tileEntityCompound);
         }
     }
 
@@ -321,9 +320,6 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             else{
                 BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
                 name = blockStateToName.get(key);
-                if(name == null){
-                    Bukkit.broadcastMessage("Invalid block state for " + key);
-                }
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
             }
 
@@ -371,7 +367,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoords = chunk.getPos();
-        sendPacketToRelevantPlayers(chunk.i, chunkCoords.b, chunkCoords.c, new PacketPlayOutMapChunk(chunk));
+        sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(), chunkCoords.b, chunkCoords.c, new PacketPlayOutMapChunk(chunk));
     }
 
     @Override
@@ -475,12 +471,12 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
 
             AxisAlignedBB chunkBounds = new AxisAlignedBB(
                     chunkCoords.b << 4, 0, chunkCoords.c << 4,
-                    chunkCoords.b << 4 + 15, chunk.i.getMaxBuildHeight(), chunkCoords.c << 4 + 15
+                    chunkCoords.b << 4 + 15, chunk.getWorld().getMaxBuildHeight(), chunkCoords.c << 4 + 15
             );
 
             world.getEntities().a(chunkBounds, entity -> entity.setRemoved(Entity.RemovalReason.b));
 
-            new HashSet<>(chunk.l.keySet()).forEach(chunk.i::removeTileEntity);
+            new HashSet<>(chunk.l.keySet()).forEach(chunk.getWorld()::removeTileEntity);
             chunk.l.clear();
 
             if(world.generator != null && !(world.generator instanceof WorldGenerator)){
@@ -697,14 +693,6 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-//        try {
-//            playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).sendPacketToTrackedPlayers(packet, false);
-//        }catch (Throwable ex){
-//            VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
-//                    .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
-//        }
-//        TODO: Paper
-
         playerChunkMap.l.get(chunkCoordIntPair.pair()).y.a(chunkCoordIntPair, false)
                 .forEach(entityPlayer -> entityPlayer.b.sendPacket(packet));
     }
