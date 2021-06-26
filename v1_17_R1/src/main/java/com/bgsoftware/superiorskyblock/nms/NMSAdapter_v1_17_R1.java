@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import io.papermc.paper.enchantments.EnchantmentRarity;
+import net.kyori.adventure.text.Component;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.core.BlockPosition;
@@ -52,10 +54,12 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.EntityCategory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -64,6 +68,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 @SuppressWarnings({"unused", "ConstantConditions"})
 public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
@@ -275,6 +280,30 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             @Override
             public boolean isCursed() {
                 return false;
+            }
+
+            public Component displayName(int i) {
+                return null;
+            }
+
+            public boolean isTradeable() {
+                return false;
+            }
+
+            public boolean isDiscoverable() {
+                return false;
+            }
+
+            public EnchantmentRarity getRarity() {
+                return null;
+            }
+
+            public float getDamageIncrease(int i, EntityCategory entityCategory) {
+                return 0;
+            }
+
+            public Set<EquipmentSlot> getActiveSlots() {
+                return null;
             }
         };
     }

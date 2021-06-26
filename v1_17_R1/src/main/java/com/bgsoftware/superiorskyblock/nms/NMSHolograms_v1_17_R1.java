@@ -15,7 +15,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
@@ -169,7 +171,7 @@ public final class NMSHolograms_v1_17_R1 implements NMSHolograms {
         @Override
         public CraftEntity getBukkitEntity() {
             if (bukkitEntity == null) {
-                bukkitEntity = new CraftArmorStand(super.getWorld().getServer(), this);
+                bukkitEntity = new CraftArmorStand((CraftServer) Bukkit.getServer(), this);
             }
             return bukkitEntity;
         }
