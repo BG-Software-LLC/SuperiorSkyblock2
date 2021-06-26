@@ -346,7 +346,7 @@ public final class SIsland implements Island {
         this.islandName = islandName;
         this.islandRawName = StringUtils.stripColors(islandName);
         this.schemName = schemName;
-        setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment, false);
+        setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment);
 
         updateLastInterest(currentTime);
 
@@ -3201,6 +3201,10 @@ public final class SIsland implements Island {
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
+        if(environment == plugin.getSettings().defaultWorldEnvironment)
+            return true;
+
         int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
         return (generatedSchematics.get() & n) == n;
     }
