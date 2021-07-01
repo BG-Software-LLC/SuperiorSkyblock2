@@ -81,9 +81,11 @@ import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -474,7 +476,19 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                     chunkCoords.b << 4 + 15, chunk.getWorld().getMaxBuildHeight(), chunkCoords.c << 4 + 15
             );
 
-            world.getEntities().a(chunkBounds, entity -> entity.setRemoved(Entity.RemovalReason.b));
+            Iterator<Entity> chunkEntities;
+
+            try {
+                chunkEntities = chunk.entities.iterator();
+            } catch(Throwable ex) {
+                List<Entity> worldEntities = new ArrayList<>();
+                world.getEntities().a(chunkBounds, worldEntities::add);
+                chunkEntities = worldEntities.iterator();
+            }
+
+            while(chunkEntities.hasNext()){
+                chunkEntities.next().setRemoved(Entity.RemovalReason.b);
+            }
 
             new HashSet<>(chunk.l.keySet()).forEach(chunk.getWorld()::removeTileEntity);
             chunk.l.clear();
