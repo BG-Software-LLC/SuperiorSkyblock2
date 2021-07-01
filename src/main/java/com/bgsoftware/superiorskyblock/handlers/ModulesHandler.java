@@ -18,6 +18,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -165,7 +166,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
     @Override
     public Collection<PluginModule> getModules() {
-        return Collections.unmodifiableCollection(modulesMap.values());
+        return Collections.unmodifiableCollection(new ArrayList<>(modulesMap.values()));
     }
 
     public void registerExternalModules(){
