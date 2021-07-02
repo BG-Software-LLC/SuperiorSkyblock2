@@ -54,6 +54,7 @@ import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 import net.minecraft.world.level.levelgen.feature.configurations.WorldGenFeatureConfiguration;
 import net.minecraft.world.level.pathfinder.PathEntity;
 import net.minecraft.world.level.pathfinder.PathPoint;
+import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
@@ -210,7 +211,7 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
         private boolean previouslyKilled = false;
 
         public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location){
-            super(worldServer, worldServer.E.getGeneratorSettings().getSeed(), new NBTTagCompound());
+            super(worldServer, ((WorldDataServer) worldServer.getWorldData()).getGeneratorSettings().getSeed(), new NBTTagCompound());
             this.islandBlockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
             this.islandChunkCoord = new ChunkCoordIntPair(islandBlockPosition);
             this.island = island;
