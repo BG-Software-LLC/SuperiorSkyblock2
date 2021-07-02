@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import ca.spottedleaf.starlight.light.StarLightInterface;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -28,13 +29,17 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
+import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
+import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
+import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.EnumSkyBlock;
@@ -85,6 +90,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -105,8 +111,8 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f");
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
 
-//    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
-//    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "b");
+    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
+    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "e");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -183,19 +189,17 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
             Executor.sync(() -> {
-//                if(STAR_LIGHT_INTERFACE.isValid()){
-//                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.e();
-//                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
-//                    ChunkProviderServer chunkProviderServer = world.getChunkProvider();
-//                    LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).queue(() ->
-//                        starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
-//                                chunkProviderServer.serverThreadQueue.execute(() ->
-//                                        chunkProviderServer.playerChunkMap.getUpdatingChunk(chunkPos.pair())
-//                                                .sendPacketToTrackedPlayers(new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, true), false)
-//                                ), null));
-//                }
-//                else {
-//                TODO: Paper
+                if(STAR_LIGHT_INTERFACE.isValid()){
+                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.k_();
+                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
+                    ChunkProviderServer chunkProviderServer = world.getChunkProvider();
+                    LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
+                        starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
+                                chunkProviderServer.h.execute(() -> sendPacketToRelevantPlayers(world, chunkPos.b, chunkPos.c,
+                                        new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, null, null, true))
+                                ), null));
+                }
+                else {
                     for (BlockData blockData : blockDataList) {
                         BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
                         if (blockData.getBlockLightLevel() > 0) {
@@ -212,7 +216,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                             }
                         }
                     }
-//                }
+                }
             }, 10L);
         }
     }
