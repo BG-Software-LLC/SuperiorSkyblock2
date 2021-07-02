@@ -59,6 +59,7 @@ import net.minecraft.world.level.chunk.BiomeStorage;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkConverter;
 import net.minecraft.world.level.chunk.ChunkSection;
+import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
 import net.minecraft.world.level.levelgen.HeightMap;
@@ -592,10 +593,16 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         PlayerChunkMap playerChunkMap = world.getChunkProvider().a;
 
-        Chunk chunk = world.getChunkIfLoaded(chunkCoords.b, chunkCoords.c);
+        IChunkAccess chunkAccess;
 
-        if(chunk != null){
-            chunkConsumer.accept(chunk);
+        try{
+            chunkAccess = world.getChunkIfLoadedImmediately(chunkCoords.b, chunkCoords.c);
+        }catch (Throwable ex){
+            chunkAccess = world.getChunkIfLoaded(chunkCoords.b, chunkCoords.c);
+        }
+
+        if(chunkAccess instanceof Chunk){
+            chunkConsumer.accept((Chunk) chunkAccess);
             if(onFinish != null)
                 onFinish.run();
         }
