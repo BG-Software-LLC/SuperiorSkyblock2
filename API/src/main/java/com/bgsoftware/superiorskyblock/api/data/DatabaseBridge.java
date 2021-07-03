@@ -40,4 +40,11 @@ public interface DatabaseBridge {
      */
     void deleteObject(String table);
 
+    /**
+     * Load data from the database for this object.
+     * @param table The table to get the data from.
+     * @param resultConsumer Consumer that receives data for each row.
+     */
+    void loadObject(String table, Consumer<Map<String, Object>> resultConsumer);
+
 }

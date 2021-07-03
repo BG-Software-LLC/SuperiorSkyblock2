@@ -110,4 +110,17 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
         statementHolder.execute(true);
     }
 
+    @Override
+    public void loadObject(String table, Consumer<Map<String, Object>> resultConsumer){
+        SQLHelper.executeQuery(String.format("SELECT * FROM {prefix}%s%s;", table, idFilter), resultSet -> {
+            while (resultSet.next()){
+                try {
+                    resultConsumer.accept(new ResultSetMapBridge(resultSet));
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        });
+    }
+
 }
