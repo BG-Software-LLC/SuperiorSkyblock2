@@ -66,6 +66,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private final Set<UUID> customWorlds = Sets.newHashSet();
     private final StackedBlocksHandler stackedBlocks;
     private final IslandRegistry islands;
+    private final DatabaseBridge databaseBridge;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;

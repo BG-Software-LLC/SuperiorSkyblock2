@@ -43,4 +43,9 @@ public final class EmptyDatabaseBridge implements DatabaseBridge {
 
     }
 
+    @Override
+    public void loadObject(String table, Consumer<Map<String, Object>> resultConsumer) {
+
+    }
+
 }
