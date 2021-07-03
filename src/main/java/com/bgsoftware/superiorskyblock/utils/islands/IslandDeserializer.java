@@ -115,8 +115,7 @@ public final class IslandDeserializer {
                 JsonObject upgradeObject = upgradeElement.getAsJsonObject();
                 String name = upgradeObject.get("name").getAsString();
                 int level = upgradeObject.get("level").getAsInt();
-                if (plugin.getUpgrades().getUpgrade(name) != null)
-                    upgradesMap.put(name, level);
+                upgradesMap.put(name, level);
             });
         } catch (JsonSyntaxException ex) {
             IslandDeserializer_Old.deserializeUpgrades(upgrades, upgradesMap);
