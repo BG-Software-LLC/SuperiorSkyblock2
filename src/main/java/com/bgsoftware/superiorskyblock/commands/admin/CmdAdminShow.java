@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -21,6 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -281,7 +281,7 @@ public final class CmdAdminShow implements IAdminIslandCommand {
 
         // Island members
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
-            Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
+            Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
 
             List<SuperiorPlayer> members = island.getIslandMembers(false);
 
@@ -290,12 +290,10 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                         .append(Locale.ISLAND_INFO_PLAYER_LINE.getMessage(locale, superiorPlayer.getName())).append("\n"));
             }
 
-            rolesStrings.keys().stream()
+            rolesStrings.keySet().stream()
                     .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
                     .forEach(playerRole ->
                             infoMessage.append(Locale.ISLAND_INFO_ROLES.getMessage(locale, playerRole, rolesStrings.get(playerRole))));
-
-            rolesStrings.delete();
         }
 
         if(!Locale.ISLAND_INFO_FOOTER.isEmpty(locale))

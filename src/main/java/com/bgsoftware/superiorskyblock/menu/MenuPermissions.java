@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,6 +26,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
@@ -231,7 +231,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
 
@@ -251,8 +251,6 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         menuPermissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuPermissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuPermissions.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuPermissions.markCompleted();
     }

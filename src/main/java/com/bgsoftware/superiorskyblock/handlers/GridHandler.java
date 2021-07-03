@@ -24,14 +24,13 @@ import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.registry.IslandRegistry;
+import com.bgsoftware.superiorskyblock.utils.registry.IslandRegistry;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
 import com.google.common.collect.Sets;
@@ -47,6 +46,7 @@ import org.bukkit.block.BlockFace;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -61,11 +62,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
-    private final Registry<UUID, IslandPreview> islandPreviews = Registry.createRegistry();
+    private final Map<UUID, IslandPreview> islandPreviews = new ConcurrentHashMap<>();
     private final Set<UUID> customWorlds = Sets.newHashSet();
     private final StackedBlocksHandler stackedBlocks;
     private final IslandRegistry islands;
-    private final DatabaseBridge databaseBridge;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -237,8 +237,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schemName.toLowerCase());
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
-                if (result) {
-                    islandPreviews.add(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
+                if(result){
+                    islandPreviews.put(superiorPlayer.getUniqueId(), new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
                     Executor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
                     Locale.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
                 }
@@ -361,7 +361,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Island island;
 
         Location corner = chunk.getBlock(0, 100, 0).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        if((island = getIslandAt(corner)) != null)
             return island;
 
         corner = chunk.getBlock(15, 100, 0).getLocation();
@@ -452,8 +452,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public List<Island> getIslands() {
-        return Lists.newArrayList(islands.iterator());
+    public List<Island> getIslands(){
+        return Collections.unmodifiableList(new ArrayList<>(islands.values()));
     }
 
     @Override
@@ -671,7 +671,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void loadGrid(DatabaseResult resultSet) {
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
-        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)) {
+        if(!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)){
             lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName,
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }

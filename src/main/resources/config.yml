@@ -179,6 +179,7 @@ island-roles:
     - MINECART_OPEN
     - MINECART_PLACE
     - MONSTER_DAMAGE
+    - NAME_ENTITY
     - PAINTING
     - PICKUP_DROPS
     - PICKUP_FISH

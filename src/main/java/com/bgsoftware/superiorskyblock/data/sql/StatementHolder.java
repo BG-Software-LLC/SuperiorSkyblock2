@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final List<Registry<Integer, Object>> batches = new ArrayList<>();
+    private final List<Map<Integer, Object>> batches = new ArrayList<>();
 
     private final String query;
     private final Map<Integer, Object> values = new HashMap<>();
@@ -32,7 +31,7 @@ public final class StatementHolder {
     }
 
     public void addBatch(){
-        batches.add(Registry.createRegistry(new HashMap<>(values)));
+        batches.add(new HashMap<>(values));
         values.clear();
         currentIndex = 1;
     }
@@ -63,13 +62,12 @@ public final class StatementHolder {
 
                         SQLHelper.setAutoCommit(false);
 
-                        for (Registry<Integer, Object> values : batches) {
-                            for (Map.Entry<Integer, Object> entry : values.entries()) {
+                        for (Map<Integer, Object> values : batches) {
+                            for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                                 preparedStatement.setObject(entry.getKey(), entry.getValue());
                                 errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                             }
                             preparedStatement.addBatch();
-                            values.delete();
                         }
 
                         preparedStatement.executeBatch();
@@ -108,24 +106,6 @@ public final class StatementHolder {
         public String toString() {
             return value;
         }
-    }
-
-    public static final class IncreasableInteger{
-
-        private int value = 0;
-
-        IncreasableInteger(){
-
-        }
-
-        public int get() {
-            return value;
-        }
-
-        public void increase(){
-            value++;
-        }
-
     }
 
 }

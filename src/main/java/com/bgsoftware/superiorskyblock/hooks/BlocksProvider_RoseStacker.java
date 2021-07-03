@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -131,6 +132,19 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
                 Key blockKey = Key.of(e.getStack().getBlock());
                 island.handleBlockBreak(blockKey, e.getDecreaseAmount());
             }
+        }
+
+        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        public void onBlockStackProtection(BlockStackEvent e){
+            if(!ProtectionListener.IMP.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
+                e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBlockUnstackProtection(BlockUnstackEvent e){
+            if(e.getPlayer() != null && !ProtectionListener.IMP.handleBlockBreak(
+                    e.getStack().getBlock(), e.getPlayer(), true))
+                e.setCancelled(true);
         }
 
     }

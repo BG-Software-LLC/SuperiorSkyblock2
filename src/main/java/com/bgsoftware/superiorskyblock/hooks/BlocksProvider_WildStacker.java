@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -34,6 +33,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public final class BlocksProvider_WildStacker implements BlocksProvider {
@@ -76,7 +76,7 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
 
     public static class WildStackerSnapshot {
 
-        private final Registry<String, StackedSnapshot> chunkSnapshots = Registry.createRegistry();
+        private final Map<String, StackedSnapshot> chunkSnapshots = new ConcurrentHashMap<>();
 
         public void cacheChunk(Chunk chunk){
             try {
@@ -88,13 +88,9 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
                     stackedSnapshot = WildStackerAPI.getWildStacker().getSystemManager().getStackedSnapshot(chunk, false);
                 }
                 if (stackedSnapshot != null) {
-                    chunkSnapshots.add(getId(chunk), stackedSnapshot);
+                    chunkSnapshots.put(getId(chunk), stackedSnapshot);
                 }
             }catch(Throwable ignored){}
-        }
-
-        public void delete(){
-            chunkSnapshots.delete();
         }
 
         public Pair<Integer, String> getSpawner(Location location) {

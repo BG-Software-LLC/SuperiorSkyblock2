@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
@@ -71,7 +71,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandChest, "island-chest.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandChest, "island-chest.yml", cfg);
 
         menuIslandChest.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuIslandChest.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
@@ -106,8 +106,6 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
                 menuIslandChest.addPermission(i, permission, noAccessSound);
             });
         }
-
-        charSlots.delete();
 
         menuIslandChest.markCompleted();
     }

@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
@@ -85,7 +85,7 @@ public final class MenuIslandRate extends SuperiorMenu {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
         zeroStarsSlot = getSlots(cfg, "zero-stars", charSlots);
         oneStarSlot = getSlots(cfg, "one-star", charSlots);
@@ -93,8 +93,6 @@ public final class MenuIslandRate extends SuperiorMenu {
         threeStarsSlot = getSlots(cfg, "three-stars", charSlots);
         fourStarsSlot = getSlots(cfg, "four-stars", charSlots);
         fiveStarsSlot = getSlots(cfg, "five-stars", charSlots);
-
-        charSlots.delete();
 
         menuIslandRate.markCompleted();
     }

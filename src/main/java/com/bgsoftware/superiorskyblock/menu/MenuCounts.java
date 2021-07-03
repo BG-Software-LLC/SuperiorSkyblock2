@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -258,14 +257,12 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
 
         menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuCounts.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuCounts.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuCounts.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuCounts.markCompleted();
     }

@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.modules.ModuleClassLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
@@ -19,15 +18,19 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 public final class ModulesHandler extends AbstractHandler implements ModulesManager {
 
-    private final static Registry<String, PluginModule> modulesMap = Registry.createRegistry();
-    private final static Registry<PluginModule, ModuleData> modulesData = Registry.createRegistry();
+    private final static Map<String, PluginModule> modulesMap = new HashMap<>();
+    private final static Map<PluginModule, ModuleData> modulesData = new HashMap<>();
     private final File modulesFolder;
 
     public ModulesHandler(SuperiorSkyblockPlugin plugin){
@@ -58,7 +61,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         pluginModule.initModule(plugin, dataFolder);
 
-        modulesMap.add(moduleName, pluginModule);
+        modulesMap.put(moduleName, pluginModule);
     }
 
     @Override
@@ -96,7 +99,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
 
             if(listeners != null || commands != null || adminCommands != null)
-                modulesData.add(pluginModule, new ModuleData(listeners, commands, adminCommands));
+                modulesData.put(pluginModule, new ModuleData(listeners, commands, adminCommands));
 
             if(listeners != null)
                 Arrays.stream(listeners).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, plugin));
@@ -163,7 +166,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
     @Override
     public Collection<PluginModule> getModules() {
-        return modulesMap.values();
+        return Collections.unmodifiableCollection(new ArrayList<>(modulesMap.values()));
     }
 
     public void registerExternalModules(){

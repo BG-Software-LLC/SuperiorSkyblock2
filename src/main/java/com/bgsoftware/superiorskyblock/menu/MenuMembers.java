@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
 
@@ -73,14 +73,12 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMembers, "members.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMembers, "members.yml", cfg);
 
         menuMembers.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuMembers.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuMembers.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuMembers.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuMembers.markCompleted();
     }

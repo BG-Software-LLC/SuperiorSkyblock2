@@ -130,7 +130,7 @@ public abstract class PlaceholderHook {
                     island = plugin.getGrid().getIslandAt(player.getLocation());
 
                     if (island == null || island instanceof SpawnIsland)
-                        return plugin.getSettings().defaultPlaceholders.get(placeholder, "");
+                        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
 
                     subPlaceholder = subPlaceholder.replace("location_", "");
                 }
@@ -384,7 +384,7 @@ public abstract class PlaceholderHook {
             }
         }catch(NullPointerException ignored){}
 
-        return plugin.getSettings().defaultPlaceholders.get(placeholder, "");
+        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
     }
 
 }

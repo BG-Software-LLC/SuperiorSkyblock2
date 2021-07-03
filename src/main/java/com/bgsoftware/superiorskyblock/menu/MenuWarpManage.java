@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuWarpManage extends SuperiorMenu {
@@ -144,7 +144,7 @@ public final class MenuWarpManage extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpManage, "warp-manage.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpManage, "warp-manage.yml", cfg);
 
         renameSlots = getSlots(cfg, "warp-rename", charSlots);
         iconSlots = getSlots(cfg, "warp-icon", charSlots);
@@ -153,8 +153,6 @@ public final class MenuWarpManage extends SuperiorMenu {
 
         if(cfg.isConfigurationSection("success-update-sound"))
             successUpdateSound = FileUtils.getSound(cfg.getConfigurationSection("success-update-sound"));
-
-        charSlots.delete();
 
         menuWarpManage.markCompleted();
     }

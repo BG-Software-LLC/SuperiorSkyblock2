@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.Inventory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuMemberManage extends SuperiorMenu {
 
@@ -94,13 +94,11 @@ public final class MenuMemberManage extends SuperiorMenu {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
         rolesSlot = getSlots(cfg, "roles", charSlots);
         banSlot = getSlots(cfg, "ban", charSlots);
         kickSlot = getSlots(cfg, "kick", charSlots);
-
-        charSlots.delete();
 
         menuMemberManage.markCompleted();
     }

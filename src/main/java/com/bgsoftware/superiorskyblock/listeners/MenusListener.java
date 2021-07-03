@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -17,7 +16,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("unused")
 public final class MenusListener implements Listener {
 
-    private final Registry<UUID, ItemStack> latestClickedItem = Registry.createRegistry();
+    private final Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
     private final SuperiorSkyblockPlugin plugin;
 
     public MenusListener(SuperiorSkyblockPlugin plugin){
@@ -40,7 +41,7 @@ public final class MenusListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryClickMonitor(InventoryClickEvent e){
         if(e.getCurrentItem() != null && e.isCancelled() && e.getClickedInventory().getHolder() instanceof SuperiorMenu) {
-            latestClickedItem.add(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
+            latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }

@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -19,7 +18,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class CmdTeam implements ISuperiorCommand {
 
@@ -81,10 +82,10 @@ public final class CmdTeam implements ISuperiorCommand {
             members.sort(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
 
             if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)){
-                Registry<PlayerRole, StringBuilder> rolesStrings = Registry.createRegistry();
+                Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
                 plugin.getPlayers().getRoles().stream().filter(PlayerRole::isRoleLadder)
-                        .forEach(playerRole -> rolesStrings.add(playerRole, new StringBuilder()));
-                rolesStrings.add(SPlayerRole.lastRole(), new StringBuilder());
+                        .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
+                rolesStrings.put(SPlayerRole.lastRole(), new StringBuilder());
 
                 String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(locale),
                         offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage(locale);
@@ -97,11 +98,9 @@ public final class CmdTeam implements ISuperiorCommand {
                             islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus, StringUtils.formatTime(locale, time))).append("\n");
                 });
 
-                rolesStrings.keys().stream()
+                rolesStrings.keySet().stream()
                         .sorted(Collections.reverseOrder(Comparator.comparingInt(PlayerRole::getWeight)))
                         .forEach(playerRole -> infoMessage.append(rolesStrings.get(playerRole)));
-
-                rolesStrings.delete();
             }
 
             if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))

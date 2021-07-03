@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,6 +20,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -113,7 +113,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMembers, "bank-logs.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMembers, "bank-logs.yml", cfg);
 
         menuMembers.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuMembers.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
@@ -122,8 +122,6 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
 
         timeSortSlots = getSlots(cfg, "time-sort", charSlots);
         moneySortSlots = getSlots(cfg, "money-sort", charSlots);
-
-        charSlots.delete();
 
         menuMembers.markCompleted();
     }

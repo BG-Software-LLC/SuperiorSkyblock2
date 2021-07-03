@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuConfirmKick extends SuperiorMenu {
 
@@ -55,12 +55,10 @@ public final class MenuConfirmKick extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmKick, "confirm-kick.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmKick, "confirm-kick.yml", cfg);
 
         confirmSlot = getSlots(cfg, "confirm", charSlots);
         cancelSlot = getSlots(cfg, "cancel", charSlots);
-
-        charSlots.delete();
 
         menuConfirmKick.markCompleted();
     }

@@ -49,7 +49,6 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
@@ -288,7 +287,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Executor.close();
             System.out.println("Closing database...");
             dataHandler.closeConnection();
-            Registry.clearCache();
         }
     }
 

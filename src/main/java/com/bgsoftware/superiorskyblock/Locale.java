@@ -4,7 +4,6 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,8 +17,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -697,7 +698,7 @@ public enum Locale {
     WORLD_NOT_UNLOCKED;
 
     private final String defaultMessage;
-    private final Registry<java.util.Locale, MessageContainer> messages = Registry.createRegistry();
+    private final Map<java.util.Locale, MessageContainer> messages = new HashMap<>();
 
     Locale(){
         this(null);
@@ -731,7 +732,7 @@ public enum Locale {
     }
 
     private void setMessage(java.util.Locale locale, MessageContainer messageContainer){
-        messages.add(locale, messageContainer);
+        messages.put(locale, messageContainer);
     }
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();

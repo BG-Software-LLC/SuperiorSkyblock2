@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -18,6 +17,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuIslandBank extends SuperiorMenu {
 
@@ -124,7 +124,7 @@ public final class MenuIslandBank extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandBank, "island-bank.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandBank, "island-bank.yml", cfg);
 
         logsSlot = getSlots(cfg, "logs", charSlots);
 
@@ -168,8 +168,6 @@ public final class MenuIslandBank extends SuperiorMenu {
                 }
             }
         }
-
-        charSlots.delete();
 
         menuIslandBank.markCompleted();
     }
