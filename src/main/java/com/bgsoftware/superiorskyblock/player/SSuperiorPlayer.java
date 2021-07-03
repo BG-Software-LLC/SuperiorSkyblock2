@@ -121,6 +121,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = plugin.getSettings().disbandCount;
         this.userLocale = LocaleUtils.getDefault();
+        databaseBridge.startSavingData();
     }
 
     /*
