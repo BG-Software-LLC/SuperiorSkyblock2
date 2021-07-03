@@ -82,7 +82,7 @@ public final class FactoriesHandler implements FactoriesManager {
 
     public DatabaseBridge createDatabaseBridge(Island island){
         SQLDatabaseBridge databaseBridge = island == null ? new SQLDatabaseBridge(null, null) :
-                new SQLDatabaseBridge(island::getUniqueId, "uuid");
+                new SQLDatabaseBridge(island::getUniqueId, "island");
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
