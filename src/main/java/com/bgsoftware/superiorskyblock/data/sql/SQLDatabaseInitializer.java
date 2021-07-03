@@ -47,8 +47,6 @@ public final class SQLDatabaseInitializer {
         if (!containsGrid())
             GridDatabaseBridge.insertGrid(plugin.getGrid());
 
-        addMissingColumns();
-
         createIndexes();
     }
 
@@ -73,70 +71,189 @@ public final class SQLDatabaseInitializer {
 
     private void createIslandsTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands (" +
-                "owner VARCHAR(36) PRIMARY KEY, " +
+                "uuid UUID PRIMARY KEY, " +
+                "owner UUID, " +
                 "center TEXT, " +
-                "teleportLocation TEXT, " +
-                "members LONGTEXT, " +
-                "banned LONGTEXT, " +
-                "permissionNodes TEXT, " +
-                "upgrades TEXT, " +
-                "warps TEXT, " +
-                "islandBank TEXT, " +
-                "islandSize INTEGER, " +
-                "blockLimits TEXT, " +
-                "teamLimit INTEGER, " +
-                "cropGrowth DECIMAL, " +
-                "spawnerRates DECIMAL," +
-                "mobDrops DECIMAL, " +
+                "creation_time INTEGER, " +
+                "island_type TEXT, " +
                 "discord TEXT, " +
                 "paypal TEXT, " +
-                "warpsLimit INTEGER, " +
-                "bonusWorth TEXT, " +
+                "worth_bonus BIG_DECIMAL, " +
+                "levels_bonus BIG_DECIMAL, " +
                 "locked BOOLEAN, " +
-                "blockCounts TEXT, " +
-                "name TEXT, " +
-                "visitorsLocation TEXT, " +
-                "description TEXT, " +
-                "ratings LONGTEXT, " +
-                "missions TEXT, " +
-                "settings TEXT, " +
                 "ignored BOOLEAN, " +
-                "generator TEXT, " +
-                "generatedSchematics TEXT, " +
-                "schemName TEXT, " +
-                "uniqueVisitors LONGTEXT, " +
-                "unlockedWorlds TEXT," +
-                "lastTimeUpdate INTEGER," +
-                "dirtyChunks TEXT," +
-                "entityLimits TEXT," +
-                "bonusLevel TEXT," +
-                "creationTime INTEGER," +
-                "coopLimit INTEGER," +
-                "islandEffects TEXT," +
-                "islandChest LONGTEXT," +
-                "uuid VARCHAR(36)," +
-                "bankLimit TEXT," +
-                "lastInterest INTEGER," +
-                "roleLimits TEXT," +
-                "warpCategories TEXT" +
+                "name TEXT, " +
+                "description TEXT, " +
+                "generated_schematics INTEGER, " +
+                "unlocked_worlds INTEGER, " +
+                "last_time_updated INTEGER, " +
+                "dirty_chunks TEXT, " +
+                "block_counts TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_banks (" +
+                "island UUID PRIMARY KEY, " +
+                "balance BIG_DECIMAL, " +
+                "last_interest_time INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_bans (" +
+                "island UUID, " +
+                "player UUID, " +
+                "banned_by UUID, " +
+                "banned_time INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_block_limits (" +
+                "island UUID, " +
+                "block TEXT, " +
+                "`limit` INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_chests (" +
+                "island UUID, " +
+                "`index` INTEGER, " +
+                "contents TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_effects (" +
+                "island UUID, " +
+                "effect_type TEXT, " +
+                "level INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_entity_limits (" +
+                "island UUID, " +
+                "entity TEXT, " +
+                "`limit` INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_flags (" +
+                "island UUID, " +
+                "name TEXT, " +
+                "status INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_generators (" +
+                "island UUID, " +
+                "environment TEXT, " +
+                "block TEXT, " +
+                "rate INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_homes (" +
+                "island UUID, " +
+                "environment TEXT, " +
+                "location TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_members (" +
+                "island UUID, " +
+                "player UUID, " +
+                "role INTEGER, " +
+                "join_time INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_missions (" +
+                "island UUID, " +
+                "name TEXT, " +
+                "finish_count INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_player_permissions (" +
+                "island UUID, " +
+                "player UUID, " +
+                "permission TEXT, " +
+                "status TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_ratings (" +
+                "island UUID, " +
+                "player UUID, " +
+                "rating INTEGER, " +
+                "rating_time INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_role_limits (" +
+                "island UUID, " +
+                "role INTEGER, " +
+                "`limit` INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_role_permissions (" +
+                "island UUID, " +
+                "role INTEGER, " +
+                "permission TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_settings (" +
+                "island UUID PRIMARY KEY, " +
+                "size INTEGER, " +
+                "bank_limit INTEGER, " +
+                "coops_limit INTEGER, " +
+                "members_limit INTEGER, " +
+                "warps_limit INTEGER, " +
+                "crop_growth_multiplier DECIMAL, " +
+                "spawner_rates_multiplier DECIMAL, " +
+                "mob_drops_multiplier DECIMAL" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_upgrades (" +
+                "island UUID, " +
+                "upgrade TEXT, " +
+                "level INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_visitor_homes (" +
+                "island UUID, " +
+                "environment TEXT, " +
+                "location TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_visitors (" +
+                "island UUID, " +
+                "player UUID, " +
+                "visit_time INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
+                "island UUID, " +
+                "name TEXT, " +
+                "slot INTEGER, " +
+                "icon TEXT" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}island_warps (" +
+                "island UUID, " +
+                "name TEXT, " +
+                "category TEXT, " +
+                "location TEXT, " +
+                "private BOOLEAN, " +
+                "icon TEXT" +
                 ");");
     }
 
     private void createPlayersTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players (" +
-                "player VARCHAR(36) PRIMARY KEY, " +
-                "teamLeader VARCHAR(36), " +
+                "uuid UUID PRIMARY KEY, " +
+                "last_used_name TEXT, " +
+                "last_used_skin TEXT, " +
+                "last_time_updated INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_missions (" +
+                "player UUID, " +
                 "name TEXT, " +
-                "islandRole TEXT, " +
-                "textureValue TEXT, " +
-                "disbands INTEGER, " +
-                "toggledPanel BOOLEAN," +
-                "islandFly BOOLEAN," +
-                "borderColor TEXT," +
-                "lastTimeStatus TEXT," +
-                "missions TEXT," +
-                "language TEXT," +
-                "toggledBorder BOOLEAN" +
+                "finish_count INTEGER" +
+                ");");
+
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_settings (" +
+                "player UUID, " +
+                "language TEXT, " +
+                "toggled_panel BOOLEAN, " +
+                "border_color TEXT, " +
+                "toggled_border BOOLEAN, " +
+                "island_fly BOOLEAN" +
                 ");");
     }
 
@@ -151,79 +268,29 @@ public final class SQLDatabaseInitializer {
     }
 
     private void createBankTransactionsTable() {
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}bankTransactions (" +
-                "island VARCHAR(36), " +
-                "player VARCHAR(36), " +
-                "bankAction TEXT, " +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}bank_transactions (" +
+                "island UUID, " +
+                "player UUID, " +
+                "bank_action TEXT, " +
                 "position INTEGER, " +
                 "time TEXT, " +
-                "failureReason TEXT," +
+                "failure_reason TEXT," +
                 "amount TEXT" +
                 ");");
     }
 
     private void createStackedBlocksTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stackedBlocks (" +
-                "world TEXT, " +
-                "x INTEGER, " +
-                "y INTEGER, " +
-                "z INTEGER, " +
-                "amount TEXT," +
-                "item TEXT" +
+                "location TEXT, " +
+                "block_type TEXT, " +
+                "amount BIG_DECIMAL" +
                 ");");
-    }
-
-    private void addMissingColumns() {
-        addColumnIfNotExists("bonusWorth", "islands", "'0'", "TEXT");
-        addColumnIfNotExists("warpsLimit", "islands", String.valueOf(plugin.getSettings().defaultWarpsLimit), "INTEGER");
-        addColumnIfNotExists("disbands", "players", String.valueOf(plugin.getSettings().disbandCount), "INTEGER");
-        addColumnIfNotExists("locked", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("blockCounts", "islands", "''", "TEXT");
-        addColumnIfNotExists("toggledPanel", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("islandFly", "players", "0", "BOOLEAN");
-        addColumnIfNotExists("name", "islands", "''", "TEXT");
-        addColumnIfNotExists("borderColor", "players", "'BLUE'", "TEXT");
-        addColumnIfNotExists("lastTimeStatus", "players", "'-1'", "TEXT");
-        addColumnIfNotExists("visitorsLocation", "islands", "''", "TEXT");
-        addColumnIfNotExists("description", "islands", "''", "TEXT");
-        addColumnIfNotExists("ratings", "islands", "''", "TEXT");
-        addColumnIfNotExists("missions", "islands", "''", "TEXT");
-        addColumnIfNotExists("missions", "players", "''", "TEXT");
-        addColumnIfNotExists("settings", "islands", "'" + getDefaultSettings() + "'", "TEXT");
-        addColumnIfNotExists("ignored", "islands", "0", "BOOLEAN");
-        addColumnIfNotExists("generator", "islands", "'" + getDefaultGenerator() + "'", "TEXT");
-        addColumnIfNotExists("generatedSchematics", "islands", "'normal'", "TEXT");
-        addColumnIfNotExists("schemName", "islands", "''", "TEXT");
-        addColumnIfNotExists("language", "players", "'en-US'", "TEXT");
-        addColumnIfNotExists("uniqueVisitors", "islands", "''", "TEXT");
-        addColumnIfNotExists("unlockedWorlds", "islands", "''", "TEXT");
-        addColumnIfNotExists("toggledBorder", "players", "1", "BOOLEAN");
-        addColumnIfNotExists("lastTimeUpdate", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
-        addColumnIfNotExists("dirtyChunks", "grid", "''", "TEXT");
-        addColumnIfNotExists("dirtyChunks", "islands", "''", "TEXT");
-        addColumnIfNotExists("entityLimits", "islands", "''", "TEXT");
-        addColumnIfNotExists("bonusLevel", "islands", "'0'", "TEXT");
-        addColumnIfNotExists("creationTime", "islands", (System.currentTimeMillis() / 1000) + "", "INTEGER");
-        addColumnIfNotExists("coopLimit", "islands", String.valueOf(plugin.getSettings().defaultCoopLimit), "INTEGER");
-        addColumnIfNotExists("islandEffects", "islands", "''", "TEXT");
-        addColumnIfNotExists("item", "stackedBlocks", "''", "TEXT");
-        addColumnIfNotExists("islandChest", "islands", "''", "LONGTEXT");
-        addColumnIfNotExists("uuid", "islands", "''", "VARCHAR(36)");
-        addColumnIfNotExists("bankLimit", "islands", "'-2'", "TEXT");
-        addColumnIfNotExists("lastInterest", "islands", String.valueOf(System.currentTimeMillis() / 1000), "INTEGER");
-        addColumnIfNotExists("roleLimits", "islands", "''", "TEXT");
-        addColumnIfNotExists("warpCategories", "islands", "''", "TEXT");
-
-        editColumn("members", "islands", "LONGTEXT");
-        editColumn("banned", "islands", "LONGTEXT");
-        editColumn("ratings", "islands", "LONGTEXT");
-        editColumn("uniqueVisitors", "islands", "LONGTEXT");
     }
 
     private void createIndexes(){
         SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS islands_uuid_index ON islands(uuid)");
-        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS transactions_uuid_index ON bankTransactions(uuid)");
-        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS players_uuid_index ON players(player)");
+        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS transactions_uuid_index ON bank_transactions(island)");
+        SQLHelper.executeUpdate("CREATE INDEX IF NOT EXISTS players_uuid_index ON players(uuid)");
     }
 
     private boolean containsGrid() {

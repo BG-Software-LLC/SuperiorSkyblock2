@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
@@ -148,7 +149,7 @@ public final class ChunksTracker {
             island = getIsland(plugin.getGrid(), chunkPosition);
 
         if(dirtyChunks.containsKey(island) && dirtyChunks.get(island).remove(chunkPosition) && save)
-            island.getDataHandler().saveDirtyChunks();
+            IslandsDatabaseBridge.saveDirtyChunks(island);
     }
 
     public static void markDirty(Island island, ChunkPosition chunkPosition, boolean save){
@@ -156,7 +157,7 @@ public final class ChunksTracker {
             island = getIsland(plugin.getGrid(), chunkPosition);
 
         if(dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save && !(island instanceof SpawnIsland))
-            island.getDataHandler().saveDirtyChunks();
+            IslandsDatabaseBridge.saveDirtyChunks(island);
     }
 
 }

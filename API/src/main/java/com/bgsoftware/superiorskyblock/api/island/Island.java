@@ -758,6 +758,12 @@ public interface Island extends Comparable<Island> {
      */
     long getNextInterest();
 
+    /**
+     * Set the last time that the bank interest was given.
+     * @param lastInterest The time it was given.
+     */
+    void setLastInterestTime(long lastInterest);
+
     /*
      *  Worth related methods
      */

@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -23,7 +24,6 @@ import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -92,25 +92,22 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private BukkitTask teleportTask = null;
 
     public SSuperiorPlayer(DatabaseResult resultSet) {
-        uuid = UUID.fromString(resultSet.getString("player"));
-        islandLeaderFromCache = UUID.fromString(resultSet.getString("teamLeader"));
-        name = resultSet.getString("name");
-        textureValue = resultSet.getString("textureValue");
+        this.uuid = UUID.fromString(resultSet.getString("uuid"));
+        this.name = resultSet.getString("last_used_name");
+        this.textureValue = resultSet.getString("last_used_skin");
+        this.disbands = resultSet.getInt("disbands");
+        this.lastTimeStatus = resultSet.getLong("lastTimeStatus");
 
-        try{
-            playerRole = SPlayerRole.fromId(Integer.parseInt(resultSet.getString("islandRole")));
-        }catch(Exception ex){
-            playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
-        }
+        PlayersDeserializer.deserializeMissions(this, this.completedMissions);
 
-        disbands = resultSet.getInt("disbands");
-        toggledPanel = resultSet.getBoolean("toggledPanel");
-        islandFly = resultSet.getBoolean("islandFly");
-        borderColor = BorderColor.valueOf(resultSet.getString("borderColor"));
-        lastTimeStatus = resultSet.getLong("lastTimeStatus");
-        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), completedMissions);
-        userLocale = LocaleUtils.getLocale(resultSet.getString("language"));
-        worldBorderEnabled = resultSet.getBoolean("toggledBorder");
+        PlayersDeserializer.deserializePlayerSettings(this, playerSettingsRaw -> {
+            DatabaseResult playerSettings = new DatabaseResult(playerSettingsRaw);
+            this.toggledPanel = playerSettings.getBoolean("toggledPanel");
+            this.islandFly = playerSettings.getBoolean("islandFly");
+            this.borderColor = BorderColor.safeValue(playerSettings.getString("borderColor"), BorderColor.BLUE);
+            this.userLocale = LocaleUtils.getLocale(playerSettings.getString("language"));
+            this.worldBorderEnabled = playerSettings.getBoolean("toggledBorder");
+        });
     }
 
     public SSuperiorPlayer(UUID player){
@@ -791,6 +788,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public PlayerDataHandler getDataHandler() {
         return EmptyDataHandler.getInstance();
     }

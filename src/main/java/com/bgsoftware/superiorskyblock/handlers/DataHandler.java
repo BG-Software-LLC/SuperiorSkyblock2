@@ -167,7 +167,7 @@ public final class DataHandler extends AbstractHandler {
 
             DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
-            islandsLoader.loadAllObjects("bankTransactions", _resultSet -> {
+            islandsLoader.loadAllObjects("bank_transactions", _resultSet -> {
                 DatabaseResult resultSet = new DatabaseResult(_resultSet);
                 try {
                     Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));

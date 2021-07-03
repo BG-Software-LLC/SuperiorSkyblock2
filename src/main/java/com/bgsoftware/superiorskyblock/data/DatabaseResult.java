@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.data;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 public final class DatabaseResult {
@@ -27,7 +28,17 @@ public final class DatabaseResult {
     }
 
     public boolean getBoolean(String key){
-        return getObject(key, Boolean.class, false);
+        int value = getObject(key, Integer.class, 0);
+        return value == 1;
+    }
+
+    public BigDecimal getBigDecimal(String key){
+        String value = getString(key);
+        try{
+            return new BigDecimal(value);
+        }catch (NumberFormatException | NullPointerException ex){
+            return BigDecimal.ZERO;
+        }
     }
 
     private <T> T getObject(String key, Class<T> clazz, T def){

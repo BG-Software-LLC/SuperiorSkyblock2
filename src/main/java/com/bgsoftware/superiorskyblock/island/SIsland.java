@@ -58,7 +58,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
+import com.bgsoftware.superiorskyblock.data.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -159,7 +159,7 @@ public final class SIsland implements Island {
     private volatile String discord = "None";
     private volatile String paypal = "None";
     private final SyncedObject<Location[]> teleportLocations = SyncedObject.of(new Location[World.Environment.values().length]);
-    private Location visitorsLocation = null;
+    private final SyncedObject<Location[]> visitorsLocations = SyncedObject.of(new Location[World.Environment.values().length]);
     private volatile boolean locked = false;
     private volatile String islandName;
     private volatile String islandRawName;
@@ -197,120 +197,62 @@ public final class SIsland implements Island {
     private final Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new ConcurrentHashMap<>();
 
     public SIsland(GridHandler grid, DatabaseResult resultSet) {
+        this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-        this.creationTime = resultSet.getLong("creationTime");
-        updateDatesFormatter();
-
-        IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
-        IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
-        IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
-        IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
-        IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
-        IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this);
-        IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
-        IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
-        IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-        IslandDeserializer.deserializeIslandFlags(resultSet.getString("settings"), this.islandSettings);
-        IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
-        IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
-        IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
-        IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
-        IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
-        IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
-        IslandDeserializer.deserializeWarpCategories(resultSet.getString("warpCategories"), this);
-
-        parseNumbersSafe(() -> this.islandBank.setBalance(new BigDecimal(resultSet.getString("islandBank"))));
-        parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
-        this.islandSize = new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0);
-        this.teamLimit = new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0);
-        this.warpsLimit = new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0);
-        this.cropGrowth = new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0);
-        this.spawnerRates = new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0);
-        this.mobDrops = new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0);
+        this.creationTime = resultSet.getLong("creation_time");
+        this.schemName = resultSet.getString("island_type");
         this.discord = resultSet.getString("discord");
         this.paypal = resultSet.getString("paypal");
-        this.visitorsLocation = LocationUtils.getLocation(resultSet.getString("visitorsLocation"));
+        this.bonusWorth.set(resultSet.getBigDecimal("worth_bonus"));
+        this.bonusLevel.set(resultSet.getBigDecimal("levels_bonus"));
         this.locked = resultSet.getBoolean("locked");
-        this.islandName = resultSet.getString("name");
-        this.islandRawName = StringUtils.stripColors(resultSet.getString("name"));
-        this.description = resultSet.getString("description");
         this.ignored = resultSet.getBoolean("ignored");
-        parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
-
-        String generatedSchematics = resultSet.getString("generatedSchematics");
-        try {
-            this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
-        } catch (Exception ex) {
-            int n = 0;
-
-            if (generatedSchematics.contains("normal"))
-                n |= 8;
-            if (generatedSchematics.contains("nether"))
-                n |= 4;
-            if (generatedSchematics.contains("the_end"))
-                n |= 3;
-
-            this.generatedSchematics.set(n);
-        }
-
-        this.schemName = resultSet.getString("schemName");
-
-        String unlockedWorlds = resultSet.getString("unlockedWorlds");
-        try {
-            this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
-        } catch (Exception ex) {
-            int n = 0;
-
-            if (unlockedWorlds.contains("nether"))
-                n |= 1;
-            if (unlockedWorlds.contains("the_end"))
-                n |= 2;
-
-            this.unlockedWorlds.set(n);
-        }
-
-        this.lastTimeUpdate = resultSet.getLong("lastTimeUpdate");
-        this.coopLimit = new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0);
-        String bankLimit = resultSet.getString("bankLimit");
-        parseNumbersSafe(() -> this.bankLimit = new UpgradeValue<>(new BigDecimal(bankLimit),
-                i -> i.compareTo(new BigDecimal(-1)) < 0));
-
-        String blockCounts = resultSet.getString("blockCounts");
-
-        Executor.sync(() -> {
-            try {
-                rawKeyPlacements = true;
-                IslandDeserializer.deserializeBlockCounts(blockCounts, this);
-            } finally {
-                rawKeyPlacements = false;
-            }
-
-            if (this.blockCounts.isEmpty())
-                calcIslandWorth(null);
-        }, 5L);
+        this.islandName = resultSet.getString("name");
+        this.islandRawName = StringUtils.stripColors(this.islandName);
+        this.description = resultSet.getString("description");
+        this.generatedSchematics.set(resultSet.getInt("generated_schematics"));
+        this.unlockedWorlds.set(Integer.parseInt("unlocked_worlds"));
+        this.lastTimeUpdate = resultSet.getLong("last_time_updated");
 
         ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
+        Executor.sync(() -> deserializeBlockCounts(resultSet.getString("blockCounts")), 5L);
 
-        String uuidRaw = resultSet.getString("uuid");
-        if (uuidRaw == null || uuidRaw.isEmpty()) {
-            this.uuid = owner.getUniqueId();
-        } else {
-            this.uuid = UUID.fromString(uuidRaw);
-        }
+        IslandsDeserializer.deserializeIslandHomes(this, this.teleportLocations);
+        IslandsDeserializer.deserializeMembers(this, this.members);
+        IslandsDeserializer.deserializeBanned(this, this.banned);
+        IslandsDeserializer.deserializePlayerPermissions(this, this.playerPermissions);
+        IslandsDeserializer.deserializeRolePermissions(this, this.rolePermissions);
+        IslandsDeserializer.deserializeUpgrades(this, this.upgrades);
+        IslandsDeserializer.deserializeWarps(this);
+        IslandsDeserializer.deserializeBlockLimits(this, this.blockLimits);
+        IslandsDeserializer.deserializeRatings(this, this.ratings);
+        IslandsDeserializer.deserializeMissions(this, this.completedMissions);
+        IslandsDeserializer.deserializeIslandFlags(this, this.islandSettings);
+        IslandsDeserializer.deserializeGenerators(this, this.cobbleGeneratorValues);
+        IslandsDeserializer.deserializeVisitors(this, this.uniqueVisitors);
+        IslandsDeserializer.deserializeEntityLimits(this, this.entityLimits);
+        IslandsDeserializer.deserializeEffects(this, this.islandEffects);
+        IslandsDeserializer.deserializeIslandChest(this, this.islandChest);
+        IslandsDeserializer.deserializeRoleLimits(this, this.roleLimits);
+        IslandsDeserializer.deserializeWarpCategories(this);
+        IslandsDeserializer.deserializeIslandBank(this);
+        IslandsDeserializer.deserializeVisitorHomes(this, this.visitorsLocations);
 
-        this.lastInterest = resultSet.getLong("lastInterest");
+        IslandsDeserializer.deserializeIslandSettings(this, islandSettingsRaw -> {
+            DatabaseResult islandSettings = new DatabaseResult(islandSettingsRaw);
+            this.islandSize = new UpgradeValue<>(islandSettings.getInt("size"), i -> i < 0);
+            this.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit"), i -> i < 0);
+            this.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit"), i -> i < 0);
+            this.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier"), i -> i < 0);
+            this.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier"), i -> i < 0);
+            this.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier"), i -> i < 0);
+            this.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit"), i -> i < 0);
+            this.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit"), i -> i.compareTo(new BigDecimal(-1)) < 0);
+        });
 
-        if (BuiltinModules.BANK.bankInterestEnabled) {
-            long currentTime = System.currentTimeMillis() / 1000;
-            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
-            if (ticksToNextInterest <= 0) {
-                giveInterest(true);
-            } else {
-                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
-            }
-        }
-
+        updateDatesFormatter();
+        startBankInterest();
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
@@ -332,14 +274,13 @@ public final class SIsland implements Island {
         this.uuid = uuid;
         this.center = SBlockPosition.of(location);
         this.creationTime = currentTime;
-        updateDatesFormatter();
         this.islandName = islandName;
         this.islandRawName = StringUtils.stripColors(islandName);
         this.schemName = schemName;
+
         setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment);
-
-        updateLastInterest(currentTime);
-
+        setLastInterestTime(currentTime);
+        updateDatesFormatter();
         assignIslandChest();
         updateUpgrades();
 
@@ -679,7 +620,7 @@ public final class SIsland implements Island {
 
     @Override
     public Location getVisitorsLocation() {
-        Location visitorsLocation = this.visitorsLocation == null ? null : this.visitorsLocation.clone();
+        Location visitorsLocation = this.visitorsLocations.readAndGet(visitorsLocations -> visitorsLocations[0]);
 
         if(visitorsLocation == null)
             return null;
@@ -744,12 +685,12 @@ public final class SIsland implements Island {
         if(visitorsLocation == null){
             deleteWarp(IslandUtils.VISITORS_WARP_NAME);
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
-            this.visitorsLocation = null;
+            this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = null);
         }
         else{
             createWarp(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, null);
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
-            this.visitorsLocation = visitorsLocation.clone();
+            this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
         }
 
         IslandsDatabaseBridge.saveVisitorLocation(this);
@@ -1690,7 +1631,7 @@ public final class SIsland implements Island {
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
         MenuIslandBank.refreshMenus(this);
 
-        updateLastInterest(currentTime);
+        setLastInterestTime(currentTime);
 
         return true;
     }
@@ -1698,6 +1639,17 @@ public final class SIsland implements Island {
     @Override
     public long getLastInterestTime() {
         return lastInterest;
+    }
+
+    @Override
+    public void setLastInterestTime(long lastInterest) {
+        if(BuiltinModules.BANK.bankInterestEnabled) {
+            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20;
+            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+        }
+
+        this.lastInterest = lastInterest;
+        IslandsDatabaseBridge.saveLastInterestTime(this);
     }
 
     @Override
@@ -3278,6 +3230,7 @@ public final class SIsland implements Island {
      */
 
     @Override
+    @Deprecated
     public IslandDataHandler getDataHandler() {
         return EmptyDataHandler.getInstance();
     }
@@ -3330,6 +3283,30 @@ public final class SIsland implements Island {
                 islandChests[i].setRows(plugin.getSettings().islandChestsDefaultSize);
             }
         });
+    }
+
+    private void deserializeBlockCounts(String blockCounts){
+        try {
+            rawKeyPlacements = true;
+            IslandsDeserializer.deserializeBlockCounts(blockCounts, this);
+        } finally {
+            rawKeyPlacements = false;
+        }
+
+        if (this.blockCounts.isEmpty())
+            calcIslandWorth(null);
+    }
+
+    private void startBankInterest(){
+        if (BuiltinModules.BANK.bankInterestEnabled) {
+            long currentTime = System.currentTimeMillis() / 1000;
+            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
+            if (ticksToNextInterest <= 0) {
+                giveInterest(true);
+            } else {
+                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            }
+        }
     }
 
     private void checkMembersDuplication(){
@@ -3546,16 +3523,6 @@ public final class SIsland implements Island {
             callback.run();
     }
 
-    private void updateLastInterest(long lastInterest){
-        if(BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20;
-            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
-        }
-
-        this.lastInterest = lastInterest;
-        IslandsDatabaseBridge.saveLastInterestTime(this);
-    }
-
     private KeyMap<UpgradeValue<Integer>> getCobbleGeneratorValues(World.Environment environment, boolean createNew){
         return getCobbleGeneratorValues(environment.ordinal(), createNew);
     }
@@ -3567,12 +3534,6 @@ public final class SIsland implements Island {
             cobbleGeneratorValues = this.cobbleGeneratorValues[index] = new KeyMap<>();
 
         return cobbleGeneratorValues;
-    }
-
-    private static void parseNumbersSafe(Runnable code) {
-        try{
-            code.run();
-        }catch (NumberFormatException | NullPointerException ignored){}
     }
 
 }

@@ -743,6 +743,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setLastInterestTime(long lastInterest) {
+
+    }
+
+    @Override
     public void handleBlockPlace(Block block) {
 
     }

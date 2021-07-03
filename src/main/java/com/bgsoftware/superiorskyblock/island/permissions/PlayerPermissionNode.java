@@ -19,14 +19,8 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     protected final Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, (JsonArray) null);
-    }
-
-    public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, JsonArray permsArray){
         this.superiorPlayer = superiorPlayer;
         this.island = island;
-        if(permsArray != null)
-            deserialize(permsArray);
     }
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, String permissions){
@@ -64,15 +58,8 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         return permsArray;
     }
 
-    private void deserialize(JsonArray permsArray){
-        for(JsonElement permElement : permsArray){
-            try {
-                JsonObject permObject = permElement.getAsJsonObject();
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
-                PrivilegeStatus privilegeStatus = PrivilegeStatus.of(permObject.get("status").getAsString());
-                privileges.put(islandPrivilege, privilegeStatus);
-            }catch (Exception ignored){}
-        }
+    public void loadPrivilege(IslandPrivilege islandPrivilege, String status){
+        privileges.put(islandPrivilege, PrivilegeStatus.of(status));
     }
 
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {

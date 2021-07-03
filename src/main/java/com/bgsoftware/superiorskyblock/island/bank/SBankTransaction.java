@@ -31,11 +31,11 @@ public final class SBankTransaction implements BankTransaction {
     public SBankTransaction(DatabaseResult resultSet) {
         String player = resultSet.getString("player");
         this.player = player == null || player.isEmpty() ? null  : UUID.fromString(player);
-        this.bankAction = BankAction.valueOf(resultSet.getString("bankAction"));
+        this.bankAction = BankAction.valueOf(resultSet.getString("bank_action"));
         this.position = resultSet.getInt("position");
         this.time = Long.parseLong(resultSet.getString("time"));
         this.date = StringUtils.formatDate(time);
-        this.failureReason = resultSet.getString("failureReason");
+        this.failureReason = resultSet.getString("failure_reason");
         this.amount = new BigDecimal(resultSet.getString("amount"));
     }
 

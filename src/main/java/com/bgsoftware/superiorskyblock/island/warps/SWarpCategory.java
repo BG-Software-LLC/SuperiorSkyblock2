@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
@@ -46,8 +47,8 @@ public final class SWarpCategory implements WarpCategory {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Name, Island: " + getOwnerName() + ", Category: " + this.name + ", New Name: " + name);
         this.name = name;
-        island.getDataHandler().saveWarps();
-        island.getDataHandler().saveWarpCategories();
+        IslandsDatabaseBridge.saveWarps(getIsland());
+        IslandsDatabaseBridge.saveWarpCategories(getIsland());
     }
 
     @Override
@@ -64,7 +65,7 @@ public final class SWarpCategory implements WarpCategory {
     public void setSlot(int slot) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Slot, Island: " + getOwnerName() + ", Category: " + this.name + ", New Slot: " + slot);
         this.slot = slot;
-        island.getDataHandler().saveWarpCategories();
+        IslandsDatabaseBridge.saveWarpCategories(getIsland());
     }
 
     @Override
@@ -83,7 +84,7 @@ public final class SWarpCategory implements WarpCategory {
     public void setIcon(@Nullable ItemStack icon) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Icon, Island: " + getOwnerName() + ", Category: " + this.name);
         this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
-        island.getDataHandler().saveWarpCategories();
+        IslandsDatabaseBridge.saveWarpCategories(getIsland());
     }
 
     private String getOwnerName(){

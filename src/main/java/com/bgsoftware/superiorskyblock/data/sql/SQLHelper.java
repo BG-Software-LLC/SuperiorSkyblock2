@@ -96,7 +96,8 @@ public final class SQLHelper {
         PreparedStatement preparedStatement = null;
         try{
             conn = dataSource.getConnection();
-            preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix));
+            preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)
+                    .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)"));
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
             System.out.println(statement);

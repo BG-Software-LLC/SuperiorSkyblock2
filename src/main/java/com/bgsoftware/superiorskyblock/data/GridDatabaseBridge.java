@@ -31,12 +31,12 @@ public final class GridDatabaseBridge {
     }
 
     public static void deleteStackedBlock(GridManager gridManager, StackedBlocksHandler.StackedBlock stackedBlock){
-        //gridManager.getDatabaseBridge().deleteObject("stackedBlocks");
+        gridManager.getDatabaseBridge().deleteObject("stacked_blocks");
         // TODO
     }
 
     public static void deleteStackedBlocks(GridManager gridManager){
-        gridManager.getDatabaseBridge().deleteObject("stackedBlocks");
+        gridManager.getDatabaseBridge().deleteObject("stacked_blocks");
     }
 
     public static void insertGrid(GridManager gridManager){
