@@ -93,7 +93,7 @@ public final class SIslandChest implements IslandChest {
         //((SIslandDataHandler) island.getDataHandler()).setModified(Query.ISLAND_SET_ISLAND_CHEST);
         if(++contentsUpdateCounter >= 50){
             contentsUpdateCounter = 0;
-            IslandsDatabaseBridge.saveIslandChest(island);
+            IslandsDatabaseBridge.saveIslandChest(island, this);
         }
     }
 

@@ -1,9 +1,12 @@
 package com.bgsoftware.superiorskyblock.data;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -16,7 +19,7 @@ public final class PlayersDeserializer {
     }
 
     public static void deserializeMissions(SuperiorPlayer superiorPlayer, Map<Mission<?>, Integer> completedMissions) {
-        superiorPlayer.getDatabaseBridge().loadObject("players_missions", missionsRow -> {
+        loadObject(superiorPlayer, "players_missions", missionsRow -> {
             String name = (String) missionsRow.get("name");
             int finishCount = (int) missionsRow.get("finish_count");
 
@@ -28,7 +31,13 @@ public final class PlayersDeserializer {
     }
 
     public static void deserializePlayerSettings(SuperiorPlayer superiorPlayer, Consumer<Map<String, Object>> playerSettingsConsumer){
-        superiorPlayer.getDatabaseBridge().loadObject("players_settings", playerSettingsConsumer);
+        loadObject(superiorPlayer, "players_settings", playerSettingsConsumer);
+    }
+
+    private static void loadObject(SuperiorPlayer superiorPlayer, String table, Consumer<Map<String, Object>> resultConsumer){
+        superiorPlayer.getDatabaseBridge().loadObject(table,
+                new DatabaseFilter(Collections.singletonList(new Pair<>("island", superiorPlayer.getUniqueId().toString()))),
+                resultConsumer);
     }
 
 }

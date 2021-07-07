@@ -156,6 +156,14 @@ public interface Island extends Comparable<Island> {
     void banMember(SuperiorPlayer superiorPlayer);
 
     /**
+     * Ban a member from the island.
+     * @param superiorPlayer The player to ban.
+     * @param whom The player that executed the ban command.
+     *             If null, CONSOLE will be chosen as the banner.
+     */
+    void banMember(SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer whom);
+
+    /**
      * Unban a player from the island.
      * @param superiorPlayer The player to unban.
      */

@@ -1,10 +1,13 @@
 package com.bgsoftware.superiorskyblock.data;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+
+import java.util.Arrays;
 
 @SuppressWarnings("unchecked")
 public final class GridDatabaseBridge {
@@ -15,28 +18,25 @@ public final class GridDatabaseBridge {
     }
 
     public static void saveLastIsland(GridManager gridManager, SBlockPosition lastIsland){
-        gridManager.getDatabaseBridge().updateObject("grid", new Pair<>("lastIsland", lastIsland.toString()));
+        gridManager.getDatabaseBridge().updateObject("grid", null, new Pair<>("lastIsland", lastIsland.toString()));
     }
 
     public static void saveStackedBlock(GridManager gridManager, StackedBlocksHandler.StackedBlock stackedBlock){
         SBlockPosition position = stackedBlock.getBlockPosition();
-        gridManager.getDatabaseBridge().insertObject("stackedBlocks",
-                new Pair<>("world", position.getWorldName()),
-                new Pair<>("x", position.getX()),
-                new Pair<>("y", position.getY()),
-                new Pair<>("z", position.getZ()),
+        gridManager.getDatabaseBridge().insertObject("stacked_blocks",
+                new Pair<>("location", position.toString()),
                 new Pair<>("amount", stackedBlock.getAmount()),
                 new Pair<>("item", stackedBlock.getBlockKey())
         );
     }
 
     public static void deleteStackedBlock(GridManager gridManager, StackedBlocksHandler.StackedBlock stackedBlock){
-        gridManager.getDatabaseBridge().deleteObject("stacked_blocks");
-        // TODO
+        gridManager.getDatabaseBridge().deleteObject("stacked_blocks",
+                createFilter(new Pair<>("location", stackedBlock.getBlockPosition().toString())));
     }
 
     public static void deleteStackedBlocks(GridManager gridManager){
-        gridManager.getDatabaseBridge().deleteObject("stacked_blocks");
+        gridManager.getDatabaseBridge().deleteObject("stacked_blocks", null);
     }
 
     public static void insertGrid(GridManager gridManager){
@@ -50,8 +50,11 @@ public final class GridDatabaseBridge {
     }
 
     public static void deleteGrid(GridManager gridManager){
-        gridManager.getDatabaseBridge().deleteObject("grid");
+        gridManager.getDatabaseBridge().deleteObject("grid", null);
     }
 
+    private static DatabaseFilter createFilter(Pair<String, Object>... others){
+        return new DatabaseFilter(Arrays.asList(others));
+    }
 
 }

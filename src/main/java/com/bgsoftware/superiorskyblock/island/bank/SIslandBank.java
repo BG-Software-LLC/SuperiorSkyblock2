@@ -256,7 +256,7 @@ public final class SIslandBank implements IslandBank {
 
     private void increaseBalance(BigDecimal amount){
         this.balance.updateAndGet(bigDecimal -> bigDecimal.add(amount));
-        IslandsDatabaseBridge.saveIslandBank(island);
+        IslandsDatabaseBridge.saveBankBalance(island);
     }
 
 }

@@ -81,22 +81,19 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public DatabaseBridge createDatabaseBridge(Island island){
-        SQLDatabaseBridge databaseBridge = island == null ? new SQLDatabaseBridge(null, null) :
-                new SQLDatabaseBridge(island::getUniqueId, "island");
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer){
-        SQLDatabaseBridge databaseBridge = superiorPlayer == null ?
-                new SQLDatabaseBridge(null, null) :
-                new SQLDatabaseBridge(superiorPlayer::getUniqueId, "player");
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(GridManager gridManager){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge(null, null);
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
     }

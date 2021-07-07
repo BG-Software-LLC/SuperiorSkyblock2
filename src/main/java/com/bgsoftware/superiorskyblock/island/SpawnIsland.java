@@ -200,6 +200,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void banMember(SuperiorPlayer superiorPlayer, SuperiorPlayer whom) {
+
+    }
+
+    @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
 
     }

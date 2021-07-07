@@ -164,7 +164,7 @@ public final class SQLDatabaseInitializer {
                 "island UUID, " +
                 "player UUID, " +
                 "permission TEXT, " +
-                "status TEXT" +
+                "status BOOLEAN" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_ratings (" +
@@ -189,7 +189,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_settings (" +
                 "island UUID PRIMARY KEY, " +
                 "size INTEGER, " +
-                "bank_limit INTEGER, " +
+                "bank_limit BIG_DECIMAL, " +
                 "coops_limit INTEGER, " +
                 "members_limit INTEGER, " +
                 "warps_limit INTEGER, " +
@@ -223,7 +223,7 @@ public final class SQLDatabaseInitializer {
                 "icon TEXT" +
                 ");");
 
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}island_warps (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warps (" +
                 "island UUID, " +
                 "name TEXT, " +
                 "category TEXT, " +
@@ -238,6 +238,7 @@ public final class SQLDatabaseInitializer {
                 "uuid UUID PRIMARY KEY, " +
                 "last_used_name TEXT, " +
                 "last_used_skin TEXT, " +
+                "disbands INTEGER, " +
                 "last_time_updated INTEGER" +
                 ");");
 
@@ -273,14 +274,14 @@ public final class SQLDatabaseInitializer {
                 "player UUID, " +
                 "bank_action TEXT, " +
                 "position INTEGER, " +
-                "time TEXT, " +
+                "time INTEGER, " +
                 "failure_reason TEXT," +
                 "amount TEXT" +
                 ");");
     }
 
     private void createStackedBlocksTable() {
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stackedBlocks (" +
+        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stacked_blocks (" +
                 "location TEXT, " +
                 "block_type TEXT, " +
                 "amount BIG_DECIMAL" +

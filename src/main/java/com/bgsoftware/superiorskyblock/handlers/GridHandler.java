@@ -709,19 +709,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void loadStackedBlocks(DatabaseResult resultSet) {
-        String world = resultSet.getString("world");
-        int x = resultSet.getInt("x");
-        int y = resultSet.getInt("y");
-        int z = resultSet.getInt("z");
+        String location = resultSet.getString("location");;
         int amount = resultSet.getInt("amount");
-
-        if (world == null)
-            return;
 
         String item = resultSet.getString("item");
         Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
 
-        stackedBlocks.setStackedBlock(SBlockPosition.of(world, x, y, z), amount, blockKey);
+        stackedBlocks.setStackedBlock(SBlockPosition.of(location), amount, blockKey);
     }
 
     public void updateStackedBlockKeys() {

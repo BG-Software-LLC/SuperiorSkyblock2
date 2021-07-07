@@ -1,337 +1,606 @@
 package com.bgsoftware.superiorskyblock.data;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
+import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("unchecked")
 public final class IslandsDatabaseBridge {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private IslandsDatabaseBridge(){
     }
 
-    public static void saveMembers(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("members",
-                IslandSerializer.serializePlayers(island.getIslandMembers(false))));
+    public static void addMember(Island island, SuperiorPlayer superiorPlayer, long addTime) {
+        island.getDatabaseBridge().insertObject("islands_members",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("role", superiorPlayer.getPlayerRole().getId()),
+                new Pair<>("join_time", addTime)
+        );
     }
 
-    public static void saveBannedPlayers(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("banned",
-                IslandSerializer.serializePlayers(island.getBannedPlayers())));
+    public static void removeMember(Island island, SuperiorPlayer superiorPlayer) {
+        island.getDatabaseBridge().deleteObject("islands_members",
+                createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString()))
+        );
+    }
+
+    public static void saveMemberRole(Island island, SuperiorPlayer superiorPlayer) {
+        island.getDatabaseBridge().updateObject("islands_members",
+                createFilter("island", island),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("role", superiorPlayer.getPlayerRole().getId())
+        );
+    }
+
+    public static void addBannedPlayer(Island island, SuperiorPlayer superiorPlayer, UUID banner, long banTime) {
+        island.getDatabaseBridge().insertObject("islands_bans",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("banned_by", banner.toString()),
+                new Pair<>("banned_time", banTime)
+        );
+    }
+
+    public static void removeBannedPlayer(Island island, SuperiorPlayer superiorPlayer) {
+        island.getDatabaseBridge().deleteObject("islands_bans",
+                createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString()))
+        );
     }
 
     public static void saveCoopLimit(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("coopLimit", island.getCoopLimit()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("coops_limit", island.getCoopLimit()));
     }
 
-    public static void saveTeleportLocation(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("teleportLocation",
-                IslandSerializer.serializeLocations(island.getTeleportLocations())));
+    public static void saveTeleportLocation(Island island, World.Environment environment, Location location) {
+        if(location == null){
+            island.getDatabaseBridge().deleteObject("islands_homes",
+                    createFilter("island", island, new Pair<>("environment", environment.name()))
+            );
+        }
+        else {
+            island.getDatabaseBridge().insertObject("islands_homes",
+                    new Pair<>("island", island.getUniqueId().toString()),
+                    new Pair<>("environment", environment.name()),
+                    new Pair<>("location", LocationUtils.getLocation(location))
+            );
+        }
     }
 
-    public static void saveVisitorLocation(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("visitorsLocation",
-                LocationUtils.getLocation(island.getVisitorsLocation())));
+    public static void saveVisitorLocation(Island island, World.Environment environment, Location location) {
+        if(location == null){
+            island.getDatabaseBridge().deleteObject("islands_visitor_homes",
+                    createFilter("island", island, new Pair<>("environment", environment.name()))
+            );
+        }
+        else {
+            island.getDatabaseBridge().insertObject("islands_visitor_homes",
+                    new Pair<>("island", island.getUniqueId().toString()),
+                    new Pair<>("environment", environment.name()),
+                    new Pair<>("location", LocationUtils.getLocation(location))
+            );
+        }
     }
 
     public static void saveUnlockedWorlds(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("unlockedWorlds",
-                island.getUnlockedWorldsFlag() + ""));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag())
+        );
     }
 
-    public static void savePermissions(Island island){
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("permissionNodes",
-                IslandSerializer.serializePermissions(island.getPlayerPermissions(), island.getRolePermissions())));
+    public static void savePlayerPermission(Island island, SuperiorPlayer superiorPlayer, IslandPrivilege privilege,
+                                            boolean status){
+        island.getDatabaseBridge().insertObject("islands_player_permissions",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("permission", privilege.getName()),
+                new Pair<>("status", status)
+        );
+    }
+
+    public static void clearPlayerPermission(Island island, SuperiorPlayer superiorPlayer){
+        island.getDatabaseBridge().deleteObject("islands_player_permissions",
+                createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString()))
+        );
+    }
+
+    public static void saveRolePermission(Island island, PlayerRole playerRole, IslandPrivilege privilege){
+        island.getDatabaseBridge().insertObject("islands_role_permissions",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("role", playerRole.getId()),
+                new Pair<>("permission", privilege.getName())
+        );
+    }
+
+    public static void clearRolePermissions(Island island){
+        island.getDatabaseBridge().deleteObject("islands_role_permissions",
+                createFilter("island", island));
     }
 
     public static void saveName(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("name", island.getName()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("name", island.getName()));
     }
 
     public static void saveDescription(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("description", island.getDescription()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("description", island.getDescription()));
     }
 
     public static void saveSize(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("islandSize", island.getIslandSize()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("size", island.getIslandSize()));
     }
 
     public static void saveDiscord(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("discord", island.getDiscord()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("discord", island.getDiscord()));
     }
 
     public static void savePaypal(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("paypal", island.getPaypal()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("paypal", island.getPaypal()));
     }
 
     public static void saveLockedStatus(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("locked", island.isLocked()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("locked", island.isLocked()));
     }
 
     public static void saveIgnoredStatus(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("ignored", island.isIgnored()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("ignored", island.isIgnored()));
     }
 
     public static void saveLastTimeUpdate(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("lastTimeUpdate", island.getLastTimeUpdate()));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("last_time_updated", island.getLastTimeUpdate()));
     }
 
     public static void saveBankLimit(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("bankLimit", island.getBankLimit() + ""));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("bank_limit", island.getBankLimit() + ""));
     }
 
     public static void saveBonusWorth(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("bonusWorth", island.getBonusWorth() + ""));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("worth_bonus", island.getBonusWorth() + ""));
     }
 
     public static void saveBonusLevel(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("bonusLevel", island.getBonusLevel() + ""));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("levels_bonus", island.getBonusLevel() + ""));
     }
 
-    public static void saveUpgrades(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("upgrades",
-                IslandSerializer.serializeUpgrades(island.getUpgrades())));
+    public static void saveUpgrade(Island island, Upgrade upgrade, int level) {
+        island.getDatabaseBridge().insertObject("islands_upgrades",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("upgrade", upgrade.getName()),
+                new Pair<>("level", level)
+        );
     }
 
     public static void saveCropGrowth(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("cropGrowth", island.getCropGrowthMultiplier()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("crop_growth_multiplier", island.getCropGrowthMultiplier()));
     }
 
     public static void saveSpawnerRates(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("spawnerRates", island.getSpawnerRatesMultiplier()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesMultiplier()));
     }
 
     public static void saveMobDrops(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("mobDrops", island.getMobDropsMultiplier()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("mob_drops_multiplier", island.getMobDropsMultiplier()));
     }
 
-    public static void saveBlockLimits(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("blockLimits",
-                IslandSerializer.serializeBlockLimits(island.getCustomBlocksLimits())));
+    public static void saveBlockLimit(Island island, Key block, int limit) {
+        island.getDatabaseBridge().updateObject("islands_block_limits",
+                createFilter("island", island),
+                new Pair<>("block", block.toString()),
+                new Pair<>("limit", limit)
+        );
     }
 
-    public static void saveEntityLimits(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("entityLimits",
-                IslandSerializer.serializeEntityLimits(island.getCustomEntitiesLimits())));
+    public static void clearBlockLimits(Island island) {
+        island.getDatabaseBridge().deleteObject("islands_block_limits",
+                createFilter("island", island));
+    }
+
+    public static void removeBlockLimit(Island island, Key block) {
+        island.getDatabaseBridge().deleteObject("islands_block_limits",
+                createFilter("island", island, new Pair<>("block", block.toString()))
+        );
+    }
+
+    public static void saveEntityLimit(Island island, Key entityType, int limit) {
+        island.getDatabaseBridge().updateObject("islands_entity_limits",
+                createFilter("island", island),
+                new Pair<>("entity", entityType.toString()),
+                new Pair<>("limit", limit)
+        );
+    }
+
+    public static void clearEntityLimits(Island island) {
+        island.getDatabaseBridge().deleteObject("islands_entity_limits",
+                createFilter("island", island));
     }
 
     public static void saveTeamLimit(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("teamLimit", island.getTeamLimit()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("members_limit", island.getTeamLimit()));
     }
 
     public static void saveWarpsLimit(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("warpsLimit", island.getWarpsLimit()));
+        island.getDatabaseBridge().updateObject("islands_settings",
+                createFilter("island", island),
+                new Pair<>("warps_limit", island.getWarpsLimit()));
     }
 
-    public static void saveIslandEffects(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("islandEffects",
-                IslandSerializer.serializeEffects(island.getPotionEffects())));
+    public static void saveIslandEffect(Island island, PotionEffectType potionEffectType, int level) {
+        island.getDatabaseBridge().insertObject("islands_effects",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("effect_type", potionEffectType.getName()),
+                new Pair<>("level", level)
+        );
     }
 
-    public static void saveRolesLimits(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("roleLimits",
-                IslandSerializer.serializeRoleLimits(island.getRoleLimits())));
+    public static void removeIslandEffect(Island island, PotionEffectType potionEffectType) {
+        island.getDatabaseBridge().deleteObject("islands_effects",
+                createFilter("island", island, new Pair<>("effect_type", potionEffectType.getName()))
+        );
     }
 
-    public static void saveWarps(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("warps",
-                IslandSerializer.serializeWarps(island.getIslandWarps())));
+    public static void clearIslandEffects(Island island) {
+        island.getDatabaseBridge().deleteObject("islands_effects",
+                createFilter("island", island));
     }
 
-    public static void saveRatings(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("ratings",
-                IslandSerializer.serializeRatings(island.getRatings())));
+    public static void saveRoleLimit(Island island, PlayerRole playerRole, int limit) {
+        island.getDatabaseBridge().insertObject("islands_role_limits",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("role", playerRole.getId()),
+                new Pair<>("limit", limit)
+        );
     }
 
-    public static void saveMissions(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("missions",
-                IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts())));
+    public static void removeRoleLimit(Island island, PlayerRole playerRole) {
+        island.getDatabaseBridge().deleteObject("islands_role_limits",
+                createFilter("island", island, new Pair<>("role", playerRole.getId()))
+        );
     }
 
-    public static void saveSettings(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("settings",
-                IslandSerializer.serializeIslandFlags(island.getAllSettings())));
+    public static void saveWarp(Island island, IslandWarp islandWarp) {
+        WarpCategory category = islandWarp.getCategory();
+        ItemStack icon = islandWarp.getRawIcon();
+        island.getDatabaseBridge().insertObject("islands_warps",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("name", islandWarp.getName()),
+                new Pair<>("category", category == null ? "" : category.getName()),
+                new Pair<>("location", LocationUtils.getLocation(islandWarp.getLocation())),
+                new Pair<>("private", islandWarp.hasPrivateFlag()),
+                new Pair<>("icon", icon == null ? "" : ItemUtils.serializeItem(icon))
+        );
     }
 
-    public static void saveGenerators(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("generator",
-                IslandSerializer.serializeGenerator(getIslandGenerators(island))));
+    public static void updateWarpName(Island island, IslandWarp islandWarp, String oldName) {
+        island.getDatabaseBridge().updateObject("islands_warps",
+                createFilter("island", island, new Pair<>("name", oldName)),
+                new Pair<>("name", islandWarp.getName())
+        );
+    }
+
+    public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
+        island.getDatabaseBridge().updateObject("islands_warps",
+                createFilter("island", island, new Pair<>("name", islandWarp.getName())),
+                new Pair<>("location", LocationUtils.getLocation(islandWarp.getLocation()))
+        );
+    }
+
+    public static void updateWarpPrivateStatus(Island island, IslandWarp islandWarp) {
+        island.getDatabaseBridge().updateObject("islands_warps",
+                createFilter("island", island, new Pair<>("name", islandWarp.getName())),
+                new Pair<>("private", islandWarp.hasPrivateFlag())
+        );
+    }
+
+    public static void updateWarpIcon(Island island, IslandWarp islandWarp) {
+        ItemStack icon = islandWarp.getRawIcon();
+        island.getDatabaseBridge().updateObject("islands_warps",
+                createFilter("island", island, new Pair<>("name", islandWarp.getName())),
+                new Pair<>("icon", icon == null ? "" : ItemUtils.serializeItem(icon))
+        );
+    }
+
+    public static void removeWarp(Island island, IslandWarp islandWarp) {
+        island.getDatabaseBridge().deleteObject("islands_warps",
+                createFilter("island", island, new Pair<>("name", islandWarp.getName()))
+        );
+    }
+
+    public static void saveRating(Island island, SuperiorPlayer superiorPlayer, Rating rating, long rateTime) {
+        island.getDatabaseBridge().insertObject("islands_ratings",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("rating", rating.getValue()),
+                new Pair<>("rating_time", rateTime)
+        );
+    }
+
+    public static void removeRating(Island island, SuperiorPlayer superiorPlayer) {
+        island.getDatabaseBridge().deleteObject("islands_ratings",
+                createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString()))
+        );
+    }
+
+    public static void clearRatings(Island island) {
+        island.getDatabaseBridge().deleteObject("islands_ratings",
+                createFilter("island", island)
+        );
+    }
+
+    public static void saveMission(Island island, Mission<?> mission, int finishCount) {
+        island.getDatabaseBridge().insertObject("islands_missions",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("name", mission.getName().toLowerCase()),
+                new Pair<>("finish_count", finishCount)
+        );
+    }
+
+    public static void removeMission(Island island, Mission<?> mission) {
+        island.getDatabaseBridge().deleteObject("islands_missions",
+                createFilter("island", island, new Pair<>("name", mission.getName()))
+        );
+    }
+
+    public static void saveIslandFlag(Island island, IslandFlag islandFlag, int status) {
+        island.getDatabaseBridge().insertObject("islands_flags",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("name", islandFlag.getName()),
+                new Pair<>("status", status)
+        );
+    }
+
+    public static void saveGeneratorRate(Island island, World.Environment environment, Key blockKey, int rate) {
+        island.getDatabaseBridge().insertObject("islands_generators",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("environment", environment.name()),
+                new Pair<>("block", blockKey.toString()),
+                new Pair<>("rate", rate)
+        );
+    }
+
+    public static void clearGeneratorRates(Island island, World.Environment environment) {
+        island.getDatabaseBridge().deleteObject("islands_generators",
+                createFilter("island", island, new Pair<>("environment", environment.name()))
+        );
     }
 
     public static void saveGeneratedSchematics(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("generatedSchematics",
-                island.getGeneratedSchematicsFlag() + ""));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()));
     }
 
     public static void saveDirtyChunks(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("dirtyChunks", ChunksTracker.serialize(island)));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("dirty_chunks", ChunksTracker.serialize(island)));
     }
 
     public static void saveBlockCounts(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("blockCounts",
-                IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())));
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("block_counts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())));
     }
 
-    public static void saveIslandChest(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("islandChest",
-                IslandSerializer.serializeIslandChest(island.getChest())));
+    public static void saveIslandChest(Island island, IslandChest islandChest) {
+        island.getDatabaseBridge().insertObject("islands_chests",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("index", islandChest.getIndex()),
+                new Pair<>("contents", ItemUtils.serialize(islandChest.getContents()))
+        );
     }
 
     public static void saveLastInterestTime(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("lastInterest", island.getLastInterestTime()));
+        island.getDatabaseBridge().updateObject("islands_banks",
+                createFilter("island", island),
+                new Pair<>("last_interest_time", island.getLastInterestTime()));
     }
 
-    public static void saveUniqueVisitors(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("uniqueVisitors",
-                IslandSerializer.serializePlayersWithTimes(island.getUniqueVisitorsWithTimes())));
+    public static void saveVisitor(Island island, SuperiorPlayer visitor, long visitTime) {
+        island.getDatabaseBridge().updateObject("islands_visitors",
+                createFilter("island", island, new Pair<>("player", visitor.getUniqueId().toString())),
+                new Pair<>("visit_time", visitTime)
+        );
     }
 
-    public static void saveWarpCategories(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("warpCategories",
-                IslandSerializer.serializeWarpCategories(island.getWarpCategories())));
+    public static void saveWarpCategory(Island island, WarpCategory warpCategory) {
+        island.getDatabaseBridge().insertObject("islands_warp_categories",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("name", warpCategory.getName()),
+                new Pair<>("slot", warpCategory.getSlot()),
+                new Pair<>("icon", ItemUtils.serializeItem(warpCategory.getRawIcon()))
+        );
     }
 
-    public static void saveUniqueId(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("uuid", island.getUniqueId().toString()));
+    public static void updateWarpCategory(Island island, IslandWarp islandWarp, String oldCategoryName) {
+        WarpCategory category = islandWarp.getCategory();
+        island.getDatabaseBridge().updateObject("islands_warps",
+                createFilter("island", island, new Pair<>("category", oldCategoryName)),
+                new Pair<>("category", category == null ? "" : category.getName())
+        );
     }
 
-    public static void saveIslandBank(Island island) {
-        island.getDatabaseBridge().updateObject("islands", new Pair<>("islandBank",
-                island.getIslandBank().getBalance() + ""));
+    public static void updateWarpCategoryName(Island island, WarpCategory warpCategory, String oldName) {
+        island.getDatabaseBridge().updateObject("islands_warp_categories",
+                createFilter("island", island, new Pair<>("name", oldName)),
+                new Pair<>("name", warpCategory.getName())
+        );
+    }
+
+    public static void updateWarpCategorySlot(Island island, WarpCategory warpCategory) {
+        island.getDatabaseBridge().updateObject("islands_warp_categories",
+                createFilter("island", island, new Pair<>("name", warpCategory.getName())),
+                new Pair<>("slot", warpCategory.getSlot())
+        );
+    }
+
+    public static void updateWarpCategoryIcon(Island island, WarpCategory warpCategory) {
+        island.getDatabaseBridge().updateObject("islands_warp_categories",
+                createFilter("island", island, new Pair<>("name", warpCategory.getName())),
+                new Pair<>("icon", ItemUtils.serializeItem(warpCategory.getRawIcon()))
+        );
+    }
+
+    public static void removeWarpCategory(Island island, WarpCategory warpCategory) {
+        island.getDatabaseBridge().deleteObject("islands_warp_categories",
+                createFilter("island", island, new Pair<>("name", warpCategory.getName()))
+        );
+    }
+
+    public static void saveIslandLeader(Island island) {
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("owner", island.getOwner().getUniqueId().toString())
+        );
+    }
+
+    public static void saveBankBalance(Island island) {
+        island.getDatabaseBridge().updateObject("islands_banks",
+                createFilter("island", island),
+                new Pair<>("balance", island.getIslandBank().getBalance() + "")
+        );
     }
 
     public static void saveBankTransaction(Island island, BankTransaction bankTransaction) {
-        island.getDatabaseBridge().insertObject("bankTransactions",
+        island.getDatabaseBridge().insertObject("bank_transactions",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("player", bankTransaction.getPlayer() == null ? "" : bankTransaction.getPlayer().toString()),
-                new Pair<>("bankAction", bankTransaction.getAction().name()),
+                new Pair<>("bank_action", bankTransaction.getAction().name()),
                 new Pair<>("position", bankTransaction.getPosition()),
-                new Pair<>("time", bankTransaction.getTime() + ""),
-                new Pair<>("failureReason", bankTransaction.getFailureReason()),
+                new Pair<>("time", bankTransaction.getTime()),
+                new Pair<>("failure_reason", bankTransaction.getFailureReason()),
                 new Pair<>("amount", bankTransaction.getAmount() + "")
         );
     }
 
     public static void insertIsland(Island island){
         island.getDatabaseBridge().insertObject("islands",
+                new Pair<>("uuid", island.getUniqueId().toString()),
                 new Pair<>("owner", island.getOwner().getUniqueId().toString()),
-                new Pair<>("center", LocationUtils.getLocation(island.getCenter(plugin.getSettings().defaultWorldEnvironment))),
-                new Pair<>("teleportLocation", IslandSerializer.serializeLocations(island.getTeleportLocations())),
-                new Pair<>("members", IslandSerializer.serializePlayers(island.getIslandMembers(false))),
-                new Pair<>("banned", IslandSerializer.serializePlayers(island.getBannedPlayers())),
-                new Pair<>("permissionNodes", IslandSerializer.serializePermissions(island.getPlayerPermissions(), island.getRolePermissions())),
-                new Pair<>("upgrades", IslandSerializer.serializeUpgrades(island.getUpgrades())),
-                new Pair<>("warps", IslandSerializer.serializeWarps(island.getIslandWarps())),
-                new Pair<>("islandBank", island.getIslandBank().getBalance() + ""),
-                new Pair<>("islandSize", island.getIslandSizeRaw()),
-                new Pair<>("blockLimits", IslandSerializer.serializeBlockLimits(island.getCustomBlocksLimits())),
-                new Pair<>("teamLimit", island.getTeamLimitRaw()),
-                new Pair<>("cropGrowth", (float) island.getCropGrowthRaw()),
-                new Pair<>("spawnerRates", (float) island.getSpawnerRatesRaw()),
-                new Pair<>("mobDrops", (float) island.getMobDropsRaw()),
+                new Pair<>("center", LocationUtils.getLocation(island.getCenter(World.Environment.NORMAL))),
+                new Pair<>("creation_time", island.getCreationTime()),
+                new Pair<>("island_type", island.getSchematicName()),
                 new Pair<>("discord", island.getDiscord()),
                 new Pair<>("paypal", island.getPaypal()),
-                new Pair<>("warpsLimit", island.getWarpsLimitRaw()),
-                new Pair<>("bonusWorth", island.getBonusWorth() + ""),
+                new Pair<>("worth_bonus", island.getBonusWorth() + ""),
+                new Pair<>("levels_bonus", island.getBonusLevel() + ""),
                 new Pair<>("locked", island.isLocked()),
-                new Pair<>("blockCounts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
-                new Pair<>("name", island.getName()),
-                new Pair<>("visitorsLocation", LocationUtils.getLocation(island.getVisitorsLocation())),
-                new Pair<>("description", island.getDescription()),
-                new Pair<>("ratings", IslandSerializer.serializeRatings(island.getRatings())),
-                new Pair<>("missions", IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts())),
-                new Pair<>("settings", IslandSerializer.serializeIslandFlags(island.getAllSettings())),
                 new Pair<>("ignored", island.isIgnored()),
-                new Pair<>("generator", IslandSerializer.serializeGenerator(getIslandGenerators(island))),
-                new Pair<>("generatedSchematics", island.getGeneratedSchematicsFlag() + ""),
-                new Pair<>("schemName", island.getSchematicName()),
-                new Pair<>("uniqueVisitors", IslandSerializer.serializePlayersWithTimes(island.getUniqueVisitorsWithTimes())),
-                new Pair<>("unlockedWorlds", island.getUnlockedWorldsFlag() + ""),
-                new Pair<>("lastTimeUpdate", island.getLastTimeUpdate()),
-                new Pair<>("dirtyChunks", ChunksTracker.serialize(island)),
-                new Pair<>("entityLimits", IslandSerializer.serializeEntityLimits(island.getCustomEntitiesLimits())),
-                new Pair<>("bonusLevel", island.getBonusLevel() + ""),
-                new Pair<>("creationTime", island.getCreationTime()),
-                new Pair<>("coopLimit", island.getCoopLimitRaw()),
-                new Pair<>("islandEffects", IslandSerializer.serializeEffects(island.getPotionEffects())),
-                new Pair<>("islandChest", IslandSerializer.serializeIslandChest(island.getChest())),
-                new Pair<>("uuid", island.getUniqueId().toString()),
-                new Pair<>("bankLimit", island.getBankLimitRaw() + ""),
-                new Pair<>("lastInterest", island.getLastInterestTime()),
-                new Pair<>("roleLimits", IslandSerializer.serializeRoleLimits(island.getRoleLimits())),
-                new Pair<>("warpCategories", IslandSerializer.serializeWarpCategories(island.getWarpCategories()))
+                new Pair<>("name", island.getName()),
+                new Pair<>("description", island.getDescription()),
+                new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()),
+                new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
+                new Pair<>("last_time_updated", island.getLastTimeUpdate()),
+                new Pair<>("dirty_chunks", ChunksTracker.serialize(island)),
+                new Pair<>("block_counts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
         );
-    }
 
-    public static void updateIsland(Island island){
-        island.getDatabaseBridge().updateObject("islands",
-                new Pair<>("center", LocationUtils.getLocation(island.getCenter(plugin.getSettings().defaultWorldEnvironment))),
-                new Pair<>("teleportLocation", IslandSerializer.serializeLocations(island.getTeleportLocations())),
-                new Pair<>("members", IslandSerializer.serializePlayers(island.getIslandMembers(false))),
-                new Pair<>("banned", IslandSerializer.serializePlayers(island.getBannedPlayers())),
-                new Pair<>("permissionNodes", IslandSerializer.serializePermissions(island.getPlayerPermissions(), island.getRolePermissions())),
-                new Pair<>("upgrades", IslandSerializer.serializeUpgrades(island.getUpgrades())),
-                new Pair<>("warps", IslandSerializer.serializeWarps(island.getIslandWarps())),
-                new Pair<>("islandBank", island.getIslandBank().getBalance() + ""),
-                new Pair<>("islandSize", island.getIslandSizeRaw()),
-                new Pair<>("blockLimits", IslandSerializer.serializeBlockLimits(island.getCustomBlocksLimits())),
-                new Pair<>("teamLimit", island.getTeamLimitRaw()),
-                new Pair<>("cropGrowth", (float) island.getCropGrowthRaw()),
-                new Pair<>("spawnerRates", (float) island.getSpawnerRatesRaw()),
-                new Pair<>("mobDrops", (float) island.getMobDropsRaw()),
-                new Pair<>("discord", island.getDiscord()),
-                new Pair<>("paypal", island.getPaypal()),
-                new Pair<>("warpsLimit", island.getWarpsLimitRaw()),
-                new Pair<>("bonusWorth", island.getBonusWorth() + ""),
-                new Pair<>("locked", island.isLocked()),
-                new Pair<>("blockCounts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())),
-                new Pair<>("name", island.getName()),
-                new Pair<>("visitorsLocation", LocationUtils.getLocation(island.getVisitorsLocation())),
-                new Pair<>("description", island.getDescription()),
-                new Pair<>("ratings", IslandSerializer.serializeRatings(island.getRatings())),
-                new Pair<>("missions", IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts())),
-                new Pair<>("settings", IslandSerializer.serializeIslandFlags(island.getAllSettings())),
-                new Pair<>("ignored", island.isIgnored()),
-                new Pair<>("generator", IslandSerializer.serializeGenerator(getIslandGenerators(island))),
-                new Pair<>("generatedSchematics", island.getGeneratedSchematicsFlag() + ""),
-                new Pair<>("schemName", island.getSchematicName()),
-                new Pair<>("uniqueVisitors", IslandSerializer.serializePlayersWithTimes(island.getUniqueVisitorsWithTimes())),
-                new Pair<>("unlockedWorlds", island.getUnlockedWorldsFlag() + ""),
-                new Pair<>("lastTimeUpdate", island.getLastTimeUpdate()),
-                new Pair<>("dirtyChunks", ChunksTracker.serialize(island)),
-                new Pair<>("entityLimits", IslandSerializer.serializeEntityLimits(island.getCustomEntitiesLimits())),
-                new Pair<>("bonusLevel", island.getBonusLevel() + ""),
-                new Pair<>("creationTime", island.getCreationTime()),
-                new Pair<>("coopLimit", island.getCoopLimitRaw()),
-                new Pair<>("islandEffects", IslandSerializer.serializeEffects(island.getPotionEffects())),
-                new Pair<>("islandChest", IslandSerializer.serializeIslandChest(island.getChest())),
-                new Pair<>("uuid", island.getUniqueId().toString()),
-                new Pair<>("bankLimit", island.getBankLimitRaw() + ""),
-                new Pair<>("lastInterest", island.getLastInterestTime()),
-                new Pair<>("roleLimits", IslandSerializer.serializeRoleLimits(island.getRoleLimits())),
-                new Pair<>("warpCategories", IslandSerializer.serializeWarpCategories(island.getWarpCategories()))
+        island.getDatabaseBridge().insertObject("islands_banks",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("balance", island.getIslandBank().getBalance() + ""),
+                new Pair<>("last_interest_time", island.getLastInterestTime())
+        );
+
+        island.getDatabaseBridge().insertObject("islands_settings",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("size", island.getIslandSize()),
+                new Pair<>("bank_limit", island.getBankLimit() + ""),
+                new Pair<>("coops_limit", island.getCoopLimit()),
+                new Pair<>("members_limit", island.getTeamLimit()),
+                new Pair<>("warps_limit", island.getWarpsLimit()),
+                new Pair<>("crop_growth_multiplier", island.getCropGrowthMultiplier()),
+                new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesMultiplier()),
+                new Pair<>("mob_drops_multiplier", island.getMobDropsMultiplier())
         );
     }
 
     public static void deleteIsland(Island island){
-        island.getDatabaseBridge().deleteObject("islands");
+        island.getDatabaseBridge().deleteObject("islands", null);
+        island.getDatabaseBridge().deleteObject("islands_banks", null);
+        island.getDatabaseBridge().deleteObject("islands_bans", null);
+        island.getDatabaseBridge().deleteObject("islands_block_limits", null);
+        island.getDatabaseBridge().deleteObject("islands_chests", null);
+        island.getDatabaseBridge().deleteObject("islands_effects", null);
+        island.getDatabaseBridge().deleteObject("islands_entity_limits", null);
+        island.getDatabaseBridge().deleteObject("islands_flags", null);
+        island.getDatabaseBridge().deleteObject("islands_generators", null);
+        island.getDatabaseBridge().deleteObject("islands_homes", null);
+        island.getDatabaseBridge().deleteObject("islands_members", null);
+        island.getDatabaseBridge().deleteObject("islands_missions", null);
+        island.getDatabaseBridge().deleteObject("islands_player_permissions", null);
+        island.getDatabaseBridge().deleteObject("islands_ratings", null);
+        island.getDatabaseBridge().deleteObject("islands_role_limits", null);
+        island.getDatabaseBridge().deleteObject("islands_role_permissions", null);
+        island.getDatabaseBridge().deleteObject("islands_settings", null);
+        island.getDatabaseBridge().deleteObject("islands_upgrades", null);
+        island.getDatabaseBridge().deleteObject("islands_visitor_homes", null);
+        island.getDatabaseBridge().deleteObject("islands_visitors", null);
+        island.getDatabaseBridge().deleteObject("islands_warp_categories", null);
+        island.getDatabaseBridge().deleteObject("islands_warps", null);
     }
 
-    private static Map<Key, Integer>[] getIslandGenerators(Island island){
-        Map<Key, Integer>[] customGeneratorAmounts = new Map[World.Environment.values().length];
-        for(World.Environment environment : World.Environment.values())
-            customGeneratorAmounts[environment.ordinal()] = island.getCustomGeneratorAmounts(environment);
-        return customGeneratorAmounts;
+    private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others){
+        List<Pair<String, Object>> filters = new ArrayList<>();
+        filters.add(new Pair<>(id, island.getUniqueId().toString()));
+        if(others != null)
+            filters.addAll(Arrays.asList(others));
+        return new DatabaseFilter(filters);
     }
 
 }

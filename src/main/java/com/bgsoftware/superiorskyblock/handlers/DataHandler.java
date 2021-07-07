@@ -100,14 +100,8 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
-        playersLoader.loadAllObjects("players", resultSet -> {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().loadPlayer(new DatabaseResult(resultSet));
-            try {
-                Integer.parseInt((String) resultSet.get("islandRole"));
-            } catch (NumberFormatException ex) {
-                PlayersDatabaseBridge.savePlayerRole(superiorPlayer);
-            }
-        });
+        playersLoader.loadAllObjects("players", resultSet ->
+                plugin.getPlayers().loadPlayer(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished players!");
     }
@@ -117,13 +111,8 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
-        islandsLoader.loadAllObjects("islands", _resultSet -> {
-            DatabaseResult resultSet = new DatabaseResult(_resultSet);
-            String uuidRaw = resultSet.getString("uuid");
-            Island island = plugin.getGrid().createIsland(resultSet);
-            if (uuidRaw == null || uuidRaw.isEmpty())
-                IslandsDatabaseBridge.saveUniqueId(island);
-        });
+        islandsLoader.loadAllObjects("islands", resultSet ->
+                plugin.getGrid().createIsland(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished islands!");
     }
@@ -146,7 +135,7 @@ public final class DataHandler extends AbstractHandler {
 
         AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
 
-        gridLoader.loadAllObjects("stackedBlocks", _resultSet -> {
+        gridLoader.loadAllObjects("stacked_blocks", _resultSet -> {
             DatabaseResult resultSet = new DatabaseResult(_resultSet);
             plugin.getGrid().loadStackedBlocks(resultSet);
             String item = resultSet.getString("item");

@@ -1,10 +1,15 @@
 package com.bgsoftware.superiorskyblock.data;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @SuppressWarnings("unchecked")
 public final class PlayersDatabaseBridge {
@@ -14,103 +19,126 @@ public final class PlayersDatabaseBridge {
 
     public static void saveTextureValue(SuperiorPlayer superiorPlayer){
         superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("textureValue", superiorPlayer.getTextureValue()));
+                createFilter("uuid", superiorPlayer),
+                new Pair<>("last_used_skin", superiorPlayer.getTextureValue()));
     }
 
     public static void savePlayerName(SuperiorPlayer superiorPlayer){
-        superiorPlayer.getDatabaseBridge().updateObject("players", new Pair<>("name", superiorPlayer.getName()));
+        superiorPlayer.getDatabaseBridge().updateObject("players",
+                createFilter("uuid", superiorPlayer),
+                new Pair<>("last_used_name", superiorPlayer.getName()));
     }
 
     public static void saveUserLocale(SuperiorPlayer superiorPlayer){
         Locale userLocale = superiorPlayer.getUserLocale();
-        superiorPlayer.getDatabaseBridge().updateObject("players", new Pair<>("language",
-                userLocale.getLanguage() + "-" + userLocale.getCountry()));
-    }
-
-    public static void saveIslandLeader(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("teamLeader", superiorPlayer.getIslandLeader().getUniqueId().toString()));
-    }
-
-    public static void savePlayerRole(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("islandRole", superiorPlayer.getPlayerRole().getId() + ""));
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()));
     }
 
     public static void saveToggledBorder(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("toggledBorder", superiorPlayer.hasWorldBorderEnabled()));
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()));
     }
 
     public static void saveDisbands(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().updateObject("players",
+                createFilter("uuid", superiorPlayer),
                 new Pair<>("disbands", superiorPlayer.getDisbands()));
     }
 
     public static void saveToggledPanel(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("toggledPanel", superiorPlayer.hasToggledPanel()));
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()));
     }
 
     public static void saveIslandFly(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("islandFly", superiorPlayer.hasIslandFlyEnabled()));
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled()));
     }
 
     public static void saveBorderColor(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("borderColor", superiorPlayer.getBorderColor().name()));
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("border_color", superiorPlayer.getBorderColor().name()));
     }
 
     public static void saveLastTimeStatus(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("lastTimeStatus", superiorPlayer.getLastTimeStatus() + ""));
+                createFilter("uuid", superiorPlayer),
+                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus() + ""));
     }
 
-    public static void saveMissions(SuperiorPlayer superiorPlayer) {
-        superiorPlayer.getDatabaseBridge().updateObject("players", new Pair<>("missions",
-                IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts())));
+    public static void saveMission(SuperiorPlayer superiorPlayer, Mission<?> mission, int finishCount) {
+        superiorPlayer.getDatabaseBridge().insertObject("players_missions",
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("name", mission.getName().toLowerCase()),
+                new Pair<>("finish_count", finishCount));
     }
 
     public static void insertPlayer(SuperiorPlayer superiorPlayer){
         Locale userLocale = superiorPlayer.getUserLocale();
+
         superiorPlayer.getDatabaseBridge().insertObject("players",
-                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                new Pair<>("teamLeader", superiorPlayer.getIslandLeader().getUniqueId().toString()),
-                new Pair<>("name", superiorPlayer.getName()),
-                new Pair<>("islandRole", superiorPlayer.getPlayerRole().getId() + ""),
-                new Pair<>("textureValue", superiorPlayer.getTextureValue()),
+                new Pair<>("uuid", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("last_used_name", superiorPlayer.getName()),
+                new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
                 new Pair<>("disbands", superiorPlayer.getDisbands()),
-                new Pair<>("toggledPanel", superiorPlayer.hasToggledPanel()),
-                new Pair<>("islandFly", superiorPlayer.hasIslandFlyEnabled()),
-                new Pair<>("borderColor", superiorPlayer.getBorderColor().name()),
-                new Pair<>("lastTimeStatus", superiorPlayer.getLastTimeStatus() + ""),
-                new Pair<>("missions", IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts())),
+                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
+        );
+
+        superiorPlayer.getDatabaseBridge().insertObject("players_settings",
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
                 new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
-                new Pair<>("toggledBorder", superiorPlayer.hasWorldBorderEnabled())
+                new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
+                new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
+                new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
+                new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
         );
     }
 
     public static void updatePlayer(SuperiorPlayer superiorPlayer){
         Locale userLocale = superiorPlayer.getUserLocale();
         superiorPlayer.getDatabaseBridge().updateObject("players",
-                new Pair<>("teamLeader", superiorPlayer.getIslandLeader().getUniqueId().toString()),
-                new Pair<>("name", superiorPlayer.getName()),
-                new Pair<>("islandRole", superiorPlayer.getPlayerRole().getId() + ""),
-                new Pair<>("textureValue", superiorPlayer.getTextureValue()),
+                createFilter("uuid", superiorPlayer),
+                new Pair<>("last_used_name", superiorPlayer.getName()),
+                new Pair<>("last_used_skin", superiorPlayer.getTextureValue()),
                 new Pair<>("disbands", superiorPlayer.getDisbands()),
-                new Pair<>("toggledPanel", superiorPlayer.hasToggledPanel()),
-                new Pair<>("islandFly", superiorPlayer.hasIslandFlyEnabled()),
-                new Pair<>("borderColor", superiorPlayer.getBorderColor().name()),
-                new Pair<>("lastTimeStatus", superiorPlayer.getLastTimeStatus() + ""),
-                new Pair<>("missions", IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts())),
-                new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
-                new Pair<>("toggledBorder", superiorPlayer.hasWorldBorderEnabled())
+                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
         );
+
+        superiorPlayer.getDatabaseBridge().updateObject("players_settings",
+                createFilter("player", superiorPlayer),
+                new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
+                new Pair<>("toggled_panel", superiorPlayer.hasToggledPanel()),
+                new Pair<>("border_color", superiorPlayer.getBorderColor().name()),
+                new Pair<>("toggled_border", superiorPlayer.hasWorldBorderEnabled()),
+                new Pair<>("island_fly", superiorPlayer.hasIslandFlyEnabled())
+        );
+
+        superiorPlayer.getDatabaseBridge().deleteObject("players_missions",
+                createFilter("player", superiorPlayer));
+
+        for(Map.Entry<Mission<?>, Integer> missionEntry : superiorPlayer.getCompletedMissionsWithAmounts().entrySet()){
+            saveMission(superiorPlayer, missionEntry.getKey(), missionEntry.getValue());
+        }
     }
 
     public static void deletePlayer(SuperiorPlayer superiorPlayer){
-        superiorPlayer.getDatabaseBridge().deleteObject("players");
+        superiorPlayer.getDatabaseBridge().deleteObject("players", null);
+        superiorPlayer.getDatabaseBridge().deleteObject("players_settings", null);
+        superiorPlayer.getDatabaseBridge().deleteObject("players_missions", null);
+    }
+
+    private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others){
+        List<Pair<String, Object>> filters = new ArrayList<>();
+        filters.add(new Pair<>(id, superiorPlayer.getUniqueId().toString()));
+        if(others != null)
+            filters.addAll(Arrays.asList(others));
+        return new DatabaseFilter(filters);
     }
 
 }

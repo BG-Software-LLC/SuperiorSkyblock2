@@ -46,9 +46,11 @@ public final class SWarpCategory implements WarpCategory {
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Name, Island: " + getOwnerName() + ", Category: " + this.name + ", New Name: " + name);
+        String oldName = this.name;
         this.name = name;
-        IslandsDatabaseBridge.saveWarps(getIsland());
-        IslandsDatabaseBridge.saveWarpCategories(getIsland());
+        for(IslandWarp islandWarp : islandWarps)
+            IslandsDatabaseBridge.updateWarpCategory(island, islandWarp, oldName);
+        IslandsDatabaseBridge.updateWarpCategoryName(island, this, oldName);
     }
 
     @Override
@@ -65,7 +67,7 @@ public final class SWarpCategory implements WarpCategory {
     public void setSlot(int slot) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Slot, Island: " + getOwnerName() + ", Category: " + this.name + ", New Slot: " + slot);
         this.slot = slot;
-        IslandsDatabaseBridge.saveWarpCategories(getIsland());
+        IslandsDatabaseBridge.updateWarpCategorySlot(island, this);
     }
 
     @Override
@@ -84,7 +86,7 @@ public final class SWarpCategory implements WarpCategory {
     public void setIcon(@Nullable ItemStack icon) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Icon, Island: " + getOwnerName() + ", Category: " + this.name);
         this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
-        IslandsDatabaseBridge.saveWarpCategories(getIsland());
+        IslandsDatabaseBridge.updateWarpCategoryIcon(island, this);
     }
 
     private String getOwnerName(){

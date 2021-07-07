@@ -49,8 +49,9 @@ public final class SIslandWarp implements IslandWarp {
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Update Warp Name, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Name: " + name);
+        String oldName = this.name;
         this.name = name;
-        IslandsDatabaseBridge.saveWarps(getIsland());
+        IslandsDatabaseBridge.updateWarpName(getIsland(), this, oldName);
     }
 
     @Override
@@ -63,7 +64,7 @@ public final class SIslandWarp implements IslandWarp {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " + SBlockPosition.of(location));
         this.location = location.clone();
-        IslandsDatabaseBridge.saveWarps(getIsland());
+        IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }
 
     @Override
@@ -75,7 +76,7 @@ public final class SIslandWarp implements IslandWarp {
     public void setPrivateFlag(boolean privateFlag) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp Private, Island: " + getOwnerName() + ", Warp: " + this.name + ", Private: " + privateFlag);
         this.privateFlag = privateFlag;
-        IslandsDatabaseBridge.saveWarps(getIsland());
+        IslandsDatabaseBridge.updateWarpPrivateStatus(getIsland(), this);
     }
 
     @Override
@@ -102,7 +103,7 @@ public final class SIslandWarp implements IslandWarp {
     public void setIcon(ItemStack icon) {
         SuperiorSkyblockPlugin.debug("Action: Update Warp Icon, Island: " + getOwnerName() + ", Warp: " + this.name);
         this.icon = icon == null ? null : icon.clone();
-        IslandsDatabaseBridge.saveWarps(getIsland());
+        IslandsDatabaseBridge.updateWarpIcon(getIsland(), this);
     }
 
     @Override

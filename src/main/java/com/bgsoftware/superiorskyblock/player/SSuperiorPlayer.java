@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
@@ -66,7 +67,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private UUID islandLeaderFromCache;
 
-    private SuperiorPlayer islandLeader;
+    private SuperiorPlayer islandLeader = this;
     private String name, textureValue = "";
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
@@ -114,7 +115,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         OfflinePlayer offlinePlayer;
         this.uuid = player;
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
-        this.islandLeader = this;
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = plugin.getSettings().disbandCount;
         this.userLocale = LocaleUtils.getDefault();
@@ -439,7 +439,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(islandLeader, "islandLeader parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + islandLeader.getName());
         this.islandLeader = islandLeader;
-        PlayersDatabaseBridge.saveIslandLeader(this);
+        //PlayersDatabaseBridge.saveIslandLeader(this);
     }
 
     @Override
@@ -465,7 +465,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
-        PlayersDatabaseBridge.savePlayerRole(this);
+        Island island = getIsland();
+        if(island != null)
+            IslandsDatabaseBridge.saveMemberRole(island, this);
     }
 
     @Override
@@ -661,8 +663,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
-        completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
-        PlayersDatabaseBridge.saveMissions(this);
+        int finishCount = completedMissions.getOrDefault(mission, 0) + 1;
+        completedMissions.put(mission, disbands);
+        PlayersDatabaseBridge.saveMission(this, mission, finishCount);
     }
 
     @Override
@@ -670,8 +673,10 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
-        if(completedMissions.getOrDefault(mission, 0) > 0) {
-            completedMissions.put(mission, completedMissions.get(mission) - 1);
+        int finishCount = completedMissions.getOrDefault(mission, 0);
+
+        if(finishCount > 0) {
+            completedMissions.put(mission, --finishCount);
         }
         else {
             completedMissions.remove(mission);
@@ -679,7 +684,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         mission.clearData(this);
 
-        PlayersDatabaseBridge.saveMissions(this);
+        PlayersDatabaseBridge.saveMission(this, mission, finishCount);
     }
 
     @Override

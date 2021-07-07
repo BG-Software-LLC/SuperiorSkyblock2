@@ -141,7 +141,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     }
 
     public SuperiorPlayer loadPlayer(DatabaseResult resultSet) {
-        UUID player = UUID.fromString(resultSet.getString("player"));
+        UUID player = UUID.fromString(resultSet.getString("uuid"));
         SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(resultSet);
         players.put(player, superiorPlayer);
         return superiorPlayer;
@@ -158,7 +158,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     // Updating last time status
     public void savePlayers(){
-        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer).forEach(PlayersDatabaseBridge::updatePlayer);
+        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer).forEach(PlayersDatabaseBridge::saveLastTimeStatus);
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

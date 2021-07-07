@@ -1,23 +1,15 @@
 package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
     private boolean shouldSaveData = false;
-    private final Supplier<UUID> objectIdSupplier;
-    private final String idFilter;
-
-    public SQLDatabaseBridge(Supplier<UUID> objectIdSupplier, String columnIdName){
-        this.objectIdSupplier = objectIdSupplier;
-        this.idFilter = columnIdName == null ? "" : String.format(" WHERE %s=?", columnIdName);
-    }
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
@@ -38,7 +30,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     }
 
     @Override
-    public void updateObject(String table, Pair<String, Object>[] columns) {
+    public void updateObject(String table, DatabaseFilter filter, Pair<String, Object>[] columns) {
         if(!shouldSaveData)
             return;
 
@@ -50,16 +42,18 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
             columnsBuilder.append(column.getKey()).append("=?");
         }
 
+        String columnFilter = getColumnFilter(filter);
         StatementHolder statementHolder = new StatementHolder(
-                String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder.toString(), idFilter)
+                String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder.toString(), columnFilter)
         );
 
         for(Pair<String, Object> column : columns) {
             statementHolder.setObject(column.getValue());
         }
 
-        if(objectIdSupplier != null){
-            statementHolder.setObject(objectIdSupplier.get() + "");
+        if(filter != null){
+            for(Pair<String, Object> _columnFilter : filter.getFilters())
+                statementHolder.setObject(_columnFilter.getValue() + "");
         }
 
         statementHolder.execute(true);
@@ -95,24 +89,27 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     }
 
     @Override
-    public void deleteObject(String table) {
+    public void deleteObject(String table, DatabaseFilter filter) {
         if(!shouldSaveData)
             return;
 
+        String columnFilter = getColumnFilter(filter);
         StatementHolder statementHolder = new StatementHolder(
-                String.format("DELETE FROM {prefix}%s%s;", table, idFilter)
+                String.format("DELETE FROM {prefix}%s%s;", table, columnFilter)
         );
 
-        if(objectIdSupplier != null){
-            statementHolder.setObject(objectIdSupplier.get() + "");
+        if(filter != null){
+            for(Pair<String, Object> _columnFilter : filter.getFilters())
+                statementHolder.setObject(_columnFilter.getValue() + "");
         }
 
         statementHolder.execute(true);
     }
 
     @Override
-    public void loadObject(String table, Consumer<Map<String, Object>> resultConsumer){
-        SQLHelper.executeQuery(String.format("SELECT * FROM {prefix}%s%s;", table, idFilter), resultSet -> {
+    public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer){
+        String columnFilter = getColumnFilter(filter);
+        SQLHelper.executeQuery(String.format("SELECT * FROM {prefix}%s%s;", table, columnFilter), resultSet -> {
             while (resultSet.next()){
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
@@ -121,6 +118,21 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 }
             }
         });
+    }
+
+    private static String getColumnFilter(DatabaseFilter filter){
+        StringBuilder columnIdentifier = new StringBuilder();
+        if(filter != null) {
+            for(Pair<String, Object> columnFilter : filter.getFilters()) {
+                if(columnIdentifier.length() == 0){
+                    columnIdentifier.append(String.format(" WHERE %s=?", columnFilter.getKey()));
+                }
+                else {
+                    columnIdentifier.append(String.format(" AND %s=?", columnFilter.getKey()));
+                }
+            }
+        }
+        return columnIdentifier.toString();
     }
 
 }
