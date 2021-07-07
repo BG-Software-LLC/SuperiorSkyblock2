@@ -81,6 +81,7 @@ public final class MenuValues extends SuperiorMenu {
         return buildInventory(title -> title
                 .replace("{0}", island.getOwner().getName())
                 .replace("{1}", StringUtils.format(island.getWorth()))
+                .replace("{2}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
         );
     }
 
