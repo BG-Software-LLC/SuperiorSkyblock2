@@ -109,6 +109,12 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     @Override
     public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer){
         String columnFilter = getColumnFilter(filter);
+
+        for(Pair<String, Object> filterPair : filter.getFilters()) {
+            columnFilter = columnFilter.replaceFirst("\\?", filterPair.getValue() instanceof String ?
+                    String.format("'%s'", filterPair.getValue()) : filterPair.getValue().toString());
+        }
+
         SQLHelper.executeQuery(String.format("SELECT * FROM {prefix}%s%s;", table, columnFilter), resultSet -> {
             while (resultSet.next()){
                 try {
