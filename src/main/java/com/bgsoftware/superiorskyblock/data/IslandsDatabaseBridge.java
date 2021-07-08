@@ -238,10 +238,10 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveBlockLimit(Island island, Key block, int limit) {
-        island.getDatabaseBridge().updateObject("islands_block_limits",
-                createFilter("island", island),
+        island.getDatabaseBridge().insertObject("islands_block_limits",
+                new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("block", block.toString()),
-                new Pair<>("limit", limit)
+                new Pair<>("`limit`", limit)
         );
     }
 
@@ -257,10 +257,10 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveEntityLimit(Island island, Key entityType, int limit) {
-        island.getDatabaseBridge().updateObject("islands_entity_limits",
-                createFilter("island", island),
+        island.getDatabaseBridge().insertObject("islands_entity_limits",
+                new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("entity", entityType.toString()),
-                new Pair<>("limit", limit)
+                new Pair<>("`limit`", limit)
         );
     }
 
@@ -304,7 +304,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_role_limits",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("role", playerRole.getId()),
-                new Pair<>("limit", limit)
+                new Pair<>("`limit`", limit)
         );
     }
 
