@@ -2494,10 +2494,12 @@ public final class SIsland implements Island {
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
-            islandEffects.put(type, new UpgradeValue<>(level, false));
+            UpgradeValue<Integer> oldPotionLevel = islandEffects.put(type, new UpgradeValue<>(level, false));
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
                 Player player = superiorPlayer.asPlayer();
                 assert player != null;
+                if(oldPotionLevel != null && oldPotionLevel.get() > level)
+                    player.removePotionEffect(type);
                 player.addPotionEffect(potionEffect, true);
             }));
         }
