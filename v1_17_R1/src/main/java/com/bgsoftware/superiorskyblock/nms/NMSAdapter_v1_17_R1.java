@@ -81,7 +81,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "ah");
 
-    private static final ReflectMethod<Boolean> ANIMAL_BREED_ITEM = new ReflectMethod<>(EntityAnimal.class, "isBreedItem", net.minecraft.world.item.ItemStack.class);
+    private static final ReflectMethod<Boolean> ANIMAL_BREED_ITEM = new ReflectMethod<>(EntityAnimal.class, "n", net.minecraft.world.item.ItemStack.class);
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -363,7 +363,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
             return ANIMAL_BREED_ITEM.invoke(entityAnimal, CraftItemStack.asNMSCopy(itemStack));
         }
         else {
-            return entityAnimal.n(CraftItemStack.asNMSCopy(itemStack));
+            return entityAnimal.isBreedItem(CraftItemStack.asNMSCopy(itemStack));
         }
     }
 
