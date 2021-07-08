@@ -97,17 +97,17 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.name = resultSet.getString("last_used_name");
         this.textureValue = resultSet.getString("last_used_skin");
         this.disbands = resultSet.getInt("disbands");
-        this.lastTimeStatus = resultSet.getLong("lastTimeStatus");
+        this.lastTimeStatus = resultSet.getLong("last_time_updated");
 
         PlayersDeserializer.deserializeMissions(this, this.completedMissions);
 
         PlayersDeserializer.deserializePlayerSettings(this, playerSettingsRaw -> {
             DatabaseResult playerSettings = new DatabaseResult(playerSettingsRaw);
-            this.toggledPanel = playerSettings.getBoolean("toggledPanel");
-            this.islandFly = playerSettings.getBoolean("islandFly");
-            this.borderColor = BorderColor.safeValue(playerSettings.getString("borderColor"), BorderColor.BLUE);
+            this.toggledPanel = playerSettings.getBoolean("toggled_panel");
+            this.islandFly = playerSettings.getBoolean("island_fly");
+            this.borderColor = BorderColor.safeValue(playerSettings.getString("border_color"), BorderColor.BLUE);
             this.userLocale = LocaleUtils.getLocale(playerSettings.getString("language"));
-            this.worldBorderEnabled = playerSettings.getBoolean("toggledBorder");
+            this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
         });
     }
 

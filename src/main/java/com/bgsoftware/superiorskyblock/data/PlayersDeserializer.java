@@ -36,7 +36,7 @@ public final class PlayersDeserializer {
 
     private static void loadObject(SuperiorPlayer superiorPlayer, String table, Consumer<Map<String, Object>> resultConsumer){
         superiorPlayer.getDatabaseBridge().loadObject(table,
-                new DatabaseFilter(Collections.singletonList(new Pair<>("island", superiorPlayer.getUniqueId().toString()))),
+                new DatabaseFilter(Collections.singletonList(new Pair<>("player", superiorPlayer.getUniqueId().toString()))),
                 resultConsumer);
     }
 
