@@ -738,7 +738,6 @@ public final class BlocksListener implements Listener {
             String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
             if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
                 island.setVisitorsLocation(null);
-                Locale.DELETE_WARP.send(superiorPlayer, IslandUtils.VISITORS_WARP_NAME);
             }
         }
     }

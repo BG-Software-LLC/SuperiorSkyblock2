@@ -749,12 +749,10 @@ public final class SIsland implements Island {
     @Override
     public void setVisitorsLocation(Location visitorsLocation) {
         if(visitorsLocation == null){
-            deleteWarp(IslandUtils.VISITORS_WARP_NAME);
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
             this.visitorsLocation = null;
         }
         else{
-            createWarp(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, null);
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
             this.visitorsLocation = visitorsLocation.clone();
         }

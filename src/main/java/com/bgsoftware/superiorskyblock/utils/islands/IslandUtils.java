@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 public final class IslandUtils {
 
-    public static final String VISITORS_WARP_NAME = "visit";
     public static final UpgradeValue<Integer> NO_LIMIT = UpgradeValue.NEGATIVE;
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
