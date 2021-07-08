@@ -59,13 +59,11 @@ public interface NMSBlocks {
 
     void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
 
-    void startTickingChunk(Island island, Chunk chunk, boolean stop);
-
     void handleSignPlace(Island island, Location location);
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation
-        return Material.getMaterial(combinedId & 4095);
+        return Material.getMaterial(String.valueOf(combinedId & 4095), true);
     }
 
     default byte getData(int combinedId) {
@@ -81,7 +79,5 @@ public interface NMSBlocks {
     default boolean isWaterLogged(Block block){
         return block.getType().name().contains("WATER");
     }
-
-    int getDefaultAmount(Block block);
 
 }

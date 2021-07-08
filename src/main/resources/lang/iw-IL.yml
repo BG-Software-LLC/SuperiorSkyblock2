@@ -121,7 +121,6 @@ COMMAND_ARGUMENT_MATERIAL: רמוח
 COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: '...העדוה'
 COMMAND_ARGUMENT_MISSION_NAME: המישמה םש
-COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: סונוב
 COMMAND_ARGUMENT_NAME: םש
 COMMAND_ARGUMENT_NEW_LEADER: שדח גיהנמ
@@ -176,7 +175,6 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: ןקחשל םייא תוקיחמ תתל
 COMMAND_DESCRIPTION_ADMIN_IGNORE: רתויב םיבוטה םייאה תמישרמ יא דירוהל.
 COMMAND_DESCRIPTION_ADMIN_JOIN: הנמזה אלל יאל סנכיהל.
 COMMAND_DESCRIPTION_ADMIN_KICK: 'Kick a player from his island.'
-COMMAND_DESCRIPTION_ADMIN_MODULES: 'Manage modules of the plugin.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: ןקחש רובע המישמ לש סוטטס תונשל.
 COMMAND_DESCRIPTION_ADMIN_MSG: העדוה ןקחשל חולשל.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: העדוה יא לש םינקחשה לכל חולשל.
@@ -379,7 +377,6 @@ INVALID_LIMIT: '&c&lהאיגש | &7{0} תיקוח אל הלבגמ.'
 INVALID_MATERIAL: '&c&lהאיגש | &7{0} תיקוח אל רמוח.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lהאיגש | &7{0} תיקוח אל המישמ.'
-INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lהאיגש | &7{0} יקוח אל סונוב.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lהאיגש | &7100 ל 0 ןיב תויהל בייח זוחא.'
@@ -544,17 +541,6 @@ MISSION_STATUS_COMPLETE: '&e&lתומישמ | &7{1} ןקחשל העצובל הת�
 MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&lתומישמ | &7{1} ןקחשל הלחתוא {0} המישמה לש סוטטסה.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
-MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
-  &e&lModule | &7{0} by {1}
-  &e&lModule | &7&m--------------------
-  &e&lModule | &7{2}
-MODULE_LOADED_SUCCESS: '&e&lModule | &7Successfully loaded the module {0}.'
-MODULE_LOADED_FAILURE: '&e&lModule | &7Couldn''t load the module {0}. Check out the console for more information.'
-MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
-MODULES_LIST: '&fModules ({0}): {1}'
-MODULES_LIST_MODULE_NAME: '&a{0}'
-MODULES_LIST_SEPARATOR: '&f, '
 NAME_ANNOUNCEMENT: '&e&lיא | &7{1} ל ולש יאה םש תא הניש {0}.'
 NAME_BLACKLISTED: '&c&lהאיגש | &7הזה םשב שמתשהל לוכי אל התא.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

@@ -181,7 +181,7 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder setUnbreakable(){
-        itemMeta.spigot().setUnbreakable(true);
+        itemMeta.setUnbreakable(true);
         return this;
     }
 

@@ -8,8 +8,6 @@ import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
-import com.bgsoftware.superiorskyblock.modules.bank.BankModule;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.SQLHelper;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -113,16 +111,18 @@ public final class DataHandler extends AbstractHandler {
                 "dirtyChunks TEXT" +
                 ");");
 
-        //Creating default transactions table
-        SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}bankTransactions (" +
-                "island VARCHAR(36), " +
-                "player VARCHAR(36), " +
-                "bankAction TEXT, " +
-                "position INTEGER, " +
-                "time TEXT, " +
-                "failureReason TEXT," +
-                "amount TEXT" +
-                ");");
+        if(plugin.getSettings().bankLogs) {
+            //Creating default transactions table
+            SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}bankTransactions (" +
+                    "island VARCHAR(36), " +
+                    "player VARCHAR(36), " +
+                    "bankAction TEXT, " +
+                    "position INTEGER, " +
+                    "time TEXT, " +
+                    "failureReason TEXT," +
+                    "amount TEXT" +
+                    ");");
+        }
 
         if(!containsGrid())
             plugin.getGrid().executeGridInsertStatement(false);
@@ -259,8 +259,8 @@ public final class DataHandler extends AbstractHandler {
 
         SuperiorSkyblockPlugin.log("Finished stacked blocks!");
 
-        if(BuiltinModules.BANK.bankLogs) {
-            SuperiorSkyblockPlugin.log("Starting to load bank transactions...");
+        if(plugin.getSettings().bankLogs) {
+            SuperiorSkyblockPlugin.log("Starting to bank transactions...");
 
             SQLHelper.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
                 while (resultSet.next()) {

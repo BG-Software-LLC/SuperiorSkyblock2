@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public abstract class Registry<K, V> implements Iterable<V> {
 
@@ -52,10 +51,6 @@ public abstract class Registry<K, V> implements Iterable<V> {
 
     public V remove(K key){
         return key == null ? null : registry.remove(key);
-    }
-
-    public boolean removeIf(Predicate<? super K> predicate){
-        return registry.keySet().removeIf(predicate);
     }
 
     public boolean containsKey(K key){

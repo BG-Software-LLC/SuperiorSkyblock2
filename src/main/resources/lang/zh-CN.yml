@@ -113,7 +113,6 @@ COMMAND_ARGUMENT_MATERIAL: 材质
 COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: 信息...
 COMMAND_ARGUMENT_MISSION_NAME: 任务名
-COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: 倍率
 COMMAND_ARGUMENT_NAME: 名字
 COMMAND_ARGUMENT_NEW_LEADER: 新领导者
@@ -168,7 +167,6 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: 给与一个玩家解散岛屿次数.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: 将岛屿从岛屿排行榜中忽略.
 COMMAND_DESCRIPTION_ADMIN_JOIN: 不需要允许强制加入岛屿.
 COMMAND_DESCRIPTION_ADMIN_KICK: 将一个玩家踢出他的岛屿.
-COMMAND_DESCRIPTION_ADMIN_MODULES: 'Manage modules of the plugin.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: 更改玩家的任务状态.
 COMMAND_DESCRIPTION_ADMIN_MSG: 向玩家发送一条不带前缀的消息.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: 向一个岛屿的全部玩家发送一条不带前缀的消息.
@@ -363,7 +361,6 @@ INVALID_LIMIT: '&c&l错误 | &7未知方块限制 {0}.'
 INVALID_MATERIAL: '&c&l错误 | &7未知材质 {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&l错误 | &7未知任务 {0}.'
-INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&l错误 | &7未知倍率 {0}.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&l错误 | &7百分比必须在0到100之间.'
@@ -524,17 +521,6 @@ MISSION_STATUS_COMPLETE: '&e&l岛屿任务 | &7已将 &b{1} &7的任务 &b{0} &7
 MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&l岛屿任务 | &7重置 &b{1} &7任务 &b{0} &7的状态.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
-MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
-  &e&lModule | &7{0} by {1}
-  &e&lModule | &7&m--------------------
-  &e&lModule | &7{2}
-MODULE_LOADED_SUCCESS: '&e&lModule | &7Successfully loaded the module {0}.'
-MODULE_LOADED_FAILURE: '&e&lModule | &7Couldn''t load the module {0}. Check out the console for more information.'
-MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
-MODULES_LIST: '&fModules ({0}): {1}'
-MODULES_LIST_MODULE_NAME: '&a{0}'
-MODULES_LIST_SEPARATOR: '&f, '
 NAME_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将他的岛屿更名为 &b{1}.'
 NAME_BLACKLISTED: '&c&l错误 | &7你不能使用这个岛屿名字.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

@@ -32,7 +32,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
         return "admin unlockworld <" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
                 Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end/normal> <true/false>";
+                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end> <true/false>";
     }
 
     @Override
@@ -67,24 +67,20 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
         if(environment == null)
             return;
 
-        if(environment == plugin.getSettings().defaultWorldEnvironment){
+        if(environment == World.Environment.NORMAL){
             Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
 
         boolean enable = Boolean.parseBoolean(args[4]);
+        boolean netherUnlock = environment == World.Environment.NETHER;
 
         islands.forEach(island -> {
-            switch (environment){
-                case NORMAL:
-                    island.setNormalEnabled(enable);
-                    break;
-                case NETHER:
-                    island.setNetherEnabled(enable);
-                    break;
-                case THE_END:
-                    island.setEndEnabled(enable);
-                    break;
+            if(netherUnlock){
+                island.setNetherEnabled(enable);
+            }
+            else{
+                island.setEndEnabled(enable);
             }
         });
 
@@ -93,18 +89,8 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if(args.length == 5)
-            return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
-
-        if(args.length != 4)
-            return new ArrayList<>();
-
-        List<String> environments = new ArrayList<>();
-        for(World.Environment environment : World.Environment.values()){
-            environments.add(environment.name().toLowerCase());
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "nether", "the_end") :
+                args.length == 5 ? CommandTabCompletes.getCustomComplete(args[3], "true", "false") : new ArrayList<>();
     }
 
 }

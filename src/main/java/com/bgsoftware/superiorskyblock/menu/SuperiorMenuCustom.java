@@ -53,12 +53,6 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
 
         if(cfg.contains("command")){
             ConfigurationSection commandsSection = cfg.getConfigurationSection("command");
-
-            if(commandsSection == null){
-                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Custom menu doesn't have it's command section configured correctly, skipping...");
-                return;
-            }
-
             List<String> aliases = Arrays.asList(commandsSection.getString("aliases", "").split(", "));
             String permission = commandsSection.getString("permission", "");
             Map<Locale, String> descriptions = new HashMap<>();

@@ -45,7 +45,7 @@ public final class SQLHelper {
             config.setPoolName("SuperiorSkyblock Pool");
 
             if (plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")) {
-                config.setDriverClassName("com.mysql.jdbc.Driver");
+                config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
                 String address = plugin.getSettings().databaseMySQLAddress;
                 String dbName = plugin.getSettings().databaseMySQLDBName;

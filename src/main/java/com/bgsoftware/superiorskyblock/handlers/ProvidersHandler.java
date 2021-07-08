@@ -8,42 +8,22 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.AFKProvider_CMI;
-import com.bgsoftware.superiorskyblock.hooks.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.AsyncProvider;
-import com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_AdvancedSpawners;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_PvpingSpawners;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_RoseStacker;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_SilkSpawners;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_UltimateStacker;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
-import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
-import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.EconomyProvider_Vault;
-import com.bgsoftware.superiorskyblock.hooks.SWMHook;
-import com.bgsoftware.superiorskyblock.hooks.SlimefunHook;
-import com.bgsoftware.superiorskyblock.hooks.ChangeSkinHook;
-import com.bgsoftware.superiorskyblock.hooks.JetsMinionsHook;
-import com.bgsoftware.superiorskyblock.hooks.LeaderHeadsHook;
+import com.bgsoftware.superiorskyblock.hooks.types.defaults.AsyncProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.types.defaults.BlocksProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.types.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.types.CoreProtectHook;
+import com.bgsoftware.superiorskyblock.hooks.types.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider;
-import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.PermissionsProvider_LuckPerms;
+import com.bgsoftware.superiorskyblock.hooks.types.PermissionsProvider_LuckPerms;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.BlocksProvider;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.PricesProvider;
-import com.bgsoftware.superiorskyblock.hooks.PricesProvider_ShopGUIPlus;
-import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.hooks.VanishProvider;
-import com.bgsoftware.superiorskyblock.hooks.VanishProvider_CMI;
-import com.bgsoftware.superiorskyblock.hooks.VanishProvider_Essentials;
-import com.bgsoftware.superiorskyblock.hooks.VanishProvider_SuperVanish;
-import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
-import com.bgsoftware.superiorskyblock.hooks.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
+import com.bgsoftware.superiorskyblock.hooks.types.defaults.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.types.defaults.PermissionsProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.types.defaults.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -90,88 +70,21 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     @Override
     public void loadData(){
         Executor.sync(() -> {
-            if(Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
-                runSafe(LeaderHeadsHook::register);
-
-            if(Bukkit.getPluginManager().isPluginEnabled("JetsMinions"))
-                runSafe(() -> JetsMinionsHook.register(plugin));
-
-            if(Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer"))
-                runSafe(() -> SkinsRestorerHook.register(plugin));
-
-            if(Bukkit.getPluginManager().isPluginEnabled("ChangeSkin"))
-                runSafe(() -> ChangeSkinHook.register(plugin));
-
-            if(Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
-                runSafe(() -> SlimefunHook.register(plugin));
-
             if(Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
                 runSafe(() -> CoreProtectHook.register(plugin));
-
-            if(Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
-                runSafe(SWMHook::register);
 
             if(this.spawnersProvider == null || spawnersProvider instanceof BlocksProvider) {
                 String spawnersProvider = plugin.getSettings().spawnersProvider;
                 boolean auto = spawnersProvider.equalsIgnoreCase("Auto");
 
-                if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_MergedSpawner()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_AdvancedSpawners()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("WildStacker"))) {
+                if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") && (auto || spawnersProvider.equalsIgnoreCase("WildStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_WildStacker()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
-                        Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_SilkSpawners()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_PvpingSpawners()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
-                    if(Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion().startsWith("7")){
-                        try {
-                            BlocksProvider blocksProvider = (BlocksProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners7").newInstance();
-                            runSafe(() -> setSpawnersProvider(blocksProvider));
-                        }catch (Exception ignored){}
-                    }
-                    else{
-                        runSafe(() -> setSpawnersProvider(new BlocksProvider_EpicSpawners()));
-                    }
-                } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_UltimateStacker()));
-                } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
-                        (auto || spawnersProvider.equalsIgnoreCase("RoseStacker"))) {
-                    runSafe(() -> setSpawnersProvider(new BlocksProvider_RoseStacker()));
                 }
             }
 
             if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms") && PermissionsProvider_LuckPerms.isCompatible()) {
                 runSafe(() -> this.permissionsProvider = new PermissionsProvider_LuckPerms());
             }
-
-            if(Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus"))
-                runSafe(() -> pricesProvider = new PricesProvider_ShopGUIPlus());
-
-            if(Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket"))
-                runSafe(() -> vanishProvider = new VanishProvider_VanishNoPacket(plugin));
-            else if(Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
-                    Bukkit.getPluginManager().isPluginEnabled("PremiumVanish"))
-                runSafe(() -> vanishProvider = new VanishProvider_SuperVanish(plugin));
-            else if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-                runSafe(() -> vanishProvider = new VanishProvider_Essentials(plugin));
-            else if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
-                runSafe(() -> vanishProvider = new VanishProvider_CMI(plugin));
-
-            if(Bukkit.getPluginManager().isPluginEnabled("CMI"))
-                runSafe(() -> addAFKProvider(new AFKProvider_CMI()));
-            if(Bukkit.getPluginManager().isPluginEnabled("Essentials"))
-                runSafe(() -> addAFKProvider(new AFKProvider_Essentials()));
 
             if(hasPaperAsyncSupport()){
                 try {
@@ -238,13 +151,18 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         AFKProvidersList.add(afkProvider);
     }
 
+    @Override
+    public void setVanishProvider(VanishProvider vanishProvider) {
+        Preconditions.checkNotNull(vanishProvider, "vanishProvider parameter cannot be null.");
+        this.vanishProvider = vanishProvider;
+    }
+
     public Pair<Integer, String> getSpawner(Location location){
         return spawnersProvider.getSpawner(location);
     }
 
     public Key getSpawnerKey(ItemStack itemStack){
-        return spawnersProvider == null ? Key.of(itemStack) :
-                Key.of(Materials.SPAWNER.toBukkitType() + "", spawnersProvider.getSpawnerType(itemStack) + "");
+        return spawnersProvider != null ? Key.of(Materials.SPAWNER.toBukkitType() + ":" + spawnersProvider.getSpawnerType(itemStack)) : Key.of(itemStack);
     }
 
     public Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition){
@@ -260,7 +178,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     public BigDecimal getPrice(Key key){
-        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey(), "0") : key);
+        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey() + ":0") : key);
     }
 
     public boolean isVanished(Player player){
@@ -283,11 +201,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return economyProvider.getBalance(superiorPlayer);
     }
 
-    public EconomyProvider.EconomyResult depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            EconomyProvider.EconomyResult result = economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
-            if(result.hasFailed())
-                return result;
+            String error = economyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -295,11 +213,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return economyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public  EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            EconomyProvider.EconomyResult result = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
-            if(result.hasFailed())
-                return result;
+            String error = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -307,7 +225,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
+    public String withdrawMoney(SuperiorPlayer superiorPlayer, double amount){
         return economyProvider.withdrawMoney(superiorPlayer, amount);
     }
 
@@ -335,14 +253,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         worldsProvider.prepareTeleport(island, location, finishCallback);
     }
 
-    public boolean isNormalEnabled(){
-        return worldsProvider.isNormalEnabled();
-    }
-
-    public boolean isNormalUnlocked(){
-        return worldsProvider.isNormalUnlocked();
-    }
-
     public boolean isNetherEnabled(){
         return worldsProvider.isNetherEnabled();
     }
@@ -367,11 +277,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return bankEconomyProvider.getBalance(superiorPlayer);
     }
 
-    public EconomyProvider.EconomyResult depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            EconomyProvider.EconomyResult result = bankEconomyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
-            if(result.hasFailed())
-                return result;
+            String error = bankEconomyProvider.depositMoney(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -379,11 +289,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return bankEconomyProvider.depositMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
+    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount){
         while(amount.compareTo(MAX_DOUBLE) > 0){
-            EconomyProvider.EconomyResult result = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
-            if(result.hasFailed())
-                return result;
+            String error = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
+            if(error != null && !error.isEmpty())
+                return error;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
@@ -391,7 +301,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return withdrawMoneyForBanks(superiorPlayer, amount.doubleValue());
     }
 
-    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
+    public String withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount){
         return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
     }
 

@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island.data;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -15,8 +14,6 @@ import org.bukkit.World;
 import java.util.Map;
 
 public final class SIslandDataHandler extends DatabaseObject implements IslandDataHandler {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Island island;
     private boolean loadingIsland = false;
@@ -296,15 +293,6 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     }
 
     @Override
-    public void saveMissions() {
-        if(loadingIsland) return;
-        Query.ISLAND_SET_MISSIONS.getStatementHolder(this)
-                .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
-                .setString(island.getOwner().getUniqueId().toString())
-                .execute(true);
-    }
-
-    @Override
     public void saveSettings() {
         if(loadingIsland) return;
         Query.ISLAND_SET_SETTINGS.getStatementHolder(this)
@@ -416,7 +404,6 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(island.getName())
                 .setString(island.getDescription())
                 .setString(IslandSerializer.serializeRatings(island.getRatings()))
-                .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
                 .setString(IslandSerializer.serializeIslandFlags(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
                 .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
@@ -456,7 +443,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     public void executeInsertStatement(boolean async){
         Query.ISLAND_INSERT.getStatementHolder(this)
                 .setString(island.getOwner().getUniqueId().toString())
-                .setString(LocationUtils.getLocation(island.getCenter(plugin.getSettings().defaultWorldEnvironment)))
+                .setString(LocationUtils.getLocation(island.getCenter(World.Environment.NORMAL)))
                 .setString(IslandSerializer.serializeLocations(island.getTeleportLocations()))
                 .setString(IslandSerializer.serializePlayers(island.getIslandMembers(false)))
                 .setString(IslandSerializer.serializePlayers(island.getBannedPlayers()))
@@ -480,7 +467,6 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
                 .setString(LocationUtils.getLocation(island.getVisitorsLocation()))
                 .setString(island.getDescription())
                 .setString(IslandSerializer.serializeRatings(island.getRatings()))
-                .setString(IslandSerializer.serializeMissions(island.getCompletedMissionsWithAmounts()))
                 .setString(IslandSerializer.serializeIslandFlags(island.getAllSettings()))
                 .setBoolean(island.isIgnored())
                 .setString(IslandSerializer.serializeGenerator(getIslandGenerators()))
@@ -509,7 +495,7 @@ public final class SIslandDataHandler extends DatabaseObject implements IslandDa
     }
 
     private Map<Key, Integer>[] getIslandGenerators(){
-        Map<Key, Integer>[] customGeneratorAmounts = new Map[World.Environment.values().length];
+        Map<Key, Integer>[] customGeneratorAmounts = new Map[3];
         for(World.Environment environment : World.Environment.values())
             customGeneratorAmounts[environment.ordinal()] = island.getCustomGeneratorAmounts(environment);
         return customGeneratorAmounts;

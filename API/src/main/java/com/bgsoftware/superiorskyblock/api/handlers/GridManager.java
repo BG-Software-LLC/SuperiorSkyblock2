@@ -176,18 +176,6 @@ public interface GridManager {
     void sortIslands(SortingType sortingType);
 
     /**
-     * Sort the islands.
-     * @param sortingType The sorting type to use.
-     * @param onFinish Callback runnable.
-     */
-    void sortIslands(SortingType sortingType, @Nullable Runnable onFinish);
-
-    /**
-     * Get the spawn island object.
-     */
-    Island getSpawnIsland();
-
-    /**
      * Get the world of an island by the environment.
      * If the environment is not the normal and that environment is disabled in config, null will be returned.
      * @param environment The world environment.

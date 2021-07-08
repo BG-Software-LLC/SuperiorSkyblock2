@@ -79,6 +79,10 @@ public interface Key extends Comparable<Key> {
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(material, data);
     }
 
+    static Key of(Material material) {
+        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(material);
+    }
+
     /**
      * Get the key of a string.
      * @param key The string to check.

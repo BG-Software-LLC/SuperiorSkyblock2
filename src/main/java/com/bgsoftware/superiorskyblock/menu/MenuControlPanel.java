@@ -18,7 +18,7 @@ import java.util.List;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
-    private static List<Integer> membersSlot, settingsSlot, visitorsSlot;
+    private static List<Integer> membersSlot, visitorsSlot;
 
     private MenuControlPanel(SuperiorPlayer superiorPlayer){
         super("menuControlPanel", superiorPlayer);
@@ -33,16 +33,6 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         if(membersSlot.contains(e.getRawSlot())){
             MenuMembers.openInventory(superiorPlayer, this, island);
-        }
-        else if (settingsSlot.contains(e.getRawSlot())) {
-            if(superiorPlayer.hasPermission("superior.island.settings")) {
-                if(!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)){
-                    Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
-                    return;
-                }
-
-                MenuSettings.openInventory(superiorPlayer, this, island);
-            }
         }
         else if (visitorsSlot.contains(e.getRawSlot())) {
             MenuVisitors.openInventory(superiorPlayer, this, island);
@@ -75,7 +65,6 @@ public final class MenuControlPanel extends SuperiorMenu {
         Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
         membersSlot = getSlots(cfg, "members", charSlots);
-        settingsSlot = getSlots(cfg, "settings", charSlots);
         visitorsSlot = getSlots(cfg, "visitors", charSlots);
 
         charSlots.delete();
@@ -118,13 +107,10 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.members"), patternChars, membersChar,
                 itemsSection, commandsSection, soundsSection);
-        MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.settings"), patternChars, settingsChar,
-                itemsSection, commandsSection, soundsSection);
         MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.visitors"), patternChars, visitorsChar,
                 itemsSection, commandsSection, soundsSection);
 
         newMenu.set("members", membersChar + "");
-        newMenu.set("settings", settingsChar + "");
         newMenu.set("visitors", visitorsChar + "");
 
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));

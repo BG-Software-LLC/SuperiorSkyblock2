@@ -268,22 +268,14 @@ visitors-sign:
   # The line that will be displayed when the sign is inactive.
   inactive: '&c[Welcome]'
 
+# Set the divider for the island bank money in the total island worth.
+# You can set it to 0 to disable island bank money to be calculated in island worth.
+bank-worth-rate: 1000
+
 # Settings related to the island worlds.
 worlds:
-  # The default world that will be used.
-  # Use normal, nether or the_end.
-  # If nether or the_end are used but they are disabled below, they wi
-  default-world: normal
   # Set the name of the islands world.
-  world-name: SuperiorWorld
-  # Settings related to the normal world.
-  normal:
-    # Should the normal world be enabled?
-    enabled: true
-    # Should the normal be unlocked by default to islands?
-    unlock: true
-    # Should the schematics in this world will not be counted towards worth and level values?
-    schematic-offset: true
+  normal-world: SuperiorWorld
   # Settings related to the nether world.
   nether:
     # Should the nether world be enabled?
@@ -293,7 +285,7 @@ worlds:
     # Custom name for the nether world.
     # When empty, the name will be "<island-world>_nether"
     name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
+    # Should the schematic of nether will not be counted towards worth and level values?
     schematic-offset: true
   end:
     # Should the end world be enabled?
@@ -303,7 +295,7 @@ worlds:
     # Custom name for the end world.
     # When empty, the name will be "<island-world>_the_end"
     name: ''
-    # Should the schematics in this world will not be counted towards worth and level values?
+    # Should the schematic of end will not be counted towards worth and level values?
     schematic-offset: true
     # Should dragon fight be enabled? This will spawn dragons for each island.
     # This feature is in beta, expect bugs!
@@ -392,6 +384,11 @@ spawners-provider: 'AUTO'
 
 # Should inventories of island members get cleared after disbanding their island?
 disband-inventory-clear: true
+
+# Should island bank balance be refunded upon island disband?
+# When set to 100, all the balance will be refunded.
+# When set to 0, no balance will be refunded.
+disband-refund: 0
 
 # All settings related to island names.
 island-names:
@@ -641,6 +638,9 @@ default-island-fly: false
 # Can be BLUE, GREEN or RED.
 default-border-color: BLUE
 
+# Should the custom generators be handled by SuperiorSkyblock?
+generators: true
+
 # Should obsidian get turned into a lava bucket when clicking it with a bucket in hand?
 obsidian-to-lava: false
 
@@ -691,6 +691,25 @@ preview-islands:
   normal: world, 0, 100, 0
   mycel: world, 0, 100, 0
   desert: world, 0, 100, 0
+
+# Should transaction logs of the island bank be saved to database?
+# Warning: There may be a lot of transactions, and can increase database.
+bank-logs: true
+
+# All settings related to bank interest.
+# This feature is a money-generator for the islands.
+# As long as the island members are online, they will earn money.
+bank-interest:
+  # Should the feature be enabled?
+  enabled: true
+  # The interval to give the interest reward (in seconds).
+  interval: 86400
+  # The percentage out of the bank that will be given.
+  # If it's 10, then 10% out of the bank balance will be given.
+  percentage: 10
+  # The maximum time that the island owner can be offline in order to be rewarded (in seconds).
+  # Can be -1 in order to disable this restriction.
+  recent-active: 86400
 
 # Should vanished players be hidden in tab completes?
 tab-complete-hide-vanished: true

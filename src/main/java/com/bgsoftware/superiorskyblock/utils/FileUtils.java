@@ -281,13 +281,9 @@ public final class FileUtils {
     }
 
     public static List<Class<?>> getClasses(URL jar, Class<?> clazz) {
-        return getClasses(jar, clazz, clazz.getClassLoader());
-    }
-
-    public static List<Class<?>> getClasses(URL jar, Class<?> clazz, ClassLoader classLoader) {
         List<Class<?>> list = new ArrayList<>();
 
-        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, classLoader); JarInputStream jis = new JarInputStream(jar.openStream())) {
+        try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, clazz.getClassLoader()); JarInputStream jis = new JarInputStream(jar.openStream())) {
             JarEntry jarEntry;
             while ((jarEntry = jis.getNextJarEntry()) != null){
                 String name = jarEntry.getName();
@@ -308,19 +304,6 @@ public final class FileUtils {
         } catch (Throwable ignored) { }
 
         return list;
-    }
-
-    public static void deleteDirectory(File directory){
-        if(directory.isDirectory()) {
-            File[] childFiles = directory.listFiles();
-            if(childFiles != null) {
-                for (File file : childFiles)
-                    deleteDirectory(file);
-            }
-        }
-
-        //noinspection ResultOfMethodCallIgnored
-        directory.delete();
     }
 
     private static final Object fileMutex = new Object();

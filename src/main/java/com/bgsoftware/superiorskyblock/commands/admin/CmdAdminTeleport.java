@@ -65,10 +65,9 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        World.Environment environment = args.length == 4 ? World.Environment.valueOf(args[3].toUpperCase()) :
-                plugin.getSettings().defaultWorldEnvironment;
+        World.Environment environment = args.length == 4 ? World.Environment.valueOf(args[3].toUpperCase()) : World.Environment.NORMAL;
 
-        if(environment != plugin.getSettings().defaultWorldEnvironment){
+        if(environment != World.Environment.NORMAL){
             if(!island.wasSchematicGenerated(environment)) {
                 PlayersListener.handlePlayerPortal(plugin, (Player) sender, ((Player) sender).getLocation(),
                         environment == World.Environment.NETHER ? PlayerTeleportEvent.TeleportCause.NETHER_PORTAL :

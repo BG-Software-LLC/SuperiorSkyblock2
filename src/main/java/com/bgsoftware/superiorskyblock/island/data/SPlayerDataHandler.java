@@ -115,14 +115,6 @@ public final class SPlayerDataHandler extends DatabaseObject implements PlayerDa
     }
 
     @Override
-    public void saveMissions() {
-        Query.PLAYER_SET_MISSIONS.getStatementHolder(this)
-                .setString(IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts()))
-                .setString(superiorPlayer.getUniqueId().toString())
-                .execute(true);
-    }
-
-    @Override
     public StatementHolder setUpdateStatement(StatementHolder statementHolder) {
         return statementHolder.setString(superiorPlayer.getIslandLeader().getUniqueId().toString())
                 .setString(superiorPlayer.getName())
@@ -133,7 +125,6 @@ public final class SPlayerDataHandler extends DatabaseObject implements PlayerDa
                 .setBoolean(superiorPlayer.hasIslandFlyEnabled())
                 .setString(superiorPlayer.getBorderColor().name())
                 .setString(superiorPlayer.getLastTimeStatus() + "")
-                .setString(IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts()))
                 .setString(superiorPlayer.getUserLocale().getLanguage() + "-" + superiorPlayer.getUserLocale().getCountry())
                 .setBoolean(superiorPlayer.hasWorldBorderEnabled())
                 .setString(superiorPlayer.getUniqueId().toString());
@@ -157,7 +148,6 @@ public final class SPlayerDataHandler extends DatabaseObject implements PlayerDa
                 .setBoolean(superiorPlayer.hasIslandFlyEnabled())
                 .setString(superiorPlayer.getBorderColor().name())
                 .setString(superiorPlayer.getLastTimeStatus() + "")
-                .setString(IslandSerializer.serializeMissions(superiorPlayer.getCompletedMissionsWithAmounts()))
                 .setString(superiorPlayer.getUserLocale().getLanguage() + "-" + superiorPlayer.getUserLocale().getCountry())
                 .setBoolean(superiorPlayer.hasWorldBorderEnabled())
                 .execute(async);

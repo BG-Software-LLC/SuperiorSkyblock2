@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="11">
+      <module name="SuperiorSkyblock2.v1_17_R1" target="16" />
+      <module name="SuperiorSkyblock2.v1_17_R1.main" target="16" />
+      <module name="SuperiorSkyblock2.v1_17_R1.test" target="16" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,7 +1,0 @@
-group 'v1_13_R1'
-
-dependencies {
-    compileOnly "org.spigotmc:v1_13_R1:latest"
-    compileOnly project(":API")
-    compileOnly parent
-}

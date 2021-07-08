@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.google.common.base.Preconditions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -31,24 +30,30 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminAddBlockLimit(), false);
         registerCommand(new CmdAdminAddBonus(), false);
         registerCommand(new CmdAdminAddCoopLimit(), false);
+        registerCommand(new CmdAdminAddCropGrowth(), false);
         registerCommand(new CmdAdminAddDisbands(), false);
+        registerCommand(new CmdAdminAddEffect(), false);
         registerCommand(new CmdAdminAddEntityLimit(), false);
+        registerCommand(new CmdAdminAddGenerator(), false);
+        registerCommand(new CmdAdminAddMobDrops(), false);
         registerCommand(new CmdAdminAddSize(), false);
+        registerCommand(new CmdAdminAddSpawnerRates(), false);
         registerCommand(new CmdAdminAddTeamLimit(), false);
         registerCommand(new CmdAdminAddWarpsLimit(), false);
         registerCommand(new CmdAdminBypass(), false);
         registerCommand(new CmdAdminChest(), false);
+        registerCommand(new CmdAdminClearGenerator(), false);
         registerCommand(new CmdAdminClose(), false);
         registerCommand(new CmdAdminCmdAll(), false);
         registerCommand(new CmdAdminCount(), false);
         registerCommand(new CmdAdminDebug(), false);
         registerCommand(new CmdAdminDelWarp(), false);
         registerCommand(new CmdAdminDemote(), false);
+        registerCommand(new CmdAdminDeposit(), false);
         registerCommand(new CmdAdminDisband(), false);
         registerCommand(new CmdAdminIgnore(), false);
         registerCommand(new CmdAdminJoin(), false);
         registerCommand(new CmdAdminKick(), false);
-        registerCommand(new CmdAdminModules(), false);
         registerCommand(new CmdAdminMsg(), false);
         registerCommand(new CmdAdminMsgAll(), false);
         registerCommand(new CmdAdminName(), false);
@@ -56,6 +61,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminOpenMenu(), false);
         registerCommand(new CmdAdminPromote(), false);
         registerCommand(new CmdAdminPurge(), false);
+        registerCommand(new CmdAdminRankup(), false);
         registerCommand(new CmdAdminRecalc(), false);
         registerCommand(new CmdAdminReload(), false);
         registerCommand(new CmdAdminRemoveBlockLimit(), false);
@@ -69,27 +75,33 @@ public final class CmdAdmin implements ISuperiorCommand {
         registerCommand(new CmdAdminSetBonus(), false);
         registerCommand(new CmdAdminSetChestRow(), false);
         registerCommand(new CmdAdminSetCoopLimit(), false);
+        registerCommand(new CmdAdminSetCropGrowth(), false);
         registerCommand(new CmdAdminSetDisbands(), false);
+        registerCommand(new CmdAdminSetEffect(), false);
         registerCommand(new CmdAdminSetEntityLimit(), false);
+        registerCommand(new CmdAdminSetGenerator(), false);
         registerCommand(new CmdAdminSetLeader(), false);
+        registerCommand(new CmdAdminSetMobDrops(), false);
         registerCommand(new CmdAdminSetPermission(), false);
         registerCommand(new CmdAdminSetRate(), false);
         registerCommand(new CmdAdminSetRoleLimit(), false);
         registerCommand(new CmdAdminSetSettings(), false);
         registerCommand(new CmdAdminSetSize(), false);
-        registerCommand(new CmdAdminSetSpawn(), false);
+        registerCommand(new CmdAdminSetSpawnerRates(), false);
         registerCommand(new CmdAdminSetTeamLimit(), false);
         registerCommand(new CmdAdminSettings(), false);
+        registerCommand(new CmdAdminSetUpgrade(), false);
         registerCommand(new CmdAdminSetWarpsLimit(), false);
         registerCommand(new CmdAdminShow(), false);
-        registerCommand(new CmdAdminSpawn(), false);
         registerCommand(new CmdAdminSpy(), false);
         registerCommand(new CmdAdminStats(), false);
+        registerCommand(new CmdAdminSyncUpgrades(), false);
         registerCommand(new CmdAdminTeleport(), false);
         registerCommand(new CmdAdminTitle(), false);
         registerCommand(new CmdAdminTitleAll(), false);
         registerCommand(new CmdAdminUnignore(), false);
         registerCommand(new CmdAdminUnlockWorld(), false);
+        registerCommand(new CmdAdminWithdraw(), false);
     }
 
     @Override
@@ -253,17 +265,6 @@ public final class CmdAdmin implements ISuperiorCommand {
             subCommands.clear();
             superiorCommands.forEach(s -> subCommands.add(s.getAliases().get(0), s));
         }
-    }
-
-    public void unregisterCommand(SuperiorCommand superiorCommand) {
-        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-
-        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase();
-        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
-
-        subCommands.remove(label);
-        aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
     }
 
     public List<SuperiorCommand> getSubCommands() {

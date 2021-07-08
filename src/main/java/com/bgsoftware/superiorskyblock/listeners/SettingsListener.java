@@ -120,32 +120,14 @@ public final class SettingsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onFireSpread(BlockBurnEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
-
-            if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
-                e.setCancelled(true);
-        }
+    public void onFireSpread(BlockBurnEvent e) {
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onBlockIgnite(BlockIgniteEvent e){
-        if(e.getCause() != BlockIgniteEvent.IgniteCause.SPREAD)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
-
-            if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
-                e.setCancelled(true);
-        }
+    public void onFireSpread(BlockIgniteEvent e){
+        if(e.getCause() != BlockIgniteEvent.IgniteCause.SPREAD && e.getCause() != BlockIgniteEvent.IgniteCause.LAVA) return;
+        e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -228,9 +210,10 @@ public final class SettingsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onEntityExplodeDamage(EntityDamageByEntityEvent e){
-        if(handleEntityExplode(e.getDamager(), e.getEntity().getLocation()))
-            e.setCancelled(true);
+    public void onEntityExplodeDamage(EntityDamageByEntityEvent e) {
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        e.setCancelled(island != null && e.getEntity() instanceof Player && !(e.getDamager() instanceof Player));
     }
 
     private boolean handleEntityExplode(Entity source, Location explodeLocation){

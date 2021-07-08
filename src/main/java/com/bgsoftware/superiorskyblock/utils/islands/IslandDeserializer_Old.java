@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
@@ -205,19 +204,6 @@ public final class IslandDeserializer_Old {
                 String[] sections = entry.split("=");
                 ratingsMap.add(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
             }catch(Exception ignored){}
-        }
-    }
-
-    static void deserializeMissions(String missions, Registry<Mission<?>, Integer> completedMissions){
-        if(missions == null)
-            return;
-
-        for(String mission : missions.split(";")){
-            String[] missionSections = mission.split("=");
-            int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
-            Mission<?> _mission = plugin.getMissions().getMission(missionSections[0]);
-            if(_mission != null)
-                completedMissions.add(_mission, completeAmount);
         }
     }
 

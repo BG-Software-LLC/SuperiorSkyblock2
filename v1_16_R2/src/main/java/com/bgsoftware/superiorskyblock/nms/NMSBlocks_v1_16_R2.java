@@ -26,7 +26,6 @@ import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.BlockBed;
 import net.minecraft.server.v1_16_R2.BlockPosition;
 import net.minecraft.server.v1_16_R2.BlockProperties;
-import net.minecraft.server.v1_16_R2.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R2.BlockStateBoolean;
 import net.minecraft.server.v1_16_R2.BlockStateEnum;
 import net.minecraft.server.v1_16_R2.BlockStateInteger;
@@ -59,7 +58,6 @@ import net.minecraft.server.v1_16_R2.PlayerChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunkMap;
 import net.minecraft.server.v1_16_R2.PlayerConnection;
 import net.minecraft.server.v1_16_R2.ProtoChunk;
-import net.minecraft.server.v1_16_R2.TagsBlock;
 import net.minecraft.server.v1_16_R2.TileEntity;
 import net.minecraft.server.v1_16_R2.TileEntitySign;
 import net.minecraft.server.v1_16_R2.TileEntityTypes;
@@ -386,17 +384,9 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
                             Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
-                            int blockAmount = 1;
-
-                            if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
-                                blockAmount = 2;
-                                blockData = blockData.set(BlockProperties.aK, BlockPropertySlabType.BOTTOM);
-                            }
-
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                            Key blockKey = Key.of(type.name(), location);
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
                             if (type == Material.SPAWNER) {
                                 spawnersLocations.add(location);
                             }
@@ -604,18 +594,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
     }
 
     @Override
-    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if(stop) {
-            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.tickingChunks
-                    .remove(((CraftChunk) chunk).getHandle().getPos().pair());
-            if(cropsTickingTileEntity != null)
-                cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
-        }
-        else
-            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
-    }
-
-    @Override
     public void handleSignPlace(Island island, Location location) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
@@ -664,20 +642,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
     }
 
-    @Override
-    public int getDefaultAmount(org.bukkit.block.Block block) {
-        IBlockData blockData = ((CraftBlock) block).getNMS();
-        Block nmsBlock =  blockData.getBlock();
-
-        // Checks for double slabs
-        if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
-                blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
-            return 2;
-        }
-
-        return 1;
-    }
-
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
@@ -698,87 +662,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
             // noinspection deprecation
             return new ProtoChunk(chunkCoord, ChunkConverter.a);
         }
-    }
-
-    private static final class CropsTickingTileEntity extends TileEntity implements ITickable{
-
-        private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
-        private static int random = ThreadLocalRandom.current().nextInt();
-
-        private final WeakReference<Island> island;
-        private final WeakReference<Chunk> chunk;
-        private final int chunkX, chunkZ;
-
-        private int currentTick = 0;
-
-        private CropsTickingTileEntity(Island island, Chunk chunk){
-            super(TileEntityTypes.COMMAND_BLOCK);
-            this.island = new WeakReference<>(island);
-            this.chunk = new WeakReference<>(chunk);
-            this.chunkX = chunk.getPos().x;
-            this.chunkZ = chunk.getPos().z;
-            setLocation(chunk.getWorld(), new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-
-            try {
-                // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
-                setCurrentChunk(chunk);
-            }catch (Throwable ignored){}
-
-            world.tileEntityListTick.add(this);
-        }
-
-        @Override
-        public void tick() {
-            if(++currentTick <= plugin.getSettings().cropsInterval)
-                return;
-
-            Chunk chunk = this.chunk.get();
-            Island island = this.island.get();
-
-            if(chunk == null || island == null){
-                world.tileEntityListTick.remove(this);
-                return;
-            }
-
-            currentTick = 0;
-
-            int worldRandomTick = world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
-            double cropGrowth = island.getCropGrowthMultiplier() - 1;
-
-            int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
-
-            if (chunkRandomTickSpeed > 0) {
-                for (ChunkSection chunkSection : chunk.getSections()) {
-                    if (chunkSection != Chunk.a && chunkSection.d()) {
-                        for (int i = 0; i < chunkRandomTickSpeed; i++) {
-                            random = random * 3 + 1013904223;
-                            int factor = random >> 2;
-                            int x = factor & 15;
-                            int z = factor >> 8 & 15;
-                            int y = factor >> 16 & 15;
-                            IBlockData blockData = chunkSection.getType(x, y, z);
-                            Block block = blockData.getBlock();
-                            if (block.isTicking(blockData) && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
-                                blockData.b((WorldServer) world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)), ThreadLocalRandom.current());
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        @Override
-        public void w() {
-            tick();
-        }
-
-        static void create(Island island, Chunk chunk){
-            long chunkPair = chunk.getPos().pair();
-            if(!tickingChunks.containsKey(chunkPair))
-                tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk));
-        }
-
     }
 
 }

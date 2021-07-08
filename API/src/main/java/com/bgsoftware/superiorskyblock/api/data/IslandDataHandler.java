@@ -153,11 +153,6 @@ public interface IslandDataHandler {
     void saveRatings();
 
     /**
-     * Save the missions of the island.
-     */
-    void saveMissions();
-
-    /**
      * Save the settings of the island.
      */
     void saveSettings();

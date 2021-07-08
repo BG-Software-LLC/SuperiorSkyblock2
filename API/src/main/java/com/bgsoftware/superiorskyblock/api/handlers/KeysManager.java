@@ -48,6 +48,8 @@ public interface KeysManager {
      */
     Key getKey(Material material, short data);
 
+    Key getKey(Material material);
+
     /**
      * Get the key of a string.
      * @param key The string to check.

@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -372,50 +371,6 @@ public interface SuperiorPlayer {
      * @param block The block to change the position to.
      */
     void setSchematicPos2(@Nullable Block block);
-
-    /*
-     *   Missions Methods
-     */
-
-    /**
-     * Complete a mission.
-     * @param mission The mission to complete.
-     */
-    void completeMission(Mission<?> mission);
-
-    /**
-     * Reset a mission.
-     * @param mission The mission to reset.
-     */
-    void resetMission(Mission<?> mission);
-
-    /**
-     * Check whether the player has completed the mission before.
-     * @param mission The mission to check.
-     */
-    boolean hasCompletedMission(Mission<?> mission);
-
-    /**
-     * Check whether the player can complete a mission again.
-     * @param mission The mission to check.
-     */
-    boolean canCompleteMissionAgain(Mission<?> mission);
-
-    /**
-     * Get the amount of times mission was completed.
-     * @param mission The mission to check.
-     */
-    int getAmountMissionCompleted(Mission<?> mission);
-
-    /**
-     * Get the list of the completed missions of the player.
-     */
-    List<Mission<?>> getCompletedMissions();
-
-    /**
-     * Get all the completed missions with the amount of times they were completed.
-     */
-    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
 
     /*
      *   Data Methods

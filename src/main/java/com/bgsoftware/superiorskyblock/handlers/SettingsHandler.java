@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.key.KeySet;
@@ -78,12 +77,8 @@ public final class SettingsHandler extends AbstractHandler {
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
-    public final World.Environment defaultWorldEnvironment;
-    public final String defaultWorldName;
+    public final double bankWorthRate;
     public final String islandWorldName;
-    public final boolean normalWorldEnabled;
-    public final boolean normalWorldUnlocked;
-    public final boolean normalSchematicOffset;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
     public final String netherWorldName;
@@ -116,6 +111,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean leaveConfirm;
     public final String spawnersProvider;
     public final boolean disbandInventoryClear;
+    public final double disbandRefund;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
     public final int islandNamesMinLength;
@@ -174,6 +170,11 @@ public final class SettingsHandler extends AbstractHandler {
     public final Map<String, List<String>> commandAliases;
     public final KeySet valuableBlocks;
     public final Registry<String, Location> islandPreviewLocations;
+    public final boolean bankLogs;
+    public final boolean bankInterestEnabled;
+    public final int bankInterestInterval;
+    public final int bankInterestPercentage;
+    public final int bankInterestRecentActive;
     public final boolean tabCompleteHideVanished;
     public final boolean dropsUpgradePlayersMultiply;
     public final long protectedMessageDelay;
@@ -182,7 +183,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final double chargeOnWarp;
     public final boolean publicWarps;
 
-    public SettingsHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
+    public SettingsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
 
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -224,10 +225,9 @@ public final class SettingsHandler extends AbstractHandler {
                 continue;
             }
 
-            String gloablKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
+            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultBlockLimits.put(Key.of(gloablKey, subKey), new UpgradeValue<>(Integer.parseInt(limit), true));
+            defaultBlockLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultEntityLimits = new KeyMap<>();
         for(String line : cfg.getStringList("default-values.entity-limits")){
@@ -238,10 +238,9 @@ public final class SettingsHandler extends AbstractHandler {
                 continue;
             }
 
-            String gloablKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
+            String key = sections.length == 2 ? sections[0] : sections[0] + ":" + sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultEntityLimits.put(Key.of(gloablKey, subKey), new UpgradeValue<>(Integer.parseInt(limit), true));
+            defaultEntityLimits.put(Key.of(key), new UpgradeValue<>(Integer.parseInt(limit), true));
         }
         defaultTeamLimit = cfg.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = cfg.getInt("default-values.warps-limit", 3);
@@ -268,9 +267,9 @@ public final class SettingsHandler extends AbstractHandler {
             String[] sections = line.split(":");
             try {
                 if (sections.length == 2)
-                    stackedBlocksLimits.put(Key.of(sections[0], ""), Integer.parseInt(sections[1]));
+                    stackedBlocksLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
-                    stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
+                    stackedBlocksLimits.put(Key.of(sections[0] + ":" + sections[1]), Integer.parseInt(sections[2]));
             }catch(Exception ignored){}
         });
         stackedBlocksAutoPickup = cfg.getBoolean("stacked-blocks.auto-collect", false);
@@ -287,10 +286,9 @@ public final class SettingsHandler extends AbstractHandler {
         visitorsSignLine = cfg.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(cfg.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = StringUtils.translateColors(cfg.getString("visitors-sign.inactive", "&c[Welcome]"));
-        islandWorldName = cfg.getString("worlds.world-name", "SuperiorWorld");
-        normalWorldEnabled = cfg.getBoolean("worlds.normal.enabled", true);
-        normalWorldUnlocked = cfg.getBoolean("worlds.normal.unlock", true);
-        normalSchematicOffset = cfg.getBoolean("worlds.normal.schematic-offset", true);
+        int bankWorthRate = cfg.getInt("bank-worth-rate", 1000);
+        this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
+        islandWorldName = cfg.getString("worlds.normal-world", "SuperiorWorld");
         netherWorldEnabled = cfg.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = cfg.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = cfg.getString("worlds.nether.name", "");
@@ -302,22 +300,6 @@ public final class SettingsHandler extends AbstractHandler {
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = cfg.getBoolean("worlds.end.schematic-offset", true);
         endDragonFight = endWorldEnabled && cfg.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
-        String defaultWorldEnvironment = cfg.getString("worlds.default-world");
-        if(defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled){
-            this.defaultWorldEnvironment = World.Environment.NORMAL;
-            this.defaultWorldName = this.islandWorldName;
-        }
-        else if(defaultWorldEnvironment.equalsIgnoreCase("nether") && netherWorldEnabled){
-            this.defaultWorldEnvironment = World.Environment.NETHER;
-            this.defaultWorldName = this.netherWorldName;
-        }
-        else if(defaultWorldEnvironment.equalsIgnoreCase("the_end") && endWorldEnabled){
-            this.defaultWorldEnvironment = World.Environment.THE_END;
-            this.defaultWorldName = this.endWorldName;
-        }
-        else{
-            throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-        }
         optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
@@ -344,6 +326,7 @@ public final class SettingsHandler extends AbstractHandler {
         leaveConfirm = cfg.getBoolean("leave-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
+        disbandRefund = Math.max(0, Math.min(100, cfg.getDouble("disband-refund"))) / 100D;
         islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
         islandNamesMinLength = cfg.getInt("island-names.min-length", 3);
@@ -356,7 +339,7 @@ public final class SettingsHandler extends AbstractHandler {
         clearOnJoin = cfg.getBoolean("clear-on-join", false);
         rateOwnIsland = cfg.getBoolean("rate-own-island", false);
         defaultSettings = cfg.getStringList("default-settings");
-        defaultGenerator = new KeyMap[World.Environment.values().length];
+        defaultGenerator = new KeyMap[3];
         if(cfg.isConfigurationSection("default-values.generator")){
             for(String env : cfg.getConfigurationSection("default-values.generator").getKeys(false)){
                 try{
@@ -461,6 +444,11 @@ public final class SettingsHandler extends AbstractHandler {
             for(String schematic : cfg.getConfigurationSection("preview-islands").getKeys(false))
                 islandPreviewLocations.add(schematic.toLowerCase(), LocationUtils.getLocation(cfg.getString("preview-islands." + schematic)));
         }
+        bankLogs = cfg.getBoolean("bank-logs", true);
+        bankInterestEnabled = cfg.getBoolean("bank-interest.enabled", true);
+        bankInterestInterval = cfg.getInt("bank-interest.interval", 86400);
+        bankInterestPercentage = cfg.getInt("bank-interest.percentage", 10);
+        bankInterestRecentActive = cfg.getInt("bank-interest.recent-active", 86400);
         tabCompleteHideVanished = cfg.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = cfg.getBoolean("drops-upgrade-players-multiply", false);
         protectedMessageDelay = cfg.getLong("protected-message-delay", 60L);
@@ -468,10 +456,6 @@ public final class SettingsHandler extends AbstractHandler {
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
         publicWarps = cfg.getBoolean("public-warps");
-        if(cfg.contains("worlds.normal-world")){
-            cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
-            cfg.set("worlds.normal-world", null);
-        }
     }
 
     @Override
@@ -494,11 +478,7 @@ public final class SettingsHandler extends AbstractHandler {
 
         cfg.save(file);
 
-        try {
-            plugin.setSettings(new SettingsHandler(plugin));
-        }catch (HandlerLoadException ex){
-            HandlerLoadException.handle(ex);
-        }
+        plugin.setSettings(new SettingsHandler(plugin));
     }
 
     private void convertData(YamlConfiguration cfg){
@@ -614,10 +594,9 @@ public final class SettingsHandler extends AbstractHandler {
         defaultGenerator[index] = new KeyMap<>();
         for(String line : lines){
             String[] sections = line.split(":");
-            String globalKey = sections[0];
-            String subKey = sections.length == 2 ? "" : sections[1];
+            String key = sections.length == 2 ? sections[0] : sections[0] + sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator[index].put(globalKey, subKey, new UpgradeValue<>(Integer.parseInt(percentage), true));
+            defaultGenerator[index].put(key, new UpgradeValue<>(Integer.parseInt(percentage), true));
         }
     }
 

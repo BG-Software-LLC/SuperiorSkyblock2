@@ -1,13 +1,11 @@
 package com.bgsoftware.superiorskyblock.player;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -21,17 +19,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class SuperiorNPCPlayer implements SuperiorPlayer {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Entity npc;
 
@@ -156,7 +147,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Consumer<Boolean> teleportResult) {
-        teleport(island.getCenter(plugin.getSettings().defaultWorldEnvironment), teleportResult);
+        teleport(island.getCenter(World.Environment.NORMAL), teleportResult);
     }
 
     @Override
@@ -327,41 +318,6 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public void setSchematicPos2(Block block) {
 
-    }
-
-    @Override
-    public void completeMission(Mission<?> mission) {
-
-    }
-
-    @Override
-    public void resetMission(Mission<?> mission) {
-
-    }
-
-    @Override
-    public boolean hasCompletedMission(Mission<?> mission) {
-        return false;
-    }
-
-    @Override
-    public boolean canCompleteMissionAgain(Mission<?> mission) {
-        return false;
-    }
-
-    @Override
-    public int getAmountMissionCompleted(Mission<?> mission) {
-        return 0;
-    }
-
-    @Override
-    public List<Mission<?>> getCompletedMissions() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return new HashMap<>();
     }
 
     @Override

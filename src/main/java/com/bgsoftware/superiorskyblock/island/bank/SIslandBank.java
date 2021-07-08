@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.island.bank;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
-import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -11,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -51,8 +49,7 @@ public final class SIslandBank implements IslandBank {
         return balance.get();
     }
 
-    @Override
-    public void setBalance(BigDecimal balance) {
+    public void loadBalance(BigDecimal balance){
         setBalance(balance, false);
     }
 
@@ -83,9 +80,7 @@ public final class SIslandBank implements IslandBank {
                     this.balance.get().add(amount).compareTo(island.getBankLimit()) > 0) {
                 failureReason = "Exceed bank limit";
             } else {
-                EconomyProvider.EconomyResult result = plugin.getProviders().withdrawMoneyForBanks(superiorPlayer, amount);
-                failureReason = result.getErrorMessage();
-                amount = BigDecimal.valueOf(result.getTransactionMoney());
+                failureReason = plugin.getProviders().withdrawMoneyForBanks(superiorPlayer, amount);
             }
         }
 
@@ -160,9 +155,7 @@ public final class SIslandBank implements IslandBank {
             EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
             if (commandsToExecute == null || commandsToExecute.isEmpty()) {
-                EconomyProvider.EconomyResult result = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
-                failureReason = result.getErrorMessage();
-                withdrawAmount = BigDecimal.valueOf(result.getTransactionMoney());
+                failureReason = plugin.getProviders().depositMoneyForBanks(superiorPlayer, withdrawAmount);
             } else {
                 String currentBalance = balance.get().toString();
                 failureReason = "";
@@ -240,7 +233,7 @@ public final class SIslandBank implements IslandBank {
     }
 
     private void addTransaction(BankTransaction bankTransaction, boolean save){
-        if(!BuiltinModules.BANK.bankLogs)
+        if(!plugin.getSettings().bankLogs)
             return;
 
         UUID senderUUID = bankTransaction.getPlayer();

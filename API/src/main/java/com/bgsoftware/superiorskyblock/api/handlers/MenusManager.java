@@ -28,12 +28,6 @@ public interface MenusManager {
     void openGlobalWarpsMenu(SuperiorPlayer superiorPlayer);
 
     /**
-     * Open the island biomes menu for a player.
-     * @param superiorPlayer The player to open the menu for.
-     */
-    void openIslandBiomesMenu(SuperiorPlayer superiorPlayer);
-
-    /**
      * Open the island creation menu for a player.
      * @param superiorPlayer The player to open the menu for.
      * @param islandName The name to give the island if the player creates a new island.
@@ -48,24 +42,11 @@ public interface MenusManager {
     void openIslandCountsMenu(SuperiorPlayer superiorPlayer, Island island);
 
     /**
-     * Open the main island missions menu for a player.
-     * @param superiorPlayer The player to open the menu for.
-     */
-    void openIslandMainMissionsMenu(SuperiorPlayer superiorPlayer);
-
-    /**
      * Open the island members menu for a player.
      * @param superiorPlayer The player to open the menu for.
      * @param island The island to get the members from.
      */
     void openIslandMembersMenu(SuperiorPlayer superiorPlayer, Island island);
-
-    /**
-     * Open the island missions menu for a player.
-     * @param superiorPlayer The player to open the menu for.
-     * @param islandMissions Should island missions be displayed or player missions?
-     */
-    void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions);
 
     /**
      * Open the island panel menu for a player.
@@ -114,19 +95,6 @@ public interface MenusManager {
      * @param island The island to get the ratings from.
      */
     void openIslandRatingsMenu(SuperiorPlayer superiorPlayer, Island island);
-
-    /**
-     * Open the island settings menu for a player.
-     * @param superiorPlayer The player to open the menu for.
-     * @param island The island to get the settings from.
-     */
-    void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island);
-
-    /**
-     * Update the island settings in the menu.
-     * @param islandFlag The settings to update.
-     */
-    void updateSettings(IslandFlag islandFlag);
 
     /**
      * Open the islands top menu for a player.

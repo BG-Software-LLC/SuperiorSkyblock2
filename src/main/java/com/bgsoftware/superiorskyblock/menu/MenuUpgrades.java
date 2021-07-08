@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Material;
@@ -99,61 +98,59 @@ public final class MenuUpgrades extends SuperiorMenu {
             }
         }
 
-        Executor.sync(() -> {
-            Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
+        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
-            if(cfg.contains("upgrades")){
-                ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
-                for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
-                    ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgrade.getName());
+        if(cfg.contains("upgrades")){
+            ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
+            for(Upgrade upgrade : plugin.getUpgrades().getUpgrades()){
+                ConfigurationSection upgradeSection = upgradesSection.getConfigurationSection(upgrade.getName());
 
-                    if(upgradeSection == null){
-                        SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " doesn't have an item in the menu.");
-                        continue;
-                    }
+                if(upgradeSection == null){
+                    SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " doesn't have an item in the menu.");
+                    continue;
+                }
 
-                    int slot = getSlots(upgradeSection, "item", charSlots).get(0);
-                    ((SUpgrade) upgrade).setMenuSlot(slot);
+                int slot = getSlots(upgradeSection, "item", charSlots).get(0);
+                ((SUpgrade) upgrade).setMenuSlot(slot);
 
-                    for(String level : upgradeSection.getKeys(false)) {
-                        if(NumberUtils.isNumber(level)) {
-                            if(slot == -1){
-                                SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgrade.getName() + " (level " + level + ") is not inside the pattern, skipping...");
-                                continue;
+                for(String level : upgradeSection.getKeys(false)) {
+                    if(NumberUtils.isNumber(level)) {
+                        if(slot == -1){
+                            SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgrade.getName() + " (level " + level + ") is not inside the pattern, skipping...");
+                            continue;
+                        }
+
+                        SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(Integer.parseInt(level));
+
+                        if(upgradeLevel != null) {
+                            ItemBuilder hasNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level"));
+
+                            if(hasNextLevel == null){
+                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing has-next-level item.");
+                                hasNextLevel = INVALID_ITEM.clone();
                             }
 
-                            SUpgradeLevel upgradeLevel = (SUpgradeLevel) upgrade.getUpgradeLevel(Integer.parseInt(level));
+                            ItemBuilder noNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
 
-                            if(upgradeLevel != null) {
-                                ItemBuilder hasNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level"));
-
-                                if(hasNextLevel == null){
-                                    SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing has-next-level item.");
-                                    hasNextLevel = INVALID_ITEM.clone();
-                                }
-
-                                ItemBuilder noNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
-
-                                if(noNextLevel == null){
-                                    SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing no-next-level item.");
-                                    noNextLevel = INVALID_ITEM.clone();
-                                }
-
-                                SoundWrapper hasNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
-                                SoundWrapper noNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound"));
-                                List<String> hasNextLevelCommands = upgradeSection.getStringList(level + ".has-next-level.commands");
-                                List<String> noNextLevelCommands = upgradeSection.getStringList(level + ".no-next-level.commands");
-                                upgradeLevel.setItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
+                            if(noNextLevel == null){
+                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing no-next-level item.");
+                                noNextLevel = INVALID_ITEM.clone();
                             }
+
+                            SoundWrapper hasNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
+                            SoundWrapper noNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".no-next-level.sound"));
+                            List<String> hasNextLevelCommands = upgradeSection.getStringList(level + ".has-next-level.commands");
+                            List<String> noNextLevelCommands = upgradeSection.getStringList(level + ".no-next-level.commands");
+                            upgradeLevel.setItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
                         }
                     }
                 }
             }
+        }
 
-            charSlots.delete();
+        charSlots.delete();
 
-            menuUpgrades.markCompleted();
-        }, 5L);
+        menuUpgrades.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, Island island){

@@ -34,7 +34,6 @@ import com.google.common.collect.Lists;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.registry.IslandRegistry;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
@@ -63,14 +62,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public final class GridHandler extends AbstractHandler implements GridManager {
 
+    private final IslandRegistry islands = new IslandRegistry();
     private final Set<UUID> islandsToPurge = Sets.newConcurrentHashSet();
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Registry<UUID, IslandPreview> islandPreviews = Registry.createRegistry();
     private final Set<UUID> customWorlds = Sets.newHashSet();
     private final StackedBlocksHandler stackedBlocks;
-    private final IslandRegistry islands;
 
-    private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
     private boolean blockFailed = false;
 
@@ -84,18 +82,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public GridHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
         stackedBlocks = new StackedBlocksHandler(plugin);
-        islands = new IslandRegistry(plugin);
     }
 
     @Override
     public void loadData(){
-        lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName, 0, 100, 0);
-        Executor.sync(this::updateSpawn);
+        lastIsland = SBlockPosition.of(plugin.getSettings().islandWorldName, 0, 100, 0);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
-    }
-
-    public void updateSpawn(){
-        spawnIsland = new SpawnIsland(plugin);
     }
 
     public void syncUpgrades(){
@@ -190,14 +182,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         if(updateGamemode)
                             player.setGameMode(GameMode.SURVIVAL);
                         superiorPlayer.teleport(island, result -> {
-                            if(result) {
+                            if(result)
                                 Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
-                                if(plugin.getSettings().defaultWorldEnvironment == World.Environment.THE_END){
-                                    plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                    if(plugin.getSettings().endDragonFight)
-                                        plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
-                                }
-                            }
                         });
                     }
                 });
@@ -253,10 +239,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         IslandPreview islandPreview = islandPreviews.remove(superiorPlayer.getUniqueId());
         if(islandPreview != null){
             superiorPlayer.runIfOnline(player -> {
-                Executor.ensureMain(() -> superiorPlayer.teleport(plugin.getGrid().getSpawnIsland(), teleportResult -> {
-                    if (teleportResult && superiorPlayer.isOnline())
-                        player.setGameMode(GameMode.SURVIVAL);
-                }));
+                superiorPlayer.asPlayer().performCommand("spawn");
                 PlayerChat.remove(player);
             });
         }
@@ -272,7 +255,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         islandPreviews.values().forEach(islandPreview -> {
             SuperiorPlayer superiorPlayer = islandPreview.getPlayer();
             superiorPlayer.runIfOnline(player -> {
-                superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+                superiorPlayer.asPlayer().performCommand("spawn");
                 // We don't wait for the teleport to happen, as this method is called when the server is disabled.
                 // Therefore, we can't wait for the async task to occur.
                 player.setGameMode(GameMode.SURVIVAL);
@@ -294,7 +277,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         island.getAllPlayersInside().forEach(superiorPlayer -> {
             SuperiorMenu.killMenu(superiorPlayer);
-            superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
+            superiorPlayer.asPlayer().performCommand("spawn");
             Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });
 
@@ -344,12 +327,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public Island getIslandAt(Location location){
-        if(location == null)
-            return null;
-
-        if(spawnIsland != null && spawnIsland.isInside(location))
-            return spawnIsland;
-
+        if(location == null) return null;
         return islands.get(location);
     }
 
@@ -377,14 +355,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             return island;
 
         return null;
-    }
-
-    @Override
-    public SpawnIsland getSpawnIsland(){
-        if(spawnIsland == null)
-            updateSpawn();
-
-        return spawnIsland;
     }
 
     @Override
@@ -429,12 +399,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         sortIslands(sortingType, null);
     }
 
-    @Override
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-
         SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
-
         islands.sort(sortingType, () -> {
             MenuTopIslands.refreshMenus(sortingType);
             if(onFinish != null)
@@ -657,10 +623,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void loadGrid(ResultSet resultSet) throws SQLException {
         lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
-        if(!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)){
-            lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName,
-                    lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
-        }
 
         for(String entry : resultSet.getString("stackedBlocks").split(";")){
             if(!entry.isEmpty()) {

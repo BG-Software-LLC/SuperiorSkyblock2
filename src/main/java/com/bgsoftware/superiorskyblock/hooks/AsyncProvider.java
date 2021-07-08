@@ -16,7 +16,4 @@ public interface AsyncProvider {
     }
 
     void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult);
-
-
-
 }

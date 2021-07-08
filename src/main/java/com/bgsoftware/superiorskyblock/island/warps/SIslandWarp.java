@@ -87,14 +87,9 @@ public final class SIslandWarp implements IslandWarp {
         if(icon == null)
             return null;
 
-        try {
-            ItemBuilder itemBuilder = new ItemBuilder(icon)
-                    .replaceAll("{0}", name);
-            return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
-        }catch (Exception ex){
-            setIcon(null);
-            return null;
-        }
+        ItemBuilder itemBuilder = new ItemBuilder(icon)
+                .replaceAll("{0}", name);
+        return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
     }
 
     @Override

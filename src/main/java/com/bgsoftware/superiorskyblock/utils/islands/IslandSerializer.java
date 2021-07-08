@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
@@ -160,18 +159,6 @@ public final class IslandSerializer {
             ratingsArray.add(ratingObject);
         });
         return gson.toJson(ratingsArray);
-    }
-
-
-    public static String serializeMissions(Map<Mission<?>, Integer> missions){
-        JsonArray missionsArray = new JsonArray();
-        missions.forEach((mission, finishCount) -> {
-            JsonObject missionObject = new JsonObject();
-            missionObject.addProperty("name", mission.getName());
-            missionObject.addProperty("finishCount", finishCount);
-            missionsArray.add(missionObject);
-        });
-        return gson.toJson(missionsArray);
     }
 
     public static String serializeIslandFlags(Map<IslandFlag, Byte> islandFlags){

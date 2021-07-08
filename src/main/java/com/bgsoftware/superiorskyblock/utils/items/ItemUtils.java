@@ -159,15 +159,13 @@ public final class ItemUtils {
     }
 
     public static ItemStack deserializeItem(String serialized){
-        if(serialized.length() > 0) {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
 
-            try {
-                CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
-                return TagUtils.compoundToItem(compoundTag);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        try{
+            CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
+            return TagUtils.compoundToItem(compoundTag);
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
 
         return null;

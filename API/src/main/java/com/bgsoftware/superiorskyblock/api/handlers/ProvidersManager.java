@@ -1,9 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
-import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.*;
 
 public interface ProvidersManager {
 
@@ -37,4 +34,5 @@ public interface ProvidersManager {
      */
     void addAFKProvider(AFKProvider afkProvider);
 
+    void setVanishProvider(VanishProvider vanishProvider);
 }

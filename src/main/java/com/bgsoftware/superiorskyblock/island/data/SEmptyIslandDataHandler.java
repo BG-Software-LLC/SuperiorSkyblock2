@@ -161,11 +161,6 @@ public final class SEmptyIslandDataHandler implements IslandDataHandler {
     }
 
     @Override
-    public void saveMissions() {
-
-    }
-
-    @Override
     public void saveSettings() {
 
     }

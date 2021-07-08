@@ -83,8 +83,8 @@ public final class MenuWarpManage extends SuperiorMenu {
 
             Block signBlock = islandWarp.getLocation().getBlock();
             if(signBlock.getState() instanceof Sign){
+                signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(signBlock.getType()));
                 signBlock.setType(Material.AIR);
-                signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
                 Locale.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
             }
 

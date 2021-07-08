@@ -29,7 +29,6 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(SuperiorMenuSettings::init);
 
         loadMenu(MenuBankLogs::init);
-        loadMenu(MenuBiomes::init);
         loadMenu(MenuBorderColor::init);
         loadMenu(MenuConfirmBan::init);
         loadMenu(MenuConfirmDisband::init);
@@ -42,17 +41,13 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(MenuIslandBank::init);
         loadMenu(MenuIslandChest::init);
         loadMenu(MenuIslandCreation::init);
-        loadMenu(MenuIslandMissions::init);
         loadMenu(MenuIslandRate::init);
         loadMenu(MenuIslandRatings::init);
         loadMenu(MenuMemberManage::init);
         loadMenu(MenuMemberRole::init);
         loadMenu(MenuMembers::init);
-        loadMenu(MenuMissions::init);
         loadMenu(MenuPermissions::init);
         loadMenu(MenuPlayerLanguage::init);
-        loadMenu(MenuPlayerMissions::init);
-        loadMenu(MenuSettings::init);
         loadMenu(MenuTopIslands::init);
         loadMenu(MenuUniqueVisitors::init);
         loadMenu(MenuUpgrades::init);
@@ -109,12 +104,6 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
-    public void openIslandBiomesMenu(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        MenuBiomes.openInventory(superiorPlayer, null);
-    }
-
-    @Override
     public void openIslandCreationMenu(SuperiorPlayer superiorPlayer, String islandName) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
@@ -129,26 +118,10 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
-    public void openIslandMainMissionsMenu(SuperiorPlayer superiorPlayer) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        MenuMissions.openInventory(superiorPlayer, null);
-    }
-
-    @Override
     public void openIslandMembersMenu(SuperiorPlayer superiorPlayer, Island island) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         MenuMembers.openInventory(superiorPlayer, null, island);
-    }
-
-    @Override
-    public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        if(islandMissions)
-            MenuIslandMissions.openInventory(superiorPlayer, null);
-        else
-            MenuPlayerMissions.openInventory(superiorPlayer, null);
     }
 
     @Override
@@ -197,19 +170,6 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         MenuIslandRatings.openInventory(superiorPlayer, null, island);
-    }
-
-    @Override
-    public void openIslandSettingsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuSettings.openInventory(superiorPlayer, null, island);
-    }
-
-    @Override
-    public void updateSettings(IslandFlag islandFlag) {
-        Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
-        MenuSettings.updateSettings(islandFlag);
     }
 
     @Override

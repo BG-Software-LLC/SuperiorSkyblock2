@@ -34,7 +34,6 @@ package com.bgsoftware.superiorskyblock.utils.tags;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.google.common.base.Preconditions;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -54,9 +53,9 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
 
     protected static final Class<?> CLASS = getNNTClass("NBTTagCompound");
 
-    private static final ReflectMethod<Void> SET = new ReflectMethod<>(CLASS,
+    private static final ReflectMethod<Void> SET = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagCompound",
             "set", String.class, getNNTClass("NBTBase"));
-    private static final ReflectMethod<Object> GET = new ReflectMethod<>(CLASS, "get", String.class);
+    private static final ReflectMethod<Object> GET = new ReflectMethod<>("net.minecraft.server.VERSION.NBTTagCompound", "get", String.class);
 
     public CompoundTag() {
         this(new HashMap<>());
@@ -146,8 +145,8 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         try {
             Object nbtTagCompound = CONSTRUCTOR.newInstance();
 
-            for(Map.Entry<String, Tag<?>> entry : value.entrySet()){
-                SET.invoke(nbtTagCompound, entry.getKey(), entry.getValue().toNBT());
+            for(String key : value.keySet()){
+                SET.invoke(nbtTagCompound, key, value.get(key).toNBT());
             }
 
             return nbtTagCompound;
@@ -157,7 +156,6 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         }
     }
 
-    @NotNull
     @Override
     public Iterator<Tag<?>> iterator() {
         return value.values().iterator();
@@ -168,7 +166,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         StringBuilder bldr = new StringBuilder();
         bldr.append("TAG_Compound: ").append(value.size()).append(" entries\r\n{\r\n");
         for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
-            bldr.append("   ").append((entry.getValue() + "").replaceAll("\r\n", "\r\n   ")).append("\r\n");
+            bldr.append("   ").append(entry.getValue().toString().replaceAll("\r\n", "\r\n   ")).append("\r\n");
         }
         bldr.append("}");
         return bldr.toString();

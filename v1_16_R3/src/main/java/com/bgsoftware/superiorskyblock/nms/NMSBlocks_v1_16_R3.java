@@ -20,22 +20,19 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
-import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
 import net.minecraft.server.v1_16_R3.BlockPosition;
-import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
+import net.minecraft.server.v1_16_R3.BlockProperties;
 import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
-import net.minecraft.server.v1_16_R3.BlockStepAbstract;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkConverter;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.Entity;
@@ -51,26 +48,21 @@ import net.minecraft.server.v1_16_R3.ITickable;
 import net.minecraft.server.v1_16_R3.LightEngine;
 import net.minecraft.server.v1_16_R3.LightEngineBlock;
 import net.minecraft.server.v1_16_R3.LightEngineGraph;
-import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
 import net.minecraft.server.v1_16_R3.Packet;
 import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
-import net.minecraft.server.v1_16_R3.PacketPlayOutLightUpdate;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R3.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunkMap;
 import net.minecraft.server.v1_16_R3.PlayerConnection;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
-import net.minecraft.server.v1_16_R3.TagsBlock;
-import net.minecraft.server.v1_16_R3.ThreadedMailbox;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntitySign;
 import net.minecraft.server.v1_16_R3.TileEntityTypes;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -91,7 +83,6 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -112,9 +103,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
     private static final ReflectField<Collection[]> ENTITY_SLICE_ARRAY = new ReflectField<>(Chunk.class, null, "entitySlices");
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
-
-    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
-    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "b");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -151,21 +139,14 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
         fieldNameToName.put("aK", "slab-type");
 
         try{
-            // Fixes BlockProperties being private-class in some versions of Yatopia causing illegal access errors.
-            Class<?> blockPropertiesClass = Class.forName("net.minecraft.server.v1_16_R3.BlockProperties");
-
-            for(Field field : blockPropertiesClass.getFields()){
-                field.setAccessible(true);
+            for(Field field : BlockProperties.class.getFields()){
                 Object value = field.get(null);
                 if(value instanceof IBlockState) {
                     register(fieldNameToName.getOrDefault(field.getName(), ((IBlockState) value).getName()),
                             field.getName(), (IBlockState) value);
                 }
             }
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-
+        }catch (Exception ignored){}
     }
 
     private static void register(String key, String fieldName, IBlockState<?> blockState){
@@ -180,7 +161,7 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
-        WorldServer world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
+        World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
 
         for(BlockData blockData : blockDataList)
@@ -191,33 +172,18 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
             Executor.sync(() -> {
-                if(STAR_LIGHT_INTERFACE.isValid()){
-                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.e();
-                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
-                    ChunkProviderServer chunkProviderServer = world.getChunkProvider();
-                    LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).queue(() ->
-                        starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
-                                chunkProviderServer.serverThreadQueue.execute(() ->
-                                        chunkProviderServer.playerChunkMap.getUpdatingChunk(chunkPos.pair())
-                                                .sendPacketToTrackedPlayers(new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, true), false)
-                                ), null));
-                }
-                else {
-                    for (BlockData blockData : blockDataList) {
-                        BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-                        if (blockData.getBlockLightLevel() > 0) {
-                            try {
-                                ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
-                            } catch (Exception ignored) {
-                            }
-                        }
-                        if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
-                            try {
-                                SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
-                                        blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
-                            } catch (Exception ignored) {
-                            }
-                        }
+                for (BlockData blockData : blockDataList) {
+                    BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+                    if (blockData.getBlockLightLevel() > 0) {
+                        try {
+                            ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
+                        } catch (Exception ignored) { }
+                    }
+                    if(blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL){
+                        try {
+                            SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
+                                    blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
+                        } catch (Exception ignored) { }
                     }
                 }
             }, 10L);
@@ -326,9 +292,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             else{
                 BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
                 name = blockStateToName.get(key);
-                if(name == null){
-                    Bukkit.broadcastMessage("Invalid block state for " + key);
-                }
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
             }
 
@@ -375,7 +338,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoords = chunk.getPos();
-        //noinspection deprecation
         sendPacketToRelevantPlayers(chunk.world, chunkCoords.x, chunkCoords.z,
                 new PacketPlayOutMapChunk(chunk, 65535));
     }
@@ -422,17 +384,9 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
                             Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
-                            int blockAmount = 1;
-
-                            if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
-                                blockAmount = 2;
-                                blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
-                            }
-
                             Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                            Key blockKey = Key.of(type.name(), location);
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
                             if (type == Material.SPAWNER) {
                                 spawnersLocations.add(location);
                             }
@@ -577,7 +531,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             chunk.markDirty();
 
             PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
-            //noinspection deprecation
             PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
 
             playersToUpdate.forEach(player -> {
@@ -640,18 +593,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
     }
 
     @Override
-    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if(stop) {
-            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.tickingChunks
-                    .remove(((CraftChunk) chunk).getHandle().getPos().pair());
-            if(cropsTickingTileEntity != null)
-                cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
-        }
-        else
-            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
-    }
-
-    @Override
     public void handleSignPlace(Island island, Location location) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
@@ -700,20 +641,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
         return blockData instanceof Waterlogged && ((Waterlogged) blockData).isWaterlogged();
     }
 
-    @Override
-    public int getDefaultAmount(org.bukkit.block.Block block) {
-        IBlockData blockData = ((CraftBlock) block).getNMS();
-        Block nmsBlock =  blockData.getBlock();
-
-        // Checks for double slabs
-        if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
-            blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
-            return 2;
-        }
-
-        return 1;
-    }
-
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
@@ -735,86 +662,4 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             return new ProtoChunk(chunkCoord, ChunkConverter.a);
         }
     }
-
-    private static final class CropsTickingTileEntity extends TileEntity implements ITickable{
-
-        private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
-        private static int random = ThreadLocalRandom.current().nextInt();
-
-        private final WeakReference<Island> island;
-        private final WeakReference<Chunk> chunk;
-        private final int chunkX, chunkZ;
-
-        private int currentTick = 0;
-
-        private CropsTickingTileEntity(Island island, Chunk chunk){
-            super(TileEntityTypes.COMMAND_BLOCK);
-            this.island = new WeakReference<>(island);
-            this.chunk = new WeakReference<>(chunk);
-            this.chunkX = chunk.getPos().x;
-            this.chunkZ = chunk.getPos().z;
-            setLocation(chunk.getWorld(), new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-
-            try {
-                // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
-                setCurrentChunk(chunk);
-            }catch (Throwable ignored){}
-
-            world.tileEntityListTick.add(this);
-        }
-
-        @Override
-        public void tick() {
-            if(++currentTick <= plugin.getSettings().cropsInterval)
-                return;
-
-            Chunk chunk = this.chunk.get();
-            Island island = this.island.get();
-
-            if(chunk == null || island == null){
-                world.tileEntityListTick.remove(this);
-                return;
-            }
-
-            currentTick = 0;
-
-            int worldRandomTick = world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
-            double cropGrowth = island.getCropGrowthMultiplier() - 1;
-
-            int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
-
-            if (chunkRandomTickSpeed > 0) {
-                for (ChunkSection chunkSection : chunk.getSections()) {
-                    if (chunkSection != Chunk.a && chunkSection.d()) {
-                        for (int i = 0; i < chunkRandomTickSpeed; i++) {
-                            random = random * 3 + 1013904223;
-                            int factor = random >> 2;
-                            int x = factor & 15;
-                            int z = factor >> 8 & 15;
-                            int y = factor >> 16 & 15;
-                            IBlockData blockData = chunkSection.getType(x, y, z);
-                            Block block = blockData.getBlock();
-                            if (block.isTicking(blockData) && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
-                                blockData.b((WorldServer) world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)), ThreadLocalRandom.current());
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        @Override
-        public void w() {
-            tick();
-        }
-
-        static void create(Island island, Chunk chunk){
-            long chunkPair = chunk.getPos().pair();
-            if(!tickingChunks.containsKey(chunkPair))
-                tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk));
-        }
-
-    }
-
 }

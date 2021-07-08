@@ -110,18 +110,12 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
     }
 
     private void readBlock(Object baseBlock){
-        Key key;
+        Key key = null;
 
         if(ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()){
             Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
             int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
             key = Key.of(material, (byte) data);
-        }
-        else{
-            int id = GET_ID.invoke(baseBlock);
-            int data = GET_DATA.invoke(baseBlock);
-            //noinspection deprecation
-            key = Key.of(Material.getMaterial(id), (byte) data);
         }
 
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);

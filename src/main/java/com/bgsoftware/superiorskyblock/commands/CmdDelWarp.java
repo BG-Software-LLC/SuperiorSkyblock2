@@ -86,8 +86,8 @@ public final class CmdDelWarp implements IPermissibleCommand {
         Block signBlock = islandWarp.getLocation().getBlock();
 
         if(signBlock.getState() instanceof Sign){
+            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(signBlock.getType()));
             signBlock.setType(Material.AIR);
-            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
             breakSign = true;
         }
 

@@ -1,11 +1,12 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'maven'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'maven-publish'
 }
 
 group 'SuperiorSkyblock'
-version = "1.7.0"
+version = "1.6.0"
 
 subprojects {
     apply plugin: 'java'
@@ -64,38 +65,15 @@ dependencies {
     implementation 'org.slf4j:SLF4J:latest'
 
     // Spigot jars
-    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin hooks
-    compileOnly 'gcspawners:AdvancedSpawners:latest'
-    compileOnly 'com.github.games647:ChangeSkin:latest'
-    compileOnly 'com.zrips:CMI:latest'
     compileOnly 'net.coreprotect:CoreProtect-6:latest'
-    compileOnly 'com.songoda:EpicSpawners-6:latest'
-    compileOnly 'com.earth2me:Essentials-2.16:latest'
     compileOnly 'com.boydti:FastAsyncWorldEdit:latest'
-    compileOnly 'me.jet315:JetsMinions:latest'
-    compileOnly 'me.robin:LeaderHeads:latest'
     compileOnly 'net.luckperms:LuckPerms:latest'
-    compileOnly 'net.luckperms:LuckPerms:latest'
-    compileOnly 'com.vk2gpz:MergedSpawner:latest'
-    compileOnly 'be.maximvdw:MVdWPlaceholderAPI:latest'
     compileOnly 'me.clip:PlaceholderAPI:latest'
-    compileOnly 'skyblock.hassan:PvpingSpawners:latest'
-    compileOnly 'dev.rosewood:RoseStacker:latest'
-    compileOnly 'net.brcdev:ShopGUIPlus-1.20:latest'
-    compileOnly 'de.candc:SilkSpawners:latest'
-    compileOnly 'net.skinsrestorer:SkinsRestorer:latest'
-    compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
-    compileOnly 'de.myzelyam:SuperVanish:latest'
-    compileOnly 'com.songoda:UltimateStacker:latest'
-    compileOnly 'org.kitteh:VanishNoPacket:latest'
     compileOnly 'net.milkbowl:Vault:latest'
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'
-    compileOnly 'com.grinderwolf:SlimeWorldManager:latest'
 }
 
 jar {
@@ -137,19 +115,12 @@ shadowJar {
     configurations = [project.configurations.getByName("runtimeClasspath")]
 }
 
-task copyAPI(type: Copy) {
-    from './archive/API.jar'
-    into './target/'
-    rename('API.jar', rootProject.name + 'API.jar')
-}
-
 clean {
     delete file('./archive/')
 }
 
 build {
     dependsOn shadowJar
-    dependsOn copyAPI
     dependsOn clean
 }
 

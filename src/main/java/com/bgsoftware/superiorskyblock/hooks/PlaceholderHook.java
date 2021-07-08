@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.hooks.types.PlaceholderHook_PAPI;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -52,9 +53,6 @@ public abstract class PlaceholderHook {
         PlaceholderHook.plugin = plugin;
 
         Executor.ensureMain(() -> {
-            if(Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
-                new PlaceholderHook_MVdW();
-            }
             if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
                 new PlaceholderHook_PAPI();
                 PlaceholderAPI = true;
@@ -115,8 +113,6 @@ public abstract class PlaceholderHook {
                         return superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No";
                     case "border_color":
                         return superiorPlayer.getBorderColor().name();
-                    case "missions_completed":
-                        return String.valueOf(superiorPlayer.getCompletedMissions().size());
                 }
             }
 
@@ -129,7 +125,7 @@ public abstract class PlaceholderHook {
 
                     island = plugin.getGrid().getIslandAt(player.getLocation());
 
-                    if (island == null || island instanceof SpawnIsland)
+                    if (island == null)
                         return plugin.getSettings().defaultPlaceholders.get(placeholder, "");
 
                     subPlaceholder = subPlaceholder.replace("location_", "");
@@ -269,15 +265,15 @@ public abstract class PlaceholderHook {
 
                 else switch (subPlaceholder) {
                     case "center":
-                        return SBlockPosition.of(island.getCenter(plugin.getSettings().defaultWorldEnvironment)).toString();
+                        return SBlockPosition.of(island.getCenter(World.Environment.NORMAL)).toString();
                     case "x":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockX());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockX());
                     case "y":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockY());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockY());
                     case "z":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockZ());
+                        return String.valueOf(island.getCenter(World.Environment.NORMAL).getBlockZ());
                     case "world":
-                        return island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld().getName();
+                        return island.getCenter(World.Environment.NORMAL).getWorld().getName();
                     case "team_size":
                         return String.valueOf(island.getIslandMembers(true).size());
                     case "team_size_online":

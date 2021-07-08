@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
-import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
@@ -120,13 +119,6 @@ public final class SuperiorSkyblockAPI {
     }
 
     /**
-     * Get the spawn island.
-     */
-    public static Island getSpawnIsland(){
-        return plugin.getGrid().getSpawnIsland();
-    }
-
-    /**
      * Get the world of an island by the world's environment.
      */
     public static World getIslandsWorld(Island island, World.Environment environment){
@@ -191,13 +183,6 @@ public final class SuperiorSkyblockAPI {
      */
     public static PlayersManager getPlayers(){
         return plugin.getPlayers();
-    }
-
-    /**
-     * Get the missions manager of the core.
-     */
-    public static MissionsManager getMissions(){
-        return plugin.getMissions();
     }
 
     /**

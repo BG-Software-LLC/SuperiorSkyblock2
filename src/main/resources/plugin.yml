@@ -6,7 +6,7 @@ main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
 website: https://bg-software.com/
 api-version: '1.13'
 softdepend: [AdvancedSpawners, ChangeSkin, CMI, EpicSpawners, Essentials, JetsMinions, LeaderHeads, MergedSpawner, MVdWPlaceholderAPI, PlaceholderAPI, PvpingSpawners, SilkSpawners, ShopGUIPlus, SkinsRestorer, VanishNoPacket, Vault, WildStacker, WorldEdit]
-loadbefore: [Multiverse-Core, Slimefun, My_Worlds]
+loadbefore: [Multiverse-Core, Slimefun]
 permissions:
   superior.*:
     description: Permission for all admin & island commands
@@ -196,8 +196,6 @@ permissions:
             description: Join an island without an invitation.
           superior.admin.kick:
             description: Kick a player from his island.
-          superior.admin.modules:
-            description: Manage modules of the plugin.
           superior.admin.mission:
             description: Change the status of a mission for a player.
           superior.admin.msg:

@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
@@ -196,17 +195,6 @@ public final class CommandTabCompletes {
         return Stream.of(Material.values()).filter(material -> material.isSolid() &&
                 material.name().toLowerCase().contains(lowerArgument)).map(material -> material.name().toLowerCase())
                 .collect(Collectors.toList());
-    }
-
-    public static List<String> getAllMissions(SuperiorSkyblockPlugin plugin){
-        return plugin.getMissions().getAllMissions().stream().map(Mission::getName).collect(Collectors.toList());
-    }
-
-    public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument){
-        String lowerArgument = argument.toLowerCase();
-        return  plugin.getMissions().getAllMissions().stream()
-                .filter(mission -> mission.getName().toLowerCase().contains(lowerArgument))
-                .map(Mission::getName).collect(Collectors.toList());
     }
 
     public static List<String> getMenus(String argument){

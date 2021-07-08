@@ -4,7 +4,6 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -42,9 +41,9 @@ public final class MenuConfirmDisband extends SuperiorMenu {
 
                 Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
-                if(BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
+                if(plugin.getSettings().disbandRefund > 0 && island.getOwner().isOnline()) {
                     Locale.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
-                            .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                            .getBalance().multiply(BigDecimal.valueOf(plugin.getSettings().disbandRefund))));
                 }
 
                 superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);

@@ -69,7 +69,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         if(environment == null)
             return;
 
-        if(environment == plugin.getSettings().defaultWorldEnvironment){
+        if(environment == World.Environment.NORMAL){
             Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
@@ -109,17 +109,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if(args.length != 4)
-            return new ArrayList<>();
-
-        List<String> environments = new ArrayList<>();
-
-        for(World.Environment environment : World.Environment.values()){
-            if(environment != plugin.getSettings().defaultWorldEnvironment)
-                environments.add(environment.name().toLowerCase());
-        }
-
-        return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
+        return args.length == 4 ? CommandTabCompletes.getCustomComplete(args[3], "nether", "the_end") : new ArrayList<>();
     }
 
 }

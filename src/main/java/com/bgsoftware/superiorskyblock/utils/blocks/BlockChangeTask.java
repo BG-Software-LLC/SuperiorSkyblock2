@@ -56,9 +56,6 @@ public final class BlockChangeTask {
 
                     IslandUtils.deleteChunk(island, entry.getKey(), null);
 
-                    if(island.isInsideRange(chunk))
-                        plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
-
                     ChunksTracker.markDirty(island, chunk, false);
 
                     entry.getValue().forEach(blockData -> blockData.doPrePlace(island));

@@ -139,7 +139,6 @@ COMMAND_ARGUMENT_MATERIAL: vat-lieu
 COMMAND_ARGUMENT_MENU: 'menu-name'
 COMMAND_ARGUMENT_MESSAGE: tin-nha...
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
-COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: da-cap
 COMMAND_ARGUMENT_NAME: ten
 COMMAND_ARGUMENT_NEW_LEADER: lanh-dao-moi
@@ -194,7 +193,6 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Giải tán cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Bỏ qua một hòn đảo từ những hòn đảo hàng đầu.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Tham gia một hòn đảo mà không cần lời mời.
 COMMAND_DESCRIPTION_ADMIN_KICK: Đá một người chơi khỏi đảo.
-COMMAND_DESCRIPTION_ADMIN_MODULES: 'Manage modules of the plugin.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Thay đổi trạng thái của một nhiệm vụ cho người
   chơi.
 COMMAND_DESCRIPTION_ADMIN_MSG: Gửi cho người chơi một tin nhắn mà không có bất kỳ
@@ -416,7 +414,6 @@ INVALID_LIMIT: '&c&lLỗi | &7Giới hạn không hợp lệ {0}.'
 INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
-INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_PAGE: '&c&lError | &7Invalid page {0}.'
 INVALID_PERCENTAGE: '&c&lLỗi | &7Tỷ lệ phần trăm phải nằm trong khoảng từ 0 đến 100.'
@@ -587,17 +584,6 @@ MISSION_STATUS_COMPLETE: '&e&lNhiệm Vụ | &7Thay đổi trạng thái của n
 MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Changed the status of all the missions to completed for {0}.'
 MISSION_STATUS_RESET: '&e&lNhiệm Vụ | &7Đặt lại trạng thái của nhiệm vụ {0} cho {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Reset the status of all the missions for {0}.'
-MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
-  &e&lModule | &7{0} by {1}
-  &e&lModule | &7&m--------------------
-  &e&lModule | &7{2}
-MODULE_LOADED_SUCCESS: '&e&lModule | &7Successfully loaded the module {0}.'
-MODULE_LOADED_FAILURE: '&e&lModule | &7Couldn''t load the module {0}. Check out the console for more information.'
-MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
-MODULES_LIST: '&fModules ({0}): {1}'
-MODULES_LIST_MODULE_NAME: '&a{0}'
-MODULES_LIST_SEPARATOR: '&f, '
 NAME_ANNOUNCEMENT: '&e&lNâng cấp | &7{0} đã thay đổi tên đảo của anh/cô ấy thành {1}.'
 NAME_BLACKLISTED: '&c&lLỗi | &7Bạn không thể sử dụng tên này.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

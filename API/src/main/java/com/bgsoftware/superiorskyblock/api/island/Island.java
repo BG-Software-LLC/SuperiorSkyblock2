@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -401,16 +400,6 @@ public interface Island extends Comparable<Island> {
      * @param chunk The chunk to check.
      */
     boolean isInsideRange(Chunk chunk);
-
-    /**
-     * Is the normal world enabled for the island?
-     */
-    boolean isNormalEnabled();
-
-    /**
-     * Enable/disable the normal world for the island.
-     */
-    void setNormalEnabled(boolean enabled);
 
     /**
      * Is the nether world enabled for the island?
@@ -874,6 +863,12 @@ public interface Island extends Comparable<Island> {
      */
     BigInteger getExactBlockCountAsBigInteger(Key key);
 
+    void setBlockCount(Key var1, int var2);
+
+    void addBlockCount(Key var1, int var2);
+
+    void removeBlockCount(Key var1, int var2);
+
     /**
      * Clear all the block counts of the island.
      */
@@ -1245,6 +1240,16 @@ public interface Island extends Comparable<Island> {
      *  Warps related methods
      */
 
+    Location getWarpLocation(String name);
+
+    /**
+     * Set the location of a warp.
+     * @param name The warp's name to set the location to.
+     * @param location The location to set.
+     * @param privateFlag Flag to determine if the warp is private or not.
+     */
+    void setWarpLocation(String name, Location location, boolean privateFlag);
+
     /**
      * Create a new warp category.
      * If a category already exists, it will be returned instead of a new created one.
@@ -1335,6 +1340,8 @@ public interface Island extends Comparable<Island> {
      */
     void deleteWarp(String name);
 
+    List<String> getAllWarps();
+
     /**
      * Get all the warps of the island.
      */
@@ -1376,50 +1383,6 @@ public interface Island extends Comparable<Island> {
      * Remove all the ratings of the island.
      */
     void removeRatings();
-
-    /*
-     *  Missions related methods
-     */
-
-    /**
-     * Complete a mission.
-     * @param mission The mission to complete.
-     */
-    void completeMission(Mission<?> mission);
-
-    /**
-     * Reset a mission.
-     * @param mission The mission to reset.
-     */
-    void resetMission(Mission<?> mission);
-
-    /**
-     * Check whether the island has completed the mission before.
-     * @param mission The mission to check.
-     */
-    boolean hasCompletedMission(Mission<?> mission);
-
-    /**
-     * Check whether the island can complete a mission again.
-     * @param mission The mission to check.
-     */
-    boolean canCompleteMissionAgain(Mission<?> mission);
-
-    /**
-     * Get the amount of times mission was completed.
-     * @param mission The mission to check.
-     */
-    int getAmountMissionCompleted(Mission<?> mission);
-
-    /**
-     * Get the list of the completed missions of the player.
-     */
-    List<Mission<?>> getCompletedMissions();
-
-    /**
-     * Get all the completed missions with the amount of times they were completed.
-     */
-    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
 
     /*
      *  Settings related methods

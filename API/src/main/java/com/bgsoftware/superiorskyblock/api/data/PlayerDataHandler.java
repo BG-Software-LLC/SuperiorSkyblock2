@@ -57,9 +57,4 @@ public interface PlayerDataHandler {
      */
     void saveLastTimeStatus();
 
-    /**
-     * Save the completed missions to the database.
-     */
-    void saveMissions();
-
 }

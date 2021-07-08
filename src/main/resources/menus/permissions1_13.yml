@@ -1363,39 +1363,6 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
-  name_entity:
-    display-menu: true
-    permission-enabled:
-      type: NAME_TAG
-      name: '&6Name Entity'
-      lore:
-        - '&7Access to name-tag entities inside the island.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: NAME_TAG
-      name: '&6Name Entity'
-      lore:
-        - '&7Access to name-tag entities inside the island.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: NAME_TAG
-      name: '&6Name Entity'
-      lore:
-        - '&7Access to name-tag entities inside the island.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
   open_island:
     display-menu: true
     permission-enabled:

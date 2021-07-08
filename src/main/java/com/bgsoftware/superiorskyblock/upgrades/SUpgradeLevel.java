@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.upgrades;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -9,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -19,7 +19,8 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.script.ScriptException;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class SUpgradeLevel implements UpgradeLevel {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final static ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     private final int level;
     private final UpgradeCost cost;
@@ -102,12 +103,12 @@ public class SUpgradeLevel implements UpgradeLevel {
     public String checkRequirements(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        for (Pair<String, String> requirement : requirements) {
+        for(Pair<String, String> requirement : requirements){
             String check = PlaceholderHook.parse(superiorPlayer, requirement.getKey());
             try {
-                if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
+                if (!Boolean.parseBoolean(engine.eval(check) + ""))
                     return requirement.getValue();
-            } catch (ScriptException ignored) {}
+            }catch (Exception ignored){}
         }
 
         return "";

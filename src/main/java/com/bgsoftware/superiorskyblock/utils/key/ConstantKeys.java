@@ -21,6 +21,5 @@ public final class ConstantKeys {
     public static final Key AIR = Key.of("AIR");
     public static final Key CAULDRON = Key.of("CAULDRON");
     public static final Key EGG_MOB_SPAWNER = Key.of(Materials.SPAWNER.toBukkitType() + ":EGG");
-    public static final Key MOB_SPAWNER = Key.of(Materials.SPAWNER.toBukkitType().name());
 
 }

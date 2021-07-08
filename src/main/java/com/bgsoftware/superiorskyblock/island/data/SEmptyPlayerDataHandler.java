@@ -65,9 +65,4 @@ public final class SEmptyPlayerDataHandler implements PlayerDataHandler {
 
     }
 
-    @Override
-    public void saveMissions() {
-
-    }
-
 }

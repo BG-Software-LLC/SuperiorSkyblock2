@@ -117,7 +117,6 @@ COMMAND_ARGUMENT_MATERIAL: matériau
 COMMAND_ARGUMENT_MENU: nom-du-menu
 COMMAND_ARGUMENT_MESSAGE: message
 COMMAND_ARGUMENT_MISSION_NAME: nom-de-la-mission
-COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
 COMMAND_ARGUMENT_MULTIPLIER: multiplicateur
 COMMAND_ARGUMENT_NAME: nom
 COMMAND_ARGUMENT_NEW_LEADER: nouveau-chef
@@ -173,7 +172,6 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un jo
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
 COMMAND_DESCRIPTION_ADMIN_KICK: Éjecter un joueur de son île.
-COMMAND_DESCRIPTION_ADMIN_MODULES: 'Manage modules of the plugin.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Changer le statut d'une mission pour un joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG: Envoyer un message sans aucun préfixe au joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Envoyer un message sans aucun préfixe à tous les membres de lîle.
@@ -364,7 +362,6 @@ INVALID_LIMIT: '&c&lErreur | &7Limite invalide: {0}.'
 INVALID_MATERIAL: '&c&lErreur | &7Matériau invalide: {0}.'
 INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
 INVALID_MISSION: '&c&lErreur | &7Mission invalide: {0}.'
-INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
 INVALID_MULTIPLIER: '&c&lErreur | &7Multiplicateur invalide: {0}.'
 INVALID_PAGE: '&c&lErreur | &7Page {0} invalide.'
 INVALID_PERCENTAGE: '&c&lErreur | &7Le poucentage doit être compris entre 0 et 100.'
@@ -524,17 +521,6 @@ MISSION_STATUS_COMPLETE: '&e&lMission | &7Le statut de la mission {0} a été co
 MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Toutes les missions ont été completées pour {0}.'
 MISSION_STATUS_RESET: '&e&lMission | &7Le statut de la mission {0} a été réinitialisé sur {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Réinitialisation du statut de toutes les missions pour {0}.'
-MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
-MODULE_INFO: |
-  &e&lModule | &7{0} by {1}
-  &e&lModule | &7&m--------------------
-  &e&lModule | &7{2}
-MODULE_LOADED_SUCCESS: '&e&lModule | &7Successfully loaded the module {0}.'
-MODULE_LOADED_FAILURE: '&e&lModule | &7Couldn''t load the module {0}. Check out the console for more information.'
-MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
-MODULES_LIST: '&fModules ({0}): {1}'
-MODULES_LIST_MODULE_NAME: '&a{0}'
-MODULES_LIST_SEPARATOR: '&f, '
 NAME_ANNOUNCEMENT: '&e&lIle | &7{0} a changé le nom de son île sur {1}.'
 NAME_BLACKLISTED: '&c&lErreur | &7Vous ne pouvez pas utiliser ce nom.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'

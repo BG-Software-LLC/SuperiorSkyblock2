@@ -53,13 +53,7 @@ public final class ChunksListener implements Listener {
 
         if(plugin.getSettings().optimizeWorlds) {
             if (island == null || !island.isInsideRange(chunk)) {
-                if (ServerVersion.isLessThan(ServerVersion.v1_14)) {
-                    e.setCancelled(true);
-                    alreadyUnloadedChunks.add(hashedChunk);
-                    chunk.unload(false);
-                } else {
-                    SET_SAVE_CHUNK.invoke(e, false);
-                }
+                SET_SAVE_CHUNK.invoke(e, false);
             }
         }
     }
@@ -77,8 +71,6 @@ public final class ChunksListener implements Listener {
         if(island == null)
             return;
 
-        plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), true);
-
         if(!island.isSpawn() && !plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
     }
@@ -94,14 +86,11 @@ public final class ChunksListener implements Listener {
         if(island == null || island.isSpawn())
             return;
 
-        if(e.getWorld().getEnvironment() == plugin.getSettings().defaultWorldEnvironment) {
+        if(e.getWorld().getEnvironment() == World.Environment.NORMAL) {
             island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
         }
 
         plugin.getNMSAdapter().injectChunkSections(e.getChunk());
-
-        if(island.isInsideRange(e.getChunk()))
-            plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), false);
 
         if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
@@ -114,14 +103,6 @@ public final class ChunksListener implements Listener {
         }
 
         plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk())).forEach(StackedBlocksHandler.StackedBlock::updateName);
-    }
-
-    // Should potentially fix crop growth tile entities "disappearing"
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onBlockGrow(BlockGrowEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null && island.isInsideRange(e.getBlock().getLocation()))
-            plugin.getNMSBlocks().startTickingChunk(island, e.getBlock().getChunk(), false);
     }
 
     private static boolean isHologram(ArmorStand armorStand){

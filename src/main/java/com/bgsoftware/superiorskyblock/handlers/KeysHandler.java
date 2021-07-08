@@ -59,6 +59,12 @@ public final class KeysHandler extends AbstractHandler implements KeysManager {
     }
 
     @Override
+    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Material material) {
+        Preconditions.checkNotNull(material, "material parameter cannot be null.");
+        return Key.of(material).markAPIKey();
+    }
+
+    @Override
     public com.bgsoftware.superiorskyblock.api.key.Key getKey(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return Key.of(key).markAPIKey();

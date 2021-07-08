@@ -6,8 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CmdAccept;
 import com.bgsoftware.superiorskyblock.commands.CmdAdmin;
+import com.bgsoftware.superiorskyblock.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.commands.CmdBan;
-import com.bgsoftware.superiorskyblock.commands.CmdBiome;
+import com.bgsoftware.superiorskyblock.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.commands.CmdBorder;
 import com.bgsoftware.superiorskyblock.commands.CmdChest;
 import com.bgsoftware.superiorskyblock.commands.CmdClose;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdCounts;
 import com.bgsoftware.superiorskyblock.commands.CmdCreate;
 import com.bgsoftware.superiorskyblock.commands.CmdDelWarp;
 import com.bgsoftware.superiorskyblock.commands.CmdDemote;
+import com.bgsoftware.superiorskyblock.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.commands.CmdDisband;
 import com.bgsoftware.superiorskyblock.commands.CmdExpel;
 import com.bgsoftware.superiorskyblock.commands.CmdFly;
@@ -32,6 +34,7 @@ import com.bgsoftware.superiorskyblock.commands.CmdPanel;
 import com.bgsoftware.superiorskyblock.commands.CmdPardon;
 import com.bgsoftware.superiorskyblock.commands.CmdPermissions;
 import com.bgsoftware.superiorskyblock.commands.CmdPromote;
+import com.bgsoftware.superiorskyblock.commands.CmdRankup;
 import com.bgsoftware.superiorskyblock.commands.CmdRate;
 import com.bgsoftware.superiorskyblock.commands.CmdRatings;
 import com.bgsoftware.superiorskyblock.commands.CmdRecalc;
@@ -40,7 +43,6 @@ import com.bgsoftware.superiorskyblock.commands.CmdSetPaypal;
 import com.bgsoftware.superiorskyblock.commands.CmdSetRole;
 import com.bgsoftware.superiorskyblock.commands.CmdSetTeleport;
 import com.bgsoftware.superiorskyblock.commands.CmdSetWarp;
-import com.bgsoftware.superiorskyblock.commands.CmdSettings;
 import com.bgsoftware.superiorskyblock.commands.CmdShow;
 import com.bgsoftware.superiorskyblock.commands.CmdTeam;
 import com.bgsoftware.superiorskyblock.commands.CmdTeamChat;
@@ -49,12 +51,14 @@ import com.bgsoftware.superiorskyblock.commands.CmdToggle;
 import com.bgsoftware.superiorskyblock.commands.CmdTop;
 import com.bgsoftware.superiorskyblock.commands.CmdTransfer;
 import com.bgsoftware.superiorskyblock.commands.CmdUncoop;
+import com.bgsoftware.superiorskyblock.commands.CmdUpgrade;
 import com.bgsoftware.superiorskyblock.commands.CmdValue;
 import com.bgsoftware.superiorskyblock.commands.CmdValues;
 import com.bgsoftware.superiorskyblock.commands.CmdVisit;
 import com.bgsoftware.superiorskyblock.commands.CmdVisitors;
 import com.bgsoftware.superiorskyblock.commands.CmdWarp;
 import com.bgsoftware.superiorskyblock.commands.CmdWarps;
+import com.bgsoftware.superiorskyblock.commands.CmdWithdraw;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
@@ -74,10 +78,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
@@ -85,8 +87,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     private final Registry<String, SuperiorCommand> subCommands = Registry.createLinkedRegistry();
     private final Registry<String, SuperiorCommand> aliasesToCommand = Registry.createRegistry();
     private final Registry<UUID, Registry<String, Long>> commandsCooldown = Registry.createRegistry();
-
-    private Set<Runnable> pendingCommands = new HashSet<>();
 
     private CmdAdmin adminCommand = null;
     private String label = null;
@@ -112,8 +112,9 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         registerCommand(new CmdAccept(), false);
         registerCommand((adminCommand = new CmdAdmin(this)), false);
+        registerCommand(new CmdBalance(), false);
         registerCommand(new CmdBan(), false);
-        registerCommand(new CmdBiome(), false);
+        registerCommand(new CmdBank(), false);
         registerCommand(new CmdBorder(), false);
         registerCommand(new CmdChest(), false);
         registerCommand(new CmdClose(), false);
@@ -123,6 +124,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdCreate(), false);
         registerCommand(new CmdDelWarp(), false);
         registerCommand(new CmdDemote(), false);
+        registerCommand(new CmdDeposit(), false);
         registerCommand(new CmdDisband(), false);
         registerCommand(new CmdExpel(), false);
         registerCommand(new CmdFly(), false);
@@ -138,6 +140,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdPardon(), false);
         registerCommand(new CmdPermissions(), false);
         registerCommand(new CmdPromote(), false);
+        registerCommand(new CmdRankup(), false);
         registerCommand(new CmdRate(), false);
         registerCommand(new CmdRatings(), false);
         registerCommand(new CmdRecalc(), false);
@@ -145,7 +148,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdSetPaypal(), false);
         registerCommand(new CmdSetRole(), false);
         registerCommand(new CmdSetTeleport(), false);
-        registerCommand(new CmdSettings(), false);
         registerCommand(new CmdSetWarp(), false);
         registerCommand(new CmdShow(), false);
         registerCommand(new CmdTeam(), false);
@@ -155,20 +157,16 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         registerCommand(new CmdTop(), false);
         registerCommand(new CmdTransfer(), false);
         registerCommand(new CmdUncoop(), false);
+        registerCommand(new CmdUpgrade(), false);
         registerCommand(new CmdValue(), false);
         registerCommand(new CmdValues(), false);
         registerCommand(new CmdVisit(), false);
         registerCommand(new CmdVisitors(), false);
         registerCommand(new CmdWarp(), false);
         registerCommand(new CmdWarps(), false);
+        registerCommand(new CmdWithdraw(), false);
 
         loadCommands();
-
-        if(this.pendingCommands != null) {
-            Set<Runnable> pendingCommands = new HashSet<>(this.pendingCommands);
-            this.pendingCommands = null;
-            pendingCommands.forEach(Runnable::run);
-        }
     }
 
     @Override
@@ -178,32 +176,9 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     }
 
     @Override
-    public void unregisterCommand(SuperiorCommand superiorCommand) {
-        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-
-        List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase();
-        aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));
-
-        subCommands.remove(label);
-        aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
-    }
-
-    @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
-        if(pendingCommands != null){
-            pendingCommands.add(() -> registerAdminCommand(superiorCommand));
-            return;
-        }
-
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
         adminCommand.registerCommand(superiorCommand, true);
-    }
-
-    @Override
-    public void unregisterAdminCommand(SuperiorCommand superiorCommand) {
-        Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
-        adminCommand.unregisterCommand(superiorCommand);
     }
 
     @Override
@@ -226,11 +201,6 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     }
 
     private void registerCommand(SuperiorCommand superiorCommand, boolean sort){
-        if(pendingCommands != null){
-            pendingCommands.add(() -> registerCommand(superiorCommand, sort));
-            return;
-        }
-
         List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
         String label = aliases.get(0).toLowerCase();
         aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(label, new ArrayList<>()));

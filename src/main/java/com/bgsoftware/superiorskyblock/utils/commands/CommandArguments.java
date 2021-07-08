@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -123,34 +122,6 @@ public final class CommandArguments {
         return new Pair<>(island, superiorPlayer);
     }
 
-    public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
-        return getMission(plugin, superiorPlayer.asPlayer(), argument);
-    }
-
-    public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
-        Mission<?> mission = plugin.getMissions().getMission(argument);
-
-        if(mission == null)
-            Locale.INVALID_MISSION.send(sender, argument);
-
-        return mission;
-    }
-
-    public static List<Mission<?>> getMultipleMissions(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument){
-        List<Mission<?>> missions = new ArrayList<>();
-
-        if(argument.equals("*")){
-            missions = plugin.getMissions().getAllMissions();
-        }
-        else {
-            Mission<?> mission = getMission(plugin, sender, argument);
-            if(mission != null)
-                missions.add(mission);
-        }
-
-        return missions;
-    }
-
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument){
         return getUpgrade(plugin, superiorPlayer.asPlayer(), argument);
     }
@@ -212,8 +183,6 @@ public final class CommandArguments {
 
         try{
             multiplier = Double.parseDouble(argument);
-            // Makes sure the multiplier is rounded.
-            multiplier = Math.round(multiplier * 100) / 100D;
         }catch(IllegalArgumentException ex){
             Locale.INVALID_MULTIPLIER.send(sender, argument);
             status = false;
