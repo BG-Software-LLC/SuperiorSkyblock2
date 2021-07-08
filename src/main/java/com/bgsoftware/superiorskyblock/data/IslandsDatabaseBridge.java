@@ -95,18 +95,17 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveVisitorLocation(Island island, World.Environment environment, Location location) {
-        if(location == null){
-            island.getDatabaseBridge().deleteObject("islands_visitor_homes",
-                    createFilter("island", island, new Pair<>("environment", environment.name()))
-            );
-        }
-        else {
-            island.getDatabaseBridge().insertObject("islands_visitor_homes",
-                    new Pair<>("island", island.getUniqueId().toString()),
-                    new Pair<>("environment", environment.name()),
-                    new Pair<>("location", LocationUtils.getLocation(location))
-            );
-        }
+        island.getDatabaseBridge().insertObject("islands_visitor_homes",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("environment", environment.name()),
+                new Pair<>("location", LocationUtils.getLocation(location))
+        );
+    }
+
+    public static void removeVisitorLocation(Island island, World.Environment environment){
+        island.getDatabaseBridge().deleteObject("islands_visitor_homes",
+                createFilter("island", island, new Pair<>("environment", environment.name()))
+        );
     }
 
     public static void saveUnlockedWorlds(Island island) {

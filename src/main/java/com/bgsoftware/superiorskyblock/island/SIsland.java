@@ -697,14 +697,14 @@ public final class SIsland implements Island {
             deleteWarp(IslandUtils.VISITORS_WARP_NAME);
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
             this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = null);
+            IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
         }
         else{
             createWarp(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, null);
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
             this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
+            IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
         }
-
-        IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
     }
 
     @Override
