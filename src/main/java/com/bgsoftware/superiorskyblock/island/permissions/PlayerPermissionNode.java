@@ -76,12 +76,15 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     }
 
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
-        PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+        PrivilegeStatus cachedStatus = privileges.getOrDefault(islandPrivilege, PrivilegeStatus.DEFAULT);
 
-        if(island.hasPermission(playerRole, islandPrivilege))
-            return PrivilegeStatus.ENABLED;
+        if(cachedStatus != PrivilegeStatus.DEFAULT)
+            return cachedStatus;
 
-        return privileges.getOrDefault(islandPrivilege, PrivilegeStatus.DISABLED);
+        PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() :
+                island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+
+        return island.hasPermission(playerRole, islandPrivilege) ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED;
     }
 
     public static class EmptyPlayerPermissionNode extends PlayerPermissionNode{
