@@ -979,7 +979,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
 
         if(value) {
-            rolePermissions.put(islandPrivilege, playerRole);
+            PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
 
             if(islandPrivilege == IslandPrivileges.FLY) {
                 getAllPlayersInside().forEach(this::updateIslandFly);
@@ -988,6 +988,8 @@ public final class SIsland implements Island {
                 getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
             }
 
+            if(oldRole != null)
+                IslandsDatabaseBridge.removeRolePermission(this, oldRole);
             IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
         }
     }

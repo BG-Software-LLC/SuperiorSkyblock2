@@ -140,6 +140,12 @@ public final class IslandsDatabaseBridge {
         );
     }
 
+    public static void removeRolePermission(Island island, PlayerRole playerRole){
+        island.getDatabaseBridge().deleteObject("islands_role_permissions",
+                createFilter("island", island, new Pair<>("role", playerRole.getId()))
+        );
+    }
+
     public static void clearRolePermissions(Island island){
         island.getDatabaseBridge().deleteObject("islands_role_permissions",
                 createFilter("island", island));
