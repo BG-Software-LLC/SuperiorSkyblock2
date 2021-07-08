@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -22,6 +23,7 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.EntityAnimal;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.biome.BiomeBase;
 import net.minecraft.world.level.block.Block;
@@ -78,6 +80,8 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "ah");
+
+    private static final ReflectMethod<Boolean> ANIMAL_BREED_ITEM = new ReflectMethod<>(EntityAnimal.class, "isBreedItem", net.minecraft.world.item.ItemStack.class);
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -354,7 +358,13 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
 
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
-        return ((CraftAnimals) animals).getHandle().n(CraftItemStack.asNMSCopy(itemStack));
+        EntityAnimal entityAnimal = ((CraftAnimals) animals).getHandle();
+        if(ANIMAL_BREED_ITEM.isValid()){
+            return ANIMAL_BREED_ITEM.invoke(entityAnimal, CraftItemStack.asNMSCopy(itemStack));
+        }
+        else {
+            return entityAnimal.n(CraftItemStack.asNMSCopy(itemStack));
+        }
     }
 
     @Override
