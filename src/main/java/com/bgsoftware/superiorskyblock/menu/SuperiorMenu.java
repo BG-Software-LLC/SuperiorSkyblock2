@@ -339,10 +339,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
         MenuData menuData = getData();
         Inventory inventory;
 
-        String title = PlaceholderHook.parse(superiorPlayer, menuData.title);
+        String title = menuData.title;
         if(titleReplacer != null)
             title = titleReplacer.apply(title);
 
+        //placeholder with titleReplacer
+        title = PlaceholderHook.parse(superiorPlayer, title);
+        
         if(menuData.inventoryType != InventoryType.CHEST){
             inventory = Bukkit.createInventory(this, menuData.inventoryType, title);
         }

@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -91,12 +90,7 @@ public final class CmdDelWarp implements IPermissibleCommand {
             breakSign = true;
         }
 
-        if(warpName.equalsIgnoreCase(IslandUtils.VISITORS_WARP_NAME)){
-            island.setVisitorsLocation(null);
-        }
-        else{
-            island.deleteWarp(warpName);
-        }
+        island.deleteWarp(warpName);
 
         Locale.DELETE_WARP.send(superiorPlayer, warpName);
 

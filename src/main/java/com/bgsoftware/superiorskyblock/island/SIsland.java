@@ -694,13 +694,11 @@ public final class SIsland implements Island {
     @Override
     public void setVisitorsLocation(Location visitorsLocation) {
         if(visitorsLocation == null){
-            deleteWarp(IslandUtils.VISITORS_WARP_NAME);
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
             this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = null);
             IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
         }
         else{
-            createWarp(IslandUtils.VISITORS_WARP_NAME, visitorsLocation, null);
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
             this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
             IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
@@ -2224,25 +2222,17 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlocksLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.blockLimits.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream().collect(
+                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomBlocksLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.blockLimits.entrySet().stream()
+        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
@@ -2307,25 +2297,17 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getEntitiesLimitsAsKeys() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.entityLimits.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream().collect(
+                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomEntitiesLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.entityLimits.entrySet().stream()
+        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
@@ -2452,10 +2434,12 @@ public final class SIsland implements Island {
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
-            islandEffects.put(type, new UpgradeValue<>(level, false));
+            UpgradeValue<Integer> oldPotionLevel = islandEffects.put(type, new UpgradeValue<>(level, false));
             Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
                 Player player = superiorPlayer.asPlayer();
                 assert player != null;
+                if(oldPotionLevel != null && oldPotionLevel.get() > level)
+                    player.removePotionEffect(type);
                 player.addPotionEffect(potionEffect, true);
             }));
             IslandsDatabaseBridge.saveIslandEffect(this, type, level);
@@ -3135,8 +3119,7 @@ public final class SIsland implements Island {
 
         return Collections.unmodifiableMap(cobbleGeneratorValues.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
 
     @Override

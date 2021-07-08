@@ -70,7 +70,6 @@ import net.minecraft.server.v1_16_R3.TileEntitySign;
 import net.minecraft.server.v1_16_R3.TileEntityTypes;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -86,6 +85,7 @@ import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R3.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -115,6 +115,8 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
 
     private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "b");
+
+    private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -326,9 +328,6 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
             else{
                 BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
                 name = blockStateToName.get(key);
-                if(name == null){
-                    Bukkit.broadcastMessage("Invalid block state for " + key);
-                }
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
             }
 
@@ -672,6 +671,15 @@ public final class NMSBlocks_v1_16_R3 implements NMSBlocks {
                 newLines = CraftSign.sanitizeLines(lines);
 
             System.arraycopy(newLines, 0, tileEntitySign.lines, 0, 4);
+        }
+    }
+
+    @Override
+    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
+        if(LINES_SIGN_CHANGE_EVENT.isValid()){
+            for(int i = 0; i < lines.length; i++)
+                //noinspection deprecation
+                signChangeEvent.setLine(i, lines[i]);
         }
     }
 

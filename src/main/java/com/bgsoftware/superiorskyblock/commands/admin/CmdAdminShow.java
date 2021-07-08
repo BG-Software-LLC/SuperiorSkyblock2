@@ -239,6 +239,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             // Island generator rates
             if (!Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Locale.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)) {
                 for (World.Environment environment : World.Environment.values()) {
+                    Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> customGeneratorValues =
+                            island.getCustomGeneratorAmounts(environment);
                     StringBuilder generatorString = new StringBuilder();
                     for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
                         Key key = Key.of(entry.getKey());
@@ -247,7 +249,7 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                                 StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
                                 island.getGeneratorAmount(key, environment))
                         );
-                        if (!island.getCustomGeneratorAmounts(environment).containsKey(key))
+                        if (!customGeneratorValues.containsKey(key))
                             generatorString.append(" ").append(Locale.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                         generatorString.append("\n");
                     }

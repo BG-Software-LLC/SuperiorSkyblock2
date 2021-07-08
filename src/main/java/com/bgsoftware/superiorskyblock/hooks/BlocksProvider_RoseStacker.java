@@ -85,10 +85,6 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
         return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
     }
 
-    public static boolean isRegistered(){
-        return registered;
-    }
-
     @SuppressWarnings("unused")
     private static class StackerListener implements Listener {
 

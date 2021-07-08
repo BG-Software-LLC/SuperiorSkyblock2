@@ -14,6 +14,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
 import java.util.List;
@@ -62,6 +63,10 @@ public interface NMSBlocks {
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
     void handleSignPlace(Island island, Location location);
+
+    default void setSignLines(SignChangeEvent signChangeEvent, String[] lines){
+
+    }
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

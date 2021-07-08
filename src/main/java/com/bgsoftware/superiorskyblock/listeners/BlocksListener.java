@@ -4,9 +4,7 @@ import  com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_MergedSpawner;
 import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_RoseStacker;
 import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -97,8 +95,7 @@ public final class BlocksListener implements Listener {
                 island.handleBlockBreak(ConstantKeys.WATER, 1);
 
             Key blockKey = Key.of(e.getBlockPlaced());
-            if(!blockKey.getGlobalKey().contains("SPAWNER") || (!BlocksProvider_MergedSpawner.isRegistered() &&
-                    !BlocksProvider_RoseStacker.isRegistered()))
+            if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerPlacements())
                 island.handleBlockPlace(e.getBlockPlaced());
 
             ChunksTracker.markDirty(island, e.getBlock(), true);
@@ -630,8 +627,13 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSignPlace(SignChangeEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null)
-            onSignPlace(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
+        if(island != null) {
+            String[] lines = e.getLines();
+            onSignPlace(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), island, e.getBlock().getLocation(), lines, true);
+            // In 1.16.5+ of Paper, the SignChangeEvent doesn't have the lines array of the signs.
+            // Therefore, we manually need to set them.
+            plugin.getNMSBlocks().setSignLines(e, lines);
+        }
     }
 
     public boolean onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
@@ -733,7 +735,6 @@ public final class BlocksListener implements Listener {
             String welcomeColor = ChatColor.getLastColors(plugin.getSettings().signWarp.get(0));
             if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
                 island.setVisitorsLocation(null);
-                Locale.DELETE_WARP.send(superiorPlayer, IslandUtils.VISITORS_WARP_NAME);
             }
         }
     }

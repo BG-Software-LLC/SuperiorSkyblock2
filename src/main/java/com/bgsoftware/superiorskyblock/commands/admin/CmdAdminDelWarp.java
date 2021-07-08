@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -80,12 +79,7 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
             breakSign = true;
         }
 
-        if(args[1].equalsIgnoreCase(IslandUtils.VISITORS_WARP_NAME)){
-            island.setVisitorsLocation(null);
-        }
-        else{
-            island.deleteWarp(islandWarp.getName());
-        }
+        island.deleteWarp(islandWarp.getName());
 
         Locale.DELETE_WARP.send(sender, islandWarp.getName());
 
