@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
+import net.kyori.adventure.text.Component;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.core.SectionPosition;
@@ -85,6 +86,7 @@ import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -113,6 +115,8 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
 
     private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(LightEngineThreaded.class, Object.class, "theLightEngine");
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "e");
+
+    private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -674,6 +678,15 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                 newLines = CraftSign.sanitizeLines(lines);
 
             System.arraycopy(newLines, 0, tileEntitySign.d, 0, 4);
+        }
+    }
+
+    @Override
+    public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
+        if(LINES_SIGN_CHANGE_EVENT.isValid()){
+            for(int i = 0; i < lines.length; i++)
+                //noinspection deprecation
+                signChangeEvent.setLine(i, lines[i]);
         }
     }
 

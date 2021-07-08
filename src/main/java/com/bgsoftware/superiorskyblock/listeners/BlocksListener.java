@@ -630,8 +630,13 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onSignPlace(SignChangeEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null)
-            onSignPlace(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), island, e.getBlock().getLocation(), e.getLines(), true);
+        if(island != null) {
+            String[] lines = e.getLines();
+            onSignPlace(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()), island, e.getBlock().getLocation(), lines, true);
+            // In 1.16.5+ of Paper, the SignChangeEvent doesn't have the lines array of the signs.
+            // Therefore, we manually need to set them.
+            plugin.getNMSBlocks().setSignLines(e, lines);
+        }
     }
 
     public boolean onSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation, String[] lines, boolean message){
