@@ -82,6 +82,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
 
+    private boolean listenToSpawnerPlacements = true;
+
     public ProvidersHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
@@ -118,6 +120,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
                         (auto || spawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_MergedSpawner()));
+                    listenToSpawnerPlacements = false;
                 } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
                         (auto || spawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_AdvancedSpawners()));
@@ -145,9 +148,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
                         (auto || spawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_UltimateStacker()));
+                    listenToSpawnerPlacements = false;
                 } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
                         (auto || spawnersProvider.equalsIgnoreCase("RoseStacker"))) {
                     runSafe(() -> setSpawnersProvider(new BlocksProvider_RoseStacker()));
+                    listenToSpawnerPlacements = false;
                 }
             }
 
@@ -397,6 +402,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public boolean isAFK(Player player){
         return AFKProvidersList.stream().anyMatch(afkProvider -> afkProvider.isAFK(player));
+    }
+
+    public boolean shouldListenToSpawnerPlacements(){
+        return listenToSpawnerPlacements;
     }
 
     private static boolean hasPaperAsyncSupport(){

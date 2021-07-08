@@ -47,10 +47,6 @@ public final class BlocksProvider_MergedSpawner implements BlocksProvider {
         return MergedSpawnerAPI.getInstance().getEntityType(itemStack).name();
     }
 
-    public static boolean isRegistered(){
-        return registered;
-    }
-
     @SuppressWarnings("unused")
     private static class StackerListener implements Listener {
 

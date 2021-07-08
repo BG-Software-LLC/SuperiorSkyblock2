@@ -64,7 +64,7 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
 
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public void onSpawnerStack(SpawnerPlaceEvent e){
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
@@ -80,7 +80,7 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
             }
 
             else{
-                island.handleBlockPlace(blockKey, increaseAmount - 1);
+                island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
