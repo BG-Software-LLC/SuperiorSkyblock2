@@ -7,7 +7,9 @@ import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock.api.key.Key, V> implements Map<com.bgsoftware.superiorskyblock.api.key.Key, V> {
@@ -124,6 +126,12 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
 
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, V> asKeyMap(){
         return innerMap.entrySet().stream().collect(Collectors.toMap(entry -> Key.of(entry.getKey()), Entry::getValue));
+    }
+
+    public static <T, U> Collector<T, ?, KeyMap<U>> getCollector(Function<? super T, ? extends com.bgsoftware.superiorskyblock.api.key.Key> keyMapper,
+                                                                      Function<? super T, ? extends U> valueMapper){
+        return Collectors.toMap(keyMapper, valueMapper,
+                (u, u2) -> { throw new IllegalStateException(String.format("Duplicate key %s", u)); }, KeyMap::new);
     }
 
 }

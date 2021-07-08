@@ -2267,25 +2267,17 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlocksLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.blockLimits.entrySet().stream().collect(
-                Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream().collect(
+                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomBlocksLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.blockLimits.entrySet().stream()
+        return Collections.unmodifiableMap(this.blockLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
@@ -2350,25 +2342,17 @@ public final class SIsland implements Island {
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getEntitiesLimitsAsKeys() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.entityLimits.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream().collect(
+                KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
     public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomEntitiesLimits() {
-        KeyMap<Integer> keyMap = new KeyMap<>();
-
-        keyMap.putAll(this.entityLimits.entrySet().stream()
+        return Collections.unmodifiableMap(this.entityLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
-
-        return keyMap;
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
+        ));
     }
 
     @Override
@@ -3180,8 +3164,7 @@ public final class SIsland implements Island {
 
         return Collections.unmodifiableMap(cobbleGeneratorValues.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()))
-        );
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
 
     @Override
