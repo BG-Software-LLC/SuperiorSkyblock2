@@ -673,18 +673,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
-        int finishCount = completedMissions.getOrDefault(mission, 0);
+        int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
 
         if(finishCount > 0) {
-            completedMissions.put(mission, --finishCount);
+            completedMissions.put(mission, finishCount);
+            PlayersDatabaseBridge.saveMission(this, mission, finishCount);
         }
         else {
             completedMissions.remove(mission);
+            PlayersDatabaseBridge.removeMission(this, mission);
         }
 
         mission.clearData(this);
-
-        PlayersDatabaseBridge.saveMission(this, mission, finishCount);
     }
 
     @Override

@@ -2843,9 +2843,9 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
-        int finishCount = completedMissions.getOrDefault(mission, 0);
+        int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
         if(finishCount > 0) {
-            completedMissions.put(mission, --finishCount);
+            completedMissions.put(mission, finishCount);
             IslandsDatabaseBridge.saveMission(this, mission, finishCount);
         }
 

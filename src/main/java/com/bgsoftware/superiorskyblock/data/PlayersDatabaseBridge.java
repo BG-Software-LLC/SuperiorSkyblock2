@@ -79,6 +79,12 @@ public final class PlayersDatabaseBridge {
                 new Pair<>("finish_count", finishCount));
     }
 
+    public static void removeMission(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        superiorPlayer.getDatabaseBridge().deleteObject("players_missions",
+                createFilter("player", superiorPlayer, new Pair<>("name", mission.getName().toLowerCase()))
+        );
+    }
+
     public static void insertPlayer(SuperiorPlayer superiorPlayer){
         Locale userLocale = superiorPlayer.getUserLocale();
 
