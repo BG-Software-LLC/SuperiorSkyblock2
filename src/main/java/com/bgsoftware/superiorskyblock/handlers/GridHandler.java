@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -503,36 +504,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         if (amount > 1) {
             StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
             Executor.sync(stackedBlock::updateName, 5L);
-
-            // TODO
-//            if (originalBlock == null) {
-//                Query.STACKED_BLOCKS_INSERT.getStatementHolder(null)
-//                        .setString(block.getWorld().getName())
-//                        .setInt(block.getX())
-//                        .setInt(block.getY())
-//                        .setInt(block.getZ())
-//                        .setInt(amount)
-//                        .setString(Key.of(block).toString())
-//                        .execute(true);
-//            } else {
-//                Query.STACKED_BLOCKS_UPDATE.getStatementHolder(null)
-//                        .setInt(amount)
-//                        .setString(block.getWorld().getName())
-//                        .setInt(block.getX())
-//                        .setInt(block.getY())
-//                        .setInt(block.getZ())
-//                        .execute(true);
-//            }
+            GridDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
-            stackedBlocks.removeStackedBlock(SBlockPosition.of(block.getLocation()));
-
-            // TODO
-//            Query.STACKED_BLOCKS_DELETE.getStatementHolder(null)
-//                    .setString(block.getWorld().getName())
-//                    .setInt(block.getX())
-//                    .setInt(block.getY())
-//                    .setInt(block.getZ())
-//                    .execute(true);
+            StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.removeStackedBlock(SBlockPosition.of(block.getLocation()));
+            if(stackedBlock != null)
+                GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
         }
     }
 
@@ -560,9 +536,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             stackedBlocks.values().forEach(stackedBlock -> {
                 stackedBlock.removeHologram();
                 SBlockPosition blockPosition = stackedBlock.getBlockPosition();
-                // TODO
-//                stackedBlocksHolder.setString(blockPosition.getWorldName()).setInt(blockPosition.getX())
-//                        .setInt(blockPosition.getY()).setInt(blockPosition.getZ()).addBatch();
+                GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
             });
         }
 
@@ -734,30 +708,18 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        // TODO
-//        List<Island> modifiedIslands = getIslands().stream()
-//                .filter(island -> ((DatabaseObject) island.getDataHandler()).isModified())
-//                .collect(Collectors.toList());
-//
-//        if(!onlineIslands.isEmpty()) {
-//            long lastTimeStatus = System.currentTimeMillis() / 1000;
-//            StatementHolder islandStatusHolder = Query.ISLAND_SET_LAST_TIME_UPDATE.getStatementHolder(null);
-//            islandStatusHolder.prepareBatch();
-//            onlineIslands.forEach(island -> islandStatusHolder.setLong(lastTimeStatus).setString(island.getOwner().getUniqueId() + "").addBatch());
-//            islandStatusHolder.execute(false);
-//        }
-//
-//        if(!modifiedIslands.isEmpty()){
-//            StatementHolder islandUpdateHolder = Query.ISLAND_UPDATE.getStatementHolder(null);
-//            islandUpdateHolder.prepareBatch();
-//            modifiedIslands.forEach(island -> ((SIslandDataHandler) island.getDataHandler())
-//                    .setUpdateStatement(islandUpdateHolder).addBatch());
-//            islandUpdateHolder.execute(false);
-//        }
+        List<Island> modifiedIslands = getIslands().stream()
+                .filter(IslandsDatabaseBridge::isModified)
+                .collect(Collectors.toList());
+
+        if(!onlineIslands.isEmpty())
+            onlineIslands.forEach(Island::updateLastTime);
+
+        if(!modifiedIslands.isEmpty())
+            modifiedIslands.forEach(IslandsDatabaseBridge::executeFutureSaves);
 
         getIslands().forEach(Island::removeEffects);
     }
-
 
     public void saveStackedBlocks() {
         Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks = new HashMap<>();

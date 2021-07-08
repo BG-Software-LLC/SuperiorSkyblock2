@@ -59,15 +59,19 @@ public final class StackedBlocksHandler {
         return stackedBlocks.remove(chunkPosition);
     }
 
-    public void removeStackedBlock(SBlockPosition blockPosition){
+    public StackedBlock removeStackedBlock(SBlockPosition blockPosition){
         Map<SBlockPosition, StackedBlock> chunkStackedBlocks = stackedBlocks.get(ChunkPosition.of(blockPosition));
+
         if(chunkStackedBlocks != null) {
             StackedBlock stackedBlock = chunkStackedBlocks.remove(blockPosition);
             if(stackedBlock != null) {
                 stackedBlock.markAsRemoved();
                 stackedBlock.removeHologram();
             }
+            return stackedBlock;
         }
+
+        return null;
     }
 
     public final class StackedBlock{
