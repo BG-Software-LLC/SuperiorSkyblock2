@@ -142,11 +142,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             return;
         }
 
-        // Loads offset values from the config.
-        World.Environment environment = plugin.getSettings().defaultWorldEnvironment;
-        boolean schematicOffset = offset || environment == World.Environment.NORMAL ? plugin.getSettings().normalSchematicOffset :
-                environment == World.Environment.NETHER ? plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
-
         SuperiorSkyblockPlugin.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
 
         // Removing any active previews for the player.
@@ -185,8 +180,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
-                island.setBonusWorth(schematicOffset ? island.getRawWorth().negate() : bonusWorth);
-                island.setBonusLevel(schematicOffset ? island.getRawLevel().negate() : bonusLevel);
+                island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
+                island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                 island.setBiome(biome);
                 island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
 
