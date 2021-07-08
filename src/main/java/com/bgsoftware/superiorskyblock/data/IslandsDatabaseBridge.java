@@ -459,8 +459,9 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveVisitor(Island island, SuperiorPlayer visitor, long visitTime) {
-        island.getDatabaseBridge().updateObject("islands_visitors",
-                createFilter("island", island, new Pair<>("player", visitor.getUniqueId().toString())),
+        island.getDatabaseBridge().insertObject("islands_visitors",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("player", visitor.getUniqueId().toString()),
                 new Pair<>("visit_time", visitTime)
         );
     }
