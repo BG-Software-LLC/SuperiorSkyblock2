@@ -2060,8 +2060,7 @@ public final class SIsland implements Island {
         }
 
         else{
-            // TODO
-            //((SIslandDataHandler) islandDataHandler).setModified(Query.ISLAND_SET_BLOCK_COUNTS);
+            IslandsDatabaseBridge.markBlockCountsToBeSaved(this);
         }
 
     }
@@ -3218,8 +3217,7 @@ public final class SIsland implements Island {
 
         islandChests[index].setRows(rows);
 
-        // TODO
-        //((SIslandDataHandler) islandDataHandler).setModified(Query.ISLAND_SET_ISLAND_CHEST);
+        IslandsDatabaseBridge.markIslandChestsToBeSaved(this, islandChests[index]);
     }
 
     /*
