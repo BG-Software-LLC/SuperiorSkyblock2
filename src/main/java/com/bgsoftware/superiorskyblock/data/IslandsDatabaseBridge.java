@@ -461,7 +461,7 @@ public final class IslandsDatabaseBridge {
     public static void saveLastInterestTime(Island island) {
         island.getDatabaseBridge().updateObject("islands_banks",
                 createFilter("island", island),
-                new Pair<>("last_interest_time", island.getLastInterestTime()));
+                new Pair<>("last_interest_time", island.getLastInterestTime() * 1000));
     }
 
     public static void saveVisitor(Island island, SuperiorPlayer visitor, long visitTime) {

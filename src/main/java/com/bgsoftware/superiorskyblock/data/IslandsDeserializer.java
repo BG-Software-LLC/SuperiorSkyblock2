@@ -269,7 +269,7 @@ public final class IslandsDeserializer {
             BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
             long lastInterestTime = (long) islandBankRow.get("last_interest_time");
             island.getIslandBank().setBalance(balance);
-            island.setLastInterestTime(lastInterestTime);
+            island.setLastInterestTime(lastInterestTime / 1000);
         });
     }
 
