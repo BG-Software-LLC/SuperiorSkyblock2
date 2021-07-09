@@ -1,0 +1,74 @@
+name: Bug Report
+description: Report a Bug or an Issue in the plugin.
+labels: ['Bug Report', 'Pending']
+assignees: OmerBenGera
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## SuperiorSkyblock2 Issues Tracker
+      You may be able to find the answer on our [Wiki](https://wiki.bg-software.com/#/superiorskyblock/), or get a quick answer to basic questions on our [Discord](https://bg-software.com/discord/).
+      Be sure to check for existing [Issues](https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues).
+      <br />
+
+- id: minecraft
+  type: textarea
+  validations:
+    required: true
+  attributes:
+    label: 'Minecraft''s Version'
+    description: |
+      The minecraft version your server run on. Use /version to find which version you use.
+      It''s recommended to also mention which jar you use (Spigot, Paper, etc)
+    placeholder: |
+      [Insert minecraft version and server jar.]
+
+- id: plugin
+  type: textarea
+  validations:
+    required: true
+  attributes:
+    label: 'Plugin''s Version'
+    description: |
+      The version of the plugin. If you use a dev build, mention which dev build you use.
+    placeholder: |
+      [Insert plugin version and if it is a dev build.]
+
+- id: description
+  type: textarea
+  validations:
+    required: true
+  attributes:
+    label: 'Describe the bug'
+    description: |
+      A clear and concise description of what the bug is.
+    placeholder: |
+      [Insert what exactly the problem is.]
+
+- id: reproduction
+  type: textarea
+  validations:
+    required: true
+  attributes:
+    label: 'To Reproduce'
+    description: |
+      Steps to reproduce the bug.
+    placeholder: |
+      [Insert what exactly happened and the steps to reproduce the issue.]
+
+- id: extra
+  type: textarea
+  attributes:
+    label: 'Additional Information'
+    description: |
+      Additional information that can help understanding the issue.
+      Config file, clips, etc are more than welcome.
+    placeholder: |
+      Drag and drop an image or video onto this field to upload it. Otherwise please use pastebin for configs.
+
+- type: markdown
+  attributes:
+    value: |
+      ## Thank you for helping improve SuperiorSkyblock2!
+      Please remember to check back for any questions being asked and reply back as soon as you can!
