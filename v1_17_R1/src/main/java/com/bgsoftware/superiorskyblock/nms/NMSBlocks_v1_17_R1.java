@@ -491,7 +491,10 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                 chunkEntities = chunk.entities.iterator();
             } catch(Throwable ex) {
                 List<Entity> worldEntities = new ArrayList<>();
-                world.getEntities().a(chunkBounds, worldEntities::add);
+                world.getEntities().a().forEach(entity -> {
+                    if(entity.getBoundingBox().c(chunkBounds))
+                        worldEntities.add(entity);
+                });
                 chunkEntities = worldEntities.iterator();
             }
 
