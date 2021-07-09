@@ -20,9 +20,11 @@ import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -36,9 +38,11 @@ import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.PlayerChunkMap;
+import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkCoordIntPair;
@@ -46,10 +50,12 @@ import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.biome.BiomeBase;
+import net.minecraft.world.level.biome.WorldChunkManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BlockBed;
 import net.minecraft.world.level.block.BlockStepAbstract;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ITileEntity;
 import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntitySign;
@@ -80,12 +86,14 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.generator.CraftChunkData;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -97,6 +105,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
@@ -116,6 +125,8 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(LightEngineThreaded.class, ThreadedMailbox.class, "e");
 
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
+    private static final ReflectField<ChunkSection[]> CHUNK_DATA_SECTIONS = new ReflectField<>(CraftChunkData.class, ChunkSection[].class, "sections");
+    private static final ReflectField<Set<BlockPosition>> CHUNK_DATA_TILES = new ReflectField<>(CraftChunkData.class, Set.class, "tiles");
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
@@ -378,6 +389,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoords = chunk.getPos();
+        //noinspection deprecation
         sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(), chunkCoords.b, chunkCoords.c, new PacketPlayOutMapChunk(chunk));
     }
 
@@ -461,6 +473,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                         NBTTagCompound sectionCompound = sectionsList.getCompound(i);
                         byte yPosition = sectionCompound.getByte("Y");
                         if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
+                            //noinspection deprecation
                             chunkSections[i] = new ChunkSection(yPosition << 4);
                             chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
                         }
@@ -506,10 +519,10 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             chunk.l.clear();
 
             if(world.generator != null && !(world.generator instanceof WorldGenerator)){
-                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world,
-                        world.getChunkProvider().d, world.generator);
+                IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(world);
+                //noinspection deprecation
                 ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
-                customChunkGenerator.buildBase(null, protoChunk);
+                chunkGenerator.buildBase(null, protoChunk);
 
                 for(int i = 0; i < 16; i++)
                     chunk.getSections()[i] = protoChunk.getSections()[i];
@@ -528,6 +541,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             levelCompound.set("Entities", new NBTTagList());
 
             if(!(world.generator instanceof WorldGenerator)) {
+                //noinspection deprecation
                 ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
 
                 try {
@@ -580,6 +594,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             chunk.markDirty();
 
             PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.b, chunkCoords.c);
+            //noinspection deprecation
             PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk);
 
             playersToUpdate.forEach(player -> {
@@ -623,6 +638,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
                     if(chunkCompound == null){
+                        //noinspection deprecation
                         ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
                         chunkCompound = ChunkRegionLoader.saveChunk(world, protoChunk);
                     }
@@ -840,14 +856,129 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public BlockPosition c() {
             return cropsTickingTileEntity.getPosition();
         }
 
         @Override
+        @SuppressWarnings("NullableProblems")
         public String d() {
             return TileEntityTypes.a(cropsTickingTileEntity.getTileType()) + "";
         }
+    }
+
+    private static class IslandsChunkGenerator extends CustomChunkGenerator {
+
+        private final Random random = new Random();
+        private final WorldServer worldServer;
+
+        IslandsChunkGenerator(WorldServer worldServer){
+            super(worldServer, worldServer.getChunkProvider().d, worldServer.generator);
+            this.worldServer = worldServer;
+        }
+
+        @Override
+        public void buildBase(RegionLimitedWorldAccess region, IChunkAccess chunk) {
+            int chunkX = chunk.getPos().b;
+            int chunkZ = chunk.getPos().c;
+
+            this.random.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
+
+            Registry<BiomeBase> biomeBaseRegistry = worldServer.t().d(IRegistry.aO);
+            WorldChunkManager worldChunkManager = getWorldChunkManager();
+            IslandsBiomesStorage biomeStorage = new IslandsBiomesStorage(biomeBaseRegistry, worldServer);
+            IslandsBiomeGrid biomeGrid = new IslandsBiomeGrid(worldServer, biomeStorage);
+
+            ChunkGenerator.ChunkData data;
+            if (worldServer.generator.isParallelCapable()) {
+                data = worldServer.generator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
+            } else {
+                synchronized(this) {
+                    data = worldServer.generator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
+                }
+            }
+
+            Preconditions.checkArgument(data instanceof CraftChunkData, "Plugins must use createChunkData(World) rather than implementing ChunkData: %s", data);
+
+            ChunkSection[] chunkDataSections = CHUNK_DATA_SECTIONS.get(data);
+            ChunkSection[] chunkSections = chunk.getSections();
+            int chunkSectionsLength = Math.min(chunkSections.length, chunkDataSections.length);
+
+            for(int i = 0; i < chunkSectionsLength; i++) {
+                if(chunkDataSections[i] != null)
+                    chunkSections[i] = chunkDataSections[i];
+            }
+
+            ((ProtoChunk) chunk).a(biomeGrid.biome);
+
+            Set<BlockPosition> tiles = CHUNK_DATA_TILES.get(data);
+            if (tiles != null) {
+                for(BlockPosition tilePosition : tiles){
+                    int tileX = tilePosition.getX(), tileY = tilePosition.getY(), tileZ = tilePosition.getZ();
+                    IBlockData tileBlock = ((CraftChunkData) data).getTypeId(tileX, tileY, tileZ);
+                    if(tileBlock.isTileEntity()){
+                        BlockPosition worldTilePosition = new BlockPosition((chunkX << 4) + tileX, tileY, (chunkZ << 4) + tileZ);
+                        TileEntity tile = ((ITileEntity) tileBlock.getBlock()).createTile(worldTilePosition, tileBlock);
+                        chunk.setTileEntity(tile);
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("NullableProblems")
+    private static class IslandsBiomeGrid implements ChunkGenerator.BiomeGrid {
+
+        private final BiomeStorage biome;
+        private final WorldServer worldServer;
+
+        public IslandsBiomeGrid(WorldServer worldServer, BiomeStorage biome) {
+            this.worldServer = worldServer;
+            this.biome = biome;
+        }
+
+        @Override
+        public Biome getBiome(int x, int z) {
+            return this.getBiome(x, 0, z);
+        }
+
+        @Override
+        public void setBiome(int x, int z, Biome biome) {
+            //noinspection unchecked
+            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry)this.biome.e, biome);
+            for(int y = worldServer.getMinBuildHeight(); y < worldServer.getMaxBuildHeight(); y += 4) {
+                this.biome.setBiome(x >> 2, y >> 2, z >> 2, biomeBase);
+            }
+        }
+
+        @Override
+        public Biome getBiome(int x, int y, int z) {
+            //noinspection unchecked
+            return CraftBlock.biomeBaseToBiome((IRegistry) this.biome.e, this.biome.getBiome(x >> 2, y >> 2, z >> 2));
+        }
+
+        @Override
+        public void setBiome(int x, int y, int z, Biome biome) {
+            Preconditions.checkArgument(biome != Biome.CUSTOM, "Cannot set the biome to %s", biome);
+            //noinspection unchecked
+            this.biome.setBiome(x >> 2, y >> 2, z >> 2, CraftBlock.biomeToBiomeBase((IRegistry)this.biome.e, biome));
+        }
+
+    }
+
+    private static class IslandsBiomesStorage extends BiomeStorage {
+
+        private static final int c = MathHelper.e(16) - 2;
+
+        IslandsBiomesStorage(Registry<BiomeBase> registry, WorldServer worldServer){
+            super(registry, worldServer, new BiomeBase[(1 << c + c) * a(worldServer.getHeight(), 4)]);
+        }
+
+        private static int a(int i, int j) {
+            return (i + j - 1) / j;
+        }
+
     }
 
 }
