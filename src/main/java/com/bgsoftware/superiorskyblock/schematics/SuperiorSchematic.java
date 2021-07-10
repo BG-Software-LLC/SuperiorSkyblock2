@@ -207,7 +207,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     @Override
-    public Location getTeleportLocation(Location location) {
+    public Location adjustRotation(Location location) {
         location.setYaw(yaw);
         location.setPitch(pitch);
         return location;

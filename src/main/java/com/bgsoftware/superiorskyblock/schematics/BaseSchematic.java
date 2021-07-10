@@ -25,8 +25,4 @@ public abstract class BaseSchematic implements Schematic {
 
     public abstract Set<ChunkPosition> getLoadedChunks();
 
-    public Location getTeleportLocation(Location location){
-        return location;
-    }
-
 }
