@@ -13,8 +13,6 @@ import skinsrestorer.shared.storage.SkinStorage;
 
 public final class SkinsRestorerHook {
 
-    private static final ReflectMethod<Object> SKINS_RESTORER_GET_SKIN = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", String.class);
-
     private static SuperiorSkyblockPlugin plugin;
     private static ISkinsRestorer skinsRestorer = null;
 
@@ -64,6 +62,8 @@ public final class SkinsRestorerHook {
     }
 
     private static final class SkinsRestorerNew implements ISkinsRestorer {
+
+        private static final ReflectMethod<Object> SKINS_RESTORER_GET_SKIN = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", String.class);
 
         @Override
         public Property getSkin(SuperiorPlayer superiorPlayer) {
