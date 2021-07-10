@@ -1,11 +1,14 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.base.Preconditions;
@@ -14,6 +17,7 @@ import dev.rosewood.rosestacker.event.BlockStackEvent;
 import dev.rosewood.rosestacker.event.BlockUnstackEvent;
 import dev.rosewood.rosestacker.event.SpawnerStackEvent;
 import dev.rosewood.rosestacker.event.SpawnerUnstackEvent;
+import dev.rosewood.rosestacker.stack.StackedBlock;
 import dev.rosewood.rosestacker.stack.StackedSpawner;
 import dev.rosewood.rosestacker.utils.ItemUtils;
 import dev.rosewood.rosestacker.utils.StackerUtils;
@@ -23,6 +27,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -130,17 +135,40 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
             }
         }
 
-        @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockStackProtection(BlockStackEvent e){
             if(!ProtectionListener.IMP.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockUnstackProtection(BlockUnstackEvent e){
             if(e.getPlayer() != null && !ProtectionListener.IMP.handleBlockBreak(
                     e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onBlockStackInteractionProtection(PlayerInteractEvent e){
+            if(e.getClickedBlock() == null || !e.getPlayer().isSneaking())
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+            if(island == null)
+                return;
+
+            StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getClickedBlock());
+
+            if(stackedBlock == null)
+                return;
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+
+            if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
+                Locale.sendProtectionMessage(superiorPlayer);
+                e.setCancelled(true);
+            }
         }
 
     }
