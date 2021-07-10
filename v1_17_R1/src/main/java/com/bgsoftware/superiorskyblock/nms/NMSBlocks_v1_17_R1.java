@@ -35,7 +35,6 @@ import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
 import net.minecraft.server.level.ChunkProviderServer;
-import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.RegionLimitedWorldAccess;
@@ -748,13 +747,9 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     }
 
     private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
-        for(EntityPlayer entityPlayer : worldServer.getPlayers()){
-            int chunksRange = entityPlayer.clientViewDistance;
-            int playerChunkX = (int) Math.floor(entityPlayer.locX()) >> 4;
-            int playerChunkZ = (int) Math.floor(entityPlayer.locZ()) >> 4;
-            if(Math.abs(playerChunkX - chunkX) <= chunksRange || Math.abs(playerChunkZ - chunkZ) <= chunksRange)
-                entityPlayer.b.sendPacket(packet);
-        }
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
     }
 
     private static final class CropsTickingTileEntity extends TileEntity {
