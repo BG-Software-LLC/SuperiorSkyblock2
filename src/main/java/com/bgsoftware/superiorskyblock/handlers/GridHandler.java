@@ -183,7 +183,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
                 island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                 island.setBiome(biome);
-                island.setTeleportLocation(((BaseSchematic) schematic).getTeleportLocation(islandLocation));
+                island.setTeleportLocation(schematic.adjustRotation(islandLocation));
 
                 superiorPlayer.runIfOnline(player -> {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
