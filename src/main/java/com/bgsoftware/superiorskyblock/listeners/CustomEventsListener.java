@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import org.bukkit.Bukkit;
@@ -158,7 +159,7 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSignBreak(BlockBreakEvent e){
         if(e.getBlock().getState() instanceof Sign){
-            BlocksListener.IMP.onSignBreak(e.getPlayer(), (Sign) e.getBlock().getState());
+            BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) e.getBlock().getState());
         }else{
             for(BlockFace blockFace : BlockFace.values()){
                 Block faceBlock = e.getBlock().getRelative(blockFace);
@@ -179,7 +180,7 @@ public final class CustomEventsListener implements Listener {
                     }
 
                     if(isSign)
-                        BlocksListener.IMP.onSignBreak(e.getPlayer(), (Sign) faceBlock.getState());
+                        BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) faceBlock.getState());
                 }
             }
         }

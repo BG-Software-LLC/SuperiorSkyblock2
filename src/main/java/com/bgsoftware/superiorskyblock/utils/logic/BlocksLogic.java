@@ -1,0 +1,188 @@
+package com.bgsoftware.superiorskyblock.utils.logic;
+
+import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
+
+import java.util.EnumMap;
+import java.util.List;
+
+public final class BlocksLogic {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final BlockFace[] NEARBY_BLOCKS = new BlockFace[] {
+            BlockFace.UP, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH, BlockFace.EAST
+    };
+
+    private BlocksLogic(){
+    }
+
+    public static void handleBreak(Block block){
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
+
+        if(island == null)
+            return;
+
+        island.handleBlockBreak(block, plugin.getNMSBlocks().getDefaultAmount(block));
+
+        EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
+
+        for(BlockFace nearbyFace : NEARBY_BLOCKS){
+            Key nearbyBlockKey = Key.of(block.getRelative(nearbyFace));
+            if(!nearbyBlockKey.getGlobalKey().equals("AIR"))
+                nearbyBlocks.put(nearbyFace, nearbyBlockKey);
+        }
+
+        Executor.sync(() -> {
+            if(plugin.getNMSAdapter().isChunkEmpty(block.getChunk()))
+                ChunksTracker.markEmpty(island, block, true);
+
+            for(BlockFace nearbyFace : NEARBY_BLOCKS){
+                Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
+                Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
+                if(oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
+                    island.handleBlockBreak(oldNearbyBlock, 1);
+                }
+            }
+        }, 2L);
+    }
+
+    public static boolean isWarpSign(String firstSignLine){
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().signWarpLine);
+    }
+
+    public static boolean isVisitorsSign(String firstSignLine){
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().visitorsSignLine);
+    }
+
+    public static boolean handleSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
+                                          String[] warpLines, boolean sendMessage){
+        Location playerLocation = superiorPlayer.getLocation();
+        if(playerLocation != null)
+            warpLocation.setYaw(playerLocation.getYaw());
+
+        if(isWarpSign(warpLines[0])){
+            return handleWarpSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
+        }
+
+        else if(isVisitorsSign(warpLines[0])){
+            return handleVisitorsSignPlace(superiorPlayer, island, warpLocation, warpLines, sendMessage);
+        }
+
+        return false;
+    }
+
+    public static boolean handleWarpSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
+                                              String[] signLines, boolean sendMessage){
+        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
+            if(sendMessage)
+                Locale.NO_MORE_WARPS.send(superiorPlayer);
+            for (int i = 0; i < 4; i++)
+                signLines[i] = "";
+            return true;
+        }
+
+        String warpName = IslandUtils.getWarpName(StringUtils.stripColors(signLines[1].trim()));
+        boolean privateFlag = signLines[2].equalsIgnoreCase("private");
+
+        if(warpName.isEmpty() || island.getWarp(warpName) != null){
+            if(sendMessage) {
+                if(warpName.isEmpty())
+                    Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+                else
+                    Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+            }
+
+            for (int i = 0; i < 4; i++) {
+                signLines[i] = "";
+            }
+        }
+        else {
+            List<String> signWarp = plugin.getSettings().signWarp;
+
+            for (int i = 0; i < signWarp.size(); i++)
+                signLines[i] = signWarp.get(i).replace("{0}", warpName);
+
+            IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
+            islandWarp.setPrivateFlag(privateFlag);
+            if(sendMessage)
+                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+        }
+
+        return true;
+    }
+
+    public static boolean handleVisitorsSignPlace(SuperiorPlayer superiorPlayer, Island island, Location visitorsLocation,
+                                                  String[] warpLines, boolean sendMessage){
+        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
+            if(sendMessage)
+                Locale.NO_MORE_WARPS.send(superiorPlayer);
+            for (int i = 0; i < 4; i++)
+                warpLines[i] = "";
+            return true;
+        }
+
+        StringBuilder descriptionBuilder = new StringBuilder();
+
+        for(int i = 1; i < 4; i++){
+            String line = warpLines[i];
+            if(!line.isEmpty())
+                descriptionBuilder.append("\n").append(ChatColor.RESET).append(line);
+        }
+
+        String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
+
+        warpLines[0] = plugin.getSettings().visitorsSignActive;
+
+        for (int i = 1; i <= 3; i++)
+            warpLines[i] = StringUtils.translateColors(warpLines[i]);
+
+        Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
+        if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
+            Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
+            oldWelcomeSign.setLine(0, plugin.getSettings().visitorsSignInactive);
+            oldWelcomeSign.update();
+        }
+
+        island.setVisitorsLocation(visitorsLocation);
+        island.setDescription(description);
+
+        if(sendMessage)
+            Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(visitorsLocation));
+
+        return true;
+    }
+
+    public static void handleSignBreak(Player player, Sign sign){
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        Island island = plugin.getGrid().getIslandAt(sign.getLocation());
+
+        if(island == null)
+            return;
+
+        if(island.getWarp(sign.getLocation()) != null){
+            island.deleteWarp(superiorPlayer, sign.getLocation());
+        }
+        else{
+            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
+                island.setVisitorsLocation(null);
+            }
+        }
+    }
+
+}

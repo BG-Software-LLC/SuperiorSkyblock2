@@ -4,12 +4,12 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -405,7 +405,7 @@ public final class NMSBlocks_v1_11_R1 implements NMSBlocks {
 
             IChatBaseComponent[] newLines;
 
-            if (BlocksListener.IMP.onSignPlace(island.getOwner(), island, location, strippedLines, false))
+            if (BlocksLogic.handleSignPlace(island.getOwner(), island, location, strippedLines, false))
                 newLines = CraftSign.sanitizeLines(strippedLines);
             else
                 newLines = CraftSign.sanitizeLines(lines);
