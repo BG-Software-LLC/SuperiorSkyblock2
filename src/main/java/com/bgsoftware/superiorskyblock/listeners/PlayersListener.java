@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.listeners.logic.PortalsLogic;
+import com.bgsoftware.superiorskyblock.listeners.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -64,7 +65,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -145,7 +145,7 @@ public final class PlayersListener implements Listener {
         }, 5L);
 
         if(!superiorPlayer.isVanished())
-            handlePlayerJoin(superiorPlayer);
+            PlayersLogic.handleJoin(superiorPlayer);
 
         Executor.sync(() -> {
             if(superiorPlayer.isOnline() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) == null){
@@ -171,18 +171,6 @@ public final class PlayersListener implements Listener {
 
     }
 
-    public static void handlePlayerJoin(SuperiorPlayer superiorPlayer){
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            island.updateLastTime();
-            island.setCurrentlyActive();
-        }
-    }
-
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -191,7 +179,7 @@ public final class PlayersListener implements Listener {
             return;
 
         if(!superiorPlayer.isVanished())
-            handlePlayerQuit(superiorPlayer);
+            PlayersLogic.handleQuit(superiorPlayer);
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
@@ -200,20 +188,6 @@ public final class PlayersListener implements Listener {
                     IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
                 }
             }
-        }
-    }
-
-    public static void handlePlayerQuit(SuperiorPlayer superiorPlayer){
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
-                    !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) &&  _superiorPlayer.isOnline());
-            if(!anyOnline)
-                island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
         }
     }
 

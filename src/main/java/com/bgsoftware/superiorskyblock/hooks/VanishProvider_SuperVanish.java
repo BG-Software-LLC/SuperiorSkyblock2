@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
+import com.bgsoftware.superiorskyblock.listeners.logic.PlayersLogic;
 import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;
@@ -35,10 +35,10 @@ public final class VanishProvider_SuperVanish implements VanishProvider, Listene
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(PlayerVanishStateChangeEvent e){
         if(e.isVanishing()) {
-            PlayersListener.handlePlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
+            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
         }
         else{
-            PlayersListener.handlePlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
+            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
         }
     }
 
