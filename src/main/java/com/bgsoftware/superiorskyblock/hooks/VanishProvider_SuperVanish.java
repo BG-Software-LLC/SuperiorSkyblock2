@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.listeners.logic.PlayersLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import de.myzelyam.api.vanish.PlayerVanishStateChangeEvent;
 import de.myzelyam.api.vanish.VanishAPI;
 import org.bukkit.Bukkit;

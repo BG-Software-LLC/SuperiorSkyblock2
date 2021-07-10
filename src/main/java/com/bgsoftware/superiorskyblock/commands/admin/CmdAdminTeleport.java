@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.listeners.logic.PortalsLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.Location;
 import org.bukkit.World;

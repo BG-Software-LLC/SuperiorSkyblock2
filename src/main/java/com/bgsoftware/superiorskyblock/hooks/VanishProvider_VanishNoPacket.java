@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.listeners.logic.PlayersLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
