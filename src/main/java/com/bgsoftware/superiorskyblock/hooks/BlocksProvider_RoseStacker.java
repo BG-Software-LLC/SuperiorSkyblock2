@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
@@ -137,13 +137,13 @@ public final class BlocksProvider_RoseStacker implements BlocksProvider {
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockStackProtection(BlockStackEvent e){
-            if(!ProtectionListener.IMP.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
+            if(!ProtectionLogic.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockUnstackProtection(BlockUnstackEvent e){
-            if(e.getPlayer() != null && !ProtectionListener.IMP.handleBlockBreak(
+            if(e.getPlayer() != null && !ProtectionLogic.handleBlockBreak(
                     e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
         }

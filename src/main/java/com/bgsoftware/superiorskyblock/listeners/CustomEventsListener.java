@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -51,7 +52,7 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onItemFrameRotation(PlayerInteractEntityEvent e) {
         if ((e.getRightClicked() instanceof ItemFrame)) {
-            if (!ProtectionListener.IMP.onItemFrameRotate(e.getPlayer(), (ItemFrame) e.getRightClicked()))
+            if (!ProtectionLogic.handleItemFrameRotate(e.getPlayer(), (ItemFrame) e.getRightClicked()))
                 e.setCancelled(true);
         }
     }
@@ -61,7 +62,7 @@ public final class CustomEventsListener implements Listener {
         if (e.getEntity() instanceof ItemFrame) {
             SuperiorPlayer damager = EntityUtils.getPlayerDamager(e);
 
-            if (damager != null && !ProtectionListener.IMP.onItemFrameBreak(damager, (ItemFrame) e.getEntity()))
+            if (damager != null && !ProtectionLogic.handleItemFrameBreak(damager, (ItemFrame) e.getEntity()))
                 e.setCancelled(true);
         }
     }
