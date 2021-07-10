@@ -518,9 +518,20 @@ public final class PlayersListener implements Listener {
         if(((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
             return;
 
-        World.Environment environment = from.getWorld().getEnvironment() != World.Environment.NORMAL ?
-                World.Environment.NORMAL : teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
-                World.Environment.NETHER : World.Environment.THE_END;
+        World.Environment environment = World.Environment.NORMAL;
+        World.Environment fromEnvironment = from.getWorld().getEnvironment();
+
+        switch (teleportCause){
+            case END_PORTAL:
+                environment = World.Environment.THE_END;
+                break;
+            case NETHER_PORTAL:
+                environment = World.Environment.NETHER;
+                break;
+        }
+
+        if(environment == fromEnvironment)
+            environment = World.Environment.NORMAL;
 
         if((environment == World.Environment.NORMAL && !island.isNormalEnabled()) ||
                 (environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
