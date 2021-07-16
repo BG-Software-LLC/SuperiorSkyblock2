@@ -519,8 +519,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
 
             if(world.generator != null && !(world.generator instanceof WorldGenerator)){
                 IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(world);
-                //noinspection deprecation
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
                 chunkGenerator.buildBase(null, protoChunk);
 
                 for(int i = 0; i < 16; i++)
@@ -540,8 +539,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
             levelCompound.set("Entities", new NBTTagList());
 
             if(!(world.generator instanceof WorldGenerator)) {
-                //noinspection deprecation
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
 
                 try {
                     CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world,
@@ -637,8 +635,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
                     if(chunkCompound == null){
-                        //noinspection deprecation
-                        ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, world);
+                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
                         chunkCompound = ChunkRegionLoader.saveChunk(world, protoChunk);
                     }
 
@@ -750,6 +747,15 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
         playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
+    }
+
+    private ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoords, WorldServer worldServer){
+        try {
+            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer, worldServer);
+        }catch(Throwable ex){
+            //noinspection deprecation
+            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer);
+        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity {
