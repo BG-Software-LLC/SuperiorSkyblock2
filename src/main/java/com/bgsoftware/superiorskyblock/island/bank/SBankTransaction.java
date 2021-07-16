@@ -26,7 +26,7 @@ public final class SBankTransaction implements BankTransaction {
         this.time = time;
         this.date = StringUtils.formatDate(time);
         this.failureReason = failureReason == null ? "" : failureReason;
-        this.amount = amount;
+        this.amount = amount.setScale(2, BigDecimal.ROUND_HALF_EVEN);
     }
 
     public SBankTransaction(ResultSet resultSet) throws SQLException {
@@ -37,7 +37,7 @@ public final class SBankTransaction implements BankTransaction {
         this.time = Long.parseLong(resultSet.getString("time"));
         this.date = StringUtils.formatDate(time);
         this.failureReason = resultSet.getString("failureReason");
-        this.amount = new BigDecimal(resultSet.getString("amount"));
+        this.amount = new BigDecimal(resultSet.getString("amount")).setScale(2, BigDecimal.ROUND_HALF_EVEN);
     }
 
     @Override
