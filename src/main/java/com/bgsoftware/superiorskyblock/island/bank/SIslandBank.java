@@ -49,7 +49,7 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BigDecimal getBalance() {
-        return balance.get();
+        return balance.get().setScale(2, RoundingMode.HALF_DOWN);
     }
 
     @Override
