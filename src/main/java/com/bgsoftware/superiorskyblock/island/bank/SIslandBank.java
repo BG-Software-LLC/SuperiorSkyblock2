@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +51,7 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BigDecimal getBalance() {
-        return balance.get();
+        return balance.get().setScale(2, RoundingMode.HALF_DOWN);
     }
 
     @Override
