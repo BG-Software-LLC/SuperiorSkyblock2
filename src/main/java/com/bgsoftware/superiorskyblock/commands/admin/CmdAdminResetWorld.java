@@ -75,7 +75,13 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         }
 
         islands.forEach(island -> {
-            World world = island.getCenter(environment).getWorld();
+            World world;
+
+            try {
+                world = island.getCenter(environment).getWorld();
+            }catch (NullPointerException ex){
+                return;
+            }
 
             // Sending the players that are in that world to the main island.
             // If the world that will be reset is the normal world, they will be teleported to spawn.
@@ -108,8 +114,22 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         List<String> environments = new ArrayList<>();
 
         for(World.Environment environment : World.Environment.values()){
-            if(environment != plugin.getSettings().defaultWorldEnvironment)
-                environments.add(environment.name().toLowerCase());
+            if(environment != plugin.getSettings().defaultWorldEnvironment) {
+                switch (environment){
+                    case NORMAL:
+                        if(island.isNormalEnabled())
+                            environments.add(environment.name().toLowerCase());
+                        break;
+                    case NETHER:
+                        if(island.isNetherEnabled())
+                            environments.add(environment.name().toLowerCase());
+                        break;
+                    case THE_END:
+                        if(island.isEndEnabled())
+                            environments.add(environment.name().toLowerCase());
+                        break;
+                }
+            }
         }
 
         return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));
