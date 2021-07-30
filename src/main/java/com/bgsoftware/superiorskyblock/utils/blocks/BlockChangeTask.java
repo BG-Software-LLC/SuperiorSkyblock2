@@ -54,7 +54,7 @@ public final class BlockChangeTask {
                     interactedChunks.add(entry.getKey());
                     interactedBlocks.addAll(entry.getValue());
 
-                    IslandUtils.deleteChunk(island, entry.getKey(), null);
+                    IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
 
                     if(island.isInsideRange(chunk))
                         plugin.getNMSBlocks().startTickingChunk(island, chunk, false);

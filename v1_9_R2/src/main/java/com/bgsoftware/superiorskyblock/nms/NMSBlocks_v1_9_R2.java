@@ -3,10 +3,8 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -44,13 +42,10 @@ import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_9_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R2.block.CraftSign;
-import org.bukkit.craftbukkit.v1_9_R2.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_9_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_9_R2.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_9_R2.util.UnsafeList;
 
 import java.lang.ref.WeakReference;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -267,40 +262,6 @@ public final class NMSBlocks_v1_9_R2 implements NMSBlocks {
         }, null);
 
         return completableFuture;
-    }
-
-    @Override
-    public void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
-            Arrays.fill(chunk.getSections(), Chunk.a);
-
-            for (int i = 0; i < chunk.entitySlices.length; i++) {
-                chunk.entitySlices[i].forEach(entity -> {
-                    if (!(entity instanceof EntityHuman))
-                        entity.dead = true;
-                });
-                chunk.entitySlices[i] = new UnsafeList<>();
-            }
-
-            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::s);
-            chunk.tileEntities.clear();
-
-            if (world.generator != null && !(world.generator instanceof WorldGenerator)) {
-                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, 0L, world.generator);
-                Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunkCoords.x, chunkCoords.z);
-
-                for (int i = 0; i < 16; i++)
-                    chunk.getSections()[i] = generatedChunk.getSections()[i];
-
-                for (Map.Entry<BlockPosition, TileEntity> entry : generatedChunk.getTileEntities().entrySet())
-                    world.setTileEntity(entry.getKey(), entry.getValue());
-            }
-
-            ChunksTracker.markEmpty(island, chunkPosition, false);
-        }, chunk -> refreshChunk(chunk.bukkitChunk));
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk) {

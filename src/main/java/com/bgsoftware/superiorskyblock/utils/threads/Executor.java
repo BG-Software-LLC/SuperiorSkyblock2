@@ -148,13 +148,17 @@ public final class Executor {
 
         public <R> NestedTask<R> runAsync(Function<T, R> function){
             NestedTask<R> nestedTask = new NestedTask<>();
-            value.whenComplete((value, ex) -> Executor.async(() -> nestedTask.value.complete(function.apply(value))));
+            value.whenComplete((value, ex) -> Executor.async(() -> {
+                Bukkit.broadcastMessage("Created new async task!");
+                nestedTask.value.complete(function.apply(value));
+            }));
             return nestedTask;
         }
 
         public NestedTask<Void> runAsync(Consumer<T> consumer){
             NestedTask<Void> nestedTask = new NestedTask<>();
             value.whenComplete((value, ex) -> Executor.async(() -> {
+                Bukkit.broadcastMessage("Created new async task!");
                 consumer.accept(value);
                 nestedTask.value.complete(null);
             }));

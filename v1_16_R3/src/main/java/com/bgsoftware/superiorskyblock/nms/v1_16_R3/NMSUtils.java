@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -8,16 +9,23 @@ import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R3.IChunkAccess;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.Packet;
+import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.PlayerChunkMap;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
+import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class NMSUtils {
+
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
 
     private NMSUtils() {
 
@@ -25,7 +33,7 @@ public final class NMSUtils {
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
-                                         Consumer<NBTTagCompound> unloadedChunkConsumer) {
+                                         BiConsumer<ChunkCoordIntPair, NBTTagCompound> unloadedChunkConsumer) {
         List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
         List<Chunk> loadedChunks = new ArrayList<>();
 
@@ -61,8 +69,10 @@ public final class NMSUtils {
         chunks.forEach(chunkConsumer);
     }
 
-    public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
-                                                 boolean saveChunks, Consumer<NBTTagCompound> chunkConsumer,
+    public static void runActionOnUnloadedChunks(WorldServer worldServer,
+                                                 Collection<ChunkCoordIntPair> chunks,
+                                                 boolean saveChunks,
+                                                 BiConsumer<ChunkCoordIntPair, NBTTagCompound> chunkConsumer,
                                                  Runnable onFinish) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
 
@@ -80,7 +90,7 @@ public final class NMSUtils {
                     }
 
                     if (chunkCompound.hasKeyOfType("Level", 10)) {
-                        chunkConsumer.accept(chunkCompound.getCompound("Level"));
+                        chunkConsumer.accept(chunkCoords, chunkCompound.getCompound("Level"));
                         if (saveChunks)
                             playerChunkMap.a(chunkCoords, chunkCompound);
                     }
@@ -92,6 +102,31 @@ public final class NMSUtils {
             if (onFinish != null)
                 onFinish.run();
         });
+    }
+
+    public static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world){
+        try{
+            // Paper's constructor for ProtoChunk
+            return new ProtoChunk(chunkCoord, ChunkConverter.a, world);
+        }catch (Throwable ex){
+            // Spigot's constructor for ProtoChunk
+            // noinspection deprecation
+            return new ProtoChunk(chunkCoord, ChunkConverter.a);
+        }
+    }
+
+    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        try {
+            PlayerChunk playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
+            if(playerChunk != null)
+                playerChunk.sendPacketToTrackedPlayers(packet, false);
+        }catch (Throwable ex){
+            PlayerChunk playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
+            if(playerChunk != null)
+                playerChunk.sendPacketToTrackedPlayers(packet, false);
+        }
     }
 
 }

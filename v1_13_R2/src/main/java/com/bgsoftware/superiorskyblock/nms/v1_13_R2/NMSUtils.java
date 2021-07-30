@@ -4,8 +4,12 @@ import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.ChunkConverter;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IChunkAccess;
 import net.minecraft.server.v1_13_R2.IChunkLoader;
+import net.minecraft.server.v1_13_R2.Packet;
+import net.minecraft.server.v1_13_R2.PlayerChunkMap;
 import net.minecraft.server.v1_13_R2.ProtoChunk;
 import net.minecraft.server.v1_13_R2.ProtoChunkExtension;
 import net.minecraft.server.v1_13_R2.WorldServer;
@@ -41,7 +45,7 @@ public final class NMSUtils {
 
         loadedChunks.forEach(chunkConsumer);
 
-        if(updateChunk != null)
+        if (updateChunk != null)
             loadedChunks.forEach(updateChunk);
 
         if (hasUnloadedChunks) {
@@ -76,6 +80,14 @@ public final class NMSUtils {
             if (onFinish != null)
                 onFinish.run();
         });
+    }
+
+    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
+        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
+        for (EntityHuman entityHuman : worldServer.players) {
+            if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
+                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
     }
 
 }

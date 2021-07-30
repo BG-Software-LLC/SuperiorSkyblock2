@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.ChunkCoordIntPair;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class NMSUtils {
@@ -23,7 +25,9 @@ public final class NMSUtils {
 
     }
 
-    public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords, boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> unloadedChunkConsumer) {
+    public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
+                                         boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
+                                         BiConsumer<ChunkCoordIntPair, NBTTagCompound> unloadedChunkConsumer) {
         List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
         List<Chunk> loadedChunks = new ArrayList<>();
 
@@ -59,7 +63,11 @@ public final class NMSUtils {
         chunks.forEach(chunkConsumer);
     }
 
-    public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks, boolean saveChunks, Consumer<NBTTagCompound> chunkConsumer, Runnable onFinish) {
+    public static void runActionOnUnloadedChunks(WorldServer worldServer,
+                                                 Collection<ChunkCoordIntPair> chunks,
+                                                 boolean saveChunks,
+                                                 BiConsumer<ChunkCoordIntPair, NBTTagCompound> chunkConsumer,
+                                                 Runnable onFinish) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
 
         Executor.createTask().runAsync(v -> {
@@ -76,7 +84,7 @@ public final class NMSUtils {
                     }
 
                     if (chunkCompound.hasKeyOfType("Level", 10)) {
-                        chunkConsumer.accept(chunkCompound.getCompound("Level"));
+                        chunkConsumer.accept(chunkCoords, chunkCompound.getCompound("Level"));
                         if (saveChunks)
                             playerChunkMap.a(chunkCoords, chunkCompound);
                     }
@@ -97,6 +105,12 @@ public final class NMSUtils {
             //noinspection deprecation
             return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer);
         }
+    }
+
+    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
     }
 
 }

@@ -4,10 +4,8 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -36,7 +34,6 @@ import net.minecraft.server.v1_15_R1.ChunkConverter;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_15_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_15_R1.ChunkSection;
-import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EnumSkyBlock;
 import net.minecraft.server.v1_15_R1.GameRules;
 import net.minecraft.server.v1_15_R1.HeightMap;
@@ -69,15 +66,12 @@ import org.bukkit.craftbukkit.v1_15_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftSign;
-import org.bukkit.craftbukkit.v1_15_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_15_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -410,83 +404,6 @@ public final class NMSBlocks_v1_15_R1 implements NMSBlocks {
                 });
 
         return completableFuture;
-    }
-
-    @Override
-    public void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
-                    Arrays.fill(chunk.getSections(), Chunk.a);
-
-                    for (int i = 0; i < chunk.entitySlices.length; i++) {
-                        chunk.entitySlices[i].forEach(entity -> {
-                            if (!(entity instanceof EntityHuman))
-                                entity.dead = true;
-                        });
-                        chunk.entitySlices[i] = new UnsafeList<>();
-                    }
-
-                    new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
-                    chunk.tileEntities.clear();
-
-                    if (world.generator != null && !(world.generator instanceof WorldGenerator)) {
-                        CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.generator);
-                        ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
-                        customChunkGenerator.buildBase(null, protoChunk);
-
-                        for (int i = 0; i < 16; i++)
-                            chunk.getSections()[i] = protoChunk.getSections()[i];
-
-                        for (Map.Entry<BlockPosition, TileEntity> entry : protoChunk.x().entrySet())
-                            world.setTileEntity(entry.getKey(), entry.getValue());
-                    }
-
-                    refreshChunk(chunk.getBukkitChunk());
-                },
-                levelCompound -> {
-                    NBTTagList sectionsList = new NBTTagList();
-                    NBTTagList tileEntities = new NBTTagList();
-
-                    levelCompound.set("Sections", sectionsList);
-                    levelCompound.set("TileEntities", tileEntities);
-                    levelCompound.set("Entities", new NBTTagList());
-
-                    if (!(world.generator instanceof WorldGenerator)) {
-                        ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
-
-                        try {
-                            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.generator);
-                            customChunkGenerator.buildBase(null, protoChunk);
-                        } catch (Exception ignored) {
-                        }
-
-                        ChunkSection[] chunkSections = protoChunk.getSections();
-
-                        for (int i = -1; i < 17; ++i) {
-                            int chunkSectionIndex = i;
-                            ChunkSection chunkSection = Arrays.stream(chunkSections).filter(_chunkPosition ->
-                                            _chunkPosition != null && _chunkPosition.getYPosition() >> 4 == chunkSectionIndex)
-                                    .findFirst().orElse(Chunk.a);
-
-                            if (chunkSection != Chunk.a) {
-                                NBTTagCompound sectionCompound = new NBTTagCompound();
-                                sectionCompound.setByte("Y", (byte) (i & 255));
-                                chunkSection.getBlocks().a(sectionCompound, "Palette", "BlockStates");
-                                sectionsList.add(sectionCompound);
-                            }
-                        }
-
-                        for (BlockPosition tilePosition : protoChunk.c()) {
-                            NBTTagCompound tileCompound = protoChunk.i(tilePosition);
-                            if (tileCompound != null)
-                                tileEntities.add(tileCompound);
-                        }
-                    }
-                });
-
-        ChunksTracker.markEmpty(island, chunkPosition, false);
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer) {

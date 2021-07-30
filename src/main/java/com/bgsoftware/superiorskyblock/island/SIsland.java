@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
@@ -15,34 +16,25 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
+import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
-import com.bgsoftware.superiorskyblock.handlers.GridHandler;
-import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
-import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
-import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
+import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.menu.MenuMemberManage;
@@ -50,26 +42,34 @@ import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
 import com.bgsoftware.superiorskyblock.menu.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
+import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.menu.MenuValues;
 import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
+import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.MenuWarps;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
@@ -102,7 +102,19 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -866,10 +878,7 @@ public final class SIsland implements Island {
             return;
         }
 
-        for(int i = 0; i < chunkPositions.size() - 1; i++)
-            IslandUtils.deleteChunk(this, chunkPositions.get(i), null);
-
-        IslandUtils.deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+        IslandUtils.deleteChunks(this, chunkPositions, onFinish);
     }
 
     @Override
@@ -879,18 +888,19 @@ public final class SIsland implements Island {
 
     @Override
     public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
-        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, onlyProtected, true);
+        List<List<ChunkPosition>> worldsChunks = new ArrayList<>(
+                IslandUtils.getChunkCoords(this, onlyProtected, true).values());
 
-        if(chunkPositions.isEmpty()){
+        if(worldsChunks.isEmpty()){
             if(onFinish != null)
                 onFinish.run();
             return;
         }
 
-        for(int i = 0; i < chunkPositions.size() - 1; i++)
-            IslandUtils.deleteChunk(this, chunkPositions.get(i), null);
+        for(int i = 0; i < worldsChunks.size() - 1; i++)
+            IslandUtils.deleteChunks(this, worldsChunks.get(i), null);
 
-        IslandUtils.deleteChunk(this, chunkPositions.get(chunkPositions.size() - 1), onFinish);
+        IslandUtils.deleteChunks(this, worldsChunks.get(worldsChunks.size() - 1), onFinish);
     }
 
     @Override
@@ -1232,9 +1242,9 @@ public final class SIsland implements Island {
                 new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
         if(snapshot == null) {
-            chunksToLoad.addAll(IslandUtils.getChunkCoords(this, true, true).stream()
-                    .map(chunkPosition -> plugin.getNMSBlocks().calculateChunk(chunkPosition))
-                    .collect(Collectors.toList()));
+//            chunksToLoad.addAll(IslandUtils.getChunkCoords(this, true, true).values().stream()
+//                    .map(chunkPosition -> plugin.getNMSBlocks().calculateChunk(chunkPosition))
+//                    .collect(Collectors.toList()));
         }
         else{
             IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk).forEach(completableFuture -> {

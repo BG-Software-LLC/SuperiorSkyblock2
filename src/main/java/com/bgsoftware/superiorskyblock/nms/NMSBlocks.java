@@ -10,10 +10,8 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
@@ -55,8 +53,6 @@ public interface NMSBlocks {
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
     CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition);
-
-    void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish);
 
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 

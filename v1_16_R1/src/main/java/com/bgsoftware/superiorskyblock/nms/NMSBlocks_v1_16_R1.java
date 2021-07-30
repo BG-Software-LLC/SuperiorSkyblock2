@@ -4,11 +4,9 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -36,7 +34,6 @@ import net.minecraft.server.v1_16_R1.ChunkConverter;
 import net.minecraft.server.v1_16_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R1.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R1.ChunkSection;
-import net.minecraft.server.v1_16_R1.EntityHuman;
 import net.minecraft.server.v1_16_R1.EnumSkyBlock;
 import net.minecraft.server.v1_16_R1.GameRules;
 import net.minecraft.server.v1_16_R1.HeightMap;
@@ -68,15 +65,12 @@ import org.bukkit.craftbukkit.v1_16_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftSign;
-import org.bukkit.craftbukkit.v1_16_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
-import org.bukkit.craftbukkit.v1_16_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,7 +87,6 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     private static final Map<String, IBlockState> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState, String> blockStateToName = new HashMap<>();
 
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "g");
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
 
@@ -131,22 +124,22 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         fieldNameToName.put("aJ", "piston-type");
         fieldNameToName.put("aK", "slab-type");
 
-        try{
-            for(Field field : BlockProperties.class.getFields()){
+        try {
+            for (Field field : BlockProperties.class.getFields()) {
                 Object value = field.get(null);
-                if(value instanceof IBlockState) {
+                if (value instanceof IBlockState) {
                     register(fieldNameToName.getOrDefault(field.getName(), ((IBlockState) value).getName()),
                             field.getName(), (IBlockState) value);
                 }
             }
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
-    private static void register(String key, String fieldName, IBlockState<?> blockState){
-        if(nameToBlockState.containsKey(key)){
+    private static void register(String key, String fieldName, IBlockState<?> blockState) {
+        if (nameToBlockState.containsKey(key)) {
             SuperiorSkyblockPlugin.log("&cWarning: block state " + key + "(" + fieldName + ") already exists. Contact Ome_R!");
-        }
-        else {
+        } else {
             nameToBlockState.put(key, blockState);
             blockStateToName.put(blockState, key);
         }
@@ -157,11 +150,11 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
         Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
 
-        for(BlockData blockData : blockDataList)
+        for (BlockData blockData : blockDataList)
             setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
 
-        if(plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().lightsUpdate) {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
             Executor.sync(() -> {
@@ -170,13 +163,15 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
                     if (blockData.getBlockLightLevel() > 0) {
                         try {
                             ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
-                        } catch (Exception ignored) { }
+                        } catch (Exception ignored) {
+                        }
                     }
-                    if(blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL){
+                    if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
                         try {
                             SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
                                     blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
-                        } catch (Exception ignored) { }
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             }, 10L);
@@ -196,11 +191,11 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     private void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
-        if(statesTag != null){
-            for(Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()){
+        if (statesTag != null) {
+            for (Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()) {
                 try {
                     IBlockState blockState = nameToBlockState.get(entry.getKey());
-                    if(blockState != null) {
+                    if (blockState != null) {
                         if (entry.getValue() instanceof ByteTag) {
                             blockData = blockData.set(blockState, ((ByteTag) entry.getValue()).getValue() == 1);
                         } else if (entry.getValue() instanceof IntArrayTag) {
@@ -211,19 +206,19 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
                             blockData = blockData.set(blockState, Enum.valueOf(blockState.getType(), data));
                         }
                     }
-                }catch (Exception ignored){}
+                } catch (Exception ignored) {
+                }
             }
         }
 
-        if((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
+        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
-        if(plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().lightsUpdate) {
             chunk.setType(blockPosition, blockData, true, true);
-        }
-        else {
+        } else {
             int indexY = blockPosition.getY() >> 4;
 
             ChunkSection chunkSection = chunk.getSections()[indexY];
@@ -243,7 +238,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             chunk.heightMap.get(HeightMap.Type.WORLD_SURFACE).a(blockX, blockY, blockZ, blockData);
         }
 
-        if(tileEntity != null) {
+        if (tileEntity != null) {
             NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
             tileEntityCompound.setInt("x", blockPosition.getX());
             tileEntityCompound.setInt("y", blockPosition.getY());
@@ -259,22 +254,20 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         IBlockData blockData = world.getType(blockPosition);
         CompoundTag compoundTag = null;
 
-        for(Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()){
-            if(compoundTag == null)
+        for (Map.Entry<IBlockState<?>, Comparable<?>> entry : blockData.getStateMap().entrySet()) {
+            if (compoundTag == null)
                 compoundTag = new CompoundTag();
 
             Tag<?> value;
             Class<?> keyClass = entry.getKey().getClass();
             String name = entry.getKey().getName();
 
-            if(keyClass.equals(BlockStateBoolean.class)) {
+            if (keyClass.equals(BlockStateBoolean.class)) {
                 value = new ByteTag((Boolean) entry.getValue() ? (byte) 1 : 0);
-            }
-            else if(keyClass.equals(BlockStateInteger.class)) {
+            } else if (keyClass.equals(BlockStateInteger.class)) {
                 BlockStateInteger key = (BlockStateInteger) entry.getKey();
-                value = new IntArrayTag(new int[] {(Integer) entry.getValue(), key.min, key.max});
-            }
-            else{
+                value = new IntArrayTag(new int[]{(Integer) entry.getValue(), key.min, key.max});
+            } else {
                 BlockStateEnum<?> key = (BlockStateEnum<?>) entry.getKey();
                 name = blockStateToName.get(key);
                 value = new StringTag(((Enum<?>) entry.getValue()).name());
@@ -290,7 +283,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     public byte[] getLightLevels(Location location) {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         LightEngine lightEngine = ((CraftWorld) location.getWorld()).getHandle().e();
-        return new byte[] {
+        return new byte[]{
                 location.getWorld().getEnvironment() != org.bukkit.World.Environment.NORMAL ? 0 : (byte) lightEngine.a(EnumSkyBlock.SKY).b(blockPosition),
                 (byte) lightEngine.a(EnumSkyBlock.BLOCK).b(blockPosition)
         };
@@ -302,7 +295,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
         TileEntity tileEntity = world.getTileEntity(blockPosition);
 
-        if(tileEntity == null)
+        if (tileEntity == null)
             return null;
 
         NBTTagCompound tileEntityCompound = tileEntity.save(new NBTTagCompound());
@@ -330,7 +323,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     @Override
     public int getCombinedId(Location location) {
         World world = ((CraftWorld) location.getWorld()).getHandle();
-        IBlockData blockData =  world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+        IBlockData blockData = world.getType(new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
         return Block.getCombinedId(blockData);
     }
 
@@ -363,15 +356,15 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         Set<Location> spawnersLocations = new HashSet<>();
 
         Consumer<ChunkSection[]> calculateConsumer = chunkSections -> {
-            for(ChunkSection chunkSection : chunkSections){
-                if(chunkSection != null){
+            for (ChunkSection chunkSection : chunkSections) {
+                if (chunkSection != null) {
                     for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
                         if (blockData.getBlock() != Blocks.AIR) {
                             Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
                             int blockAmount = 1;
 
-                            if((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
+                            if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
                                     blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
                                 blockAmount = 2;
                                 blockData = blockData.set(BlockProperties.aK, BlockPropertySlabType.BOTTOM);
@@ -414,123 +407,43 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         return completableFuture;
     }
 
-    @Override
-    public void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, onFinish, chunk -> {
-            Arrays.fill(chunk.getSections(), Chunk.a);
-
-            for(int i = 0; i < chunk.entitySlices.length; i++) {
-                chunk.entitySlices[i].forEach(entity -> {
-                    if(!(entity instanceof EntityHuman))
-                        entity.dead = true;
-                });
-                chunk.entitySlices[i] = new UnsafeList<>();
-            }
-
-            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::removeTileEntity);
-            chunk.tileEntities.clear();
-
-            if(!(world.generator instanceof WorldGenerator)){
-                CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
-                customChunkGenerator.buildBase(null, protoChunk);
-
-                for(int i = 0; i < 16; i++)
-                    chunk.getSections()[i] = protoChunk.getSections()[i];
-
-                for(Map.Entry<BlockPosition, TileEntity> entry : protoChunk.x().entrySet())
-                    world.setTileEntity(entry.getKey(), entry.getValue());
-            }
-
-            refreshChunk(chunk.getBukkitChunk());
-        },
-        levelCompound -> {
-            NBTTagList sectionsList = new NBTTagList();
-            NBTTagList tileEntities = new NBTTagList();
-
-            levelCompound.set("Sections", sectionsList);
-            levelCompound.set("TileEntities", tileEntities);
-            levelCompound.set("Entities", new NBTTagList());
-
-            if(world.generator != null && !(world.generator instanceof WorldGenerator)) {
-                ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
-
-                try {
-                    CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(world, world.getChunkProvider().chunkGenerator, world.generator);
-                    customChunkGenerator.buildBase(null, protoChunk);
-                }catch (Exception ignored){}
-
-                ChunkSection[] chunkSections = protoChunk.getSections();
-
-                for(int i = -1; i < 17; ++i) {
-                    int chunkSectionIndex = i;
-                    ChunkSection chunkSection = Arrays.stream(chunkSections).filter(_chunkPosition ->
-                            _chunkPosition != null && _chunkPosition.getYPosition() >> 4 == chunkSectionIndex)
-                            .findFirst().orElse(Chunk.a);
-
-                    if (chunkSection != Chunk.a) {
-                        NBTTagCompound sectionCompound = new NBTTagCompound();
-                        sectionCompound.setByte("Y", (byte) (i & 255));
-                        chunkSection.getBlocks().a(sectionCompound, "Palette", "BlockStates");
-                        sectionsList.add(sectionCompound);
-                    }
-                }
-
-                for(BlockPosition tilePosition : protoChunk.c()){
-                    NBTTagCompound tileCompound = protoChunk.i(tilePosition);
-                    if(tileCompound != null)
-                        tileEntities.add(tileCompound);
-                }
-            }
-        });
-
-        ChunksTracker.markEmpty(island, chunkPosition, false);
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
+    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer) {
         runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, compoundConsumer);
     }
 
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
+    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer) {
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         PlayerChunkMap playerChunkMap = world.getChunkProvider().playerChunkMap;
 
         Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
 
-        if(chunk != null){
+        if (chunk != null) {
             chunkConsumer.accept(chunk);
-            if(onFinish != null)
+            if (onFinish != null)
                 onFinish.run();
-        }
-
-        else{
+        } else {
             Executor.createTask().runAsync(v -> {
-                try{
+                try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if(chunkCompound == null){
+                    if (chunkCompound == null) {
                         ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
                         chunkCompound = ChunkRegionLoader.saveChunk(world, protoChunk);
-                    }
-
-                    else{
+                    } else {
                         chunkCompound = playerChunkMap.getChunkData(world.getTypeKey(),
                                 Suppliers.ofInstance(world.getWorldPersistentData()), chunkCompound, chunkCoords, world);
                     }
 
-                    if(chunkCompound.hasKeyOfType("Level", 10)) {
+                    if (chunkCompound.hasKeyOfType("Level", 10)) {
                         compoundConsumer.accept(chunkCompound.getCompound("Level"));
-                        if(saveChunk)
+                        if (saveChunk)
                             playerChunkMap.a(chunkCoords, chunkCompound);
                     }
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }).runSync(v -> {
-                if(onFinish != null)
+                if (onFinish != null)
                     onFinish.run();
             });
         }
@@ -538,13 +451,12 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
 
     @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
-        if(stop) {
+        if (stop) {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.tickingChunks
                     .remove(((CraftChunk) chunk).getHandle().getPos().pair());
-            if(cropsTickingTileEntity != null)
+            if (cropsTickingTileEntity != null)
                 cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
-        }
-        else
+        } else
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
     }
 
@@ -553,7 +465,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         WorldServer worldServer = ((CraftWorld) location.getWorld()).getHandle();
         TileEntity tileEntity = worldServer.getTileEntity(blockPosition);
-        if(tileEntity instanceof TileEntitySign) {
+        if (tileEntity instanceof TileEntitySign) {
             TileEntitySign tileEntitySign = (TileEntitySign) tileEntity;
             String[] lines = new String[4];
             System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
@@ -589,7 +501,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
 
     @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
-        if(block.getType().name().contains("WATER"))
+        if (block.getType().name().contains("WATER"))
             return true;
 
         org.bukkit.block.data.BlockData blockData = block.getBlockData();
@@ -600,10 +512,10 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
     @Override
     public int getDefaultAmount(org.bukkit.block.Block block) {
         IBlockData blockData = ((CraftBlock) block).getNMS();
-        Block nmsBlock =  blockData.getBlock();
+        Block nmsBlock = blockData.getBlock();
 
         // Checks for double slabs
-        if((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
+        if ((nmsBlock.a(TagsBlock.SLABS) || nmsBlock.a(TagsBlock.WOODEN_SLABS)) &&
                 blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
             return 2;
         }
@@ -611,18 +523,18 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
         return 1;
     }
 
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
         try {
             playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).sendPacketToTrackedPlayers(packet, false);
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
                     .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
         }
     }
 
-    private static final class CropsTickingTileEntity extends TileEntity implements ITickable{
+    private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
 
         private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
         private static int random = ThreadLocalRandom.current().nextInt();
@@ -633,7 +545,7 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
 
         private int currentTick = 0;
 
-        private CropsTickingTileEntity(Island island, Chunk chunk){
+        private CropsTickingTileEntity(Island island, Chunk chunk) {
             super(TileEntityTypes.COMMAND_BLOCK);
             this.island = new WeakReference<>(island);
             this.chunk = new WeakReference<>(chunk);
@@ -644,20 +556,21 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             try {
                 // Not a method of Spigot - fixes https://github.com/OmerBenGera/SuperiorSkyblock2/issues/5
                 setCurrentChunk(chunk);
-            }catch (Throwable ignored){}
+            } catch (Throwable ignored) {
+            }
 
             world.tileEntityListTick.add(this);
         }
 
         @Override
         public void tick() {
-            if(++currentTick <= plugin.getSettings().cropsInterval)
+            if (++currentTick <= plugin.getSettings().cropsInterval)
                 return;
 
             Chunk chunk = this.chunk.get();
             Island island = this.island.get();
 
-            if(chunk == null || island == null){
+            if (chunk == null || island == null) {
                 world.tileEntityListTick.remove(this);
                 return;
             }
@@ -695,9 +608,9 @@ public final class NMSBlocks_v1_16_R1 implements NMSBlocks {
             tick();
         }
 
-        static void create(Island island, Chunk chunk){
+        static void create(Island island, Chunk chunk) {
             long chunkPair = chunk.getPos().pair();
-            if(!tickingChunks.containsKey(chunkPair))
+            if (!tickingChunks.containsKey(chunkPair))
                 tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk));
         }
 

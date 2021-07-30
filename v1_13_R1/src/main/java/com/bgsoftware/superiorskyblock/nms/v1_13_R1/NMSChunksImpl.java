@@ -1,24 +1,36 @@
 package com.bgsoftware.superiorskyblock.nms.v1_13_R1;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import net.minecraft.server.v1_13_R1.BiomeBase;
+import net.minecraft.server.v1_13_R1.BlockPosition;
 import net.minecraft.server.v1_13_R1.Chunk;
+import net.minecraft.server.v1_13_R1.ChunkConverter;
 import net.minecraft.server.v1_13_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_13_R1.EntityHuman;
+import net.minecraft.server.v1_13_R1.IChunkAccess;
 import net.minecraft.server.v1_13_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_13_R1.PlayerConnection;
 import net.minecraft.server.v1_13_R1.ProtoChunk;
+import net.minecraft.server.v1_13_R1.TileEntity;
 import net.minecraft.server.v1_13_R1.WorldServer;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_13_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_13_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_13_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
@@ -57,6 +69,65 @@ public final class NMSChunksImpl implements NMSChunks {
                 playerConnection.sendPacket(mapChunkPacket);
             });
         });
+    }
+
+    @Override
+    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
+        if (chunkPositions.isEmpty())
+            return;
+
+        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
+                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
+                .collect(Collectors.toList());
+
+        chunkPositions.forEach(chunkPosition -> ChunksTracker.markEmpty(island, chunkPosition, false));
+
+        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
+
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
+            Arrays.fill(chunk.getSections(), Chunk.a);
+
+            if (chunk instanceof Chunk) {
+                removeEntities((Chunk) chunk);
+                new HashSet<>(((Chunk) chunk).tileEntities.keySet()).forEach(((Chunk) chunk).world::n);
+                ((Chunk) chunk).tileEntities.clear();
+            }
+            else{
+                ((ProtoChunk) chunk).r().clear();
+                ((ProtoChunk) chunk).s().clear();
+            }
+
+            removeBlocks(worldServer, chunk);
+        }, chunk -> {
+            ChunkCoordIntPair chunkCoords = chunk.getPos();
+            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.x, chunkCoords.z, new PacketPlayOutMapChunk(chunk, 65535));
+        });
+    }
+
+    private static void removeEntities(Chunk chunk) {
+        for (int i = 0; i < chunk.entitySlices.length; i++) {
+            chunk.entitySlices[i].forEach(entity -> {
+                if (!(entity instanceof EntityHuman))
+                    entity.dead = true;
+            });
+            chunk.entitySlices[i] = new UnsafeList<>();
+        }
+    }
+
+    private static void removeBlocks(WorldServer worldServer, IChunkAccess chunkAccess) {
+        ChunkCoordIntPair chunkCoords = chunkAccess.getPos();
+
+        if (worldServer.generator != null && !(worldServer.generator instanceof WorldGenerator)) {
+            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
+            ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
+            customChunkGenerator.createChunk(protoChunk);
+
+            for (int i = 0; i < 16; i++)
+                chunkAccess.getSections()[i] = protoChunk.getSections()[i];
+
+            for (Map.Entry<BlockPosition, TileEntity> entry : protoChunk.r().entrySet())
+                worldServer.setTileEntity(entry.getKey(), entry.getValue());
+        }
     }
 
 }

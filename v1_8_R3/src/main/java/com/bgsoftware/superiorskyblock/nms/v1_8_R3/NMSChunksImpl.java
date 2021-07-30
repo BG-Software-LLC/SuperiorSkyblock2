@@ -1,17 +1,29 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
+import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_8_R3.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
@@ -32,6 +44,59 @@ public final class NMSChunksImpl implements NMSChunks {
             Arrays.fill(chunk.getBiomeIndex(), biomeBase);
             chunk.e();
         }, null);
+    }
+
+    @Override
+    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
+        if (chunkPositions.isEmpty())
+            return;
+
+        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
+                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
+                .collect(Collectors.toList());
+
+        chunkPositions.forEach(chunkPosition -> ChunksTracker.markEmpty(island, chunkPosition, false));
+
+        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
+
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
+            Arrays.fill(chunk.getSections(), null);
+
+            removeEntities(chunk);
+
+            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::t);
+            chunk.tileEntities.clear();
+
+            removeBlocks(chunk);
+        }, chunk -> {
+            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunk.locX, chunk.locZ,
+                    new PacketPlayOutMapChunk(chunk, false, 65535));
+        });
+    }
+
+    private static void removeEntities(Chunk chunk) {
+        for (int i = 0; i < chunk.entitySlices.length; i++) {
+            chunk.entitySlices[i].forEach(entity -> {
+                if (!(entity instanceof EntityHuman))
+                    entity.dead = true;
+            });
+            chunk.entitySlices[i] = new UnsafeList<>();
+        }
+    }
+
+    private static void removeBlocks(Chunk chunk) {
+        WorldServer worldServer = (WorldServer) chunk.world;
+
+        if (worldServer.generator != null && !(worldServer.generator instanceof WorldGenerator)) {
+            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
+            Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunk.locX, chunk.locZ);
+
+            for (int i = 0; i < 16; i++)
+                chunk.getSections()[i] = generatedChunk.getSections()[i];
+
+            for (Map.Entry<BlockPosition, TileEntity> entry : generatedChunk.getTileEntities().entrySet())
+                worldServer.setTileEntity(entry.getKey(), entry.getValue());
+        }
     }
 
 }
