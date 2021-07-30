@@ -319,8 +319,14 @@ public final class UpgradesListener implements Listener {
             return;
 
         island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
-            if(result)
-                e.getEntity().remove();
+            if(result) {
+                if(ServerVersion.isAtLeast(ServerVersion.v1_17)){
+                    Executor.ensureMain(() -> e.getEntity().remove());
+                }
+                else {
+                    e.getEntity().remove();
+                }
+            }
         });
     }
 
