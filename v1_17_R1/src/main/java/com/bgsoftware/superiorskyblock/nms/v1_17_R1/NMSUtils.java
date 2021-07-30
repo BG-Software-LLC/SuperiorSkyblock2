@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.ChunkCoordIntPair;
@@ -16,10 +18,13 @@ import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class NMSUtils {
+
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
 
     private NMSUtils() {
 
@@ -107,10 +112,19 @@ public final class NMSUtils {
         }
     }
 
-    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
+    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
+        PlayerChunk playerChunk;
+
+        try {
+            playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
+        }catch (Throwable ex){
+            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
+        }
+
+        if(playerChunk != null)
+            playerChunk.a(packet, false);
     }
 
 }
