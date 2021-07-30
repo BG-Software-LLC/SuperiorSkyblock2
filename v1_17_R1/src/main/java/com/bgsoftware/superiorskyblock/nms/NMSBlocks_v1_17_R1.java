@@ -76,6 +76,7 @@ import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.LightEngineGraph;
 import net.minecraft.world.phys.AxisAlignedBB;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -96,19 +97,11 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({"unused", "ConstantConditions", "rawtypes"})
 public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
@@ -575,43 +568,128 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
     }
 
     @Override
-    public void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-        IRegistry<BiomeBase> biomeBaseRegistry = world.t().b(IRegistry.aO);
+    public void setChunkBiomes(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate) {
+        if(chunkPositions.isEmpty())
+            return;
+
+        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
+                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
+                .collect(Collectors.toList());
+
+        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
+        IRegistry<BiomeBase> biomeBaseRegistry = worldServer.t().b(IRegistry.aO);
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biomeBaseRegistry, biome);
 
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
-            BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
+        runActionOnChunks(worldServer, chunksCoords, true, null,
+                chunk -> setChunkBiomeConsumer(chunk, biomeBase, playersToUpdate),
+                unloadedChunk -> setUnloadedChunkBiomeConsumer(unloadedChunk, biomeBaseRegistry, biomeBase));
+    }
 
-            if(biomeBases == null)
-                throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.b + "," + chunkCoords.c + ").");
+    private static void setChunkBiomeConsumer(Chunk chunk, BiomeBase biomeBase, Collection<Player> playersToUpdate){
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+        BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
 
-            Arrays.fill(biomeBases, biomeBase);
-            chunk.markDirty();
+        if(biomeBases == null)
+            throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.b + "," + chunkCoords.c + ").");
 
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.b, chunkCoords.c);
-            //noinspection deprecation
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk);
+        Arrays.fill(biomeBases, biomeBase);
+        chunk.markDirty();
 
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
-        },
-        levelCompound -> {
-            int[] biomes = levelCompound.hasKeyOfType("Biomes", 11) ? levelCompound.getIntArray("Biomes") : new int[256];
-            Arrays.fill(biomes, biomeBaseRegistry.getId(biomeBase));
-            levelCompound.setIntArray("Biomes", biomes);
+        PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.b, chunkCoords.c);
+        //noinspection deprecation
+        PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk);
+
+        playersToUpdate.forEach(player -> {
+            PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
+            playerConnection.sendPacket(unloadChunkPacket);
+            playerConnection.sendPacket(mapChunkPacket);
         });
     }
 
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
+    private static void setUnloadedChunkBiomeConsumer(NBTTagCompound levelCompound, IRegistry<BiomeBase> biomeBaseRegistry, BiomeBase biomeBase){
+        int[] biomes = levelCompound.hasKeyOfType("Biomes", 11) ? levelCompound.getIntArray("Biomes") : new int[256];
+        Arrays.fill(biomes, biomeBaseRegistry.getId(biomeBase));
+        levelCompound.setIntArray("Biomes", biomes);
+    }
+
+    private static void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
         runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, compoundConsumer);
     }
 
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
+    private static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords, boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> unloadedChunkConsumer){
+        List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
+        List<Chunk> loadedChunks = new ArrayList<>();
+
+        chunksCoords.forEach(chunkCoords -> {
+            IChunkAccess chunkAccess;
+
+            try{
+                chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.b, chunkCoords.c);
+            }catch (Throwable ex){
+                chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.b, chunkCoords.c);
+            }
+
+            if(chunkAccess instanceof Chunk){
+                Bukkit.broadcastMessage("Looaded: " + chunkCoords.b + ", " + chunkCoords.c);
+                loadedChunks.add((Chunk) chunkAccess);
+            }
+            else{
+                Bukkit.broadcastMessage("Unloaded: " + chunkCoords.b + ", " + chunkCoords.c);
+                unloadedChunks.add(chunkCoords);
+            }
+        });
+
+        boolean hasUnloadedChunks = !unloadedChunks.isEmpty();
+
+        if(!loadedChunks.isEmpty())
+            runActionOnLoadedChunks(worldServer, loadedChunks, chunkConsumer);
+
+        if(hasUnloadedChunks) {
+            runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, unloadedChunkConsumer, onFinish);
+        }
+        else if(onFinish != null){
+            onFinish.run();
+        }
+    }
+
+    private static void runActionOnLoadedChunks(WorldServer worldServer, Collection<Chunk> chunks, Consumer<Chunk> chunkConsumer){
+        chunks.forEach(chunkConsumer);
+    }
+
+    private static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks, boolean saveChunks, Consumer<NBTTagCompound> chunkConsumer, Runnable onFinish){
+        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
+
+        Executor.createTask().runAsync(v -> {
+            chunks.forEach(chunkCoords -> {
+                try{
+                    NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
+
+                    if(chunkCompound == null){
+                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, worldServer);
+                        chunkCompound = ChunkRegionLoader.saveChunk(worldServer, protoChunk);
+                    }
+
+                    else{
+                        chunkCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
+                                Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
+                    }
+
+                    if(chunkCompound.hasKeyOfType("Level", 10)) {
+                        chunkConsumer.accept(chunkCompound.getCompound("Level"));
+                        if(saveChunks)
+                            playerChunkMap.a(chunkCoords, chunkCompound);
+                    }
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            });
+        }).runSync(v -> {
+            if(onFinish != null)
+                onFinish.run();
+        });
+    }
+
+    private static void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){
         WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
         PlayerChunkMap playerChunkMap = world.getChunkProvider().a;
 
@@ -749,7 +827,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
     }
 
-    private ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoords, WorldServer worldServer){
+    private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoords, WorldServer worldServer){
         try {
             return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer, worldServer);
         }catch(Throwable ex){
