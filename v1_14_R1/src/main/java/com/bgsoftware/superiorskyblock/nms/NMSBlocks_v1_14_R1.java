@@ -20,7 +20,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
-import net.minecraft.server.v1_14_R1.BiomeBase;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockBed;
 import net.minecraft.server.v1_14_R1.BlockPosition;
@@ -42,7 +41,6 @@ import net.minecraft.server.v1_14_R1.HeightMap;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.IBlockState;
 import net.minecraft.server.v1_14_R1.IChatBaseComponent;
-import net.minecraft.server.v1_14_R1.IRegistry;
 import net.minecraft.server.v1_14_R1.ITickable;
 import net.minecraft.server.v1_14_R1.LightEngine;
 import net.minecraft.server.v1_14_R1.LightEngineBlock;
@@ -52,10 +50,8 @@ import net.minecraft.server.v1_14_R1.NBTTagList;
 import net.minecraft.server.v1_14_R1.Packet;
 import net.minecraft.server.v1_14_R1.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_14_R1.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_14_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunk;
 import net.minecraft.server.v1_14_R1.PlayerChunkMap;
-import net.minecraft.server.v1_14_R1.PlayerConnection;
 import net.minecraft.server.v1_14_R1.ProtoChunk;
 import net.minecraft.server.v1_14_R1.TagsBlock;
 import net.minecraft.server.v1_14_R1.TileEntity;
@@ -65,19 +61,16 @@ import net.minecraft.server.v1_14_R1.World;
 import net.minecraft.server.v1_14_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_14_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_14_R1.block.CraftSign;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_14_R1.util.UnsafeList;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -492,31 +485,6 @@ public final class NMSBlocks_v1_14_R1 implements NMSBlocks {
         });
 
         ChunksTracker.markEmpty(island, chunkPosition, false);
-    }
-
-    @Override
-    public void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
-            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-            Arrays.fill(chunk.getBiomeIndex(), biomeBase);
-            chunk.markDirty();
-
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
-
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
-        },
-        levelCompound -> {
-            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-            int[] biomes = levelCompound.hasKeyOfType("Biomes", 11) ? levelCompound.getIntArray("Biomes") : new int[256];
-            Arrays.fill(biomes, IRegistry.BIOME.a(biomeBase));
-            levelCompound.setIntArray("Biomes", biomes);
-        });
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){

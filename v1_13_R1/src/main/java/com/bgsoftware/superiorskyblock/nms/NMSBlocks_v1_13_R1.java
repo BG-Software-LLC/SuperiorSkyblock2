@@ -462,34 +462,6 @@ public final class NMSBlocks_v1_13_R1 implements NMSBlocks {
         }, chunk -> refreshChunk(chunk.bukkitChunk));
     }
 
-    @Override
-    public void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
-            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-            BiomeBase[] biomeIndex = chunk.getBiomeIndex();
-
-            if(chunk instanceof ProtoChunk && biomeIndex == null) {
-                biomeIndex = new BiomeBase[256];
-                chunk.a(biomeIndex);
-            }
-
-            Arrays.fill(biomeIndex, biomeBase);
-            if(chunk instanceof Chunk)
-                ((Chunk) chunk).markDirty();
-        },
-        chunk -> {
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
-
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
-        });
-    }
-
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<IChunkAccess> chunkConsumer, Consumer<Chunk> updateChunk){
         runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, updateChunk);
     }

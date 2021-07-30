@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
+import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
@@ -103,6 +104,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
+    private NMSChunks nmsChunks;
     private NMSHolograms nmsHolograms;
     private NMSDragonFight nmsDragonFight;
 
@@ -300,6 +302,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
+            nmsChunks = (NMSChunks) Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.NMSChunksImpl", version)).newInstance();
             nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
             if (new SettingsHandler(this).endDragonFight)
                 nmsDragonFight = (NMSDragonFight) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSDragonFight_" + version).newInstance();
@@ -581,6 +584,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSDragonFight getNMSDragonFight() {
         return nmsDragonFight;
+    }
+
+    public NMSChunks getNMSChunks() {
+        return nmsChunks;
     }
 
     public String getFileName(){

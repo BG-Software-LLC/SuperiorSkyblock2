@@ -44,7 +44,6 @@ import net.minecraft.server.v1_16_R2.HeightMap;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.IBlockState;
 import net.minecraft.server.v1_16_R2.IChatBaseComponent;
-import net.minecraft.server.v1_16_R2.IRegistry;
 import net.minecraft.server.v1_16_R2.ITickable;
 import net.minecraft.server.v1_16_R2.LightEngine;
 import net.minecraft.server.v1_16_R2.LightEngineBlock;
@@ -54,10 +53,8 @@ import net.minecraft.server.v1_16_R2.NBTTagList;
 import net.minecraft.server.v1_16_R2.Packet;
 import net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_16_R2.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunkMap;
-import net.minecraft.server.v1_16_R2.PlayerConnection;
 import net.minecraft.server.v1_16_R2.ProtoChunk;
 import net.minecraft.server.v1_16_R2.TagsBlock;
 import net.minecraft.server.v1_16_R2.TileEntity;
@@ -67,19 +64,16 @@ import net.minecraft.server.v1_16_R2.World;
 import net.minecraft.server.v1_16_R2.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_16_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R2.block.CraftSign;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R2.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_16_R2.util.CraftChatMessage;
 import org.bukkit.craftbukkit.v1_16_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_16_R2.util.UnsafeList;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
@@ -523,38 +517,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         });
 
         ChunksTracker.markEmpty(island, chunkPosition, false);
-    }
-
-    @Override
-    public void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-        WorldServer world = ((CraftWorld) chunkPosition.getWorld()).getHandle();
-        IRegistry<BiomeBase> biomeBaseRegistry = world.r().b(IRegistry.ay);
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biomeBaseRegistry, biome);
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, true, chunk -> {
-            BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(chunk.getBiomeIndex());
-
-            if(biomeBases == null)
-                throw new RuntimeException("Error while receiving biome bases of chunk (" + chunkCoords.x + "," + chunkCoords.z + ").");
-
-            Arrays.fill(biomeBases, biomeBase);
-            chunk.markDirty();
-
-            PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
-            PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
-
-            playersToUpdate.forEach(player -> {
-                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
-                playerConnection.sendPacket(unloadChunkPacket);
-                playerConnection.sendPacket(mapChunkPacket);
-            });
-        },
-        levelCompound -> {
-            int[] biomes = levelCompound.hasKeyOfType("Biomes", 11) ? levelCompound.getIntArray("Biomes") : new int[256];
-            Arrays.fill(biomes, biomeBaseRegistry.a(biomeBase));
-            levelCompound.setIntArray("Biomes", biomes);
-        });
     }
 
     private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer){

@@ -1447,7 +1447,7 @@ public final class SIsland implements Island {
             {
                 World normalWorld = getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, false, false);
-                plugin.getNMSBlocks().setChunkBiomes(chunkPositions, biome, playersToUpdate);
+                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
             }
 
             if (plugin.getProviders().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
@@ -1455,19 +1455,19 @@ public final class SIsland implements Island {
                 Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                         ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
-                plugin.getNMSBlocks().setChunkBiomes(chunkPositions, netherBiome, playersToUpdate);
+                plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
             }
 
             if (plugin.getProviders().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
                 World endWorld = getCenter(World.Environment.THE_END).getWorld();
                 Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
-                plugin.getNMSBlocks().setChunkBiomes(chunkPositions, endBiome, playersToUpdate);
+                plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
             }
 
             for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, registeredWorld, false, false);
-                plugin.getNMSBlocks().setChunkBiomes(chunkPositions, biome, playersToUpdate);
+                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
             }
         }
 

@@ -17,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -58,14 +57,6 @@ public interface NMSBlocks {
     CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition);
 
     void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish);
-
-    default void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate){
-
-    }
-
-    default void setChunkBiomes(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate){
-
-    }
 
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
