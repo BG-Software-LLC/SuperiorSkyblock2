@@ -7,15 +7,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.minecraft.server.v1_13_R2.Block;
 import net.minecraft.server.v1_13_R2.BlockBed;
 import net.minecraft.server.v1_13_R2.BlockPosition;
@@ -24,9 +21,7 @@ import net.minecraft.server.v1_13_R2.BlockPropertySlabType;
 import net.minecraft.server.v1_13_R2.BlockStateBoolean;
 import net.minecraft.server.v1_13_R2.BlockStateEnum;
 import net.minecraft.server.v1_13_R2.BlockStateInteger;
-import net.minecraft.server.v1_13_R2.Blocks;
 import net.minecraft.server.v1_13_R2.Chunk;
-import net.minecraft.server.v1_13_R2.ChunkConverter;
 import net.minecraft.server.v1_13_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_13_R2.ChunkSection;
 import net.minecraft.server.v1_13_R2.EntityHuman;
@@ -36,16 +31,12 @@ import net.minecraft.server.v1_13_R2.HeightMap;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IBlockState;
 import net.minecraft.server.v1_13_R2.IChatBaseComponent;
-import net.minecraft.server.v1_13_R2.IChunkAccess;
-import net.minecraft.server.v1_13_R2.IChunkLoader;
 import net.minecraft.server.v1_13_R2.ITickable;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.Packet;
 import net.minecraft.server.v1_13_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_13_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_13_R2.PlayerChunkMap;
-import net.minecraft.server.v1_13_R2.ProtoChunk;
-import net.minecraft.server.v1_13_R2.ProtoChunkExtension;
 import net.minecraft.server.v1_13_R2.TagsBlock;
 import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntitySign;
@@ -71,9 +62,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "ConstantConditions", "rawtypes"})
 public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
@@ -359,85 +348,6 @@ public final class NMSBlocks_v1_13_R2 implements NMSBlocks {
         Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().getChunkProvider().chunks
                 .get(ChunkCoordIntPair.a(chunkPosition.getX(), chunkPosition.getZ()));
         return chunk == null ? null : chunk.bukkitChunk;
-    }
-
-    @Override
-    public CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-
-        CompletableFuture<CalculatedChunk> completableFuture = new CompletableFuture<>();
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, false, chunk -> {
-            KeyMap<Integer> blockCounts = new KeyMap<>();
-            Set<Location> spawnersLocations = new HashSet<>();
-
-            for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != null && chunkSection != Chunk.a) {
-                    for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        if (blockData.getBlock() != Blocks.AIR) {
-                            Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
-                            int blockAmount = 1;
-
-                            if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(BlockProperties.au) == BlockPropertySlabType.DOUBLE) {
-                                blockAmount = 2;
-                                blockData = blockData.set(BlockProperties.au, BlockPropertySlabType.BOTTOM);
-                            }
-
-                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                            if (type == Material.SPAWNER) {
-                                spawnersLocations.add(location);
-                            }
-                        }
-                    }
-                }
-            }
-
-            completableFuture.complete(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
-        }, null);
-
-        return completableFuture;
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<IChunkAccess> chunkConsumer, Consumer<Chunk> updateChunk) {
-        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, updateChunk);
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<IChunkAccess> chunkConsumer, Consumer<Chunk> updateChunk) {
-        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
-        IChunkLoader chunkLoader = world.getChunkProvider().chunkLoader;
-
-        Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
-
-        if (chunk != null) {
-            chunkConsumer.accept(chunk);
-            if (updateChunk != null)
-                updateChunk.accept(chunk);
-            if (onFinish != null)
-                onFinish.run();
-        } else {
-            Executor.createTask().runAsync(v -> {
-                try {
-                    ProtoChunk protoChunk = chunkLoader.b(world, chunkCoords.x, chunkCoords.z, chunkAccess -> {
-                    });
-
-                    if (protoChunk == null || protoChunk instanceof ProtoChunkExtension)
-                        protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a);
-
-                    chunkConsumer.accept(protoChunk);
-                    if (saveChunk)
-                        chunkLoader.saveChunk(world, protoChunk);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }).runSync(v -> {
-                if (onFinish != null)
-                    onFinish.run();
-            });
-        }
     }
 
     @Override

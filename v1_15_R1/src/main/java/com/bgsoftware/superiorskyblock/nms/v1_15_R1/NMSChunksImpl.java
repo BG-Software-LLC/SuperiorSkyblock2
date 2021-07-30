@@ -6,13 +6,20 @@ import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.BlockPosition;
+import net.minecraft.server.v1_15_R1.BlockProperties;
+import net.minecraft.server.v1_15_R1.BlockPropertySlabType;
+import net.minecraft.server.v1_15_R1.Blocks;
 import net.minecraft.server.v1_15_R1.Chunk;
 import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_15_R1.ChunkSection;
 import net.minecraft.server.v1_15_R1.EntityHuman;
+import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.IRegistry;
 import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import net.minecraft.server.v1_15_R1.NBTTagList;
@@ -20,21 +27,28 @@ import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_15_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_15_R1.PlayerConnection;
 import net.minecraft.server.v1_15_R1.ProtoChunk;
+import net.minecraft.server.v1_15_R1.TagsBlock;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_15_R1.util.UnsafeList;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
@@ -143,6 +157,78 @@ public final class NMSChunksImpl implements NMSChunks {
                 }
             }
         });
+    }
+
+    @Override
+    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
+        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+        List<CalculatedChunk> allCalculatedChunks = new ArrayList<>();
+
+        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
+                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
+                .collect(Collectors.toList());
+        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
+
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
+            completableFuture.complete(allCalculatedChunks);
+        }, chunk -> {
+            ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld().getWorld(), chunk.getPos().x, chunk.getPos().z);
+            allCalculatedChunks.add(calculateChunk(chunkPosition, chunk.getSections()));
+        }, (chunkCoords, unloadedChunk) -> {
+            NBTTagList sectionsList = unloadedChunk.getList("Sections", 10);
+            ChunkSection[] chunkSections = new ChunkSection[sectionsList.size()];
+
+            for (int i = 0; i < sectionsList.size(); ++i) {
+                NBTTagCompound sectionCompound = sectionsList.getCompound(i);
+                byte yPosition = sectionCompound.getByte("Y");
+                if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
+                    //noinspection deprecation
+                    chunkSections[i] = new ChunkSection(yPosition << 4);
+                    chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
+                }
+            }
+
+            ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunkCoords.x, chunkCoords.z);
+            allCalculatedChunks.add(calculateChunk(chunkPosition, chunkSections));
+        });
+
+        return completableFuture;
+    }
+
+    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
+        KeyMap<Integer> blockCounts = new KeyMap<>();
+        Set<Location> spawnersLocations = new HashSet<>();
+
+        for (ChunkSection chunkSection : chunkSections) {
+            if (chunkSection != null) {
+                for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                    IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                    if (blockData.getBlock() != Blocks.AIR) {
+                        Location location = new Location(chunkPosition.getWorld(),
+                                (chunkPosition.getX() << 4) + bp.getX(),
+                                chunkSection.getYPosition() + bp.getY(),
+                                (chunkPosition.getZ() << 4) + bp.getZ());
+
+                        int blockAmount = 1;
+
+                        if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
+                                blockData.get(BlockProperties.aD) == BlockPropertySlabType.DOUBLE) {
+                            blockAmount = 2;
+                            blockData = blockData.set(BlockProperties.aD, BlockPropertySlabType.BOTTOM);
+                        }
+
+                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
+                        Key blockKey = Key.of(type.name() + "", "", location);
+                        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                        if (type == Material.SPAWNER) {
+                            spawnersLocations.add(location);
+                        }
+                    }
+                }
+            }
+        }
+
+        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
     }
 
     private static void removeEntities(Chunk chunk) {

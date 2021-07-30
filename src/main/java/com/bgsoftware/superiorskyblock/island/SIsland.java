@@ -1220,14 +1220,14 @@ public final class SIsland implements Island {
 
     @Override
     public void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
-        if(!Bukkit.isPrimaryThread()){
+        if (!Bukkit.isPrimaryThread()) {
             Executor.sync(() -> calcIslandWorth(asker, callback));
             return;
         }
 
-        long lastUpdateTime =  getLastTimeUpdate();
+        long lastUpdateTime = getLastTimeUpdate();
 
-        if(lastUpdateTime != -1 && (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600){
+        if (lastUpdateTime != -1 && (System.currentTimeMillis() / 1000) - lastUpdateTime >= 600) {
             finishCalcIsland(asker, callback, getIslandLevel(), getWorth());
             return;
         }
@@ -1236,23 +1236,19 @@ public final class SIsland implements Island {
 
         SuperiorSkyblockPlugin.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + (asker == null ? "Null" : asker.getName()));
 
-        CompletableFutureList<CalculatedChunk> chunksToLoad = new CompletableFutureList<>();
+        CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
         BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
                 new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
 
-        if(snapshot == null) {
-//            chunksToLoad.addAll(IslandUtils.getChunkCoords(this, true, true).values().stream()
-//                    .map(chunkPosition -> plugin.getNMSBlocks().calculateChunk(chunkPosition))
-//                    .collect(Collectors.toList()));
-        }
-        else{
-            IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk).forEach(completableFuture -> {
-                CompletableFuture<CalculatedChunk> calculateCompletable = new CompletableFuture<>();
-                completableFuture.whenComplete((chunk, ex) -> plugin.getNMSBlocks().calculateChunk(ChunkPosition.of(chunk)).whenComplete(
-                        (pair, ex2) -> calculateCompletable.complete(pair)));
-                chunksToLoad.add(calculateCompletable);
-            });
+        if (snapshot == null) {
+            IslandUtils.getChunkCoords(this, true, true).values().forEach(worldChunks ->
+                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks)));
+        } else {
+            IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk)
+                    .forEach(completableFuture -> completableFuture.whenComplete((chunk, ex) -> chunksToLoad.add(
+                            plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)))
+                    )));
         }
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
@@ -1265,7 +1261,7 @@ public final class SIsland implements Island {
         Map<Location, Pair<Integer, ItemStack>> blocksToCheck = new HashMap<>();
 
         Executor.createTask().runAsync(v -> {
-            chunksToLoad.forEachCompleted(calculatedChunk -> {
+            chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->
                         key.getGlobalKey().equals(ConstantKeys.MOB_SPAWNER.getGlobalKey()));
@@ -1274,41 +1270,37 @@ public final class SIsland implements Island {
                 handleBlocksPlace(calculatedChunk.getBlockCounts(), false, blockCounts, islandWorth, islandLevel);
 
                 // Load spawners
-                for(Location location : calculatedChunk.getSpawners()){
+                for (Location location : calculatedChunk.getSpawners()) {
                     Pair<Integer, String> spawnerInfo = snapshot != null ? snapshot.getSpawner(location) : plugin.getProviders().getSpawner(location);
 
-                    if(spawnerInfo.getValue() == null){
+                    if (spawnerInfo.getValue() == null) {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
-                    }
-                    else{
+                    } else {
                         Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
                         handleBlockPlace(spawnerKey, spawnerInfo.getKey(), false, blockCounts, islandWorth, islandLevel);
                     }
                 }
 
                 // Load stacked blocks
-                if(snapshot != null){
-                    for(Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(calculatedChunk.getPosition())){
+                if (snapshot != null) {
+                    for (Pair<Integer, ItemStack> stackedBlock : snapshot.getBlocks(calculatedChunk.getPosition())) {
                         handleBlockPlace(Key.of(stackedBlock.getValue()), stackedBlock.getKey() - 1, false,
                                 blockCounts, islandWorth, islandLevel);
                     }
-                }
-                else {
+                } else {
                     Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
                             plugin.getProviders().getBlocks(calculatedChunk.getPosition());
-                    if(stackedBlocks == null){
+                    if (stackedBlocks == null) {
                         chunksToCheck.add(calculatedChunk.getPosition());
-                    }
-                    else {
+                    } else {
                         for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : stackedBlocks)
                             handleBlockPlace(pair.getKey(), pair.getValue() - 1, false, blockCounts, islandWorth, islandLevel);
                     }
                 }
 
-                for(StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
+                for (StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
                     handleBlockPlace(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1, false, blockCounts, islandWorth, islandLevel);
-
-            }, (cF, ex) -> {
+            }), (cF, ex) -> {
                 SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                 ex.printStackTrace();
             });
@@ -1316,17 +1308,17 @@ public final class SIsland implements Island {
             Key blockKey;
             int blockCount;
 
-            for(Pair<Location, Integer> pair : spawnersToCheck){
+            for (Pair<Location, Integer> pair : spawnersToCheck) {
                 try {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
                     blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", creatureSpawner.getSpawnedType() + "", pair.getKey());
                     blockCount = pair.getValue();
 
-                    if(blockCount <= 0) {
+                    if (blockCount <= 0) {
                         Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
 
                         String entityType = spawnerInfo.getValue();
-                        if(entityType == null)
+                        if (entityType == null)
                             entityType = creatureSpawner.getSpawnedType().name();
 
                         blockCount = spawnerInfo.getKey();
@@ -1334,11 +1326,12 @@ public final class SIsland implements Island {
                     }
 
                     handleBlockPlace(blockKey, blockCount, false, blockCounts, islandWorth, islandLevel);
-                }catch(Throwable ignored){}
+                } catch (Throwable ignored) {
+                }
             }
             spawnersToCheck.clear();
 
-            for(ChunkPosition chunkPosition : chunksToCheck) {
+            for (ChunkPosition chunkPosition : chunksToCheck) {
                 for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition))
                     handleBlockPlace(pair.getKey(), pair.getValue() - 1, false, blockCounts, islandWorth, islandLevel);
             }

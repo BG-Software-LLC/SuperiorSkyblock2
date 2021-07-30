@@ -52,8 +52,6 @@ public interface NMSBlocks {
 
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
-    CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition);
-
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
     void handleSignPlace(Island island, Location location);

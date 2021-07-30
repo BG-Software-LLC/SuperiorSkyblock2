@@ -6,17 +6,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R1.Block;
 import net.minecraft.server.v1_8_R1.BlockDoubleStep;
-import net.minecraft.server.v1_8_R1.BlockDoubleStepAbstract;
 import net.minecraft.server.v1_8_R1.BlockPosition;
-import net.minecraft.server.v1_8_R1.Blocks;
 import net.minecraft.server.v1_8_R1.ChatSerializer;
 import net.minecraft.server.v1_8_R1.Chunk;
 import net.minecraft.server.v1_8_R1.ChunkCoordIntPair;
@@ -28,7 +23,6 @@ import net.minecraft.server.v1_8_R1.IBlockData;
 import net.minecraft.server.v1_8_R1.IChatBaseComponent;
 import net.minecraft.server.v1_8_R1.IChunkLoader;
 import net.minecraft.server.v1_8_R1.IUpdatePlayerListBox;
-import net.minecraft.server.v1_8_R1.MinecraftKey;
 import net.minecraft.server.v1_8_R1.NBTTagCompound;
 import net.minecraft.server.v1_8_R1.Packet;
 import net.minecraft.server.v1_8_R1.PacketPlayOutBlockChange;
@@ -54,9 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
@@ -246,91 +238,6 @@ public final class NMSBlocks_v1_8_R1 implements NMSBlocks {
         Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().chunkProviderServer
                 .getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
         return chunk == null ? null : chunk.bukkitChunk;
-    }
-
-    @Override
-    public CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-
-        CompletableFuture<CalculatedChunk> completableFuture = new CompletableFuture<>();
-
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, false, chunk -> {
-            KeyMap<Integer> blockCounts = new KeyMap<>();
-            Set<Location> spawnersLocations = new HashSet<>();
-
-            for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != null) {
-                    //noinspection all
-                    for (BlockPosition bp : (Iterable<BlockPosition>) BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
-                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        if (blockData.getBlock() != Blocks.AIR) {
-                            Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
-                            int blockAmount = 1;
-
-                            if (blockData.getBlock() instanceof BlockDoubleStep) {
-                                blockAmount = 2;
-                                // Converts the block data to a regular slab
-                                MinecraftKey blockKey = (MinecraftKey) Block.REGISTRY.c(blockData.getBlock());
-                                blockData = ((Block) Block.REGISTRY.get(new MinecraftKey(blockKey.a()
-                                        .replace("double_", "")))).getBlockData()
-                                        .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
-                            }
-
-                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            short data = (short) blockData.getBlock().toLegacyData(blockData);
-                            Key blockKey = Key.of(type, data, location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                            if (type == Material.MOB_SPAWNER) {
-                                spawnersLocations.add(location);
-                            }
-                        }
-                    }
-                }
-            }
-
-            completableFuture.complete(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
-        });
-
-        return completableFuture;
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer) {
-        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, null);
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<Chunk> updateChunk) {
-        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
-        IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(bukkitWorld.getUID(), uuid -> CHUNK_LOADER.get(world.chunkProviderServer));
-
-        Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
-
-        if (chunk != null) {
-            chunkConsumer.accept(chunk);
-            if (updateChunk != null)
-                updateChunk.accept(chunk);
-            if (onFinish != null)
-                onFinish.run();
-        } else try {
-            Chunk loadedChunk = chunkLoader.a(world, chunkCoords.x, chunkCoords.z);
-
-            if (loadedChunk != null)
-                chunkConsumer.accept(loadedChunk);
-
-            if (loadedChunk != null) {
-                if (saveChunk) {
-                    try {
-                        chunkLoader.a(world, loadedChunk);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-
-            if (onFinish != null)
-                onFinish.run();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
     }
 
     @Override

@@ -5,29 +5,45 @@ import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import net.minecraft.server.v1_9_R2.BiomeBase;
+import net.minecraft.server.v1_9_R2.Block;
+import net.minecraft.server.v1_9_R2.BlockDoubleStep;
+import net.minecraft.server.v1_9_R2.BlockDoubleStepAbstract;
 import net.minecraft.server.v1_9_R2.BlockPosition;
+import net.minecraft.server.v1_9_R2.Blocks;
 import net.minecraft.server.v1_9_R2.Chunk;
 import net.minecraft.server.v1_9_R2.ChunkCoordIntPair;
+import net.minecraft.server.v1_9_R2.ChunkSection;
 import net.minecraft.server.v1_9_R2.EntityHuman;
+import net.minecraft.server.v1_9_R2.IBlockData;
+import net.minecraft.server.v1_9_R2.MinecraftKey;
 import net.minecraft.server.v1_9_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_9_R2.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_9_R2.PlayerConnection;
 import net.minecraft.server.v1_9_R2.TileEntity;
 import net.minecraft.server.v1_9_R2.WorldServer;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_9_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_9_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R2.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_9_R2.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_9_R2.util.UnsafeList;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
@@ -84,6 +100,61 @@ public final class NMSChunksImpl implements NMSChunks {
         }, chunk -> {
             NMSUtils.sendPacketToRelevantPlayers(worldServer, chunk.locX, chunk.locZ, new PacketPlayOutMapChunk(chunk, 65535));
         });
+    }
+
+    @Override
+    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
+        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+        List<CalculatedChunk> allCalculatedChunks = new ArrayList<>();
+
+        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
+                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
+                .collect(Collectors.toList());
+        WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
+
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
+            completableFuture.complete(allCalculatedChunks);
+        }, chunk -> {
+            ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
+
+            KeyMap<Integer> blockCounts = new KeyMap<>();
+            Set<Location> spawnersLocations = new HashSet<>();
+
+            for (ChunkSection chunkSection : chunk.getSections()) {
+                if (chunkSection != null && chunkSection != Chunk.a) {
+                    for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
+                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                        if (blockData.getBlock() != Blocks.AIR) {
+                            Location location = new Location(worldServer.getWorld(),
+                                    (chunkPosition.getX() << 4) + bp.getX(),
+                                    chunkSection.getYPosition() + bp.getY(),
+                                    (chunkPosition.getZ() << 4) + bp.getZ());
+                            int blockAmount = 1;
+
+                            if (blockData.getBlock() instanceof BlockDoubleStep) {
+                                blockAmount = 2;
+                                // Converts the block data to a regular slab
+                                MinecraftKey blockKey = Block.REGISTRY.b(blockData.getBlock());
+                                blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
+                                                .replace("double_", ""))).getBlockData()
+                                        .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                            }
+
+                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
+                            Key blockKey = Key.of(type.name() + "", "", location);
+                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                            if (type == Material.MOB_SPAWNER) {
+                                spawnersLocations.add(location);
+                            }
+                        }
+                    }
+                }
+            }
+
+            allCalculatedChunks.add(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
+        }, null);
+
+        return completableFuture;
     }
 
     private static void removeEntities(Chunk chunk) {

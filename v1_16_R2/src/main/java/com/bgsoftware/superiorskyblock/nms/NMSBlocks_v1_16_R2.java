@@ -8,16 +8,13 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
 import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
 import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R2.Block;
 import net.minecraft.server.v1_16_R2.BlockBed;
 import net.minecraft.server.v1_16_R2.BlockPosition;
@@ -26,11 +23,9 @@ import net.minecraft.server.v1_16_R2.BlockPropertySlabType;
 import net.minecraft.server.v1_16_R2.BlockStateBoolean;
 import net.minecraft.server.v1_16_R2.BlockStateEnum;
 import net.minecraft.server.v1_16_R2.BlockStateInteger;
-import net.minecraft.server.v1_16_R2.Blocks;
 import net.minecraft.server.v1_16_R2.Chunk;
 import net.minecraft.server.v1_16_R2.ChunkConverter;
 import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R2.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.EnumSkyBlock;
 import net.minecraft.server.v1_16_R2.GameRules;
@@ -43,7 +38,6 @@ import net.minecraft.server.v1_16_R2.LightEngine;
 import net.minecraft.server.v1_16_R2.LightEngineBlock;
 import net.minecraft.server.v1_16_R2.LightEngineGraph;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
-import net.minecraft.server.v1_16_R2.NBTTagList;
 import net.minecraft.server.v1_16_R2.Packet;
 import net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
@@ -70,13 +64,9 @@ import org.bukkit.entity.Minecart;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "ConstantConditions", "rawtypes"})
 public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
@@ -351,109 +341,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().getChunkProvider()
                 .getChunkAt(chunkPosition.getX(), chunkPosition.getZ(), false);
         return chunk == null ? null : chunk.bukkitChunk;
-    }
-
-    @Override
-    public CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition) {
-        ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ());
-
-        CompletableFuture<CalculatedChunk> completableFuture = new CompletableFuture<>();
-        KeyMap<Integer> blockCounts = new KeyMap<>();
-        Set<Location> spawnersLocations = new HashSet<>();
-
-        Consumer<ChunkSection[]> calculateConsumer = chunkSections -> {
-            for (ChunkSection chunkSection : chunkSections) {
-                if (chunkSection != null) {
-                    for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                        IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        if (blockData.getBlock() != Blocks.AIR) {
-                            Location location = new Location(chunkPosition.getWorld(), (chunkCoords.x << 4) + bp.getX(), chunkSection.getYPosition() + bp.getY(), (chunkCoords.z << 4) + bp.getZ());
-                            int blockAmount = 1;
-
-                            if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                    blockData.get(BlockProperties.aK) == BlockPropertySlabType.DOUBLE) {
-                                blockAmount = 2;
-                                blockData = blockData.set(BlockProperties.aK, BlockPropertySlabType.BOTTOM);
-                            }
-
-                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
-                            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                            if (type == Material.SPAWNER) {
-                                spawnersLocations.add(location);
-                            }
-                        }
-                    }
-                }
-            }
-
-            completableFuture.complete(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
-        };
-
-        //noinspection all
-        runActionOnChunk(chunkPosition.getWorld(), chunkCoords, false, chunk -> {
-                    calculateConsumer.accept(chunk.getSections());
-                },
-                levelCompound -> {
-                    NBTTagList sectionsList = levelCompound.getList("Sections", 10);
-                    ChunkSection[] chunkSections = new ChunkSection[sectionsList.size()];
-
-                    for (int i = 0; i < sectionsList.size(); ++i) {
-                        NBTTagCompound sectionCompound = sectionsList.getCompound(i);
-                        byte yPosition = sectionCompound.getByte("Y");
-                        if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
-                            //noinspection deprecation
-                            chunkSections[i] = new ChunkSection(yPosition << 4);
-                            chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
-                        }
-                    }
-
-                    calculateConsumer.accept(chunkSections);
-                });
-
-        return completableFuture;
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer) {
-        runActionOnChunk(bukkitWorld, chunkCoords, saveChunk, null, chunkConsumer, compoundConsumer);
-    }
-
-    private void runActionOnChunk(org.bukkit.World bukkitWorld, ChunkCoordIntPair chunkCoords, boolean saveChunk, Runnable onFinish, Consumer<Chunk> chunkConsumer, Consumer<NBTTagCompound> compoundConsumer) {
-        WorldServer world = ((CraftWorld) bukkitWorld).getHandle();
-        PlayerChunkMap playerChunkMap = world.getChunkProvider().playerChunkMap;
-
-        Chunk chunk = world.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);
-
-        if (chunk != null) {
-            chunkConsumer.accept(chunk);
-            if (onFinish != null)
-                onFinish.run();
-        } else {
-            Executor.createTask().runAsync(v -> {
-                try {
-                    NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
-
-                    if (chunkCompound == null) {
-                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, world);
-                        chunkCompound = ChunkRegionLoader.saveChunk(world, protoChunk);
-                    } else {
-                        chunkCompound = playerChunkMap.getChunkData(world.getTypeKey(),
-                                Suppliers.ofInstance(world.getWorldPersistentData()), chunkCompound, chunkCoords, world);
-                    }
-
-                    if (chunkCompound.hasKeyOfType("Level", 10)) {
-                        compoundConsumer.accept(chunkCompound.getCompound("Level"));
-                        if (saveChunk)
-                            playerChunkMap.a(chunkCoords, chunkCompound);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }).runSync(v -> {
-                if (onFinish != null)
-                    onFinish.run();
-            });
-        }
     }
 
     @Override
