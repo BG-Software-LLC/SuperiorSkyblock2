@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.NMSUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -16,18 +17,14 @@ import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R3.ChunkProviderServer;
 import net.minecraft.server.v1_8_R3.ChunkSection;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.IChunkLoader;
 import net.minecraft.server.v1_8_R3.IUpdatePlayerListBox;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
-import net.minecraft.server.v1_8_R3.Packet;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
-import net.minecraft.server.v1_8_R3.PlayerChunkMap;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.TileEntitySign;
 import net.minecraft.server.v1_8_R3.World;
@@ -89,7 +86,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         int combinedId = material.getId() + (data << 12);
         setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
 
-        sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
+        NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
 
@@ -222,7 +219,7 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
                 new PacketPlayOutMapChunk(chunk, false, 65535));
     }
 
@@ -288,14 +285,6 @@ public final class NMSBlocks_v1_8_R3 implements NMSBlocks {
         }
 
         return 1;
-    }
-
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getPlayerChunkMap();
-        for (EntityHuman entityHuman : worldServer.players) {
-            if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
-                ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
-        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerListBox {

@@ -5,6 +5,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.NMSUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -23,13 +24,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.LightEngineThreaded;
-import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.tags.TagsBlock;
@@ -57,7 +56,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateInteger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.chunk.BiomeStorage;
 import net.minecraft.world.level.chunk.Chunk;
-import net.minecraft.world.level.chunk.ChunkConverter;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
@@ -186,7 +184,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
                     ChunkProviderServer chunkProviderServer = world.getChunkProvider();
                     LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
                             starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
-                                    chunkProviderServer.h.execute(() -> sendPacketToRelevantPlayers(world, chunkPos.b, chunkPos.c,
+                                    chunkProviderServer.h.execute(() -> NMSUtils.sendPacketToRelevantPlayers(world, chunkPos.b, chunkPos.c,
                                             new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, null, null, true))
                                     ), null));
                 } else {
@@ -216,7 +214,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, getCombinedId(material, data), null, null);
-        sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
+        NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
 
@@ -364,7 +362,7 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoords = chunk.getPos();
         //noinspection deprecation
-        sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(), chunkCoords.b, chunkCoords.c, new PacketPlayOutMapChunk(chunk));
+        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(), chunkCoords.b, chunkCoords.c, new PacketPlayOutMapChunk(chunk));
     }
 
     @Override
@@ -475,21 +473,6 @@ public final class NMSBlocks_v1_17_R1 implements NMSBlocks {
         }
 
         return 1;
-    }
-
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
-        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).a(packet, false);
-    }
-
-    private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoords, WorldServer worldServer) {
-        try {
-            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer, worldServer);
-        } catch (Throwable ex) {
-            //noinspection deprecation
-            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer);
-        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity {

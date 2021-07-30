@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R2.NMSUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
@@ -24,7 +25,6 @@ import net.minecraft.server.v1_16_R2.BlockStateBoolean;
 import net.minecraft.server.v1_16_R2.BlockStateEnum;
 import net.minecraft.server.v1_16_R2.BlockStateInteger;
 import net.minecraft.server.v1_16_R2.Chunk;
-import net.minecraft.server.v1_16_R2.ChunkConverter;
 import net.minecraft.server.v1_16_R2.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R2.ChunkSection;
 import net.minecraft.server.v1_16_R2.EnumSkyBlock;
@@ -38,12 +38,10 @@ import net.minecraft.server.v1_16_R2.LightEngine;
 import net.minecraft.server.v1_16_R2.LightEngineBlock;
 import net.minecraft.server.v1_16_R2.LightEngineGraph;
 import net.minecraft.server.v1_16_R2.NBTTagCompound;
-import net.minecraft.server.v1_16_R2.Packet;
 import net.minecraft.server.v1_16_R2.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R2.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunk;
 import net.minecraft.server.v1_16_R2.PlayerChunkMap;
-import net.minecraft.server.v1_16_R2.ProtoChunk;
 import net.minecraft.server.v1_16_R2.TagsBlock;
 import net.minecraft.server.v1_16_R2.TileEntity;
 import net.minecraft.server.v1_16_R2.TileEntitySign;
@@ -171,7 +169,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, getCombinedId(material, data), null, null);
-        sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
+        NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
 
@@ -312,7 +310,7 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         ChunkCoordIntPair chunkCoords = chunk.getPos();
-        sendPacketToRelevantPlayers(chunk.world, chunkCoords.x, chunkCoords.z,
+        NMSUtils.sendPacketToRelevantPlayers(chunk.world, chunkCoords.x, chunkCoords.z,
                 new PacketPlayOutMapChunk(chunk, 65535));
     }
 
@@ -415,28 +413,6 @@ public final class NMSBlocks_v1_16_R2 implements NMSBlocks {
         }
 
         return 1;
-    }
-
-    private void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
-        PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
-        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        try {
-            playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair()).sendPacketToTrackedPlayers(packet, false);
-        } catch (Throwable ex) {
-            VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair()).players.a(chunkCoordIntPair, false)
-                    .forEach(entityPlayer -> entityPlayer.playerConnection.sendPacket(packet));
-        }
-    }
-
-    private static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoord, World world) {
-        try {
-            // Paper's constructor for ProtoChunk
-            return new ProtoChunk(chunkCoord, ChunkConverter.a, world);
-        } catch (Throwable ex) {
-            // Spigot's constructor for ProtoChunk
-            // noinspection deprecation
-            return new ProtoChunk(chunkCoord, ChunkConverter.a);
-        }
     }
 
     private static final class CropsTickingTileEntity extends TileEntity implements ITickable {
