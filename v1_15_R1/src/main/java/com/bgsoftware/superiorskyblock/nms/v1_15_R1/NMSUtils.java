@@ -118,15 +118,16 @@ public final class NMSUtils {
     public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().playerChunkMap;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        PlayerChunk playerChunk;
+
         try {
-            PlayerChunk playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
-            if(playerChunk != null)
-                playerChunk.sendPacketToTrackedPlayers(packet, false);
+            playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
         }catch (Throwable ex){
-            PlayerChunk playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
-            if(playerChunk != null)
-                playerChunk.sendPacketToTrackedPlayers(packet, false);
+            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
         }
+
+        if(playerChunk != null)
+            playerChunk.sendPacketToTrackedPlayers(packet, false);
     }
 
 }
