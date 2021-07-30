@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
@@ -40,7 +41,9 @@ public final class MissionsModule extends BuiltinModule {
 
         }
 
-        plugin.getMissions().loadMissionsData(missionsToLoad);
+        // Should be running in 1-tick delay so players and their islands will be loaded
+        // before loading data of missions, as they depend on this data.
+        Executor.sync(() -> plugin.getMissions().loadMissionsData(missionsToLoad), 1L);
     }
 
     @Override
