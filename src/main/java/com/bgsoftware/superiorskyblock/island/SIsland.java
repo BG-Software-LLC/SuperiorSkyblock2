@@ -128,7 +128,7 @@ public final class SIsland implements Island {
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
 
-    protected static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     /*
      * Island identifiers
@@ -3511,8 +3511,7 @@ public final class SIsland implements Island {
                             .forEach(entry -> cobbleGeneratorValues.remove(entry.getKey()));
                 }
 
-                for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> entry : levelGenerator.entrySet())
-                    cobbleGeneratorValues.put(entry.getKey(), entry.getValue());
+                cobbleGeneratorValues.putAll(levelGenerator);
             }
         }
 
@@ -3541,7 +3540,7 @@ public final class SIsland implements Island {
 
     private void updateLastInterest(long lastInterest){
         if(BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20;
+            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
             Executor.sync(() -> giveInterest(true), ticksToNextInterest);
         }
 
