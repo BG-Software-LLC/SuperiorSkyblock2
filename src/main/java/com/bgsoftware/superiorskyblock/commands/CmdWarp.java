@@ -6,10 +6,13 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +33,8 @@ public final class CmdWarp implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         return "warp [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
     }
 
     @Override
@@ -45,7 +49,7 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -64,6 +68,22 @@ public final class CmdWarp implements ISuperiorCommand {
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
+        if (args.length == 3) {
+
+            for (String warpName : island.getIslandWarps().keySet()) {
+
+                if (!warpName.equalsIgnoreCase(args[2]))
+                    continue;
+
+                MenuWarps.simulateClick(superiorPlayer, island, args[2]);
+
+                return;
+
+            }
+
+        }
+
         MenuWarpCategories.openInventory(superiorPlayer, null, island);
     }
 

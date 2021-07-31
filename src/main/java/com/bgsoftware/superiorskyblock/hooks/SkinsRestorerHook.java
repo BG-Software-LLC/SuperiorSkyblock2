@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.mojang.authlib.properties.Property;
-import net.skinsrestorer.shared.storage.Config;
-import net.skinsrestorer.shared.storage.Locale;
-import net.skinsrestorer.shared.storage.MySQL;
 import org.bukkit.Bukkit;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
+import skinsrestorer.shared.storage.Config;
+import skinsrestorer.shared.storage.Locale;
 import skinsrestorer.shared.storage.SkinStorage;
+import skinsrestorer.shared.utils.MySQL;
 
 public final class SkinsRestorerHook {
 
@@ -64,25 +64,24 @@ public final class SkinsRestorerHook {
 
     private static final class SkinsRestorerNew implements ISkinsRestorer {
 
-        private final net.skinsrestorer.bukkit.SkinsRestorer instance;
+        private final skinsrestorer.bukkit.SkinsRestorer instance;
 
         public SkinsRestorerNew(){
-            instance = net.skinsrestorer.bukkit.SkinsRestorer.getInstance();
+            instance = SkinsRestorer.getInstance();
             if(instance.isBungeeEnabled()){
                 // We want to adjust config options to also work if bungee mode is enabled
 
                 Config.load(instance.getConfigPath(), instance.getResource("config.yml"));
                 Locale.load(instance.getConfigPath());
 
-                if (Config.MYSQL_ENABLED) {
+                if (Config.USE_MYSQL) {
                     try {
                         MySQL mysql = new MySQL(
                                 Config.MYSQL_HOST,
                                 Config.MYSQL_PORT,
                                 Config.MYSQL_DATABASE,
                                 Config.MYSQL_USERNAME,
-                                Config.MYSQL_PASSWORD,
-                                Config.MYSQL_CONNECTIONOPTIONS
+                                Config.MYSQL_PASSWORD
                         );
                         mysql.openConnection();
                         mysql.createTable();
@@ -98,7 +97,7 @@ public final class SkinsRestorerHook {
         public Property getSkin(SuperiorPlayer superiorPlayer) {
             try {
                 return (Property) instance.getSkinStorage().getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
-            }catch (net.skinsrestorer.shared.exception.SkinRequestException ex){
+            }catch (SkinRequestException ex){
                 return null;
             }
         }
