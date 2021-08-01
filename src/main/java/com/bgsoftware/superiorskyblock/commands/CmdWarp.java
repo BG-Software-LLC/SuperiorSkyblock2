@@ -2,10 +2,12 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
@@ -30,7 +32,8 @@ public final class CmdWarp implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         return "warp [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
     }
 
     @Override
@@ -45,7 +48,7 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -58,13 +61,52 @@ public final class CmdWarp implements ISuperiorCommand {
         Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1]);
 
+        System.out.println(args[0]);
+
         Island island = arguments.getKey();
 
         if(island == null)
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        MenuWarpCategories.openInventory(superiorPlayer, null, island);
+
+        switch (args.length) {
+
+            case 3:
+                IslandWarp warp = island.getWarp(args[2]);
+                if (warp == null) {
+                    Locale.INVALID_WARP.send(superiorPlayer, args[2]);
+                    return;
+                }
+                warpPlayer(warp, superiorPlayer, island);
+                break;
+
+            case 2:
+                warp = island.getWarp(args[1]);
+                if (warp != null) {
+                    warpPlayer(warp, superiorPlayer, island);
+                    return;
+                }
+                MenuWarpCategories.openInventory(superiorPlayer, null, island);
+                break;
+
+            default:
+                MenuWarpCategories.openInventory(superiorPlayer, null, island);
+                break;
+
+
+        }
+
+    }
+
+    private void warpPlayer(IslandWarp warp, SuperiorPlayer superiorPlayer, Island island) {
+
+        if (!warp.getIsland().isMember(superiorPlayer) && warp.hasPrivateFlag()) {
+            Locale.INVALID_WARP.send(superiorPlayer);
+            return;
+        }
+        MenuWarps.simulateClick(superiorPlayer, island, warp.getName());
+
     }
 
     @Override
