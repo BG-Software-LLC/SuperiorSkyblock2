@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
@@ -89,7 +89,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
 
         uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", charSlots);
 
@@ -97,8 +97,6 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
         menuVisitors.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuVisitors.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuVisitors.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuVisitors.markCompleted();
     }

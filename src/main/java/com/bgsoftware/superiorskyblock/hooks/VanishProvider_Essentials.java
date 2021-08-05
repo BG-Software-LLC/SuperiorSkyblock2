@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
+import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.earth2me.essentials.Essentials;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.Bukkit;
@@ -38,10 +38,10 @@ public final class VanishProvider_Essentials implements VanishProvider, Listener
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(VanishStatusChangeEvent e){
         if(e.getValue()) {
-            PlayersListener.handlePlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
+            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
         }
         else{
-            PlayersListener.handlePlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
+            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
         }
     }
 

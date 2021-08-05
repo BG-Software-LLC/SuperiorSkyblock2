@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -26,27 +24,19 @@ public final class WorldsProvider_Default implements WorldsProvider {
     private final EnumMap<World.Environment, World> islandWorlds = new EnumMap<>(World.Environment.class);
     private final SuperiorSkyblockPlugin plugin;
 
-    public WorldsProvider_Default(SuperiorSkyblockPlugin plugin){
+    public WorldsProvider_Default(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public void prepareWorlds() {
-        SettingsHandler settingsHandler;
-
-        try {
-            settingsHandler = new SettingsHandler(plugin);
-        }catch (HandlerLoadException ex){
-            return;
-        }
-
-        Difficulty difficulty = Difficulty.valueOf(settingsHandler.worldsDifficulty.toUpperCase());
-        if(settingsHandler.normalWorldEnabled)
-            loadWorld(settingsHandler.islandWorldName, difficulty, World.Environment.NORMAL);
-        if(settingsHandler.netherWorldEnabled)
-            loadWorld(settingsHandler.netherWorldName, difficulty, World.Environment.NETHER);
-        if(settingsHandler.endWorldEnabled)
-            loadWorld(settingsHandler.endWorldName, difficulty, World.Environment.THE_END);
+        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().worldsDifficulty.toUpperCase());
+        if (plugin.getSettings().normalWorldEnabled)
+            loadWorld(plugin.getSettings().islandWorldName, difficulty, World.Environment.NORMAL);
+        if (plugin.getSettings().netherWorldEnabled)
+            loadWorld(plugin.getSettings().netherWorldName, difficulty, World.Environment.NETHER);
+        if (plugin.getSettings().endWorldEnabled)
+            loadWorld(plugin.getSettings().endWorldName, difficulty, World.Environment.THE_END);
     }
 
     @Override
@@ -72,28 +62,28 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
         int islandRange = maxIslandSize * 3;
 
-        if(islandFace == BlockFace.NORTH){
+        if (islandFace == BlockFace.NORTH) {
             location.add(islandRange, 0, 0);
-        }else if(islandFace == BlockFace.EAST){
-            if(location.getX() == -location.getZ())
+        } else if (islandFace == BlockFace.EAST) {
+            if (location.getX() == -location.getZ())
                 location.add(islandRange, 0, 0);
-            else if(location.getX() == location.getZ())
+            else if (location.getX() == location.getZ())
                 location.subtract(islandRange, 0, 0);
             else
                 location.add(0, 0, islandRange);
-        }else if(islandFace == BlockFace.SOUTH){
-            if(location.getX() == -location.getZ())
+        } else if (islandFace == BlockFace.SOUTH) {
+            if (location.getX() == -location.getZ())
                 location.subtract(0, 0, islandRange);
             else
                 location.subtract(islandRange, 0, 0);
-        }else if(islandFace == BlockFace.WEST){
-            if(location.getX() == location.getZ())
+        } else if (islandFace == BlockFace.WEST) {
+            if (location.getX() == location.getZ())
                 location.add(islandRange, 0, 0);
             else
                 location.subtract(0, 0, islandRange);
         }
 
-        if(servedPositions.contains(SBlockPosition.of(location)) || plugin.getGrid().getIslandAt(location) != null){
+        if (servedPositions.contains(SBlockPosition.of(location)) || plugin.getGrid().getIslandAt(location) != null) {
             return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner, islandUUID);
         }
 
@@ -143,19 +133,19 @@ public final class WorldsProvider_Default implements WorldsProvider {
         return plugin.getSettings().endWorldUnlocked;
     }
 
-    private BlockFace getIslandFace(Location location){
+    private BlockFace getIslandFace(Location location) {
         //Possibilities: North / East
-        if(location.getX() >= location.getZ()) {
+        if (location.getX() >= location.getZ()) {
             return -location.getX() > location.getZ() ? BlockFace.NORTH : BlockFace.EAST;
         }
         //Possibilities: South / West
-        else{
+        else {
             return -location.getX() > location.getZ() ? BlockFace.WEST : BlockFace.SOUTH;
         }
     }
 
-    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment){
-        if(Bukkit.getWorld(worldName) != null){
+    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
+        if (Bukkit.getWorld(worldName) != null) {
             throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
                     "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
                     "- Your level-name property in server.properties is set to " + worldName + ".");
@@ -165,7 +155,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
         world.setDifficulty(difficulty);
         islandWorlds.put(environment, world);
 
-        if(Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")){
+        if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
         }

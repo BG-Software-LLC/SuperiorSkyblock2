@@ -9,13 +9,13 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPlayer, Long>> {
 
@@ -78,14 +78,12 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUniqueVisitors, "unique-visitors.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUniqueVisitors, "unique-visitors.yml", cfg);
 
         menuUniqueVisitors.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
         menuUniqueVisitors.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
         menuUniqueVisitors.setNextSlot(getSlots(cfg, "next-page", charSlots));
         menuUniqueVisitors.setSlots(getSlots(cfg, "slots", charSlots));
-
-        charSlots.delete();
 
         menuUniqueVisitors.markCompleted();
     }

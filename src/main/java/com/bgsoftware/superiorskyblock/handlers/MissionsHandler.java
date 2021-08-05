@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -29,7 +28,9 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -37,8 +38,8 @@ import java.util.stream.Collectors;
 
 public final class MissionsHandler extends AbstractHandler implements MissionsManager {
 
-    private final static Registry<String, Mission<?>> missionMap = Registry.createRegistry();
-    private final static Registry<Mission<?>, MissionData> missionDataMap = Registry.createRegistry();
+    private final static Map<String, Mission<?>> missionMap = new HashMap<>();
+    private final static Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
 
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -345,11 +346,11 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
                 mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                 mission.load(plugin, missionSection);
-                missionMap.add(missionName.toLowerCase(), mission);
+                missionMap.put(missionName.toLowerCase(), mission);
                 newMission = mission;
             }
 
-            missionDataMap.add(mission, new MissionsHandler.MissionData(mission, missionSection));
+            missionDataMap.put(mission, new MissionsHandler.MissionData(mission, missionSection));
 
             SuperiorSkyblockPlugin.log("Registered mission " + missionName);
         } catch (Exception ex) {

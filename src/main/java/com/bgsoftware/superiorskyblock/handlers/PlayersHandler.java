@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
 import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.google.common.base.Preconditions;
@@ -22,8 +21,11 @@ import org.bukkit.entity.Player;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -32,10 +34,10 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
 
-    private final Registry<Integer, PlayerRole> rolesByWeight = Registry.createRegistry();
-    private final Registry<Integer, PlayerRole> rolesById = Registry.createRegistry();
-    private final Registry<String, PlayerRole> rolesByName = Registry.createRegistry();
-    private final Registry<UUID, SuperiorPlayer> players = Registry.createRegistry();
+    private final Map<Integer, PlayerRole> rolesByWeight = new HashMap<>();
+    private final Map<Integer, PlayerRole> rolesById = new HashMap<>();
+    private final Map<String, PlayerRole> rolesByName = new HashMap<>();
+    private final Map<UUID, SuperiorPlayer> players = new ConcurrentHashMap<>();
 
     private int lastRole = Integer.MIN_VALUE;
 
@@ -80,7 +82,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         if(!players.containsKey(uuid)) {
-            players.add(uuid, plugin.getFactory().createPlayer(uuid));
+            players.put(uuid, plugin.getFactory().createPlayer(uuid));
             Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)), 1L);
         }
         return players.get(uuid);
@@ -137,12 +139,12 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public List<PlayerRole> getRoles(){
-        return rolesById.keys().stream().sorted().map(rolesById::get).collect(Collectors.toList());
+        return rolesById.keySet().stream().sorted().map(rolesById::get).collect(Collectors.toList());
     }
 
     public void loadPlayer(ResultSet resultSet) throws SQLException {
         UUID player = UUID.fromString(resultSet.getString("player"));
-        players.add(player, plugin.getFactory().createPlayer(resultSet));
+        players.put(player, plugin.getFactory().createPlayer(resultSet));
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer){
@@ -187,9 +189,9 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
         PlayerRole playerRole = new SPlayerRole(name, id, weight, section.getStringList("permissions"), previousRole);
 
-        rolesByWeight.add(weight, playerRole);
-        rolesById.add(id, playerRole);
-        rolesByName.add(name.toUpperCase(), playerRole);
+        rolesByWeight.put(weight, playerRole);
+        rolesById.put(id, playerRole);
+        rolesByName.put(name.toUpperCase(), playerRole);
 
         if(weight > lastRole)
             lastRole = weight;

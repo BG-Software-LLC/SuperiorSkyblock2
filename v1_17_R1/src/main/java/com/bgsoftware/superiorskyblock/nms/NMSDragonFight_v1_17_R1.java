@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -53,6 +54,7 @@ import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 import net.minecraft.world.level.levelgen.feature.configurations.WorldGenFeatureConfiguration;
 import net.minecraft.world.level.pathfinder.PathEntity;
 import net.minecraft.world.level.pathfinder.PathPoint;
+import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
@@ -80,6 +82,7 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
 
     private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<>(EntityEnderDragon.class, EnderDragonBattle.class, "cn");
     private static final ReflectField<IDragonController> DRAGON_PHASE = new ReflectField<>(DragonControllerManager.class, IDragonController.class, "d");
+    private static final ReflectMethod<PathEntity> DRAGON_FIND_PATH = new ReflectMethod<>(EntityEnderDragon.class, "a", int.class, int.class, PathPoint.class);
 
     static {
         DRAGON_BATTLE.removeFinal();
@@ -208,7 +211,7 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
         private boolean previouslyKilled = false;
 
         public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location){
-            super(worldServer, worldServer.E.getGeneratorSettings().getSeed(), new NBTTagCompound());
+            super(worldServer, ((WorldDataServer) worldServer.getWorldData()).getGeneratorSettings().getSeed(), new NBTTagCompound());
             this.islandBlockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
             this.islandChunkCoord = new ChunkCoordIntPair(islandBlockPosition);
             this.island = island;
@@ -615,7 +618,12 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
                 headClosestNode += 12;
             }
 
-            currentPath = a.a(closestNode, headClosestNode, (PathPoint) null);
+            if(DRAGON_FIND_PATH.isValid()){
+                currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode, headClosestNode, null);
+            }
+            else{
+                currentPath = this.a.findPath(closestNode, headClosestNode, null);
+            }
 
             targetBlock = navigateToNextPathNode(currentPath, this.a, targetBlock);
         }
@@ -707,7 +715,13 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
                     closestNode += 12;
                 }
 
-                currentPath = this.a.a(closestNode1, closestNode, (PathPoint) null);
+                if(DRAGON_FIND_PATH.isValid()){
+                    currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode1, closestNode, null);
+                }
+                else{
+                    currentPath = this.a.findPath(closestNode1, closestNode, null);
+                }
+
                 if (currentPath != null) {
                     currentPath.a();
                 }
@@ -839,7 +853,13 @@ public final class NMSDragonFight_v1_17_R1 implements NMSDragonFight {
                 }
 
                 PathPoint var4 = new PathPoint(highestBlock.getX(), highestBlock.getY(), highestBlock.getZ());
-                currentPath = this.a.a(closestNode, closestNode1, var4);
+
+                if(DRAGON_FIND_PATH.isValid()){
+                    currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode, closestNode1, var4);
+                }
+                else{
+                    currentPath = this.a.findPath(closestNode, closestNode1, var4);
+                }
 
                 if (currentPath != null)
                     currentPath.a();

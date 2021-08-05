@@ -6,9 +6,10 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
@@ -82,10 +83,10 @@ public final class SlimefunHook implements ProtectionModule, Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onAndroidMiner(AndroidMineEvent e){
         SuperiorSkyblockPlugin.debug("Action: Android Break, Block: " + e.getBlock().getLocation() + ", Type: " + e.getBlock().getType());
-        if(BlocksListener.tryUnstack(null, e.getBlock(), plugin))
+        if(StackedBlocksLogic.tryUnstack(null, e.getBlock(), plugin))
             e.setCancelled(true);
         else
-            BlocksListener.handleBlockBreak(plugin, e.getBlock());
+            BlocksLogic.handleBreak(e.getBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

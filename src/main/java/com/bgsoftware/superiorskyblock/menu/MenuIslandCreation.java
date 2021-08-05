@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -109,6 +110,11 @@ public final class MenuIslandCreation extends SuperiorMenu {
             }
 
             Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
+
+            World.Environment environment = plugin.getSettings().defaultWorldEnvironment;
+            offset |= environment == World.Environment.NORMAL ? plugin.getSettings().normalSchematicOffset :
+                    environment == World.Environment.NETHER ? plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
+
             plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, bonusLevel, biome, menu.islandName, offset);
         }
         else{

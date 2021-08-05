@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.apache.commons.lang.math.NumberUtils;
@@ -26,6 +25,7 @@ import org.bukkit.inventory.Inventory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
@@ -100,7 +100,7 @@ public final class MenuUpgrades extends SuperiorMenu {
         }
 
         Executor.sync(() -> {
-            Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
+            Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
             if(cfg.contains("upgrades")){
                 ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
@@ -149,8 +149,6 @@ public final class MenuUpgrades extends SuperiorMenu {
                     }
                 }
             }
-
-            charSlots.delete();
 
             menuUpgrades.markCompleted();
         }, 5L);

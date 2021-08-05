@@ -10,10 +10,9 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Player;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
 import java.util.List;
@@ -53,15 +52,13 @@ public interface NMSBlocks {
 
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
-    CompletableFuture<CalculatedChunk> calculateChunk(ChunkPosition chunkPosition);
-
-    void deleteChunk(Island island, ChunkPosition chunkPosition, Runnable onFinish);
-
-    void setChunkBiome(ChunkPosition chunkPosition, Biome biome, List<Player> playersToUpdate);
-
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
     void handleSignPlace(Island island, Location location);
+
+    default void setSignLines(SignChangeEvent signChangeEvent, String[] lines){
+
+    }
 
     default Material getMaterial(int combinedId) {
         //noinspection deprecation

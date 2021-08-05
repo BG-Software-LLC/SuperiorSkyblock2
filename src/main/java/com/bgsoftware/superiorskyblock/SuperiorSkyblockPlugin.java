@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
 import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
+import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
@@ -49,7 +50,6 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
@@ -104,6 +104,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSAdapter nmsAdapter;
     private NMSTags nmsTags;
     private NMSBlocks nmsBlocks;
+    private NMSChunks nmsChunks;
     private NMSHolograms nmsHolograms;
     private NMSDragonFight nmsDragonFight;
 
@@ -165,6 +166,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();
+
+            try {
+                settingsHandler = new SettingsHandler(this);
+            } catch (HandlerLoadException ex) {
+                if (!HandlerLoadException.handle(ex)) {
+                    shouldEnable = false;
+                    return;
+                }
+            }
 
             modulesHandler.loadData();
 
@@ -279,7 +289,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Executor.close();
             System.out.println("Closing database...");
             dataHandler.closeConnection();
-            Registry.clearCache();
         }
     }
 
@@ -293,6 +302,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
             nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
             nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
+            nmsChunks = (NMSChunks) Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.NMSChunksImpl", version)).newInstance();
             nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
             if (new SettingsHandler(this).endDragonFight)
                 nmsDragonFight = (NMSDragonFight) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSDragonFight_" + version).newInstance();
@@ -332,44 +342,54 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
     }
 
-    @SuppressWarnings("all")
     public ChunkGenerator getGenerator(){
         if(worldGenerator == null) {
-            File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
+            loadGeneratorFromFile();
+            if (worldGenerator == null)
+                worldGenerator = new WorldGenerator(settingsHandler.defaultWorldEnvironment);
+        }
 
-            if (!generatorFolder.exists()) {
-                generatorFolder.mkdirs();
-            } else {
-                try {
-                    outerLoop:
-                    for (File file : generatorFolder.listFiles()) {
+        return worldGenerator;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void loadGeneratorFromFile(){
+        File generatorFolder = new File(plugin.getDataFolder(), "world-generator");
+
+        if(!generatorFolder.isDirectory()){
+            generatorFolder.delete();
+        }
+
+        if (!generatorFolder.exists()) {
+            generatorFolder.mkdirs();
+        }
+
+        else {
+            try {
+                File[] generatorsFilesList =  generatorFolder.listFiles();
+                if(generatorsFilesList != null) {
+                    for (File file : generatorsFilesList) {
                         Optional<Class<?>> generatorClassOptional = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
                         if (generatorClassOptional.isPresent()) {
                             Class<?> generatorClass = generatorClassOptional.get();
-                            for(Constructor<?> constructor : generatorClass.getConstructors()){
-                                if(constructor.getParameterCount() == 0){
+                            for (Constructor<?> constructor : generatorClass.getConstructors()) {
+                                if (constructor.getParameterCount() == 0) {
                                     worldGenerator = (ChunkGenerator) generatorClass.newInstance();
-                                    break outerLoop;
-                                }
-                                else if(constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
-                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)){
+                                    return;
+                                } else if (constructor.getParameterTypes()[0].equals(JavaPlugin.class) ||
+                                        constructor.getParameterTypes()[0].equals(SuperiorSkyblock.class)) {
                                     worldGenerator = (ChunkGenerator) constructor.newInstance(this);
-                                    break outerLoop;
+                                    return;
                                 }
                             }
                         }
                     }
-                } catch (Exception ex) {
-                    log("An error occurred while loading the generator:");
-                    ex.printStackTrace();
                 }
+            } catch (Exception ex) {
+                log("An error occurred while loading the generator:");
+                ex.printStackTrace();
             }
-
-            if (worldGenerator == null)
-                worldGenerator = new WorldGenerator();
         }
-
-        return worldGenerator;
     }
 
     @Override
@@ -389,14 +409,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public boolean reloadPlugin(boolean loadGrid){
         HeadUtils.readTextures(this);
 
-        try {
-            settingsHandler = new SettingsHandler(this);
-        }catch (HandlerLoadException ex){
-            if(!HandlerLoadException.handle(ex))
-                return false;
+        if(!loadGrid) {
+            try {
+                settingsHandler = new SettingsHandler(this);
+            } catch (HandlerLoadException ex) {
+                if (!HandlerLoadException.handle(ex))
+                    return false;
+            }
         }
 
-        if(loadGrid){
+        else{
             commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
@@ -562,6 +584,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public NMSDragonFight getNMSDragonFight() {
         return nmsDragonFight;
+    }
+
+    public NMSChunks getNMSChunks() {
+        return nmsChunks;
     }
 
     public String getFileName(){

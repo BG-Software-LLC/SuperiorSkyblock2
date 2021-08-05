@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -19,11 +18,13 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class ChunksTracker {
 
-    private static final Registry<Island, Set<ChunkPosition>> dirtyChunks = Registry.createRegistry();
+    private static final Map<Island, Set<ChunkPosition>> dirtyChunks = new ConcurrentHashMap<>();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Gson gson = new GsonBuilder().create();
 
@@ -71,7 +72,7 @@ public final class ChunksTracker {
     }
 
     public static String serialize(Island island){
-        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.get(island, new HashSet<>());
+        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.getOrDefault(island, new HashSet<>());
         return IslandSerializer.serializeDirtyChunks(dirtyChunks);
     }
 

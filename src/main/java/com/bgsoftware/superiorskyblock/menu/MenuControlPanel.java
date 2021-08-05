@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
@@ -72,13 +72,11 @@ public final class MenuControlPanel extends SuperiorMenu {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
         membersSlot = getSlots(cfg, "members", charSlots);
         settingsSlot = getSlots(cfg, "settings", charSlots);
         visitorsSlot = getSlots(cfg, "visitors", charSlots);
-
-        charSlots.delete();
 
         menuControlPanel.markCompleted();
     }

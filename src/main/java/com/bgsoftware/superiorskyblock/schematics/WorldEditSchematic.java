@@ -83,6 +83,11 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
     }
 
     @Override
+    public Location adjustRotation(Location location) {
+        return location;
+    }
+
+    @Override
     public Set<ChunkPosition> getLoadedChunks() {
         return Collections.emptySet();
     }

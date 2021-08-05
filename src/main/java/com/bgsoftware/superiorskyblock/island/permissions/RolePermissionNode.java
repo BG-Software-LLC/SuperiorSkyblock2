@@ -3,9 +3,10 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
+
+import java.util.Map;
 
 public class RolePermissionNode extends PermissionNodeAbstract {
 
@@ -22,7 +23,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
         Executor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
-    private RolePermissionNode(Registry<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode){
+    private RolePermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode){
         super(privileges);
 
         this.playerRole = playerRole;
@@ -49,7 +50,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     }
 
     public PrivilegeStatus getStatus(IslandPrivilege permission){
-        return privileges.get(permission, PrivilegeStatus.DEFAULT);
+        return privileges.getOrDefault(permission, PrivilegeStatus.DEFAULT);
     }
 
     @Override

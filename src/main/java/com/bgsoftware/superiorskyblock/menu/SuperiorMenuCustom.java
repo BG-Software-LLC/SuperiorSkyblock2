@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.collect.Sets;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -71,9 +70,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
             plugin.getCommands().registerCommand(new CustomMenuCommand(fileName, aliases, permission, descriptions, displayCommand));
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(superiorMenuCustom, fileName, cfg);
-
-        charSlots.delete();
+        FileUtils.loadGUI(superiorMenuCustom, fileName, cfg);
 
         superiorMenuCustom.markCompleted();
     }

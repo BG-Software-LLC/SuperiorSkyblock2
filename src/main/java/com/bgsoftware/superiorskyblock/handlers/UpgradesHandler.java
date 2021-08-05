@@ -7,17 +7,18 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrades.DefaultUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class UpgradesHandler extends AbstractHandler implements UpgradesManager {
 
-    private final Registry<String, SUpgrade> upgrades = Registry.createRegistry();
-    private final Registry<String, UpgradeCostLoader> upgradeCostLoaders = Registry.createRegistry();
+    private final Map<String, SUpgrade> upgrades = new HashMap<>();
+    private final Map<String, UpgradeCostLoader> upgradeCostLoaders = new HashMap<>();
 
     public UpgradesHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -58,7 +59,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
     public void registerUpgradeCostLoader(String id, UpgradeCostLoader costLoader) {
         id = id.toLowerCase();
         Preconditions.checkArgument(!upgradeCostLoaders.containsKey(id), "A loader with the id " + id + " already exists.");
-        upgradeCostLoaders.add(id, costLoader);
+        upgradeCostLoaders.put(id, costLoader);
     }
 
     @Override
@@ -74,7 +75,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
     }
 
     public void loadUpgrade(SUpgrade upgrade){
-        this.upgrades.add(upgrade.getName().toLowerCase(), upgrade);
+        this.upgrades.put(upgrade.getName().toLowerCase(), upgrade);
     }
 
 }

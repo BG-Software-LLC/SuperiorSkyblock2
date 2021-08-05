@@ -7,16 +7,19 @@ import org.bukkit.Bukkit;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Predicate;
 
-public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Registry<K, V> {
+public final class SortedRegistry<K, V, Z extends Comparator<V>> {
 
-    private final Registry<Z, Set<V>> sortedValues = createRegistry();
+    private final Map<Z, Set<V>> sortedValues = new ConcurrentHashMap<>();
+    private final Map<K, V> innerMap = new ConcurrentHashMap<>();
 
-    protected SortedRegistry(){
-        super();
+    public V get(K key){
+        return innerMap.get(key);
     }
 
     public V get(int index, Z sortingType){
@@ -29,16 +32,14 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         return Iterables.indexOf(sortedValues.get(sortingType), value::equals);
     }
 
-    @Override
-    public V add(K key, V value) {
+    public V put(K key, V value) {
         for(Set<V> sortedTree : sortedValues.values())
             sortedTree.add(value);
-        return super.add(key, value);
+        return innerMap.put(key, value);
     }
 
-    @Override
     public V remove(K key) {
-        V value = super.remove(key);
+        V value = innerMap.remove(key);
         if(value != null){
             for (Set<V> sortedTree : sortedValues.values())
                 sortedTree.remove(value);
@@ -51,7 +52,7 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
         return Iterables.unmodifiableIterable(sortedValues.get(sortingType)).iterator();
     }
 
-    protected void sort(Z sortingType, Predicate<V> predicate, Runnable onFinish){
+    public void sort(Z sortingType, Predicate<V> predicate, Runnable onFinish){
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> sort(sortingType, predicate, onFinish));
             return;
@@ -61,23 +62,23 @@ public abstract class SortedRegistry<K, V, Z extends Comparator<V>> extends Regi
 
         Set<V> newSortedTree = new ConcurrentSkipListSet<>(sortingType);
 
-        for (V element : this) {
+        for (V element : innerMap.values()) {
             if (predicate == null || predicate.test(element))
                 newSortedTree.add(element);
         }
 
-        sortedValues.add(sortingType, newSortedTree);
+        sortedValues.put(sortingType, newSortedTree);
 
         if(onFinish != null)
             onFinish.run();
     }
 
-    protected void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
+    public void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate){
         Preconditions.checkArgument(!sortedValues.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
 
         Set<V> sortedIslands = new ConcurrentSkipListSet<>(sortingType);
-        sortedIslands.addAll(values());
-        sortedValues.add(sortingType, sortedIslands);
+        sortedIslands.addAll(innerMap.values());
+        sortedValues.put(sortingType, sortedIslands);
 
         if(sort)
             sort(sortingType, predicate, null);

@@ -121,6 +121,8 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.utils.hikari'
+
     if(System.getenv("BUILD_NUMBER") == null){
         archiveName = rootProject.name + ".jar"
     }

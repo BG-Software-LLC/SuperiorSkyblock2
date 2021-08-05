@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -95,9 +94,7 @@ public final class MenuWarpCategories extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategories, "warp-categories.yml", cfg);
-
-        charSlots.delete();
+        FileUtils.loadGUI(menuWarpCategories, "warp-categories.yml", cfg);
 
         rowsSize = menuWarpCategories.getRowsSize();
         editLore = cfg.getStringList("edit-lore");

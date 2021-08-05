@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,6 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuBorderColor extends SuperiorMenu {
@@ -102,7 +102,7 @@ public final class MenuBorderColor extends SuperiorMenu {
             }
         }
 
-        Registry<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
+        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
         greenColorSlot = getSlots(cfg, "green-color", charSlots);
         redColorSlot = getSlots(cfg, "red-color", charSlots);
@@ -133,8 +133,6 @@ public final class MenuBorderColor extends SuperiorMenu {
                 });
             }
         }
-
-        charSlots.delete();
 
         menuBorderColor.markCompleted();
     }

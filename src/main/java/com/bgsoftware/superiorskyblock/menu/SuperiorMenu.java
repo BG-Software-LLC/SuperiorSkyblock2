@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -23,6 +22,7 @@ import org.bukkit.inventory.InventoryHolder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -53,7 +53,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
             'X', 'Y', 'Z'
     };
 
-    protected static final Registry<String, MenuData> dataMap = Registry.createRegistry();
+    protected static final Map<String, MenuData> dataMap = new HashMap<>();
 
     private final String identifier;
     protected final SuperiorPlayer superiorPlayer;
@@ -78,22 +78,22 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public void addSound(int slot, SoundWrapper sound) {
         if(sound != null)
-            getData().sounds.add(slot, sound);
+            getData().sounds.put(slot, sound);
     }
 
     public void addCommands(int slot, List<String> commands) {
         if(commands != null && !commands.isEmpty())
-            getData().commands.add(slot, commands);
+            getData().commands.put(slot, commands);
     }
 
     public void addPermission(int slot, String permission, SoundWrapper noAccessSound) {
         if(permission != null && !permission.isEmpty())
-            getData().permissions.add(slot, new Pair<>(permission, noAccessSound));
+            getData().permissions.put(slot, new Pair<>(permission, noAccessSound));
     }
 
     public void addFillItem(int slot, ItemBuilder itemBuilder){
         if(itemBuilder != null)
-            getData().fillItems.add(slot, itemBuilder);
+            getData().fillItems.put(slot, itemBuilder);
     }
 
     public ItemBuilder getFillItem(int slot){
@@ -105,7 +105,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public void resetData(){
-        dataMap.add(identifier, new MenuData());
+        dataMap.put(identifier, new MenuData());
     }
 
     public void setTitle(String title){
@@ -129,7 +129,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public void addData(String key, Object value){
-        getData().data.add(key, value);
+        getData().data.put(key, value);
     }
 
     public Object getData(String key){
@@ -137,7 +137,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     }
 
     public Object getData(String key, Object def){
-        return getData().data.get(key, def);
+        return getData().data.getOrDefault(key, def);
     }
 
     public boolean containsData(String key){
@@ -339,10 +339,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
         MenuData menuData = getData();
         Inventory inventory;
 
-        String title = PlaceholderHook.parse(superiorPlayer, menuData.title);
+        String title = menuData.title;
         if(titleReplacer != null)
             title = titleReplacer.apply(title);
 
+        //placeholder with titleReplacer
+        title = PlaceholderHook.parse(superiorPlayer, title);
+        
         if(menuData.inventoryType != InventoryType.CHEST){
             inventory = Bukkit.createInventory(this, menuData.inventoryType, title);
         }
@@ -357,7 +360,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         //noinspection all
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();
 
-        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entries()) {
+        for(Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
             ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
             if(itemStackEntry.getKey() >= 0)
                 inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ?
@@ -381,7 +384,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     private MenuData getData(){
         if(!dataMap.containsKey(identifier)){
-            dataMap.add(identifier, new MenuData());
+            dataMap.put(identifier, new MenuData());
         }
 
         return dataMap.get(identifier);
@@ -451,11 +454,11 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected static class MenuData{
 
-        private final Registry<Integer, SoundWrapper> sounds = Registry.createRegistry();
-        private final Registry<Integer, List<String>> commands = Registry.createRegistry();
-        private final Registry<Integer, Pair<String, SoundWrapper>> permissions = Registry.createRegistry();
-        private final Registry<Integer, ItemBuilder> fillItems = Registry.createRegistry();
-        private final Registry<String, Object> data = Registry.createRegistry();
+        private final Map<Integer, SoundWrapper> sounds = new HashMap<>();
+        private final Map<Integer, List<String>> commands = new HashMap<>();
+        private final Map<Integer, Pair<String, SoundWrapper>> permissions = new HashMap<>();
+        private final Map<Integer, ItemBuilder> fillItems = new HashMap<>();
+        private final Map<String, Object> data = new HashMap<>();
         private String title = "";
         private InventoryType inventoryType = InventoryType.CHEST;
         private int rowsSize = 6;
@@ -463,7 +466,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     }
 
-    protected static List<Integer> getSlots(ConfigurationSection section, String key, Registry<Character, List<Integer>> charSlots) {
+    protected static List<Integer> getSlots(ConfigurationSection section, String key, Map<Character, List<Integer>> charSlots) {
         if(!section.contains(key))
             return new ArrayList<>();
 
