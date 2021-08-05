@@ -56,7 +56,7 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public void setBalance(BigDecimal balance) {
-        this.balance.set(balance);
+        this.balance.set(balance.setScale(2, RoundingMode.HALF_DOWN));
     }
 
     @Override
@@ -265,7 +265,7 @@ public final class SIslandBank implements IslandBank {
     }
 
     private void increaseBalance(BigDecimal amount){
-        this.balance.updateAndGet(bigDecimal -> bigDecimal.add(amount));
+        this.balance.updateAndGet(bigDecimal -> bigDecimal.add(amount).setScale(2, RoundingMode.HALF_DOWN));
 
         Query.ISLAND_SET_BANK.getStatementHolder((SIslandDataHandler) island.getDataHandler())
                 .setString(balance + "")
