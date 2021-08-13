@@ -120,23 +120,26 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPrivilege islandPermission;
+        IslandPrivilege requiredPrivilege;
 
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
+        String blockTypeName = blockType.name();
 
-        if(isChest(blockState, blockType)) islandPermission = IslandPrivileges.CHEST_ACCESS;
-        else if(blockState instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
-        else if(blockState instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
-        else if(blockType == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
-        else if(blockType.name().equals("SOIL") || blockType.name().equals("FARMLAND"))
-            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-        else if(blockType.name().equals("TURTLE_EGG"))
-            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if(plugin.getGrid().getBlockAmount(clickedBlock) > 1) islandPermission = IslandPrivileges.BREAK;
-        else islandPermission = IslandPrivileges.INTERACT;
+        if(isChest(blockState, blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
+        else if(blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
+        else if(blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
+        else if(blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
+        else if(blockTypeName.equals("SOIL") || blockTypeName.equals("FARMLAND"))
+            requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
+        else if(blockTypeName.equals("TURTLE_EGG"))
+            requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
+        else if(blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+            requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
+        else if(plugin.getGrid().getBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
+        else requiredPrivilege = IslandPrivileges.INTERACT;
 
-        if(!island.hasPermission(superiorPlayer, islandPermission)){
+        if(!island.hasPermission(superiorPlayer, requiredPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
             return;
