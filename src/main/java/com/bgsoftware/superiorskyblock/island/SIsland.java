@@ -2754,8 +2754,10 @@ public final class SIsland implements Island {
         superiorPlayer.teleport(location, success -> {
             if(success) {
                 Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
-                IslandUtils.sendMessage(this, Locale.TELEPORTED_TO_WARP_ANNOUNCEMENT,
-                        Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), warp);
+                if(!superiorPlayer.isVanished()) {
+                    IslandUtils.sendMessage(this, Locale.TELEPORTED_TO_WARP_ANNOUNCEMENT,
+                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), warp);
+                }
             }
         });
     }
