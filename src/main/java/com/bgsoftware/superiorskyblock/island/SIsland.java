@@ -1245,10 +1245,13 @@ public final class SIsland implements Island {
             IslandUtils.getChunkCoords(this, true, true).values().forEach(worldChunks ->
                     chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks)));
         } else {
-            IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk)
-                    .forEach(completableFuture -> completableFuture.whenComplete((chunk, ex) -> chunksToLoad.add(
-                            plugin.getNMSChunks().calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)))
-                    )));
+            IslandUtils.getAllChunksAsync(this, true, true, snapshot::cacheChunk).forEach(completableFuture -> {
+                CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
+                completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
+                        .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk))).whenComplete(
+                        (pair, ex2) -> calculateCompletable.complete(pair)));
+                chunksToLoad.add(calculateCompletable);
+            });
         }
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
