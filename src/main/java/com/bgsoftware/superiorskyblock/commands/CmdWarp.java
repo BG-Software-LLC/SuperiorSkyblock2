@@ -61,8 +61,6 @@ public final class CmdWarp implements ISuperiorCommand {
         Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1]);
 
-        System.out.println(args[0]);
-
         Island island = arguments.getKey();
 
         if(island == null)
