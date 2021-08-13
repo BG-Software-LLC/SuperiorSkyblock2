@@ -20,6 +20,8 @@ import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
@@ -51,6 +53,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -305,7 +308,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
         assert islandTeleportLocation != null;
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
-        Block islandCenterBlock = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock();
 
         if(island instanceof SpawnIsland){
             SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
@@ -315,99 +317,101 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             return;
         }
 
-        Location toTeleport = null;
+        teleportIfSafe(island, islandTeleportBlock, islandTeleportLocation, 0, 0, (teleportResult, teleportLocation) -> {
+            if(teleportResult) {
+                if(result != null)
+                    result.accept(true);
+                return;
+            }
 
-        //We check if the island's teleport location is safe.
-        if(LocationUtils.isSafeBlock(islandTeleportBlock)){
-            toTeleport = islandTeleportLocation;
-        }
+            Block islandCenterBlock = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock();
 
-        //We check if the island's center location is safe.
-        else if(LocationUtils.isSafeBlock(islandCenterBlock)){
-            toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
-            toTeleport.setYaw(islandTeleportLocation.getYaw());
-            toTeleport.setPitch(islandTeleportLocation.getPitch());
-            island.setTeleportLocation(toTeleport);
-        }
-
-        //We check if the highest block at the island's center location is safe.
-        else if(LocationUtils.isSafeBlock((islandCenterBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation())))){
-            toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
-            toTeleport.setYaw(islandTeleportLocation.getYaw());
-            toTeleport.setPitch(islandTeleportLocation.getPitch());
-            island.setTeleportLocation(toTeleport);
-        }
-
-        //Checking if one of the options above is safe.
-        if(toTeleport != null){
-            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
-            teleport(toTeleport.add(0, 0.5, 0));
-            if(result != null)
-                result.accept(true);
-            return;
-        }
-
-        /*
-         *   Finding a new block to teleport the player to.
-         */
-
-        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
-                plugin.getSettings().defaultWorldEnvironment, true, true, null)
-                .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
-
-        Executor.createTask().runAsync(v -> {
-            for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
-                ChunkSnapshot chunkSnapshot;
-
-                try {
-                    chunkSnapshot = chunkToLoad.get();
-                }catch(Exception ex){
-                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                    continue;
+            teleportIfSafe(island, islandCenterBlock, null, islandTeleportLocation.getYaw(),
+                    islandTeleportLocation.getPitch(), (centerTeleportResult, centerTeleportLocation) -> {
+                if(centerTeleportResult){
+                    island.setTeleportLocation(centerTeleportLocation);
+                    if(result != null)
+                        result.accept(true);
+                    return;
                 }
 
-                if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
-                    continue;
+                Block centerHighestBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation());
+                if(LocationUtils.isSafeBlock(centerHighestBlock)){
+                    Location newTeleportLocation = centerHighestBlock.getLocation().add(0.5, 0, 0.5);
+                    island.setTeleportLocation(newTeleportLocation);
+                    newTeleportLocation.setYaw(islandTeleportLocation.getYaw());
+                    newTeleportLocation.setPitch(islandTeleportLocation.getPitch());
+                    teleport(newTeleportLocation.add(0, 0.5, 0));
+                    if(result != null)
+                        result.accept(true);
+                    return;
+                }
 
-                int worldBuildLimit = Bukkit.getWorld(chunkSnapshot.getWorldName()).getMaxHeight();
+                /*
+                 *   Finding a new block to teleport the player to.
+                 */
 
-                for(int x = 0; x < 16; x++){
-                    for(int z = 0; z < 16; z++){
-                        int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
-                        Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z),
-                                belowKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
+                List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
+                                plugin.getSettings().defaultWorldEnvironment, true, true, null)
+                        .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
-                        Material blockType, belowType;
+                Executor.createTask().runAsync(v -> {
+                    for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
+                        ChunkSnapshot chunkSnapshot;
 
                         try {
-                            blockType = Material.valueOf(blockKey.getGlobalKey());
-                            belowType = Material.valueOf(belowKey.getGlobalKey());
-                        }catch(IllegalArgumentException ex){
+                            chunkSnapshot = chunkToLoad.get();
+                        }catch(Exception ex){
+                            SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                             continue;
                         }
 
-                        if(blockType.isSolid() || belowType.isSolid()){
-                            return new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                                    chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z);
+                        if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
+                            continue;
+
+                        int worldBuildLimit = Bukkit.getWorld(chunkSnapshot.getWorldName()).getMaxHeight();
+
+                        for(int x = 0; x < 16; x++){
+                            for(int z = 0; z < 16; z++){
+                                int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
+                                Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z),
+                                        belowKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
+
+                                Material blockType, belowType;
+
+                                try {
+                                    blockType = Material.valueOf(blockKey.getGlobalKey());
+                                    belowType = Material.valueOf(belowKey.getGlobalKey());
+                                }catch(IllegalArgumentException ex){
+                                    continue;
+                                }
+
+                                if(blockType.isSolid() || belowType.isSolid()){
+                                    return new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                                            chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z);
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            return null;
-        }).runSync(location -> {
-            if(location != null){
-                location.setYaw(islandTeleportLocation.getYaw());
-                location.setPitch(islandTeleportLocation.getPitch());
-                island.setTeleportLocation(location);
-                SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
-                teleport(location.add(0.5, 0.5, 0.5));
-                if(result != null)
-                    result.accept(true);
-            }
-            else if(result != null){
-                result.accept(false);
-            }
+                    return null;
+                }).runSync(location -> {
+                    if(location != null){
+                        location.setYaw(islandTeleportLocation.getYaw());
+                        location.setPitch(islandTeleportLocation.getPitch());
+                        island.setTeleportLocation(location);
+                        SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
+                        teleport(location.add(0.5, 0.5, 0.5));
+                        if(result != null)
+                            result.accept(true);
+                    }
+                    else if(result != null){
+                        result.accept(false);
+                    }
+                });
+
+            });
+
         });
     }
 
@@ -767,6 +771,35 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public int hashCode() {
         return uuid.hashCode();
+    }
+
+    private void teleportIfSafe(Island island, Block block, Location customLocation, float yaw, float pitch,
+                                BiConsumer<Boolean, Location> teleportResult){
+        ChunksProvider.loadChunk(ChunkPosition.of(block), chunk -> {
+            if(!LocationUtils.isSafeBlock(block)){
+                if(teleportResult != null)
+                    teleportResult.accept(false, null);
+                return;
+            }
+
+            Location toTeleport;
+
+            if(customLocation != null){
+                toTeleport = customLocation;
+            }
+            else{
+                toTeleport = block.getLocation().add(0.5, 0, 0.5);
+                toTeleport.setYaw(yaw);
+                toTeleport.setPitch(pitch);
+                island.setTeleportLocation(toTeleport);
+            }
+
+            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
+            teleport(toTeleport.add(0, 0.5, 0));
+
+            if(teleportResult != null)
+                teleportResult.accept(true, toTeleport);
+        });
     }
 
     private static HitActionResult checkPvPAllow(SuperiorPlayer player, boolean target){
