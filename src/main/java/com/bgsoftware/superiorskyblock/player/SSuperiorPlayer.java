@@ -325,12 +325,16 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         //We check if the island's center location is safe.
         else if(LocationUtils.isSafeBlock(islandCenterBlock)){
             toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
+            toTeleport.setYaw(islandTeleportLocation.getYaw());
+            toTeleport.setPitch(islandTeleportLocation.getPitch());
             island.setTeleportLocation(toTeleport);
         }
 
         //We check if the highest block at the island's center location is safe.
         else if(LocationUtils.isSafeBlock((islandCenterBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation())))){
             toTeleport = islandCenterBlock.getLocation().add(0.5, 0, 0.5);
+            toTeleport.setYaw(islandTeleportLocation.getYaw());
+            toTeleport.setPitch(islandTeleportLocation.getPitch());
             island.setTeleportLocation(toTeleport);
         }
 
@@ -393,6 +397,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             return null;
         }).runSync(location -> {
             if(location != null){
+                location.setYaw(islandTeleportLocation.getYaw());
+                location.setPitch(islandTeleportLocation.getPitch());
                 island.setTeleportLocation(location);
                 SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
                 teleport(location.add(0.5, 0.5, 0.5));
