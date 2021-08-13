@@ -218,6 +218,8 @@ public final class IslandUtils {
     }
 
     public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target){
+        EventsCaller.callIslandBanEvent(caller, target, island);
+
         island.banMember(target);
 
         IslandUtils.sendMessage(island, Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
