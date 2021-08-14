@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
+import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
@@ -16,13 +17,14 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.material.MaterialData;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface NMSBlocks {
 
     void setBlocks(Chunk chunk, List<BlockData> blockDataList);
 
     void setBlock(Location location, Material material, byte data);
+
+    ICachedBlock cacheBlock(Block block);
 
     default CompoundTag readBlockStates(Location location){
         return null;

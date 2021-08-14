@@ -4,8 +4,10 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.NMSUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
@@ -129,6 +131,11 @@ public final class NMSBlocks_v1_12_R1 implements NMSBlocks {
             else
                 chunk.world.getTileEntity(blockPosition).load(tileEntityCompound);
         }
+    }
+
+    @Override
+    public ICachedBlock cacheBlock(org.bukkit.block.Block block) {
+        return new NMSCachedBlock(block);
     }
 
     @Override

@@ -1,14 +1,22 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
@@ -37,6 +45,8 @@ import org.bukkit.potion.PotionEffectType;
 
 @SuppressWarnings("unused")
 public final class SettingsListener implements Listener {
+
+    private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(ProjectileHitEvent.class, "getHitBlock");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -207,6 +217,37 @@ public final class SettingsListener implements Listener {
                 ((Player) entity).removePotionEffect(PotionEffectType.POISON);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBowAttackChorus(ProjectileHitEvent e){
+        if(!(e.getEntity() instanceof Arrow) || !(e.getEntity().getShooter() instanceof Player) ||
+                !PROJECTILE_HIT_EVENT_TARGET_BLOCK.isValid())
+            return;
+
+        SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity().getShooter());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()))
+            return;
+
+        Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
+
+        if(!hitBlock.getType().name().equals("CHORUS_FLOWER"))
+            return;
+
+        if(island.hasPermission(damagerPlayer, IslandPrivileges.BREAK)){
+            BlocksLogic.handleBreak(hitBlock);
+        }
+        else{
+            ICachedBlock cachedBlock = plugin.getNMSBlocks().cacheBlock(hitBlock);
+            hitBlock.setType(Material.AIR);
+
+            Locale.sendProtectionMessage(damagerPlayer);
+
+            Executor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()),1L);
+        }
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
