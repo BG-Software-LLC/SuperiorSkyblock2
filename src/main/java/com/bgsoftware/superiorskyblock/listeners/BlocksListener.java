@@ -170,15 +170,15 @@ public final class BlocksListener implements Listener {
 
         List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
 
-        if(island != null)
+        if(island != null) {
             blockStates.forEach(blockState -> {
-                if(!island.isInsideRange(blockState.getLocation())){
+                if (!island.isInsideRange(blockState.getLocation())) {
                     e.getBlocks().remove(blockState);
-                }
-                else {
-                    island.handleBlockPlace(Key.of(blockState.getData().toItemStack()), 1);
+                } else {
+                    island.handleBlockPlace(Key.of(blockState), 1);
                 }
             });
+        }
     }
 
     //Checking for chorus flower spread outside island.
