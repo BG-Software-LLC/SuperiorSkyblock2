@@ -13,7 +13,8 @@ public enum Materials {
     SUNFLOWER("DOUBLE_PLANT"),
     BLACK_STAINED_GLASS_PANE("STAINED_GLASS_PANE", 15),
     BONE_MEAL("INK_SACK", 15),
-    NETHER_PORTAL("PORTAL");
+    NETHER_PORTAL("PORTAL"),
+    END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
 
     Materials(String bukkitType){
         this(bukkitType, 0);

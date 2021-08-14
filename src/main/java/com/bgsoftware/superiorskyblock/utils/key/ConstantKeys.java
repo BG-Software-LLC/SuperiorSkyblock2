@@ -22,5 +22,7 @@ public final class ConstantKeys {
     public static final Key CAULDRON = Key.of("CAULDRON");
     public static final Key EGG_MOB_SPAWNER = Key.of(Materials.SPAWNER.toBukkitType() + ":EGG");
     public static final Key MOB_SPAWNER = Key.of(Materials.SPAWNER.toBukkitType().name());
+    public static final Key END_PORTAL_FRAME_WITH_EYE = Key.of(Materials.END_PORTAL_FRAME.toBukkitType(), (short) 7);
+    public static final Key END_PORTAL_FRAME = Key.of(Materials.END_PORTAL_FRAME.toBukkitType().name());
 
 }

@@ -76,8 +76,12 @@ public final class BlocksListener implements Listener {
                 island.handleBlockBreak(ConstantKeys.WATER, 1);
 
             Key blockKey = Key.of(e.getBlockPlaced());
+
+            if(blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
+                island.handleBlockBreak(ConstantKeys.END_PORTAL_FRAME, 1);
+
             if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerPlacements())
-                island.handleBlockPlace(e.getBlockPlaced());
+                island.handleBlockPlace(blockKey, 1);
 
             ChunksTracker.markDirty(island, e.getBlock(), true);
         }
