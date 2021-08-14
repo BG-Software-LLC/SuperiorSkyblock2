@@ -43,9 +43,12 @@ public final class BlocksLogic {
         EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
 
         for(BlockFace nearbyFace : NEARBY_BLOCKS){
-            Key nearbyBlockKey = Key.of(block.getRelative(nearbyFace));
-            if(!nearbyBlockKey.getGlobalKey().equals("AIR"))
-                nearbyBlocks.put(nearbyFace, nearbyBlockKey);
+            Block nearbyBlock = block.getRelative(nearbyFace);
+            if(!nearbyBlock.getType().isBlock()) {
+                Key nearbyBlockKey = Key.of(nearbyBlock);
+                if (!nearbyBlockKey.getGlobalKey().equals("AIR"))
+                    nearbyBlocks.put(nearbyFace, nearbyBlockKey);
+            }
         }
 
         Executor.sync(() -> {
