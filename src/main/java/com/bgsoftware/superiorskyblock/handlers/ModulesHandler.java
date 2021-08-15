@@ -174,7 +174,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
         if(folderFiles != null) {
             for (File file : folderFiles) {
-                if(!file.isDirectory()) {
+                if(!file.isDirectory() && file.getName().endsWith(".jar")) {
                     try {
                         registerModule(file);
                     } catch (Exception ex) {
