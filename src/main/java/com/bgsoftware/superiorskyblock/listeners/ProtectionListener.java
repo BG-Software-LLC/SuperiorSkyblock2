@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -20,6 +21,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
@@ -45,6 +47,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -75,6 +78,8 @@ import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
+
+    private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(ProjectileHitEvent.class, "getHitEntity");
 
     private static final String PLAYER_DROP_KEY = "player-drop";
 
@@ -620,6 +625,39 @@ public final class ProtectionListener implements Listener {
 
         if(!island.hasPermission(superiorPlayer, islandPrivilege)){
             e.setCancelled(true);
+            // Using this method to fix issue #76 (A NPE error)
+            Locale.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onProjectileHit(ProjectileHitEvent e){
+        if(!PROJECTILE_HIT_TARGET_ENTITY.isValid() || !(e.getEntity() instanceof FishHook))
+            return;
+
+        ProjectileSource projectileSource = e.getEntity().getShooter();
+
+        if(!(projectileSource instanceof Player))
+            return;
+
+        Entity hitEntity = PROJECTILE_HIT_TARGET_ENTITY.invoke(e);
+
+        if(hitEntity == null)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(hitEntity.getLocation());
+
+        if(island == null)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) projectileSource);
+
+        IslandPrivilege requiredPrivilege = EntityUtils.isMonster(e.getEntityType()) ?
+                IslandPrivileges.MONSTER_DAMAGE : EntityUtils.isAnimal(e.getEntityType()) ?
+                IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.BREAK;
+
+        if(!island.hasPermission(superiorPlayer, requiredPrivilege)){
+            e.getEntity().remove();
             // Using this method to fix issue #76 (A NPE error)
             Locale.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
         }
