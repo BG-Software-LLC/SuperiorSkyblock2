@@ -52,7 +52,9 @@ public final class NMSUtils {
         boolean hasUnloadedChunks = !unloadedChunks.isEmpty();
 
         loadedChunks.forEach(chunkConsumer);
-        loadedChunks.forEach(updateChunk);
+
+        if(updateChunk != null)
+            loadedChunks.forEach(updateChunk);
 
         if (hasUnloadedChunks) {
             runActionOnUnloadedChunks(worldServer, unloadedChunks, saveChunks, chunkConsumer, onFinish);
