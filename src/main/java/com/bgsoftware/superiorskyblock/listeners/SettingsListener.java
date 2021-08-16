@@ -233,7 +233,7 @@ public final class SettingsListener implements Listener {
 
         Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
 
-        if(!hitBlock.getType().name().equals("CHORUS_FLOWER"))
+        if(hitBlock == null || !hitBlock.getType().name().equals("CHORUS_FLOWER"))
             return;
 
         if(island.hasPermission(damagerPlayer, IslandPrivileges.BREAK)){
