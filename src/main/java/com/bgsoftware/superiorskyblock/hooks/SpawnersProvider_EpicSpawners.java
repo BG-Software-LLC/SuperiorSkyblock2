@@ -23,13 +23,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class BlocksProvider_EpicSpawners implements BlocksProvider {
+public final class SpawnersProvider_EpicSpawners implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
 
     private final EpicSpawners instance = EpicSpawners.getInstance();
 
-    public BlocksProvider_EpicSpawners(){
+    public SpawnersProvider_EpicSpawners(){
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;

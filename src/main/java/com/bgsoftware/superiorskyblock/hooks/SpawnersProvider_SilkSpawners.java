@@ -15,13 +15,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class BlocksProvider_SilkSpawners implements BlocksProvider {
+public final class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
 
-    public BlocksProvider_SilkSpawners(){
+    public SpawnersProvider_SilkSpawners(){
         if(!registered) {
-            Bukkit.getPluginManager().registerEvents(new BlocksProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using SilkSpawners as a spawners provider.");
         }

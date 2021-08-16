@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 
 public interface ProvidersManager {
@@ -12,6 +13,12 @@ public interface ProvidersManager {
      * @param spawnersProvider The spawner provider to set.
      */
     void setSpawnersProvider(SpawnersProvider spawnersProvider);
+
+    /**
+     * Set a custom stacked-blocks provider for the plugin.
+     * @param stackedBlocksProvider The stacked-blocks provider to set.
+     */
+    void setStackedBlocksProvider(StackedBlocksProvider stackedBlocksProvider);
 
     /**
      * Set custom ecconomy provider for the plugin.

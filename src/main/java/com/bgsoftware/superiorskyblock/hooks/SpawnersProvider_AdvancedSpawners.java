@@ -16,13 +16,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class BlocksProvider_AdvancedSpawners implements BlocksProvider {
+public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
 
-    public BlocksProvider_AdvancedSpawners(){
+    public SpawnersProvider_AdvancedSpawners(){
         if(!registered) {
-            Bukkit.getPluginManager().registerEvents(new BlocksProvider_AdvancedSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using AdvancedSpawners as a spawners provider.");
         }

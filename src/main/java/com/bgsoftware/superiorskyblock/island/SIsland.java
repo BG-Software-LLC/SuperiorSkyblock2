@@ -24,7 +24,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
-import com.bgsoftware.superiorskyblock.hooks.BlocksProvider_WildStacker;
+import com.bgsoftware.superiorskyblock.hooks.SpawnersProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
@@ -104,6 +104,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1238,8 +1239,8 @@ public final class SIsland implements Island {
 
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
-        BlocksProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
-                new BlocksProvider_WildStacker.WildStackerSnapshot() : null;
+        SpawnersProvider_WildStacker.WildStackerSnapshot snapshot = plugin.getProviders().isWildStacker() ?
+                new SpawnersProvider_WildStacker.WildStackerSnapshot() : null;
 
         if (snapshot == null) {
             IslandUtils.getChunkCoords(this, true, true).values().forEach(worldChunks ->
@@ -1291,7 +1292,7 @@ public final class SIsland implements Island {
                                 blockCounts, islandWorth, islandLevel);
                     }
                 } else {
-                    Set<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
+                    Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
                             plugin.getProviders().getBlocks(calculatedChunk.getPosition());
                     if (stackedBlocks == null) {
                         chunksToCheck.add(calculatedChunk.getPosition());

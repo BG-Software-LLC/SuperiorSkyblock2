@@ -36,31 +36,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public final class BlocksProvider_WildStacker implements BlocksProvider {
+public final class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
 
-    public BlocksProvider_WildStacker(){
+    public SpawnersProvider_WildStacker(){
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
-
-            SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
-
-                @Override
-                public com.bgsoftware.superiorskyblock.api.key.Key getCustomKey(Location location) {
-                    return getSystemManager().isStackedBarrel(location) ?
-                            com.bgsoftware.superiorskyblock.api.key.Key.of(getSystemManager().getStackedBarrel(location).getBarrelItem(1)) :
-                            com.bgsoftware.superiorskyblock.api.key.Key.of("CAULDRON");
-                }
-
-                @Override
-                public boolean isCustomKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
-                    return false;
-                }
-
-            }, ConstantKeys.CAULDRON);
-
             SuperiorSkyblockPlugin.log("Using WildStacker as a spawners provider.");
         }
     }
@@ -68,10 +51,6 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
     @Override
     public Pair<Integer, String> getSpawner(Location location) {
         throw new UnsupportedOperationException("Unsupported Operation");
-    }
-
-    private SystemManager getSystemManager(){
-        return WildStackerAPI.getWildStacker().getSystemManager();
     }
 
     public static class WildStackerSnapshot {
@@ -125,72 +104,6 @@ public final class BlocksProvider_WildStacker implements BlocksProvider {
     private static class StackerListener implements Listener{
 
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelPlace(BarrelPlaceEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-
-            if(island == null)
-                return;
-
-            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
-            int increaseAmount = e.getBarrel().getStackAmount();
-
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
-                e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-            }
-
-            else{
-                island.handleBlockPlace(blockKey, increaseAmount);
-            }
-        }
-
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelStack(BarrelStackEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-
-            if(island == null)
-                return;
-
-            Key blockKey = Key.of(e.getTarget().getBarrelItem(1));
-            int increaseAmount = e.getTarget().getStackAmount();
-
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
-                e.setCancelled(true);
-            }
-
-            else{
-                island.handleBlockPlace(blockKey, increaseAmount);
-            }
-        }
-
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelUnstack(BarrelUnstackEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-            if(island != null)
-                island.handleBlockBreak(Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
-        }
-
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelPlace(BarrelPlaceInventoryEvent e){
-            Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-
-            if(island == null)
-                return;
-
-            Key blockKey = Key.of(e.getBarrel().getBarrelItem(1));
-            int increaseAmount = e.getIncreaseAmount();
-
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
-                e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-            }
-
-            else{
-                island.handleBlockPlace(blockKey, increaseAmount);
-            }
-        }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e){

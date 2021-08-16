@@ -13,20 +13,17 @@ import com.songoda.ultimatestacker.events.SpawnerBreakEvent;
 import com.songoda.ultimatestacker.events.SpawnerPlaceEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 
-public final class BlocksProvider_UltimateStacker implements BlocksProvider {
+public final class SpawnersProvider_UltimateStacker implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
 
     private final UltimateStacker instance = UltimateStacker.getInstance();
 
-    public BlocksProvider_UltimateStacker(){
+    public SpawnersProvider_UltimateStacker(){
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
@@ -39,24 +36,11 @@ public final class BlocksProvider_UltimateStacker implements BlocksProvider {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
 
         int blockCount = -1;
-        if(Bukkit.isPrimaryThread()){
+        if (Bukkit.isPrimaryThread()) {
             blockCount = instance.getSpawnerStackManager().getSpawner(location).getAmount();
         }
 
         return new Pair<>(blockCount, null);
-    }
-
-    @Override
-    public String getSpawnerType(ItemStack itemStack) {
-        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
-
-        try{
-            BlockStateMeta bsm = (BlockStateMeta) itemStack.getItemMeta();
-            CreatureSpawner cs = (CreatureSpawner)bsm.getBlockState();
-            return cs.getSpawnedType().name();
-        }catch (Exception ex){
-            return "PIG";
-        }
     }
 
     @SuppressWarnings("unused")

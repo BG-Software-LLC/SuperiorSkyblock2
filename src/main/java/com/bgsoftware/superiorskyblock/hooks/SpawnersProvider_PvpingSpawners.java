@@ -15,13 +15,13 @@ import skyblock.hassan.plugin.api.SpawnerStackEvent;
 import skyblock.hassan.plugin.api.SpawnerUnstackEvent;
 import skyblock.hassan.plugin.spawners.StackedSpawner;
 
-public final class BlocksProvider_PvpingSpawners implements BlocksProvider{
+public final class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
 
     private final Main main;
 
-    public BlocksProvider_PvpingSpawners(){
+    public SpawnersProvider_PvpingSpawners(){
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
         if(!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());

@@ -391,6 +391,10 @@ leave-confirm: true
 # Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
 
+# If you want a specific stacked-blocks provider to use, specify it here.
+# Providers: Auto, WildStacker, RoseStacker
+stacked-blocks-provider: 'AUTO'
+
 # Should inventories of island members get cleared after disbanding their island?
 disband-inventory-clear: true
 

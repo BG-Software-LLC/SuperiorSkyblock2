@@ -16,13 +16,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class BlocksProvider_MergedSpawner implements BlocksProvider {
+public final class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
 
-    public BlocksProvider_MergedSpawner(){
+    public SpawnersProvider_MergedSpawner(){
         if(!registered) {
-            Bukkit.getPluginManager().registerEvents(new BlocksProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using MergedSpawner as a spawners provider.");
         }
