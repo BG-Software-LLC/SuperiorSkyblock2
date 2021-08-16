@@ -21,6 +21,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.Snowman;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -215,6 +216,11 @@ public final class BlocksListener implements Listener {
                 Island island = plugin.getGrid().getIslandAt(block.getLocation());
                 if(island != null)
                     island.handleBlockBreak(block, 1);
+            }
+            if(e.getEntity() instanceof TNTPrimed){
+                Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+                if(island != null)
+                    island.handleBlockBreak(ConstantKeys.TNT, 1);
             }
         }
     }
