@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -157,8 +159,29 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         return stackedBlocksProvider.getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
     }
 
-    public boolean isWildStacker() {
-        return spawnersProvider instanceof SpawnersProvider_WildStacker;
+    public boolean hasSnapshotsSupport() {
+        return spawnersProvider instanceof SpawnersSnapshotProvider ||
+                stackedBlocksProvider instanceof StackedBlocksSnapshotProvider;
+    }
+
+    public void takeSnapshots(Chunk chunk){
+        if(spawnersProvider instanceof SpawnersSnapshotProvider){
+            ((SpawnersSnapshotProvider) spawnersProvider).takeSnapshot(chunk);
+        }
+        if(stackedBlocksProvider instanceof StackedBlocksSnapshotProvider){
+            ((StackedBlocksSnapshotProvider) stackedBlocksProvider).takeSnapshot(chunk);
+        }
+    }
+
+    public void releaseSnapshots(ChunkPosition chunkPosition){
+        if(spawnersProvider instanceof SpawnersSnapshotProvider){
+            ((SpawnersSnapshotProvider) spawnersProvider).releaseSnapshot(
+                    chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+        }
+        if(stackedBlocksProvider instanceof StackedBlocksSnapshotProvider){
+            ((StackedBlocksSnapshotProvider) stackedBlocksProvider).releaseSnapshot(
+                    chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+        }
     }
 
     public boolean hasPermission(Player player, String permission) {

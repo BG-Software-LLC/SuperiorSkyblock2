@@ -3,11 +3,13 @@ package com.bgsoftware.superiorskyblock.hooks;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
@@ -15,7 +17,9 @@ import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelStackEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelUnstackEvent;
 import com.bgsoftware.wildstacker.api.handlers.SystemManager;
+import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
@@ -23,8 +27,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
-public final class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect {
+public final class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
 
     private static boolean registered = false;
 
@@ -57,9 +62,31 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
     @Override
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
-        throw new UnsupportedOperationException("Unsupported Operation");
+        StackedSnapshot stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot( ChunkPosition.of(world, chunkX, chunkZ));
+
+        try {
+            return stackedSnapshot.getAllBarrelsItems().values().stream()
+                    .filter(entry -> entry.getValue() != null)
+                    .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
+                    .collect(Collectors.toSet());
+        }catch (Throwable ex){
+            return stackedSnapshot.getAllBarrels().values().stream()
+                    .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
+                    .collect(Collectors.toSet());
+        }
     }
 
+    @Override
+    public void takeSnapshot(Chunk chunk) {
+        WildStackerSnapshotsContainer.takeSnapshot(chunk);
+    }
+
+    @Override
+    public void releaseSnapshot(World world, int chunkX, int chunkZ) {
+        WildStackerSnapshotsContainer.releaseSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
+    }
+
+    @SuppressWarnings("unused")
     private static class StackerListener implements Listener {
 
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
