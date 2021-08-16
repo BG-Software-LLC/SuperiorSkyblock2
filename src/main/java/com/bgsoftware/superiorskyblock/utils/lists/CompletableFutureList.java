@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.lists;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -15,16 +16,20 @@ public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<
         super(other);
     }
 
-    public void forEachCompleted(Consumer<? super E> consumer, BiConsumer<CompletableFuture<E>, Throwable> onFailure){
+    public void forEachCompleted(Consumer<? super E> consumer, Consumer<Throwable> onFailure){
         for(CompletableFuture<E> completableFuture : this){
-            completableFuture.whenComplete((e, ex) -> {
-                if(ex == null)
-                    consumer.accept(e);
+            completableFuture.whenComplete((result, error) -> {
+                if(error == null)
+                    consumer.accept(result);
                 else
-                    onFailure.accept(completableFuture, ex);
+                    onFailure.accept(error);
             });
         }
-        CompletableFuture.allOf(toArray(new CompletableFuture[0])).join();
+        try {
+            CompletableFuture.allOf(toArray(new CompletableFuture[0])).get(10, TimeUnit.SECONDS);
+        }catch (Exception ex){
+            onFailure.accept(ex);
+        }
     }
 
 }

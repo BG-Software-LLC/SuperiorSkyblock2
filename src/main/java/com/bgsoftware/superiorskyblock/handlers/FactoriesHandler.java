@@ -5,9 +5,11 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
@@ -64,6 +66,11 @@ public final class FactoriesHandler implements FactoriesManager {
     public IslandBank createIslandBank(Island island){
         SIslandBank islandBank = new SIslandBank(island);
         return banksFactory == null ? islandBank : banksFactory.createIslandBank(island, islandBank);
+    }
+
+    public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island){
+        return islandsFactory == null ? new DefaultIslandCalculationAlgorithm(island) :
+                islandsFactory.createIslandCalculationAlgorithm(island);
     }
 
 }
