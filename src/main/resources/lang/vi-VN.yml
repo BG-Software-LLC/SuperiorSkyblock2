@@ -560,6 +560,7 @@ ISLAND_WARP_PUBLIC: ''
 ISLAND_WARP_PRIVATE: '&c[Riêng Tư]'
 ISLAND_WAS_CLOSED: '&e&lNâng cấp | &7&oHòn đảo bạn đang ở đã bị đóng cửa và bạn sẽ
   dịch chuyển trở lại spawn...'
+ISLAND_WORTH_ERROR: '&c&lError | &7An unexpected error occurred while calculating your island. Contact administrators if the issue persists.'
 ISLAND_WORTH_RESULT: '&e&lĐảo Thần | &7Giá trị đảo của bạn là {0} [Cấp độ {1}]'
 JOIN_ADMIN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã gia nhập đảo của bạn.'
 JOIN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã gia nhập đảo của bạn.'

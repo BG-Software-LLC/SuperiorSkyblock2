@@ -1234,6 +1234,18 @@ public final class SIsland implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         calculationAlgorithm.calculateIsland().whenComplete((result, error) -> {
+            if(error != null){
+                SuperiorSkyblockPlugin.log("&cError occurred when calculating the island:");
+                error.printStackTrace();
+
+                if(asker != null)
+                    Locale.ISLAND_WORTH_ERROR.send(asker);
+
+                beingRecalculated = false;
+
+                return;
+            }
+
             this.blockCounts.clear();
             this.islandWorth.set(BigDecimal.ZERO);
             this.islandLevel.set(BigDecimal.ZERO);

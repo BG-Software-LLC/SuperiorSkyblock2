@@ -94,10 +94,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     blockCounts.addCounts(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1);
 
                 plugin.getProviders().releaseSnapshots(calculatedChunk.getPosition());
-            }), error -> {
-                SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                error.printStackTrace();
-            });
+            }), result::completeExceptionally);
         }).runSync(v -> {
             Key blockKey;
             int blockCount;
