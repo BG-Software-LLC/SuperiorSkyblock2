@@ -48,6 +48,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -355,6 +356,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                         .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
                 Executor.createTask().runAsync(v -> {
+                    List<Location> safeLocations = new ArrayList<>();
+
                     for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
                         ChunkSnapshot chunkSnapshot;
 
@@ -386,14 +389,15 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                                 }
 
                                 if(blockType.isSolid() || belowType.isSolid()){
-                                    return new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                                            chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z);
+                                    safeLocations.add(new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                                            chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z));
                                 }
                             }
                         }
                     }
 
-                    return null;
+                    return safeLocations.stream().min(Comparator.comparingDouble(loc ->
+                            loc.distanceSquared(islandTeleportLocation))).orElse(null);
                 }).runSync(location -> {
                     if(location != null){
                         adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
