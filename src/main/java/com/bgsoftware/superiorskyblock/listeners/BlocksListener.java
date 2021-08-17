@@ -104,6 +104,11 @@ public final class BlocksListener implements Listener {
         if(island == null)
             return;
 
+        Material blockType = e.getBlockClicked().getType();
+
+        if(!blockType.name().contains("WATER") && !blockType.name().contains("LAVA"))
+            return;
+
         island.handleBlockBreak(Key.of(e.getBlockClicked()), 1);
 
         Executor.sync(() -> {
