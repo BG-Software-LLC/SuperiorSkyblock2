@@ -105,11 +105,14 @@ public final class BlocksListener implements Listener {
             return;
 
         Material blockType = e.getBlockClicked().getType();
+        boolean isWaterLogged = plugin.getNMSBlocks().isWaterLogged(e.getBlockClicked());
 
-        if(!blockType.name().contains("WATER") && !blockType.name().contains("LAVA"))
+        if(!blockType.name().contains("WATER") && !blockType.name().contains("LAVA") && !isWaterLogged)
             return;
 
-        island.handleBlockBreak(Key.of(e.getBlockClicked()), 1);
+        Key blockKey = isWaterLogged ? ConstantKeys.WATER : Key.of(e.getBlockClicked());
+
+        island.handleBlockBreak(blockKey, 1);
 
         Executor.sync(() -> {
             Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
