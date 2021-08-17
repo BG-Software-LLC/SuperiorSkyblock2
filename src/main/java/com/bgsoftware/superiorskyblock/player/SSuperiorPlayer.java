@@ -38,6 +38,7 @@ import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
@@ -335,7 +336,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                     return;
                 }
 
-                Block centerHighestBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation());
+                Block centerHighestBlock = islandCenterBlock.getWorld()
+                        .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
                 if(LocationUtils.isSafeBlock(centerHighestBlock)){
                     Location newTeleportLocation = centerHighestBlock.getLocation().add(0.5, 0, 0.5);
                     island.setTeleportLocation(newTeleportLocation);
