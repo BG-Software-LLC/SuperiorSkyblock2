@@ -123,8 +123,9 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             spawnersToCheck.clear();
 
             for (ChunkPosition chunkPosition : chunksToCheck) {
-                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition))
+                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition)) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
+                }
             }
 
             chunksToCheck.clear();
@@ -149,6 +150,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         }
 
         public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, BigInteger amount) {
+            blockKey = plugin.getBlockValues().getBlockKey(blockKey);
             BigInteger currentAmount = blockCounts.getOrDefault(blockKey, BigInteger.ZERO);
             blockCounts.put(blockKey, currentAmount.add(amount));
         }
@@ -156,7 +158,6 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         public void addCounts(KeyMap<Integer> other) {
             other.forEach(this::addCounts);
         }
-
     }
 
 }
