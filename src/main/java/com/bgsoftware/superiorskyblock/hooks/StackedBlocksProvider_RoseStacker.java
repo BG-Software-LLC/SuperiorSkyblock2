@@ -20,6 +20,7 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Collection;
@@ -31,8 +32,8 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
 
     private static boolean registered = false;
 
-    public StackedBlocksProvider_RoseStacker(){
-        if(!registered) {
+    public StackedBlocksProvider_RoseStacker() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using RoseStacker as a stacked-blocks provider.");
@@ -43,7 +44,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
 
-        if(!Bukkit.isPrimaryThread())
+        if (!Bukkit.isPrimaryThread())
             return null;
 
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
@@ -63,57 +64,73 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
 
         private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBlockStack(BlockStackEvent e){
-            Location location = e.getStack().getLocation();
+        @EventHandler(priority = EventPriority.MONITOR)
+        public void onBlockPlace(BlockPlaceEvent e) {
+            Location location = e.getBlock().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
-            if(island != null) {
-                com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getStack().getBlock());
-                island.handleBlockPlace(blockKey, e.isNew() ? e.getIncreaseAmount() - 1 : e.getIncreaseAmount());
+            if (island != null && e.isCancelled()) {
+                StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getBlockAgainst());
+                if (stackedBlock != null) {
+                    // We want to add additional one block, to adjust the counts to the correct value.
+                    com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getBlock());
+                    island.handleBlockPlace(blockKey, 1);
+                }
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBlockUnstack(BlockUnstackEvent e){
+        public void onBlockStack(BlockStackEvent e) {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
-            if(island != null) {
+            if (island != null) {
+                com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getStack().getBlock());
+                int placedBlocksAmount = e.isNew() ? e.getIncreaseAmount() - 1 : e.getIncreaseAmount();
+                if (placedBlocksAmount > 0)
+                    island.handleBlockPlace(blockKey, placedBlocksAmount);
+            }
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBlockUnstack(BlockUnstackEvent e) {
+            Location location = e.getStack().getLocation();
+            Island island = plugin.getGrid().getIslandAt(location);
+            if (island != null) {
                 com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getStack().getBlock());
                 island.handleBlockBreak(blockKey, e.getDecreaseAmount());
             }
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-        public void onBlockStackProtection(BlockStackEvent e){
-            if(!ProtectionLogic.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
+        public void onBlockStackProtection(BlockStackEvent e) {
+            if (!ProtectionLogic.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-        public void onBlockUnstackProtection(BlockUnstackEvent e){
-            if(e.getPlayer() != null && !ProtectionLogic.handleBlockBreak(
+        public void onBlockUnstackProtection(BlockUnstackEvent e) {
+            if (e.getPlayer() != null && !ProtectionLogic.handleBlockBreak(
                     e.getStack().getBlock(), e.getPlayer(), true))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-        public void onBlockStackInteractionProtection(PlayerInteractEvent e){
-            if(e.getClickedBlock() == null || !e.getPlayer().isSneaking())
+        public void onBlockStackInteractionProtection(PlayerInteractEvent e) {
+            if (e.getClickedBlock() == null || !e.getPlayer().isSneaking())
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
 
-            if(island == null)
+            if (island == null)
                 return;
 
             StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getClickedBlock());
 
-            if(stackedBlock == null)
+            if (stackedBlock == null)
                 return;
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
-            if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
+            if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
                 Locale.sendProtectionMessage(superiorPlayer);
                 e.setCancelled(true);
             }
