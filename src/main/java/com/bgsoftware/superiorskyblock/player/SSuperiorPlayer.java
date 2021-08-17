@@ -326,9 +326,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             }
 
             Block islandCenterBlock = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock();
+            float rotationYaw = islandTeleportLocation.getYaw();
+            float rotationPitch = islandTeleportLocation.getPitch();
 
-            teleportIfSafe(island, islandCenterBlock, null, islandTeleportLocation.getYaw(),
-                    islandTeleportLocation.getPitch(), (centerTeleportResult, centerTeleportLocation) -> {
+            teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch,
+                    (centerTeleportResult, centerTeleportLocation) -> {
                 if(centerTeleportResult){
                     island.setTeleportLocation(centerTeleportLocation);
                     if(result != null)
@@ -339,13 +341,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 Block centerHighestBlock = islandCenterBlock.getWorld()
                         .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
                 if(LocationUtils.isSafeBlock(centerHighestBlock)){
-                    Location newTeleportLocation = centerHighestBlock.getLocation().add(0.5, 0, 0.5);
-                    newTeleportLocation.setYaw(islandTeleportLocation.getYaw());
-                    newTeleportLocation.setPitch(islandTeleportLocation.getPitch());
-                    island.setTeleportLocation(newTeleportLocation);
-                    teleport(newTeleportLocation.add(0, 0.5, 0));
-                    if(result != null)
-                        result.accept(true);
+                    adjustAndTeleportPlayerToLocation(island, centerHighestBlock.getLocation(), rotationYaw,
+                            rotationPitch, result);
                     return;
                 }
 
@@ -399,13 +396,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                     return null;
                 }).runSync(location -> {
                     if(location != null){
-                        location.setYaw(islandTeleportLocation.getYaw());
-                        location.setPitch(islandTeleportLocation.getPitch());
-                        island.setTeleportLocation(location);
-                        SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
-                        teleport(location.add(0.5, 0.5, 0.5));
-                        if(result != null)
-                            result.accept(true);
+                        adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
                     }
                     else if(result != null){
                         result.accept(false);
@@ -415,6 +406,19 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             });
 
         });
+    }
+
+    private void adjustAndTeleportPlayerToLocation(Island island, Location location, float yaw, float pitch, Consumer<Boolean> result){
+        location = location.add(0.5, 0, 0.5);
+        location.setYaw(yaw);
+        location.setPitch(pitch);
+
+        SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
+
+        island.setTeleportLocation(location);
+        teleport(location.add(0, 0.5, 0));
+        if(result != null)
+            result.accept(true);
     }
 
     @Override
