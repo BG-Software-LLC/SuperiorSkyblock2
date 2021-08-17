@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
+import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.cscorelib2.config.Config;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectableAction;
@@ -103,6 +104,11 @@ public final class SlimefunHook implements ProtectionModule, Listener {
 
         storageMap.keySet().stream().filter(location -> location.getBlockX() >> 4 == e.getChunkX() &&
                 location.getBlockZ() >> 4 == e.getChunkZ()).forEach(BlockStorage::clearBlockInfo);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e){
+        BlocksLogic.handlePlace(e.getBlock(), null);
     }
 
     public static void register(SuperiorSkyblockPlugin plugin){

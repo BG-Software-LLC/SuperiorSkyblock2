@@ -68,24 +68,7 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockPlaceMonitor(BlockPlaceEvent e){
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-
-        if(island != null) {
-            if(e.getBlockReplacedState().getType().name().contains("LAVA"))
-                island.handleBlockBreak(ConstantKeys.LAVA, 1);
-            else if(e.getBlockReplacedState().getType().name().contains("WATER"))
-                island.handleBlockBreak(ConstantKeys.WATER, 1);
-
-            Key blockKey = Key.of(e.getBlockPlaced());
-
-            if(blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
-                island.handleBlockBreak(ConstantKeys.END_PORTAL_FRAME, 1);
-
-            if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerPlacements())
-                island.handleBlockPlace(blockKey, 1);
-
-            ChunksTracker.markDirty(island, e.getBlock(), true);
-        }
+        BlocksLogic.handlePlace(e.getBlock(), e.getBlockReplacedState());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
@@ -63,6 +64,29 @@ public final class BlocksLogic {
                 }
             }
         }, 2L);
+    }
+
+    public static void handlePlace(Block block, BlockState oldBlockState){
+        Island island = plugin.getGrid().getIslandAt(block.getLocation());
+
+        if(island != null) {
+            if(oldBlockState != null) {
+                if (oldBlockState.getType().name().contains("LAVA"))
+                    island.handleBlockBreak(ConstantKeys.LAVA, 1);
+                else if (oldBlockState.getType().name().contains("WATER"))
+                    island.handleBlockBreak(ConstantKeys.WATER, 1);
+            }
+
+            Key blockKey = Key.of(block);
+
+            if(blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
+                island.handleBlockBreak(ConstantKeys.END_PORTAL_FRAME, 1);
+
+            if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerPlacements())
+                island.handleBlockPlace(blockKey, 1);
+
+            ChunksTracker.markDirty(island, block, true);
+        }
     }
 
     public static boolean isWarpSign(String firstSignLine){
