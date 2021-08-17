@@ -111,6 +111,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -1234,12 +1235,17 @@ public final class SIsland implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         calculationAlgorithm.calculateIsland().whenComplete((result, error) -> {
-            if(error != null){
-                SuperiorSkyblockPlugin.log("&cError occurred when calculating the island:");
-                error.printStackTrace();
+            if (error != null) {
+                if (error instanceof TimeoutException) {
+                    if (asker != null)
+                        Locale.ISLAND_WORTH_TIME_OUT.send(asker);
+                } else {
+                    SuperiorSkyblockPlugin.log("&cError occurred when calculating the island:");
+                    error.printStackTrace();
 
-                if(asker != null)
-                    Locale.ISLAND_WORTH_ERROR.send(asker);
+                    if (asker != null)
+                        Locale.ISLAND_WORTH_ERROR.send(asker);
+                }
 
                 beingRecalculated = false;
 

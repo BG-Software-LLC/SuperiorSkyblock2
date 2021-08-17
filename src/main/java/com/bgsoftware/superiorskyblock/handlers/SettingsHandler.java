@@ -181,6 +181,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
+    public final long recalcTaskTimeout;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         super(plugin);
@@ -469,6 +470,7 @@ public final class SettingsHandler extends AbstractHandler {
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
         publicWarps = cfg.getBoolean("public-warps");
+        recalcTaskTimeout = cfg.getLong("recalc-task-timeout");
     }
 
     @Override

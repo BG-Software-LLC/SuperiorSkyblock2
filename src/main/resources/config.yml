@@ -720,3 +720,7 @@ charge-on-warp: 0
 
 # Should island warps be public by default?
 public-warps: false
+
+# Timeout for the recalculate task, in seconds.
+# If you want to disable the timeout, set this to 0 or below.
+recalc-task-timeout: 10
