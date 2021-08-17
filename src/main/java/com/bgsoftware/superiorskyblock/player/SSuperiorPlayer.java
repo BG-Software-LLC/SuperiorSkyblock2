@@ -12,10 +12,10 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
@@ -26,7 +26,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -304,24 +303,24 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Consumer<Boolean> result) {
-        if(!isOnline())
+        if (!isOnline())
             return;
 
         Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
         assert islandTeleportLocation != null;
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
 
-        if(island instanceof SpawnIsland){
+        if (island instanceof SpawnIsland) {
             SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
             teleport(islandTeleportLocation.add(0, 0.5, 0));
-            if(result != null)
+            if (result != null)
                 result.accept(true);
             return;
         }
 
         teleportIfSafe(island, islandTeleportBlock, islandTeleportLocation, 0, 0, (teleportResult, teleportLocation) -> {
-            if(teleportResult) {
-                if(result != null)
+            if (teleportResult) {
+                if (result != null)
                     result.accept(true);
                 return;
             }
@@ -330,21 +329,32 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             float rotationYaw = islandTeleportLocation.getYaw();
             float rotationPitch = islandTeleportLocation.getPitch();
 
-            teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch,
-                    (centerTeleportResult, centerTeleportLocation) -> {
-                if(centerTeleportResult){
+            teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch, (centerTeleportResult, centerTeleportLocation) -> {
+                if (centerTeleportResult) {
                     island.setTeleportLocation(centerTeleportLocation);
-                    if(result != null)
+                    if (result != null)
                         result.accept(true);
                     return;
                 }
 
-                Block centerHighestBlock = islandCenterBlock.getWorld()
-                        .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
-                if(LocationUtils.isSafeBlock(centerHighestBlock)){
-                    adjustAndTeleportPlayerToLocation(island, centerHighestBlock.getLocation(), rotationYaw,
-                            rotationPitch, result);
-                    return;
+                {
+                    Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
+                            .getHighestBlockAt(islandTeleportBlock.getLocation()).getRelative(BlockFace.UP);
+                    if (LocationUtils.isSafeBlock(teleportLocationHighestBlock)) {
+                        adjustAndTeleportPlayerToLocation(island, teleportLocationHighestBlock.getLocation(),
+                                rotationYaw, rotationPitch, result);
+                        return;
+                    }
+                }
+
+                {
+                    Block centerHighestBlock = islandCenterBlock.getWorld()
+                            .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
+                    if (LocationUtils.isSafeBlock(centerHighestBlock)) {
+                        adjustAndTeleportPlayerToLocation(island, centerHighestBlock.getLocation(), rotationYaw,
+                                rotationPitch, result);
+                        return;
+                    }
                 }
 
                 /*
@@ -358,12 +368,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 Executor.createTask().runAsync(v -> {
                     List<Location> safeLocations = new ArrayList<>();
 
-                    for(CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad){
+                    for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
                         ChunkSnapshot chunkSnapshot;
 
                         try {
                             chunkSnapshot = chunkToLoad.get();
-                        }catch(Exception ex){
+                        } catch (Exception ex) {
                             SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
                             continue;
                         }
@@ -373,8 +383,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
                         int worldBuildLimit = Bukkit.getWorld(chunkSnapshot.getWorldName()).getMaxHeight();
 
-                        for(int x = 0; x < 16; x++){
-                            for(int z = 0; z < 16; z++){
+                        for (int x = 0; x < 16; x++) {
+                            for (int z = 0; z < 16; z++) {
                                 int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
                                 Key blockKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y, z),
                                         belowKey = plugin.getNMSAdapter().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
@@ -384,11 +394,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                                 try {
                                     blockType = Material.valueOf(blockKey.getGlobalKey());
                                     belowType = Material.valueOf(belowKey.getGlobalKey());
-                                }catch(IllegalArgumentException ex){
+                                } catch (IllegalArgumentException ex) {
                                     continue;
                                 }
 
-                                if(blockType.isSolid() || belowType.isSolid()){
+                                if (blockType.isSolid() || belowType.isSolid()) {
                                     safeLocations.add(new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
                                             chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z));
                                 }
@@ -399,10 +409,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                     return safeLocations.stream().min(Comparator.comparingDouble(loc ->
                             loc.distanceSquared(islandTeleportLocation))).orElse(null);
                 }).runSync(location -> {
-                    if(location != null){
+                    if (location != null) {
                         adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
-                    }
-                    else if(result != null){
+                    } else if (result != null) {
                         result.accept(false);
                     }
                 });
