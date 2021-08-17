@@ -340,9 +340,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                         .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
                 if(LocationUtils.isSafeBlock(centerHighestBlock)){
                     Location newTeleportLocation = centerHighestBlock.getLocation().add(0.5, 0, 0.5);
-                    island.setTeleportLocation(newTeleportLocation);
                     newTeleportLocation.setYaw(islandTeleportLocation.getYaw());
                     newTeleportLocation.setPitch(islandTeleportLocation.getPitch());
+                    island.setTeleportLocation(newTeleportLocation);
                     teleport(newTeleportLocation.add(0, 0.5, 0));
                     if(result != null)
                         result.accept(true);
