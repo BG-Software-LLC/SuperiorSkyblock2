@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.nbt.NBTTagCompound;
@@ -24,7 +25,8 @@ import java.util.function.Consumer;
 
 public final class NMSUtils {
 
-    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks");
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks", "l");
+    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(PlayerChunk.class, "a", Packet.class, boolean.class);
 
     private NMSUtils() {
 
@@ -123,8 +125,13 @@ public final class NMSUtils {
             playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
         }
 
-        if(playerChunk != null)
-            playerChunk.a(packet, false);
+        if(playerChunk != null) {
+            try {
+                playerChunk.a(packet, false);
+            }catch (Throwable ex){
+                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
+            }
+        }
     }
 
 }

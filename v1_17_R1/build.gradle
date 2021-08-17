@@ -8,6 +8,7 @@ java {
 
 dependencies {
     compileOnly "org.spigotmc:v1_17_R1-Tuinity:latest"
+    //compileOnly files('D:\\My Servers\\Testing 1.16\\spigot_server.jar')
     compileOnly project(":API")
     compileOnly parent
 }
