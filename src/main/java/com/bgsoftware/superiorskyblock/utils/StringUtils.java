@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -89,7 +90,7 @@ public final class StringUtils {
         for(String subKey : type.split("_"))
             formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase()).append(subKey.substring(1).toLowerCase());
 
-        return formattedKey.toString().substring(1);
+        return formattedKey.substring(1);
     }
 
 
@@ -157,19 +158,19 @@ public final class StringUtils {
     public static String getPermissionsString(){
         StringBuilder stringBuilder = new StringBuilder();
         IslandPrivilege.values().stream().sorted(Comparator.comparing(IslandPrivilege::getName)).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
     public static String getSettingsString(){
         StringBuilder stringBuilder = new StringBuilder();
         IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName)).forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
     public static String getUpgradesString(SuperiorSkyblockPlugin plugin){
         StringBuilder stringBuilder = new StringBuilder();
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> stringBuilder.append(", ").append(upgrade.getName()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
     public static String formatTime(java.util.Locale locale, long time){
@@ -335,6 +336,19 @@ public final class StringUtils {
         }
 
         return newText.toString();
+    }
+
+    public static String format(java.util.Locale userLocale, BorderColor borderColor){
+        switch (borderColor){
+            case RED:
+                return Locale.BORDER_PLAYER_COLOR_NAME_RED.getMessage(userLocale);
+            case BLUE:
+                return Locale.BORDER_PLAYER_COLOR_NAME_BLUE.getMessage(userLocale);
+            case GREEN:
+                return Locale.BORDER_PLAYER_COLOR_NAME_GREEN.getMessage(userLocale);
+        }
+
+        throw new IllegalArgumentException("Invalid border color: " + borderColor.name());
     }
 
     private static String parseHexColor(String hexColor){
