@@ -1570,7 +1570,7 @@ public final class SIsland implements Island {
     @Override
     public void setLastInterestTime(long lastInterest) {
         if(BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20;
+            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
             Executor.sync(() -> giveInterest(true), ticksToNextInterest);
         }
 
@@ -1663,8 +1663,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
         _handleBlocksPlace(blocks.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> BigInteger.valueOf(entry.getValue()))));
-        islandDataHandler.saveBlockCounts();
-        islandDataHandler.saveDirtyChunks();
+        IslandsDatabaseBridge.saveBlockCounts(this);
+        IslandsDatabaseBridge.saveDirtyChunks(this);
     }
 
     @Override
@@ -3411,18 +3411,6 @@ public final class SIsland implements Island {
             blockCounts.remove(key);
         else
             blockCounts.put(key, currentAmount.subtract(amount));
-    }
-
-    private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
-        try{
-            code.run();
-        }catch (NumberFormatException | NullPointerException ignored){}
-    }
-
-    private interface SafeRunnable{
-
-        void run() throws SQLException;
-
     }
 
 }
