@@ -114,6 +114,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean kickConfirm;
     public final boolean leaveConfirm;
     public final String spawnersProvider;
+    public final String stackedBlocksProvider;
     public final boolean disbandInventoryClear;
     public final boolean islandNamesRequiredForCreation;
     public final int islandNamesMaxLength;
@@ -180,6 +181,7 @@ public final class SettingsHandler extends AbstractHandler {
     public final boolean physicsListener;
     public final double chargeOnWarp;
     public final boolean publicWarps;
+    public final long recalcTaskTimeout;
 
     public SettingsHandler(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         super(plugin);
@@ -342,6 +344,7 @@ public final class SettingsHandler extends AbstractHandler {
         kickConfirm = cfg.getBoolean("kick-confirm");
         leaveConfirm = cfg.getBoolean("leave-confirm");
         spawnersProvider = cfg.getString("spawners-provider", "AUTO");
+        stackedBlocksProvider = cfg.getString("stacked-blocks-provider", "AUTO");
         disbandInventoryClear = cfg.getBoolean("disband-inventory-clear", true);
         islandNamesRequiredForCreation = cfg.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = cfg.getInt("island-names.max-length", 16);
@@ -467,6 +470,7 @@ public final class SettingsHandler extends AbstractHandler {
         physicsListener = cfg.getBoolean("physics-listener", true);
         chargeOnWarp = cfg.getDouble("charge-on-warp", 0D);
         publicWarps = cfg.getBoolean("public-warps");
+        recalcTaskTimeout = cfg.getLong("recalc-task-timeout");
     }
 
     @Override

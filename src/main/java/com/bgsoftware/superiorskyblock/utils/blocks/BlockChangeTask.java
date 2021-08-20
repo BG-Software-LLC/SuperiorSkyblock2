@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class BlockChangeTask {
 
@@ -44,17 +45,17 @@ public final class BlockChangeTask {
             Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
 
             submitted = true;
-            int index = 0, size = blocksCache.size();
 
             List<BlockData> interactedBlocks = new ArrayList<>();
+            AtomicInteger loadedChunks = new AtomicInteger(0);
+            int chunksAmount = blocksCache.size();
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
-                int entryIndex = ++index;
                 ChunksProvider.loadChunk(entry.getKey(), chunk -> {
                     interactedChunks.add(entry.getKey());
                     interactedBlocks.addAll(entry.getValue());
 
-                    IslandUtils.deleteChunk(island, entry.getKey(), null);
+                    IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
 
                     if(island.isInsideRange(chunk))
                         plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
@@ -69,14 +70,16 @@ public final class BlockChangeTask {
                         entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
 
                     plugin.getNMSBlocks().refreshChunk(chunk);
-
-                    if(entryIndex == size && onFinish != null) {
-                        onFinish.run();
-                        Executor.sync(() -> plugin.getNMSBlocks().refreshLights(chunk.getWorld(), interactedBlocks), 10L);
+                }).whenComplete((chunk, ex) -> {
+                    if(onFinish != null) {
+                        if (loadedChunks.incrementAndGet() >= chunksAmount) {
+                            onFinish.run();
+                            Executor.sync(() -> plugin.getNMSBlocks().refreshLights(chunk.getWorld(), interactedBlocks), 10L);
+                        }
                     }
                 });
             }
-        }finally {
+        } finally {
             blocksCache.clear();
         }
     }

@@ -55,7 +55,8 @@ public final class MenuBorderColor extends SuperiorMenu {
             superiorPlayer.setBorderColor(borderColor);
             plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
 
-            Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer, StringUtils.format(borderColor.name()));
+            Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
+                    StringUtils.format(superiorPlayer.getUserLocale(), borderColor));
         }
 
         Executor.sync(() -> {

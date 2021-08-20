@@ -30,4 +30,11 @@ public interface Schematic {
      */
     void pasteSchematic(Island island, Location location, Runnable callback, @Nullable Consumer<Throwable> onFailure);
 
+    /**
+     * Adjust schematic's rotations to the given location.
+     * @param location The location to adjust.
+     * @return The exact same object given as a parameter.
+     */
+    Location adjustRotation(Location location);
+
 }

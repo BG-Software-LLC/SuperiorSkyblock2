@@ -165,7 +165,8 @@ public final class UpgradesListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof LivingEntity))
+        if(!(e.getEntity() instanceof LivingEntity) ||
+                ((LivingEntity) e.getEntity()).getHealth() - e.getFinalDamage() > 0)
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
@@ -319,8 +320,14 @@ public final class UpgradesListener implements Listener {
             return;
 
         island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
-            if(result)
-                e.getEntity().remove();
+            if(result) {
+                if(ServerVersion.isAtLeast(ServerVersion.v1_17)){
+                    Executor.ensureMain(() -> e.getEntity().remove());
+                }
+                else {
+                    e.getEntity().remove();
+                }
+            }
         });
     }
 

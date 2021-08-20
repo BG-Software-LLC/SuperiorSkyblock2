@@ -114,7 +114,7 @@ public abstract class PlaceholderHook {
                     case "chat_spy":
                         return superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No";
                     case "border_color":
-                        return superiorPlayer.getBorderColor().name();
+                        return StringUtils.format(superiorPlayer.getUserLocale(), superiorPlayer.getBorderColor());
                     case "missions_completed":
                         return String.valueOf(superiorPlayer.getCompletedMissions().size());
                 }

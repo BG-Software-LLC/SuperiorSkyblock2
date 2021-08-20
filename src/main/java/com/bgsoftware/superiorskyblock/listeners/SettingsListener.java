@@ -1,18 +1,29 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 
+import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -38,46 +49,24 @@ import org.bukkit.potion.PotionEffectType;
 @SuppressWarnings("unused")
 public final class SettingsListener implements Listener {
 
+    private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(ProjectileHitEvent.class, "getHitBlock");
+
     private final SuperiorSkyblockPlugin plugin;
 
     public SettingsListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+
+        try{
+            Class.forName("com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent");
+            Bukkit.getPluginManager().registerEvents(new PaperListener(), plugin);
+        }catch (Throwable ignored){}
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(plugin.getGrid() == null)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getLocation());
-
-        if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
-
-            switch (e.getSpawnReason().name()){
-                case "JOCKEY":
-                case "CHUNK_GEN":
-                case "NATURAL":
-                case "TRAP":
-                case "MOUNT":
-                    {
-                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.NATURAL_MONSTER_SPAWN :
-                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
-                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        e.setCancelled(true);
-                    break;
-                }
-                case "SPAWNER":
-                case "SPAWNER_EGG": {
-                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
-                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
-                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        e.setCancelled(true);
-                    break;
-                }
-            }
-        }
+        if(!shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -210,6 +199,37 @@ public final class SettingsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBowAttackChorus(ProjectileHitEvent e){
+        if(!(e.getEntity() instanceof Arrow) || !(e.getEntity().getShooter() instanceof Player) ||
+                !PROJECTILE_HIT_EVENT_TARGET_BLOCK.isValid())
+            return;
+
+        SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity().getShooter());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()))
+            return;
+
+        Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
+
+        if(hitBlock == null || !hitBlock.getType().name().equals("CHORUS_FLOWER"))
+            return;
+
+        if(island.hasPermission(damagerPlayer, IslandPrivileges.BREAK)){
+            BlocksLogic.handleBreak(hitBlock);
+        }
+        else{
+            ICachedBlock cachedBlock = plugin.getNMSBlocks().cacheBlock(hitBlock);
+            hitBlock.setType(Material.AIR);
+
+            Locale.sendProtectionMessage(damagerPlayer);
+
+            Executor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()),1L);
+        }
+
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntityExplodeDamage(HangingBreakByEntityEvent e){
         if(handleEntityExplode(e.getRemover(), e.getEntity().getLocation()))
             e.setCancelled(true);
@@ -245,6 +265,55 @@ public final class SettingsListener implements Listener {
         }
 
         return false;
+    }
+
+    private boolean shouldBlockEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType){
+        if(plugin.getGrid() == null)
+            return false;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if(island != null){
+            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+                return false;
+
+            switch (spawnReason.name()){
+                case "JOCKEY":
+                case "CHUNK_GEN":
+                case "NATURAL":
+                case "TRAP":
+                case "MOUNT":
+                {
+                    IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
+                        return true;
+                    break;
+                }
+                case "SPAWNER":
+                case "SPAWNER_EGG": {
+                    IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(entityType) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
+                        return true;
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private class PaperListener implements Listener {
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        public void onEntitySpawn(PreCreatureSpawnEvent e){
+            if(!shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
+                e.setCancelled(true);
+                e.setShouldAbortSpawn(true);
+            }
+        }
+
     }
 
 }

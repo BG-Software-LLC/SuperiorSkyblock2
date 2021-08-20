@@ -1,30 +1,43 @@
 package com.bgsoftware.superiorskyblock.utils.lists;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<E>> {
 
-    public CompletableFutureList(){
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    public CompletableFutureList() {
 
     }
 
-    public CompletableFutureList(ArrayList<CompletableFuture<E>> other){
+    public CompletableFutureList(ArrayList<CompletableFuture<E>> other) {
         super(other);
     }
 
-    public void forEachCompleted(Consumer<? super E> consumer, BiConsumer<CompletableFuture<E>, Throwable> onFailure){
-        for(CompletableFuture<E> completableFuture : this){
-            completableFuture.whenComplete((e, ex) -> {
-                if(ex == null)
-                    consumer.accept(e);
-                else
-                    onFailure.accept(completableFuture, ex);
-            });
+    public void forEachCompleted(Consumer<? super E> consumer, Consumer<Throwable> onFailure) {
+        CompletableFuture<Void> allTasks = CompletableFuture.allOf(toArray(new CompletableFuture[0])).thenRun(() -> {
+            for (CompletableFuture<E> completableFuture : this) {
+                E result = completableFuture.getNow(null);
+                assert result != null; // Result cannot be null as all CompletableFutures must be completed by now.
+                consumer.accept(result);
+            }
+        }).exceptionally(error -> {
+            onFailure.accept(error);
+            return null;
+        });
+
+        if (plugin.getSettings().recalcTaskTimeout <= 0L) {
+            allTasks.join();
+        } else try {
+            allTasks.get(plugin.getSettings().recalcTaskTimeout, TimeUnit.SECONDS);
+        } catch (Throwable error) {
+            onFailure.accept(error);
         }
-        CompletableFuture.allOf(toArray(new CompletableFuture[0])).join();
     }
 
 }

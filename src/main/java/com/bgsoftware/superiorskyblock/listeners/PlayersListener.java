@@ -6,10 +6,10 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
-import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
+import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -36,11 +36,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -65,9 +63,7 @@ import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -148,7 +144,7 @@ public final class PlayersListener implements Listener {
         }, 5L);
 
         if(!superiorPlayer.isVanished())
-            handlePlayerJoin(superiorPlayer);
+            PlayersLogic.handleJoin(superiorPlayer);
 
         Executor.sync(() -> {
             if(superiorPlayer.isOnline() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) == null){
@@ -174,18 +170,6 @@ public final class PlayersListener implements Listener {
 
     }
 
-    public static void handlePlayerJoin(SuperiorPlayer superiorPlayer){
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            island.updateLastTime();
-            island.setCurrentlyActive();
-        }
-    }
-
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -194,7 +178,7 @@ public final class PlayersListener implements Listener {
             return;
 
         if(!superiorPlayer.isVanished())
-            handlePlayerQuit(superiorPlayer);
+            PlayersLogic.handleQuit(superiorPlayer);
 
         for(Island _island : plugin.getGrid().getIslands()){
             if(_island.isCoop(superiorPlayer)) {
@@ -203,20 +187,6 @@ public final class PlayersListener implements Listener {
                     IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
                 }
             }
-        }
-    }
-
-    public static void handlePlayerQuit(SuperiorPlayer superiorPlayer){
-        superiorPlayer.updateLastTimeStatus();
-
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
-                    !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) &&  _superiorPlayer.isOnline());
-            if(!anyOnline)
-                island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
         }
     }
 
@@ -492,89 +462,12 @@ public final class PlayersListener implements Listener {
                 return;
         }
 
-        handlePlayerPortal(plugin, (Player) e.getEntity(), e.getLocation(), teleportCause, null);
+        PortalsLogic.handlePlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, null);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerPortal(PlayerPortalEvent e){
-        handlePlayerPortal(plugin, e.getPlayer(), e.getFrom(), e.getCause(), e);
-    }
-
-    public static void handlePlayerPortal(SuperiorSkyblockPlugin plugin, Player player, Location from, PlayerTeleportEvent.TeleportCause teleportCause, Cancellable cancellable) {
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-
-        if(superiorPlayer instanceof SuperiorNPCPlayer)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(from);
-
-        if(island == null || !plugin.getGrid().isIslandsWorld(from.getWorld()))
-            return;
-
-        if(cancellable != null)
-            cancellable.setCancelled(true);
-
-        if(superiorPlayer.isImmunedToPortals())
-            return;
-
-        World.Environment environment = from.getWorld().getEnvironment() != World.Environment.NORMAL ?
-                World.Environment.NORMAL : teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
-                World.Environment.NETHER : World.Environment.THE_END;
-
-        if((environment == World.Environment.NORMAL && !island.isNormalEnabled()) ||
-                (environment == World.Environment.NETHER && !island.isNetherEnabled()) ||
-                (environment == World.Environment.THE_END && !island.isEndEnabled())){
-            if(!Locale.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
-                Locale.sendSchematicMessage(superiorPlayer, Locale.WORLD_NOT_UNLOCKED.getMessage(superiorPlayer.getUserLocale(), StringUtils.format(environment.name())));
-            return;
-        }
-
-        String envName = environment.name().toLowerCase();
-        Location toTeleport = getLocationNoException(island, environment);
-
-        boolean offsetSchematic = environment == World.Environment.NORMAL ? plugin.getSettings().normalSchematicOffset :
-                environment == World.Environment.NETHER ? plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
-
-        boolean endPortal = environment == World.Environment.THE_END;
-
-        if(toTeleport != null) {
-            if(!island.wasSchematicGenerated(environment)){
-                String schematicName = island.getSchematicName();
-                if(schematicName.isEmpty())
-                    schematicName = plugin.getSchematics().getDefaultSchematic(environment);
-
-                Schematic schematic = plugin.getSchematics().getSchematic(schematicName + "_" + envName);
-                if(schematic != null) {
-                    BigDecimal originalWorth = island.getRawWorth(), originalLevel = island.getRawLevel();
-                    schematic.pasteSchematic(island, island.getCenter(environment).getBlock().
-                            getRelative(BlockFace.DOWN).getLocation(), () -> {
-                        if(offsetSchematic) {
-                            BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth),
-                                    schematicLevel = island.getRawLevel().subtract(originalLevel);
-                            island.setBonusWorth(island.getBonusWorth().subtract(schematicWorth));
-                            island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
-                        }
-
-                        if(endPortal){
-                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                            if(plugin.getSettings().endDragonFight)
-                                plugin.getNMSDragonFight().startDragonBattle(island, toTeleport);
-                        }
-
-                        handleTeleport(plugin, superiorPlayer, island, ((BaseSchematic) schematic).getTeleportLocation(toTeleport));
-                    }, Throwable::printStackTrace);
-                    island.setSchematicGenerate(environment);
-                }
-                else{
-                    Locale.sendSchematicMessage(superiorPlayer, ChatColor.RED + "The server hasn't added a " + envName + " schematic. Please contact administrator to solve the problem. " +
-                            "The format for " + envName + " schematic is \"" + schematicName + "_" + envName + "\".");
-                }
-            }
-
-            else {
-                handleTeleport(plugin, superiorPlayer, island, toTeleport);
-            }
-        }
+        PortalsLogic.handlePlayerPortal(e.getPlayer(), e.getFrom(), e.getCause(), e);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -605,28 +498,6 @@ public final class PlayersListener implements Listener {
         e.getClickedBlock().setType(Material.AIR);
     }
 
-    private static void handleTeleport(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, Location toTeleport){
-        superiorPlayer.teleport(toTeleport);
-        plugin.getNMSAdapter().setWorldBorder(superiorPlayer, island);
-        Executor.sync(() -> {
-            if(island != null && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
-                Player player = superiorPlayer.asPlayer();
-                if(player != null) {
-                    player.setAllowFlight(true);
-                    player.setFlying(true);
-                }
-            }
-        }, 2L);
-    }
-
-    private static Location getLocationNoException(Island island, World.Environment environment){
-        try{
-            return island.getTeleportLocation(environment);
-        }catch(Exception ex){
-            return null;
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent e){
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -636,8 +507,9 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
+        String message = e.getMessage().toLowerCase();
         if(island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, false) &&
-                plugin.getSettings().blockedVisitorsCommands.stream().anyMatch(cmd -> e.getMessage().contains(cmd))){
+                plugin.getSettings().blockedVisitorsCommands.stream().anyMatch(message::contains)){
             e.setCancelled(true);
             Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }

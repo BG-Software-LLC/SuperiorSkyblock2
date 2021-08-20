@@ -109,7 +109,7 @@ public final class NMSAdapter_v1_17_R1 implements NMSAdapter {
         Location location = creatureSpawner.getLocation();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner)((CraftWorld) location.getWorld()).getHandle().getTileEntity(blockPosition);
-        return mobSpawner.getSpawner().d;
+        return mobSpawner == null ? 0 : mobSpawner.getSpawner().d;
     }
 
     @Override

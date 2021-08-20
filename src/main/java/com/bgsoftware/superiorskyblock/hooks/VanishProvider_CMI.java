@@ -4,7 +4,7 @@ import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.events.CMIPlayerUnVanishEvent;
 import com.Zrips.CMI.events.CMIPlayerVanishEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
+import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,12 +35,12 @@ public final class VanishProvider_CMI implements VanishProvider, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(CMIPlayerVanishEvent e){
-        PlayersListener.handlePlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+        PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerUnvanish(CMIPlayerUnVanishEvent e){
-        PlayersListener.handlePlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+        PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
     }
 
 }

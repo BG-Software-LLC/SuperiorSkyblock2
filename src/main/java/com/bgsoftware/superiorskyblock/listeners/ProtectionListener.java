@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -11,7 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,24 +20,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Donkey;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
-import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Trident;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -51,6 +47,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -82,26 +79,26 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
+    private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(ProjectileHitEvent.class, "getHitEntity");
+
     private static final String PLAYER_DROP_KEY = "player-drop";
 
-    public static ProtectionListener IMP;
     private final SuperiorSkyblockPlugin plugin;
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        IMP = this;
         new PlayerArrowPickup();
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e){
-        if(!handleBlockPlace(e.getBlock(), e.getPlayer(), true))
+        if(!ProtectionLogic.handleBlockPlace(e.getBlock(), e.getPlayer(), true))
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e){
-        if(!handleBlockBreak(e.getBlock(), e.getPlayer(), true))
+        if(!ProtectionLogic.handleBlockBreak(e.getBlock(), e.getPlayer(), true))
             e.setCancelled(true);
     }
 
@@ -128,23 +125,26 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        IslandPrivilege islandPermission;
+        IslandPrivilege requiredPrivilege;
 
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
+        String blockTypeName = blockType.name();
 
-        if(isChest(blockState, blockType)) islandPermission = IslandPrivileges.CHEST_ACCESS;
-        else if(blockState instanceof InventoryHolder) islandPermission = IslandPrivileges.USE;
-        else if(blockState instanceof Sign) islandPermission = IslandPrivileges.SIGN_INTERACT;
-        else if(blockType == Materials.SPAWNER.toBukkitType()) islandPermission = IslandPrivileges.SPAWNER_BREAK;
-        else if(blockType.name().equals("SOIL") || blockType.name().equals("FARMLAND"))
-            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-        else if(blockType.name().equals("TURTLE_EGG"))
-            islandPermission = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if(plugin.getGrid().getBlockAmount(clickedBlock) > 1) islandPermission = IslandPrivileges.BREAK;
-        else islandPermission = IslandPrivileges.INTERACT;
+        if(isChest(blockState, blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
+        else if(blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
+        else if(blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
+        else if(blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
+        else if(blockTypeName.equals("SOIL") || blockTypeName.equals("FARMLAND"))
+            requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
+        else if(blockTypeName.equals("TURTLE_EGG"))
+            requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
+        else if(blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+            requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
+        else if(plugin.getGrid().getBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
+        else requiredPrivilege = IslandPrivileges.INTERACT;
 
-        if(!island.hasPermission(superiorPlayer, islandPermission)){
+        if(!island.hasPermission(superiorPlayer, requiredPrivilege)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
             return;
@@ -172,7 +172,7 @@ public final class ProtectionListener implements Listener {
         if(!(e.getEntity() instanceof Player))
             return;
 
-        if(!handleBlockPlace(e.getBlock(), (Player) e.getEntity(), false))
+        if(!ProtectionLogic.handleBlockPlace(e.getBlock(), (Player) e.getEntity(), false))
             e.setCancelled(true);
     }
 
@@ -254,57 +254,6 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
-    }
-
-    public boolean onItemFrameRotate(Player player, ItemFrame itemFrame){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-        Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
-
-        if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
-                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-                return false;
-            }
-
-            return true;
-        }
-
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
-            Locale.sendProtectionMessage(player);
-            return false;
-        }
-
-        if(!island.isInsideRange(itemFrame.getLocation())){
-            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean onItemFrameBreak(SuperiorPlayer superiorPlayer, ItemFrame itemFrame){
-        Island island = plugin.getGrid().getIslandAt(itemFrame.getLocation());
-
-        if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
-                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-                return false;
-            }
-
-            return true;
-        }
-
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)){
-            Locale.sendProtectionMessage(superiorPlayer);
-            return false;
-        }
-
-        if(!island.isInsideRange(itemFrame.getLocation())){
-            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
-            return false;
-        }
-
-        return true;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -413,12 +362,12 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityInteract(PlayerInteractAtEntityEvent e){
-        handleEntityInteract(e);
+        ProtectionLogic.handleEntityInteract(e);
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityInteract(PlayerInteractEntityEvent e){
-        handleEntityInteract(e);
+        ProtectionLogic.handleEntityInteract(e);
     }
 
     @EventHandler
@@ -681,6 +630,39 @@ public final class ProtectionListener implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onProjectileHit(ProjectileHitEvent e){
+        if(!PROJECTILE_HIT_TARGET_ENTITY.isValid() || !(e.getEntity() instanceof FishHook))
+            return;
+
+        ProjectileSource projectileSource = e.getEntity().getShooter();
+
+        if(!(projectileSource instanceof Player))
+            return;
+
+        Entity hitEntity = PROJECTILE_HIT_TARGET_ENTITY.invoke(e);
+
+        if(hitEntity == null)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(hitEntity.getLocation());
+
+        if(island == null)
+            return;
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer((Player) projectileSource);
+
+        IslandPrivilege requiredPrivilege = EntityUtils.isMonster(e.getEntityType()) ?
+                IslandPrivileges.MONSTER_DAMAGE : EntityUtils.isAnimal(e.getEntityType()) ?
+                IslandPrivileges.ANIMAL_DAMAGE : IslandPrivileges.BREAK;
+
+        if(!island.hasPermission(superiorPlayer, requiredPrivilege)){
+            e.getEntity().remove();
+            // Using this method to fix issue #76 (A NPE error)
+            Locale.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
+        }
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFertilize(PlayerInteractEvent e){
         if(e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
@@ -750,123 +732,6 @@ public final class ProtectionListener implements Listener {
         if(island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.ANIMAL_SHEAR)){
             e.setCancelled(true);
             Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
-    public boolean handleBlockPlace(Block block, Player player, boolean sendMessages){
-        Island island = plugin.getGrid().getIslandAt(block.getLocation());
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-
-        if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())){
-                if(sendMessages)
-                    Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
-                return false;
-            }
-
-            return true;
-        }
-
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)){
-            if(sendMessages)
-                Locale.sendProtectionMessage(superiorPlayer);
-            return false;
-        }
-
-        if(!island.isInsideRange(block.getLocation())){
-            if(sendMessages)
-                Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
-            return false;
-        }
-
-        return true;
-    }
-
-    public boolean handleBlockBreak(Block block, Player player, boolean sendMessages){
-        Island island = plugin.getGrid().getIslandAt(block.getLocation());
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-
-        if(island == null) {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
-                if(sendMessages)
-                    Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
-                return false;
-            }
-
-            return true;
-        }
-
-        Material blockType = block.getType();
-
-        IslandPrivilege islandPermission = blockType == Materials.SPAWNER.toBukkitType() ?
-                IslandPrivileges.SPAWNER_BREAK : IslandPrivileges.BREAK;
-
-        if(!island.hasPermission(superiorPlayer, islandPermission)){
-            if(sendMessages)
-                Locale.sendProtectionMessage(player);
-            return false;
-        }
-
-        if(plugin.getSettings().valuableBlocks.contains(Key.of(block)) &&
-                !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
-            if(sendMessages)
-                Locale.sendProtectionMessage(player);
-            return false;
-        }
-
-        if(!island.isInsideRange(block.getLocation())){
-            if(sendMessages)
-                Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
-            return false;
-        }
-
-        return true;
-    }
-
-    private void handleEntityInteract(PlayerInteractEntityEvent e){
-        if(e.getRightClicked() instanceof Painting || e.getRightClicked() instanceof ItemFrame)
-            return;
-
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
-        ItemStack usedItem = e.getPlayer().getItemInHand();
-
-        boolean closeInventory = false;
-
-        IslandPrivilege islandPrivilege;
-
-        if(e.getRightClicked() instanceof ArmorStand){
-            islandPrivilege = IslandPrivileges.INTERACT;
-        }
-        else if(usedItem != null && e.getRightClicked() instanceof Animals &&
-                plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
-            islandPrivilege = IslandPrivileges.ANIMAL_BREED;
-        }
-        else if(usedItem != null && usedItem.getType() == Material.NAME_TAG){
-            islandPrivilege = IslandPrivileges.NAME_ENTITY;
-        }
-        else if(e.getRightClicked() instanceof Villager){
-            islandPrivilege = IslandPrivileges.VILLAGER_TRADING;
-            closeInventory = true;
-        }
-        else if(e.getRightClicked() instanceof Horse || (ServerVersion.isAtLeast(ServerVersion.v1_11) && (
-                e.getRightClicked() instanceof Mule || e.getRightClicked() instanceof Donkey))){
-            islandPrivilege = IslandPrivileges.HORSE_INTERACT;
-            closeInventory = true;
-        }
-        else return;
-
-        if(island != null && !island.hasPermission(superiorPlayer, islandPrivilege)){
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-            if(closeInventory) {
-                Executor.sync(() -> {
-                    Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
-                    if(openInventory != null && (openInventory.getType() == InventoryType.MERCHANT ||
-                            openInventory.getType() == InventoryType.CHEST))
-                        e.getPlayer().closeInventory();
-                }, 1L);
-            }
         }
     }
 

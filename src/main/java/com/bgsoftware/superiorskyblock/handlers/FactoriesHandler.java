@@ -8,11 +8,13 @@ import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.google.common.base.Preconditions;
@@ -61,7 +63,7 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(DatabaseResult resultSet) {
+    public SuperiorPlayer createPlayer(ResultSet resultSet) throws SQLException {
         SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
@@ -74,6 +76,11 @@ public final class FactoriesHandler implements FactoriesManager {
     public IslandBank createIslandBank(Island island){
         SIslandBank islandBank = new SIslandBank(island);
         return banksFactory == null ? islandBank : banksFactory.createIslandBank(island, islandBank);
+    }
+
+    public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island){
+        return islandsFactory == null ? new DefaultIslandCalculationAlgorithm(island) :
+                islandsFactory.createIslandCalculationAlgorithm(island);
     }
 
     public boolean hasCustomDatabaseBridge(){
