@@ -1622,29 +1622,7 @@ public final class SIsland implements Island {
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        handleBlockPlace(key, amount, save, blockCounts, islandWorth, islandLevel);
-    }
 
-    @Override
-    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks) {
-        Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
-        _handleBlocksPlace(blocks.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> BigInteger.valueOf(entry.getValue()))));
-        IslandsDatabaseBridge.saveBlockCounts(this);
-        IslandsDatabaseBridge.saveDirtyChunks(this);
-    }
-
-    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save,
-                                  KeyMap<BigInteger> blockCounts,
-                                  AtomicReference<BigDecimal> islandWorth,
-                                  AtomicReference<BigDecimal> islandLevel){
-        handleBlockPlace(key, BigInteger.valueOf(amount), save, blockCounts, islandWorth, islandLevel);
-    }
-
-    private void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save,
-                                  KeyMap<BigInteger> blockCounts,
-                                  AtomicReference<BigDecimal> syncedIslandWorth,
-                                  AtomicReference<BigDecimal> syncedIslandLevel){
         if(amount.compareTo(BigInteger.ZERO) == 0)
             return;
 
@@ -1656,12 +1634,12 @@ public final class SIsland implements Island {
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
         if(blockValue.compareTo(BigDecimal.ZERO) != 0){
-            syncedIslandWorth.updateAndGet(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
+            islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
         if(blockLevel.compareTo(BigDecimal.ZERO) != 0){
-            syncedIslandLevel.updateAndGet(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
+            islandLevel.updateAndGet(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
             increaseAmount = true;
         }
 
@@ -1671,7 +1649,7 @@ public final class SIsland implements Island {
         if(increaseAmount || hasBlockLimit || valuesMenu) {
             SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount);
 
-            addCounts(blockCounts, blockLimits, key, amount);
+            addCounts(key, amount);
 
             updateLastTime();
 
@@ -1680,69 +1658,13 @@ public final class SIsland implements Island {
         }
     }
 
-    public void _handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> blocks){
-        for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : blocks.entrySet()){
-            BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
-            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
-
-            boolean increaseAmount = false;
-
-            if(blockValue.doubleValue() != 0){
-                this.islandWorth.updateAndGet(islandWorth ->
-                        islandWorth.add(blockValue.multiply(new BigDecimal(entry.getValue()))));
-                increaseAmount = true;
-            }
-
-            if(blockLevel.doubleValue() != 0){
-                this.islandLevel.updateAndGet(islandLevel ->
-                        islandLevel.add(blockLevel.multiply(new BigDecimal(entry.getValue()))));
-                increaseAmount = true;
-            }
-
-            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey()),
-                    valuesMenu = plugin.getBlockValues().isValuesMenu(entry.getKey());
-
-            if(increaseAmount || hasBlockLimit || valuesMenu) {
-                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
-                addCounts(this.blockCounts, this.blockLimits, entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    private void addCounts(KeyMap<BigInteger> blockCounts, KeyMap<UpgradeValue<Integer>> blockLimits,
-                           com.bgsoftware.superiorskyblock.api.key.Key key, int amount){
-        addCounts(blockCounts, blockLimits, key, BigInteger.valueOf(amount));
-    }
-
-    private void addCounts(KeyMap<BigInteger> blockCounts, KeyMap<UpgradeValue<Integer>> blockLimits,
-                           com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
-        Key valueKey = plugin.getBlockValues().getBlockKey(key);
-
-        SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
-
-        BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
-        blockCounts.put(valueKey, currentAmount.add(amount));
-
-        if(!rawKeyPlacements) {
-            Key limitKey = blockLimits.getKey(valueKey);
-            Key globalKey = Key.of(valueKey.getGlobalKey(), "");
-            boolean limitCount = false;
-
-            if (!limitKey.equals(valueKey)) {
-                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount);
-                currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
-                blockCounts.put(limitKey, currentAmount.add(amount));
-                limitCount = true;
-            }
-
-            if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
-                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
-                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount);
-                currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
-                blockCounts.put(globalKey, currentAmount.add(amount));
-            }
-        }
+    @Override
+    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks) {
+        Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
+        _handleBlocksPlace(blocks.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> BigInteger.valueOf(entry.getValue()))));
+        islandDataHandler.saveBlockCounts();
+        islandDataHandler.saveDirtyChunks();
     }
 
     @Override
@@ -1804,21 +1726,21 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Block Break, Island: " + owner.getName() + ", Block: " + key);
 
             Key valueKey = plugin.getBlockValues().getBlockKey(key);
-            removeCounts(blockCounts, valueKey, amount);
+            removeCounts(valueKey, amount);
 
             com.bgsoftware.superiorskyblock.api.key.Key limitKey = blockLimits.getKey(valueKey);
             Key globalKey = Key.of(valueKey.getGlobalKey(), "");
             boolean limitCount = false;
 
             if (!limitKey.equals(valueKey)) {
-                removeCounts(blockCounts, limitKey, amount);
+                removeCounts(limitKey, amount);
                 limitCount = true;
             }
 
             if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
                     (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                             plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-                removeCounts(blockCounts, globalKey, amount);
+                removeCounts(globalKey, amount);
             }
 
             updateLastTime();
@@ -1834,15 +1756,6 @@ public final class SIsland implements Island {
                 }
             }
         }
-    }
-
-    private void removeCounts(KeyMap<BigInteger> blockCounts, com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
-        SuperiorSkyblockPlugin.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
-        BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
-        if(currentAmount.compareTo(amount) <= 0)
-            blockCounts.remove(key);
-        else
-            blockCounts.put(key, currentAmount.subtract(amount));
     }
 
     @Override
@@ -3430,6 +3343,86 @@ public final class SIsland implements Island {
             cobbleGeneratorValues = this.cobbleGeneratorValues[index] = new KeyMap<>();
 
         return cobbleGeneratorValues;
+    }
+
+    private void _handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> blocks) {
+        for(Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : blocks.entrySet()){
+            BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
+            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
+
+            boolean increaseAmount = false;
+
+            if(blockValue.doubleValue() != 0){
+                this.islandWorth.updateAndGet(islandWorth ->
+                        islandWorth.add(blockValue.multiply(new BigDecimal(entry.getValue()))));
+                increaseAmount = true;
+            }
+
+            if(blockLevel.doubleValue() != 0){
+                this.islandLevel.updateAndGet(islandLevel ->
+                        islandLevel.add(blockLevel.multiply(new BigDecimal(entry.getValue()))));
+                increaseAmount = true;
+            }
+
+            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey()),
+                    valuesMenu = plugin.getBlockValues().isValuesMenu(entry.getKey());
+
+            if(increaseAmount || hasBlockLimit || valuesMenu) {
+                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
+                addCounts(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    private void addCounts(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
+        Key valueKey = plugin.getBlockValues().getBlockKey(key);
+
+        SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
+
+        BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
+        blockCounts.put(valueKey, currentAmount.add(amount));
+
+        if(!rawKeyPlacements) {
+            Key limitKey = blockLimits.getKey(valueKey);
+            Key globalKey = Key.of(valueKey.getGlobalKey(), "");
+            boolean limitCount = false;
+
+            if (!limitKey.equals(valueKey)) {
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount);
+                currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
+                blockCounts.put(limitKey, currentAmount.add(amount));
+                limitCount = true;
+            }
+
+            if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
+                    (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
+                            plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount);
+                currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
+                blockCounts.put(globalKey, currentAmount.add(amount));
+            }
+        }
+    }
+
+    private void removeCounts(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount){
+        SuperiorSkyblockPlugin.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
+        BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
+        if(currentAmount.compareTo(amount) <= 0)
+            blockCounts.remove(key);
+        else
+            blockCounts.put(key, currentAmount.subtract(amount));
+    }
+
+    private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
+        try{
+            code.run();
+        }catch (NumberFormatException | NullPointerException ignored){}
+    }
+
+    private interface SafeRunnable{
+
+        void run() throws SQLException;
+
     }
 
 }
