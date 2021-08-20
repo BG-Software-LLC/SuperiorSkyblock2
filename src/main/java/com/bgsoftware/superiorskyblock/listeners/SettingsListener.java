@@ -13,6 +13,8 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -21,6 +23,7 @@ import org.bukkit.entity.Chicken;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -52,42 +55,18 @@ public final class SettingsListener implements Listener {
 
     public SettingsListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
+
+        try{
+            Class.forName("com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent");
+            Bukkit.getPluginManager().registerEvents(new PaperListener(), plugin);
+        }catch (Throwable ignored){}
+
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(plugin.getGrid() == null)
-            return;
-
-        Island island = plugin.getGrid().getIslandAt(e.getLocation());
-
-        if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return;
-
-            switch (e.getSpawnReason().name()){
-                case "JOCKEY":
-                case "CHUNK_GEN":
-                case "NATURAL":
-                case "TRAP":
-                case "MOUNT":
-                    {
-                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.NATURAL_MONSTER_SPAWN :
-                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
-                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        e.setCancelled(true);
-                    break;
-                }
-                case "SPAWNER":
-                case "SPAWNER_EGG": {
-                    IslandFlag toCheck = EntityUtils.isMonster(e.getEntityType()) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
-                            EntityUtils.isAnimal(e.getEntityType()) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
-                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        e.setCancelled(true);
-                    break;
-                }
-            }
-        }
+        if(!shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -286,6 +265,55 @@ public final class SettingsListener implements Listener {
         }
 
         return false;
+    }
+
+    private boolean shouldBlockEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType){
+        if(plugin.getGrid() == null)
+            return false;
+
+        Island island = plugin.getGrid().getIslandAt(location);
+
+        if(island != null){
+            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+                return false;
+
+            switch (spawnReason.name()){
+                case "JOCKEY":
+                case "CHUNK_GEN":
+                case "NATURAL":
+                case "TRAP":
+                case "MOUNT":
+                {
+                    IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
+                        return true;
+                    break;
+                }
+                case "SPAWNER":
+                case "SPAWNER_EGG": {
+                    IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
+                            EntityUtils.isAnimal(entityType) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
+                    if (toCheck != null && !island.hasSettingsEnabled(toCheck))
+                        return true;
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private class PaperListener implements Listener {
+
+        @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+        public void onEntitySpawn(PreCreatureSpawnEvent e){
+            if(!shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
+                e.setCancelled(true);
+                e.setShouldAbortSpawn(true);
+            }
+        }
+
     }
 
 }
