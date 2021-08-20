@@ -63,7 +63,7 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(ResultSet resultSet) throws SQLException {
+    public SuperiorPlayer createPlayer(DatabaseResult resultSet) {
         SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
