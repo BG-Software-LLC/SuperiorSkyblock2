@@ -287,7 +287,7 @@ public final class SettingsListener implements Listener {
                     IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
                             EntityUtils.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        return true;
+                        return false;
                     break;
                 }
                 case "SPAWNER":
@@ -295,13 +295,13 @@ public final class SettingsListener implements Listener {
                     IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
                             EntityUtils.isAnimal(entityType) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        return true;
+                        return false;
                     break;
                 }
             }
         }
 
-        return false;
+        return true;
     }
 
     private class PaperListener implements Listener {
