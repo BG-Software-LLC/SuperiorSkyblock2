@@ -16,6 +16,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Horse;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Mule;
 import org.bukkit.entity.Painting;
@@ -195,6 +196,19 @@ public final class ProtectionLogic {
 
         if(!island.isInsideRange(itemFrame.getLocation())){
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean handlePlayerPickupItem(Player player, Item item){
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+        Island island = plugin.getGrid().getIslandAt(item.getLocation());
+
+        if(island != null && !plugin.getNMSAdapter().wasThrownByPlayer(item, player) &&
+                !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
+            Locale.sendProtectionMessage(superiorPlayer);
             return false;
         }
 

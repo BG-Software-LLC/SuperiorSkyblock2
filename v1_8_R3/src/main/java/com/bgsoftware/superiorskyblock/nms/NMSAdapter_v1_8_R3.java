@@ -13,6 +13,7 @@ import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.Entity;
+import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.Item;
@@ -40,6 +41,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
@@ -319,6 +321,11 @@ public final class NMSAdapter_v1_8_R3 implements NMSAdapter {
     @Override
     public int getPortalTicks(org.bukkit.entity.Entity entity) {
         return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
+    }
+
+    @Override
+    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
+        return player.getName().equals(((EntityItem) ((CraftItem) item).getHandle()).n());
     }
 
 }

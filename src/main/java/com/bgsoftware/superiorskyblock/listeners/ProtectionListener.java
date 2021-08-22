@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,7 +26,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
@@ -45,7 +45,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.entity.PlayerLeashEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
@@ -54,6 +53,7 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -69,25 +69,24 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.metadata.MetadataValue;
 import org.bukkit.projectiles.ProjectileSource;
-
-import java.util.List;
-import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
     private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(ProjectileHitEvent.class, "getHitEntity");
 
-    private static final String PLAYER_DROP_KEY = "player-drop";
-
     private final SuperiorSkyblockPlugin plugin;
 
     public ProtectionListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
         new PlayerArrowPickup();
+
+        try {
+            Class.forName("org.bukkit.event.player.PlayerAttemptPickupItemEvent");
+            Bukkit.getPluginManager().registerEvents(new PaperAttemptPickupListener(), plugin);
+        } catch (Exception ignored) {}
+
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -424,25 +423,8 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerItemPickup(PlayerPickupItemEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
-        UUID droppedPlayer = getPlayerWhoDropped(e.getItem());
-
-        if(island != null && !superiorPlayer.getUniqueId().equals(droppedPlayer) &&
-                !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
+        if(!ProtectionLogic.handlePlayerPickupItem(e.getPlayer(), e.getItem()))
             e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onItemDespawn(ItemDespawnEvent e){
-        e.getEntity().removeMetadata(PLAYER_DROP_KEY, plugin);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onItemDrop(PlayerDropItemEvent e){
-        e.getItemDrop().setMetadata(PLAYER_DROP_KEY, new FixedMetadataValue(plugin, e.getPlayer().getUniqueId()));
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -735,11 +717,6 @@ public final class ProtectionListener implements Listener {
         }
     }
 
-    private static UUID getPlayerWhoDropped(Item item){
-        List<MetadataValue> playerDropValues = item.getMetadata(PLAYER_DROP_KEY);
-        return playerDropValues.size() >= 1 ? (UUID) playerDropValues.get(0).value() : null;
-    }
-
     class PlayerArrowPickup implements Listener{
 
         PlayerArrowPickup(){
@@ -765,6 +742,16 @@ public final class ProtectionListener implements Listener {
                 e.setCancelled(true);
                 Locale.sendProtectionMessage(superiorPlayer);
             }
+        }
+
+    }
+
+    private static final class PaperAttemptPickupListener implements Listener {
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onPlayerItemPickup(PlayerAttemptPickupItemEvent e){
+            if(!ProtectionLogic.handlePlayerPickupItem(e.getPlayer(), e.getItem()))
+                e.setCancelled(true);
         }
 
     }
