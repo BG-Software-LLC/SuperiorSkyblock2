@@ -269,13 +269,13 @@ public final class SettingsListener implements Listener {
 
     private boolean shouldBlockEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType){
         if(plugin.getGrid() == null)
-            return false;
+            return true;
 
         Island island = plugin.getGrid().getIslandAt(location);
 
         if(island != null){
             if(!plugin.getSettings().spawnProtection && island.isSpawn())
-                return false;
+                return true;
 
             switch (spawnReason.name()){
                 case "JOCKEY":
