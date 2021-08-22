@@ -65,7 +65,7 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(!shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
+        if(shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
             e.setCancelled(true);
     }
 
@@ -287,7 +287,7 @@ public final class SettingsListener implements Listener {
                     IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
                             EntityUtils.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        return false;
+                        return true;
                     break;
                 }
                 case "SPAWNER":
@@ -295,20 +295,20 @@ public final class SettingsListener implements Listener {
                     IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.SPAWNER_MONSTER_SPAWN :
                             EntityUtils.isAnimal(entityType) ? IslandFlags.SPAWNER_ANIMALS_SPAWN : null;
                     if (toCheck != null && !island.hasSettingsEnabled(toCheck))
-                        return false;
+                        return true;
                     break;
                 }
             }
         }
 
-        return true;
+        return false;
     }
 
     private class PaperListener implements Listener {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         public void onEntitySpawn(PreCreatureSpawnEvent e){
-            if(!shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
+            if(shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
                 e.setCancelled(true);
                 e.setShouldAbortSpawn(true);
             }
