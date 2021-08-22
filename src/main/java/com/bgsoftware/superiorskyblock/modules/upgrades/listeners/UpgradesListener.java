@@ -163,7 +163,7 @@ public final class UpgradesListener implements Listener {
         EntityUtils.clearEntityEquipment(e.getEntity());
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
         if(!(e.getEntity() instanceof LivingEntity) ||
                 ((LivingEntity) e.getEntity()).getHealth() - e.getFinalDamage() > 0)
