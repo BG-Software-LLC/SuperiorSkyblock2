@@ -267,9 +267,9 @@ public final class IslandsDeserializer {
     public static void deserializeIslandBank(Island island){
         loadObject(island, "islands_banks", islandBankRow -> {
             BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
-            long lastInterestTime = (long) islandBankRow.get("last_interest_time");
+            long lastInterestTime = getAsLong(islandBankRow.get("last_interest_time"));
             island.getIslandBank().setBalance(balance);
-            island.setLastInterestTime(lastInterestTime / 1000);
+            island.setLastInterestTime(lastInterestTime / 1000L);
         });
     }
 
@@ -281,6 +281,16 @@ public final class IslandsDeserializer {
         island.getDatabaseBridge().loadObject(table,
                 new DatabaseFilter(Collections.singletonList(new Pair<>("island", island.getUniqueId().toString()))),
                 resultConsumer);
+    }
+
+    private static long getAsLong(Object value){
+        if(value instanceof Integer) {
+            return (int) value;
+        } else if(value instanceof Long) {
+            return (long) value;
+        } else {
+            throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to long.");
+        }
     }
 
 }
