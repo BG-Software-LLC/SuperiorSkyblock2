@@ -209,6 +209,7 @@ public final class SIsland implements Island {
     public SIsland(GridHandler grid, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
+        this.owner.setPlayerRole(SPlayerRole.lastRole());
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
         this.creationTime = resultSet.getLong("creation_time");
         this.schemName = resultSet.getString("island_type");
