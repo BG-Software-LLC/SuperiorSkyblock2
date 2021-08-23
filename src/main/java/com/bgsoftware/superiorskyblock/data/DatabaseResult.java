@@ -34,11 +34,24 @@ public final class DatabaseResult {
     }
 
     public double getDouble(String key){
-        return getObject(key, Double.class, 0D);
+        Object value = getObject(key, 0L);
+
+        if(value instanceof Double){
+            return (double) value;
+        }
+        else if(value instanceof Long) {
+            return (double) (long) value;
+        }
+        else if(value instanceof Integer) {
+            return (double) (int) value;
+        }
+        else {
+            return 0L;
+        }
     }
 
     public boolean getBoolean(String key){
-        int value = getObject(key, Integer.class, 0);
+        int value = getInt(key);
         return value == 1;
     }
 
