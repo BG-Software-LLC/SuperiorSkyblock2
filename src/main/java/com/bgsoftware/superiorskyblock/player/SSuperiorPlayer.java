@@ -495,7 +495,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
         Island island = getIsland();
-        if(island != null)
+        if(island != null && island.getOwner() != this)
             IslandsDatabaseBridge.saveMemberRole(island, this);
     }
 
