@@ -16,7 +16,17 @@ public final class DatabaseResult {
     }
 
     public long getLong(String key){
-        return getObject(key, Long.class, 0L);
+        Object value = getObject(key, 0L);
+
+        if(value instanceof Long) {
+            return (long) value;
+        }
+        else if(value instanceof Integer) {
+            return (int) value;
+        }
+        else {
+            return 0L;
+        }
     }
 
     public int getInt(String key){
@@ -39,6 +49,10 @@ public final class DatabaseResult {
         }catch (NumberFormatException | NullPointerException ex){
             return BigDecimal.ZERO;
         }
+    }
+
+    private Object getObject(String key, Object def){
+        return resultSet.getOrDefault(key, def);
     }
 
     private <T> T getObject(String key, Class<T> clazz, T def){
