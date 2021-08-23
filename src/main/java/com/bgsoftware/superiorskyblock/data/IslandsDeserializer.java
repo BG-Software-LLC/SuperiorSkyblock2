@@ -100,7 +100,7 @@ public final class IslandsDeserializer {
 
     public static void deserializeUpgrades(Island island, Map<String, Integer> upgradesMap) {
         loadObject(island, "islands_upgrades", upgradeRow -> {
-            String upgradeName = (String) upgradeRow.get("name");
+            String upgradeName = (String) upgradeRow.get("upgrade");
             int level = (int) upgradeRow.get("level");
             upgradesMap.put(upgradeName, level);
         });
