@@ -78,7 +78,10 @@ public final class IslandsDeserializer {
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) playerPermissionRow.get("permission"));
                 playerPermissions.computeIfAbsent(superiorPlayer, s -> new PlayerPermissionNode(superiorPlayer, island))
                         .loadPrivilege(islandPrivilege, (String) playerPermissionRow.get("status"));
-            }catch (Exception ignored){}
+            }catch (Exception error) {
+                SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
+                error.printStackTrace();
+            }
         });
     }
 
@@ -88,7 +91,10 @@ public final class IslandsDeserializer {
                 PlayerRole playerRole = SPlayerRole.fromId((int) rolePermissionRow.get("role"));
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) rolePermissionRow.get("permission"));
                 rolePermissions.put(islandPrivilege, playerRole);
-            }catch (Exception ignored){}
+            }catch (Exception error) {
+                SuperiorSkyblockPlugin.log("&cError occurred while loading role permissions:");
+                error.printStackTrace();
+            }
         });
     }
 
@@ -191,7 +197,10 @@ public final class IslandsDeserializer {
                 Key blockKey = Key.of((String) generatorsRow.get("block"));
                 int rate = (int) generatorsRow.get("rate");
                 (cobbleGenerator[environment] = new KeyMap<>()).put(blockKey, new UpgradeValue<>(rate, n -> n < 0));
-            }catch (Exception ignored){}
+            }catch (Exception error) {
+                SuperiorSkyblockPlugin.log("&cError occurred while loading generators:");
+                error.printStackTrace();
+            }
         });
     }
 
