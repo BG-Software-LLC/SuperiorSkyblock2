@@ -11,6 +11,7 @@ import java.util.Map;
 public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
 
     private final List<Map<Integer, Object>> batches = new ArrayList<>();
 
@@ -19,8 +20,7 @@ public final class StatementHolder {
     private int currentIndex = 1;
 
     public StatementHolder(String statement){
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        this.query = statement.replace("{prefix}", prefix);
+        setQuery(statement);
     }
 
     public StatementHolder setObject(Object value){
@@ -29,7 +29,7 @@ public final class StatementHolder {
     }
 
     public void setQuery(String query) {
-        this.query = query;
+        this.query = query.replace("{prefix}", prefix);
     }
 
     public void addBatch(){
@@ -39,13 +39,11 @@ public final class StatementHolder {
     }
 
     public void executeBatch(boolean async){
+        if(query == null || query.isEmpty() || batches.isEmpty())
+            return;
+
         if(async && !Executor.isDataThread()){
             Executor.data(() -> executeBatch(false));
-            return;
-        }
-
-        if (batches.isEmpty()) {
-            execute(async);
             return;
         }
 
@@ -86,11 +84,6 @@ public final class StatementHolder {
     public void execute(boolean async) {
         if(async && !Executor.isDataThread()){
             Executor.data(() -> execute(false));
-            return;
-        }
-
-        if (!batches.isEmpty()) {
-            executeBatch(async);
             return;
         }
 

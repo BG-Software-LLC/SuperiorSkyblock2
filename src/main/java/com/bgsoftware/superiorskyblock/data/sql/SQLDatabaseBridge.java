@@ -35,7 +35,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
         if(batchOperations){
             batchStatementHolder = new StatementHolder("");
         }
-        else{
+        else if(batchStatementHolder != null) {
             batchStatementHolder.executeBatch(true);
             batchStatementHolder = null;
         }
