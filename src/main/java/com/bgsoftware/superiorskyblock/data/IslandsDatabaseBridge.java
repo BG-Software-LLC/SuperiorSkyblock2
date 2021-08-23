@@ -59,8 +59,7 @@ public final class IslandsDatabaseBridge {
 
     public static void saveMemberRole(Island island, SuperiorPlayer superiorPlayer) {
         island.getDatabaseBridge().updateObject("islands_members",
-                createFilter("island", island),
-                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString())),
                 new Pair<>("role", superiorPlayer.getPlayerRole().getId())
         );
     }
