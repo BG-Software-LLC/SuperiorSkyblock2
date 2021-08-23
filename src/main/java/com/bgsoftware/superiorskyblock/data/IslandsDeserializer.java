@@ -137,7 +137,7 @@ public final class IslandsDeserializer {
 
     public static void deserializeBlockLimits(Island island, KeyMap<UpgradeValue<Integer>> blockLimits) {
         loadObject(island, "islands_block_limits", blockLimitsRow -> {
-            Key blockKey = Key.of((String) blockLimitsRow.get("id"));
+            Key blockKey = Key.of((String) blockLimitsRow.get("block"));
             int limit = (int) blockLimitsRow.get("limit");
             blockLimits.put(blockKey, new UpgradeValue<>(limit, i -> i < 0));
         });
