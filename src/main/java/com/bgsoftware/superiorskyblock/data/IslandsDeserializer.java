@@ -223,10 +223,13 @@ public final class IslandsDeserializer {
             int index = (int) islandChestRow.get("index");
             String contents = (String) islandChestRow.get("contents");
 
-            if (index >= islandChestList.size()) {
-                islandChestList.add(SIslandChest.createChest(island, index, ItemUtils.deserialize(contents)));
-            } else
-                islandChestList.add(index, SIslandChest.createChest(island, index, ItemUtils.deserialize(contents)));
+            while (index > islandChestList.size()){
+                IslandChest newIslandChest = new SIslandChest(island, islandChestList.size());
+                newIslandChest.setRows(plugin.getSettings().islandChestsDefaultSize);
+                islandChestList.add(newIslandChest);
+            }
+
+            islandChestList.add(SIslandChest.createChest(island, index, ItemUtils.deserialize(contents)));
         });
 
         islandChestsSync.set(islandChestList.toArray(new IslandChest[0]));
