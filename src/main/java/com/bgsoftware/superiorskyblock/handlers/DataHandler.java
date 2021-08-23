@@ -162,7 +162,10 @@ public final class DataHandler extends AbstractHandler {
                     Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
                     if (island != null)
                         island.getIslandBank().loadTransaction(new SBankTransaction(resultSet));
-                } catch (Exception ignored) {}
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
+                    error.printStackTrace();
+                }
             });
 
             SuperiorSkyblockPlugin.log("Finished bank transactions!");
