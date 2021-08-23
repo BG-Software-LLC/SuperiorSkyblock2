@@ -284,11 +284,12 @@ public final class IslandsDeserializer {
     }
 
     private static long getAsLong(Object value){
-        if(value instanceof Integer) {
-            return (int) value;
-        } else if(value instanceof Long) {
+        if(value instanceof Long) {
             return (long) value;
-        } else {
+        }
+        else if(value instanceof Integer) {
+            return (int) value;
+        }  else {
             throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to long.");
         }
     }
