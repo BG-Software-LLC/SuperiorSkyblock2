@@ -85,6 +85,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         stackedBlocks = new StackedBlocksHandler(plugin);
         islands = new IslandRegistry(plugin);
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+        databaseBridge.startSavingData();
     }
 
     @Override
