@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class CmdTeleport implements ISuperiorCommand {
 
@@ -63,7 +64,8 @@ public final class CmdTeleport implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(plugin.getSettings().homeWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().homeWarmup));
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+                    plugin.getSettings().homeWarmup, TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
                     teleportToIsland(superiorPlayer, island), plugin.getSettings().homeWarmup / 50));
         }
