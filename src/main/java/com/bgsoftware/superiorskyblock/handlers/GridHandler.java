@@ -523,24 +523,22 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void removeStackedBlocks(Island island, ChunkPosition chunkPosition) {
-        // TODO
-//        StatementHolder stackedBlocksHolder = Query.STACKED_BLOCKS_DELETE.getStatementHolder(
-//                (SIslandDataHandler) island.getDataHandler());
-//        stackedBlocksHolder.prepareBatch();
+        try {
+            databaseBridge.batchOperations(true);
 
-        Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks =
-                this.stackedBlocks.removeStackedBlocks(chunkPosition);
+            Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks =
+                    this.stackedBlocks.removeStackedBlocks(chunkPosition);
 
-        if (stackedBlocks != null) {
-            stackedBlocks.values().forEach(stackedBlock -> {
-                stackedBlock.removeHologram();
-                SBlockPosition blockPosition = stackedBlock.getBlockPosition();
-                GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
-            });
+            if (stackedBlocks != null) {
+                stackedBlocks.values().forEach(stackedBlock -> {
+                    stackedBlock.removeHologram();
+                    SBlockPosition blockPosition = stackedBlock.getBlockPosition();
+                    GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
+                });
+            }
+        } finally {
+            databaseBridge.batchOperations(false);
         }
-
-        // TODO
-        //stackedBlocksHolder.execute(true);
     }
 
     @Override

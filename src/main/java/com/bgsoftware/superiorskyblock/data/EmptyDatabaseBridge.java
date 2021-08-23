@@ -31,6 +31,11 @@ public final class EmptyDatabaseBridge implements DatabaseBridge {
     }
 
     @Override
+    public void batchOperations(boolean batchOperations) {
+
+    }
+
+    @Override
     public void updateObject(String table, @Nullable DatabaseFilter filter, Pair<String, Object>... columns) {
 
     }

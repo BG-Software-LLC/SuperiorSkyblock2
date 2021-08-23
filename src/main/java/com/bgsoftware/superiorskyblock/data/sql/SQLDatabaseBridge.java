@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
     private boolean shouldSaveData = false;
+    private StatementHolder batchStatementHolder;
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
@@ -30,6 +31,17 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     }
 
     @Override
+    public void batchOperations(boolean batchOperations) {
+        if(batchOperations){
+            batchStatementHolder = new StatementHolder("");
+        }
+        else{
+            batchStatementHolder.executeBatch(true);
+            batchStatementHolder = null;
+        }
+    }
+
+    @Override
     public void updateObject(String table, DatabaseFilter filter, Pair<String, Object>[] columns) {
         if(!shouldSaveData)
             return;
@@ -43,9 +55,9 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
         }
 
         String columnFilter = getColumnFilter(filter);
-        StatementHolder statementHolder = new StatementHolder(
-                String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder.toString(), columnFilter)
-        );
+
+        String query = String.format("UPDATE {prefix}%s SET %s%s;", table, columnsBuilder, columnFilter);
+        StatementHolder statementHolder = buildStatementHolder(query);
 
         for(Pair<String, Object> column : columns) {
             statementHolder.setObject(column.getValue());
@@ -56,7 +68,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 statementHolder.setObject(_columnFilter.getValue() + "");
         }
 
-        statementHolder.execute(true);
+        executeStatementHolder(statementHolder);
     }
 
     @Override
@@ -76,16 +88,14 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
             valuesBuilder.append("?");
         }
 
-        StatementHolder statementHolder = new StatementHolder(
-                String.format("REPLACE INTO {prefix}%s (%s) VALUES(%s);", table,
-                        columnsBuilder.toString(), valuesBuilder.toString())
-        );
+        String query = String.format("REPLACE INTO {prefix}%s (%s) VALUES(%s);", table, columnsBuilder, valuesBuilder);
+        StatementHolder statementHolder = buildStatementHolder(query);
 
         for(Pair<String, Object> column : columns) {
             statementHolder.setObject(column.getValue());
         }
 
-        statementHolder.execute(true);
+        executeStatementHolder(statementHolder);
     }
 
     @Override
@@ -94,16 +104,15 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
             return;
 
         String columnFilter = getColumnFilter(filter);
-        StatementHolder statementHolder = new StatementHolder(
-                String.format("DELETE FROM {prefix}%s%s;", table, columnFilter)
-        );
+        String query = String.format("DELETE FROM {prefix}%s%s;", table, columnFilter);
+        StatementHolder statementHolder = buildStatementHolder(query);
 
         if(filter != null){
             for(Pair<String, Object> _columnFilter : filter.getFilters())
                 statementHolder.setObject(_columnFilter.getValue() + "");
         }
 
-        statementHolder.execute(true);
+        executeStatementHolder(statementHolder);
     }
 
     @Override
@@ -124,6 +133,25 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 }
             }
         });
+    }
+
+    private StatementHolder buildStatementHolder(String query){
+        if(batchStatementHolder == null){
+            return new StatementHolder(query);
+        }
+        else {
+            batchStatementHolder.setQuery(query);
+            return batchStatementHolder;
+        }
+    }
+
+    private void executeStatementHolder(StatementHolder statementHolder){
+        if(batchStatementHolder == statementHolder){
+            statementHolder.addBatch();
+        }
+        else {
+            statementHolder.execute(true);
+        }
     }
 
     private static String getColumnFilter(DatabaseFilter filter){

@@ -22,6 +22,11 @@ public interface DatabaseBridge {
     void startSavingData();
 
     /**
+     * Set whether to execute operations in batches or not.
+     */
+    void batchOperations(boolean batchOperations);
+
+    /**
      * Update the object in the database.
      * @param table The name of the table in the database.
      * @param filter The filter of the column.
