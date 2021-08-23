@@ -225,6 +225,7 @@ public final class SIslandBank implements IslandBank {
         return getTransactions(CONSOLE_UUID);
     }
 
+    @Override
     public void loadTransaction(BankTransaction bankTransaction){
         addTransaction(bankTransaction, false);
     }
