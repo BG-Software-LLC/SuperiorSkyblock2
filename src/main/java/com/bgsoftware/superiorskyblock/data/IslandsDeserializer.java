@@ -175,9 +175,12 @@ public final class IslandsDeserializer {
         loadObject(island, "islands_flags", islandFlagRow -> {
             try {
                 IslandFlag islandFlag = IslandFlag.getByName((String) islandFlagRow.get("name"));
-                byte status = (byte) islandFlagRow.get("status");
+                byte status = getAsByte(islandFlagRow.get("status"));
                 islandFlags.put(islandFlag, status);
-            } catch (Exception ignored) {}
+            } catch (Exception error) {
+                SuperiorSkyblockPlugin.log("&cError occurred while loading island flags:");
+                error.printStackTrace();
+            }
         });
     }
 
@@ -294,6 +297,17 @@ public final class IslandsDeserializer {
             return (int) value;
         }  else {
             throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to long.");
+        }
+    }
+
+    private static byte getAsByte(Object value){
+        if(value instanceof Byte) {
+            return (byte) value;
+        }
+        else if(value instanceof Integer) {
+            return (byte) (int) value;
+        }  else {
+            throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to byte.");
         }
     }
 
