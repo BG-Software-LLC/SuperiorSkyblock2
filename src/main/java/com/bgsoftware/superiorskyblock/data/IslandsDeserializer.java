@@ -63,7 +63,7 @@ public final class IslandsDeserializer {
 
     public static void deserializeVisitors(Island island, SyncedObject<? extends Collection<Pair<SuperiorPlayer, Long>>> visitorsSetSync) {
         visitorsSetSync.write(visitorsSet -> loadObject(island, "islands_visitors", visitorsRow -> {
-            UUID uuid = UUID.fromString((String) visitorsRow.get("uuid"));
+            UUID uuid = UUID.fromString((String) visitorsRow.get("player"));
             long visitTime = (long) visitorsRow.get("visit_time");
             visitorsSet.add(new Pair<>(plugin.getPlayers().getSuperiorPlayer(uuid), visitTime));
         }));
