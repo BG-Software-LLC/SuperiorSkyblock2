@@ -16,6 +16,7 @@ import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.Chunk;
 import net.minecraft.server.v1_13_R2.DimensionManager;
 import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityItem;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.IBlockData;
 import net.minecraft.server.v1_13_R2.IRegistry;
@@ -46,11 +47,13 @@ import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Animals;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EntityEquipment;
@@ -322,6 +325,11 @@ public final class NMSAdapter_v1_13_R2 implements NMSAdapter {
     @Override
     public int getPortalTicks(org.bukkit.entity.Entity entity) {
         return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
+    }
+
+    @Override
+    public boolean wasThrownByPlayer(Item item, Player player) {
+        return player.getUniqueId().equals(((EntityItem) ((CraftItem) item).getHandle()).l());
     }
 
     private static class CustomTileEntityHopper extends TileEntityHopper {

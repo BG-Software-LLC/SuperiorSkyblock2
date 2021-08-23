@@ -17,6 +17,7 @@ import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.DataPaletteBlock;
 import net.minecraft.server.v1_12_R1.Entity;
+import net.minecraft.server.v1_12_R1.EntityItem;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.EnumParticle;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -46,6 +47,7 @@ import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -333,6 +335,10 @@ public final class NMSAdapter_v1_12_R1 implements NMSAdapter {
         return PORTAL_TICKS.get(((CraftEntity) entity).getHandle());
     }
 
+    @Override
+    public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
+        return player.getName().equals(((EntityItem) ((CraftItem) item).getHandle()).n());
+    }
 
     private static class EmptyCounterChunkSection extends ChunkSection{
 

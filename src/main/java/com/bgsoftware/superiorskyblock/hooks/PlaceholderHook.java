@@ -325,7 +325,7 @@ public abstract class PlaceholderHook {
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale());
                     case "bank_next_interest":
-                        return StringUtils.formatTime(superiorPlayer.getUserLocale(), island.getNextInterest());
+                        return StringUtils.formatTime(superiorPlayer.getUserLocale(), island.getNextInterest() * 1000L);
                     case "hoppers_limit":
                         return String.valueOf(island.getBlockLimit(ConstantKeys.HOPPER));
                     case "crops_multiplier":

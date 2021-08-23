@@ -65,7 +65,7 @@ public final class SettingsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(!shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
+        if(shouldBlockEntitySpawn(e.getLocation(), e.getSpawnReason(), e.getEntityType()))
             e.setCancelled(true);
     }
 
@@ -308,7 +308,7 @@ public final class SettingsListener implements Listener {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
         public void onEntitySpawn(PreCreatureSpawnEvent e){
-            if(!shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
+            if(shouldBlockEntitySpawn(e.getSpawnLocation(), e.getReason(), e.getType())){
                 e.setCancelled(true);
                 e.setShouldAbortSpawn(true);
             }

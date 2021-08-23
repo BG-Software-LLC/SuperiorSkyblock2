@@ -783,6 +783,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
+
+    }
+
+    @Override
     public void handleBlocksPlace(Map<Key, Integer> blocks) {
 
     }

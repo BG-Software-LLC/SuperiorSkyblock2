@@ -19,6 +19,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.LivingEntity;
@@ -163,18 +164,22 @@ public final class UpgradesListener implements Listener {
         EntityUtils.clearEntityEquipment(e.getEntity());
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onLastDamageEntity(EntityDamageEvent e){
-        if(!(e.getEntity() instanceof LivingEntity) ||
-                ((LivingEntity) e.getEntity()).getHealth() - e.getFinalDamage() > 0)
+        if(!(e.getEntity() instanceof LivingEntity))
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+        LivingEntity livingEntity = (LivingEntity) e.getEntity();
+
+        if(!(livingEntity instanceof ArmorStand) && livingEntity.getHealth() - e.getFinalDamage() > 0)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(livingEntity.getLocation());
 
         if(island == null)
             return;
 
-        EntityUtils.cacheEntityEquipment((LivingEntity) e.getEntity());
+        EntityUtils.cacheEntityEquipment(livingEntity);
     }
 
     /*

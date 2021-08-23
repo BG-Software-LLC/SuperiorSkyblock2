@@ -1620,6 +1620,11 @@ public final class SIsland implements Island {
 
     @Override
     public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
+        handleBlockPlace(key, amount, save, true);
+    }
+
+    @Override
+    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
@@ -1651,7 +1656,8 @@ public final class SIsland implements Island {
 
             addCounts(key, amount);
 
-            updateLastTime();
+            if(updateLastTimeStatus)
+                updateLastTime();
 
             if(save)
                 saveBlockCounts(oldWorth, oldLevel);

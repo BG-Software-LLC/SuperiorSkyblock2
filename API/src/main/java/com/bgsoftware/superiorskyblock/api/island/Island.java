@@ -821,6 +821,15 @@ public interface Island extends Comparable<Island> {
     void handleBlockPlace(Key key, BigInteger amount, boolean save);
 
     /**
+     * Handle a placement of a block's key with a specific amount.
+     * @param key The block's key that was placed.
+     * @param amount The amount of the block.
+     * @param save Whether or not the block counts should be saved into database.
+     * @param updateLastTimeStatus Whether to update last time island was updated or not.
+     */
+    void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus);
+
+    /**
      * Handle placements of many blocks in one time.
      * @param blocks All the blocks to place.
      */
