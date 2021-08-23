@@ -80,7 +80,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
             }
         }
 
-        static PrivilegeStatus of(String value) throws IllegalArgumentException{
+        static PrivilegeStatus of(String value) throws IllegalArgumentException {
             switch (value){
                 case "0":
                     return DISABLED;
@@ -88,6 +88,17 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                     return ENABLED;
                 default:
                     return valueOf(value);
+            }
+        }
+
+        static PrivilegeStatus of(byte value) throws IllegalArgumentException {
+            switch (value){
+                case 0:
+                    return DISABLED;
+                case 1:
+                    return ENABLED;
+                default:
+                    throw new IllegalArgumentException("Invalid privilege status: " + value);
             }
         }
 

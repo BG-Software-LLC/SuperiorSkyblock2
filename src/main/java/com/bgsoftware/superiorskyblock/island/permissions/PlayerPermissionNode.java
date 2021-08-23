@@ -57,7 +57,7 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         return permsArray;
     }
 
-    public void loadPrivilege(IslandPrivilege islandPrivilege, String status){
+    public void loadPrivilege(IslandPrivilege islandPrivilege, byte status){
         privileges.put(islandPrivilege, PrivilegeStatus.of(status));
     }
 

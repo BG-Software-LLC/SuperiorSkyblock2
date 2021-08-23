@@ -77,7 +77,7 @@ public final class IslandsDeserializer {
             try {
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) playerPermissionRow.get("permission"));
                 playerPermissions.computeIfAbsent(superiorPlayer, s -> new PlayerPermissionNode(superiorPlayer, island))
-                        .loadPrivilege(islandPrivilege, (String) playerPermissionRow.get("status"));
+                        .loadPrivilege(islandPrivilege, getAsByte(playerPermissionRow.get("status")));
             }catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
                 error.printStackTrace();
