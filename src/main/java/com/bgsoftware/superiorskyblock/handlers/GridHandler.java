@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.handlers;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
@@ -12,28 +13,25 @@ import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
+import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
-import com.bgsoftware.superiorskyblock.schematics.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.utils.registry.IslandRegistry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-
-import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.utils.registry.IslandRegistry;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -687,7 +685,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         String location = resultSet.getString("location");;
         int amount = resultSet.getInt("amount");
 
-        String item = resultSet.getString("item");
+        String item = resultSet.getString("block_type");
         Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
 
         stackedBlocks.setStackedBlock(SBlockPosition.of(location), amount, blockKey);

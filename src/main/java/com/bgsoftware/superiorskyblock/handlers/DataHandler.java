@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -138,7 +137,7 @@ public final class DataHandler extends AbstractHandler {
         gridLoader.loadAllObjects("stacked_blocks", _resultSet -> {
             DatabaseResult resultSet = new DatabaseResult(_resultSet);
             plugin.getGrid().loadStackedBlocks(resultSet);
-            String item = resultSet.getString("item");
+            String item = resultSet.getString("block_type");
             if (item == null || item.isEmpty())
                 updateBlockKeys.set(true);
         });

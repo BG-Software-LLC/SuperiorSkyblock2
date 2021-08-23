@@ -341,7 +341,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stacked_blocks (" +
                 "location TEXT PRIMARY KEY, " +
                 "block_type TEXT, " +
-                "amount BIG_DECIMAL" +
+                "amount INTEGER" +
                 ");");
     }
 
