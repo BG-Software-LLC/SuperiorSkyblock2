@@ -113,6 +113,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             this.userLocale = LocaleUtils.getLocale(playerSettings.getString("language"));
             this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
         });
+
+        databaseBridge.startSavingData();
     }
 
     public SSuperiorPlayer(UUID player){
