@@ -137,7 +137,7 @@ public final class IslandsDeserializer {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = Key.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            island.handleBlockPlace(blockKey, amount, false);
+            island.handleBlockPlace(blockKey, amount, false, false);
         });
     }
 
