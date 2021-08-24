@@ -1,16 +1,16 @@
-package com.bgsoftware.superiorskyblock.player;
+package com.bgsoftware.superiorskyblock.island.warps;
 
 import java.util.EnumMap;
 
-public final class PlayerAttributes {
+public final class IslandWarpAttributes {
 
     private final EnumMap<Field, Object> fieldValues = new EnumMap<>(Field.class);
 
-    public PlayerAttributes(){
+    public IslandWarpAttributes(){
 
     }
 
-    public PlayerAttributes setValue(Field field, Object value){
+    public IslandWarpAttributes setValue(Field field, Object value){
         fieldValues.put(field, value);
         return this;
     }
@@ -29,19 +29,11 @@ public final class PlayerAttributes {
 
     public enum Field {
 
-        UUID,
-        ISLAND_LEADER,
-        LAST_USED_NAME,
-        LAST_USED_SKIN,
-        ISLAND_ROLE,
-        DISBANDS,
-        LAST_TIME_UPDATED,
-        COMPLETED_MISSIONS,
-        TOGGLED_PANEL,
-        ISLAND_FLY,
-        BORDER_COLOR,
-        LANGUAGE,
-        TOGGLED_BORDER
+        NAME,
+        CATEGORY,
+        LOCATION,
+        PRIVATE_STATUS,
+        ICON
 
     }
 

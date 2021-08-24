@@ -51,7 +51,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,22 +111,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             this.userLocale = LocaleUtils.getLocale(playerSettings.getString("language"));
             this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
         });
-
-        databaseBridge.startSavingData();
-    }
-
-    public SSuperiorPlayer(PlayerAttributes playerAttributes){
-        this.uuid = playerAttributes.getValue(PlayerAttributes.Field.UUID, null);
-        this.name = playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_NAME, "null");
-        this.textureValue = playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_SKIN, "");
-        this.disbands = playerAttributes.getValue(PlayerAttributes.Field.DISBANDS, plugin.getSettings().disbandCount);
-        this.lastTimeStatus = playerAttributes.getValue(PlayerAttributes.Field.LAST_TIME_UPDATED, System.currentTimeMillis() / 1000L);
-        this.completedMissions.putAll(playerAttributes.getValue(PlayerAttributes.Field.COMPLETED_MISSIONS, new HashMap<>()));
-        this.toggledPanel = playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_PANEL, plugin.getSettings().defaultToggledPanel);
-        this.islandFly = playerAttributes.getValue(PlayerAttributes.Field.ISLAND_FLY, plugin.getSettings().defaultIslandFly);
-        this.borderColor = playerAttributes.getValue(PlayerAttributes.Field.BORDER_COLOR, BorderColor.safeValue(plugin.getSettings().defaultBorderColor, BorderColor.BLUE));
-        this.userLocale = playerAttributes.getValue(PlayerAttributes.Field.LANGUAGE, LocaleUtils.getDefault());
-        this.worldBorderEnabled = playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_BORDER, plugin.getSettings().defaultWorldBorder);
 
         databaseBridge.startSavingData();
     }

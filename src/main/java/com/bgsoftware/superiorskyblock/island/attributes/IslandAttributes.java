@@ -15,10 +15,16 @@ public final class IslandAttributes {
         return this;
     }
 
-    public <T> T getValue(Field field, T def){
+    public <T> T getValue(Field field){
         Object value = fieldValues.get(field);
         // noinspection all
-        return value == null ? def : (T) value;
+        return (T) value;
+    }
+
+    public <T> T getValue(Field field, Class<T> type){
+        Object value = fieldValues.get(field);
+        // noinspection all
+        return type.cast(value);
     }
 
     public enum Field {

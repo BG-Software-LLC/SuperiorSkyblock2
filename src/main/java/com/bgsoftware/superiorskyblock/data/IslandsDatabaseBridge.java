@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -39,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class IslandsDatabaseBridge {
 
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
-    private static final UUID CONSOLE_UUID = new UUID(0, 0);
 
     private IslandsDatabaseBridge(){
     }
@@ -592,109 +590,6 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void insertEntireIslandData(Island island) {
-        insertIsland(island);
-
-        long currentTime = System.currentTimeMillis();
-
-        runAsBatched(island, () -> {
-            for (SuperiorPlayer superiorPlayer : island.getBannedPlayers())
-                addBannedPlayer(island, superiorPlayer, CONSOLE_UUID, currentTime);
-        });
-
-        runAsBatched(island, () -> {
-            for (Map.Entry<Key, Integer> blockLimit : island.getBlocksLimits().entrySet())
-                saveBlockLimit(island, blockLimit.getKey(), blockLimit.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(IslandChest islandChest : island.getChest())
-                saveIslandChest(island, islandChest);
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<PotionEffectType, Integer> islandEffect : island.getPotionEffects().entrySet())
-                saveIslandEffect(island, islandEffect.getKey(), islandEffect.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<Key, Integer> entityLimit : island.getEntitiesLimitsAsKeys().entrySet())
-                saveEntityLimit(island, entityLimit.getKey(), entityLimit.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<IslandFlag, Byte> islandFlag : island.getAllSettings().entrySet())
-                saveIslandFlag(island, islandFlag.getKey(), islandFlag.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(World.Environment environment : World.Environment.values()) {
-                for (Map.Entry<Key, Integer> generatorRate : island.getCustomGeneratorAmounts(environment).entrySet())
-                    saveGeneratorRate(island, environment, generatorRate.getKey(), generatorRate.getValue());
-            }
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<World.Environment, Location> teleportLocation : island.getTeleportLocations().entrySet())
-                saveTeleportLocation(island, teleportLocation.getKey(), teleportLocation.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(SuperiorPlayer superiorPlayer : island.getIslandMembers(false))
-                addMember(island, superiorPlayer, currentTime);
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<Mission<?>, Integer> completedMission : island.getCompletedMissionsWithAmounts().entrySet())
-                saveMission(island, completedMission.getKey(), completedMission.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<SuperiorPlayer, PermissionNode> playerPermissionNode : island.getPlayerPermissions().entrySet()) {
-                for(Map.Entry<IslandPrivilege, Boolean> playerPermission : playerPermissionNode.getValue().getCustomPermissions().entrySet())
-                    savePlayerPermission(island, playerPermissionNode.getKey(), playerPermission.getKey(), playerPermission.getValue());
-            }
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<UUID, Rating> ratings : island.getRatings().entrySet())
-                saveRating(island, ratings.getKey(), ratings.getValue(), currentTime);
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<PlayerRole, Integer> roleLimit : island.getRoleLimits().entrySet())
-                saveRoleLimit(island, roleLimit.getKey(), roleLimit.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<IslandPrivilege, PlayerRole> rolePermission : island.getRolePermissions().entrySet())
-                saveRolePermission(island, rolePermission.getValue(), rolePermission.getKey());
-        });
-
-        runAsBatched(island, () -> {
-            for(Map.Entry<String, Integer> upgrade : island.getUpgrades().entrySet())
-                saveUpgrade(island, upgrade.getKey(), upgrade.getValue());
-        });
-
-        if(island.getVisitorsLocation() != null)
-            saveVisitorLocation(island, World.Environment.NORMAL, island.getVisitorsLocation());
-
-        runAsBatched(island, () -> {
-            for(Pair<SuperiorPlayer, Long> visitor : island.getUniqueVisitorsWithTimes())
-                saveVisitor(island, visitor.getKey(), visitor.getValue());
-        });
-
-        runAsBatched(island, () -> {
-            for(WarpCategory warpCategory : island.getWarpCategories().values())
-                saveWarpCategory(island, warpCategory);
-        });
-
-        runAsBatched(island, () -> {
-            for(IslandWarp islandWarp : island.getIslandWarps().values())
-                saveWarp(island, islandWarp);
-        });
-    }
-
     public static void deleteIsland(Island island){
         island.getDatabaseBridge().deleteObject("islands", null);
         island.getDatabaseBridge().deleteObject("islands_banks", null);
@@ -760,15 +655,6 @@ public final class IslandsDatabaseBridge {
         if(others != null)
             filters.addAll(Arrays.asList(others));
         return new DatabaseFilter(filters);
-    }
-
-    private static void runAsBatched(Island island, Runnable runnable){
-        try {
-            island.getDatabaseBridge().batchOperations(true);
-            runnable.run();
-        } finally {
-            island.getDatabaseBridge().batchOperations(false);
-        }
     }
 
     private enum FutureSave {

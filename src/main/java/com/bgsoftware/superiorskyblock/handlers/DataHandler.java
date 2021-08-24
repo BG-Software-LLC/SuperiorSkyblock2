@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoadedData;
 import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
@@ -45,17 +43,17 @@ public final class DataHandler extends AbstractHandler {
     public void loadDataWithException() throws HandlerLoadException {
         loadDatabaseLoaders();
 
-        List<DatabaseLoadedData> loadedData = databaseLoaders.stream().map(DatabaseLoader::loadData)
-                .collect(Collectors.toList());
+        databaseLoaders.forEach(DatabaseLoader::loadData);
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().init(plugin);
         }
 
-        loadedData.forEach(databaseLoadedData -> {
-            databaseLoadedData.getLoadedPlayers().forEach(PlayersDatabaseBridge::insertEntirePlayerData);
-            databaseLoadedData.getLoadedIslands().forEach(IslandsDatabaseBridge::insertEntireIslandData);
-        });
+        databaseLoaders.forEach(DatabaseLoader::saveData);
+
+        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
+            SQLDatabaseInitializer.getInstance().createIndexes();
+        }
 
         loadPlayers();
         loadIslands();

@@ -106,19 +106,6 @@ public final class PlayersDatabaseBridge {
         );
     }
 
-    public static void insertEntirePlayerData(SuperiorPlayer superiorPlayer){
-        insertPlayer(superiorPlayer);
-
-        try{
-            superiorPlayer.getDatabaseBridge().batchOperations(true);
-            for(Map.Entry<Mission<?>, Integer> completedMission : superiorPlayer.getCompletedMissionsWithAmounts().entrySet())
-                saveMission(superiorPlayer, completedMission.getKey(), completedMission.getValue());
-        } finally {
-            superiorPlayer.getDatabaseBridge().batchOperations(false);
-        }
-
-    }
-
     public static void updatePlayer(SuperiorPlayer superiorPlayer){
         Locale userLocale = superiorPlayer.getUserLocale();
         superiorPlayer.getDatabaseBridge().updateObject("players",

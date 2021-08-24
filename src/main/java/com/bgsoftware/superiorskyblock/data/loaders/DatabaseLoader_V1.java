@@ -3,43 +3,26 @@ package com.bgsoftware.superiorskyblock.data.loaders;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.sql.SQLSession;
-import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.SIslandChest;
+import com.bgsoftware.superiorskyblock.data.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.attributes.IslandAttributes;
+import com.bgsoftware.superiorskyblock.island.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
-import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
+import com.bgsoftware.superiorskyblock.island.warps.IslandWarpAttributes;
+import com.bgsoftware.superiorskyblock.island.warps.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.player.PlayerAttributes;
-import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
@@ -50,23 +33,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final Gson gson = new Gson();
 
     private static File databaseFile;
     private static SQLSession sqlSession;
 
-    private final List<SuperiorPlayer> loadedPlayers = new ArrayList<>();
-    private final List<Island> loadedIslands = new ArrayList<>();
+    private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
+    private final List<IslandAttributes> loadedIslands = new ArrayList<>();
 
     @Override
-    public DatabaseLoadedData loadData() {
+    public void loadData() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
 
         sqlSession.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
@@ -105,8 +89,82 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         else{
             SuperiorSkyblockPlugin.log("&a[Database-Converter] Successfully created a backup for the database.");
         }
+    }
 
-        return new DatabaseLoadedData(loadedPlayers, loadedIslands);
+    @Override
+    public void saveData() {
+        long currentTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting players...");
+
+        StatementHolder playersQuery = new StatementHolder("INSERT INTO {prefix}players VALUES(?,?,?,?,?)");
+        StatementHolder playersMissionsQuery = new StatementHolder("INSERT INTO {prefix}players_missions VALUES(?,?,?)");
+        StatementHolder playersSettingsQuery = new StatementHolder("INSERT INTO {prefix}players_settings VALUES(?,?,?,?,?,?)");
+
+        for(PlayerAttributes playerAttributes : loadedPlayers) {
+            insertPlayer(playerAttributes, playersQuery, playersMissionsQuery, playersSettingsQuery);
+        }
+
+        playersQuery.executeBatch(false);
+        playersMissionsQuery.executeBatch(false);
+        playersSettingsQuery.executeBatch(false);
+
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting islands...");
+
+        StatementHolder islandsQuery = new StatementHolder("INSERT INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        StatementHolder islandsBanksQuery = new StatementHolder("INSERT INTO {prefix}islands_banks VALUES(?,?,?)");
+        StatementHolder islandsBansQuery = new StatementHolder("INSERT INTO {prefix}islands_bans VALUES(?,?,?,?)");
+        StatementHolder islandsBlockLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_block_limits VALUES(?,?,?)");
+        StatementHolder islandsChestsQuery = new StatementHolder("INSERT INTO {prefix}islands_chests VALUES(?,?,?)");
+        StatementHolder islandsEffectsQuery = new StatementHolder("INSERT INTO {prefix}islands_effects VALUES(?,?,?)");
+        StatementHolder islandsEntityLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_entity_limits VALUES(?,?,?)");
+        StatementHolder islandsFlagsQuery = new StatementHolder("INSERT INTO {prefix}islands_flags VALUES(?,?,?)");
+        StatementHolder islandsGeneratorsQuery = new StatementHolder("INSERT INTO {prefix}islands_generators VALUES(?,?,?,?)");
+        StatementHolder islandsHomesQuery = new StatementHolder("INSERT INTO {prefix}islands_homes VALUES(?,?,?)");
+        StatementHolder islandsMembersQuery = new StatementHolder("INSERT INTO {prefix}islands_members VALUES(?,?,?,?)");
+        StatementHolder islandsMissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_missions VALUES(?,?,?)");
+        StatementHolder islandsPlayerPermissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_player_permissions VALUES(?,?,?,?)");
+        StatementHolder islandsRatingsQuery = new StatementHolder("INSERT INTO {prefix}islands_ratings VALUES(?,?,?,?)");
+        StatementHolder islandsRoleLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_role_limits VALUES(?,?,?)");
+        StatementHolder islandsRolePermissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_role_permissions VALUES(?,?,?)");
+        StatementHolder islandsSettingsQuery = new StatementHolder("INSERT INTO {prefix}islands_settings VALUES(?,?,?,?,?,?,?,?,?)");
+        StatementHolder islandsUpgradesQuery = new StatementHolder("INSERT INTO {prefix}islands_upgrades VALUES(?,?,?)");
+        StatementHolder islandsVisitorHomesQuery = new StatementHolder("INSERT INTO {prefix}islands_visitor_homes VALUES(?,?,?)");
+        StatementHolder islandsVisitorsQuery = new StatementHolder("INSERT INTO {prefix}islands_visitors VALUES(?,?,?)");
+        StatementHolder islandsWarpCategoriesQuery = new StatementHolder("INSERT INTO {prefix}islands_warp_categories VALUES(?,?,?,?)");
+        StatementHolder islandsWarpsQuery = new StatementHolder("INSERT INTO {prefix}islands_warps VALUES(?,?,?,?,?,?)");
+
+        for(IslandAttributes islandAttributes : loadedIslands) {
+            insertIsland(islandAttributes, currentTime, islandsQuery, islandsBanksQuery, islandsBansQuery,
+                    islandsBlockLimitsQuery, islandsChestsQuery, islandsEffectsQuery, islandsEntityLimitsQuery,
+                    islandsFlagsQuery, islandsGeneratorsQuery, islandsHomesQuery, islandsMembersQuery,
+                    islandsMissionsQuery, islandsPlayerPermissionsQuery, islandsRatingsQuery, islandsRoleLimitsQuery,
+                    islandsRolePermissionsQuery, islandsSettingsQuery, islandsUpgradesQuery, islandsVisitorHomesQuery,
+                    islandsVisitorsQuery, islandsWarpCategoriesQuery, islandsWarpsQuery);
+        }
+
+        islandsQuery.executeBatch(false);
+        islandsBanksQuery.executeBatch(false);
+        islandsBansQuery.executeBatch(false);
+        islandsBlockLimitsQuery.executeBatch(false);
+        islandsChestsQuery.executeBatch(false);
+        islandsEffectsQuery.executeBatch(false);
+        islandsEntityLimitsQuery.executeBatch(false);
+        islandsFlagsQuery.executeBatch(false);
+        islandsGeneratorsQuery.executeBatch(false);
+        islandsHomesQuery.executeBatch(false);
+        islandsMembersQuery.executeBatch(false);
+        islandsMissionsQuery.executeBatch(false);
+        islandsPlayerPermissionsQuery.executeBatch(false);
+        islandsRatingsQuery.executeBatch(false);
+        islandsRoleLimitsQuery.executeBatch(false);
+        islandsRolePermissionsQuery.executeBatch(false);
+        islandsSettingsQuery.executeBatch(false);
+        islandsUpgradesQuery.executeBatch(false);
+        islandsVisitorHomesQuery.executeBatch(false);
+        islandsVisitorsQuery.executeBatch(false);
+        islandsWarpCategoriesQuery.executeBatch(false);
+        islandsWarpsQuery.executeBatch(false);
     }
 
     public static void register(){
@@ -137,7 +195,198 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return true;
     }
 
-    private SuperiorPlayer loadPlayer(ResultSet resultSet) throws SQLException {
+    @SuppressWarnings("unchecked")
+    private void insertPlayer(PlayerAttributes playerAttributes,
+                              StatementHolder playersQuery,
+                              StatementHolder playersMissionsQuery,
+                              StatementHolder playersSettingsQuery) {
+        UUID playerUUID = playerAttributes.getValue(PlayerAttributes.Field.UUID);
+        playersQuery.setObject(playerUUID)
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_NAME))
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_USED_SKIN))
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.DISBANDS))
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LAST_TIME_UPDATED))
+                .addBatch();
+        ((Map<String, Integer>) playerAttributes.getValue(PlayerAttributes.Field.COMPLETED_MISSIONS)).forEach((missionName, finishCount) ->
+                playersMissionsQuery.setObject(playerUUID)
+                        .setObject(missionName.toLowerCase())
+                        .setObject(finishCount)
+                        .addBatch());
+        playersSettingsQuery.setObject(playerUUID)
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.LANGUAGE))
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_PANEL))
+                .setObject(((BorderColor) playerAttributes.getValue(PlayerAttributes.Field.BORDER_COLOR)).name())
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.TOGGLED_BORDER))
+                .setObject(playerAttributes.getValue(PlayerAttributes.Field.ISLAND_FLY))
+                .addBatch();
+    }
+
+    @SuppressWarnings({"unchecked"})
+    private void insertIsland(IslandAttributes islandAttributes, long currentTime,
+                              StatementHolder islandsQuery, StatementHolder islandsBanksQuery,
+                              StatementHolder islandsBansQuery, StatementHolder islandsBlockLimitsQuery,
+                              StatementHolder islandsChestsQuery, StatementHolder islandsEffectsQuery,
+                              StatementHolder islandsEntityLimitsQuery, StatementHolder islandsFlagsQuery,
+                              StatementHolder islandsGeneratorsQuery, StatementHolder islandsHomesQuery,
+                              StatementHolder islandsMembersQuery, StatementHolder islandsMissionsQuery,
+                              StatementHolder islandsPlayerPermissionsQuery, StatementHolder islandsRatingsQuery,
+                              StatementHolder islandsRoleLimitsQuery, StatementHolder islandsRolePermissionsQuery,
+                              StatementHolder islandsSettingsQuery, StatementHolder islandsUpgradesQuery,
+                              StatementHolder islandsVisitorHomesQuery, StatementHolder islandsVisitorsQuery,
+                              StatementHolder islandsWarpCategoriesQuery, StatementHolder islandsWarpsQuery){
+        UUID islandUUID = islandAttributes.getValue(IslandAttributes.Field.UUID);
+        islandsQuery.setObject(islandUUID)
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.OWNER))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.CENTER))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.CREATION_TIME))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_TYPE))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.DISCORD))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.PAYPAL))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.WORTH_BONUS))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.LEVELS_BONUS))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.LOCKED))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.IGNORED))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.NAME))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.DESCRIPTION))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.GENERATED_SCHEMATICS))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.UNLOCKED_WORLDS))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.LAST_TIME_UPDATED))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.DIRTY_CHUNKS))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.BLOCK_COUNTS))
+                .addBatch();
+        islandsBanksQuery.setObject(islandUUID)
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_BALANCE))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LAST_INTEREST))
+                .addBatch();
+        ((List<PlayerAttributes>) islandAttributes.getValue(IslandAttributes.Field.BANS)).forEach(playerAttributes ->
+                islandsBansQuery.setObject(islandUUID)
+                        .setObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
+                        .setObject(CONSOLE_UUID)
+                        .setObject(currentTime)
+                        .addBatch());
+        ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS)).forEach((key, limit) ->
+                islandsBlockLimitsQuery.setObject(islandUUID)
+                        .setObject(key)
+                        .setObject(limit)
+                        .addBatch());
+        ((List<IslandChestAttributes>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS)).forEach(islandChestAttributes ->
+                islandsChestsQuery.setObject(islandUUID)
+                        .setObject(islandChestAttributes.getValue(IslandChestAttributes.Field.INDEX))
+                        .setObject(islandChestAttributes.getValue(IslandChestAttributes.Field.CONTENTS))
+                        .addBatch());
+        ((Map<PotionEffectType, Integer>) islandAttributes.getValue(IslandAttributes.Field.EFFECTS)).forEach((type, level) ->
+                islandsEffectsQuery.setObject(islandUUID)
+                        .setObject(type.getName())
+                        .setObject(level)
+                        .addBatch());
+        ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS)).forEach((entity, limit) ->
+                islandsEntityLimitsQuery.setObject(islandUUID)
+                        .setObject(entity)
+                        .setObject(limit)
+                        .addBatch());
+        ((Map<IslandFlag, Byte>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_FLAGS)).forEach((islandFlag, status) ->
+                islandsFlagsQuery.setObject(islandUUID)
+                        .setObject(islandFlag.getName())
+                        .setObject(status)
+                        .addBatch());
+        runOnEnvironments((KeyMap<Integer>[]) islandAttributes.getValue(IslandAttributes.Field.GENERATORS), (generatorRates, environment) ->
+                generatorRates.forEach((block, rate) ->
+                        islandsGeneratorsQuery.setObject(islandUUID)
+                                .setObject(environment.name())
+                                .setObject(block)
+                                .setObject(rate)
+                                .addBatch()));
+        runOnEnvironments((String[]) islandAttributes.getValue(IslandAttributes.Field.HOMES), (islandHome, environment) ->
+                islandsHomesQuery.setObject(islandUUID)
+                        .setObject(environment.name())
+                        .setObject(islandHome)
+                        .addBatch());
+        ((List<PlayerAttributes>) islandAttributes.getValue(IslandAttributes.Field.MEMBERS)).forEach(playerAttributes ->
+                islandsMembersQuery.setObject(islandUUID)
+                        .setObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
+                        .setObject(((PlayerRole) playerAttributes.getValue(PlayerAttributes.Field.ISLAND_ROLE)).getId())
+                        .setObject(currentTime)
+                        .addBatch());
+        ((Map<String, Integer>) islandAttributes.getValue(IslandAttributes.Field.MISSIONS)).forEach((mission, finishCount) ->
+                islandsMissionsQuery.setObject(islandUUID)
+                        .setObject(mission)
+                        .setObject(finishCount)
+                        .addBatch());
+        ((Map<UUID, PlayerPermissionNode>) islandAttributes.getValue(IslandAttributes.Field.PLAYER_PERMISSIONS)).forEach((playerUUID, node) -> {
+            for(Map.Entry<IslandPrivilege, Boolean> playerPermission : node.getCustomPermissions().entrySet())
+                islandsPlayerPermissionsQuery.setObject(islandUUID)
+                        .setObject(playerUUID)
+                        .setObject(playerPermission.getKey().getName())
+                        .setObject(playerPermission.getValue())
+                        .addBatch();
+        });
+        ((Map<UUID, Rating>) islandAttributes.getValue(IslandAttributes.Field.RATINGS)).forEach((playerUUID, rating) ->
+                islandsRatingsQuery.setObject(islandUUID)
+                        .setObject(playerUUID)
+                        .setObject(rating.getValue())
+                        .setObject(currentTime)
+                        .addBatch());
+        ((Map<PlayerRole, Integer>) islandAttributes.getValue(IslandAttributes.Field.ROLE_LIMITS)).forEach((role, limit) ->
+                islandsRoleLimitsQuery.setObject(islandUUID)
+                        .setObject(role.getId())
+                        .setObject(limit)
+                        .addBatch());
+        ((Map<IslandPrivilege, PlayerRole>) islandAttributes.getValue(IslandAttributes.Field.ROLE_PERMISSIONS)).forEach((privilege, role) ->
+                islandsRolePermissionsQuery.setObject(islandUUID)
+                        .setObject(role.getId())
+                        .setObject(privilege.getName())
+                        .addBatch());
+        islandsSettingsQuery.setObject(islandUUID)
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.ISLAND_SIZE))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.BANK_LIMIT))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.COOP_LIMIT))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.TEAM_LIMIT))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.WARPS_LIMIT))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER))
+                .setObject(islandAttributes.getValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER))
+                .addBatch();
+        ((Map<String, Integer>) islandAttributes.getValue(IslandAttributes.Field.UPGRADES)).forEach((upgradeName, level) ->
+                islandsUpgradesQuery.setObject(islandUUID)
+                        .setObject(upgradeName)
+                        .setObject(level)
+                        .addBatch());
+        String visitorHome = islandAttributes.getValue(IslandAttributes.Field.VISITOR_HOMES);
+        if(visitorHome != null && !visitorHome.isEmpty())
+            islandsVisitorHomesQuery.setObject(islandUUID)
+                    .setObject(World.Environment.NORMAL.name())
+                    .setObject(visitorHome)
+                    .addBatch();
+        ((List<Pair<UUID, Long>>) islandAttributes.getValue(IslandAttributes.Field.VISITORS)).forEach(visitor ->
+                islandsVisitorsQuery.setObject(islandUUID)
+                        .setObject(visitor.getKey().toString())
+                        .setObject(visitor.getValue())
+                        .addBatch());
+        ((List<WarpCategoryAttributes>) islandAttributes.getValue(IslandAttributes.Field.WARP_CATEGORIES)).forEach(warpCategoryAttributes ->
+                islandsWarpCategoriesQuery.setObject(islandUUID)
+                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.NAME))
+                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.SLOT))
+                        .setObject(warpCategoryAttributes.getValue(WarpCategoryAttributes.Field.ICON))
+                        .addBatch());
+        ((List<IslandWarpAttributes>) islandAttributes.getValue(IslandAttributes.Field.WARPS)).forEach(islandWarpAttributes ->
+            islandsWarpsQuery.setObject(islandUUID)
+                    .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.NAME))
+                    .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.CATEGORY))
+                    .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.LOCATION))
+                    .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.PRIVATE_STATUS))
+                    .setObject(islandWarpAttributes.getValue(IslandWarpAttributes.Field.ICON))
+                    .addBatch());
+    }
+
+    private <T> void runOnEnvironments(T[] arr, BiConsumer<T, World.Environment> consumer){
+        for(World.Environment environment : World.Environment.values()){
+            if(arr[environment.ordinal()] != null) {
+                consumer.accept(arr[environment.ordinal()], environment);
+            }
+        }
+    }
+
+    private PlayerAttributes loadPlayer(ResultSet resultSet) throws SQLException {
         PlayerRole playerRole;
 
         try{
@@ -146,7 +395,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
         }
 
-        return new SSuperiorPlayer(new PlayerAttributes()
+        return new PlayerAttributes()
                 .setValue(PlayerAttributes.Field.UUID, UUID.fromString(resultSet.getString("player")))
                 .setValue(PlayerAttributes.Field.ISLAND_LEADER, UUID.fromString(resultSet.getString("teamLeader")))
                 .setValue(PlayerAttributes.Field.LAST_USED_NAME, resultSet.getString("name"))
@@ -158,12 +407,12 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(PlayerAttributes.Field.TOGGLED_PANEL, resultSet.getBoolean("toggledPanel"))
                 .setValue(PlayerAttributes.Field.ISLAND_FLY, resultSet.getBoolean("islandFly"))
                 .setValue(PlayerAttributes.Field.BORDER_COLOR, BorderColor.valueOf(resultSet.getString("borderColor")))
-                .setValue(PlayerAttributes.Field.LANGUAGE, LocaleUtils.getLocale(resultSet.getString("language")))
-                .setValue(PlayerAttributes.Field.TOGGLED_BORDER, resultSet.getBoolean("toggledBorder"))
+                .setValue(PlayerAttributes.Field.LANGUAGE, resultSet.getString("language"))
+                .setValue(PlayerAttributes.Field.TOGGLED_BORDER, resultSet.getBoolean("toggledBorder")
         );
     }
 
-    private Island loadIsland(ResultSet resultSet) throws SQLException {
+    private IslandAttributes loadIsland(ResultSet resultSet) throws SQLException {
         UUID ownerUUID = UUID.fromString(resultSet.getString("owner"));
         UUID islandUUID;
 
@@ -198,11 +447,10 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 unlockedWorlds |= 2;
         }
 
-        return new SIsland(new IslandAttributes()
+        return new IslandAttributes()
                 .setValue(IslandAttributes.Field.UUID, islandUUID)
-                .setValue(IslandAttributes.Field.OWNER, getSuperiorPlayer(ownerUUID))
-                .setValue(IslandAttributes.Field.CENTER, SBlockPosition.of(Objects.requireNonNull(
-                        LocationUtils.getLocation(resultSet.getString("center")))))
+                .setValue(IslandAttributes.Field.OWNER, ownerUUID)
+                .setValue(IslandAttributes.Field.CENTER, resultSet.getString("center"))
                 .setValue(IslandAttributes.Field.CREATION_TIME, resultSet.getLong("creationTime"))
                 .setValue(IslandAttributes.Field.ISLAND_TYPE, resultSet.getString("schemName"))
                 .setValue(IslandAttributes.Field.DISCORD, resultSet.getString("discord"))
@@ -238,28 +486,19 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(IslandAttributes.Field.WARP_CATEGORIES, deserializeWarpCategories(resultSet.getString("warpCategories")))
                 .setValue(IslandAttributes.Field.BANK_BALANCE, new BigDecimal(resultSet.getString("islandBank")))
                 .setValue(IslandAttributes.Field.BANK_LAST_INTEREST, resultSet.getLong("lastInterest"))
-                .setValue(IslandAttributes.Field.VISITOR_HOMES, new Location[] { LocationUtils.getLocation(resultSet.getString("visitorsLocation")) })
-                .setValue(IslandAttributes.Field.ISLAND_SIZE, new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0))
-                .setValue(IslandAttributes.Field.TEAM_LIMIT, new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0))
-                .setValue(IslandAttributes.Field.WARPS_LIMIT, new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0))
-                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0))
-                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0))
-                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0))
-                .setValue(IslandAttributes.Field.COOP_LIMIT, new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0))
-                .setValue(IslandAttributes.Field.BANK_LIMIT, new UpgradeValue<>(new BigDecimal(resultSet.getString("bankLimit")),
-                        i -> i.compareTo(new BigDecimal(-1)) < 0))
-        );
+                .setValue(IslandAttributes.Field.VISITOR_HOMES, resultSet.getString("visitorsLocation"))
+                .setValue(IslandAttributes.Field.ISLAND_SIZE, resultSet.getInt("islandSize"))
+                .setValue(IslandAttributes.Field.TEAM_LIMIT, resultSet.getInt("teamLimit"))
+                .setValue(IslandAttributes.Field.WARPS_LIMIT, resultSet.getInt("warpsLimit"))
+                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, resultSet.getDouble("cropGrowth"))
+                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, resultSet.getDouble("spawnerRates"))
+                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.getDouble("mobDrops"))
+                .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.getInt("coopLimit"))
+                .setValue(IslandAttributes.Field.BANK_LIMIT, new BigDecimal(resultSet.getString("bankLimit")));
     }
 
-    private SuperiorPlayer getSuperiorPlayer(UUID uuid){
-        return loadedPlayers.stream()
-                .filter(superiorPlayer -> superiorPlayer.getUniqueId().equals(uuid))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static Map<Mission<?>, Integer> deserializeMissions(String missions){
-        Map<Mission<?>, Integer> completedMissions = new HashMap<>();
+    private static Map<String, Integer> deserializeMissions(String missions){
+        Map<String, Integer> completedMissions = new HashMap<>();
 
         JsonArray missionsArray = gson.fromJson(missions, JsonArray.class);
         missionsArray.forEach(missionElement -> {
@@ -268,24 +507,21 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             String name = missionObject.get("name").getAsString();
             int finishCount = missionObject.get("finishCount").getAsInt();
 
-            Mission<?> mission = plugin.getMissions().getMission(name);
-
-            if (mission != null)
-                completedMissions.put(mission, finishCount);
+            completedMissions.put(name, finishCount);
         });
 
         return completedMissions;
     }
 
-    private Location[] deserializeHomes(String locationParam){
-        Location[] locations = new Location[World.Environment.values().length];
+    private String[] deserializeHomes(String locationParam){
+        String[] locations = new String[World.Environment.values().length];
 
         JsonArray locationsArray = gson.fromJson(locationParam, JsonArray.class);
         locationsArray.forEach(locationElement -> {
             JsonObject locationObject = locationElement.getAsJsonObject();
             try {
                 int i = World.Environment.valueOf(locationObject.get("env").getAsString()).ordinal();
-                locations[i] = FileUtils.toLocation(locationObject.get("location").getAsString());
+                locations[i] = locationObject.get("location").getAsString();
             } catch (Exception ignored) {
             }
         });
@@ -293,18 +529,22 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return locations;
     }
 
-    private List<SuperiorPlayer> deserializePlayers(String players) {
-        List<SuperiorPlayer> superiorPlayers = new ArrayList<>();
-        JsonArray playersArray = gson.fromJson(players, JsonArray.class);
-        playersArray.forEach(uuid -> {
-            UUID playerUUID = UUID.fromString(uuid.getAsString());
-            superiorPlayers.add(getSuperiorPlayer(playerUUID));
-        });
-        return superiorPlayers;
+    private PlayerAttributes getPlayerAttributes(UUID uuid){
+        return loadedPlayers.stream().filter(playerAttributes ->
+                playerAttributes.getValue(PlayerAttributes.Field.UUID).equals(uuid))
+                .findFirst()
+                .orElse(null);
     }
 
-    private Map<SuperiorPlayer, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
-        Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions = new HashMap<>();
+    private List<PlayerAttributes> deserializePlayers(String players) {
+        List<PlayerAttributes> playerAttributes = new ArrayList<>();
+        JsonArray playersArray = gson.fromJson(players, JsonArray.class);
+        playersArray.forEach(uuid -> playerAttributes.add(getPlayerAttributes(UUID.fromString(uuid.getAsString()))));
+        return playerAttributes;
+    }
+
+    private Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
+        Map<UUID, PlayerPermissionNode> playerPermissions = new HashMap<>();
 
         JsonObject globalObject = gson.fromJson(permissionNodes, JsonObject.class);
         JsonArray playersArray = globalObject.getAsJsonArray("players");
@@ -313,10 +553,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             JsonObject playerObject = playerElement.getAsJsonObject();
             try {
                 UUID uuid = UUID.fromString(playerObject.get("uuid").getAsString());
-                SuperiorPlayer superiorPlayer = getSuperiorPlayer(uuid);
                 JsonArray permsArray = playerObject.getAsJsonArray("permissions");
-                PlayerPermissionNode playerPermissionNode = new PlayerPermissionNode(superiorPlayer, null, "");
-                playerPermissions.put(superiorPlayer, playerPermissionNode);
+                PlayerPermissionNode playerPermissionNode = new PlayerPermissionNode(null, null, "");
+                playerPermissions.put(uuid, playerPermissionNode);
 
                 for(JsonElement permElement : permsArray){
                     try {
@@ -367,44 +606,38 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return upgradesMap;
     }
 
-    private List<IslandWarp> deserializeWarps(String islandWarps){
-        List<IslandWarp> islandWarpList = new ArrayList<>();
+    private List<IslandWarpAttributes> deserializeWarps(String islandWarps){
+        List<IslandWarpAttributes> islandWarpList = new ArrayList<>();
 
         JsonArray warpsArray = gson.fromJson(islandWarps, JsonArray.class);
         warpsArray.forEach(warpElement -> {
             JsonObject warpObject = warpElement.getAsJsonObject();
-            String name = IslandUtils.getWarpName(warpObject.get("name").getAsString());
-
-            if (name.isEmpty())
-                return;
-
-            WarpCategory warpCategory = null;
-            if (warpObject.has("category"))
-                warpCategory = new SWarpCategory(null, warpObject.get("category").getAsString());
-
-            Location location = FileUtils.toLocation(warpObject.get("location").getAsString());
+            String name = warpObject.get("name").getAsString();
+            String warpCategory = warpObject.get("category").getAsString();
+            String location = warpObject.get("location").getAsString();
             boolean privateWarp = warpObject.get("private").getAsInt() == 1;
-            ItemStack icon = warpObject.has("icon") ?
-                    ItemUtils.deserializeItem(warpObject.get("icon").getAsString()) : null;
+            String icon = warpObject.has("icon") ? warpObject.get("icon").getAsString() : "";
 
-            IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, privateWarp, icon);
-            islandWarpList.add(islandWarp);
-
-            islandWarp.getCategory().getWarps().add(islandWarp);
+            islandWarpList.add(new IslandWarpAttributes()
+                    .setValue(IslandWarpAttributes.Field.NAME, name)
+                    .setValue(IslandWarpAttributes.Field.CATEGORY, warpCategory)
+                    .setValue(IslandWarpAttributes.Field.LOCATION, location)
+                    .setValue(IslandWarpAttributes.Field.PRIVATE_STATUS, privateWarp)
+                    .setValue(IslandWarpAttributes.Field.ICON, icon));
         });
 
         return islandWarpList;
     }
 
-    private KeyMap<UpgradeValue<Integer>> deserializeBlockLimits(String blocks){
-        KeyMap<UpgradeValue<Integer>> blockLimits = new KeyMap<>();
+    private KeyMap<Integer> deserializeBlockLimits(String blocks){
+        KeyMap<Integer> blockLimits = new KeyMap<>();
 
         JsonArray blockLimitsArray = gson.fromJson(blocks, JsonArray.class);
         blockLimitsArray.forEach(blockLimitElement -> {
             JsonObject blockLimitObject = blockLimitElement.getAsJsonObject();
             Key blockKey = Key.of(blockLimitObject.get("id").getAsString());
             int limit = blockLimitObject.get("limit").getAsInt();
-            blockLimits.put(blockKey, new UpgradeValue<>(limit, i -> i < 0));
+            blockLimits.put(blockKey, limit);
         });
 
         return blockLimits;
@@ -444,9 +677,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return islandFlags;
     }
 
-    private KeyMap<UpgradeValue<Integer>>[] deserializeGenerators(String generator){
+    private KeyMap<Integer>[] deserializeGenerators(String generator){
         // noinspection all
-        KeyMap<UpgradeValue<Integer>>[] cobbleGenerator = new KeyMap[World.Environment.values().length];
+        KeyMap<Integer>[] cobbleGenerator = new KeyMap[World.Environment.values().length];
 
         JsonArray generatorWorldsArray = gson.fromJson(generator, JsonArray.class);
         generatorWorldsArray.forEach(generatorWorldElement -> {
@@ -457,7 +690,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                     JsonObject generatorObject = generatorElement.getAsJsonObject();
                     Key blockKey = Key.of(generatorObject.get("id").getAsString());
                     int rate = generatorObject.get("rate").getAsInt();
-                    (cobbleGenerator[i] = new KeyMap<>()).put(blockKey, new UpgradeValue<>(rate, n -> n < 0));
+                    (cobbleGenerator[i] = new KeyMap<>()).put(blockKey, rate);
                 });
             } catch (Exception ignored) {
             }
@@ -466,8 +699,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return cobbleGenerator;
     }
 
-    private List<Pair<SuperiorPlayer, Long>> deserializeVisitors(String visitors){
-        List<Pair<SuperiorPlayer, Long>> visitorsList = new ArrayList<>();
+    private List<Pair<UUID, Long>> deserializeVisitors(String visitors){
+        List<Pair<UUID, Long>> visitorsList = new ArrayList<>();
 
         JsonArray playersArray = gson.fromJson(visitors, JsonArray.class);
 
@@ -476,7 +709,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             try {
                 UUID uuid = UUID.fromString(playerObject.get("uuid").getAsString());
                 long lastTimeRecorded = playerObject.get("lastTimeRecorded").getAsLong();
-                visitorsList.add(new Pair<>(plugin.getPlayers().getSuperiorPlayer(uuid), lastTimeRecorded));
+                visitorsList.add(new Pair<>(uuid, lastTimeRecorded));
             } catch (Exception ignored) {
             }
         });
@@ -484,22 +717,22 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         return visitorsList;
     }
 
-    private KeyMap<UpgradeValue<Integer>> deserializeEntityLimits(String entities){
-        KeyMap<UpgradeValue<Integer>> entityLimits = new KeyMap<>();
+    private KeyMap<Integer> deserializeEntityLimits(String entities){
+        KeyMap<Integer> entityLimits = new KeyMap<>();
 
         JsonArray entityLimitsArray = gson.fromJson(entities, JsonArray.class);
         entityLimitsArray.forEach(entityLimitElement -> {
             JsonObject entityLimitObject = entityLimitElement.getAsJsonObject();
             Key entity = Key.of(entityLimitObject.get("id").getAsString());
             int limit = entityLimitObject.get("limit").getAsInt();
-            entityLimits.put(entity, new UpgradeValue<>(limit, i -> i < 0));
+            entityLimits.put(entity, limit);
         });
 
         return entityLimits;
     }
 
-    private Map<PotionEffectType, UpgradeValue<Integer>> deserializeEffects(String effects){
-        Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
+    private Map<PotionEffectType, Integer> deserializeEffects(String effects){
+        Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
 
         JsonArray effectsArray = gson.fromJson(effects, JsonArray.class);
         effectsArray.forEach(effectElement -> {
@@ -507,34 +740,36 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             PotionEffectType potionEffectType = PotionEffectType.getByName(effectObject.get("type").getAsString());
             if (potionEffectType != null) {
                 int level = effectObject.get("level").getAsInt();
-                islandEffects.put(potionEffectType, new UpgradeValue<>(level, i -> i < 0));
+                islandEffects.put(potionEffectType, level);
             }
         });
 
         return islandEffects;
     }
 
-    private IslandChest[] deserializeIslandChests(String islandChest){
-        JsonArray islandChestsArray = gson.fromJson(islandChest, JsonArray.class);
-        List<IslandChest> islandChestList = new ArrayList<>();
+    private List<IslandChestAttributes> deserializeIslandChests(String islandChest){
+        List<IslandChestAttributes> islandChestList = new ArrayList<>();
 
+        JsonArray islandChestsArray = gson.fromJson(islandChest, JsonArray.class);
         islandChestsArray.forEach(islandChestElement -> {
             JsonObject islandChestObject = islandChestElement.getAsJsonObject();
-            int i = islandChestObject.get("index").getAsInt();
+            int index = islandChestObject.get("index").getAsInt();
             String contents = islandChestObject.get("contents").getAsString();
 
-            if (i >= islandChestList.size()) {
-                islandChestList.add(SIslandChest.createChest(null, i, ItemUtils.deserialize(contents)));
+            if (index >= islandChestList.size()) {
+                islandChestList.add(null);
             } else
-                islandChestList.add(i, SIslandChest.createChest(null, i, ItemUtils.deserialize(contents)));
+                islandChestList.add(index, new IslandChestAttributes()
+                        .setValue(IslandChestAttributes.Field.INDEX, index)
+                        .setValue(IslandChestAttributes.Field.CONTENTS, contents));
 
         });
 
-        return islandChestList.toArray(new IslandChest[0]);
+        return islandChestList;
     }
 
-    private Map<PlayerRole, UpgradeValue<Integer>> deserializeRoleLimits(String roles){
-        Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new HashMap<>();
+    private Map<PlayerRole, Integer> deserializeRoleLimits(String roles){
+        Map<PlayerRole, Integer> roleLimits = new HashMap<>();
 
         JsonArray roleLimitsArray = gson.fromJson(roles, JsonArray.class);
         roleLimitsArray.forEach(roleElement -> {
@@ -542,24 +777,26 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             PlayerRole playerRole = SPlayerRole.fromId(roleObject.get("id").getAsInt());
             if (playerRole != null) {
                 int limit = roleObject.get("limit").getAsInt();
-                roleLimits.put(playerRole, new UpgradeValue<>(limit, i -> i < 0));
+                roleLimits.put(playerRole, limit);
             }
         });
 
         return roleLimits;
     }
 
-    private Map<String, WarpCategory> deserializeWarpCategories(String categories){
-        Map<String, WarpCategory> warpCategories = new HashMap<>();
+    private List<WarpCategoryAttributes> deserializeWarpCategories(String categories){
+        List<WarpCategoryAttributes> warpCategories = new ArrayList<>();
 
         JsonArray warpCategoriesArray = gson.fromJson(categories, JsonArray.class);
         warpCategoriesArray.forEach(warpCategoryElement -> {
             JsonObject warpCategoryObject = warpCategoryElement.getAsJsonObject();
-            String name = StringUtils.stripColors(warpCategoryObject.get("name").getAsString());
+            String name = warpCategoryObject.get("name").getAsString();
             int slot = warpCategoryObject.get("slot").getAsInt();
-            ItemStack icon = ItemUtils.deserializeItem(warpCategoryObject.get("icon").getAsString());
-            WarpCategory warpCategoryClone = new SWarpCategory(null, name, slot, icon);
-            warpCategories.put(name.toLowerCase(), warpCategoryClone);
+            String icon = warpCategoryObject.get("icon").getAsString();
+            warpCategories.add(new WarpCategoryAttributes()
+                    .setValue(WarpCategoryAttributes.Field.NAME, name)
+                    .setValue(WarpCategoryAttributes.Field.SLOT, slot)
+                    .setValue(WarpCategoryAttributes.Field.ICON, icon));
         });
 
         return warpCategories;
