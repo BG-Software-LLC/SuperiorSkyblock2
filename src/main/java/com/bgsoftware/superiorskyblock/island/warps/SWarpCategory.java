@@ -24,12 +24,18 @@ public final class SWarpCategory implements WarpCategory {
     private final Island island;
 
     private String name;
-    private int slot = 0;
-    private ItemStack icon = DEFAULT_WARP_ICON.clone();
+    private int slot;
+    private ItemStack icon;
 
     public SWarpCategory(Island island, String name){
+        this(island, name, 0, null);
+    }
+
+    public SWarpCategory(Island island, String name, int slot, ItemStack icon){
         this.island = island;
         this.name = name;
+        this.slot = slot;
+        this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon;
     }
 
     @Override

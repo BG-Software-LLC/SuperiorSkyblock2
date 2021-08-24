@@ -392,6 +392,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
             IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, privateWarp, icon);
             islandWarpList.add(islandWarp);
+
+            islandWarp.getCategory().getWarps().add(islandWarp);
         });
 
         return islandWarpList;
@@ -565,14 +567,13 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                     return;
                 }
 
+
                 int slot = warpCategoryObject.get("slot").getAsInt();
-                warpCategory.setSlot(slot);
 
                 ItemStack icon = ItemUtils.deserializeItem(warpCategoryObject.get("icon").getAsString());
-                if (icon != null)
-                    warpCategory.setIcon(icon);
 
-                warpCategories.put(name.toLowerCase(), warpCategory);
+                WarpCategory warpCategoryClone = new SWarpCategory(null, name, slot, icon);
+                warpCategories.put(name.toLowerCase(), warpCategoryClone);
             }
         });
 
