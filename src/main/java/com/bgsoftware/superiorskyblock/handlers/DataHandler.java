@@ -9,7 +9,9 @@ import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoadedData;
 import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader;
+import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
@@ -37,24 +40,28 @@ public final class DataHandler extends AbstractHandler {
         throw new UnsupportedOperationException("Not supported for DataHandler.");
     }
 
+
     @Override
     public void loadDataWithException() throws HandlerLoadException {
-        databaseLoaders.forEach(DatabaseLoader::loadData);
-        List<Island> customLoadedIslands = plugin.getGrid().getIslands();
-        List<SuperiorPlayer> customLoadedPlayers = plugin.getPlayers().getAllPlayers();
+        loadDatabaseLoaders();
+
+        List<DatabaseLoadedData> loadedData = databaseLoaders.stream().map(DatabaseLoader::loadData)
+                .collect(Collectors.toList());
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().init(plugin);
         }
+
+        loadedData.forEach(databaseLoadedData -> {
+            databaseLoadedData.getLoadedPlayers().forEach(PlayersDatabaseBridge::insertPlayer);
+            databaseLoadedData.getLoadedIslands().forEach(IslandsDatabaseBridge::insertIsland);
+        });
 
         loadPlayers();
         loadIslands();
         loadGrid();
         loadStackedBlocks();
         loadBankTransactions();
-
-        customLoadedIslands.forEach(IslandsDatabaseBridge::insertIsland);
-        customLoadedPlayers.forEach(PlayersDatabaseBridge::insertPlayer);
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -108,6 +115,10 @@ public final class DataHandler extends AbstractHandler {
 
     public void insertPlayer(SuperiorPlayer player) {
         PlayersDatabaseBridge.insertPlayer(player);
+    }
+
+    private void loadDatabaseLoaders() {
+        DatabaseLoader_V1.register();
     }
 
     private void loadPlayers() {

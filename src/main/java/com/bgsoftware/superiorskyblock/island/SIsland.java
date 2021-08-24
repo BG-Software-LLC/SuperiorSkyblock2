@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.island.attributes.IslandAttributes;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
@@ -268,6 +269,69 @@ public final class SIsland implements Island {
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
+
+        databaseBridge.startSavingData();
+    }
+
+    public SIsland(IslandAttributes islandAttributes){
+        this.uuid = islandAttributes.getValue(IslandAttributes.Field.UUID, UUID.randomUUID());
+        this.owner = islandAttributes.getValue(IslandAttributes.Field.OWNER, null);
+        this.center = islandAttributes.getValue(IslandAttributes.Field.CENTER, null);
+        this.creationTime = islandAttributes.getValue(IslandAttributes.Field.CREATION_TIME, System.currentTimeMillis() / 1000L);
+        this.schemName = islandAttributes.getValue(IslandAttributes.Field.ISLAND_TYPE, "");
+        this.discord = islandAttributes.getValue(IslandAttributes.Field.DISCORD, "None");
+        this.paypal = islandAttributes.getValue(IslandAttributes.Field.PAYPAL, "None");
+        this.bonusWorth.set(islandAttributes.getValue(IslandAttributes.Field.WORTH_BONUS, BigDecimal.ZERO));
+        this.bonusLevel.set(islandAttributes.getValue(IslandAttributes.Field.LEVELS_BONUS, BigDecimal.ZERO));
+        this.locked = islandAttributes.getValue(IslandAttributes.Field.LOCKED, false);
+        this.ignored = islandAttributes.getValue(IslandAttributes.Field.IGNORED, false);
+        this.islandName = islandAttributes.getValue(IslandAttributes.Field.NAME, "");
+        this.islandRawName = StringUtils.stripColors(this.islandName);
+        this.description = islandAttributes.getValue(IslandAttributes.Field.DESCRIPTION, "");
+        this.generatedSchematics.set(islandAttributes.getValue(IslandAttributes.Field.GENERATED_SCHEMATICS, 0));
+        this.unlockedWorlds.set(islandAttributes.getValue(IslandAttributes.Field.UNLOCKED_WORLDS, 0));
+        this.lastTimeUpdate = islandAttributes.getValue(IslandAttributes.Field.LAST_TIME_UPDATED, System.currentTimeMillis() / 1000L);
+        ChunksTracker.deserialize(null, this, islandAttributes.getValue(IslandAttributes.Field.DIRTY_CHUNKS, ""));
+        deserializeBlockCounts(islandAttributes.getValue(IslandAttributes.Field.BLOCK_COUNTS, ""));
+        Location[] teleportLocations = islandAttributes.getValue(IslandAttributes.Field.HOMES, new Location[] { center.parse() });
+        this.teleportLocations.write(islandTeleportLocations ->
+                System.arraycopy(teleportLocations, 0, islandTeleportLocations, 0, teleportLocations.length));
+        this.members.write(members -> members.addAll(islandAttributes.getValue(IslandAttributes.Field.MEMBERS, new ArrayList<>())));
+        this.banned.addAll(islandAttributes.getValue(IslandAttributes.Field.BANS, new ArrayList<>()));
+        this.playerPermissions.putAll(islandAttributes.getValue(IslandAttributes.Field.PLAYER_PERMISSIONS, new HashMap<>()));
+        this.rolePermissions.putAll(islandAttributes.getValue(IslandAttributes.Field.ROLE_PERMISSIONS, new HashMap<>()));
+        this.upgrades.putAll(islandAttributes.getValue(IslandAttributes.Field.UPGRADES, new HashMap<>()));
+        islandAttributes.getValue(IslandAttributes.Field.WARPS, new ArrayList<IslandWarp>()).forEach(this::loadIslandWarp);
+        this.blockLimits.putAll(islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS, new HashMap<>()));
+        this.ratings.putAll(islandAttributes.getValue(IslandAttributes.Field.RATINGS, new HashMap<>()));
+        this.completedMissions.putAll(islandAttributes.getValue(IslandAttributes.Field.MISSIONS, new HashMap<>()));
+        this.islandSettings.putAll(islandAttributes.getValue(IslandAttributes.Field.ISLAND_FLAGS, new HashMap<>()));
+        Map<Key, UpgradeValue<Integer>>[] cobbleGeneratorValues = islandAttributes.getValue(IslandAttributes.Field.GENERATORS, null);
+        if(cobbleGeneratorValues != null) {
+            for (int i = 0; i < cobbleGeneratorValues.length; ++i) {
+                if (cobbleGeneratorValues[i] != null)
+                    (this.cobbleGeneratorValues[i] = new KeyMap<>()).putAll(cobbleGeneratorValues[i]);
+            }
+        }
+        this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(islandAttributes.getValue(IslandAttributes.Field.VISITORS, new ArrayList<>())));
+        this.entityLimits.putAll(islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS, new HashMap<>()));
+        this.islandEffects.putAll(islandAttributes.getValue(IslandAttributes.Field.EFFECTS, new HashMap<>()));
+        IslandChest[] islandChests = islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS, new IslandChest[0]);
+        this.islandChest.write(islandIslandChests -> System.arraycopy(islandChests, 0, islandIslandChests, 0, islandChests.length));
+        this.roleLimits.putAll(islandAttributes.getValue(IslandAttributes.Field.ROLE_LIMITS, new HashMap<>()));
+        this.warpCategories.putAll(islandAttributes.getValue(IslandAttributes.Field.WARP_CATEGORIES, new HashMap<>()));
+        this.islandBank.setBalance(islandAttributes.getValue(IslandAttributes.Field.BANK_BALANCE, BigDecimal.ZERO));
+        this.lastInterest = islandAttributes.getValue(IslandAttributes.Field.BANK_LAST_INTEREST, System.currentTimeMillis() / 1000L);
+        Location[] visitorLocations = islandAttributes.getValue(IslandAttributes.Field.VISITOR_HOMES, new Location[0]);
+        this.visitorsLocations.write(islandVisitorsLocations -> System.arraycopy(visitorLocations, 0, islandVisitorsLocations, 0, visitorLocations.length));
+        this.islandSize = islandAttributes.getValue(IslandAttributes.Field.ISLAND_SIZE, this.islandSize);
+        this.teamLimit = islandAttributes.getValue(IslandAttributes.Field.TEAM_LIMIT, this.teamLimit);
+        this.warpsLimit = islandAttributes.getValue(IslandAttributes.Field.WARPS_LIMIT, this.warpsLimit);
+        this.cropGrowth = islandAttributes.getValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, this.cropGrowth);
+        this.spawnerRates = islandAttributes.getValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, this.spawnerRates);
+        this.mobDrops = islandAttributes.getValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, this.mobDrops);
+        this.coopLimit = islandAttributes.getValue(IslandAttributes.Field.COOP_LIMIT, this.coopLimit);
+        this.bankLimit = islandAttributes.getValue(IslandAttributes.Field.BANK_LIMIT, this.bankLimit);
 
         databaseBridge.startSavingData();
     }
@@ -2455,16 +2519,7 @@ public final class SIsland implements Island {
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
         IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
-
-        IslandWarp oldWarp = warpsByName.put(name.toLowerCase(), islandWarp);
-
-        if(oldWarp != null)
-            deleteWarp(oldWarp.getName());
-
-        warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
-                location.getBlockY(), location.getBlockZ()), islandWarp);
-
-        warpCategory.getWarps().add(islandWarp);
+        loadIslandWarp(islandWarp);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
@@ -3420,6 +3475,20 @@ public final class SIsland implements Island {
             blockCounts.remove(key);
         else
             blockCounts.put(key, currentAmount.subtract(amount));
+    }
+
+    private void loadIslandWarp(IslandWarp islandWarp){
+        IslandWarp oldWarp = warpsByName.put(islandWarp.getName().toLowerCase(), islandWarp);
+
+        if(oldWarp != null)
+            deleteWarp(oldWarp.getName());
+
+        Location location = islandWarp.getLocation();
+
+        warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
+                location.getBlockY(), location.getBlockZ()), islandWarp);
+
+        islandWarp.getCategory().getWarps().add(islandWarp);
     }
 
 }

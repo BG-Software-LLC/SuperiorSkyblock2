@@ -97,7 +97,7 @@ public final class ChunksTracker {
             if(serialized != null && !serialized.isEmpty()) {
                 if (serialized.contains("|")) {
                     deserializeOldV1(island, serialized);
-                } else {
+                } else if(grid != null) {
                     deserializeOldV2(grid, island, serialized);
                 }
             }
