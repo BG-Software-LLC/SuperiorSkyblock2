@@ -11,12 +11,12 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.data.sql.SQLSession;
 import com.bgsoftware.superiorskyblock.data.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.attributes.IslandAttributes;
-import com.bgsoftware.superiorskyblock.island.attributes.IslandChestAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.IslandAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.warps.IslandWarpAttributes;
-import com.bgsoftware.superiorskyblock.island.warps.WarpCategoryAttributes;
-import com.bgsoftware.superiorskyblock.player.PlayerAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.IslandWarpAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -762,7 +762,6 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 islandChestList.add(index, new IslandChestAttributes()
                         .setValue(IslandChestAttributes.Field.INDEX, index)
                         .setValue(IslandChestAttributes.Field.CONTENTS, contents));
-
         });
 
         return islandChestList;

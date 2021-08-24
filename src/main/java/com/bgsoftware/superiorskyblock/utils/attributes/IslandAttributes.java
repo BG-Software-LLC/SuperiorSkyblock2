@@ -1,30 +1,14 @@
-package com.bgsoftware.superiorskyblock.island.attributes;
+package com.bgsoftware.superiorskyblock.utils.attributes;
 
-import java.util.EnumMap;
-
-public final class IslandAttributes {
-
-    private final EnumMap<Field, Object> fieldValues = new EnumMap<>(Field.class);
+public final class IslandAttributes extends AttributesRegistry<IslandAttributes.Field> {
 
     public IslandAttributes(){
-
+        super(Field.class);
     }
 
-    public IslandAttributes setValue(Field field, Object value){
-        fieldValues.put(field, value);
-        return this;
-    }
-
-    public <T> T getValue(Field field){
-        Object value = fieldValues.get(field);
-        // noinspection all
-        return (T) value;
-    }
-
-    public <T> T getValue(Field field, Class<T> type){
-        Object value = fieldValues.get(field);
-        // noinspection all
-        return type.cast(value);
+    @Override
+    public IslandAttributes setValue(Field field, Object value) {
+        return (IslandAttributes) super.setValue(field, value);
     }
 
     public enum Field {
