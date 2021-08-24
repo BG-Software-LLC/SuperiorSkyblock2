@@ -104,6 +104,13 @@ public final class SQLSession {
     }
 
     public void executeUpdate(String statement){
+        executeUpdate(statement, error -> {
+            System.out.println(statement);
+            error.printStackTrace();
+        });
+    }
+
+    public void executeUpdate(String statement, Consumer<SQLException> onFailure){
         String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
@@ -113,8 +120,7 @@ public final class SQLSession {
                     .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)"));
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
-            System.out.println(statement);
-            ex.printStackTrace();
+            onFailure.accept(ex);
         } finally {
             close(preparedStatement);
             close(conn);

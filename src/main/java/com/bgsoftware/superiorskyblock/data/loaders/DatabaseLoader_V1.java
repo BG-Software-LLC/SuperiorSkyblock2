@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class DatabaseLoader_V1 implements DatabaseLoader {
 
@@ -67,11 +68,15 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     @Override
     public DatabaseLoadedData loadData() {
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
+
         sqlSession.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
             while (resultSet.next()) {
                 loadedPlayers.add(loadPlayer(resultSet));
             }
         });
+
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedPlayers.size() + " players in the database.");
 
         sqlSession.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
             while (resultSet.next()) {
@@ -79,16 +84,27 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             }
         });
 
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
+
         sqlSession.close();
 
+        AtomicBoolean failedBackup = new AtomicBoolean(false);
+
         if(sqlSession.isUsingMySQL()){
-            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}islands_bkp");
-            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}players_bkp");
+            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}islands_bkp", failure -> failedBackup.set(true));
+            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}players_bkp", failure -> failedBackup.set(true));
         }
         else {
             if (!databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
-                SuperiorSkyblockPlugin.log("&cFailed to create a backup for the database file.");
+                failedBackup.set(true);
             }
+        }
+
+        if(failedBackup.get()){
+            SuperiorSkyblockPlugin.log("&c[Database-Converter] Failed to create a backup for the database file.");
+        }
+        else{
+            SuperiorSkyblockPlugin.log("&a[Database-Converter] Successfully created a backup for the database.");
         }
 
         return new DatabaseLoadedData(loadedPlayers, loadedIslands);
