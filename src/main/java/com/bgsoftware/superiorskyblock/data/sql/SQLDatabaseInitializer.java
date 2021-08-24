@@ -223,7 +223,7 @@ public final class SQLDatabaseInitializer {
                 ");");
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS role_permissions_index ON " +
-                "{prefix}islands_role_permissions (island,role);");
+                "{prefix}islands_role_permissions (island,permission);");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_settings (" +
                 "island UUID PRIMARY KEY, " +
