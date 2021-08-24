@@ -64,7 +64,6 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     private final List<SuperiorPlayer> loadedPlayers = new ArrayList<>();
     private final List<Island> loadedIslands = new ArrayList<>();
-    private final Map<String, WarpCategory> loadedWarpCategories = new HashMap<>();
 
     @Override
     public DatabaseLoadedData loadData() {
@@ -380,10 +379,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 return;
 
             WarpCategory warpCategory = null;
-            if (warpObject.has("category")) {
+            if (warpObject.has("category"))
                 warpCategory = new SWarpCategory(null, warpObject.get("category").getAsString());
-                loadedWarpCategories.put(warpCategory.getName().toLowerCase(), warpCategory);
-            }
 
             Location location = FileUtils.toLocation(warpObject.get("location").getAsString());
             boolean privateWarp = warpObject.get("private").getAsInt() == 1;
@@ -559,22 +556,10 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         warpCategoriesArray.forEach(warpCategoryElement -> {
             JsonObject warpCategoryObject = warpCategoryElement.getAsJsonObject();
             String name = StringUtils.stripColors(warpCategoryObject.get("name").getAsString());
-
-            WarpCategory warpCategory = loadedWarpCategories.get(name.toLowerCase());
-
-            if (warpCategory != null) {
-                if (warpCategory.getWarps().isEmpty()) {
-                    return;
-                }
-
-
-                int slot = warpCategoryObject.get("slot").getAsInt();
-
-                ItemStack icon = ItemUtils.deserializeItem(warpCategoryObject.get("icon").getAsString());
-
-                WarpCategory warpCategoryClone = new SWarpCategory(null, name, slot, icon);
-                warpCategories.put(name.toLowerCase(), warpCategoryClone);
-            }
+            int slot = warpCategoryObject.get("slot").getAsInt();
+            ItemStack icon = ItemUtils.deserializeItem(warpCategoryObject.get("icon").getAsString());
+            WarpCategory warpCategoryClone = new SWarpCategory(null, name, slot, icon);
+            warpCategories.put(name.toLowerCase(), warpCategoryClone);
         });
 
         return warpCategories;
