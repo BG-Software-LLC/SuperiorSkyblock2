@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
@@ -17,11 +18,15 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
+
+    private final List<DatabaseLoader> databaseLoaders = new ArrayList<>();
 
     public DataHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -34,6 +39,10 @@ public final class DataHandler extends AbstractHandler {
 
     @Override
     public void loadDataWithException() throws HandlerLoadException {
+        databaseLoaders.forEach(DatabaseLoader::loadData);
+        List<Island> customLoadedIslands = plugin.getGrid().getIslands();
+        List<SuperiorPlayer> customLoadedPlayers = plugin.getPlayers().getAllPlayers();
+
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().init(plugin);
         }
@@ -43,6 +52,9 @@ public final class DataHandler extends AbstractHandler {
         loadGrid();
         loadStackedBlocks();
         loadBankTransactions();
+
+        customLoadedIslands.forEach(IslandsDatabaseBridge::insertIsland);
+        customLoadedPlayers.forEach(PlayersDatabaseBridge::insertPlayer);
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -54,6 +66,10 @@ public final class DataHandler extends AbstractHandler {
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
         }
+    }
+
+    public void addDatabaseLoader(DatabaseLoader databaseLoader){
+        this.databaseLoaders.add(databaseLoader);
     }
 
     public void saveDatabase(boolean async) {
