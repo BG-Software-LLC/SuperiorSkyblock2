@@ -676,7 +676,8 @@ public final class IslandsDatabaseBridge {
                 saveUpgrade(island, upgrade.getKey(), upgrade.getValue());
         });
 
-        saveVisitorLocation(island, World.Environment.NORMAL, island.getVisitorsLocation());
+        if(island.getVisitorsLocation() != null)
+            saveVisitorLocation(island, World.Environment.NORMAL, island.getVisitorsLocation());
 
         runAsBatched(island, () -> {
             for(Pair<SuperiorPlayer, Long> visitor : island.getUniqueVisitorsWithTimes())
