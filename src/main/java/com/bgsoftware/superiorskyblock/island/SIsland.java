@@ -316,8 +316,7 @@ public final class SIsland implements Island {
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(islandAttributes.getValue(IslandAttributes.Field.VISITORS, new ArrayList<>())));
         this.entityLimits.putAll(islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS, new HashMap<>()));
         this.islandEffects.putAll(islandAttributes.getValue(IslandAttributes.Field.EFFECTS, new HashMap<>()));
-        IslandChest[] islandChests = islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS, new IslandChest[0]);
-        this.islandChest.write(islandIslandChests -> System.arraycopy(islandChests, 0, islandIslandChests, 0, islandChests.length));
+        this.islandChest.set(islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS, new IslandChest[0]));
         this.roleLimits.putAll(islandAttributes.getValue(IslandAttributes.Field.ROLE_LIMITS, new HashMap<>()));
         this.warpCategories.putAll(islandAttributes.getValue(IslandAttributes.Field.WARP_CATEGORIES, new HashMap<>()));
         this.islandBank.setBalance(islandAttributes.getValue(IslandAttributes.Field.BANK_BALANCE, BigDecimal.ZERO));
