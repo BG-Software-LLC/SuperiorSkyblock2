@@ -1501,7 +1501,7 @@ public final class SIsland implements Island {
         if(playerPermissionNode != null){
             playerPermissions.put(newPlayer, playerPermissionNode);
             IslandsDatabaseBridge.clearPlayerPermission(this, originalPlayer);
-            for(Map.Entry<IslandPrivilege, Boolean> privilegeEntry : playerPermissionNode.getPermissions())
+            for(Map.Entry<IslandPrivilege, Boolean> privilegeEntry : playerPermissionNode.getCustomPermissions().entrySet())
                 IslandsDatabaseBridge.savePlayerPermission(this, newPlayer,
                         privilegeEntry.getKey(), privilegeEntry.getValue());
         }

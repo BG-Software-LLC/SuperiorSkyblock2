@@ -53,8 +53,8 @@ public final class DataHandler extends AbstractHandler {
         }
 
         loadedData.forEach(databaseLoadedData -> {
-            databaseLoadedData.getLoadedPlayers().forEach(PlayersDatabaseBridge::insertPlayer);
-            databaseLoadedData.getLoadedIslands().forEach(IslandsDatabaseBridge::insertIsland);
+            databaseLoadedData.getLoadedPlayers().forEach(PlayersDatabaseBridge::insertEntirePlayerData);
+            databaseLoadedData.getLoadedIslands().forEach(IslandsDatabaseBridge::insertEntireIslandData);
         });
 
         loadPlayers();

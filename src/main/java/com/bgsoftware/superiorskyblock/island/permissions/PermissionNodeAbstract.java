@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.google.common.base.Preconditions;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -42,17 +41,18 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     @Override
     public abstract boolean hasPermission(IslandPrivilege permission);
 
-    public Collection<Map.Entry<IslandPrivilege, Boolean>> getPermissions(){
-        return privileges.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue() == PrivilegeStatus.ENABLED
-        )).entrySet();
-    }
-
     @Override
     public void setPermission(IslandPrivilege islandPrivilege, boolean value){
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
         privileges.put(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
+    }
+
+    @Override
+    public Map<IslandPrivilege, Boolean> getCustomPermissions() {
+        return privileges.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue() == PrivilegeStatus.ENABLED
+        ));
     }
 
     @Override
