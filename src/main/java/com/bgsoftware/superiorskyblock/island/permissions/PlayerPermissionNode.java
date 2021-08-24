@@ -7,8 +7,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import java.util.Map;
 
@@ -44,17 +42,6 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     @Override
     public PermissionNodeAbstract clone() {
         return new PlayerPermissionNode(privileges, superiorPlayer, island);
-    }
-
-    public JsonArray serialize() {
-        JsonArray permsArray = new JsonArray();
-        privileges.forEach((key, value) -> {
-            JsonObject permObject = new JsonObject();
-            permObject.addProperty("name", key.getName());
-            permObject.addProperty("status", value.toString());
-            permsArray.add(permObject);
-        });
-        return permsArray;
     }
 
     public void loadPrivilege(IslandPrivilege islandPrivilege, byte status){
