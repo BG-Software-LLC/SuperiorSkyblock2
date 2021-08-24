@@ -387,13 +387,10 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
             Location location = FileUtils.toLocation(warpObject.get("location").getAsString());
             boolean privateWarp = warpObject.get("private").getAsInt() == 1;
+            ItemStack icon = warpObject.has("icon") ?
+                    ItemUtils.deserializeItem(warpObject.get("icon").getAsString()) : null;
 
-            IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory);
-            islandWarp.setPrivateFlag(privateWarp);
-
-            if (warpObject.has("icon"))
-                islandWarp.setIcon(ItemUtils.deserializeItem(warpObject.get("icon").getAsString()));
-
+            IslandWarp islandWarp = new SIslandWarp(name, location, warpCategory, privateWarp, icon);
             islandWarpList.add(islandWarp);
         });
 

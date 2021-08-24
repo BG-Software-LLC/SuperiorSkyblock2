@@ -28,11 +28,16 @@ public final class SIslandWarp implements IslandWarp {
     private ItemStack icon;
 
     public SIslandWarp(String name, Location location, WarpCategory warpCategory){
+        this(name, location, warpCategory, !plugin.getSettings().publicWarps, null);
+    }
+
+    public SIslandWarp(String name, Location location, WarpCategory warpCategory, boolean privateFlag, ItemStack icon){
         this.name = name;
         this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
                 location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
         this.warpCategory = warpCategory;
-        this.privateFlag = !plugin.getSettings().publicWarps;
+        this.privateFlag = privateFlag;
+        this.icon = icon;
     }
 
     @Override
