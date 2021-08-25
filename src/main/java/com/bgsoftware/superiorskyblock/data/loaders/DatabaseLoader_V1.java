@@ -12,11 +12,13 @@ import com.bgsoftware.superiorskyblock.data.sql.SQLSession;
 import com.bgsoftware.superiorskyblock.data.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -30,12 +32,14 @@ import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public final class DatabaseLoader_V1 implements DatabaseLoader {
 
@@ -49,7 +53,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
 
-    private final Deserializer deserializer = new Deserializer();
+    private final IDeserializer deserializer = new MultipleDeserializer(new JsonDeserializer(), new RawDeserializer());
 
     @Override
     public void loadData() {
@@ -497,9 +501,158 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(IslandAttributes.Field.BANK_LIMIT, new BigDecimal(resultSet.getString("bankLimit")));
     }
 
-    private class Deserializer {
+    private PlayerAttributes getPlayerAttributes(UUID uuid) {
+        return loadedPlayers.stream().filter(playerAttributes ->
+                        playerAttributes.getValue(PlayerAttributes.Field.UUID).equals(uuid))
+                .findFirst()
+                .orElse(null);
+    }
 
-        private Map<String, Integer> deserializeMissions(String missions) {
+    interface IDeserializer {
+
+        Map<String, Integer> deserializeMissions(String missions);
+
+        String[] deserializeHomes(String locationParam);
+
+        List<PlayerAttributes> deserializePlayers(String players);
+
+        Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes);
+
+        Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes);
+
+        Map<String, Integer> deserializeUpgrades(String upgrades);
+
+        List<IslandWarpAttributes> deserializeWarps(String islandWarps);
+
+        KeyMap<Integer> deserializeBlockLimits(String blocks);
+
+        Map<UUID, Rating> deserializeRatings(String ratings);
+
+        Map<IslandFlag, Byte> deserializeIslandFlags(String settings);
+
+        KeyMap<Integer>[] deserializeGenerators(String generator);
+
+        List<Pair<UUID, Long>> deserializeVisitors(String visitors);
+
+        KeyMap<Integer> deserializeEntityLimits(String entities);
+
+        Map<PotionEffectType, Integer> deserializeEffects(String effects);
+
+        List<IslandChestAttributes> deserializeIslandChests(String islandChest);
+
+        Map<PlayerRole, Integer> deserializeRoleLimits(String roles);
+
+        List<WarpCategoryAttributes> deserializeWarpCategories(String categories);
+
+    }
+
+    private static class MultipleDeserializer implements IDeserializer {
+
+        private final List<IDeserializer> deserializers;
+
+        public MultipleDeserializer(IDeserializer... deserializers){
+            this.deserializers = Arrays.asList(deserializers);
+        }
+
+        private <T> T runDeserializers(Function<IDeserializer, T> function){
+            for(IDeserializer deserializer : deserializers){
+                try {
+                    return function.apply(deserializer);
+                } catch (Exception ignored) {}
+            }
+
+            throw new RuntimeException("No valid deserializer found.");
+        }
+
+        @Override
+        public Map<String, Integer> deserializeMissions(String missions) {
+            return runDeserializers(deserializer -> deserializer.deserializeMissions(missions));
+        }
+
+        @Override
+        public String[] deserializeHomes(String locationParam) {
+            return runDeserializers(deserializer -> deserializer.deserializeHomes(locationParam));
+        }
+
+        @Override
+        public List<PlayerAttributes> deserializePlayers(String players) {
+            return runDeserializers(deserializer -> deserializer.deserializePlayers(players));
+        }
+
+        @Override
+        public Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
+            return runDeserializers(deserializer -> deserializer.deserializePlayerPerms(permissionNodes));
+        }
+
+        @Override
+        public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
+            return runDeserializers(deserializer -> deserializer.deserializeRolePerms(permissionNodes));
+        }
+
+        @Override
+        public Map<String, Integer> deserializeUpgrades(String upgrades) {
+            return runDeserializers(deserializer -> deserializer.deserializeUpgrades(upgrades));
+        }
+
+        @Override
+        public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
+            return runDeserializers(deserializer -> deserializer.deserializeWarps(islandWarps));
+        }
+
+        @Override
+        public KeyMap<Integer> deserializeBlockLimits(String blocks) {
+            return runDeserializers(deserializer -> deserializer.deserializeBlockLimits(blocks));
+        }
+
+        @Override
+        public Map<UUID, Rating> deserializeRatings(String ratings) {
+            return runDeserializers(deserializer -> deserializer.deserializeRatings(ratings));
+        }
+
+        @Override
+        public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
+            return runDeserializers(deserializer -> deserializer.deserializeIslandFlags(settings));
+        }
+
+        @Override
+        public KeyMap<Integer>[] deserializeGenerators(String generator) {
+            return runDeserializers(deserializer -> deserializer.deserializeGenerators(generator));
+        }
+
+        @Override
+        public List<Pair<UUID, Long>> deserializeVisitors(String visitors) {
+            return runDeserializers(deserializer -> deserializer.deserializeVisitors(visitors));
+        }
+
+        @Override
+        public KeyMap<Integer> deserializeEntityLimits(String entities) {
+            return runDeserializers(deserializer -> deserializer.deserializeEntityLimits(entities));
+        }
+
+        @Override
+        public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
+            return runDeserializers(deserializer -> deserializer.deserializeEffects(effects));
+        }
+
+        @Override
+        public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
+            return runDeserializers(deserializer -> deserializer.deserializeIslandChests(islandChest));
+        }
+
+        @Override
+        public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
+            return runDeserializers(deserializer -> deserializer.deserializeRoleLimits(roles));
+        }
+
+        @Override
+        public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
+            return runDeserializers(deserializer -> deserializer.deserializeWarpCategories(categories));
+        }
+    }
+
+    private class JsonDeserializer implements IDeserializer {
+
+        public Map<String, Integer> deserializeMissions(String missions) {
             Map<String, Integer> completedMissions = new HashMap<>();
 
             JsonArray missionsArray = gson.fromJson(missions, JsonArray.class);
@@ -515,7 +668,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return completedMissions;
         }
 
-        private String[] deserializeHomes(String locationParam) {
+        public String[] deserializeHomes(String locationParam) {
             String[] locations = new String[World.Environment.values().length];
 
             JsonArray locationsArray = gson.fromJson(locationParam, JsonArray.class);
@@ -531,14 +684,14 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return locations;
         }
 
-        private List<PlayerAttributes> deserializePlayers(String players) {
+        public List<PlayerAttributes> deserializePlayers(String players) {
             List<PlayerAttributes> playerAttributes = new ArrayList<>();
             JsonArray playersArray = gson.fromJson(players, JsonArray.class);
             playersArray.forEach(uuid -> playerAttributes.add(getPlayerAttributes(UUID.fromString(uuid.getAsString()))));
             return playerAttributes;
         }
 
-        private Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
+        public Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
             Map<UUID, PlayerPermissionNode> playerPermissions = new HashMap<>();
 
             JsonObject globalObject = gson.fromJson(permissionNodes, JsonObject.class);
@@ -567,7 +720,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return playerPermissions;
         }
 
-        private Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
+        public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
             Map<IslandPrivilege, PlayerRole> rolePermissions = new HashMap<>();
 
             JsonObject globalObject = gson.fromJson(permissionNodes, JsonObject.class);
@@ -588,7 +741,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return rolePermissions;
         }
 
-        private Map<String, Integer> deserializeUpgrades(String upgrades) {
+        public Map<String, Integer> deserializeUpgrades(String upgrades) {
             Map<String, Integer> upgradesMap = new HashMap<>();
 
             JsonArray upgradesArray = gson.fromJson(upgrades, JsonArray.class);
@@ -602,7 +755,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return upgradesMap;
         }
 
-        private List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
+        public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
             List<IslandWarpAttributes> islandWarpList = new ArrayList<>();
 
             JsonArray warpsArray = gson.fromJson(islandWarps, JsonArray.class);
@@ -625,7 +778,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return islandWarpList;
         }
 
-        private KeyMap<Integer> deserializeBlockLimits(String blocks) {
+        public KeyMap<Integer> deserializeBlockLimits(String blocks) {
             KeyMap<Integer> blockLimits = new KeyMap<>();
 
             JsonArray blockLimitsArray = gson.fromJson(blocks, JsonArray.class);
@@ -639,7 +792,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return blockLimits;
         }
 
-        private Map<UUID, Rating> deserializeRatings(String ratings) {
+        public Map<UUID, Rating> deserializeRatings(String ratings) {
             Map<UUID, Rating> ratingsMap = new HashMap<>();
 
             JsonArray ratingsArray = gson.fromJson(ratings, JsonArray.class);
@@ -656,7 +809,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return ratingsMap;
         }
 
-        private Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
+        public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
             Map<IslandFlag, Byte> islandFlags = new HashMap<>();
 
             JsonArray islandFlagsArray = gson.fromJson(settings, JsonArray.class);
@@ -673,7 +826,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return islandFlags;
         }
 
-        private KeyMap<Integer>[] deserializeGenerators(String generator) {
+        public KeyMap<Integer>[] deserializeGenerators(String generator) {
             // noinspection all
             KeyMap<Integer>[] cobbleGenerator = new KeyMap[World.Environment.values().length];
 
@@ -695,7 +848,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return cobbleGenerator;
         }
 
-        private List<Pair<UUID, Long>> deserializeVisitors(String visitors) {
+        public List<Pair<UUID, Long>> deserializeVisitors(String visitors) {
             List<Pair<UUID, Long>> visitorsList = new ArrayList<>();
 
             JsonArray playersArray = gson.fromJson(visitors, JsonArray.class);
@@ -713,7 +866,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return visitorsList;
         }
 
-        private KeyMap<Integer> deserializeEntityLimits(String entities) {
+        public KeyMap<Integer> deserializeEntityLimits(String entities) {
             KeyMap<Integer> entityLimits = new KeyMap<>();
 
             JsonArray entityLimitsArray = gson.fromJson(entities, JsonArray.class);
@@ -727,7 +880,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return entityLimits;
         }
 
-        private Map<PotionEffectType, Integer> deserializeEffects(String effects) {
+        public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
             Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
 
             JsonArray effectsArray = gson.fromJson(effects, JsonArray.class);
@@ -743,7 +896,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return islandEffects;
         }
 
-        private List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
+        public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
             List<IslandChestAttributes> islandChestList = new ArrayList<>();
 
             JsonArray islandChestsArray = gson.fromJson(islandChest, JsonArray.class);
@@ -763,7 +916,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return islandChestList;
         }
 
-        private Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
+        public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
             Map<PlayerRole, Integer> roleLimits = new HashMap<>();
 
             JsonArray roleLimitsArray = gson.fromJson(roles, JsonArray.class);
@@ -779,7 +932,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return roleLimits;
         }
 
-        private List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
+        public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
             List<WarpCategoryAttributes> warpCategories = new ArrayList<>();
 
             JsonArray warpCategoriesArray = gson.fromJson(categories, JsonArray.class);
@@ -797,13 +950,383 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return warpCategories;
         }
 
-        private PlayerAttributes getPlayerAttributes(UUID uuid) {
-            return loadedPlayers.stream().filter(playerAttributes ->
-                            playerAttributes.getValue(PlayerAttributes.Field.UUID).equals(uuid))
-                    .findFirst()
-                    .orElse(null);
+    }
+
+    private class RawDeserializer implements IDeserializer {
+
+        @Override
+        public Map<String, Integer> deserializeMissions(String missions) {
+            Map<String, Integer> completedMissions = new HashMap<>();
+
+            if(missions != null) {
+                for (String mission : missions.split(";")) {
+                    String[] missionSections = mission.split("=");
+                    int completeAmount = missionSections.length > 1 ? Integer.parseInt(missionSections[1]) : 1;
+                    completedMissions.put(missionSections[0], completeAmount);
+                }
+            }
+
+            return completedMissions;
         }
 
+        @Override
+        public String[] deserializeHomes(String locationParam) {
+            String[] islandHomes = new String[World.Environment.values().length];
+
+            if(locationParam == null)
+                return islandHomes;
+
+            String _locationParam = locationParam.contains("=") ? locationParam : "normal=" + locationParam;
+
+            for (String worldSection : _locationParam.split(";")) {
+                try {
+                    String[] locationSection = worldSection.split("=");
+                    String environment = locationSection[0].toUpperCase();
+                    islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
+                } catch (Exception ignored) {
+                }
+            }
+
+            return islandHomes;
+        }
+
+        @Override
+        public List<PlayerAttributes> deserializePlayers(String players) {
+            List<PlayerAttributes> playerAttributesList = new ArrayList<>();
+
+            if(players != null) {
+
+                for (String uuid : players.split(",")) {
+                    try {
+                        playerAttributesList.add(getPlayerAttributes(UUID.fromString(uuid)));
+                    } catch (Exception ignored) {}
+                }
+            }
+
+            return playerAttributesList;
+        }
+
+        @Override
+        public Map<UUID, PlayerPermissionNode> deserializePlayerPerms(String permissionNodes) {
+            Map<UUID, PlayerPermissionNode> playerPermissions = new HashMap<>();
+
+            if(permissionNodes == null)
+                return playerPermissions;
+
+            for(String entry : permissionNodes.split(",")) {
+                try {
+                    String[] sections = entry.split("=");
+
+                    try {
+                        try{
+                            int id = Integer.parseInt(sections[0]);
+                            SPlayerRole.fromId(id);
+                        }catch (Exception ex){
+                            SPlayerRole.of(sections[0]);
+                        }
+                    }catch(Exception ex){
+                        playerPermissions.put(UUID.fromString(sections[0]), new PlayerPermissionNode(null,
+                                null, sections.length == 1 ? "" : sections[1]));
+                    }
+                }catch(Exception ignored){}
+            }
+
+            return playerPermissions;
+        }
+
+        @Override
+        public Map<IslandPrivilege, PlayerRole> deserializeRolePerms(String permissionNodes) {
+            Map<IslandPrivilege, PlayerRole> rolePermissions = new HashMap<>();
+
+            if(permissionNodes == null)
+                return rolePermissions;
+
+            for(String entry : permissionNodes.split(",")) {
+                try {
+                    String[] sections = entry.split("=");
+
+                    PlayerRole playerRole;
+
+                    try{
+                        int id = Integer.parseInt(sections[0]);
+                        playerRole = SPlayerRole.fromId(id);
+                    }catch (Exception ex){
+                        playerRole = SPlayerRole.of(sections[0]);
+                    }
+
+                    if(sections.length != 1){
+                        String[] permission = sections[1].split(";");
+                        for (String perm : permission) {
+                            String[] permissionSections = perm.split(":");
+                            try {
+                                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
+                                if (permissionSections.length == 2 && permissionSections[1].equals("1")) {
+                                    rolePermissions.put(islandPrivilege, playerRole);
+                                }
+                            }catch(Exception ignored){}
+                        }
+                    }
+                }catch(Exception ignored){}
+            }
+
+            return rolePermissions;
+        }
+
+        @Override
+        public Map<String, Integer> deserializeUpgrades(String upgrades) {
+            Map<String, Integer> upgradesMap = new HashMap<>();
+
+            if(upgrades != null) {
+                for (String entry : upgrades.split(",")) {
+                    try {
+                        String[] sections = entry.split("=");
+                        upgradesMap.put(sections[0], Integer.parseInt(sections[1]));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return upgradesMap;
+        }
+
+        @Override
+        public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
+            List<IslandWarpAttributes> warpAttributes = new ArrayList<>();
+
+            if(islandWarps == null)
+                return warpAttributes;
+
+            for(String entry : islandWarps.split(";")) {
+                try {
+                    String[] sections = entry.split("=");
+                    String name = StringUtils.stripColors(sections[0].trim());
+                    String category = "";
+                    boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
+
+                    if(name.contains("-")){
+                        String[] nameSections = name.split("-");
+                        category = IslandUtils.getWarpName(nameSections[0]);
+                        name = nameSections[1];
+                    }
+
+                    name = IslandUtils.getWarpName(name);
+
+                    if(name.isEmpty())
+                        continue;
+
+                    warpAttributes.add(new IslandWarpAttributes()
+                            .setValue(IslandWarpAttributes.Field.NAME, name)
+                            .setValue(IslandWarpAttributes.Field.CATEGORY, category)
+                            .setValue(IslandWarpAttributes.Field.LOCATION, sections[1])
+                            .setValue(IslandWarpAttributes.Field.PRIVATE_STATUS, privateFlag)
+                            .setValue(IslandWarpAttributes.Field.ICON, sections[3]));
+                }catch(Exception ignored){}
+            }
+
+            return warpAttributes;
+        }
+
+        @Override
+        public KeyMap<Integer> deserializeBlockLimits(String blocks) {
+            KeyMap<Integer> blockLimits = new KeyMap<>();
+
+            if(blocks != null) {
+                for (String limit : blocks.split(",")) {
+                    try {
+                        String[] sections = limit.split("=");
+                        blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return blockLimits;
+        }
+
+        @Override
+        public Map<UUID, Rating> deserializeRatings(String ratings) {
+            Map<UUID, Rating> ratingsMap = new HashMap<>();
+
+            if(ratings != null) {
+                for (String entry : ratings.split(";")) {
+                    try {
+                        String[] sections = entry.split("=");
+                        ratingsMap.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return ratingsMap;
+        }
+
+        @Override
+        public Map<IslandFlag, Byte> deserializeIslandFlags(String settings) {
+            Map<IslandFlag, Byte> islandSettings = new HashMap<>();
+
+            if(settings != null) {
+                for (String setting : settings.split(";")) {
+                    try {
+                        if (setting.contains("=")) {
+                            String[] settingSections = setting.split("=");
+                            islandSettings.put(IslandFlag.getByName(settingSections[0]), Byte.valueOf(settingSections[1]));
+                        } else {
+                            if (!plugin.getSettings().defaultSettings.contains(setting))
+                                islandSettings.put(IslandFlag.getByName(setting), (byte) 1);
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return islandSettings;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public KeyMap<Integer>[] deserializeGenerators(String generator) {
+            KeyMap<Integer>[] cobbleGenerator = new KeyMap[World.Environment.values().length];
+
+            if(generator == null)
+                return cobbleGenerator;
+
+            if(generator.contains(";")){
+                for(String env : generator.split(";")){
+                    String[] sections = env.split(":");
+                    try{
+                        World.Environment environment = World.Environment.valueOf(sections[0]);
+                        deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = new KeyMap<>());
+                    }catch (Exception ignored){}
+                }
+            }
+            else {
+                deserializeGenerators(generator, cobbleGenerator[0] = new KeyMap<>());
+            }
+
+            return cobbleGenerator;
+        }
+
+        private void deserializeGenerators(String generator, KeyMap<Integer> cobbleGenerator) {
+            for (String limit : generator.split(",")) {
+                try {
+                    String[] sections = limit.split("=");
+                    cobbleGenerator.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        @Override
+        public List<Pair<UUID, Long>> deserializeVisitors(String visitorsRaw) {
+            List<Pair<UUID, Long>> visitors = new ArrayList<>();
+
+            if(visitorsRaw != null) {
+                for (String visitor : visitorsRaw.split(",")) {
+                    try {
+                        String[] visitorSections = visitor.split(";");
+                        long lastTimeJoined = visitorSections.length == 2 ? Long.parseLong(visitorSections[1]) : System.currentTimeMillis();
+                        visitors.add(new Pair<>(UUID.fromString(visitorSections[0]), lastTimeJoined));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return visitors;
+        }
+
+        @Override
+        public KeyMap<Integer> deserializeEntityLimits(String entities) {
+            KeyMap<Integer> entityLimits = new KeyMap<>();
+
+            if(entities != null) {
+                for (String limit : entities.split(",")) {
+                    try {
+                        String[] sections = limit.split("=");
+                        entityLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return entityLimits;
+        }
+
+        @Override
+        public Map<PotionEffectType, Integer> deserializeEffects(String effects) {
+            Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
+
+            if(effects != null) {
+                for (String effect : effects.split(",")) {
+                    String[] sections = effect.split("=");
+                    PotionEffectType potionEffectType = PotionEffectType.getByName(sections[0]);
+                    if (potionEffectType != null)
+                        islandEffects.put(potionEffectType, Integer.parseInt(sections[1]));
+                }
+            }
+
+            return islandEffects;
+        }
+
+        @Override
+        public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
+            List<IslandChestAttributes> islandChestAttributes = new ArrayList<>();
+
+            if(islandChest == null || islandChest.isEmpty())
+                return islandChestAttributes;
+
+            String[] islandChestsSections = islandChest.split("\n");
+
+            for(int i = 0; i < islandChestsSections.length; i++){
+                islandChestAttributes.add(new IslandChestAttributes()
+                        .setValue(IslandChestAttributes.Field.INDEX, i)
+                        .setValue(IslandChestAttributes.Field.CONTENTS, islandChestsSections[i]));
+            }
+
+            return islandChestAttributes;
+        }
+
+        @Override
+        public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
+            Map<PlayerRole, Integer> roleLimits = new HashMap<>();
+
+            if(roles != null) {
+                for (String limit : roles.split(",")) {
+                    try {
+                        String[] sections = limit.split("=");
+                        PlayerRole playerRole = SPlayerRole.fromId(Integer.parseInt(sections[0]));
+                        if (playerRole != null)
+                            roleLimits.put(playerRole, Integer.parseInt(sections[1]));
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+
+            return roleLimits;
+        }
+
+        @Override
+        public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
+            List<WarpCategoryAttributes> warpCategoryAttributes = new ArrayList<>();
+
+            if(categories == null)
+                return warpCategoryAttributes;
+
+            for(String entry : categories.split(";")) {
+                try {
+                    String[] sections = entry.split("=");
+                    String name = StringUtils.stripColors(sections[0].trim());
+                    int slot = Integer.parseInt(sections[1]);
+                    String icon = sections[2];
+
+                    warpCategoryAttributes.add(new WarpCategoryAttributes()
+                            .setValue(WarpCategoryAttributes.Field.NAME, name)
+                            .setValue(WarpCategoryAttributes.Field.SLOT, slot)
+                            .setValue(WarpCategoryAttributes.Field.ICON, icon));
+                }catch(Exception ignored){}
+            }
+
+            return warpCategoryAttributes;
+        }
     }
 
 }
