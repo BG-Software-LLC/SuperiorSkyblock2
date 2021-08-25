@@ -23,11 +23,6 @@ public final class StatementHolder {
         setQuery(statement);
     }
 
-    public StatementHolder setObject(Object value){
-        values.put(currentIndex++, value);
-        return this;
-    }
-
     public void setQuery(String query) {
         this.query = query.replace("{prefix}", prefix);
     }
@@ -36,6 +31,11 @@ public final class StatementHolder {
         batches.add(new HashMap<>(values));
         values.clear();
         currentIndex = 1;
+    }
+
+    public StatementHolder setObject(Object value){
+        values.put(currentIndex++, value);
+        return this;
     }
 
     public void executeBatch(boolean async){

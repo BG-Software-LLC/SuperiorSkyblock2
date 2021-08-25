@@ -69,7 +69,7 @@ public final class PlayersDatabaseBridge {
     public static void saveLastTimeStatus(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().updateObject("players",
                 createFilter("uuid", superiorPlayer),
-                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus() + ""));
+                new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus()));
     }
 
     public static void saveMission(SuperiorPlayer superiorPlayer, Mission<?> mission, int finishCount) {

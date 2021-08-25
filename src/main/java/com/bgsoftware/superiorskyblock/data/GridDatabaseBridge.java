@@ -26,7 +26,7 @@ public final class GridDatabaseBridge {
         gridManager.getDatabaseBridge().insertObject("stacked_blocks",
                 new Pair<>("location", position.toString()),
                 new Pair<>("amount", stackedBlock.getAmount()),
-                new Pair<>("block_type", stackedBlock.getBlockKey())
+                new Pair<>("block_type", stackedBlock.getBlockKey().toString())
         );
     }
 

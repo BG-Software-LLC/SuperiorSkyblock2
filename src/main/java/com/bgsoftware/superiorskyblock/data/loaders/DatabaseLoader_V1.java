@@ -360,12 +360,12 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         ((List<PlayerAttributes>) islandAttributes.getValue(IslandAttributes.Field.BANS)).forEach(playerAttributes ->
                 islandsBansQuery.setObject(islandUUID)
                         .setObject(playerAttributes.getValue(PlayerAttributes.Field.UUID))
-                        .setObject(CONSOLE_UUID)
+                        .setObject(CONSOLE_UUID.toString())
                         .setObject(currentTime)
                         .addBatch());
         ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS)).forEach((key, limit) ->
                 islandsBlockLimitsQuery.setObject(islandUUID)
-                        .setObject(key)
+                        .setObject(key.toString())
                         .setObject(limit)
                         .addBatch());
         ((List<IslandChestAttributes>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_CHESTS)).forEach(islandChestAttributes ->
@@ -380,7 +380,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                         .addBatch());
         ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS)).forEach((entity, limit) ->
                 islandsEntityLimitsQuery.setObject(islandUUID)
-                        .setObject(entity)
+                        .setObject(entity.toString())
                         .setObject(limit)
                         .addBatch());
         ((Map<IslandFlag, Byte>) islandAttributes.getValue(IslandAttributes.Field.ISLAND_FLAGS)).forEach((islandFlag, status) ->
@@ -392,7 +392,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 generatorRates.forEach((block, rate) ->
                         islandsGeneratorsQuery.setObject(islandUUID)
                                 .setObject(environment.name())
-                                .setObject(block)
+                                .setObject(block.toString())
                                 .setObject(rate)
                                 .addBatch()));
         runOnEnvironments((String[]) islandAttributes.getValue(IslandAttributes.Field.HOMES), (islandHome, environment) ->
@@ -414,14 +414,14 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         ((Map<UUID, PlayerPermissionNode>) islandAttributes.getValue(IslandAttributes.Field.PLAYER_PERMISSIONS)).forEach((playerUUID, node) -> {
             for (Map.Entry<IslandPrivilege, Boolean> playerPermission : node.getCustomPermissions().entrySet())
                 islandsPlayerPermissionsQuery.setObject(islandUUID)
-                        .setObject(playerUUID)
+                        .setObject(playerUUID.toString())
                         .setObject(playerPermission.getKey().getName())
                         .setObject(playerPermission.getValue())
                         .addBatch();
         });
         ((Map<UUID, Rating>) islandAttributes.getValue(IslandAttributes.Field.RATINGS)).forEach((playerUUID, rating) ->
                 islandsRatingsQuery.setObject(islandUUID)
-                        .setObject(playerUUID)
+                        .setObject(playerUUID.toString())
                         .setObject(rating.getValue())
                         .setObject(currentTime)
                         .addBatch());
