@@ -18,7 +18,7 @@ public final class GridDatabaseBridge {
     }
 
     public static void saveLastIsland(GridManager gridManager, SBlockPosition lastIsland){
-        gridManager.getDatabaseBridge().updateObject("grid", null, new Pair<>("lastIsland", lastIsland.toString()));
+        gridManager.getDatabaseBridge().updateObject("grid", null, new Pair<>("last_island", lastIsland.toString()));
     }
 
     public static void saveStackedBlock(GridManager gridManager, StackedBlocksHandler.StackedBlock stackedBlock){
@@ -41,11 +41,9 @@ public final class GridDatabaseBridge {
 
     public static void insertGrid(GridManager gridManager){
         gridManager.getDatabaseBridge().insertObject("grid",
-                new Pair<>("lastIsland", SBlockPosition.of(gridManager.getLastIslandLocation()).toString()),
-                new Pair<>("stackedBlocks", ""),
-                new Pair<>("maxIslandSize", plugin.getSettings().maxIslandSize),
-                new Pair<>("world", plugin.getSettings().islandWorldName),
-                new Pair<>("dirtyChunks", "")
+                new Pair<>("last_island", SBlockPosition.of(gridManager.getLastIslandLocation()).toString()),
+                new Pair<>("max_island_size", plugin.getSettings().maxIslandSize),
+                new Pair<>("world", plugin.getSettings().islandWorldName)
         );
     }
 

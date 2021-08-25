@@ -319,11 +319,9 @@ public final class SQLDatabaseInitializer {
 
     private void createGridTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}grid (" +
-                "lastIsland TEXT, " +
-                "stackedBlocks TEXT, " +
-                "maxIslandSize INTEGER, " +
-                "world TEXT, " +
-                "dirtyChunks TEXT" +
+                "last_island TEXT, " +
+                "max_island_size INTEGER, " +
+                "world TEXT" +
                 ");");
     }
 

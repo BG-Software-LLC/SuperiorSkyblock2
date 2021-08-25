@@ -25,7 +25,6 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.IslandRegistry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -642,20 +641,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void loadGrid(DatabaseResult resultSet) {
-        lastIsland = SBlockPosition.of(resultSet.getString("lastIsland"));
+        lastIsland = SBlockPosition.of(resultSet.getString("last_island"));
         if(!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)){
             lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName,
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 
-        for (String entry : resultSet.getString("stackedBlocks").split(";")) {
-            if (!entry.isEmpty()) {
-                String[] sections = entry.split("=");
-                stackedBlocks.setStackedBlock(SBlockPosition.of(sections[0]), Integer.parseInt(sections[1]), ConstantKeys.AIR);
-            }
-        }
-
-        int maxIslandSize = resultSet.getInt("maxIslandSize");
+        int maxIslandSize = resultSet.getInt("max_island_size");
         String world = resultSet.getString("world");
 
         try {
@@ -673,10 +665,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         } catch (IOException ex) {
             ex.printStackTrace();
             Bukkit.shutdown();
-            return;
         }
-
-        ChunksTracker.deserialize(this, null, resultSet.getString("dirtyChunks"));
     }
 
     public void loadStackedBlocks(DatabaseResult resultSet) {
