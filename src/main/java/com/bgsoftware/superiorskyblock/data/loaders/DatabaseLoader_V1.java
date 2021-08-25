@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.attributes.BankTransactionsAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.GridAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandWarpAttributes;
@@ -56,6 +57,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
     private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
     private final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
+    private GridAttributes gridAttributes;
 
     private final IDeserializer deserializer = new MultipleDeserializer(new JsonDeserializer(), new RawDeserializer());
 
@@ -95,6 +97,15 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
 
+        sqlSession.executeQuery("SELECT * FROM {prefix}grid;", resultSet -> {
+            if (resultSet.next()) {
+                gridAttributes = new GridAttributes()
+                        .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
+                        .setValue(GridAttributes.Field.MAX_ISLAND_SIZE, resultSet.getString("maxIslandSize"))
+                        .setValue(GridAttributes.Field.WORLD, resultSet.getString("world"));
+            }
+        });
+
         sqlSession.close();
 
         AtomicBoolean failedBackup = new AtomicBoolean(false);
@@ -121,6 +132,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         saveIslands();
         saveStackedBlocks();
         saveBankTransactions();
+        saveGrid();
     }
 
     public static void register() {
@@ -154,9 +166,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private void savePlayers(){
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting players...");
 
-        StatementHolder playersQuery = new StatementHolder("INSERT INTO {prefix}players VALUES(?,?,?,?,?)");
-        StatementHolder playersMissionsQuery = new StatementHolder("INSERT INTO {prefix}players_missions VALUES(?,?,?)");
-        StatementHolder playersSettingsQuery = new StatementHolder("INSERT INTO {prefix}players_settings VALUES(?,?,?,?,?,?)");
+        StatementHolder playersQuery = new StatementHolder("REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
+        StatementHolder playersMissionsQuery = new StatementHolder("REPLACE INTO {prefix}players_missions VALUES(?,?,?)");
+        StatementHolder playersSettingsQuery = new StatementHolder("REPLACE INTO {prefix}players_settings VALUES(?,?,?,?,?,?)");
 
         for (PlayerAttributes playerAttributes : loadedPlayers) {
             insertPlayer(playerAttributes, playersQuery, playersMissionsQuery, playersSettingsQuery);
@@ -172,28 +184,28 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting islands...");
 
-        StatementHolder islandsQuery = new StatementHolder("INSERT INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-        StatementHolder islandsBanksQuery = new StatementHolder("INSERT INTO {prefix}islands_banks VALUES(?,?,?)");
-        StatementHolder islandsBansQuery = new StatementHolder("INSERT INTO {prefix}islands_bans VALUES(?,?,?,?)");
-        StatementHolder islandsBlockLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_block_limits VALUES(?,?,?)");
-        StatementHolder islandsChestsQuery = new StatementHolder("INSERT INTO {prefix}islands_chests VALUES(?,?,?)");
-        StatementHolder islandsEffectsQuery = new StatementHolder("INSERT INTO {prefix}islands_effects VALUES(?,?,?)");
-        StatementHolder islandsEntityLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_entity_limits VALUES(?,?,?)");
-        StatementHolder islandsFlagsQuery = new StatementHolder("INSERT INTO {prefix}islands_flags VALUES(?,?,?)");
-        StatementHolder islandsGeneratorsQuery = new StatementHolder("INSERT INTO {prefix}islands_generators VALUES(?,?,?,?)");
-        StatementHolder islandsHomesQuery = new StatementHolder("INSERT INTO {prefix}islands_homes VALUES(?,?,?)");
-        StatementHolder islandsMembersQuery = new StatementHolder("INSERT INTO {prefix}islands_members VALUES(?,?,?,?)");
-        StatementHolder islandsMissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_missions VALUES(?,?,?)");
-        StatementHolder islandsPlayerPermissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_player_permissions VALUES(?,?,?,?)");
-        StatementHolder islandsRatingsQuery = new StatementHolder("INSERT INTO {prefix}islands_ratings VALUES(?,?,?,?)");
-        StatementHolder islandsRoleLimitsQuery = new StatementHolder("INSERT INTO {prefix}islands_role_limits VALUES(?,?,?)");
-        StatementHolder islandsRolePermissionsQuery = new StatementHolder("INSERT INTO {prefix}islands_role_permissions VALUES(?,?,?)");
-        StatementHolder islandsSettingsQuery = new StatementHolder("INSERT INTO {prefix}islands_settings VALUES(?,?,?,?,?,?,?,?,?)");
-        StatementHolder islandsUpgradesQuery = new StatementHolder("INSERT INTO {prefix}islands_upgrades VALUES(?,?,?)");
-        StatementHolder islandsVisitorHomesQuery = new StatementHolder("INSERT INTO {prefix}islands_visitor_homes VALUES(?,?,?)");
-        StatementHolder islandsVisitorsQuery = new StatementHolder("INSERT INTO {prefix}islands_visitors VALUES(?,?,?)");
-        StatementHolder islandsWarpCategoriesQuery = new StatementHolder("INSERT INTO {prefix}islands_warp_categories VALUES(?,?,?,?)");
-        StatementHolder islandsWarpsQuery = new StatementHolder("INSERT INTO {prefix}islands_warps VALUES(?,?,?,?,?,?)");
+        StatementHolder islandsQuery = new StatementHolder("REPLACE INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        StatementHolder islandsBanksQuery = new StatementHolder("REPLACE INTO {prefix}islands_banks VALUES(?,?,?)");
+        StatementHolder islandsBansQuery = new StatementHolder("REPLACE INTO {prefix}islands_bans VALUES(?,?,?,?)");
+        StatementHolder islandsBlockLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_block_limits VALUES(?,?,?)");
+        StatementHolder islandsChestsQuery = new StatementHolder("REPLACE INTO {prefix}islands_chests VALUES(?,?,?)");
+        StatementHolder islandsEffectsQuery = new StatementHolder("REPLACE INTO {prefix}islands_effects VALUES(?,?,?)");
+        StatementHolder islandsEntityLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_entity_limits VALUES(?,?,?)");
+        StatementHolder islandsFlagsQuery = new StatementHolder("REPLACE INTO {prefix}islands_flags VALUES(?,?,?)");
+        StatementHolder islandsGeneratorsQuery = new StatementHolder("REPLACE INTO {prefix}islands_generators VALUES(?,?,?,?)");
+        StatementHolder islandsHomesQuery = new StatementHolder("REPLACE INTO {prefix}islands_homes VALUES(?,?,?)");
+        StatementHolder islandsMembersQuery = new StatementHolder("REPLACE INTO {prefix}islands_members VALUES(?,?,?,?)");
+        StatementHolder islandsMissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_missions VALUES(?,?,?)");
+        StatementHolder islandsPlayerPermissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_player_permissions VALUES(?,?,?,?)");
+        StatementHolder islandsRatingsQuery = new StatementHolder("REPLACE INTO {prefix}islands_ratings VALUES(?,?,?,?)");
+        StatementHolder islandsRoleLimitsQuery = new StatementHolder("REPLACE INTO {prefix}islands_role_limits VALUES(?,?,?)");
+        StatementHolder islandsRolePermissionsQuery = new StatementHolder("REPLACE INTO {prefix}islands_role_permissions VALUES(?,?,?)");
+        StatementHolder islandsSettingsQuery = new StatementHolder("REPLACE INTO {prefix}islands_settings VALUES(?,?,?,?,?,?,?,?,?)");
+        StatementHolder islandsUpgradesQuery = new StatementHolder("REPLACE INTO {prefix}islands_upgrades VALUES(?,?,?)");
+        StatementHolder islandsVisitorHomesQuery = new StatementHolder("REPLACE INTO {prefix}islands_visitor_homes VALUES(?,?,?)");
+        StatementHolder islandsVisitorsQuery = new StatementHolder("REPLACE INTO {prefix}islands_visitors VALUES(?,?,?)");
+        StatementHolder islandsWarpCategoriesQuery = new StatementHolder("REPLACE INTO {prefix}islands_warp_categories VALUES(?,?,?,?)");
+        StatementHolder islandsWarpsQuery = new StatementHolder("REPLACE INTO {prefix}islands_warps VALUES(?,?,?,?,?,?)");
 
         for (IslandAttributes islandAttributes : loadedIslands) {
             insertIsland(islandAttributes, currentTime, islandsQuery, islandsBanksQuery, islandsBansQuery,
@@ -231,7 +243,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private void saveStackedBlocks(){
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting stacked blocks...");
 
-        StatementHolder insertQuery = new StatementHolder("INSERT INTO {prefix}stacked_blocks VALUES(?,?,?)");
+        StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
 
         for (StackedBlockAttributes stackedBlockAttributes : loadedBlocks) {
             insertQuery
@@ -247,7 +259,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private void saveBankTransactions(){
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting bank transactions...");
 
-        StatementHolder insertQuery = new StatementHolder("INSERT INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
+        StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
 
         for (BankTransactionsAttributes bankTransactionsAttributes : loadedBankTransactions) {
             insertQuery
@@ -262,6 +274,17 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
 
         insertQuery.executeBatch(false);
+    }
+
+    private void saveGrid(){
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting grid data...");
+
+        new StatementHolder("DELETE FROM {prefix}grid;").execute(false);
+        new StatementHolder("REPLACE INTO {prefix}grid VALUES(?,?,?)")
+                .setObject(gridAttributes.getValue(GridAttributes.Field.LAST_ISLAND))
+                .setObject(gridAttributes.getValue(GridAttributes.Field.MAX_ISLAND_SIZE))
+                .setObject(gridAttributes.getValue(GridAttributes.Field.WORLD))
+                .execute(false);
     }
 
     @SuppressWarnings("unchecked")
