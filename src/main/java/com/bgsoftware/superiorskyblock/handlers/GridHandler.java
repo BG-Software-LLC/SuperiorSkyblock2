@@ -724,12 +724,15 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         GridDatabaseBridge.deleteStackedBlocks(this);
 
-        for (StackedBlocksHandler.StackedBlock stackedBlock : stackedBlocks.values()) {
-            if (stackedBlock.getAmount() > 1) {
-                GridDatabaseBridge.saveStackedBlock(this, stackedBlock);
-            } else {
-                GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
+        try {
+            databaseBridge.batchOperations(true);
+            for (StackedBlocksHandler.StackedBlock stackedBlock : stackedBlocks.values()) {
+                if (stackedBlock.getAmount() > 1) {
+                    GridDatabaseBridge.saveStackedBlock(this, stackedBlock);
+                }
             }
+        } finally {
+            databaseBridge.batchOperations(false);
         }
     }
 
