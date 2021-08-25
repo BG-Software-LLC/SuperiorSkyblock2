@@ -165,7 +165,7 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_block_limits (" +
                 "island UUID, " +
-                "block TEXT, " +
+                "block UNIQUE_TEXT, " +
                 "`limit` INTEGER" +
                 ");");
 
@@ -177,32 +177,32 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_effects (" +
                 "island UUID, " +
-                "effect_type TEXT, " +
+                "effect_type UNIQUE_TEXT, " +
                 "level INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_entity_limits (" +
                 "island UUID, " +
-                "entity TEXT, " +
+                "entity UNIQUE_TEXT, " +
                 "`limit` INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_flags (" +
                 "island UUID, " +
-                "name TEXT, " +
+                "name UNIQUE_TEXT, " +
                 "status INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_generators (" +
                 "island UUID, " +
-                "environment TEXT, " +
-                "block TEXT, " +
+                "environment VARCHAR(7), " +
+                "block UNIQUE_TEXT, " +
                 "rate INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_homes (" +
                 "island UUID, " +
-                "environment TEXT, " +
+                "environment VARCHAR(7), " +
                 "location TEXT" +
                 ");");
 
@@ -215,14 +215,14 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_missions (" +
                 "island UUID, " +
-                "name TEXT, " +
+                "name UNIQUE_TEXT, " +
                 "finish_count INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_player_permissions (" +
                 "island UUID, " +
                 "player UUID, " +
-                "permission TEXT, " +
+                "permission UNIQUE_TEXT, " +
                 "status BOOLEAN" +
                 ");");
 
@@ -242,7 +242,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_role_permissions (" +
                 "island UUID, " +
                 "role INTEGER, " +
-                "permission TEXT" +
+                "permission UNIQUE_TEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_settings (" +
@@ -259,13 +259,13 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_upgrades (" +
                 "island UUID, " +
-                "upgrade TEXT, " +
+                "upgrade UNIQUE_TEXT, " +
                 "level INTEGER" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_visitor_homes (" +
                 "island UUID, " +
-                "environment TEXT, " +
+                "environment VARCHAR(7), " +
                 "location TEXT" +
                 ");");
 
@@ -277,14 +277,14 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
                 "island UUID, " +
-                "name TEXT, " +
+                "name UNIQUE_TEXT, " +
                 "slot INTEGER, " +
                 "icon TEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warps (" +
                 "island UUID, " +
-                "name TEXT, " +
+                "name UNIQUE_TEXT, " +
                 "category TEXT, " +
                 "location TEXT, " +
                 "private BOOLEAN, " +
@@ -303,7 +303,7 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_missions (" +
                 "player UUID, " +
-                "name TEXT, " +
+                "name UNIQUE_TEXT, " +
                 "finish_count INTEGER" +
                 ");");
 
