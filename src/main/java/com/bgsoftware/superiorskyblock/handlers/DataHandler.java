@@ -43,13 +43,25 @@ public final class DataHandler extends AbstractHandler {
     public void loadDataWithException() throws HandlerLoadException {
         loadDatabaseLoaders();
 
-        databaseLoaders.forEach(DatabaseLoader::loadData);
+        databaseLoaders.forEach(databaseLoader -> {
+            try {
+                databaseLoader.loadData();
+            }catch (Exception error) {
+                error.printStackTrace();
+            }
+        });
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().init(plugin);
         }
 
-        databaseLoaders.forEach(DatabaseLoader::saveData);
+        databaseLoaders.forEach(databaseLoader -> {
+            try {
+                databaseLoader.saveData();
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
+        });
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().createIndexes();
