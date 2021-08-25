@@ -98,7 +98,7 @@ public final class Executor {
     public static void close() {
         try {
             shutdown = true;
-            System.out.println("Shutting down database executor");
+            SuperiorSkyblockPlugin.log("Shutting down database executor");
             shutdownAndAwaitTermination();
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -105,7 +105,7 @@ public final class SQLSession {
 
     public void executeUpdate(String statement){
         executeUpdate(statement, error -> {
-            System.out.println(statement);
+            SuperiorSkyblockPlugin.log("&cAn errror occurred while running statement: " + statement);
             error.printStackTrace();
         });
     }

@@ -286,7 +286,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }finally {
             CalcTask.cancelTask();
             Executor.close();
-            System.out.println("Closing database...");
+            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             dataHandler.closeConnection();
         }
     }

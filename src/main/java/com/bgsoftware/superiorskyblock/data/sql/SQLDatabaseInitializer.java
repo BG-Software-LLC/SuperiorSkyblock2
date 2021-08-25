@@ -364,7 +364,7 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.buildStatement(statementStr, PreparedStatement::executeUpdate, ex -> {
             if (!ex.getMessage().toLowerCase().contains("duplicate")) {
-                System.out.println("Statement: " + statementStr);
+                SuperiorSkyblockPlugin.log("&cAn error occurred while running statement: " + statementStr);
                 ex.printStackTrace();
             }
         });
