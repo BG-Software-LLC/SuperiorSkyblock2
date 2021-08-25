@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.data.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.attributes.BankTransactionsAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandWarpAttributes;
@@ -54,6 +55,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
     private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
+    private final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
 
     private final IDeserializer deserializer = new MultipleDeserializer(new JsonDeserializer(), new RawDeserializer());
 
@@ -85,6 +87,14 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
 
+        sqlSession.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
+            while (resultSet.next()) {
+                loadedBankTransactions.add(loadBankTransaction(resultSet));
+            }
+        });
+
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
+
         sqlSession.close();
 
         AtomicBoolean failedBackup = new AtomicBoolean(false);
@@ -110,6 +120,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         savePlayers();
         saveIslands();
         saveStackedBlocks();
+        saveBankTransactions();
     }
 
     public static void register() {
@@ -227,6 +238,26 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                     .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.LOCATION))
                     .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.BLOCK_TYPE))
                     .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.AMOUNT))
+                    .addBatch();
+        }
+
+        insertQuery.executeBatch(false);
+    }
+
+    private void saveBankTransactions(){
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting bank transactions...");
+
+        StatementHolder insertQuery = new StatementHolder("INSERT INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
+
+        for (BankTransactionsAttributes bankTransactionsAttributes : loadedBankTransactions) {
+            insertQuery
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.ISLAND))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.PLAYER))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.BANK_ACTION))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.POSITION))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.TIME))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.FAILURE_REASON))
+                    .setObject(bankTransactionsAttributes.getValue(BankTransactionsAttributes.Field.AMOUNT))
                     .addBatch();
         }
 
@@ -547,6 +578,17 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(StackedBlockAttributes.Field.LOCATION, world + ", " + x + ", " + y + ", " + z)
                 .setValue(StackedBlockAttributes.Field.BLOCK_TYPE, blockType)
                 .setValue(StackedBlockAttributes.Field.AMOUNT, amount);
+    }
+
+    private BankTransactionsAttributes loadBankTransaction(ResultSet resultSet) throws SQLException {
+        return new BankTransactionsAttributes()
+                .setValue(BankTransactionsAttributes.Field.ISLAND, resultSet.getString("island"))
+                .setValue(BankTransactionsAttributes.Field.PLAYER, resultSet.getString("player"))
+                .setValue(BankTransactionsAttributes.Field.BANK_ACTION, resultSet.getString("bankAction"))
+                .setValue(BankTransactionsAttributes.Field.POSITION, resultSet.getInt("position"))
+                .setValue(BankTransactionsAttributes.Field.TIME, resultSet.getString("time"))
+                .setValue(BankTransactionsAttributes.Field.FAILURE_REASON, resultSet.getString("failureReason"))
+                .setValue(BankTransactionsAttributes.Field.AMOUNT, resultSet.getString("amount"));
     }
 
     private PlayerAttributes getPlayerAttributes(UUID uuid) {
