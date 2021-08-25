@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.utils.attributes.IslandAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.PlayerAttributes;
+import com.bgsoftware.superiorskyblock.utils.attributes.StackedBlockAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
@@ -52,6 +53,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
+    private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
 
     private final IDeserializer deserializer = new MultipleDeserializer(new JsonDeserializer(), new RawDeserializer());
 
@@ -75,6 +77,14 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
 
+        sqlSession.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
+            while (resultSet.next()) {
+                loadedBlocks.add(loadStackedBlock(resultSet));
+            }
+        });
+
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
+
         sqlSession.close();
 
         AtomicBoolean failedBackup = new AtomicBoolean(false);
@@ -97,8 +107,40 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     @Override
     public void saveData() {
-        long currentTime = System.currentTimeMillis();
+        savePlayers();
+        saveIslands();
+        saveStackedBlocks();
+    }
 
+    public static void register() {
+        if (isDatabaseOldFormat())
+            plugin.getDataHandler().addDatabaseLoader(new DatabaseLoader_V1());
+    }
+
+    private static boolean isDatabaseOldFormat() {
+        sqlSession = new SQLSession();
+
+        if (!sqlSession.isUsingMySQL()) {
+            databaseFile = new File("plugins", "SuperiorSkyblock2\\database.db");
+
+            if (!databaseFile.exists())
+                return false;
+        }
+
+        if (!sqlSession.createConnection(SuperiorSkyblockPlugin.getPlugin(), false)) {
+            sqlSession.close();
+            return false;
+        }
+
+        if (sqlSession.doesTableExist("islands_members")) {
+            sqlSession.close();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void savePlayers(){
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting players...");
 
         StatementHolder playersQuery = new StatementHolder("INSERT INTO {prefix}players VALUES(?,?,?,?,?)");
@@ -112,6 +154,10 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         playersQuery.executeBatch(false);
         playersMissionsQuery.executeBatch(false);
         playersSettingsQuery.executeBatch(false);
+    }
+
+    private void saveIslands(){
+        long currentTime = System.currentTimeMillis();
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting islands...");
 
@@ -171,32 +217,20 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         islandsWarpsQuery.executeBatch(false);
     }
 
-    public static void register() {
-        if (isDatabaseOldFormat())
-            plugin.getDataHandler().addDatabaseLoader(new DatabaseLoader_V1());
-    }
+    private void saveStackedBlocks(){
+        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting stacked blocks...");
 
-    private static boolean isDatabaseOldFormat() {
-        sqlSession = new SQLSession();
+        StatementHolder insertQuery = new StatementHolder("INSERT INTO {prefix}stacked_blocks VALUES(?,?,?)");
 
-        if (!sqlSession.isUsingMySQL()) {
-            databaseFile = new File("plugins", "SuperiorSkyblock2\\database.db");
-
-            if (!databaseFile.exists())
-                return false;
+        for (StackedBlockAttributes stackedBlockAttributes : loadedBlocks) {
+            insertQuery
+                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.LOCATION))
+                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.BLOCK_TYPE))
+                    .setObject(stackedBlockAttributes.getValue(StackedBlockAttributes.Field.AMOUNT))
+                    .addBatch();
         }
 
-        if (!sqlSession.createConnection(SuperiorSkyblockPlugin.getPlugin(), false)) {
-            sqlSession.close();
-            return false;
-        }
-
-        if (sqlSession.doesTableExist("islands_members")) {
-            sqlSession.close();
-            return false;
-        }
-
-        return true;
+        insertQuery.executeBatch(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -499,6 +533,20 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.getDouble("mobDrops"))
                 .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.getInt("coopLimit"))
                 .setValue(IslandAttributes.Field.BANK_LIMIT, new BigDecimal(resultSet.getString("bankLimit")));
+    }
+
+    private StackedBlockAttributes loadStackedBlock(ResultSet resultSet) throws SQLException {
+        String world = resultSet.getString("world");
+        int x = resultSet.getInt("x");
+        int y = resultSet.getInt("y");
+        int z = resultSet.getInt("z");
+        String amount = resultSet.getString("amount");
+        String blockType = resultSet.getString("item");
+
+        return new StackedBlockAttributes()
+                .setValue(StackedBlockAttributes.Field.LOCATION, world + ", " + x + ", " + y + ", " + z)
+                .setValue(StackedBlockAttributes.Field.BLOCK_TYPE, blockType)
+                .setValue(StackedBlockAttributes.Field.AMOUNT, amount);
     }
 
     private PlayerAttributes getPlayerAttributes(UUID uuid) {
