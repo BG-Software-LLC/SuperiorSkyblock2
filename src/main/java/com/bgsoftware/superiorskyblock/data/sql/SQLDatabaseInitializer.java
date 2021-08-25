@@ -48,65 +48,65 @@ public final class SQLDatabaseInitializer {
     }
 
     public void createIndexes(){
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_bans_index ON " +
-                "{prefix}islands_bans (island,player);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_bans_index ON " +
+                "{prefix}islands_bans (island,player);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS block_limits_index ON " +
-                "{prefix}islands_block_limits (island,block);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX block_limits_index ON " +
+                "{prefix}islands_block_limits (island,block);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_chests_index ON " +
-                "{prefix}islands_chests (island,`index`);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_chests_index ON " +
+                "{prefix}islands_chests (island,`index`);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_effects_index ON " +
-                "{prefix}islands_effects (island,effect_type);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_effects_index ON " +
+                "{prefix}islands_effects (island,effect_type);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS entity_limits_index ON " +
-                "{prefix}islands_entity_limits (island,entity);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX entity_limits_index ON " +
+                "{prefix}islands_entity_limits (island,entity);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_flags_index ON " +
-                "{prefix}islands_flags (island,name);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_flags_index ON " +
+                "{prefix}islands_flags (island,name);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_generators_index ON " +
-                "{prefix}islands_generators (island,environment,block);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_generators_index ON " +
+                "{prefix}islands_generators (island,environment,block);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_homes_index ON " +
-                "{prefix}islands_homes (island,environment);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_homes_index ON " +
+                "{prefix}islands_homes (island,environment);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_members_index ON " +
-                "{prefix}islands_members (island,player);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_members_index ON " +
+                "{prefix}islands_members (island,player);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_missions_index ON " +
-                "{prefix}islands_missions (island,name);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_missions_index ON " +
+                "{prefix}islands_missions (island,name);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS player_permissions_index ON " +
-                "{prefix}islands_player_permissions (island,player,permission);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX player_permissions_index ON " +
+                "{prefix}islands_player_permissions (island,player,permission);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_ratings_index ON " +
-                "{prefix}islands_ratings (island,player);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_ratings_index ON " +
+                "{prefix}islands_ratings (island,player);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS role_limits_index ON " +
-                "{prefix}islands_role_limits (island,role);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX role_limits_index ON " +
+                "{prefix}islands_role_limits (island,role);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS role_permissions_index ON " +
-                "{prefix}islands_role_permissions (island,permission);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX role_permissions_index ON " +
+                "{prefix}islands_role_permissions (island,permission);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_upgrades_index ON " +
-                "{prefix}islands_upgrades (island,upgrade);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_upgrades_index ON " +
+                "{prefix}islands_upgrades (island,upgrade);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS visitor_homes_index ON " +
-                "{prefix}islands_visitor_homes (island,environment);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX visitor_homes_index ON " +
+                "{prefix}islands_visitor_homes (island,environment);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_visitors_index ON " +
-                "{prefix}islands_visitors (island,player);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_visitors_index ON " +
+                "{prefix}islands_visitors (island,player);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS warp_categories_index ON " +
-                "{prefix}islands_warp_categories (island,name);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX warp_categories_index ON " +
+                "{prefix}islands_warp_categories (island,name);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS islands_warps_index ON " +
-                "{prefix}islands_warps (island,name);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_warps_index ON " +
+                "{prefix}islands_warps (island,name);", ignoreError -> {});
 
-        SQLHelper.executeUpdate("CREATE UNIQUE INDEX IF NOT EXISTS players_missions_index ON " +
-                "{prefix}players_missions (player,name);");
+        SQLHelper.executeUpdate("CREATE UNIQUE INDEX players_missions_index ON " +
+                "{prefix}players_missions (player,name);", ignoreError -> {});
     }
 
     public void close() {
@@ -339,7 +339,7 @@ public final class SQLDatabaseInitializer {
 
     private void createStackedBlocksTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stacked_blocks (" +
-                "location TEXT PRIMARY KEY, " +
+                "location VARCHAR(30) PRIMARY KEY, " +
                 "block_type TEXT, " +
                 "amount INTEGER" +
                 ");");

@@ -19,21 +19,24 @@ public final class SQLSession {
     private final CompletableFuture<Void> ready = new CompletableFuture<>();
     private final Object mutex = new Object();
 
-    private SuperiorSkyblockPlugin plugin;
+    private final SuperiorSkyblockPlugin plugin;
+    private final boolean logging;
+    private final boolean usesMySQL;
+
     private HikariDataSource dataSource;
-    private boolean logging;
-    private boolean usesMySQL;
+
+    public SQLSession(SuperiorSkyblockPlugin plugin, boolean logging){
+        this.plugin = plugin;
+        this.logging = logging;
+        this.usesMySQL = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL");
+    }
 
     private void log(String message){
         if(logging)
             SuperiorSkyblockPlugin.log(message);
     }
 
-    public boolean createConnection(SuperiorSkyblockPlugin plugin, boolean logging){
-        this.plugin = plugin;
-        this.logging = logging;
-        this.usesMySQL = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL");
-
+    public boolean createConnection(){
         try {
             log("Trying to connect to " + plugin.getSettings().databaseType + " database...");
 
@@ -117,7 +120,7 @@ public final class SQLSession {
         try{
             conn = dataSource.getConnection();
             preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)
-                    .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)"));
+                    .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(255)"));
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
             onFailure.accept(ex);

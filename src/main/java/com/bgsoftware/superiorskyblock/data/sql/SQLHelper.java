@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public final class SQLHelper {
 
-    private static final SQLSession globalSession = new SQLSession();
+    private static SQLSession globalSession;
 
     private SQLHelper(){
 
@@ -24,11 +24,16 @@ public final class SQLHelper {
     }
 
     public static boolean createConnection(SuperiorSkyblockPlugin plugin){
-        return globalSession.createConnection(plugin, true);
+        globalSession = new SQLSession(plugin, true);
+        return globalSession.createConnection();
     }
 
     public static void executeUpdate(String statement){
         globalSession.executeUpdate(statement);
+    }
+
+    public static void executeUpdate(String statement, Consumer<SQLException> onFailure){
+        globalSession.executeUpdate(statement, onFailure);
     }
 
     public static boolean doesConditionExist(String statement){
