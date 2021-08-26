@@ -1,0 +1,86 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: BlocksMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: false
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Should the mission only check for naturally-generated blocks?
+# Used so players cannot place and break blocks in order to increase their progress.
+only-natural-blocks: true
+
+# Rewards given when completing the mission.
+rewards:
+  items:
+    '1':
+      type: OAK_SAPLING
+      amount: 16
+  commands:
+    - 'is admin msg %player% &e&lMission | &7Successfully finished the mission WoodCutter!'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-blocks:
+  '1':
+    types:
+      - 'OAK_LOG'
+      - 'SPRUCE_LOG'
+      - 'BIRCH_LOG'
+      - 'JUNGLE_LOG'
+      - 'ACACIA_LOG'
+      - 'DARK_OAK_LOG'
+    amount: 320
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aWood Cutter'
+    lore:
+      - '&7Cut 320 logs.'
+      - ''
+      - '&6Required Materials:'
+      - '&8 - &7x320 Logs'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x16 Oak Saplings'
+      - ''
+      - '&6Cut Logs: &7{1}/320'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aWood Cutter'
+    lore:
+      - '&7Cut 320 logs.'
+      - ''
+      - '&6Required Materials:'
+      - '&8 - &7x320 Logs'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x16 Oak Saplings'
+      - ''
+      - '&6Cut Logs: &7320/320'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aWood Cutter'
+    lore:
+      - '&7Cut 320 logs.'
+      - ''
+      - '&6Cut Logs: &7320/320'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

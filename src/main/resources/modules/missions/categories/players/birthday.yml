@@ -1,0 +1,66 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: CraftingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: false
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 150'
+    - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Birthday!'
+
+# List of all required items must be crafted in order to complete the mission.
+craftings:
+  '1':
+    type: CAKE
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aBirthday'
+    lore:
+      - '&7Bake a cake!'
+      - ''
+      - '&6Required Materials:'
+      - '&8 - &7x1 Cake'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150'
+      - ''
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aBirthday'
+    lore:
+      - '&7Bake a cake!'
+      - ''
+      - '&6Required Materials:'
+      - '&8 - &7x1 Cake'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150'
+      - ''
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aBirthday'
+    lore:
+      - '&7Bake a cake!'
+      - ''
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'
