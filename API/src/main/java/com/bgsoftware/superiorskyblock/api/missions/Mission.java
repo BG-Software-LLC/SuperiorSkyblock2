@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.missions;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,7 +10,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,6 +25,7 @@ public abstract class Mission<V> {
     private final Map<SuperiorPlayer, V> missionData = new ConcurrentHashMap<>();
 
     private String name = null;
+    private MissionCategory missionCategory = null;
     private Consumer<V> clearMethod = null;
     private boolean onlyShowIfRequiredCompleted = false;
     private boolean islandMission = false;
@@ -46,6 +45,24 @@ public abstract class Mission<V> {
      */
     public String getName(){
         return name;
+    }
+
+    /**
+     * Set the category of the mission.
+     * @param missionCategory The category to set.
+     */
+    public void setMissionCategory(MissionCategory missionCategory){
+        Preconditions.checkNotNull(missionCategory, "missionCategory parameter cannot be null.");
+        Preconditions.checkArgument(missionCategory.getMissions().contains(this), "The mission is not inside the given category.");
+        if(this.missionCategory == null)
+            this.missionCategory = missionCategory;
+    }
+
+    /**
+     * Get the category of the mission.
+     */
+    public MissionCategory getMissionCategory() {
+        return missionCategory;
     }
 
     /**

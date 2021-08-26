@@ -15,23 +15,10 @@ pattern:
   - '$ # # # # # # # $'
   - '$ $ $ $ $ $ $ $ $'
 
-player-missions: '@'
-island-missions: '^'
-
 items:
   '$':
     type: BLACK_STAINED_GLASS_PANE
     name: '&f'
-  '@':
-    type: PLAYER_HEAD
-    name: '&ePlayer Missions'
-    lore:
-      - '&7Click to open your missions.'
-  '^':
-    type: GRASS_BLOCK
-    name: '&eIsland Missions'
-    lore:
-      - '&7Click to open your island''s missions.'
 
 sounds:
   '@':

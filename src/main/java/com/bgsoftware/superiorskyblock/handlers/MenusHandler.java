@@ -42,16 +42,15 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
         loadMenu(MenuIslandBank::init);
         loadMenu(MenuIslandChest::init);
         loadMenu(MenuIslandCreation::init);
-        loadMenu(MenuIslandMissions::init);
         loadMenu(MenuIslandRate::init);
         loadMenu(MenuIslandRatings::init);
         loadMenu(MenuMemberManage::init);
         loadMenu(MenuMemberRole::init);
         loadMenu(MenuMembers::init);
         loadMenu(MenuMissions::init);
+        loadMenu(MenuMissionsCategory::init);
         loadMenu(MenuPermissions::init);
         loadMenu(MenuPlayerLanguage::init);
-        loadMenu(MenuPlayerMissions::init);
         loadMenu(MenuSettings::init);
         loadMenu(MenuTopIslands::init);
         loadMenu(MenuUniqueVisitors::init);
@@ -144,11 +143,7 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     @Override
     public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-
-        if(islandMissions)
-            MenuIslandMissions.openInventory(superiorPlayer, null);
-        else
-            MenuPlayerMissions.openInventory(superiorPlayer, null);
+        throw new UnsupportedOperationException("Island Missions menu no longer exists.");
     }
 
     @Override

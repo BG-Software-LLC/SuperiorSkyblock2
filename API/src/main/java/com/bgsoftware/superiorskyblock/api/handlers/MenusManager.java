@@ -65,6 +65,7 @@ public interface MenusManager {
      * @param superiorPlayer The player to open the menu for.
      * @param islandMissions Should island missions be displayed or player missions?
      */
+    @Deprecated
     void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions);
 
     /**

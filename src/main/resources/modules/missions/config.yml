@@ -11,12 +11,9 @@ enabled: true
 # Settings related to mission categories.
 categories:
   players:
-    slot: 5
-    type: SKULL_ITEM
-    data: 3
-    name: '&ePlayer Missions'
+    name: 'Players'
+    slot: 21
 
   islands:
-    slot: 6
-    type: GRASS
-    name: '&eIsland Missions'
+    name: 'Islands'
+    slot: 23

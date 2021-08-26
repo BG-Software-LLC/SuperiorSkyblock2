@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import javax.annotation.Nullable;
@@ -10,7 +11,7 @@ import java.util.function.Consumer;
 public interface MissionsManager {
 
     /**
-     * Get a mission by it's name.
+     * Get a mission by its name.
      * @param name The name to check.
      */
     @Nullable
@@ -30,6 +31,18 @@ public interface MissionsManager {
      * Get a list of all missions that are island missions.
      */
     List<Mission<?>> getIslandMissions();
+
+    /**
+     * Get a mission category by its name.
+     * @param name The name to check.
+     */
+    @Nullable
+    MissionCategory getMissionCategory(String name);
+
+    /**
+     * Get all the mission categories.
+     */
+    List<MissionCategory> getMissionCategories();
 
     /**
      * Check whether or not the player has already completed the mission.

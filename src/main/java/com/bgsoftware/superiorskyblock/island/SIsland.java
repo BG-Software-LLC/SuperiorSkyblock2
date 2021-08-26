@@ -34,11 +34,11 @@ import com.bgsoftware.superiorskyblock.menu.MenuCoops;
 import com.bgsoftware.superiorskyblock.menu.MenuCounts;
 import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.menu.MenuMemberManage;
 import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
 import com.bgsoftware.superiorskyblock.menu.MenuMembers;
+import com.bgsoftware.superiorskyblock.menu.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
 import com.bgsoftware.superiorskyblock.menu.MenuSettings;
 import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
@@ -2696,7 +2696,7 @@ public final class SIsland implements Island {
 
         islandDataHandler.saveMissions();
 
-        MenuIslandMissions.refreshMenus(this);
+        MenuMissionsCategory.refreshMenus(mission.getMissionCategory());
     }
 
     @Override
@@ -2716,7 +2716,7 @@ public final class SIsland implements Island {
 
         mission.clearData(getOwner());
 
-        MenuIslandMissions.refreshMenus(this);
+        MenuMissionsCategory.refreshMenus(mission.getMissionCategory());
     }
 
     @Override

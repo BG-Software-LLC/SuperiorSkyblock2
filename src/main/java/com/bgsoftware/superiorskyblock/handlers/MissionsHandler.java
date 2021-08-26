@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -38,8 +40,9 @@ import java.util.stream.Collectors;
 
 public final class MissionsHandler extends AbstractHandler implements MissionsManager {
 
-    private final static Map<String, Mission<?>> missionMap = new HashMap<>();
-    private final static Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
+    private static final Map<String, Mission<?>> missionMap = new HashMap<>();
+    private static final Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
+    private static final Map<String, MissionCategory> missionCategories = new HashMap<>();
 
     public MissionsHandler(SuperiorSkyblockPlugin plugin){
         super(plugin);
@@ -72,6 +75,17 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @Override
     public List<Mission<?>> getIslandMissions() {
         return getFilteredMissions(missionData -> missionData.islandMission);
+    }
+
+    @Nullable
+    @Override
+    public MissionCategory getMissionCategory(String name) {
+        return missionCategories.get(name.toLowerCase());
+    }
+
+    @Override
+    public List<MissionCategory> getMissionCategories() {
+        return Collections.unmodifiableList(new ArrayList<>(missionCategories.values()));
     }
 
     @Override
@@ -323,8 +337,12 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         loadMissionsData(getAllMissions());
     }
 
+    public void loadMissionCategory(MissionCategory missionCategory){
+        missionCategories.put(missionCategory.getName().toLowerCase(), missionCategory);
+    }
+
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection){
+    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
@@ -362,6 +380,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
     public void loadMissionsData(List<Mission<?>> missionsList) {
         Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
 
@@ -403,10 +422,10 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     private List<Mission<?>> getFilteredMissions(Predicate<MissionData> predicate) {
-        return missionDataMap.values().stream().filter(predicate)
+        return Collections.unmodifiableList(missionDataMap.values().stream().filter(predicate)
                 .sorted(Comparator.comparingInt(o -> o.index))
                 .map(missionData -> missionData.mission)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     private Mission<?> createInstance(Class<?> clazz, String name, boolean islandMission, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{

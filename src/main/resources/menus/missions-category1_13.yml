@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lYour Missions'
+title: '&l{0} Missions'
 previous-menu: true
 
 pattern:
