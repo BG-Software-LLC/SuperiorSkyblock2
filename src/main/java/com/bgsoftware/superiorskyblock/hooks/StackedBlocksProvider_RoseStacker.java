@@ -20,7 +20,6 @@ import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import java.util.Collection;
@@ -63,20 +62,6 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
     private static final class StackerListener implements Listener {
 
         private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-        @EventHandler(priority = EventPriority.MONITOR)
-        public void onBlockPlace(BlockPlaceEvent e) {
-            Location location = e.getBlock().getLocation();
-            Island island = plugin.getGrid().getIslandAt(location);
-            if (island != null && e.isCancelled()) {
-                StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getBlockAgainst());
-                if (stackedBlock != null) {
-                    // We want to add additional one block, to adjust the counts to the correct value.
-                    com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getBlock());
-                    island.handleBlockPlace(blockKey, 1);
-                }
-            }
-        }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBlockStack(BlockStackEvent e) {
