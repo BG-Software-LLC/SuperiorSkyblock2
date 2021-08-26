@@ -218,6 +218,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isShownAsOnline() {
+        Player player = asPlayer();
+        return player != null && player.getGameMode() != GameMode.SPECTATOR && !isVanished();
+    }
+
+    @Override
     public boolean hasPermission(String permission){
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Player player = asPlayer();

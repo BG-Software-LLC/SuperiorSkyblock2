@@ -373,7 +373,7 @@ public final class SIsland implements Island {
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
         return playersInside.readAndGet(playersInside -> playersInside.stream()
-                .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || !superiorPlayer.isVanished()))
+                .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || superiorPlayer.isShownAsOnline()))
                 .collect(Collectors.toList()));
     }
 
@@ -594,7 +594,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Left Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         }
 
-        if(!isMember(superiorPlayer) && !superiorPlayer.isVanished()){
+        if(!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()){
             Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
                     uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
 
@@ -2522,7 +2522,7 @@ public final class SIsland implements Island {
         superiorPlayer.teleport(location, success -> {
             if(success) {
                 Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
-                if(!superiorPlayer.isVanished()) {
+                if(superiorPlayer.isShownAsOnline()) {
                     IslandUtils.sendMessage(this, Locale.TELEPORTED_TO_WARP_ANNOUNCEMENT,
                             Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), warp);
                 }

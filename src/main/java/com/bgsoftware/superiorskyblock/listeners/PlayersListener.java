@@ -50,6 +50,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -143,7 +144,7 @@ public final class PlayersListener implements Listener {
             }
         }, 5L);
 
-        if(!superiorPlayer.isVanished())
+        if(superiorPlayer.isShownAsOnline())
             PlayersLogic.handleJoin(superiorPlayer);
 
         Executor.sync(() -> {
@@ -177,7 +178,7 @@ public final class PlayersListener implements Listener {
         if(superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        if(!superiorPlayer.isVanished())
+        if(superiorPlayer.isShownAsOnline())
             PlayersLogic.handleQuit(superiorPlayer);
 
         for(Island _island : plugin.getGrid().getIslands()){
@@ -592,6 +593,18 @@ public final class PlayersListener implements Listener {
                 e.getPlayer().setFlying(true);
             }, 1L);
 
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerGameModeChange(PlayerGameModeChangeEvent e){
+        GameMode currentGameMode = e.getPlayer().getGameMode();
+        GameMode newGameMode = e.getNewGameMode();
+
+        if(newGameMode == GameMode.SPECTATOR){
+            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+        } else if(currentGameMode == GameMode.SPECTATOR){
+            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+        }
     }
 
     private final class EffectsListener implements Listener{

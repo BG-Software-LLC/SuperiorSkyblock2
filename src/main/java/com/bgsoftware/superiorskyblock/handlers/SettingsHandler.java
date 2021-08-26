@@ -92,7 +92,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final String endWorldName;
     public final boolean endSchematicOffset;
     public final boolean endDragonFight;
-    public final boolean optimizeWorlds;
     public final String worldsDifficulty;
     public final String spawnLocation;
     public final boolean spawnProtection;
@@ -319,7 +318,6 @@ public final class SettingsHandler extends AbstractHandler {
         else{
             throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
-        optimizeWorlds = cfg.getBoolean("worlds.optimize", false);
         worldsDifficulty = cfg.getString("worlds.difficulty", "EASY");
         spawnLocation = cfg.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = cfg.getBoolean("spawn.protection", true);

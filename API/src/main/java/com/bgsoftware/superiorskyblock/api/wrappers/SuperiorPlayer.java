@@ -108,6 +108,12 @@ public interface SuperiorPlayer {
     boolean isVanished();
 
     /**
+     * Checks whether the player is shown as online.
+     * @return false if vanished, in spectator mode or offline.
+     */
+    boolean isShownAsOnline();
+
+    /**
      * Check whether or not the player has a permission.
      * When the player is offline, false will be returned.
      */
