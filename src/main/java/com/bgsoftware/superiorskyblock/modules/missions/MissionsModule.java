@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdAdminMission
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.modules.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -94,10 +93,7 @@ public final class MissionsModule extends BuiltinModule {
         return enabled && isInitialized();
     }
 
-    @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        super.onPluginInit(plugin);
-
+    private void generateDefaultFiles(){
         FileUtils.copyResource("modules/missions/BlocksMissions");
         FileUtils.copyResource("modules/missions/CraftingMissions");
         FileUtils.copyResource("modules/missions/EnchantingMissions");
@@ -105,11 +101,6 @@ public final class MissionsModule extends BuiltinModule {
         FileUtils.copyResource("modules/missions/ItemsMissions");
         FileUtils.copyResource("modules/missions/KillsMissions");
         FileUtils.copyResource("modules/missions/StatisticsMissions");
-
-        File file = new File(getDataFolder(), "config.yml");
-
-        if(!file.exists())
-            FileUtils.saveResource("modules/missions/config.yml");
 
         File categoriesFolder = new File(getDataFolder(), "categories");
 
@@ -125,20 +116,88 @@ public final class MissionsModule extends BuiltinModule {
             FileUtils.saveResource("modules/missions/categories/players/mobs-killer.yml");
             FileUtils.saveResource("modules/missions/categories/players/woodcutter.yml");
         }
+    }
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+    @Override
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        File file = new File(getDataFolder(), "config.yml");
+
+        if(!file.exists())
+            FileUtils.saveResource("modules/missions/config.yml");
+
+        config = CommentedConfiguration.loadConfiguration(file);
+
+        convertOldMissions(plugin, file, config);
+        convertNonCategorizedMissions(file, config);
+        generateDefaultFiles();
 
         try{
-            cfg.syncWithConfig(file, FileUtils.getResource("modules/missions/config.yml"), getIgnoredSections());
+            config.syncWithConfig(file, FileUtils.getResource("modules/missions/config.yml"), getIgnoredSections());
         }catch (Exception ex){
             ex.printStackTrace();
         }
 
-        convertOldMissions(plugin, file, cfg);
+        updateConfig(plugin);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void convertOldMissions(SuperiorSkyblockPlugin plugin, File file, YamlConfiguration config){
+    private void convertNonCategorizedMissions(File file, YamlConfiguration config){
+        ConfigurationSection missionsSection = config.getConfigurationSection("missions");
+
+        if(missionsSection == null)
+            return;
+
+        ConfigurationSection categoriesSection = config.createSection("categories");
+
+        categoriesSection.set("islands.name", "Islands");
+        categoriesSection.set("islands.slot", 0);
+        categoriesSection.set("players.name", "Players");
+        categoriesSection.set("players.slot", 0);
+
+        File islandsCategoryFile = new File(getDataFolder(), "categories/islands");
+        File playersCategoryFile = new File(getDataFolder(), "categories/players");
+
+        islandsCategoryFile.mkdirs();
+        playersCategoryFile.mkdirs();
+
+        for(String missionName : missionsSection.getKeys(false)){
+            ConfigurationSection missionSection = missionsSection.getConfigurationSection(missionName);
+
+            if(missionSection == null)
+                continue;
+
+            boolean islandsMission = missionSection.getBoolean("island", false);
+
+            File missionFile = new File(islandsMission ? islandsCategoryFile : playersCategoryFile, missionName + ".yml");
+
+            try {
+                missionFile.createNewFile();
+            } catch (IOException error) {
+                error.printStackTrace();
+                continue;
+            }
+
+            YamlConfiguration missionConfigFile = new YamlConfiguration();
+            missionSection.getValues(true).forEach(missionConfigFile::set);
+
+            try {
+                missionConfigFile.save(missionFile);
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
+        }
+
+        config.set("missions", "");
+
+        try {
+            config.save(file);
+        } catch (Exception error) {
+            error.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void convertOldMissions(SuperiorSkyblockPlugin plugin, File file, YamlConfiguration config) {
         File oldMissionsFolder = new File(plugin.getDataFolder(), "missions");
         if(oldMissionsFolder.exists()) {
             File oldMissionsFile = new File(oldMissionsFolder, "missions.yml");
