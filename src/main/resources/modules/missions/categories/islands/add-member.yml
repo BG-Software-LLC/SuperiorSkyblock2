@@ -8,6 +8,9 @@
 # The mission file to use
 mission-file: IslandMissions
 
+# Whether progress should be counted towards all island members or not.
+island: true
+
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
 
