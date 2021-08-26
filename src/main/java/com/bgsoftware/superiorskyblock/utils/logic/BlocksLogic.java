@@ -39,7 +39,10 @@ public final class BlocksLogic {
         if(island == null)
             return;
 
-        island.handleBlockBreak(block, plugin.getNMSBlocks().getDefaultAmount(block));
+        Key blockKey = Key.of(block);
+
+        if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
+            island.handleBlockBreak(blockKey, plugin.getNMSBlocks().getDefaultAmount(block));
 
         EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
 
@@ -82,7 +85,7 @@ public final class BlocksLogic {
             if(blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
                 island.handleBlockBreak(ConstantKeys.END_PORTAL_FRAME, 1);
 
-            if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerPlacements())
+            if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
                 island.handleBlockPlace(blockKey, 1);
 
             ChunksTracker.markDirty(island, block, true);
