@@ -110,6 +110,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isShownAsOnline() {
+        return false;
+    }
+
+    @Override
     public boolean hasPermission(String permission) {
         return false;
     }
