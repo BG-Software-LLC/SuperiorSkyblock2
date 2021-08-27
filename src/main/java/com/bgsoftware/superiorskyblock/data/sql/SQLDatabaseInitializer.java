@@ -133,7 +133,7 @@ public final class SQLDatabaseInitializer {
                 "uuid UUID PRIMARY KEY, " +
                 "owner UUID, " +
                 "center TEXT, " +
-                "creation_time INTEGER, " +
+                "creation_time BIGINT, " +
                 "island_type TEXT, " +
                 "discord TEXT, " +
                 "paypal TEXT, " +
@@ -145,7 +145,7 @@ public final class SQLDatabaseInitializer {
                 "description TEXT, " +
                 "generated_schematics INTEGER, " +
                 "unlocked_worlds INTEGER, " +
-                "last_time_updated INTEGER, " +
+                "last_time_updated BIGINT, " +
                 "dirty_chunks TEXT, " +
                 "block_counts TEXT" +
                 ");");
@@ -153,14 +153,14 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_banks (" +
                 "island UUID PRIMARY KEY, " +
                 "balance BIG_DECIMAL, " +
-                "last_interest_time INTEGER" +
+                "last_interest_time BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_bans (" +
                 "island UUID, " +
                 "player UUID, " +
                 "banned_by UUID, " +
-                "banned_time INTEGER" +
+                "banned_time BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_block_limits (" +
@@ -210,7 +210,7 @@ public final class SQLDatabaseInitializer {
                 "island UUID, " +
                 "player UUID, " +
                 "role INTEGER, " +
-                "join_time INTEGER" +
+                "join_time BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_missions (" +
@@ -230,7 +230,7 @@ public final class SQLDatabaseInitializer {
                 "island UUID, " +
                 "player UUID, " +
                 "rating INTEGER, " +
-                "rating_time INTEGER" +
+                "rating_time BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_role_limits (" +
@@ -272,7 +272,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_visitors (" +
                 "island UUID, " +
                 "player UUID, " +
-                "visit_time INTEGER" +
+                "visit_time BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
@@ -298,7 +298,7 @@ public final class SQLDatabaseInitializer {
                 "last_used_name TEXT, " +
                 "last_used_skin TEXT, " +
                 "disbands INTEGER, " +
-                "last_time_updated INTEGER" +
+                "last_time_updated BIGINT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_missions (" +
@@ -331,7 +331,7 @@ public final class SQLDatabaseInitializer {
                 "player UUID, " +
                 "bank_action TEXT, " +
                 "position INTEGER, " +
-                "time INTEGER, " +
+                "time BIGINT, " +
                 "failure_reason TEXT," +
                 "amount TEXT" +
                 ");");
