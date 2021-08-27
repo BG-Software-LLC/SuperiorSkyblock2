@@ -76,14 +76,11 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerUnstackEvent e){
-            if(e.getDecreaseAmount() == 1)
-                return;
-
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if(island != null) {
                 Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
-                island.handleBlockBreak(spawnerKey, e.getDecreaseAmount() - 1);
+                island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
             }
         }
 
