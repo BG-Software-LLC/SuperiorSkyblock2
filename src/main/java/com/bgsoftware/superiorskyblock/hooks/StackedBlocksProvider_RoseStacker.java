@@ -68,10 +68,8 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getStack().getBlock());
-                int placedBlocksAmount = e.isNew() ? e.getIncreaseAmount() - 1 : e.getIncreaseAmount();
-                if (placedBlocksAmount > 0)
-                    island.handleBlockPlace(blockKey, placedBlocksAmount);
+                int placedBlocksAmount = e.isNew() ? Math.max(1, e.getIncreaseAmount() - 1) : e.getIncreaseAmount();
+                island.handleBlockPlace(e.getStack().getBlock(), placedBlocksAmount);
             }
         }
 
@@ -80,8 +78,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                com.bgsoftware.superiorskyblock.utils.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(e.getStack().getBlock());
-                island.handleBlockBreak(blockKey, e.getDecreaseAmount());
+                island.handleBlockBreak(e.getStack().getBlock(), e.getDecreaseAmount());
             }
         }
 
