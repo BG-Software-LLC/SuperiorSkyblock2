@@ -95,8 +95,10 @@ public final class MissionsModule extends BuiltinModule {
 
     private void generateDefaultFiles(){
         FileUtils.copyResource("modules/missions/BlocksMissions");
+        FileUtils.copyResource("modules/missions/BrewingMissions");
         FileUtils.copyResource("modules/missions/CraftingMissions");
         FileUtils.copyResource("modules/missions/EnchantingMissions");
+        FileUtils.copyResource("modules/missions/FishingMissions");
         FileUtils.copyResource("modules/missions/IslandMissions");
         FileUtils.copyResource("modules/missions/ItemsMissions");
         FileUtils.copyResource("modules/missions/KillsMissions");
