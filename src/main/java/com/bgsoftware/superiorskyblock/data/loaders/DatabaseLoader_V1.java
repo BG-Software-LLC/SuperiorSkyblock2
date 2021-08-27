@@ -159,7 +159,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             return false;
         }
 
-        if (sqlSession.doesTableExist("islands_members")) {
+        if (!sqlSession.doesTableExist("stackedBlocks")) {
             sqlSession.close();
             return false;
         }
