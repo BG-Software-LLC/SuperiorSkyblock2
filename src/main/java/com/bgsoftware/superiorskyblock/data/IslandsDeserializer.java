@@ -118,7 +118,7 @@ public final class IslandsDeserializer {
                 warpCategory = island.createWarpCategory((String) islandWarpRow.get("category"));
 
             Location location = FileUtils.toLocation((String) islandWarpRow.get("location"));
-            boolean privateWarp = (int) islandWarpRow.get("private") == 1;
+            boolean privateWarp = (boolean) islandWarpRow.get("private");
 
             IslandWarp islandWarp = island.createWarp(name, location, warpCategory);
             islandWarp.setPrivateFlag(privateWarp);
