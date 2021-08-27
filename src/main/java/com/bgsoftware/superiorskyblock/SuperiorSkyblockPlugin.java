@@ -221,7 +221,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 log("");
             }
 
-            ChunksProvider.init();
+            ChunksProvider.start();
 
             Executor.sync(() -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
