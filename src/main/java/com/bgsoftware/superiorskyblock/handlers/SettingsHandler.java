@@ -149,7 +149,6 @@ public final class SettingsHandler extends AbstractHandler {
     public final List<String> pvpWorlds;
     public final boolean stopLeaving;
     public final boolean valuesMenu;
-    public final int chunksPerTick;
     public final List<String> cropsToGrow;
     public final int cropsInterval;
     public final boolean onlyBackButton;
@@ -428,7 +427,6 @@ public final class SettingsHandler extends AbstractHandler {
         pvpWorlds = cfg.getStringList("pvp-worlds");
         stopLeaving = cfg.getBoolean("stop-leaving", false);
         valuesMenu = cfg.getBoolean("values-menu", true);
-        chunksPerTick = cfg.getInt("chunks-per-tick", 10);
         cropsToGrow = cfg.getStringList("crops-to-grow");
         cropsInterval = cfg.getInt("crops-interval", 5);
         onlyBackButton = cfg.getBoolean("only-back-button", false);
