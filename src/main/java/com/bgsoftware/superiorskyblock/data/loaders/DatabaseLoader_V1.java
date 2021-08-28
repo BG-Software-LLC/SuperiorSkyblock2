@@ -105,19 +105,28 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             }
         });
 
-        AtomicBoolean failedBackup = new AtomicBoolean(false);
+        AtomicBoolean failedBackup = new AtomicBoolean(true);
 
-        if (sqlSession.isUsingMySQL()) {
+        if(!sqlSession.isUsingMySQL()) {
+            sqlSession.close();
+            if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
+                failedBackup.set(false);
+            }
+        }
+
+        if(failedBackup.get()) {
+            if(!sqlSession.isUsingMySQL()) {
+                sqlSession = new SQLSession(plugin, false);
+                sqlSession.createConnection();
+            }
+
+            failedBackup.set(false);
+
             sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}bkp_islands", failure -> failedBackup.set(true));
             sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}bkp_players", failure -> failedBackup.set(true));
             sqlSession.executeUpdate("RENAME TABLE {prefix}grid TO {prefix}bkp_grid", failure -> failedBackup.set(true));
             sqlSession.executeUpdate("RENAME TABLE {prefix}stackedBlocks TO {prefix}bkp_stackedBlocks", failure -> failedBackup.set(true));
             sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> failedBackup.set(true));
-        } else {
-            sqlSession.close();
-            if (!databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
-                failedBackup.set(true);
-            }
         }
 
         if(sqlSession.isUsingMySQL())
