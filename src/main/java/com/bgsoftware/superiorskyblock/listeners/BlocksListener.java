@@ -192,57 +192,52 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFromMonitor(BlockFormEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
+        Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
 
-            if (island != null) {
-                Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1, false), 1L);
-            }
+        if (island != null) {
+            Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1, false), 1L);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFromToMonitor(BlockFromToEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
-            if(island != null && e.getToBlock().getType() != Material.AIR)
-                BlocksLogic.handleBreak(e.getToBlock());
-        }
+        Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
+        if(island != null && e.getToBlock().getType() != Material.AIR)
+            BlocksLogic.handleBreak(e.getToBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityExplodeMonitor(EntityExplodeEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            for(Block block : e.blockList()){
-                Island island = plugin.getGrid().getIslandAt(block.getLocation());
-                if(island != null)
-                    island.handleBlockBreak(block, 1);
-            }
-            if(e.getEntity() instanceof TNTPrimed){
-                Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-                if(island != null)
-                    island.handleBlockBreak(ConstantKeys.TNT, 1);
-            }
+        for(Block block : e.blockList()){
+            Island island = plugin.getGrid().getIslandAt(block.getLocation());
+            if(island != null)
+                island.handleBlockBreak(block, 1);
+        }
+        if(e.getEntity() instanceof TNTPrimed){
+            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            if(island != null)
+                island.handleBlockBreak(ConstantKeys.TNT, 1);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityChangeBlockMonitor(EntityChangeBlockEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            if(island != null) {
-                island.handleBlockBreak(e.getBlock(), 1);
-                if(e.getTo() != Material.AIR) {
-                    byte data = 0;
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-                    try{
-                        //noinspection deprecation
-                        data = e.getData();
-                    }catch (Throwable ignored){}
+        if(island == null)
+            return;
 
-                    island.handleBlockPlace(Key.of(e.getTo(), data), 1);
-                }
-            }
+        island.handleBlockBreak(e.getBlock(), 1);
+
+        if(e.getTo() != Material.AIR) {
+            byte data = 0;
+
+            try{
+                //noinspection deprecation
+                data = e.getData();
+            }catch (Throwable ignored){}
+
+            island.handleBlockPlace(Key.of(e.getTo(), data), 1);
         }
     }
 

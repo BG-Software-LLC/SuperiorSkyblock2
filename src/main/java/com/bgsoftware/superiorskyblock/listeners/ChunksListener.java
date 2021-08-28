@@ -29,7 +29,7 @@ public final class ChunksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onChunkUnloadMonitor(ChunkUnloadEvent e){
-        if(plugin.getGrid() == null || !plugin.getGrid().isIslandsWorld(e.getWorld()))
+        if(!plugin.getGrid().isIslandsWorld(e.getWorld()))
             return;
 
         plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk()))
@@ -48,9 +48,6 @@ public final class ChunksListener implements Listener {
 
     @EventHandler
     public void onChunkLoad(ChunkLoadEvent e){
-        if(plugin.getGrid() == null)
-            return;
-
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
         Island island = plugin.getGrid().getIslandAt(firstBlock);
 
