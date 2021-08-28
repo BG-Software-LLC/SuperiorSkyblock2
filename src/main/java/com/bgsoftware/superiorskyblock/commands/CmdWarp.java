@@ -103,14 +103,21 @@ public final class CmdWarp implements ISuperiorCommand {
             Locale.INVALID_WARP.send(superiorPlayer);
             return;
         }
+
         MenuWarps.simulateClick(superiorPlayer, island, warp.getName());
 
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().tabCompleteHideVanished) : new ArrayList<>();
+
+        return switch (args.length) {
+            case 2 -> CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+                    plugin.getSettings().tabCompleteHideVanished);
+            case 3 -> CommandTabCompletes.getIslandWarps(CommandArguments.getIsland(plugin, sender, args[1]).getKey(), args[2]);
+            default -> new ArrayList<>();
+        };
+
     }
 
 }
