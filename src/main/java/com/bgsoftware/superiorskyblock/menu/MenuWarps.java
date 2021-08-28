@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -46,21 +47,31 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             MenuWarpManage.openInventory(superiorPlayer, this, islandWarp);
         }
         else {
-            if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
-                if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().chargeOnWarp)) < 0){
-                    Locale.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
-                    return;
-                }
 
-                plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().chargeOnWarp);
-            }
+            simulateClick(superiorPlayer, warpCategory.getIsland(), islandWarp.getName());
 
             Executor.sync(() -> {
                 previousMove = false;
-                superiorPlayer.runIfOnline(Player::closeInventory);
-                warpCategory.getIsland().warpPlayer(superiorPlayer, islandWarp.getName());
             }, 1L);
         }
+    }
+
+    public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {
+
+        if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
+            if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().chargeOnWarp)) < 0){
+                Locale.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
+                return;
+            }
+
+            plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().chargeOnWarp);
+        }
+
+        Executor.sync(() -> {
+            superiorPlayer.runIfOnline(Player::closeInventory);
+            island.warpPlayer(superiorPlayer, warpName);
+        }, 1L);
+
     }
 
     @Override
