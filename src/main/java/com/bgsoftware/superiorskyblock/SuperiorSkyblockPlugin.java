@@ -13,8 +13,8 @@ import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
+import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
@@ -43,21 +43,20 @@ import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
-import com.bgsoftware.superiorskyblock.upgrades.loaders.VaultUpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.upgrades.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
+import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -81,6 +80,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final Updater updater = new Updater(this, "superiorskyblock2");
 
+    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this);
     private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this);
     private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
@@ -92,7 +92,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
     private final CommandsHandler commandsHandler = new CommandsHandler(this);
     private final DataHandler dataHandler = new DataHandler(this);
-    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final ModulesHandler modulesHandler = new ModulesHandler(this);
 
     // The only handler that is initialized is this one, therefore it's not final.
@@ -287,7 +286,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }finally {
             CalcTask.cancelTask();
             Executor.close();
-            System.out.println("Closing database...");
+            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             dataHandler.closeConnection();
         }
     }
@@ -725,7 +724,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public static void debug(String message){
         if(plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
-            System.out.println("[SuperiorSkyblock2-DEBUG] " + message);
+            plugin.getLogger().info("[DEBUG] " + message);
     }
 
     public static SuperiorSkyblockPlugin getPlugin(){

@@ -80,6 +80,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
 
@@ -346,7 +347,8 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                         long timeNow = System.currentTimeMillis();
 
                         if(timeNow < timeToExecute){
-                            Locale.COMMAND_COOLDOWN_FORMAT.send(sender, locale, StringUtils.formatTime(locale, timeToExecute - timeNow));
+                            Locale.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
+                                    StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
                             return false;
                         }
 

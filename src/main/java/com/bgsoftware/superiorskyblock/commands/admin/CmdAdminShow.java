@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public final class CmdAdminShow implements IAdminIslandCommand {
 
@@ -93,7 +94,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
         // Island last time updated
         if(lastTime != -1){
             if(!Locale.ISLAND_INFO_LAST_TIME_UPDATED.isEmpty(locale)){
-                infoMessage.append(Locale.ISLAND_INFO_LAST_TIME_UPDATED.getMessage(locale, StringUtils.formatTime(locale, System.currentTimeMillis() - (lastTime * 1000)))).append("\n");
+                infoMessage.append(Locale.ISLAND_INFO_LAST_TIME_UPDATED.getMessage(locale, StringUtils.formatTime(locale,
+                        System.currentTimeMillis() - (lastTime * 1000), TimeUnit.MILLISECONDS))).append("\n");
             }
         }
         else{

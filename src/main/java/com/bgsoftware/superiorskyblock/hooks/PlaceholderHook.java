@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -325,7 +326,7 @@ public abstract class PlaceholderHook {
                     case "bank_format":
                         return StringUtils.fancyFormat(island.getIslandBank().getBalance(), superiorPlayer.getUserLocale());
                     case "bank_next_interest":
-                        return StringUtils.formatTime(superiorPlayer.getUserLocale(), island.getNextInterest() * 1000L);
+                        return StringUtils.formatTime(superiorPlayer.getUserLocale(), island.getNextInterest(), TimeUnit.SECONDS);
                     case "hoppers_limit":
                         return String.valueOf(island.getBlockLimit(ConstantKeys.HOPPER));
                     case "crops_multiplier":

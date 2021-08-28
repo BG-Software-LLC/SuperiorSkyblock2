@@ -5,11 +5,9 @@ import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
+import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.database.DatabaseObject;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
-import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.google.common.base.Preconditions;
@@ -142,9 +140,11 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         return rolesById.keySet().stream().sorted().map(rolesById::get).collect(Collectors.toList());
     }
 
-    public void loadPlayer(ResultSet resultSet) throws SQLException {
-        UUID player = UUID.fromString(resultSet.getString("player"));
-        players.put(player, plugin.getFactory().createPlayer(resultSet));
+    public SuperiorPlayer loadPlayer(DatabaseResult resultSet) {
+        UUID player = UUID.fromString(resultSet.getString("uuid"));
+        SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(resultSet);
+        players.put(player, superiorPlayer);
+        return superiorPlayer;
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer){
@@ -158,28 +158,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     // Updating last time status
     public void savePlayers(){
-        List<SuperiorPlayer> onlinePlayers = Bukkit.getOnlinePlayers().stream()
-                .map(this::getSuperiorPlayer)
-                .collect(Collectors.toList());
-
-        List<SuperiorPlayer> modifiedPlayers = players.values().stream()
-                .filter(player -> player.getDataHandler() != null && ((DatabaseObject) player.getDataHandler()).isModified())
-                .collect(Collectors.toList());
-
-        if(!onlinePlayers.isEmpty()){
-            long lastTimeStatus = System.currentTimeMillis() / 1000;
-            StatementHolder playerStatusHolder = Query.PLAYER_SET_LAST_STATUS.getStatementHolder(null);
-            playerStatusHolder.prepareBatch();
-            onlinePlayers.forEach(superiorPlayer -> playerStatusHolder.setString(lastTimeStatus + "").setString(superiorPlayer.getUniqueId() + "").addBatch());
-            playerStatusHolder.execute(false);
-        }
-
-        if(!modifiedPlayers.isEmpty()){
-            StatementHolder playerUpdateHolder = Query.PLAYER_UPDATE.getStatementHolder(null);
-            playerUpdateHolder.prepareBatch();
-            modifiedPlayers.forEach(player -> ((SPlayerDataHandler) player.getDataHandler()).setUpdateStatement(playerUpdateHolder).addBatch());
-            playerUpdateHolder.execute(false);
-        }
+        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer).forEach(PlayersDatabaseBridge::saveLastTimeStatus);
     }
 
     private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){

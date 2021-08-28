@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class CmdRankup implements IPermissibleCommand {
 
@@ -93,7 +94,7 @@ public final class CmdRankup implements IPermissibleCommand {
         if(island.hasActiveUpgradeCooldown()){
             long timeNow = System.currentTimeMillis(), lastUpgradeTime = island.getLastTimeUpgrade();
             Locale.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    lastUpgradeTime + plugin.getSettings().upgradeCooldown - timeNow));
+                    lastUpgradeTime + plugin.getSettings().upgradeCooldown - timeNow, TimeUnit.MILLISECONDS));
             hasNextLevel = false;
         }
         else {

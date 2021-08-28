@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -14,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public final class CmdTeleport implements ISuperiorCommand {
 
@@ -64,8 +64,9 @@ public final class CmdTeleport implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if(plugin.getSettings().homeWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().homeWarmup));
-            ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(Executor.sync(() ->
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+                    plugin.getSettings().homeWarmup, TimeUnit.MILLISECONDS));
+            superiorPlayer.setTeleportTask(Executor.sync(() ->
                     teleportToIsland(superiorPlayer, island), plugin.getSettings().homeWarmup / 50));
         }
         else {
@@ -79,7 +80,7 @@ public final class CmdTeleport implements ISuperiorCommand {
     }
 
     private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island){
-        ((SPlayerDataHandler) superiorPlayer.getDataHandler()).setTeleportTask(null);
+        superiorPlayer.setTeleportTask(null);
         superiorPlayer.teleport(island, result -> {
             if(result)
                 Locale.TELEPORTED_SUCCESS.send(superiorPlayer);

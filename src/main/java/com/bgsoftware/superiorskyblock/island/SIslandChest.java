@@ -4,8 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -90,10 +89,12 @@ public final class SIslandChest implements IslandChest {
     }
 
     public void updateContents(){
-        ((SIslandDataHandler) island.getDataHandler()).setModified(Query.ISLAND_SET_ISLAND_CHEST);
         if(++contentsUpdateCounter >= 50){
             contentsUpdateCounter = 0;
-            island.getDataHandler().saveIslandChest();
+            IslandsDatabaseBridge.saveIslandChest(island, this);
+        }
+        else{
+            IslandsDatabaseBridge.markIslandChestsToBeSaved(island, this);
         }
     }
 

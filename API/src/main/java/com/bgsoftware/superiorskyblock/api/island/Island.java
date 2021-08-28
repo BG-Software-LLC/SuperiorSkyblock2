@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -153,6 +154,14 @@ public interface Island extends Comparable<Island> {
      * @param superiorPlayer The player to ban.
      */
     void banMember(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Ban a member from the island.
+     * @param superiorPlayer The player to ban.
+     * @param whom The player that executed the ban command.
+     *             If null, CONSOLE will be chosen as the banner.
+     */
+    void banMember(SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer whom);
 
     /**
      * Unban a player from the island.
@@ -756,6 +765,12 @@ public interface Island extends Comparable<Island> {
      * Get the duration until the bank interest will be given again, in seconds
      */
     long getNextInterest();
+
+    /**
+     * Set the last time that the bank interest was given.
+     * @param lastInterest The time it was given.
+     */
+    void setLastInterestTime(long lastInterest);
 
     /*
      *  Worth related methods
@@ -1585,7 +1600,14 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the data handler of the object.
+     * @deprecated See getDatabaseBridge
      */
+    @Deprecated
     IslandDataHandler getDataHandler();
+
+    /**
+     * Get the current database bridge of the island.
+     */
+    DatabaseBridge getDatabaseBridge();
 
 }

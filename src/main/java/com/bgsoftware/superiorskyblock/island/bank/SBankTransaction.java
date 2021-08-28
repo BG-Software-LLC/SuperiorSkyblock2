@@ -2,11 +2,10 @@ package com.bgsoftware.superiorskyblock.island.bank;
 
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.UUID;
 
 public final class SBankTransaction implements BankTransaction {
@@ -29,14 +28,14 @@ public final class SBankTransaction implements BankTransaction {
         this.amount = amount.setScale(2, BigDecimal.ROUND_HALF_EVEN);
     }
 
-    public SBankTransaction(ResultSet resultSet) throws SQLException {
+    public SBankTransaction(DatabaseResult resultSet) {
         String player = resultSet.getString("player");
         this.player = player == null || player.isEmpty() ? null  : UUID.fromString(player);
-        this.bankAction = BankAction.valueOf(resultSet.getString("bankAction"));
+        this.bankAction = BankAction.valueOf(resultSet.getString("bank_action"));
         this.position = resultSet.getInt("position");
-        this.time = Long.parseLong(resultSet.getString("time"));
+        this.time = resultSet.getLong("time");
         this.date = StringUtils.formatDate(time);
-        this.failureReason = resultSet.getString("failureReason");
+        this.failureReason = resultSet.getString("failure_reason");
         this.amount = new BigDecimal(resultSet.getString("amount")).setScale(2, BigDecimal.ROUND_HALF_EVEN);
     }
 

@@ -69,4 +69,11 @@ public interface IslandBank {
      */
     List<BankTransaction> getConsoleTransactions();
 
+    /**
+     * Load a transaction log.
+     * Used to load transactions from the database.
+     * @param bankTransaction The transaction object to load.
+     */
+    void loadTransaction(BankTransaction bankTransaction);
+
 }
