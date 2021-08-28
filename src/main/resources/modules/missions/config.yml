@@ -10,10 +10,22 @@ enabled: true
 
 # Settings related to mission categories.
 categories:
-  players:
-    name: 'Players'
+  miner:
+    name: 'Miner'
+    slot: 20
+
+  slayer:
+    name: 'Slayer'
     slot: 21
 
-  islands:
-    name: 'Islands'
+  farmer:
+    name: 'Farmer'
+    slot: 22
+
+  fisherman:
+    name: 'Fisherman'
     slot: 23
+
+  explorer:
+    name: 'Explorer'
+    slot: 24
