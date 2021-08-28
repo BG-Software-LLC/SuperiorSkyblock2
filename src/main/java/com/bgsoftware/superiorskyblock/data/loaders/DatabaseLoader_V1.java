@@ -1034,12 +1034,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 int index = islandChestObject.get("index").getAsInt();
                 String contents = islandChestObject.get("contents").getAsString();
 
-                if (index >= islandChestList.size()) {
-                    islandChestList.add(null);
-                } else
-                    islandChestList.add(index, new IslandChestAttributes()
-                            .setValue(IslandChestAttributes.Field.INDEX, index)
-                            .setValue(IslandChestAttributes.Field.CONTENTS, contents));
+                islandChestList.add(new IslandChestAttributes()
+                        .setValue(IslandChestAttributes.Field.INDEX, index)
+                        .setValue(IslandChestAttributes.Field.CONTENTS, contents));
             });
 
             return islandChestList;
