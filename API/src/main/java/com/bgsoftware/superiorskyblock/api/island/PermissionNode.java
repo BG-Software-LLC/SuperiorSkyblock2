@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import java.util.Map;
+
 public interface PermissionNode extends Cloneable {
 
     /**
@@ -14,5 +16,11 @@ public interface PermissionNode extends Cloneable {
      * @param value The value to set.
      */
     void setPermission(IslandPrivilege islandPrivilege, boolean value);
+
+    /**
+     * Get all permissions set using the provided method.
+     * This does not include default permissions.
+     */
+    Map<IslandPrivilege, Boolean> getCustomPermissions();
 
 }

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.database;
+package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.zaxxer.hikari.HikariConfig;
@@ -11,40 +11,40 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-public final class SQLHelper {
+public final class SQLSession {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final CompletableFuture<Void> ready = new CompletableFuture<>();
-    private static final Object mutex = new Object();
+    private final CompletableFuture<Void> ready = new CompletableFuture<>();
+    private final Object mutex = new Object();
 
-    private static HikariDataSource dataSource;
+    private final SuperiorSkyblockPlugin plugin;
+    private final boolean logging;
+    private final boolean usesMySQL;
 
-    private SQLHelper(){
+    private HikariDataSource dataSource;
 
+    public SQLSession(SuperiorSkyblockPlugin plugin, boolean logging){
+        this.plugin = plugin;
+        this.logging = logging;
+        this.usesMySQL = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL");
     }
 
-    public static void waitForConnection(){
+    private void log(String message){
+        if(logging)
+            SuperiorSkyblockPlugin.log(message);
+    }
+
+    public boolean createConnection(){
         try {
-            ready.get();
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
-    }
+            log("Trying to connect to " + plugin.getSettings().databaseType + " database...");
 
-    public static Object getMutex() {
-        return mutex;
-    }
-
-    public static boolean createConnection(SuperiorSkyblockPlugin plugin){
-        try {
-            SuperiorSkyblockPlugin.log("Trying to connect to " + plugin.getSettings().databaseType + " database...");
             HikariConfig config = new HikariConfig();
             config.setConnectionTestQuery("SELECT 1");
             config.setPoolName("SuperiorSkyblock Pool");
 
-            if (plugin.getSettings().databaseType.equalsIgnoreCase("MySQL")) {
+            if (usesMySQL) {
                 config.setDriverClassName("com.mysql.jdbc.Driver");
 
                 String address = plugin.getSettings().databaseMySQLAddress;
@@ -71,7 +71,7 @@ public final class SQLHelper {
 
                 dataSource = new HikariDataSource(config);
 
-                SuperiorSkyblockPlugin.log("Successfully established connection with MySQL database!");
+                log("Successfully established connection with MySQL database!");
             } else {
                 config.setDriverClassName("org.sqlite.JDBC");
                 File file = new File(plugin.getDataFolder(), "database.db");
@@ -79,7 +79,7 @@ public final class SQLHelper {
 
                 dataSource = new HikariDataSourceSQLiteWrapper(config);
 
-                SuperiorSkyblockPlugin.log("Successfully established connection with SQLite database!");
+                log("Successfully established connection with SQLite database!");
             }
 
             ready.complete(null);
@@ -90,48 +90,68 @@ public final class SQLHelper {
         return false;
     }
 
-    public static void executeUpdate(String statement){
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+    public boolean isUsingMySQL(){
+        return usesMySQL;
+    }
+
+    public void waitForConnection(){
+        try {
+            ready.get();
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public Object getMutex() {
+        return mutex;
+    }
+
+    public void executeUpdate(String statement){
+        executeUpdate(statement, error -> {
+            SuperiorSkyblockPlugin.log("&cAn errror occurred while running statement: " + statement);
+            error.printStackTrace();
+        });
+    }
+
+    public void executeUpdate(String statement, Consumer<SQLException> onFailure){
+        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         try{
             conn = dataSource.getConnection();
-            preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix));
+            preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)
+                    .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)")
+                    .replace("UNIQUE_TEXT", "VARCHAR(30)"));
             preparedStatement.executeUpdate();
         }catch(SQLException ex){
-            System.out.println(statement);
-            ex.printStackTrace();
+            onFailure.accept(ex);
         } finally {
             close(preparedStatement);
             close(conn);
         }
     }
 
-    public static boolean doesConditionExist(String statement){
-        boolean ret = false;
-
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
-        Connection conn = null;
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        try{
-            conn = dataSource.getConnection();
-            preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix));
-            resultSet = preparedStatement.executeQuery();
-            ret = resultSet.next();
-        }catch(SQLException ex){
-            ex.printStackTrace();
-        } finally {
-            close(resultSet);
-            close(preparedStatement);
-            close(conn);
-        }
-
-        return ret;
+    public boolean doesConditionExist(String statement){
+        AtomicBoolean result = new AtomicBoolean(false);
+        executeQuery(statement, resultSet -> result.set(resultSet.next()));
+        return result.get();
     }
 
-    public static void executeQuery(String statement, QueryConsumer<ResultSet> callback){
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+    public boolean doesTableExist(String tableName) {
+        AtomicBoolean result = new AtomicBoolean(false);
+
+        executeQuery("SELECT * FROM {prefix}" + tableName, resultSet ->
+                result.set(true), error -> result.set(false));
+
+        return result.get();
+    }
+
+    public void executeQuery(String statement, QueryConsumer<ResultSet> callback){
+        executeQuery(statement, callback, SQLException::printStackTrace);
+    }
+
+    public void executeQuery(String statement, QueryConsumer<ResultSet> callback, Consumer<SQLException> onFailure){
+        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -141,7 +161,7 @@ public final class SQLHelper {
             resultSet = preparedStatement.executeQuery();
             callback.accept(resultSet);
         }catch(SQLException ex){
-            ex.printStackTrace();
+            onFailure.accept(ex);
         } finally {
             close(resultSet);
             close(preparedStatement);
@@ -149,12 +169,12 @@ public final class SQLHelper {
         }
     }
 
-    public static void close(){
+    public void close(){
         dataSource.close();
     }
 
-    public static void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
-        String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+    public void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
+        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         try{
@@ -164,21 +184,21 @@ public final class SQLHelper {
         }catch(SQLException ex){
             failure.accept(ex);
         } finally {
-          close(preparedStatement);
-          close(conn);
+            close(preparedStatement);
+            close(conn);
         }
     }
 
-    private static void close(AutoCloseable closeable){
+    private void close(AutoCloseable closeable){
         if(closeable != null){
             try {
-                if(!(closeable instanceof Connection) || plugin.getSettings().databaseType.equalsIgnoreCase("MySQL"))
+                if(!(closeable instanceof Connection) || usesMySQL)
                     closeable.close();
             } catch (Exception ignored) {}
         }
     }
 
-    public static void setAutoCommit(boolean autoCommit){
+    public void setAutoCommit(boolean autoCommit){
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -190,7 +210,7 @@ public final class SQLHelper {
         }
     }
 
-    public static void commit() throws SQLException{
+    public void commit() throws SQLException{
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -206,8 +226,7 @@ public final class SQLHelper {
 
     }
 
-
-    private static class HikariDataSourceSQLiteWrapper extends HikariDataSource{
+    private static class HikariDataSourceSQLiteWrapper extends HikariDataSource {
 
         private final Connection conn;
 
@@ -229,4 +248,3 @@ public final class SQLHelper {
     }
 
 }
-

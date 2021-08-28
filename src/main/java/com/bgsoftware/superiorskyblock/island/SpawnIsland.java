@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -19,8 +20,9 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.data.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.hooks.SWMHook;
-import com.bgsoftware.superiorskyblock.island.data.SEmptyIslandDataHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
@@ -194,6 +196,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer) {
+
+    }
+
+    @Override
+    public void banMember(SuperiorPlayer superiorPlayer, SuperiorPlayer whom) {
 
     }
 
@@ -738,6 +745,11 @@ public final class SpawnIsland implements Island {
     @Override
     public long getNextInterest() {
         return -1;
+    }
+
+    @Override
+    public void setLastInterestTime(long lastInterest) {
+
     }
 
     @Override
@@ -1387,7 +1399,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public IslandDataHandler getDataHandler() {
-        return SEmptyIslandDataHandler.getHandler();
+        return EmptyDataHandler.getInstance();
+    }
+
+    @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return EmptyDatabaseBridge.getInstance();
     }
 
     @SuppressWarnings("NullableProblems")

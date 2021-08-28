@@ -480,9 +480,6 @@ public final class ProtectionListener implements Listener {
                 Locale.sendProtectionMessage(superiorPlayer);
             }
         } catch (Exception ex) {
-            System.out.println("Item: " + e.getItem());
-            System.out.println("Entity: " + spawnType);
-            System.out.println("Entity Class: " + spawnType.getEntityClass());
             ex.printStackTrace();
         }
     }

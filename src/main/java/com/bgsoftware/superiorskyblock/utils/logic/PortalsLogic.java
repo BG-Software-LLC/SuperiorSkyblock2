@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.ChatColor;
@@ -41,7 +40,7 @@ public final class PortalsLogic {
         if (involvedEvent != null)
             involvedEvent.setCancelled(true);
 
-        if (((SPlayerDataHandler) superiorPlayer.getDataHandler()).isImmunedToTeleport())
+        if (superiorPlayer.isImmunedToPortals())
             return;
 
         World.Environment destinationEnvironment = getTargetWorld(portalLocation, teleportCause);

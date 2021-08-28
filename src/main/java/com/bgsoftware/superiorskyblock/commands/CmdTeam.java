@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public final class CmdTeam implements ISuperiorCommand {
 
@@ -92,10 +93,11 @@ public final class CmdTeam implements ISuperiorCommand {
 
                 members.forEach(islandMember -> {
                     PlayerRole playerRole = islandMember.getPlayerRole();
-                    long time = islandMember.getLastTimeStatus() == -1 ? -1 : ((System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus()) * 1000;
+                    long time = islandMember.getLastTimeStatus() == -1 ? -1 : ((System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus());
                     boolean onlinePlayer = islandMember.isOnline() && islandMember.isShownAsOnline();
                     rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
-                            islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus, StringUtils.formatTime(locale, time))).append("\n");
+                            islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus,
+                            StringUtils.formatTime(locale, time, TimeUnit.SECONDS))).append("\n");
                 });
 
                 rolesStrings.keySet().stream()

@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
+    implementation 'com.bgsoftware.common.executors:Executors:latest'
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'
@@ -121,7 +122,7 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.utils.hikari'
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.data.sql.hikari'
 
     if(System.getenv("BUILD_NUMBER") == null){
         archiveName = rootProject.name + ".jar"

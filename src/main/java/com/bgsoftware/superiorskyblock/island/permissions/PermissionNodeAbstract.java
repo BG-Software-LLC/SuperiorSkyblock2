@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class PermissionNodeAbstract implements PermissionNode {
@@ -47,6 +48,14 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     }
 
     @Override
+    public Map<IslandPrivilege, Boolean> getCustomPermissions() {
+        return privileges.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue() == PrivilegeStatus.ENABLED
+        ));
+    }
+
+    @Override
     public abstract PermissionNodeAbstract clone();
 
     protected boolean isDefault(IslandPrivilege islandPrivilege){
@@ -71,7 +80,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
             }
         }
 
-        static PrivilegeStatus of(String value) throws IllegalArgumentException{
+        static PrivilegeStatus of(String value) throws IllegalArgumentException {
             switch (value){
                 case "0":
                     return DISABLED;
@@ -79,6 +88,17 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                     return ENABLED;
                 default:
                     return valueOf(value);
+            }
+        }
+
+        static PrivilegeStatus of(byte value) throws IllegalArgumentException {
+            switch (value){
+                case 0:
+                    return DISABLED;
+                case 1:
+                    return ENABLED;
+                default:
+                    throw new IllegalArgumentException("Invalid privilege status: " + value);
             }
         }
 

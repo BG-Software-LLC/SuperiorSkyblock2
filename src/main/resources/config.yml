@@ -583,9 +583,6 @@ stop-leaving: false
 # Should the values menu be enabled?
 values-menu: true
 
-# How many chunks should be loaded in one tick by SuperiorSkyblock?
-chunks-per-tick: 10
-
 # A list of crops that will be affected by the crop growth multiplier.
 # You can find a list of materials here: https://bg-software.com/materials/
 crops-to-grow:

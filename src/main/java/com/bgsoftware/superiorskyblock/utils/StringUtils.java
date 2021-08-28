@@ -16,9 +16,11 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,7 +30,6 @@ public final class StringUtils {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
-    private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
     private static final char SPACE_ASCII = 160;
 
     @SuppressWarnings("all")
@@ -173,59 +174,76 @@ public final class StringUtils {
         return stringBuilder.substring(2);
     }
 
-    public static String formatTime(java.util.Locale locale, long time){
+    public static String formatTime(java.util.Locale locale, long time, TimeUnit timeUnit){
+        return formatTimeFromMilliseconds(locale, timeUnit.toMillis(time));
+    }
+
+    private static String formatTimeFromMilliseconds(java.util.Locale locale, long millis){
+        Duration duration = Duration.ofMillis(millis);
         StringBuilder timeBuilder = new StringBuilder();
-        long timeUnitValue;
         boolean RTL = LocaleUtils.isRightToLeft(locale);
 
-        if(time > D){
-            timeUnitValue = time / D;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+        {
+            long days = duration.toDays();
+
+            if(days > 0){
+                if(RTL){
+                    timeBuilder.insert(0, days).insert(0, " ").insert(0, days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+                }
+                else {
+                    timeBuilder.append(days).append(" ").append(days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
+                }
+                duration = duration.minusDays(days);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
-            }
-            time %= D;
         }
 
-        if(time > H){
-            timeUnitValue = time / H;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+        {
+            long hours = duration.toHours();
+
+            if(hours > 0){
+                if(RTL){
+                    timeBuilder.insert(0, hours).insert(0, " ").insert(0, hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+                }
+                else {
+                    timeBuilder.append(hours).append(" ").append(hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
+                }
+
+                duration = duration.minusHours(hours);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
-            }
-            time %= H;
         }
 
-        if(time > MIN){
-            timeUnitValue = time / MIN;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+        {
+            long minutes = duration.toMinutes();
+
+            if(minutes > 0){
+                if(RTL){
+                    timeBuilder.insert(0, minutes).insert(0, " ").insert(0, minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+                }
+                else {
+                    timeBuilder.append(minutes).append(" ").append(minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
+                }
+                duration = duration.minusMinutes(minutes);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
-            }
-            time %= MIN;
         }
 
-        if(time > S){
-            timeUnitValue = time / S;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
-            }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
+        {
+            long seconds = duration.getSeconds();
+
+            if(seconds > 0){
+                if(RTL){
+                    timeBuilder.insert(0, seconds).insert(0, " ").insert(0, seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
+                }
+                else {
+                    timeBuilder.append(seconds).append(" ").append(seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
+                }
             }
         }
 

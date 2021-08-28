@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
-import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
@@ -22,10 +22,12 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.data.DatabaseResult;
+import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
-import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
-import com.bgsoftware.superiorskyblock.island.data.SPlayerDataHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
@@ -56,10 +58,8 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandDeserializer;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -88,14 +88,11 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -111,6 +108,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -120,6 +118,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
+    private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
 
@@ -145,7 +144,7 @@ public final class SIsland implements Island {
      * Island data
      */
 
-    private final IslandDataHandler islandDataHandler = new SIslandDataHandler(this);
+    private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final IslandBank islandBank = plugin.getFactory().createIslandBank(this);
     private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
 
@@ -170,7 +169,7 @@ public final class SIsland implements Island {
     private volatile String discord = "None";
     private volatile String paypal = "None";
     private final SyncedObject<Location[]> teleportLocations = SyncedObject.of(new Location[World.Environment.values().length]);
-    private Location visitorsLocation = null;
+    private final SyncedObject<Location[]> visitorsLocations = SyncedObject.of(new Location[World.Environment.values().length]);
     private volatile boolean locked = false;
     private volatile String islandName;
     private volatile String islandRawName;
@@ -207,133 +206,70 @@ public final class SIsland implements Island {
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
     private final Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new ConcurrentHashMap<>();
 
-    public SIsland(GridHandler grid, ResultSet resultSet) throws SQLException {
-        try {
-            ((SIslandDataHandler) islandDataHandler).setLoadingIsland(true);
+    public SIsland(GridHandler grid, DatabaseResult resultSet) {
+        this.uuid = UUID.fromString(resultSet.getString("uuid"));
+        this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
+        this.owner.setPlayerRole(SPlayerRole.lastRole());
+        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
+        this.creationTime = resultSet.getLong("creation_time");
+        this.schemName = resultSet.getString("island_type");
+        this.discord = resultSet.getString("discord");
+        this.paypal = resultSet.getString("paypal");
+        this.bonusWorth.set(resultSet.getBigDecimal("worth_bonus"));
+        this.bonusLevel.set(resultSet.getBigDecimal("levels_bonus"));
+        this.locked = resultSet.getBoolean("locked");
+        this.ignored = resultSet.getBoolean("ignored");
+        this.islandName = resultSet.getString("name");
+        this.islandRawName = StringUtils.stripColors(this.islandName);
+        this.description = resultSet.getString("description");
+        this.generatedSchematics.set(resultSet.getInt("generated_schematics"));
+        this.unlockedWorlds.set(resultSet.getInt("unlocked_worlds"));
+        this.lastTimeUpdate = resultSet.getLong("last_time_updated");
 
-            this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
-            this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-            this.creationTime = resultSet.getLong("creationTime");
-            updateDatesFormatter();
+        ChunksTracker.deserialize(grid, this, resultSet.getString("dirty_chunks"));
+        String blockCountsString = resultSet.getString("block_counts");
+        Executor.sync(() -> deserializeBlockCounts(blockCountsString), 5L);
 
-            IslandDeserializer.deserializeLocations(resultSet.getString("teleportLocation"), this.teleportLocations);
-            IslandDeserializer.deserializePlayers(resultSet.getString("members"), this.members);
-            IslandDeserializer.deserializePlayers(resultSet.getString("banned"), this.banned);
-            IslandDeserializer.deserializePermissions(resultSet.getString("permissionNodes"), this.playerPermissions, this.rolePermissions, this);
-            IslandDeserializer.deserializeUpgrades(resultSet.getString("upgrades"), this.upgrades);
-            IslandDeserializer.deserializeWarps(resultSet.getString("warps"), this);
-            IslandDeserializer.deserializeBlockLimits(resultSet.getString("blockLimits"), this.blockLimits);
-            IslandDeserializer.deserializeRatings(resultSet.getString("ratings"), this.ratings);
-            IslandDeserializer.deserializeMissions(resultSet.getString("missions"), this.completedMissions);
-            IslandDeserializer.deserializeIslandFlags(resultSet.getString("settings"), this.islandSettings);
-            IslandDeserializer.deserializeGenerators(resultSet.getString("generator"), this.cobbleGeneratorValues);
-            IslandDeserializer.deserializePlayersWithTimes(resultSet.getString("uniqueVisitors"), this.uniqueVisitors);
-            IslandDeserializer.deserializeEntityLimits(resultSet.getString("entityLimits"), this.entityLimits);
-            IslandDeserializer.deserializeEffects(resultSet.getString("islandEffects"), this.islandEffects);
-            IslandDeserializer.deserializeIslandChest(this, resultSet.getString("islandChest"), this.islandChest);
-            IslandDeserializer.deserializeRoleLimits(resultSet.getString("roleLimits"), this.roleLimits);
-            IslandDeserializer.deserializeWarpCategories(resultSet.getString("warpCategories"), this);
+        IslandsDeserializer.deserializeIslandHomes(this, this.teleportLocations);
+        IslandsDeserializer.deserializeMembers(this, this.members);
+        IslandsDeserializer.deserializeBanned(this, this.banned);
+        IslandsDeserializer.deserializePlayerPermissions(this, this.playerPermissions);
+        IslandsDeserializer.deserializeRolePermissions(this, this.rolePermissions);
+        IslandsDeserializer.deserializeUpgrades(this, this.upgrades);
+        IslandsDeserializer.deserializeWarps(this);
+        IslandsDeserializer.deserializeBlockLimits(this, this.blockLimits);
+        IslandsDeserializer.deserializeRatings(this, this.ratings);
+        IslandsDeserializer.deserializeMissions(this, this.completedMissions);
+        IslandsDeserializer.deserializeIslandFlags(this, this.islandSettings);
+        IslandsDeserializer.deserializeGenerators(this, this.cobbleGeneratorValues);
+        IslandsDeserializer.deserializeVisitors(this, this.uniqueVisitors);
+        IslandsDeserializer.deserializeEntityLimits(this, this.entityLimits);
+        IslandsDeserializer.deserializeEffects(this, this.islandEffects);
+        IslandsDeserializer.deserializeIslandChest(this, this.islandChest);
+        IslandsDeserializer.deserializeRoleLimits(this, this.roleLimits);
+        IslandsDeserializer.deserializeWarpCategories(this);
+        IslandsDeserializer.deserializeIslandBank(this);
+        IslandsDeserializer.deserializeVisitorHomes(this, this.visitorsLocations);
 
-            if (!resultSet.getString("uniqueVisitors").contains(";"))
-                islandDataHandler.saveUniqueVisitors();
+        IslandsDeserializer.deserializeIslandSettings(this, islandSettingsRaw -> {
+            DatabaseResult islandSettings = new DatabaseResult(islandSettingsRaw);
+            this.islandSize = new UpgradeValue<>(islandSettings.getInt("size"), i -> i < 0);
+            this.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit"), i -> i < 0);
+            this.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit"), i -> i < 0);
+            this.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier"), i -> i < 0);
+            this.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier"), i -> i < 0);
+            this.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier"), i -> i < 0);
+            this.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit"), i -> i < 0);
+            this.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit"), i -> i.compareTo(new BigDecimal(-1)) < 0);
+        });
 
-            parseNumbersSafe(() -> this.islandBank.setBalance(new BigDecimal(resultSet.getString("islandBank"))));
-            parseNumbersSafe(() -> this.bonusWorth.set(new BigDecimal(resultSet.getString("bonusWorth"))));
-            this.islandSize = new UpgradeValue<>(resultSet.getInt("islandSize"), i -> i < 0);
-            this.teamLimit = new UpgradeValue<>(resultSet.getInt("teamLimit"), i -> i < 0);
-            this.warpsLimit = new UpgradeValue<>(resultSet.getInt("warpsLimit"), i -> i < 0);
-            this.cropGrowth = new UpgradeValue<>(resultSet.getDouble("cropGrowth"), i -> i < 0);
-            this.spawnerRates = new UpgradeValue<>(resultSet.getDouble("spawnerRates"), i -> i < 0);
-            this.mobDrops = new UpgradeValue<>(resultSet.getDouble("mobDrops"), i -> i < 0);
-            this.discord = resultSet.getString("discord");
-            this.paypal = resultSet.getString("paypal");
-            this.visitorsLocation = LocationUtils.getLocation(resultSet.getString("visitorsLocation"));
-            this.locked = resultSet.getBoolean("locked");
-            this.islandName = resultSet.getString("name");
-            this.islandRawName = StringUtils.stripColors(this.islandName);
-            this.description = resultSet.getString("description");
-            this.ignored = resultSet.getBoolean("ignored");
-            parseNumbersSafe(() -> this.bonusLevel.set(new BigDecimal(resultSet.getString("bonusLevel"))));
+        updateDatesFormatter();
+        startBankInterest();
+        checkMembersDuplication();
+        updateOldUpgradeValues();
+        updateUpgrades();
 
-            String generatedSchematics = resultSet.getString("generatedSchematics");
-            try {
-                this.generatedSchematics.set(Integer.parseInt(generatedSchematics));
-            } catch (Exception ex) {
-                int n = 0;
-
-                if (generatedSchematics.contains("normal"))
-                    n |= 8;
-                if (generatedSchematics.contains("nether"))
-                    n |= 4;
-                if (generatedSchematics.contains("the_end"))
-                    n |= 3;
-
-                this.generatedSchematics.set(n);
-            }
-
-            this.schemName = resultSet.getString("schemName");
-
-            String unlockedWorlds = resultSet.getString("unlockedWorlds");
-            try {
-                this.unlockedWorlds.set(Integer.parseInt(unlockedWorlds));
-            } catch (Exception ex) {
-                int n = 0;
-
-                if (unlockedWorlds.contains("nether"))
-                    n |= 1;
-                if (unlockedWorlds.contains("the_end"))
-                    n |= 2;
-
-                this.unlockedWorlds.set(n);
-            }
-
-            this.lastTimeUpdate = resultSet.getLong("lastTimeUpdate");
-            this.coopLimit = new UpgradeValue<>(resultSet.getInt("coopLimit"), i -> i < 0);
-            String bankLimit = resultSet.getString("bankLimit");
-            parseNumbersSafe(() -> this.bankLimit = new UpgradeValue<>(new BigDecimal(bankLimit),
-                    i -> i.compareTo(new BigDecimal(-1)) < 0));
-
-            String blockCounts = resultSet.getString("blockCounts");
-
-            Executor.sync(() -> {
-                try {
-                    rawKeyPlacements = true;
-                    IslandDeserializer.deserializeBlockCounts(blockCounts, this);
-                } finally {
-                    rawKeyPlacements = false;
-                }
-
-                if (this.blockCounts.isEmpty())
-                    calcIslandWorth(null);
-            }, 5L);
-
-            ChunksTracker.deserialize(grid, this, resultSet.getString("dirtyChunks"));
-
-            String uuidRaw = resultSet.getString("uuid");
-            if (uuidRaw == null || uuidRaw.isEmpty()) {
-                this.uuid = owner.getUniqueId();
-            } else {
-                this.uuid = UUID.fromString(uuidRaw);
-            }
-
-            this.lastInterest = resultSet.getLong("lastInterest");
-
-            if (BuiltinModules.BANK.bankInterestEnabled) {
-                long currentTime = System.currentTimeMillis() / 1000;
-                long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
-                if (ticksToNextInterest <= 0) {
-                    giveInterest(true);
-                } else {
-                    Executor.sync(() -> giveInterest(true), ticksToNextInterest);
-                }
-            }
-
-            checkMembersDuplication();
-            updateOldUpgradeValues();
-            updateUpgrades();
-        }finally {
-            ((SIslandDataHandler) islandDataHandler).setLoadingIsland(false);
-        }
+        databaseBridge.startSavingData();
     }
 
     @SuppressWarnings("WeakerAccess")
@@ -350,16 +286,17 @@ public final class SIsland implements Island {
         this.uuid = uuid;
         this.center = SBlockPosition.of(location);
         this.creationTime = currentTime;
-        updateDatesFormatter();
         this.islandName = islandName;
         this.islandRawName = StringUtils.stripColors(islandName);
         this.schemName = schemName;
+
         setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment);
-
-        updateLastInterest(currentTime);
-
+        setLastInterestTime(currentTime);
+        updateDatesFormatter();
         assignIslandChest();
         updateUpgrades();
+
+        databaseBridge.startSavingData();
     }
 
     /*
@@ -504,7 +441,7 @@ public final class SIsland implements Island {
             setCurrentlyActive();
         }
 
-        islandDataHandler.saveMembers();
+        IslandsDatabaseBridge.addMember(this, superiorPlayer, System.currentTimeMillis());
     }
 
     @Override
@@ -535,7 +472,7 @@ public final class SIsland implements Island {
         MenuMemberRole.destroyMenus(superiorPlayer);
         MenuMembers.refreshMenus(this);
 
-        islandDataHandler.saveMembers();
+        IslandsDatabaseBridge.removeMember(this, superiorPlayer);
     }
 
     @Override
@@ -546,6 +483,11 @@ public final class SIsland implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer){
+        banMember(superiorPlayer, null);
+    }
+
+    @Override
+    public void banMember(SuperiorPlayer superiorPlayer, SuperiorPlayer whom) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Ban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
@@ -559,7 +501,9 @@ public final class SIsland implements Island {
         if (location != null && isInside(location))
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
 
-        islandDataHandler.saveBannedPlayers();
+        IslandsDatabaseBridge.addBannedPlayer(this,
+                superiorPlayer, whom == null ? CONSOLE_UUID : whom.getUniqueId(),
+                System.currentTimeMillis());
     }
 
     @Override
@@ -568,7 +512,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Unban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
         banned.remove(superiorPlayer);
-        islandDataHandler.saveBannedPlayers();
+        IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
     }
 
     @Override
@@ -629,7 +573,7 @@ public final class SIsland implements Island {
         coopLimit = Math.max(0, coopLimit);
         SuperiorSkyblockPlugin.debug("Action: Set Coop Limit, Island: " + owner.getName() + ", Coop Limit: " + coopLimit);
         this.coopLimit = new UpgradeValue<>(coopLimit, false);
-        islandDataHandler.saveCoopLimit();
+        IslandsDatabaseBridge.saveCoopLimit(this);
     }
 
     @Override
@@ -654,16 +598,18 @@ public final class SIsland implements Island {
             Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
                     uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
 
+            long visitTime = System.currentTimeMillis();
+
             if(playerPairOptional.isPresent()){
-                playerPairOptional.get().setValue(System.currentTimeMillis());
+                playerPairOptional.get().setValue(visitTime);
             }
             else{
-                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, System.currentTimeMillis())));
+                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, visitTime)));
             }
 
             MenuUniqueVisitors.refreshMenus(this);
 
-            islandDataHandler.saveUniqueVisitors();
+            IslandsDatabaseBridge.saveVisitor(this, superiorPlayer, visitTime);
         }
 
         updateLastTime();
@@ -695,7 +641,7 @@ public final class SIsland implements Island {
 
     @Override
     public Location getVisitorsLocation() {
-        Location visitorsLocation = this.visitorsLocation == null ? null : this.visitorsLocation.clone();
+        Location visitorsLocation = this.visitorsLocations.readAndGet(visitorsLocations -> visitorsLocations[0]);
 
         if(visitorsLocation == null)
             return null;
@@ -751,21 +697,22 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Change Teleport Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(teleportLocation));
         teleportLocations.write(teleportLocations ->
                 teleportLocations[environment.ordinal()] = teleportLocation == null ? null : teleportLocation.clone());
-        islandDataHandler.saveTeleportLocation();
+
+        IslandsDatabaseBridge.saveTeleportLocation(this, environment, teleportLocation);
     }
 
     @Override
     public void setVisitorsLocation(Location visitorsLocation) {
         if(visitorsLocation == null){
             SuperiorSkyblockPlugin.debug("Action: Delete Visitors Location, Island: " + owner.getName());
-            this.visitorsLocation = null;
+            this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = null);
+            IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
         }
         else{
             SuperiorSkyblockPlugin.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
-            this.visitorsLocation = visitorsLocation.clone();
+            this.visitorsLocations.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
+            IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
         }
-
-        islandDataHandler.saveVisitorLocation();
     }
 
     @Override
@@ -954,7 +901,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Disable Normal, Island: " + owner.getName());
         }
 
-        islandDataHandler.saveUnlockedWorlds();
+        IslandsDatabaseBridge.saveUnlockedWorlds(this);
     }
 
     @Override
@@ -973,7 +920,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Disable Nether, Island: " + owner.getName());
         }
 
-        islandDataHandler.saveUnlockedWorlds();
+        IslandsDatabaseBridge.saveUnlockedWorlds(this);
     }
 
     @Override
@@ -992,7 +939,7 @@ public final class SIsland implements Island {
             SuperiorSkyblockPlugin.debug("Action: Disable End, Island: " + owner.getName());
         }
 
-        islandDataHandler.saveUnlockedWorlds();
+        IslandsDatabaseBridge.saveUnlockedWorlds(this);
     }
 
     @Override
@@ -1038,7 +985,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
 
         if(value) {
-            rolePermissions.put(islandPrivilege, playerRole);
+            PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
 
             if(islandPrivilege == IslandPrivileges.FLY) {
                 getAllPlayersInside().forEach(this::updateIslandFly);
@@ -1047,7 +994,9 @@ public final class SIsland implements Island {
                 getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
             }
 
-            islandDataHandler.savePermissions();
+            if(oldRole != null)
+                IslandsDatabaseBridge.removeRolePermission(this, oldRole);
+            IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
         }
     }
 
@@ -1062,7 +1011,7 @@ public final class SIsland implements Island {
             IslandUtils.updateTradingMenus(this, superiorPlayer);
         });
 
-        islandDataHandler.savePermissions();
+        IslandsDatabaseBridge.clearRolePermissions(this);
 
         MenuPermissions.refreshMenus(this);
     }
@@ -1086,7 +1035,7 @@ public final class SIsland implements Island {
             }
         }
 
-        islandDataHandler.savePermissions();
+        IslandsDatabaseBridge.savePlayerPermission(this, superiorPlayer, islandPrivilege, value);
 
         MenuPermissions.refreshMenus(this, superiorPlayer);
     }
@@ -1103,7 +1052,7 @@ public final class SIsland implements Island {
             IslandUtils.updateTradingMenus(this, superiorPlayer);
         }
 
-        islandDataHandler.savePermissions();
+        IslandsDatabaseBridge.clearPlayerPermission(this, superiorPlayer);
 
         MenuPermissions.refreshMenus(this, superiorPlayer);
     }
@@ -1165,7 +1114,7 @@ public final class SIsland implements Island {
         this.islandName = islandName;
         this.islandRawName = StringUtils.stripColors(this.islandName);
 
-        islandDataHandler.saveName();
+        IslandsDatabaseBridge.saveName(this);
     }
 
     @Override
@@ -1180,7 +1129,7 @@ public final class SIsland implements Island {
 
         this.description = description;
 
-        islandDataHandler.saveDescription();
+        IslandsDatabaseBridge.saveDescription(this);
     }
 
     @Override
@@ -1313,7 +1262,7 @@ public final class SIsland implements Island {
         getLoadedChunks(true, false).forEach(chunk ->
                 plugin.getNMSBlocks().startTickingChunk(this, chunk, false));
 
-        islandDataHandler.saveSize();
+        IslandsDatabaseBridge.saveSize(this);
     }
 
     @Override
@@ -1327,7 +1276,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Discord, Island: " + owner.getName() + ", Discord: " + discord);
 
         this.discord = discord;
-        islandDataHandler.saveDiscord();
+        IslandsDatabaseBridge.saveDiscord(this);
     }
 
     @Override
@@ -1341,7 +1290,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Paypal, Island: " + owner.getName() + ", Paypal: " + paypal);
 
         this.paypal = paypal;
-        islandDataHandler.savePaypal();
+        IslandsDatabaseBridge.savePaypal(this);
     }
 
     @Override
@@ -1411,7 +1360,7 @@ public final class SIsland implements Island {
             }
         }
 
-        islandDataHandler.saveLockedStatus();
+        IslandsDatabaseBridge.saveLockedStatus(this);
     }
 
     @Override
@@ -1423,7 +1372,7 @@ public final class SIsland implements Island {
     public void setIgnored(boolean ignored) {
         SuperiorSkyblockPlugin.debug("Action: Set Ignored, Island: " + owner.getName() + ", Ignored: " + ignored);
         this.ignored = ignored;
-        islandDataHandler.saveIgnoredStatus();
+        IslandsDatabaseBridge.saveIgnoredStatus(this);
     }
 
     @Override
@@ -1440,8 +1389,6 @@ public final class SIsland implements Island {
 
         SuperiorSkyblockPlugin.debug("Action: Transfer Owner, Island: " + owner.getName() + ", New Owner: " + superiorPlayer.getName());
 
-        ((SIslandDataHandler) islandDataHandler).executeDeleteStatement(true);
-
         //Kick member without saving to database
         members.write(members -> members.remove(superiorPlayer));
 
@@ -1457,7 +1404,8 @@ public final class SIsland implements Island {
         owner = superiorPlayer;
         getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
 
-        ((SIslandDataHandler) islandDataHandler).executeInsertStatement(true);
+        IslandsDatabaseBridge.saveIslandLeader(this);
+        IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
 
         plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner.getUniqueId());
 
@@ -1471,13 +1419,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(originalPlayer, "originalPlayer parameter cannot be null.");
         Preconditions.checkNotNull(newPlayer, "newPlayer parameter cannot be null.");
 
-        boolean executeUpdate = false;
-
         if(owner == originalPlayer) {
-            ((SIslandDataHandler) islandDataHandler).executeDeleteStatement(true);
             owner = newPlayer;
             getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
-            ((SIslandDataHandler) islandDataHandler).executeInsertStatement(true);
+            IslandsDatabaseBridge.saveIslandLeader(this);
             plugin.getGrid().transferIsland(originalPlayer.getUniqueId(), owner.getUniqueId());
         }
         else if(isMember(originalPlayer)){
@@ -1485,17 +1430,18 @@ public final class SIsland implements Island {
                 members.remove(originalPlayer);
                 members.add(newPlayer);
             });
-            executeUpdate = true;
+            IslandsDatabaseBridge.removeMember(this, originalPlayer);
+            IslandsDatabaseBridge.addMember(this, newPlayer, System.currentTimeMillis());
         }
 
         PlayerPermissionNode playerPermissionNode = playerPermissions.remove(originalPlayer);
         if(playerPermissionNode != null){
             playerPermissions.put(newPlayer, playerPermissionNode);
-            executeUpdate = true;
+            IslandsDatabaseBridge.clearPlayerPermission(this, originalPlayer);
+            for(Map.Entry<IslandPrivilege, Boolean> privilegeEntry : playerPermissionNode.getCustomPermissions().entrySet())
+                IslandsDatabaseBridge.savePlayerPermission(this, newPlayer,
+                        privilegeEntry.getKey(), privilegeEntry.getValue());
         }
-
-        if(executeUpdate)
-            ((SIslandDataHandler) islandDataHandler).executeUpdateStatement(true);
     }
 
     @Override
@@ -1565,7 +1511,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Update Last Time, Island: " + owner.getName() + ", Last Time: " + lastTimeUpdate);
         this.lastTimeUpdate = lastTimeUpdate;
         if(lastTimeUpdate != -1)
-            islandDataHandler.saveLastTimeUpdate();
+            IslandsDatabaseBridge.saveLastTimeUpdate(this);
     }
 
     /*
@@ -1593,7 +1539,8 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Set Bank Limit, Island: " + owner.getName() + ", Bank Limit: " + bankLimit);
 
         this.bankLimit = new UpgradeValue<>(bankLimit, i -> i.compareTo(new BigDecimal(-1)) < 0);
-        islandDataHandler.saveBankLimit();
+
+        IslandsDatabaseBridge.saveBankLimit(this);
     }
 
     @Override
@@ -1612,7 +1559,7 @@ public final class SIsland implements Island {
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
         MenuIslandBank.refreshMenus(this);
 
-        updateLastInterest(currentTime);
+        setLastInterestTime(currentTime);
 
         return true;
     }
@@ -1620,6 +1567,17 @@ public final class SIsland implements Island {
     @Override
     public long getLastInterestTime() {
         return lastInterest;
+    }
+
+    @Override
+    public void setLastInterestTime(long lastInterest) {
+        if(BuiltinModules.BANK.bankInterestEnabled) {
+            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
+            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+        }
+
+        this.lastInterest = lastInterest;
+        IslandsDatabaseBridge.saveLastInterestTime(this);
     }
 
     @Override
@@ -1713,8 +1671,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
         _handleBlocksPlace(blocks.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> BigInteger.valueOf(entry.getValue()))));
-        islandDataHandler.saveBlockCounts();
-        islandDataHandler.saveDirtyChunks();
+        IslandsDatabaseBridge.saveBlockCounts(this);
+        IslandsDatabaseBridge.saveDirtyChunks(this);
     }
 
     @Override
@@ -1867,7 +1825,7 @@ public final class SIsland implements Island {
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
 
-        islandDataHandler.saveBonusWorth();
+        IslandsDatabaseBridge.saveBonusWorth(this);
     }
 
     @Override
@@ -1885,7 +1843,7 @@ public final class SIsland implements Island {
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
 
-        islandDataHandler.saveBonusLevel();
+        IslandsDatabaseBridge.saveBonusLevel(this);
     }
 
     @Override
@@ -1925,7 +1883,7 @@ public final class SIsland implements Island {
         }
 
         if(++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10){
-            islandDataHandler.saveBlockCounts();
+            IslandsDatabaseBridge.saveBlockCounts(this);
             blocksUpdateCounter = 0;
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
             plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
@@ -1934,7 +1892,7 @@ public final class SIsland implements Island {
         }
 
         else{
-            ((SIslandDataHandler) islandDataHandler).setModified(Query.ISLAND_SET_BLOCK_COUNTS);
+            IslandsDatabaseBridge.markBlockCountsToBeSaved(this);
         }
 
     }
@@ -1960,7 +1918,7 @@ public final class SIsland implements Island {
 
         lastUpgradeTime = System.currentTimeMillis();
 
-        islandDataHandler.saveUpgrades();
+        IslandsDatabaseBridge.saveUpgrade(this, upgrade, level);
 
         UpgradeLevel upgradeLevel = getUpgradeLevel(upgrade);
 
@@ -2042,7 +2000,7 @@ public final class SIsland implements Island {
         cropGrowth = Math.max(1, cropGrowth);
         SuperiorSkyblockPlugin.debug("Action: Set Crop Growth, Island: " + owner.getName() + ", Crop Growth: " + cropGrowth);
         this.cropGrowth = new UpgradeValue<>(cropGrowth, false);
-        islandDataHandler.saveCropGrowth();
+        IslandsDatabaseBridge.saveCropGrowth(this);
     }
 
     @Override
@@ -2060,7 +2018,7 @@ public final class SIsland implements Island {
         spawnerRates = Math.max(1, spawnerRates);
         SuperiorSkyblockPlugin.debug("Action: Set Spawner Rates, Island: " + owner.getName() + ", Spawner Rates: " + spawnerRates);
         this.spawnerRates = new UpgradeValue<>(spawnerRates, false);
-        islandDataHandler.saveSpawnerRates();
+        IslandsDatabaseBridge.saveSpawnerRates(this);
     }
 
     @Override
@@ -2078,7 +2036,7 @@ public final class SIsland implements Island {
         mobDrops = Math.max(1, mobDrops);
         SuperiorSkyblockPlugin.debug("Action: Set Mob Drops, Island: " + owner.getName() + ", Mob Drops: " + mobDrops);
         this.mobDrops = new UpgradeValue<>(mobDrops, false);
-        islandDataHandler.saveMobDrops();
+        IslandsDatabaseBridge.saveMobDrops(this);
     }
 
     @Override
@@ -2112,7 +2070,7 @@ public final class SIsland implements Island {
     public void clearBlockLimits() {
         SuperiorSkyblockPlugin.debug("Action: Clear Block Limits, Island: " + owner.getName());
         blockLimits.clear();
-        islandDataHandler.saveBlockLimits();
+        IslandsDatabaseBridge.clearBlockLimits(this);
     }
 
     @Override
@@ -2121,7 +2079,7 @@ public final class SIsland implements Island {
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + finalLimit);
         blockLimits.put(key, new UpgradeValue<>(finalLimit, false));
-        islandDataHandler.saveBlockLimits();
+        IslandsDatabaseBridge.saveBlockLimit(this, key, limit);
     }
 
     @Override
@@ -2129,7 +2087,7 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Remove Block Limit, Island: " + owner.getName() + ", Block: " + key);
         blockLimits.remove(key);
-        islandDataHandler.saveBlockLimits();
+        IslandsDatabaseBridge.removeBlockLimit(this, key);
     }
 
     @Override
@@ -2187,7 +2145,7 @@ public final class SIsland implements Island {
     public void clearEntitiesLimits() {
         SuperiorSkyblockPlugin.debug("Action: Clear Entity Limit, Island: " + owner.getName());
         entityLimits.clear();
-        islandDataHandler.saveEntityLimits();
+        IslandsDatabaseBridge.clearEntityLimits(this);
     }
 
     @Override
@@ -2202,7 +2160,7 @@ public final class SIsland implements Island {
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + key + ", Limit: " + finalLimit);
         entityLimits.put(key, new UpgradeValue<>(finalLimit, false));
-        islandDataHandler.saveEntityLimits();
+        IslandsDatabaseBridge.saveEntityLimit(this, key, limit);
     }
 
     @Override
@@ -2270,7 +2228,7 @@ public final class SIsland implements Island {
         teamLimit = Math.max(0, teamLimit);
         SuperiorSkyblockPlugin.debug("Action: Set Team Limit, Island: " + owner.getName() + ", Team Limit: " + teamLimit);
         this.teamLimit = new UpgradeValue<>(teamLimit, false);
-        islandDataHandler.saveTeamLimit();
+        IslandsDatabaseBridge.saveTeamLimit(this);
     }
 
     @Override
@@ -2288,7 +2246,7 @@ public final class SIsland implements Island {
         warpsLimit = Math.max(0, warpsLimit);
         SuperiorSkyblockPlugin.debug("Action: Set Warps Limit, Island: " + owner.getName() + ", Warps Limit: " + warpsLimit);
         this.warpsLimit = new UpgradeValue<>(warpsLimit, false);
-        islandDataHandler.saveWarpsLimit();
+        IslandsDatabaseBridge.saveWarpsLimit(this);
     }
 
     @Override
@@ -2303,6 +2261,7 @@ public final class SIsland implements Island {
                 if(player != null)
                     player.removePotionEffect(type);
             }));
+            IslandsDatabaseBridge.removeIslandEffect(this, type);
         }
         else {
             PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
@@ -2314,9 +2273,8 @@ public final class SIsland implements Island {
                     player.removePotionEffect(type);
                 player.addPotionEffect(potionEffect, true);
             }));
+            IslandsDatabaseBridge.saveIslandEffect(this, type, level);
         }
-
-        islandDataHandler.saveIslandEffects();
     }
 
     @Override
@@ -2366,7 +2324,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Clear Island Effects, Island: " + owner.getName());
         islandEffects.clear();
         removeEffects();
-        islandDataHandler.saveIslandEffects();
+        IslandsDatabaseBridge.clearIslandEffects(this);
     }
 
     @Override
@@ -2376,12 +2334,12 @@ public final class SIsland implements Island {
 
         if(limit < 0) {
             roleLimits.remove(playerRole);
+            IslandsDatabaseBridge.removeRoleLimit(this, playerRole);
         }
         else {
             roleLimits.put(playerRole, new UpgradeValue<>(limit, false));
+            IslandsDatabaseBridge.saveRoleLimit(this, playerRole, limit);
         }
-
-        islandDataHandler.saveRolesLimits();
     }
 
     @Override
@@ -2432,7 +2390,7 @@ public final class SIsland implements Island {
 
             warpCategory.setSlot(slot);
 
-            islandDataHandler.saveWarpCategories();
+            IslandsDatabaseBridge.saveWarpCategory(this, warpCategory);
 
             MenuWarpCategories.refreshMenus(this);
         }
@@ -2469,12 +2427,10 @@ public final class SIsland implements Island {
 
         boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase()) != null;
         if(validWarpRemoval) {
-            islandDataHandler.saveWarpCategories();
-
+            IslandsDatabaseBridge.removeWarpCategory(this, warpCategory);
             boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
             if (shouldSaveWarps) {
                 new ArrayList<>(warpCategory.getWarps()).forEach(islandWarp -> deleteWarp(islandWarp.getName()));
-                islandDataHandler.saveWarps();
                 MenuWarps.destroyMenus(warpCategory);
             }
 
@@ -2499,18 +2455,9 @@ public final class SIsland implements Island {
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
 
         IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
+        loadIslandWarp(islandWarp);
 
-        IslandWarp oldWarp = warpsByName.put(name.toLowerCase(), islandWarp);
-
-        if(oldWarp != null)
-            deleteWarp(oldWarp.getName());
-
-        warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
-                location.getBlockY(), location.getBlockZ()), islandWarp);
-
-        warpCategory.getWarps().add(islandWarp);
-
-        islandDataHandler.saveWarps();
+        IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
         MenuGlobalWarps.refreshMenus();
         MenuWarps.refreshMenus(warpCategory);
@@ -2547,11 +2494,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(warp, "warp parameter cannot be null.");
 
         if(plugin.getSettings().warpsWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(), plugin.getSettings().warpsWarmup));
-            BukkitTask teleportTask = Executor.sync(() -> warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50);
-            PlayerDataHandler playerDataHandler = superiorPlayer.getDataHandler();
-            if(playerDataHandler != null)
-                ((SPlayerDataHandler) playerDataHandler).setTeleportTask(teleportTask);
+            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+                    plugin.getSettings().warpsWarmup, TimeUnit.MILLISECONDS));
+            superiorPlayer.setTeleportTask(Executor.sync(() ->
+                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
         }
         else {
             warpPlayerWithoutWarmup(superiorPlayer, warp);
@@ -2560,9 +2506,7 @@ public final class SIsland implements Island {
 
     private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
         Location location = warpsByName.get(warp.toLowerCase()).getLocation();
-        PlayerDataHandler playerDataHandler = superiorPlayer.getDataHandler();
-        if(playerDataHandler != null)
-            ((SPlayerDataHandler) playerDataHandler).setTeleportTask(null);
+        superiorPlayer.setTeleportTask(null);
 
         if(!isInsideRange(location)){
             Locale.UNSAFE_WARP.send(superiorPlayer);
@@ -2610,11 +2554,12 @@ public final class SIsland implements Island {
         if(islandWarp != null){
             warpsByLocation.remove(islandWarp.getLocation());
             warpCategory.getWarps().remove(islandWarp);
+
+            IslandsDatabaseBridge.removeWarp(this, islandWarp);
+
             if(warpCategory.getWarps().isEmpty())
                 deleteCategory(warpCategory);
         }
-
-        islandDataHandler.saveWarps();
 
         MenuGlobalWarps.refreshMenus();
 
@@ -2643,12 +2588,14 @@ public final class SIsland implements Island {
 
         SuperiorSkyblockPlugin.debug("Action: Set Rating, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Rating: " + rating);
 
-        if(rating == Rating.UNKNOWN)
+        if(rating == Rating.UNKNOWN) {
             ratings.remove(superiorPlayer.getUniqueId());
-        else
+            IslandsDatabaseBridge.removeRating(this, superiorPlayer);
+        }
+        else {
             ratings.put(superiorPlayer.getUniqueId(), rating);
-
-        islandDataHandler.saveRatings();
+            IslandsDatabaseBridge.saveRating(this, superiorPlayer, rating, System.currentTimeMillis());
+        }
 
         MenuIslandRatings.refreshMenus(this);
     }
@@ -2678,7 +2625,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Remove Ratings, Island: " + owner.getName());
         ratings.clear();
 
-        islandDataHandler.saveRatings();
+        IslandsDatabaseBridge.clearRatings(this);
 
         MenuIslandRatings.refreshMenus(this);
     }
@@ -2692,9 +2639,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Complete Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
-        completedMissions.put(mission, completedMissions.getOrDefault(mission, 0) + 1);
+        int finishCount = completedMissions.getOrDefault(mission, 0) + 1;
+        completedMissions.put(mission, finishCount);
 
-        islandDataHandler.saveMissions();
+        IslandsDatabaseBridge.saveMission(this, mission, finishCount);
 
         MenuMissionsCategory.refreshMenus(mission.getMissionCategory());
     }
@@ -2704,15 +2652,16 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
 
-        if(completedMissions.getOrDefault(mission, 0) > 0) {
-            completedMissions.put(mission, completedMissions.get(mission) - 1);
+        int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
+        if(finishCount > 0) {
+            completedMissions.put(mission, finishCount);
+            IslandsDatabaseBridge.saveMission(this, mission, finishCount);
         }
 
         else {
             completedMissions.remove(mission);
+            IslandsDatabaseBridge.removeMission(this, mission);
         }
-
-        islandDataHandler.saveMissions();
 
         mission.clearData(getOwner());
 
@@ -2850,7 +2799,7 @@ public final class SIsland implements Island {
                 islandSettings.remove(IslandFlags.ALWAYS_SHINY);
         }
 
-        islandDataHandler.saveSettings();
+        IslandsDatabaseBridge.saveIslandFlag(this, settings, 1);
 
         MenuSettings.refreshMenus(this);
     }
@@ -2861,8 +2810,6 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Disable Settings, Island: " + owner.getName() + ", Settings: " + settings.getName());
 
         islandSettings.put(settings, (byte) 0);
-
-        islandDataHandler.saveSettings();
 
         switch (settings.getName()){
             case "ALWAYS_DAY":
@@ -2884,6 +2831,8 @@ public final class SIsland implements Island {
                 });
                 break;
         }
+
+        IslandsDatabaseBridge.saveIslandFlag(this, settings, 0);
 
         MenuSettings.refreshMenus(this);
     }
@@ -2950,7 +2899,8 @@ public final class SIsland implements Island {
         int finalAmount = Math.max(0, amount);
         SuperiorSkyblockPlugin.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + finalAmount + ", World: " + environment);
         cobbleGeneratorValues.put(key, new UpgradeValue<>(finalAmount, false));
-        islandDataHandler.saveGenerators();
+
+        IslandsDatabaseBridge.saveGeneratorRate(this, environment, key, amount);
     }
 
     @Override
@@ -3005,7 +2955,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Clear Generator, Island: " + owner.getName() + ", World: " + environment);
         if(cobbleGeneratorValues != null) {
             cobbleGeneratorValues.clear();
-            islandDataHandler.saveGenerators();
+            IslandsDatabaseBridge.clearGeneratorRates(this, environment);
         }
     }
 
@@ -3016,10 +2966,6 @@ public final class SIsland implements Island {
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-
-        if(environment == plugin.getSettings().defaultWorldEnvironment)
-            return true;
-
         int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
         return (generatedSchematics.get() & n) == n;
     }
@@ -3046,7 +2992,7 @@ public final class SIsland implements Island {
             }
         });
 
-        islandDataHandler.saveGeneratedSchematics();
+        IslandsDatabaseBridge.saveGeneratedSchematics(this);
     }
 
     @Override
@@ -3097,7 +3043,7 @@ public final class SIsland implements Island {
 
         islandChests[index].setRows(rows);
 
-        ((SIslandDataHandler) islandDataHandler).setModified(Query.ISLAND_SET_ISLAND_CHEST);
+        IslandsDatabaseBridge.markIslandChestsToBeSaved(this, islandChests[index]);
     }
 
     /*
@@ -3105,8 +3051,14 @@ public final class SIsland implements Island {
      */
 
     @Override
+    @Deprecated
     public IslandDataHandler getDataHandler() {
-        return islandDataHandler;
+        return EmptyDataHandler.getInstance();
+    }
+
+    @Override
+    public DatabaseBridge getDatabaseBridge() {
+        return databaseBridge;
     }
 
     /*
@@ -3154,28 +3106,41 @@ public final class SIsland implements Island {
         });
     }
 
-    private void checkMembersDuplication(){
-        boolean toSave = members.writeAndGet(members -> {
-            Iterator<SuperiorPlayer> iterator = members.iterator();
-            boolean removed = false;
+    private void deserializeBlockCounts(String blockCounts){
+        try {
+            rawKeyPlacements = true;
+            IslandsDeserializer.deserializeBlockCounts(blockCounts, this);
+        } finally {
+            rawKeyPlacements = false;
+        }
 
+        if (this.blockCounts.isEmpty())
+            calcIslandWorth(null);
+    }
+
+    private void startBankInterest(){
+        if (BuiltinModules.BANK.bankInterestEnabled) {
+            long currentTime = System.currentTimeMillis() / 1000;
+            long ticksToNextInterest = (BuiltinModules.BANK.bankInterestInterval - (currentTime - this.lastInterest)) * 20;
+            if (ticksToNextInterest <= 0) {
+                giveInterest(true);
+            } else {
+                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            }
+        }
+    }
+
+    private void checkMembersDuplication(){
+        members.write(members -> {
+            Iterator<SuperiorPlayer> iterator = members.iterator();
             while (iterator.hasNext()){
                 SuperiorPlayer superiorPlayer = iterator.next();
-                if(!superiorPlayer.getIslandLeader().equals(owner)){
+                if(superiorPlayer.equals(owner) || !superiorPlayer.getIslandLeader().equals(owner)){
                     iterator.remove();
-                    removed = true;
-                }
-                else if(superiorPlayer.equals(owner)){
-                    iterator.remove();
-                    removed = true;
+                    IslandsDatabaseBridge.removeMember(this, superiorPlayer);
                 }
             }
-
-            return removed;
         });
-
-        if(toSave)
-            islandDataHandler.saveMembers();
     }
 
     private void updateOldUpgradeValues(){
@@ -3230,42 +3195,42 @@ public final class SIsland implements Island {
         if(overrideCustom || islandSize.isSynced()) {
             islandSize = new UpgradeValue<>(-1, true);
             if(overrideCustom)
-                islandDataHandler.saveSize();
+                IslandsDatabaseBridge.saveSize(this);
         }
         if(overrideCustom || warpsLimit.isSynced()) {
             warpsLimit = new UpgradeValue<>(-1, true);
             if(overrideCustom)
-                islandDataHandler.saveWarpsLimit();
+                IslandsDatabaseBridge.saveWarpsLimit(this);
         }
         if(overrideCustom || teamLimit.isSynced()) {
             teamLimit = new UpgradeValue<>(-1, true);
             if(overrideCustom)
-                islandDataHandler.saveTeamLimit();
+                IslandsDatabaseBridge.saveTeamLimit(this);
         }
         if(overrideCustom || coopLimit.isSynced()) {
             coopLimit = new UpgradeValue<>(-1, true);
             if(overrideCustom)
-                islandDataHandler.saveCoopLimit();
+                IslandsDatabaseBridge.saveCoopLimit(this);
         }
         if(overrideCustom || cropGrowth.isSynced()) {
             cropGrowth = new UpgradeValue<>(-1D, true);
             if(overrideCustom)
-                islandDataHandler.saveCropGrowth();
+                IslandsDatabaseBridge.saveCropGrowth(this);
         }
         if(overrideCustom || spawnerRates.isSynced()) {
             spawnerRates = new UpgradeValue<>(-1D, true);
             if(overrideCustom)
-                islandDataHandler.saveSpawnerRates();
+                IslandsDatabaseBridge.saveSpawnerRates(this);
         }
         if(overrideCustom || mobDrops.isSynced()) {
             mobDrops = new UpgradeValue<>(-1D, true);
             if(overrideCustom)
-                islandDataHandler.saveMobDrops();
+                IslandsDatabaseBridge.saveMobDrops(this);
         }
         if(overrideCustom || bankLimit.isSynced()) {
             bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
             if(overrideCustom)
-                islandDataHandler.saveBankLimit();
+                IslandsDatabaseBridge.saveBankLimit(this);
         }
 
         blockLimits.entrySet().stream()
@@ -3367,16 +3332,6 @@ public final class SIsland implements Island {
             callback.run();
     }
 
-    private void updateLastInterest(long lastInterest){
-        if(BuiltinModules.BANK.bankInterestEnabled) {
-            long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
-            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
-        }
-
-        this.lastInterest = lastInterest;
-        islandDataHandler.saveLastInterestTime();
-    }
-
     private KeyMap<UpgradeValue<Integer>> getCobbleGeneratorValues(World.Environment environment, boolean createNew){
         return getCobbleGeneratorValues(environment.ordinal(), createNew);
     }
@@ -3458,16 +3413,18 @@ public final class SIsland implements Island {
             blockCounts.put(key, currentAmount.subtract(amount));
     }
 
-    private static void parseNumbersSafe(SafeRunnable code) throws SQLException {
-        try{
-            code.run();
-        }catch (NumberFormatException | NullPointerException ignored){}
-    }
+    private void loadIslandWarp(IslandWarp islandWarp){
+        IslandWarp oldWarp = warpsByName.put(islandWarp.getName().toLowerCase(), islandWarp);
 
-    private interface SafeRunnable{
+        if(oldWarp != null)
+            deleteWarp(oldWarp.getName());
 
-        void run() throws SQLException;
+        Location location = islandWarp.getLocation();
 
+        warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
+                location.getBlockY(), location.getBlockZ()), islandWarp);
+
+        islandWarp.getCategory().getWarps().add(islandWarp);
     }
 
 }

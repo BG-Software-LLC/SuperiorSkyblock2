@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -12,6 +13,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -428,13 +430,68 @@ public interface SuperiorPlayer {
      */
 
     /**
+     * Set immunity to PvP for this player.
+     * @param immunedToPvP Whether or not the player should be immuned to PvP.
+     */
+    void setImmunedToPvP(boolean immunedToPvP);
+
+    /**
+     * Whether the player is immuned to PvP or not.
+     */
+    boolean isImmunedToPvP();
+
+    /**
+     * Set whether or not the player has just left an island's area.
+     * If set to true, the player will not be able to escape islands.
+     * @param leavingFlag Whether or not the island has left an island's area.
+     */
+    void setLeavingFlag(boolean leavingFlag);
+
+    /**
+     * Whether the player has just left an island's area or not.
+     */
+    boolean isLeavingFlag();
+
+    /**
+     * Set a teleportation task for the player.
+     * This is used for warmpups, etc.
+     * @param teleportTask The teleport task to set.
+     */
+    void setTeleportTask(@Nullable BukkitTask teleportTask);
+
+    /**
+     * Get the current active teleport task of the player.
+     */
+    @Nullable
+    BukkitTask getTeleportTask();
+
+    /**
+     * Set whether or not the player is immuned to portals.
+     * If set to true, players will not be able to get teleported through portals.
+     * @param immuneToPortals Whether the player should be immuned or not.
+     */
+    void setImmunedToPortals(boolean immuneToPortals);
+
+    /**
+     * Whether the player is immuned to portals or not.
+     */
+    boolean isImmunedToPortals();
+
+    /**
      * Merge another player into this object.
      */
     void merge(SuperiorPlayer otherPlayer);
 
     /**
      * Get the data handler of the object.
+     * @deprecated See getDatabaseBridge
      */
+    @Deprecated
     PlayerDataHandler getDataHandler();
+
+    /**
+     * Get the database bridge of the player.
+     */
+    DatabaseBridge getDatabaseBridge();
 
 }

@@ -1,13 +1,18 @@
-package com.bgsoftware.superiorskyblock.island.data;
+package com.bgsoftware.superiorskyblock.data;
 
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
+import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 
-public final class SEmptyIslandDataHandler implements IslandDataHandler {
+public final class EmptyDataHandler implements IslandDataHandler, PlayerDataHandler {
 
-    private static SEmptyIslandDataHandler dataHandlerInstance = new SEmptyIslandDataHandler();
+    private static final EmptyDataHandler instance = new EmptyDataHandler();
 
-    public static IslandDataHandler getHandler() {
-        return dataHandlerInstance;
+    public static EmptyDataHandler getInstance() {
+        return instance;
+    }
+
+    private EmptyDataHandler(){
+
     }
 
     @Override
@@ -207,6 +212,61 @@ public final class SEmptyIslandDataHandler implements IslandDataHandler {
 
     @Override
     public void saveWarpCategories() {
+
+    }
+
+    @Override
+    public void saveTextureValue() {
+
+    }
+
+    @Override
+    public void savePlayerName() {
+
+    }
+
+    @Override
+    public void saveUserLocale() {
+
+    }
+
+    @Override
+    public void saveIslandLeader() {
+
+    }
+
+    @Override
+    public void savePlayerRole() {
+
+    }
+
+    @Override
+    public void saveToggledBorder() {
+
+    }
+
+    @Override
+    public void saveDisbands() {
+
+    }
+
+    @Override
+    public void saveToggledPanel() {
+
+    }
+
+    @Override
+    public void saveIslandFly() {
+
+    }
+
+    @Override
+    public void saveBorderColor() {
+
+    }
+
+    @Override
+    public void saveLastTimeStatus() {
 
     }
 }
