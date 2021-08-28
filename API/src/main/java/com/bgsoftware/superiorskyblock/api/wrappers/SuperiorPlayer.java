@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -15,15 +15,12 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface SuperiorPlayer {
+public interface SuperiorPlayer extends IMissionsHolder {
 
     /*
      *   General Methods
@@ -380,50 +377,6 @@ public interface SuperiorPlayer {
      * @param block The block to change the position to.
      */
     void setSchematicPos2(@Nullable Block block);
-
-    /*
-     *   Missions Methods
-     */
-
-    /**
-     * Complete a mission.
-     * @param mission The mission to complete.
-     */
-    void completeMission(Mission<?> mission);
-
-    /**
-     * Reset a mission.
-     * @param mission The mission to reset.
-     */
-    void resetMission(Mission<?> mission);
-
-    /**
-     * Check whether the player has completed the mission before.
-     * @param mission The mission to check.
-     */
-    boolean hasCompletedMission(Mission<?> mission);
-
-    /**
-     * Check whether the player can complete a mission again.
-     * @param mission The mission to check.
-     */
-    boolean canCompleteMissionAgain(Mission<?> mission);
-
-    /**
-     * Get the amount of times mission was completed.
-     * @param mission The mission to check.
-     */
-    int getAmountMissionCompleted(Mission<?> mission);
-
-    /**
-     * Get the list of the completed missions of the player.
-     */
-    List<Mission<?>> getCompletedMissions();
-
-    /**
-     * Get all the completed missions with the amount of times they were completed.
-     */
-    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
 
     /*
      *   Data Methods
