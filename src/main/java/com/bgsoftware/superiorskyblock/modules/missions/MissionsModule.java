@@ -108,16 +108,11 @@ public final class MissionsModule extends BuiltinModule {
         File categoriesFolder = new File(getDataFolder(), "categories");
 
         if((!categoriesFolder.exists() || !categoriesFolder.isDirectory()) && categoriesFolder.mkdirs()){
-            FileUtils.saveResource("modules/missions/categories/islands/10k-worth.yml");
-            FileUtils.saveResource("modules/missions/categories/islands/add-member.yml");
-            FileUtils.saveResource("modules/missions/categories/players/birthday.yml");
-            FileUtils.saveResource("modules/missions/categories/players/cobble-miner.yml");
-            FileUtils.saveResource("modules/missions/categories/players/dragon-killer.yml");
-            FileUtils.saveResource("modules/missions/categories/players/enchanter.yml");
-            FileUtils.saveResource("modules/missions/categories/players/first-invite.yml");
-            FileUtils.saveResource("modules/missions/categories/players/first-island.yml");
-            FileUtils.saveResource("modules/missions/categories/players/mobs-killer.yml");
-            FileUtils.saveResource("modules/missions/categories/players/woodcutter.yml");
+            FileUtils.saveResource("modules/missions/categories/farmer/farmer_1.yml");
+            FileUtils.saveResource("modules/missions/categories/farmer/farmer_2.yml");
+            FileUtils.saveResource("modules/missions/categories/farmer/farmer_3.yml");
+            FileUtils.saveResource("modules/missions/categories/farmer/farmer_4.yml");
+            FileUtils.saveResource("modules/missions/categories/farmer/farmer_5.yml");
         }
     }
 
