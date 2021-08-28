@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -81,21 +82,21 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission<?> mission) {
         try {
-            Island island = superiorPlayer.getIsland();
-
-            if (island == null)
-                return new ItemStack(Material.AIR);
-
             Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
             if (!missionDataOptional.isPresent())
                 return clickedItem;
 
             MissionsHandler.MissionData missionData = missionDataOptional.get();
-            boolean completed = !island.canCompleteMissionAgain(mission);
+            IMissionsHolder missionsHolder = mission.getIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
+
+            if (missionsHolder == null)
+                return new ItemStack(Material.AIR);
+
+            boolean completed = !missionsHolder.canCompleteMissionAgain(mission);
             int percentage = getPercentage(mission.getProgress(superiorPlayer));
             int progressValue = mission.getProgressValue(superiorPlayer);
-            int amountCompleted = island.getAmountMissionCompleted(mission);
+            int amountCompleted = missionsHolder.getAmountMissionCompleted(mission);
 
             ItemStack itemStack = completed ? missionData.completed.clone().build(superiorPlayer) :
                     plugin.getMissions().canComplete(superiorPlayer, mission) ?
