@@ -94,9 +94,8 @@ icons:
     type: PAPER
     name: '&aFarmer V'
     lore:
-      - '&7Now that you are a professional farmer,'
-      - '&7let''s get the hands dirty.'
-      - '&7Collect x64 of each crop.'
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
       - ''
       - '&6Required Plants:'
       - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
@@ -124,9 +123,8 @@ icons:
     type: MAP
     name: '&aFarmer V'
     lore:
-      - '&7Now that you are a professional farmer,'
-      - '&7let''s get the hands dirty.'
-      - '&7Collect x64 of each crop.'
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
       - ''
       - '&6Rewards:'
       - '&8 - &7$1,000,000'
