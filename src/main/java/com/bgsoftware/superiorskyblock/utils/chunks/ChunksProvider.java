@@ -51,7 +51,8 @@ public final class ChunksProvider {
     }
 
     public static void stop() {
-        chunksExecutor.stop();
+        if (chunksExecutor.isRunning())
+            chunksExecutor.stop();
     }
 
     public static void start() {
