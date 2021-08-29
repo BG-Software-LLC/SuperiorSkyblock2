@@ -113,6 +113,11 @@ public final class MissionsModule extends BuiltinModule {
             FileUtils.saveResource("modules/missions/categories/farmer/farmer_3.yml");
             FileUtils.saveResource("modules/missions/categories/farmer/farmer_4.yml");
             FileUtils.saveResource("modules/missions/categories/farmer/farmer_5.yml");
+            FileUtils.saveResource("modules/missions/categories/miner/miner_1.yml");
+            FileUtils.saveResource("modules/missions/categories/miner/miner_2.yml");
+            FileUtils.saveResource("modules/missions/categories/miner/miner_3.yml");
+            FileUtils.saveResource("modules/missions/categories/miner/miner_4.yml");
+            FileUtils.saveResource("modules/missions/categories/miner/miner_5.yml");
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_1.yml");
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_2.yml");
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_3.yml");
