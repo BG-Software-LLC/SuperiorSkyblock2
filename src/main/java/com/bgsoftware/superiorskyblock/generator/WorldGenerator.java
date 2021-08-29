@@ -52,11 +52,11 @@ public final class WorldGenerator extends ChunkGenerator {
         switch (world.getEnvironment()) {
             case NETHER: {
                 if (NETHER_BIOME != null)
-                    plugin.getNMSAdapter().setBiome(biomes, NETHER_BIOME);
+                    plugin.getNMSWorld().setBiome(biomes, NETHER_BIOME);
                 break;
             }
             case NORMAL: {
-                plugin.getNMSAdapter().setBiome(biomes, Biome.PLAINS);
+                plugin.getNMSWorld().setBiome(biomes, Biome.PLAINS);
                 break;
             }
         }

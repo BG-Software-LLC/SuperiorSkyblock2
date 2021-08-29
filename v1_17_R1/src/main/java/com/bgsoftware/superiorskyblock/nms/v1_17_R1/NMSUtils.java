@@ -2,19 +2,34 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
+import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
+import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.block.BlockBed;
+import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkConverter;
+import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
+import net.minecraft.world.level.levelgen.HeightMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +40,12 @@ import java.util.function.Consumer;
 
 public final class NMSUtils {
 
-    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(PlayerChunkMap.class, Map.class, "visibleChunks", "l");
-    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(PlayerChunk.class, "a", Packet.class, boolean.class);
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
+            PlayerChunkMap.class, Map.class, "visibleChunks", "l");
+    private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
+            PlayerChunk.class, "a", Packet.class, boolean.class);
 
     private NMSUtils() {
 
@@ -114,22 +133,103 @@ public final class NMSUtils {
         }
     }
 
-    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet){
+    public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
         PlayerChunk playerChunk;
 
         try {
             playerChunk = playerChunkMap.getVisibleChunk(chunkCoordIntPair.pair());
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(chunkCoordIntPair.pair());
         }
 
-        if(playerChunk != null) {
+        if (playerChunk != null) {
             try {
                 playerChunk.a(packet, false);
-            }catch (Throwable ex){
+            } catch (Throwable ex) {
                 SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
+            }
+        }
+    }
+
+    public static void setBlock(net.minecraft.world.level.chunk.Chunk chunk, BlockPosition blockPosition,
+                                int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
+        IBlockData blockData = net.minecraft.world.level.block.Block.getByCombinedId(combinedId);
+
+        if (statesTag != null) {
+            for (Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()) {
+                try {
+                    // noinspection rawtypes
+                    IBlockState blockState = BlockStatesMapper.getBlockState(entry.getKey());
+                    if (blockState != null) {
+                        if (entry.getValue() instanceof ByteTag) {
+                            // noinspection unchecked
+                            blockData = blockData.set(blockState, ((ByteTag) entry.getValue()).getValue() == 1);
+                        } else if (entry.getValue() instanceof IntArrayTag) {
+                            int[] data = ((IntArrayTag) entry.getValue()).getValue();
+                            // noinspection unchecked
+                            blockData = blockData.set(blockState, data[0]);
+                        } else if (entry.getValue() instanceof StringTag) {
+                            String data = ((StringTag) entry.getValue()).getValue();
+                            // noinspection unchecked
+                            blockData = blockData.set(blockState, Enum.valueOf(blockState.getType(), data));
+                        }
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) ||
+                blockData.getBlock() instanceof BlockBed) {
+            chunk.getWorld().setTypeAndData(blockPosition, blockData, 3);
+            return;
+        }
+
+        if (plugin.getSettings().lightsUpdate) {
+            chunk.setType(blockPosition, blockData, true, true);
+        } else {
+            int indexY = chunk.getSectionIndex(blockPosition.getY());
+
+            ChunkSection chunkSection = chunk.getSections()[indexY];
+
+            if (chunkSection == null) {
+                int yOffset = SectionPosition.a(blockPosition.getY());
+                try {
+                    // Paper's constructor for ChunkSection for more optimized chunk sections.
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset, chunk, chunk.getWorld(), true);
+                } catch (Throwable ex) {
+                    // Spigot's constructor for ChunkSection
+                    // noinspection deprecation
+                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset);
+                }
+            }
+
+            int blockX = blockPosition.getX() & 15;
+            int blockY = blockPosition.getY();
+            int blockZ = blockPosition.getZ() & 15;
+
+            chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
+
+            chunk.j.get(HeightMap.Type.e).a(blockX, blockY, blockZ, blockData);
+            chunk.j.get(HeightMap.Type.f).a(blockX, blockY, blockZ, blockData);
+            chunk.j.get(HeightMap.Type.d).a(blockX, blockY, blockZ, blockData);
+            chunk.j.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
+
+            chunk.markDirty();
+            chunk.setNeedsSaving(true);
+        }
+
+        if (tileEntity != null) {
+            NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
+            if (tileEntityCompound != null) {
+                tileEntityCompound.setInt("x", blockPosition.getX());
+                tileEntityCompound.setInt("y", blockPosition.getY());
+                tileEntityCompound.setInt("z", blockPosition.getZ());
+                TileEntity worldTileEntity = chunk.getWorld().getTileEntity(blockPosition);
+                if (worldTileEntity != null)
+                    worldTileEntity.load(tileEntityCompound);
             }
         }
     }

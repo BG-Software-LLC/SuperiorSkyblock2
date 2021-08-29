@@ -1,26 +1,37 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
+import ca.spottedleaf.starlight.light.StarLightInterface;
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.nms.NMSBlocks_v1_17_R1;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.IslandsChunkGenerator;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
+import net.minecraft.server.level.ChunkProviderServer;
+import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
+import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.biome.BiomeBase;
 import net.minecraft.world.level.block.BlockStepAbstract;
 import net.minecraft.world.level.block.Blocks;
@@ -30,10 +41,12 @@ import net.minecraft.world.level.chunk.BiomeStorage;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.lighting.LightEngineGraph;
 import net.minecraft.world.phys.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
@@ -44,6 +57,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -53,7 +67,16 @@ import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
 
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f");
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
+            BiomeStorage.class, BiomeBase[].class, "f");
+    private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(
+            LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
+    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(
+            LightEngineThreaded.class, Object.class, "theLightEngine");
+    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
+            LightEngineThreaded.class, ThreadedMailbox.class, "e");
 
     @Override
     public void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate) {
@@ -135,6 +158,7 @@ public final class NMSChunksImpl implements NMSChunks {
                 try {
                     CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer,
                             worldServer.getChunkProvider().d, worldServer.generator);
+                    //noinspection ConstantConditions
                     customChunkGenerator.buildBase(null, protoChunk);
                 } catch (Exception ignored) {
                 }
@@ -198,6 +222,93 @@ public final class NMSChunksImpl implements NMSChunks {
         });
 
         return completableFuture;
+    }
+
+    @Override
+    public void injectChunkSections(org.bukkit.Chunk chunk) {
+        // No implementation
+    }
+
+    @Override
+    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.c());
+    }
+
+    @Override
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+
+        PacketPlayOutMapChunk packetPlayOutMapChunk;
+
+        try {
+            packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, true);
+        } catch (Throwable ex) {
+            // noinspection deprecation
+            packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk);
+        }
+
+        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.getWorld(), chunkCoords.b, chunkCoords.c, packetPlayOutMapChunk);
+    }
+
+    @Override
+    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        WorldServer world = (WorldServer) chunk.getWorld();
+
+        if (plugin.getSettings().lightsUpdate) {
+            // Update lights for the blocks.
+            // We use a delayed task to avoid null nibbles
+            Executor.sync(() -> {
+                if (STAR_LIGHT_INTERFACE.isValid()) {
+                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.k_();
+                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
+                    ChunkProviderServer chunkProviderServer = world.getChunkProvider();
+                    LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
+                            starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
+                                    chunkProviderServer.h.execute(() -> NMSUtils.sendPacketToRelevantPlayers(world, chunkPos.b, chunkPos.c,
+                                            new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, null, null, true))
+                                    ), null));
+                } else {
+                    for (BlockData blockData : blockDataList) {
+                        BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+                        if (blockData.getBlockLightLevel() > 0) {
+                            try {
+                                world.k_().a(EnumSkyBlock.b).a(blockPosition, blockData.getBlockLightLevel());
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
+                            try {
+                                SKY_LIGHT_UPDATE.invoke(world.k_().a(EnumSkyBlock.a), 9223372036854775807L,
+                                        blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
+                            } catch (Exception ignored) {
+                            }
+                        }
+                    }
+                }
+            }, 10L);
+        }
+    }
+
+    @Override
+    public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
+        Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().getChunkProvider()
+                .getChunkAt(chunkPosition.getX(), chunkPosition.getZ(), false);
+        return chunk == null ? null : chunk.bukkitChunk;
+    }
+
+    @Override
+    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
+        if (stop) {
+            CropsTickingTileEntity cropsTickingTileEntity =
+                    CropsTickingTileEntity.remove(((CraftChunk) chunk).getHandle().getPos());
+            if (cropsTickingTileEntity != null)
+                cropsTickingTileEntity.remove();
+        } else {
+            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+        }
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
@@ -268,8 +379,9 @@ public final class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
         if (!(worldServer.generator instanceof WorldGenerator)) {
-            NMSBlocks_v1_17_R1.IslandsChunkGenerator chunkGenerator = new NMSBlocks_v1_17_R1.IslandsChunkGenerator(worldServer);
+            IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
             ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
+            //noinspection ConstantConditions
             chunkGenerator.buildBase(null, protoChunk);
 
             for (int i = 0; i < 16; i++)

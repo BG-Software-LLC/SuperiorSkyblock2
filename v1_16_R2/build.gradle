@@ -1,7 +1,0 @@
-group 'v1_16_R2'
-
-dependencies {
-    compileOnly "org.spigotmc:v1_16_R2-Tuinity:latest"
-    compileOnly project(":API")
-    compileOnly parent
-}

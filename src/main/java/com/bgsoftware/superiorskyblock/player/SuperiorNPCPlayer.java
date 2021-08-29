@@ -239,6 +239,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void updateWorldBorder(@Nullable Island island) {
+
+    }
+
+    @Override
     public boolean hasBlocksStackerEnabled() {
         return false;
     }

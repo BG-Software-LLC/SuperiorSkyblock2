@@ -272,6 +272,12 @@ public interface SuperiorPlayer extends IMissionsHolder {
     void toggleWorldBorder();
 
     /**
+     * Update world border for this player.
+     * @param island The island the player should see the border of.
+     */
+    void updateWorldBorder(@Nullable Island island);
+
+    /**
      * Check whether or not the blocks stacker mode is enabled for the player.
      */
     boolean hasBlocksStackerEnabled();

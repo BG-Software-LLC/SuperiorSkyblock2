@@ -130,9 +130,6 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent e) {
-        if (plugin.getGrid() == null)
-            return;
-
         Location from = e.getFrom(), to = e.getTo();
 
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
@@ -168,7 +165,7 @@ public final class CustomEventsListener implements Listener {
                         org.bukkit.material.Sign sign = (org.bukkit.material.Sign) faceBlock.getState().getData();
                         isSign = sign.getAttachedFace().getOppositeFace() == blockFace;
                     } else {
-                        Object blockData = plugin.getNMSAdapter().getBlockData(faceBlock);
+                        Object blockData = plugin.getNMSWorld().getBlockData(faceBlock);
                         if (blockData instanceof org.bukkit.block.data.type.Sign) {
                             isSign = ((org.bukkit.block.data.type.Sign) blockData).getRotation().getOppositeFace() == blockFace;
                         } else {

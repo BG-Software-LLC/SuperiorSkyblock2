@@ -93,8 +93,12 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
             return;
         }
 
-        plugin.getNMSAdapter().sendTitle(targetPlayer.asPlayer(), title == null ? null : StringUtils.translateColors(title),
-                subtitle == null ? null : StringUtils.translateColors(subtitle), fadeIn.getKey(), duration.getKey(), fadeOut.getKey());
+        plugin.getNMSPlayers().sendTitle(targetPlayer.asPlayer(),
+                title == null ? null : StringUtils.translateColors(title),
+                subtitle == null ? null : StringUtils.translateColors(subtitle),
+                fadeIn.getKey(),
+                duration.getKey(),
+                fadeOut.getKey());
 
         Locale.TITLE_SENT.send(sender, targetPlayer.getName());
     }

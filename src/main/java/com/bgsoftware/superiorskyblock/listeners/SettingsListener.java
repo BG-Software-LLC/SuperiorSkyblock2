@@ -219,7 +219,7 @@ public final class SettingsListener implements Listener {
             BlocksLogic.handleBreak(hitBlock);
         }
         else{
-            ICachedBlock cachedBlock = plugin.getNMSBlocks().cacheBlock(hitBlock);
+            ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
             hitBlock.setType(Material.AIR);
 
             Locale.sendProtectionMessage(damagerPlayer);
@@ -268,9 +268,6 @@ public final class SettingsListener implements Listener {
     }
 
     private boolean shouldBlockEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType){
-        if(plugin.getGrid() == null)
-            return false;
-
         Island island = plugin.getGrid().getIslandAt(location);
 
         if(island != null){

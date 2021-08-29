@@ -300,9 +300,6 @@ public final class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockFlow(BlockFromToEvent e) {
-        if (plugin == null || plugin.getGrid() == null)
-            return;
-
         Island fromIsland = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         Location toLocation = e.getBlock().getRelative(e.getFace()).getLocation();
 

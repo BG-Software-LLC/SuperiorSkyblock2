@@ -139,7 +139,7 @@ public final class PlayersListener implements Listener {
                     SkinsRestorerHook.setSkinTexture(superiorPlayer);
                 }
                 else {
-                    plugin.getNMSAdapter().setSkinTexture(superiorPlayer);
+                    plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
                 }
             }
         }, 5L);
@@ -458,7 +458,7 @@ public final class PlayersListener implements Listener {
 
         if(teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL){
             int ticksDelay = ((Player) e.getEntity()).getGameMode() == GameMode.CREATIVE ? 1 : 80;
-            int portalTicks = plugin.getNMSAdapter().getPortalTicks(e.getEntity());
+            int portalTicks = plugin.getNMSEntities().getPortalTicks(e.getEntity());
             if(portalTicks != ticksDelay)
                 return;
         }

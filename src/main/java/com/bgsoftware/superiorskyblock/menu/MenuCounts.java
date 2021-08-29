@@ -242,7 +242,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
         return island.getBlockCountsAsBigInteger().entrySet().stream().sorted((o1, o2) -> {
             Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
             Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());
-            int compare = plugin.getNMSBlocks().compareMaterials(firstMaterial, secondMaterial);
+            int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
             return compare != 0 ? compare : o1.getKey().compareTo(o2.getKey());
         }).map(Pair::new).collect(Collectors.toList());
     }

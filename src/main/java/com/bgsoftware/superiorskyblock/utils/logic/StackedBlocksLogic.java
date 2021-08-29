@@ -162,7 +162,7 @@ public final class StackedBlocksLogic {
 
         plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
 
-        plugin.getNMSAdapter().playBreakAnimation(block);
+        plugin.getNMSWorld().playBreakAnimation(block);
 
         CoreProtectHook.recordBlockChange(player, block, false);
 

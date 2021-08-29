@@ -89,9 +89,9 @@ public final class UpgradesListener implements Listener {
         if(spawnerRatesMultiplier > 1 && !alreadySet.contains(island.getOwner().getUniqueId())){
             alreadySet.add(island.getOwner().getUniqueId());
             Executor.sync(() -> {
-                int spawnDelay = plugin.getNMSAdapter().getSpawnerDelay(spawner);
+                int spawnDelay = plugin.getNMSWorld().getSpawnerDelay(spawner);
                 if(spawnDelay > 0) {
-                    plugin.getNMSAdapter().setSpawnerDelay(spawner, (int) Math.round(spawnDelay / spawnerRatesMultiplier));
+                    plugin.getNMSWorld().setSpawnerDelay(spawner, (int) Math.round(spawnDelay / spawnerRatesMultiplier));
                     Executor.sync(() -> alreadySet.remove(island.getOwner().getUniqueId()), 10L);
                 }
             }, 5L);
@@ -235,7 +235,7 @@ public final class UpgradesListener implements Listener {
         if(island == null)
             return;
 
-        island.handleBlockBreak(plugin.getNMSBlocks().getMinecartBlock((Minecart) e.getVehicle()), 1);
+        island.handleBlockBreak(plugin.getNMSAlgorithms().getMinecartBlock((Minecart) e.getVehicle()), 1);
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -433,7 +433,7 @@ public final class UpgradesListener implements Listener {
             }
         }
         else if(entity instanceof Minecart) {
-            Material material = Material.valueOf(plugin.getNMSBlocks().getMinecartBlock((Minecart) entity).getGlobalKey());
+            Material material = Material.valueOf(plugin.getNMSAlgorithms().getMinecartBlock((Minecart) entity).getGlobalKey());
             switch (material.name()) {
                 case "HOPPER":
                     return new ItemStack(Material.HOPPER_MINECART);

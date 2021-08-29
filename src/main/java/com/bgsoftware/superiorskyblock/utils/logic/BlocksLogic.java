@@ -42,7 +42,7 @@ public final class BlocksLogic {
         Key blockKey = Key.of(block);
 
         if(!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
-            island.handleBlockBreak(blockKey, plugin.getNMSBlocks().getDefaultAmount(block));
+            island.handleBlockBreak(blockKey, plugin.getNMSWorld().getDefaultAmount(block));
 
         EnumMap<BlockFace, Key> nearbyBlocks = new EnumMap<>(BlockFace.class);
 
@@ -56,7 +56,7 @@ public final class BlocksLogic {
         }
 
         Executor.sync(() -> {
-            if(plugin.getNMSAdapter().isChunkEmpty(block.getChunk()))
+            if(plugin.getNMSChunks().isChunkEmpty(block.getChunk()))
                 ChunksTracker.markEmpty(island, block, true);
 
             for(BlockFace nearbyFace : NEARBY_BLOCKS){

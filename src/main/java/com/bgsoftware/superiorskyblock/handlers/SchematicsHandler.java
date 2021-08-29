@@ -181,7 +181,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
                     Location blockLocation = block.getLocation();
 
                     if(blockType != Material.AIR) {
-                        CompoundTag tileEntity = plugin.getNMSBlocks().readTileEntity(blockLocation);
+                        CompoundTag tileEntity = plugin.getNMSWorld().readTileEntity(blockLocation);
                         if(tileEntity != null && block.getState() instanceof InventoryHolder)
                             tileEntity.setString("inventoryType", ((InventoryHolder) block.getState()).getInventory().getType().name());
 
@@ -189,8 +189,8 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
                         blocks.add(new TagBuilder()
                                 .withBlockPosition(SchematicPosition.of(x, y, z))
                                 .withBlockType(blockLocation, blockType, block.getData())
-                                .withStates(plugin.getNMSBlocks().readBlockStates(blockLocation))
-                                .withLightLevels(plugin.getNMSBlocks().getLightLevels(blockLocation))
+                                .withStates(plugin.getNMSWorld().readBlockStates(blockLocation))
+                                .withLightLevels(plugin.getNMSWorld().getLightLevels(blockLocation))
                                 .withTileEntity(tileEntity)
                                 .build()
                         );

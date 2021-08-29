@@ -110,7 +110,7 @@ public final class PlayersLogic {
         }
 
         if (toIsland == null)
-            plugin.getNMSAdapter().setWorldBorder(superiorPlayer, null);
+            plugin.getNMSWorld().setWorldBorder(superiorPlayer, null);
 
         return true;
     }
@@ -166,7 +166,7 @@ public final class PlayersLogic {
 
         if (equalIslands) {
             if (!equalWorlds) {
-                Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+                Executor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
                 superiorPlayer.setImmunedToPortals(true);
                 Executor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
             }
@@ -220,7 +220,7 @@ public final class PlayersLogic {
             }, 5L);
         }
 
-        Executor.sync(() -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, toIsland), 1L);
+        Executor.sync(() -> plugin.getNMSWorld().setWorldBorder(superiorPlayer, toIsland), 1L);
     }
 
 }

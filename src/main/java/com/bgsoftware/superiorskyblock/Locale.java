@@ -986,9 +986,9 @@ public enum Locale {
                     ((Player) sender).spigot().sendMessage(duplicate);
 
                 if(actionBarMessage != null)
-                    plugin.getNMSAdapter().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
+                    plugin.getNMSPlayers().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
 
-                plugin.getNMSAdapter().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
+                plugin.getNMSPlayers().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
                         Locale.replaceArgs(subtitleMessage, objects), fadeIn, duration, fadeOut);
             }
         }

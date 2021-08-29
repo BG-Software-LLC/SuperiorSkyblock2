@@ -402,7 +402,7 @@ public final class SettingsHandler extends AbstractHandler {
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
-                            CompoundTag itemCompound = plugin.getNMSAdapter().getNMSCompound(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().getNBTTag(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);

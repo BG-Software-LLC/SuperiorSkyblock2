@@ -82,7 +82,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
                 }
             });
             if (success) {
-                plugin.getNMSAdapter().playPlaceSound(stackedBlock);
+                plugin.getNMSWorld().playPlaceSound(stackedBlock);
             }
         }
     }

@@ -87,9 +87,9 @@ public final class GeneratorsListener implements Listener {
 
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
 
-        plugin.getNMSBlocks().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
+        plugin.getNMSWorld().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
 
-        plugin.getNMSAdapter().playGeneratorSound(block.getLocation());
+        plugin.getNMSWorld().playGeneratorSound(block.getLocation());
     }
 
     private boolean hasWaterNearby(Block block){
@@ -102,7 +102,7 @@ public final class GeneratorsListener implements Listener {
         }
         else{
             for (BlockFace blockFace : nearbyFaces) {
-                if (plugin.getNMSBlocks().isWaterLogged(block.getRelative(blockFace)))
+                if (plugin.getNMSWorld().isWaterLogged(block.getRelative(blockFace)))
                     return true;
             }
         }

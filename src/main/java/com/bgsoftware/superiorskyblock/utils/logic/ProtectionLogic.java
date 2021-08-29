@@ -120,7 +120,7 @@ public final class ProtectionLogic {
             islandPrivilege = IslandPrivileges.INTERACT;
         }
         else if(usedItem != null && e.getRightClicked() instanceof Animals &&
-                plugin.getNMSAdapter().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
+                plugin.getNMSEntities().isAnimalFood(usedItem, (Animals) e.getRightClicked())){
             islandPrivilege = IslandPrivileges.ANIMAL_BREED;
         }
         else if(usedItem != null && usedItem.getType() == Material.NAME_TAG){
@@ -206,7 +206,7 @@ public final class ProtectionLogic {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(item.getLocation());
 
-        if(island != null && !plugin.getNMSAdapter().wasThrownByPlayer(item, player) &&
+        if(island != null && !plugin.getNMSPlayers().wasThrownByPlayer(item, player) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)){
             Locale.sendProtectionMessage(superiorPlayer);
             return false;

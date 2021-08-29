@@ -40,10 +40,10 @@ public final class CoreProtectHook {
         else if(coreProtectAPI.APIVersion() == 6) {
             if(!place)
                 coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(),
-                        (org.bukkit.block.data.BlockData) plugin.getNMSAdapter().getBlockData(block));
+                        (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
             else
                 coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(),
-                        (org.bukkit.block.data.BlockData) plugin.getNMSAdapter().getBlockData(block));
+                        (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
         }
     }
 

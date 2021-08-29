@@ -106,7 +106,7 @@ public final class BlocksListener implements Listener {
             return;
 
         Material blockType = e.getBlockClicked().getType();
-        boolean isWaterLogged = plugin.getNMSBlocks().isWaterLogged(e.getBlockClicked());
+        boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(e.getBlockClicked());
 
         if(!blockType.name().contains("WATER") && !blockType.name().contains("LAVA") && !isWaterLogged)
             return;
@@ -117,7 +117,7 @@ public final class BlocksListener implements Listener {
 
         Executor.sync(() -> {
             Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
-            if(plugin.getNMSAdapter().isChunkEmpty(location.getChunk()))
+            if(plugin.getNMSChunks().isChunkEmpty(location.getChunk()))
                 ChunksTracker.markEmpty(island, location, true);
         }, 2L);
     }
@@ -192,57 +192,52 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFromMonitor(BlockFormEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
+        Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
 
-            if (island != null) {
-                Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1, false), 1L);
-            }
+        if (island != null) {
+            Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1, false), 1L);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockFromToMonitor(BlockFromToEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
-            if(island != null && e.getToBlock().getType() != Material.AIR)
-                BlocksLogic.handleBreak(e.getToBlock());
-        }
+        Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
+        if(island != null && e.getToBlock().getType() != Material.AIR)
+            BlocksLogic.handleBreak(e.getToBlock());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityExplodeMonitor(EntityExplodeEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            for(Block block : e.blockList()){
-                Island island = plugin.getGrid().getIslandAt(block.getLocation());
-                if(island != null)
-                    island.handleBlockBreak(block, 1);
-            }
-            if(e.getEntity() instanceof TNTPrimed){
-                Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-                if(island != null)
-                    island.handleBlockBreak(ConstantKeys.TNT, 1);
-            }
+        for(Block block : e.blockList()){
+            Island island = plugin.getGrid().getIslandAt(block.getLocation());
+            if(island != null)
+                island.handleBlockBreak(block, 1);
+        }
+        if(e.getEntity() instanceof TNTPrimed){
+            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+            if(island != null)
+                island.handleBlockBreak(ConstantKeys.TNT, 1);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onEntityChangeBlockMonitor(EntityChangeBlockEvent e){
-        if(plugin != null && plugin.getGrid() != null) {
-            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            if(island != null) {
-                island.handleBlockBreak(e.getBlock(), 1);
-                if(e.getTo() != Material.AIR) {
-                    byte data = 0;
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-                    try{
-                        //noinspection deprecation
-                        data = e.getData();
-                    }catch (Throwable ignored){}
+        if(island == null)
+            return;
 
-                    island.handleBlockPlace(Key.of(e.getTo(), data), 1);
-                }
-            }
+        island.handleBlockBreak(e.getBlock(), 1);
+
+        if(e.getTo() != Material.AIR) {
+            byte data = 0;
+
+            try{
+                //noinspection deprecation
+                data = e.getData();
+            }catch (Throwable ignored){}
+
+            island.handleBlockPlace(Key.of(e.getTo(), data), 1);
         }
     }
 
@@ -447,7 +442,7 @@ public final class BlocksListener implements Listener {
             BlocksLogic.handleSignPlace(superiorPlayer, island, e.getBlock().getLocation(), signLines, true);
             // In 1.16.5+ of Paper, the SignChangeEvent doesn't have the lines array of the signs.
             // Therefore, we manually need to set them.
-            plugin.getNMSBlocks().setSignLines(e, signLines);
+            plugin.getNMSWorld().setSignLines(e, signLines);
         }
     }
 

@@ -2,16 +2,24 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.collect.Maps;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_12_R1.ChunkProviderServer;
+import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
+import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChunkLoader;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.Packet;
 import net.minecraft.server.v1_12_R1.PlayerChunkMap;
+import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
 
@@ -24,8 +32,14 @@ import java.util.function.Consumer;
 
 public final class NMSUtils {
 
-    private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
-    private static final ReflectMethod<Void> SAVE_CHUNK = new ReflectMethod<>(IChunkLoader.class, "a", World.class, Chunk.class);
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(
+            ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
+    private static final ReflectMethod<Void> SAVE_CHUNK = new ReflectMethod<>(
+            IChunkLoader.class, "a", World.class, Chunk.class);
+    private static final ReflectMethod<Void> TILE_ENTITY_LOAD = new ReflectMethod<>(
+            TileEntity.class, "a", NBTTagCompound.class);
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
@@ -53,7 +67,7 @@ public final class NMSUtils {
 
         loadedChunks.forEach(chunkConsumer);
 
-        if(updateChunk != null)
+        if (updateChunk != null)
             loadedChunks.forEach(updateChunk);
 
         if (hasUnloadedChunks) {
@@ -100,6 +114,54 @@ public final class NMSUtils {
         for (EntityHuman entityHuman : worldServer.players) {
             if (entityHuman instanceof EntityPlayer && playerChunkMap.a((EntityPlayer) entityHuman, chunkX, chunkZ))
                 ((EntityPlayer) entityHuman).playerConnection.sendPacket(packet);
+        }
+    }
+
+    public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag tileEntity) {
+        IBlockData blockData = Block.getByCombinedId(combinedId);
+
+        if (blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+            chunk.world.setTypeAndData(blockPosition, blockData, 3);
+            return;
+        }
+
+        int blockX = blockPosition.getX() & 15;
+        int blockY = blockPosition.getY();
+        int blockZ = blockPosition.getZ() & 15;
+
+        int highestBlockLight = chunk.b(blockX, blockZ);
+        boolean initLight = false;
+
+        int indexY = blockY >> 4;
+
+        ChunkSection chunkSection = chunk.getSections()[indexY];
+
+        if (chunkSection == null) {
+            chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk.world.worldProvider.m());
+            initLight = blockY > highestBlockLight;
+        }
+
+        chunkSection.setType(blockX, blockY & 15, blockZ, blockData);
+
+        chunk.markDirty();
+
+        if (initLight)
+            chunk.initLighting();
+
+        if (tileEntity != null) {
+            NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();
+            if (tileEntityCompound != null) {
+                tileEntityCompound.setInt("x", blockPosition.getX());
+                tileEntityCompound.setInt("y", blockPosition.getY());
+                tileEntityCompound.setInt("z", blockPosition.getZ());
+                TileEntity worldTileEntity = chunk.world.getTileEntity(blockPosition);
+                if (worldTileEntity != null) {
+                    if (TILE_ENTITY_LOAD.isValid())
+                        TILE_ENTITY_LOAD.invoke(worldTileEntity, tileEntityCompound);
+                    else
+                        worldTileEntity.load(tileEntityCompound);
+                }
+            }
         }
     }
 
