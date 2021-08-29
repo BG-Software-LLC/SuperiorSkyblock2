@@ -313,6 +313,9 @@ public final class IslandsDeserializer {
         if(value instanceof Byte) {
             return (byte) value;
         }
+        else if(value instanceof Boolean) {
+            return (Boolean) value ? (byte) 1 : 0;
+        }
         else if(value instanceof Integer) {
             return (byte) (int) value;
         }  else {
