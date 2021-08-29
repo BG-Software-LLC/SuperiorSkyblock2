@@ -217,6 +217,9 @@ public final class NMSUtils {
             chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING_NO_LEAVES).a(blockX, blockY, blockZ, blockData);
             chunk.heightMap.get(HeightMap.Type.OCEAN_FLOOR).a(blockX, blockY, blockZ, blockData);
             chunk.heightMap.get(HeightMap.Type.WORLD_SURFACE).a(blockX, blockY, blockZ, blockData);
+
+            chunk.markDirty();
+            chunk.setNeedsSaving(true);
         }
 
         if (tileEntity != null) {

@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateInteger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.BiomeStorage;
+import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.lighting.LightEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
@@ -51,6 +52,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftSign;
@@ -171,20 +173,21 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
-        WorldServer world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        net.minecraft.world.level.chunk.Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
-
-        for (BlockData blockData : blockDataList)
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+        }
     }
 
     @Override
     public void setBlock(Location location, Material material, byte data) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
         NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition,
                 plugin.getNMSAlgorithms().getCombinedId(material, data), null, null);
+
         NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
@@ -332,7 +335,7 @@ public final class NMSWorldImpl implements NMSWorld {
         SoundEffectType soundEffectType = world.getType(blockPosition).getStepSound();
 
         world.playSound(null, blockPosition, soundEffectType.getPlaceSound(),
-                SoundCategory.e ,(soundEffectType.getVolume() + 1.0F) / 2.0F, soundEffectType.getPitch() * 0.8F);
+                SoundCategory.e, (soundEffectType.getVolume() + 1.0F) / 2.0F, soundEffectType.getPitch() * 0.8F);
     }
 
 }

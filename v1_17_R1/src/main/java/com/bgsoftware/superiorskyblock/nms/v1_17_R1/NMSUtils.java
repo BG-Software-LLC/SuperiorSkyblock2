@@ -218,6 +218,7 @@ public final class NMSUtils {
             chunk.j.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
 
             chunk.markDirty();
+            chunk.setNeedsSaving(true);
         }
 
         if (tileEntity != null) {

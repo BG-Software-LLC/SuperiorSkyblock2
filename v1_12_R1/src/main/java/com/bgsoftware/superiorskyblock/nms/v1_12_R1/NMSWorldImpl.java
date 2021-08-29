@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -13,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.BlockDoubleStep;
 import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.EnumParticle;
 import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -36,6 +38,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
@@ -151,12 +154,11 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
-        net.minecraft.server.v1_12_R1.World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        net.minecraft.server.v1_12_R1.Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
-
-        for (com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getClonedTileEntity());
+        }
     }
 
     @Override

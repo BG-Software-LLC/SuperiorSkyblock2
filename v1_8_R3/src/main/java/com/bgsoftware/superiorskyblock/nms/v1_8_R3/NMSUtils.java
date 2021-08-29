@@ -135,6 +135,8 @@ public final class NMSUtils {
 
         chunkSection.setType(blockX, blockY & 15, blockZ, blockData);
 
+        chunk.e();
+
         if (initLight)
             chunk.initLighting();
 

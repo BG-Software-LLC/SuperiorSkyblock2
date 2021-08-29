@@ -26,6 +26,7 @@ import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
+import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
@@ -52,6 +53,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
+import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftSign;
@@ -183,12 +185,11 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
-        WorldServer world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        net.minecraft.server.v1_16_R3.Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
-
-        for (BlockData blockData : blockDataList)
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+        }
     }
 
     @Override

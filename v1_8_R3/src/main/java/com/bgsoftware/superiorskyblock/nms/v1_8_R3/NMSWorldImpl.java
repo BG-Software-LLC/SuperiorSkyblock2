@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
@@ -34,6 +35,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
@@ -155,12 +157,11 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
-        net.minecraft.server.v1_8_R3.World world = ((CraftWorld) bukkitChunk.getWorld()).getHandle();
-        Chunk chunk = world.getChunkAt(bukkitChunk.getX(), bukkitChunk.getZ());
-
-        for (com.bgsoftware.superiorskyblock.utils.blocks.BlockData blockData : blockDataList)
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getClonedTileEntity());
+        }
     }
 
     @Override
