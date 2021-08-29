@@ -1,8 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSection;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
@@ -18,16 +22,19 @@ import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_12_R1.ChunkSection;
 import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_12_R1.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_12_R1.PlayerConnection;
 import net.minecraft.server.v1_12_R1.TileEntity;
+import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -47,6 +54,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public final class NMSChunksImpl implements NMSChunks {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     public void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate) {
@@ -155,6 +164,64 @@ public final class NMSChunksImpl implements NMSChunks {
         }, null);
 
         return completableFuture;
+    }
+
+    @Override
+    public void injectChunkSections(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        for (int i = 0; i < 16; i++)
+            chunk.getSections()[i] = EmptyCounterChunkSection.of(chunk.getSections()[i]);
+    }
+
+    @Override
+    public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.a());
+    }
+
+    @Override
+    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+                new PacketPlayOutMapChunk(chunk, 65535));
+    }
+
+    @Override
+    public void refreshLights(org.bukkit.Chunk chunk, List<BlockData> blockDataList) {
+        World world = ((CraftChunk) chunk).getHandle().getWorld();
+
+        // Update lights for the blocks.
+        for (BlockData blockData : blockDataList) {
+            BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
+            if (plugin.getSettings().lightsUpdate && blockData.getBlockLightLevel() > 0)
+                world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
+
+            byte skyLight = plugin.getSettings().lightsUpdate ? blockData.getSkyLightLevel() : 15;
+
+            if (skyLight > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
+                world.a(EnumSkyBlock.SKY, blockPosition, skyLight);
+        }
+
+        refreshChunk(chunk);
+    }
+
+    @Override
+    public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
+        Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().getChunkProviderServer()
+                .getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());
+        return chunk == null ? null : chunk.bukkitChunk;
+    }
+
+    @Override
+    public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
+        if (stop) {
+            ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunk.getX(), chunk.getZ());
+            CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(chunkCoords);
+            if (cropsTickingTileEntity != null)
+                cropsTickingTileEntity.getWorld().tileEntityListTick.remove(cropsTickingTileEntity);
+        } else {
+            CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+        }
     }
 
     private static void removeEntities(Chunk chunk) {

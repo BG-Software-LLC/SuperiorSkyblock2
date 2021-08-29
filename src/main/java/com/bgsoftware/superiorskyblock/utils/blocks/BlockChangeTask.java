@@ -46,35 +46,33 @@ public final class BlockChangeTask {
 
             submitted = true;
 
-            List<BlockData> interactedBlocks = new ArrayList<>();
             AtomicInteger loadedChunks = new AtomicInteger(0);
             int chunksAmount = blocksCache.size();
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
                 ChunksProvider.loadChunk(entry.getKey(), chunk -> {
                     interactedChunks.add(entry.getKey());
-                    interactedBlocks.addAll(entry.getValue());
 
                     IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
 
                     if(island.isInsideRange(chunk))
-                        plugin.getNMSBlocks().startTickingChunk(island, chunk, false);
+                        plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
                     ChunksTracker.markDirty(island, chunk, false);
 
                     entry.getValue().forEach(blockData -> blockData.doPrePlace(island));
 
-                    plugin.getNMSBlocks().setBlocks(chunk, entry.getValue());
+                    plugin.getNMSWorld().setBlocks(chunk, entry.getValue());
 
                     if(island.getOwner().isOnline())
                         entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
 
-                    plugin.getNMSBlocks().refreshChunk(chunk);
+                    plugin.getNMSChunks().refreshChunk(chunk);
+                    Executor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
                 }).whenComplete((chunk, ex) -> {
                     if(onFinish != null) {
                         if (loadedChunks.incrementAndGet() >= chunksAmount) {
                             onFinish.run();
-                            Executor.sync(() -> plugin.getNMSBlocks().refreshLights(chunk.getWorld(), interactedBlocks), 10L);
                         }
                     }
                 });

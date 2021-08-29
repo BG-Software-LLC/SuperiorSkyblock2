@@ -355,7 +355,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
         }
 
         if(inventory.getHolder() == null)
-            INVENTORY.set(inventory, plugin.getNMSAdapter().getCustomHolder(menuData.inventoryType,this, title));
+            INVENTORY.set(inventory, plugin.getNMSAlgorithms().getCustomHolder(menuData.inventoryType,this, title));
 
         //noinspection all
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();

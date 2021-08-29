@@ -106,7 +106,7 @@ public final class BlocksListener implements Listener {
             return;
 
         Material blockType = e.getBlockClicked().getType();
-        boolean isWaterLogged = plugin.getNMSBlocks().isWaterLogged(e.getBlockClicked());
+        boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(e.getBlockClicked());
 
         if(!blockType.name().contains("WATER") && !blockType.name().contains("LAVA") && !isWaterLogged)
             return;
@@ -117,7 +117,7 @@ public final class BlocksListener implements Listener {
 
         Executor.sync(() -> {
             Location location = LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace());
-            if(plugin.getNMSAdapter().isChunkEmpty(location.getChunk()))
+            if(plugin.getNMSChunks().isChunkEmpty(location.getChunk()))
                 ChunksTracker.markEmpty(island, location, true);
         }, 2L);
     }
@@ -442,7 +442,7 @@ public final class BlocksListener implements Listener {
             BlocksLogic.handleSignPlace(superiorPlayer, island, e.getBlock().getLocation(), signLines, true);
             // In 1.16.5+ of Paper, the SignChangeEvent doesn't have the lines array of the signs.
             // Therefore, we manually need to set them.
-            plugin.getNMSBlocks().setSignLines(e, signLines);
+            plugin.getNMSWorld().setSignLines(e, signLines);
         }
     }
 

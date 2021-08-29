@@ -40,9 +40,9 @@ public final class ChunksListener implements Listener {
         if(island == null)
             return;
 
-        plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), true);
+        plugin.getNMSChunks().startTickingChunk(island, e.getChunk(), true);
 
-        if(!island.isSpawn() && !plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+        if(!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
     }
 
@@ -58,12 +58,12 @@ public final class ChunksListener implements Listener {
             island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
         }
 
-        plugin.getNMSAdapter().injectChunkSections(e.getChunk());
+        plugin.getNMSChunks().injectChunkSections(e.getChunk());
 
         if(island.isInsideRange(e.getChunk()))
-            plugin.getNMSBlocks().startTickingChunk(island, e.getChunk(), false);
+            plugin.getNMSChunks().startTickingChunk(island, e.getChunk(), false);
 
-        if(!plugin.getNMSAdapter().isChunkEmpty(e.getChunk()))
+        if(!plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
 
         // We want to delete old holograms of stacked blocks
@@ -81,7 +81,7 @@ public final class ChunksListener implements Listener {
     public void onBlockGrow(BlockGrowEvent e){
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if(island != null && island.isInsideRange(e.getBlock().getLocation()))
-            plugin.getNMSBlocks().startTickingChunk(island, e.getBlock().getChunk(), false);
+            plugin.getNMSChunks().startTickingChunk(island, e.getBlock().getChunk(), false);
     }
 
     private static boolean isHologram(ArmorStand armorStand){

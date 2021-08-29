@@ -187,7 +187,7 @@ public final class ItemBuilder implements Cloneable {
 
     public ItemBuilder withPotionEffect(PotionEffect potionEffect){
         if(itemMeta instanceof PotionMeta)
-            plugin.getNMSAdapter().addPotion((PotionMeta) itemMeta, potionEffect);
+            plugin.getNMSAlgorithms().addPotion((PotionMeta) itemMeta, potionEffect);
         return this;
     }
 
@@ -210,7 +210,7 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withCustomModel(int customModel){
-        plugin.getNMSAdapter().setCustomModel(itemMeta, customModel);
+        plugin.getNMSAlgorithms().setCustomModel(itemMeta, customModel);
         return this;
     }
 

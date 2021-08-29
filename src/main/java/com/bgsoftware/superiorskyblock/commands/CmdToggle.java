@@ -64,7 +64,7 @@ public final class CmdToggle implements ISuperiorCommand {
             }
 
             superiorPlayer.toggleWorldBorder();
-            plugin.getNMSAdapter().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+            superiorPlayer.updateWorldBorder(plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
         }
 
         else if(args[1].equalsIgnoreCase("blocks")){

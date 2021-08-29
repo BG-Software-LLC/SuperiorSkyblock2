@@ -219,7 +219,7 @@ public final class SettingsListener implements Listener {
             BlocksLogic.handleBreak(hitBlock);
         }
         else{
-            ICachedBlock cachedBlock = plugin.getNMSBlocks().cacheBlock(hitBlock);
+            ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
             hitBlock.setType(Material.AIR);
 
             Locale.sendProtectionMessage(damagerPlayer);

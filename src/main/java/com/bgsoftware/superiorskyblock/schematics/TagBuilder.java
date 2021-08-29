@@ -31,7 +31,7 @@ public final class TagBuilder {
 
     public TagBuilder withBlockType(Location location, Material blockType, int data){
         if(ServerVersion.isLegacy()) {
-            compoundValue.put("combinedId", new IntTag(plugin.getNMSBlocks().getCombinedId(location)));
+            compoundValue.put("combinedId", new IntTag(plugin.getNMSAlgorithms().getCombinedId(location)));
         }
         else {
             compoundValue.put("type", new StringTag(blockType.name()));

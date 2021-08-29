@@ -791,7 +791,7 @@ public final class SIsland implements Island {
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
         return IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks).stream()
-                .map(plugin.getNMSBlocks()::getChunkIfLoaded).filter(Objects::nonNull).collect(Collectors.toList());
+                .map(plugin.getNMSChunks()::getChunkIfLoaded).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     @Override
@@ -1139,7 +1139,7 @@ public final class SIsland implements Island {
                 kickMember(superiorPlayer);
 
             if (plugin.getSettings().disbandInventoryClear)
-                plugin.getNMSAdapter().clearInventory(superiorPlayer.asOfflinePlayer());
+                plugin.getNMSPlayers().clearInventory(superiorPlayer.asOfflinePlayer());
 
             plugin.getMissions().getAllMissions().stream().filter(mission -> {
                 MissionsHandler.MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
@@ -1224,7 +1224,7 @@ public final class SIsland implements Island {
     @Override
     public void updateBorder() {
         SuperiorSkyblockPlugin.debug("Action: Update Border, Island: " + owner.getName());
-        getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
+        getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
     }
 
     @Override
@@ -1254,13 +1254,13 @@ public final class SIsland implements Island {
 
         // First, we want to remove all the current crop tile entities
         getLoadedChunks(true, false).forEach(chunk ->
-                plugin.getNMSBlocks().startTickingChunk(this, chunk, true));
+                plugin.getNMSChunks().startTickingChunk(this, chunk, true));
 
         this.islandSize = new UpgradeValue<>(islandSize, false);
 
         // Now, we want to update the tile entities again
         getLoadedChunks(true, false).forEach(chunk ->
-                plugin.getNMSBlocks().startTickingChunk(this, chunk, false));
+                plugin.getNMSChunks().startTickingChunk(this, chunk, false));
 
         IslandsDatabaseBridge.saveSize(this);
     }
@@ -1468,7 +1468,7 @@ public final class SIsland implements Island {
 
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> plugin.getNMSAdapter().sendTitle(superiorPlayer.asPlayer(),
+                .forEach(superiorPlayer -> plugin.getNMSPlayers().sendTitle(superiorPlayer.asPlayer(),
                         title, subtitle, fadeIn, duration, fadeOut));
     }
 

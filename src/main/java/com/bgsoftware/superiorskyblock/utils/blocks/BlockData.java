@@ -98,7 +98,7 @@ public final class BlockData {
     public void doPostPlace(Island island){
         if(clonedTileEntity != null && (clonedTileEntity.containsKey("Text1") || clonedTileEntity.containsKey("Text2") ||
                 clonedTileEntity.containsKey("Text3") || clonedTileEntity.containsKey("Text4")))
-            plugin.getNMSBlocks().handleSignPlace(island, location);
+            plugin.getNMSWorld().placeSign(island, location);
     }
 
     private static String getSignLine(int index, String def){

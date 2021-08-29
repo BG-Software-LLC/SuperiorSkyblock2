@@ -117,7 +117,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
                     int data = ((IntTag) compoundValue.getOrDefault("data", new IntTag(0))).getValue();
 
-                    combinedId = plugin.getNMSBlocks().getCombinedId(type, (byte) data);
+                    combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
                 }
                 else{
                     SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + x + ", " + y + ", " + z + " - skipping...");
@@ -222,8 +222,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     }
 
     private void readBlock(SchematicBlock block){
-        int combinedId = block.getCombinedId();
-        Key key = Key.of(plugin.getNMSBlocks().getMaterial(combinedId) + "", plugin.getNMSBlocks().getData(combinedId) + "");
+        Key key = plugin.getNMSAlgorithms().getBlockKey(block.getCombinedId());
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 
@@ -271,7 +270,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     if(item.getValue() instanceof CompoundTag) {
                         try {
                             ItemStack itemStack = TagUtils.compoundToItem((CompoundTag) item.getValue());
-                            CompoundTag itemCompound = plugin.getNMSAdapter().getNMSCompound(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().getNBTTag(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
                         } catch (Exception ignored) {
@@ -291,7 +290,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             if(flower != null){
                 try {
                     String[] flowerSections = flower.split(":");
-                    tileEntity.setString("Item", plugin.getNMSAdapter().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
+                    tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
                     tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
                 }catch (Exception ignored){}
             }
@@ -321,28 +320,28 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         {
             String signLine0 = compoundTag.getString("signLine0");
             if(signLine0 != null){
-                tileEntity.setString("Text1", plugin.getNMSBlocks().parseSignLine(signLine0));
+                tileEntity.setString("Text1", plugin.getNMSAlgorithms().parseSignLine(signLine0));
             }
         }
 
         {
             String signLine1 = compoundTag.getString("signLine1");
             if(signLine1 != null){
-                tileEntity.setString("Text2", plugin.getNMSBlocks().parseSignLine(signLine1));
+                tileEntity.setString("Text2", plugin.getNMSAlgorithms().parseSignLine(signLine1));
             }
         }
 
         {
             String signLine2 = compoundTag.getString("signLine2");
             if(signLine2 != null){
-                tileEntity.setString("Text3", plugin.getNMSBlocks().parseSignLine(signLine2));
+                tileEntity.setString("Text3", plugin.getNMSAlgorithms().parseSignLine(signLine2));
             }
         }
 
         {
             String signLine3 = compoundTag.getString("signLine3");
             if(signLine3 != null){
-                tileEntity.setString("Text4", plugin.getNMSBlocks().parseSignLine(signLine3));
+                tileEntity.setString("Text4", plugin.getNMSAlgorithms().parseSignLine(signLine3));
             }
         }
 

@@ -36,12 +36,15 @@ import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
-import com.bgsoftware.superiorskyblock.nms.NMSAdapter;
-import com.bgsoftware.superiorskyblock.nms.NMSBlocks;
+import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
+import com.bgsoftware.superiorskyblock.nms.NMSDragonFightImpl;
+import com.bgsoftware.superiorskyblock.nms.NMSEntities;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
+import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
@@ -59,8 +62,6 @@ import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -100,12 +101,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private IScriptEngine scriptEngine = NashornEngine.getInstance();
 
-    private NMSAdapter nmsAdapter;
-    private NMSTags nmsTags;
-    private NMSBlocks nmsBlocks;
+    private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
-    private NMSHolograms nmsHolograms;
     private NMSDragonFight nmsDragonFight;
+    private NMSEntities nmsEntities;
+    private NMSHolograms nmsHolograms;
+    private NMSPlayers nmsPlayers;
+    private NMSTags nmsTags;
+    private NMSWorld nmsWorld;
 
     private ChunkGenerator worldGenerator = null;
 
@@ -275,7 +278,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Bukkit.getOnlinePlayers().forEach(player -> {
                 SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 player.closeInventory();
-                nmsAdapter.setWorldBorder(superiorPlayer, null);
+                superiorPlayer.updateWorldBorder(null);
                 if (superiorPlayer.hasIslandFlyEnabled()) {
                     player.setAllowFlight(false);
                     player.setFlying(false);
@@ -298,47 +301,25 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private boolean loadNMSAdapter(){
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
-            nmsAdapter = (NMSAdapter) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSAdapter_" + version).newInstance();
-            nmsTags = (NMSTags) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSTags_" + version).newInstance();
-            nmsBlocks = (NMSBlocks) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSBlocks_" + version).newInstance();
-            nmsChunks = (NMSChunks) Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.NMSChunksImpl", version)).newInstance();
-            nmsHolograms = (NMSHolograms) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSHolograms_" + version).newInstance();
-            if (new SettingsHandler(this).endDragonFight)
-                nmsDragonFight = (NMSDragonFight) Class.forName("com.bgsoftware.superiorskyblock.nms.NMSDragonFight_" + version).newInstance();
-            else
-                nmsDragonFight = new NMSDragonFight() {
-                    @Override
-                    public void startDragonBattle(Island island, Location location) {
-
-                    }
-
-                    @Override
-                    public void removeDragonBattle(Island island) {
-
-                    }
-
-                    @Override
-                    public void tickBattles() {
-
-                    }
-
-                    @Override
-                    public void setDragonPhase(EnderDragon enderDragon, Object phase) {
-
-                    }
-
-                    @Override
-                    public void awardTheEndAchievement(Player player) {
-
-                    }
-                };
+            nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
+            nmsChunks = loadNMSClass("NMSChunksImpl", version);
+            nmsDragonFight = new SettingsHandler(this).endDragonFight ?
+                    loadNMSClass("NMSDragonFightImpl", version) : new NMSDragonFightImpl();
+            nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
+            nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
+            nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
+            nmsTags = loadNMSClass("NMSTagsImpl", version);
+            nmsWorld = loadNMSClass("NMSWorldImpl", version);
             return true;
-        }catch (HandlerLoadException ignored){
-            return true;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
             return false;
         }
+    }
+
+    private <T> T loadNMSClass(String className, String version) throws Exception {
+        // noinspection unchecked
+        return (T) Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.%s", version, className)).newInstance();
     }
 
     public ChunkGenerator getGenerator(){
@@ -368,6 +349,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 File[] generatorsFilesList =  generatorFolder.listFiles();
                 if(generatorsFilesList != null) {
                     for (File file : generatorsFilesList) {
+                        //noinspection deprecation
                         Optional<Class<?>> generatorClassOptional = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
                         if (generatorClassOptional.isPresent()) {
                             Class<?> generatorClass = generatorClassOptional.get();
@@ -471,11 +453,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             for(Player player : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                 Island island = gridHandler.getIslandAt(player.getLocation());
-                nmsAdapter.setWorldBorder(superiorPlayer, island);
+                superiorPlayer.updateWorldBorder(island);
                 if(island != null)
                     island.applyEffects(superiorPlayer);
             }
-            //CropsTask.startTask();
         });
 
         CalcTask.startTask();
@@ -565,28 +546,36 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         this.settingsHandler = settingsHandler;
     }
 
-    public NMSAdapter getNMSAdapter() {
-        return nmsAdapter;
+    public NMSAlgorithms getNMSAlgorithms() {
+        return nmsAlgorithms;
     }
 
-    public NMSTags getNMSTags(){
-        return nmsTags;
-    }
-
-    public NMSBlocks getNMSBlocks() {
-        return nmsBlocks;
-    }
-
-    public NMSHolograms getNMSHolograms() {
-        return nmsHolograms;
+    public NMSChunks getNMSChunks() {
+        return nmsChunks;
     }
 
     public NMSDragonFight getNMSDragonFight() {
         return nmsDragonFight;
     }
 
-    public NMSChunks getNMSChunks() {
-        return nmsChunks;
+    public NMSEntities getNMSEntities() {
+        return nmsEntities;
+    }
+
+    public NMSHolograms getNMSHolograms() {
+        return nmsHolograms;
+    }
+
+    public NMSPlayers getNMSPlayers() {
+        return nmsPlayers;
+    }
+
+    public NMSTags getNMSTags(){
+        return nmsTags;
+    }
+
+    public NMSWorld getNMSWorld() {
+        return nmsWorld;
     }
 
     public String getFileName(){

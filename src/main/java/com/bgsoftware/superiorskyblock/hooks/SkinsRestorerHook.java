@@ -24,7 +24,7 @@ public final class SkinsRestorerHook {
 
         Property property = skinsRestorer.getSkin(superiorPlayer);
         if(property != null)
-            Executor.sync(() -> plugin.getNMSAdapter().setSkinTexture(superiorPlayer, property));
+            Executor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     public static boolean isEnabled() {

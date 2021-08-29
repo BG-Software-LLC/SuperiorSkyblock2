@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.utils.entities;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.key.Key;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Ambient;
@@ -57,7 +56,7 @@ public final class EntityUtils {
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity){
-        List<ItemStack> entityEquipment = new ArrayList<>(Arrays.asList(plugin.getNMSAdapter().getEquipment(livingEntity.getEquipment())));
+        List<ItemStack> entityEquipment = new ArrayList<>(Arrays.asList(plugin.getNMSEntities().getEquipment(livingEntity.getEquipment())));
 
         if(livingEntity instanceof Pig){
             if(((Pig) livingEntity).hasSaddle())

@@ -594,7 +594,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void updateBorder() {
-        getAllPlayersInside().forEach(superiorPlayer -> plugin.getNMSAdapter().setWorldBorder(superiorPlayer, this));
+        getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
     }
 
     @Override

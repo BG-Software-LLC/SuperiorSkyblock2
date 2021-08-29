@@ -110,7 +110,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             pluginCommand.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
         }
 
-        plugin.getNMSAdapter().registerCommand(pluginCommand);
+        plugin.getNMSAlgorithms().registerCommand(pluginCommand);
 
         registerCommand(new CmdAccept(), false);
         registerCommand((adminCommand = new CmdAdmin(this)), false);

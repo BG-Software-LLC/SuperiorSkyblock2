@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
