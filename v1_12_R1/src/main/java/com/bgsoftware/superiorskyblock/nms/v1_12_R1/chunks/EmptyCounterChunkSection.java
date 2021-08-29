@@ -18,7 +18,7 @@ public final class EmptyCounterChunkSection extends ChunkSection {
 
     private int nonEmptyBlockCount, tickingBlockCount;
 
-    EmptyCounterChunkSection(ChunkSection chunkSection) {
+    private EmptyCounterChunkSection(ChunkSection chunkSection) {
         super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
 
         nonEmptyBlockCount = NON_EMPTY_BLOCK_COUNT.get(chunkSection, 0);
@@ -78,7 +78,7 @@ public final class EmptyCounterChunkSection extends ChunkSection {
         return nonEmptyBlockCount == 0;
     }
 
-    static EmptyCounterChunkSection of(ChunkSection chunkSection) {
+    public static EmptyCounterChunkSection of(ChunkSection chunkSection) {
         return chunkSection == null ? null : new EmptyCounterChunkSection(chunkSection);
     }
 
