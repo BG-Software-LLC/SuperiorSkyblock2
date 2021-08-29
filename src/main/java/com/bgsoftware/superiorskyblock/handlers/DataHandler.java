@@ -43,25 +43,25 @@ public final class DataHandler extends AbstractHandler {
     public void loadDataWithException() throws HandlerLoadException {
         loadDatabaseLoaders();
 
-        databaseLoaders.forEach(databaseLoader -> {
+        for(DatabaseLoader databaseLoader : databaseLoaders) {
             try {
                 databaseLoader.loadData();
             }catch (Exception error) {
-                error.printStackTrace();
+                throw new HandlerLoadException(error, "&cUnexpected error occurred while converting data:", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
             }
-        });
+        }
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().init(plugin);
         }
 
-        databaseLoaders.forEach(databaseLoader -> {
+        for(DatabaseLoader databaseLoader : databaseLoaders) {
             try {
                 databaseLoader.saveData();
-            } catch (Exception error) {
-                error.printStackTrace();
+            }catch (Exception error) {
+                throw new HandlerLoadException(error, "&cUnexpected error occurred while saving data:", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
             }
-        });
+        }
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().createIndexes();
