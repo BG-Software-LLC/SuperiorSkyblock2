@@ -111,12 +111,12 @@ public final class CmdWarp implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
 
-        return switch (args.length) {
-            case 2 -> CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+        switch (args.length) {
+            case 2: return CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
                     plugin.getSettings().tabCompleteHideVanished);
-            case 3 -> CommandTabCompletes.getIslandWarps(CommandArguments.getIsland(plugin, sender, args[1]).getKey(), args[2]);
-            default -> new ArrayList<>();
-        };
+            case 3: return CommandTabCompletes.getIslandWarps(CommandArguments.getIsland(plugin, sender, args[1]).getKey(), args[2]);
+            default: return new ArrayList<>();
+        }
 
     }
 
