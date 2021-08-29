@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CompletableFuture;
 
 public final class BlockChangeTask {
 
@@ -46,11 +47,10 @@ public final class BlockChangeTask {
 
             submitted = true;
 
-            AtomicInteger loadedChunks = new AtomicInteger(0);
-            int chunksAmount = blocksCache.size();
+            List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>();
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
-                ChunksProvider.loadChunk(entry.getKey(), chunk -> {
+                chunkFutures.add(ChunksProvider.loadChunk(entry.getKey(), chunk -> {
                     interactedChunks.add(entry.getKey());
 
                     IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
@@ -69,12 +69,12 @@ public final class BlockChangeTask {
 
                     plugin.getNMSChunks().refreshChunk(chunk);
                     Executor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
-                }).whenComplete((chunk, ex) -> {
-                    if(onFinish != null) {
-                        if (loadedChunks.incrementAndGet() >= chunksAmount) {
-                            onFinish.run();
-                        }
-                    }
+                }));
+            }
+
+            if(onFinish != null) {
+                CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
+                    onFinish.run();
                 });
             }
         } finally {
