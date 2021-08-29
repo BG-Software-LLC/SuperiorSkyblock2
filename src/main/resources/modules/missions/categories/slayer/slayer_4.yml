@@ -23,6 +23,12 @@ rewards:
     - 'is admin msg %player% &e&lSlayer | &7You passed all the tests, you are ready now for the end...'
     - 'is admin msg %player% &e&lSlayer | &7&oYou are now a professional Slayer, congratz!'
 
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'slayer_1'
+  - 'slayer_2'
+  - 'slayer_3'
+
 # List of all required blocks must be gathered in order to complete the mission.
 required-entities:
   '1':

@@ -23,6 +23,10 @@ rewards:
     - 'is admin msg %player% &e&lSlayer | &7Explore the nether, bring some goodies back home.'
     - 'is admin msg %player% &e&lSlayer | &7&oFor more information about the next mission, checkout /is missions'
 
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'slayer_1'
+
 # List of all required blocks must be gathered in order to complete the mission.
 required-entities:
   '1':
