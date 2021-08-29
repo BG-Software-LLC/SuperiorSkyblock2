@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
+package com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;

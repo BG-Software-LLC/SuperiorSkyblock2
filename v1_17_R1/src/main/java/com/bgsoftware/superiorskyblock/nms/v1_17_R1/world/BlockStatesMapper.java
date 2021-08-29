@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
+package com.bgsoftware.superiorskyblock.nms.v1_17_R1.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import net.minecraft.world.level.block.state.properties.IBlockState;

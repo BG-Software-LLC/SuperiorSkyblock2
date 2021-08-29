@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.IslandsChunkGenerator;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;

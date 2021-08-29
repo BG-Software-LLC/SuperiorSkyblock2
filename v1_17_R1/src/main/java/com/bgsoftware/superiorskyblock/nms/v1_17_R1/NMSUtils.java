@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;

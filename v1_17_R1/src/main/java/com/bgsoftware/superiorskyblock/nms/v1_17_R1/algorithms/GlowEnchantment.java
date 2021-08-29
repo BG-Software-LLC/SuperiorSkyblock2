@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
+package com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms;
 
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
+package com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.google.common.base.Preconditions;

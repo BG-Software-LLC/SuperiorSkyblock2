@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
