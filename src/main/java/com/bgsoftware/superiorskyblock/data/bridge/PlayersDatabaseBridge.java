@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.data;
+package com.bgsoftware.superiorskyblock.data.bridge;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;

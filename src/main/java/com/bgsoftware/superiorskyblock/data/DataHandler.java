@@ -1,17 +1,15 @@
-package com.bgsoftware.superiorskyblock.handlers;
+package com.bgsoftware.superiorskyblock.data;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.DatabaseResult;
-import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader;
-import com.bgsoftware.superiorskyblock.data.loaders.DatabaseLoader_V1;
+import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.loader.DatabaseLoader;
+import com.bgsoftware.superiorskyblock.data.loader.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
+import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
@@ -37,7 +35,6 @@ public final class DataHandler extends AbstractHandler {
     public void loadData() {
         throw new UnsupportedOperationException("Not supported for DataHandler.");
     }
-
 
     @Override
     public void loadDataWithException() throws HandlerLoadException {
@@ -110,25 +107,8 @@ public final class DataHandler extends AbstractHandler {
         }
     }
 
-    public void insertIsland(Island island) {
-        IslandsDatabaseBridge.insertIsland(island);
-    }
-
-    public void deleteIsland(Island island, boolean async) {
-        if (async && Bukkit.isPrimaryThread()) {
-            Executor.async(() -> deleteIsland(island, false));
-            return;
-        }
-
-        IslandsDatabaseBridge.deleteIsland(island);
-    }
-
-    public void insertPlayer(SuperiorPlayer player) {
-        PlayersDatabaseBridge.insertPlayer(player);
-    }
-
     private void loadDatabaseLoaders() {
-        DatabaseLoader_V1.register();
+        DatabaseLoader_V1.register(this);
     }
 
     private void loadPlayers() {

@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
-import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
@@ -175,7 +175,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
                 islands.add(superiorPlayer.getUniqueId(), island);
                 setLastIsland(SBlockPosition.of(islandLocation));
-                plugin.getDataHandler().insertIsland(island);
+                IslandsDatabaseBridge.insertIsland(island);
 
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
@@ -299,7 +299,15 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         });
 
         islands.remove(island.getOwner().getUniqueId());
-        plugin.getDataHandler().deleteIsland(island, !pluginDisable);
+
+        // Delete island from database
+        if(pluginDisable) {
+            IslandsDatabaseBridge.deleteIsland(island);
+        }
+        else {
+            Executor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
+        }
+
         plugin.getNMSDragonFight().removeDragonBattle(island);
 
         ChunksTracker.removeIsland(island);

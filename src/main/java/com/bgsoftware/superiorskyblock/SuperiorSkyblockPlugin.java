@@ -17,7 +17,7 @@ import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
-import com.bgsoftware.superiorskyblock.handlers.DataHandler;
+import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
@@ -292,6 +292,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             CalcTask.cancelTask();
             Executor.close();
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
+
             dataHandler.closeConnection();
         }
     }
@@ -514,10 +515,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public CommandsHandler getCommands() {
         return commandsHandler;
-    }
-
-    public DataHandler getDataHandler() {
-        return dataHandler;
     }
 
     public SettingsHandler getSettings() {

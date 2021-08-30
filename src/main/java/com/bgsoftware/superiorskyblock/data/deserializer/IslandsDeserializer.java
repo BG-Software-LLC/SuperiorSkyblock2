@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.data;
+package com.bgsoftware.superiorskyblock.data.deserializer;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;

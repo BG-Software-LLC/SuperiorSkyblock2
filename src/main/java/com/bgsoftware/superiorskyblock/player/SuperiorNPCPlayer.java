@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
-import com.bgsoftware.superiorskyblock.data.EmptyDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;

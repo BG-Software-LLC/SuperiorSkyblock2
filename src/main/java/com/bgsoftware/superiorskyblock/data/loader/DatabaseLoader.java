@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.data.loaders;
+package com.bgsoftware.superiorskyblock.data.loader;
 
 public interface DatabaseLoader {
 

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 import java.io.File;

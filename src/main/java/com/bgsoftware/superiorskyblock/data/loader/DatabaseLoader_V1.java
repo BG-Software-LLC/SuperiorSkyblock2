@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.data.loaders;
+package com.bgsoftware.superiorskyblock.data.loader;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.data.sql.SQLSession;
 import com.bgsoftware.superiorskyblock.data.sql.StatementHolder;
+import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -148,9 +149,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         saveGrid();
     }
 
-    public static void register() {
+    public static void register(DataHandler dataHandler) {
         if (isDatabaseOldFormat())
-            plugin.getDataHandler().addDatabaseLoader(new DatabaseLoader_V1());
+            dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
     }
 
     private static boolean isDatabaseOldFormat() {

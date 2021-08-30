@@ -6,18 +6,16 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
-import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,8 +78,9 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     public SuperiorPlayer getSuperiorPlayer(UUID uuid){
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         if(!players.containsKey(uuid)) {
-            players.put(uuid, plugin.getFactory().createPlayer(uuid));
-            Executor.async(() -> plugin.getDataHandler().insertPlayer(players.get(uuid)), 1L);
+            SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(uuid);
+            players.put(uuid, superiorPlayer);
+            Executor.async(() -> PlayersDatabaseBridge.insertPlayer(superiorPlayer), 1L);
         }
         return players.get(uuid);
     }
