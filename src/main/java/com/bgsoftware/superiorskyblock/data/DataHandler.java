@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -20,7 +20,6 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {

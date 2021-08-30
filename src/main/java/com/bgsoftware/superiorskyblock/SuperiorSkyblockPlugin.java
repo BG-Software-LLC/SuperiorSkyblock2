@@ -22,7 +22,7 @@ import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
-import com.bgsoftware.superiorskyblock.handlers.ModulesHandler;
+import com.bgsoftware.superiorskyblock.module.ModulesHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
 import com.bgsoftware.superiorskyblock.mission.container.DefaultMissionsContainer;
+import com.bgsoftware.superiorskyblock.module.container.DefaultModulesContainer;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
@@ -120,7 +121,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final CommandsHandler commandsHandler = new CommandsHandler(this,
             new PlayerCommandsMap(this), new AdminCommandsMap(this));
 
-    private final ModulesHandler modulesHandler = new ModulesHandler(this);
+    private final ModulesHandler modulesHandler = new ModulesHandler(this,
+            new DefaultModulesContainer());
 
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
