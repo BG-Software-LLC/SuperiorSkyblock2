@@ -472,11 +472,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
-        stackedBlocksHandler.loadData();
 
         if (loadGrid) {
             try {
                 dataHandler.loadDataWithException();
+                stackedBlocksHandler.loadData();
             }catch(HandlerLoadException ex){
                 if(!HandlerLoadException.handle(ex))
                     return false;
