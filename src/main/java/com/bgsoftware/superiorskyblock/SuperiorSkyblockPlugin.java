@@ -12,9 +12,11 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
+import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
-import com.bgsoftware.superiorskyblock.handlers.CommandsHandler;
+import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.handlers.DataHandler;
 import com.bgsoftware.superiorskyblock.handlers.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
@@ -91,7 +93,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final KeysHandler keysHandler = new KeysHandler(this);
     private final ProvidersHandler providersHandler = new ProvidersHandler(this);
     private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
-    private final CommandsHandler commandsHandler = new CommandsHandler(this);
+    private final CommandsHandler commandsHandler = new CommandsHandler(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
     private final DataHandler dataHandler = new DataHandler(this);
     private final ModulesHandler modulesHandler = new ModulesHandler(this);
 

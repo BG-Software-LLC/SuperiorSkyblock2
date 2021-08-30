@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface CommandsManager {
@@ -36,8 +37,24 @@ public interface CommandsManager {
     List<SuperiorCommand> getSubCommands();
 
     /**
+     * Get a sub command by its label.
+     * @param commandLabel The label of the sub command.
+     * @return The sub command if exists or null.
+     */
+    @Nullable
+    SuperiorCommand getCommand(String commandLabel);
+
+    /**
      * Get all the registered admin sub-commands.
      */
     List<SuperiorCommand> getAdminSubCommands();
+
+    /**
+     * Get an admin sub command by its label.
+     * @param commandLabel The label of the sub command.
+     * @return The sub command if exists or null.
+     */
+    @Nullable
+    SuperiorCommand getAdminCommand(String commandLabel);
 
 }
