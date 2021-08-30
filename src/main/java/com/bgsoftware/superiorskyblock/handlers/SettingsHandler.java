@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.utils.key.KeySet;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;

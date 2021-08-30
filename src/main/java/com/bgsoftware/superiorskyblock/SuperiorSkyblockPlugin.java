@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.handlers.BlockValuesHandler;
+import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
@@ -62,6 +62,9 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.values.container.BlockLevelsContainer;
+import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContainer;
+import com.bgsoftware.superiorskyblock.values.container.GeneralBlockValuesContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -83,18 +86,33 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final Updater updater = new Updater(this, "superiorskyblock2");
 
-    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
-    private final GridHandler gridHandler = new GridHandler(this);
-    private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this);
-    private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
-    private final PlayersHandler playersHandler = new PlayersHandler(this);
-    private final MissionsHandler missionsHandler = new MissionsHandler(this);
-    private final MenusHandler menusHandler = new MenusHandler(this);
-    private final KeysHandler keysHandler = new KeysHandler(this);
-    private final ProvidersHandler providersHandler = new ProvidersHandler(this);
-    private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
-    private final CommandsHandler commandsHandler = new CommandsHandler(this, new PlayerCommandsMap(this), new AdminCommandsMap(this));
     private final DataHandler dataHandler = new DataHandler(this);
+
+    private final FactoriesHandler factoriesHandler = new FactoriesHandler();
+
+    private final GridHandler gridHandler = new GridHandler(this);
+
+    private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this,
+            new BlockWorthValuesContainer(), new BlockLevelsContainer(),
+            new GeneralBlockValuesContainer(), new GeneralBlockValuesContainer());
+
+    private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
+
+    private final PlayersHandler playersHandler = new PlayersHandler(this);
+
+    private final MissionsHandler missionsHandler = new MissionsHandler(this);
+
+    private final MenusHandler menusHandler = new MenusHandler(this);
+
+    private final KeysHandler keysHandler = new KeysHandler(this);
+
+    private final ProvidersHandler providersHandler = new ProvidersHandler(this);
+
+    private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
+
+    private final CommandsHandler commandsHandler = new CommandsHandler(this,
+            new PlayerCommandsMap(this), new AdminCommandsMap(this));
+
     private final ModulesHandler modulesHandler = new ModulesHandler(this);
 
     // The only handler that is initialized is this one, therefore it's not final.
