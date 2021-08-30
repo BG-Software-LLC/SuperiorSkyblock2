@@ -30,8 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
-
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.google.common.base.Preconditions;
 
@@ -40,60 +39,37 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The <code>TAG_Byte_Array</code> tag.
+ * The <code>TAG_Int</code> tag.
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
-public final class ByteArrayTag extends Tag<byte[]> {
+public final class IntTag extends Tag<Integer> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
+    static final Class<?> CLASS = getNNTClass("NBTTagInt");
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public ByteArrayTag(byte[] value) {
-        super(value, CLASS, byte[].class);
+    public IntTag(int value) {
+        super(value, CLASS, int.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value.length);
-        os.write(value);
+        os.writeInt(value);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder hex = new StringBuilder();
-        for (byte b : value) {
-            String hexDigits = Integer.toHexString(b).toUpperCase();
-            if (hexDigits.length() == 1) {
-                hex.append("0");
-            }
-            hex.append(hexDigits).append(" ");
-        }
-        return "TAG_Byte_Array: " + hex.toString();
-    }
-
-    public static ByteArrayTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
+    public static IntTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
-            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
-            return new ByteArrayTag(value);
+            int value = plugin.getNMSTags().getNBTIntValue(tag);
+            return new IntTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static ByteArrayTag fromStream(DataInputStream is) throws IOException{
-        int length = is.readInt();
-        byte[] bytes = new byte[length];
-        is.readFully(bytes);
-        return new ByteArrayTag(bytes);
+    public static IntTag fromStream(DataInputStream is) throws IOException{
+        return new IntTag(is.readInt());
     }
 
 }

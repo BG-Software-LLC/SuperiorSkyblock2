@@ -30,7 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.google.common.base.Preconditions;
@@ -52,7 +52,7 @@ import java.util.Set;
  */
 public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagCompound");
+    static final Class<?> CLASS = getNNTClass("NBTTagCompound");
 
     private static final ReflectMethod<Void> SET = new ReflectMethod<>(CLASS,
             "set", String.class, getNNTClass("NBTBase"));

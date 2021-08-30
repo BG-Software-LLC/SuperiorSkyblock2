@@ -30,46 +30,57 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
- * The <code>TAG_Int</code> tag.
+ * The <code>TAG_String</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class IntTag extends Tag<Integer> {
+public final class StringTag extends Tag<String> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagInt");
+    protected static final Class<?> CLASS = getNNTClass("NBTTagString");
 
-    public IntTag(int value) {
-        super(value, CLASS, int.class);
+    /**
+     * Creates the tag.
+     *
+     * @param value The value.
+     */
+    public StringTag(String value) {
+        super(value, CLASS, String.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value);
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        os.writeShort(bytes.length);
+        os.write(bytes);
     }
 
-    public static IntTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntTag!");
+    public static StringTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to StringTag!");
 
         try {
-            int value = plugin.getNMSTags().getNBTIntValue(tag);
-            return new IntTag(value);
+            String value = plugin.getNMSTags().getNBTStringValue(tag);
+            return new StringTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static IntTag fromStream(DataInputStream is) throws IOException{
-        return new IntTag(is.readInt());
+    public static StringTag fromStream(DataInputStream is) throws IOException{
+        int length = is.readShort();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return new StringTag(new String(bytes, StandardCharsets.UTF_8));
     }
 
 }

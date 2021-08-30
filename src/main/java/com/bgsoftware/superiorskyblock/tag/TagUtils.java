@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 

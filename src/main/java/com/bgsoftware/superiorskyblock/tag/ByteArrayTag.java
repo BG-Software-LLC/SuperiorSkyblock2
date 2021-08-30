@@ -30,45 +30,70 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
+
+
+import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The <code>TAG_End</code> tag.
+ * The <code>TAG_Byte_Array</code> tag.
  *
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class EndTag extends Tag<Object> {
+public final class ByteArrayTag extends Tag<byte[]> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagEnd");
+    static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
 
     /**
      * Creates the tag.
+     *
+     * @param value The value.
      */
-    public EndTag() {
-        super(null, CLASS);
+    public ByteArrayTag(byte[] value) {
+        super(value, CLASS, byte[].class);
     }
 
     @Override
-    protected void writeData(DataOutputStream os) {
-
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        os.write(value);
     }
 
     @Override
     public String toString() {
-        return "TAG_End";
+        StringBuilder hex = new StringBuilder();
+        for (byte b : value) {
+            String hexDigits = Integer.toHexString(b).toUpperCase();
+            if (hexDigits.length() == 1) {
+                hex.append("0");
+            }
+            hex.append(hexDigits).append(" ");
+        }
+        return "TAG_Byte_Array: " + hex;
     }
 
-    public static EndTag fromStream(DataInputStream is, int depth) throws IOException{
-        if (depth == 0) {
-            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
-        } else {
-            return new EndTag();
+    public static ByteArrayTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
+
+        try {
+            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
+            return new ByteArrayTag(value);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
         }
+    }
+
+    public static ByteArrayTag fromStream(DataInputStream is) throws IOException{
+        int length = is.readInt();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return new ByteArrayTag(bytes);
     }
 
 }

@@ -30,57 +30,45 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
-
-import com.google.common.base.Preconditions;
+package com.bgsoftware.superiorskyblock.tag;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
- * The <code>TAG_String</code> tag.
+ * The <code>TAG_End</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class StringTag extends Tag<String> {
+@SuppressWarnings("WeakerAccess")
+public final class EndTag extends Tag<Object> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagString");
+    static final Class<?> CLASS = getNNTClass("NBTTagEnd");
 
     /**
      * Creates the tag.
-     *
-     * @param value The value.
      */
-    public StringTag(String value) {
-        super(value, CLASS, String.class);
+    public EndTag() {
+        super(null, CLASS);
     }
 
     @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        os.writeShort(bytes.length);
-        os.write(bytes);
+    protected void writeData(DataOutputStream os) {
+
     }
 
-    public static StringTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to StringTag!");
+    @Override
+    public String toString() {
+        return "TAG_End";
+    }
 
-        try {
-            String value = plugin.getNMSTags().getNBTStringValue(tag);
-            return new StringTag(value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
+    public static EndTag fromStream(DataInputStream is, int depth) throws IOException{
+        if (depth == 0) {
+            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+        } else {
+            return new EndTag();
         }
-    }
-
-    public static StringTag fromStream(DataInputStream is) throws IOException{
-        int length = is.readShort();
-        byte[] bytes = new byte[length];
-        is.readFully(bytes);
-        return new StringTag(new String(bytes, StandardCharsets.UTF_8));
     }
 
 }

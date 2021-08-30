@@ -30,46 +30,25 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
-import com.google.common.base.Preconditions;
+public final class NBTTags {
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+    private NBTTags() {
 
-/**
- * The <code>TAG_Short</code> tag.
- *
- * @author Graham Edgecombe
- */
-public final class ShortTag extends Tag<Short> {
-
-    protected static final Class<?> CLASS = getNNTClass("NBTTagShort");
-
-    public ShortTag(short value) {
-        super(value, CLASS, short.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeShort(value);
-    }
-
-    public static ShortTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ShortTag!");
-
-        try {
-            short value = plugin.getNMSTags().getNBTShortValue(tag);
-            return new ShortTag(value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    public static ShortTag fromStream(DataInputStream is) throws IOException{
-        return new ShortTag(is.readShort());
-    }
+    public static final int TYPE_END = 0;
+    public static final int TYPE_BYTE = 1;
+    public static final int TYPE_SHORT = 2;
+    public static final int TYPE_INT = 3;
+    public static final int TYPE_LONG = 4;
+    public static final int TYPE_FLOAT = 5;
+    public static final int TYPE_DOUBLE = 6;
+    public static final int TYPE_BYTE_ARRAY = 7;
+    public static final int TYPE_STRING = 8;
+    public static final int TYPE_LIST = 9;
+    public static final int TYPE_COMPOUND = 10;
+    public static final int TYPE_INT_ARRAY = 11;
 
 }

@@ -30,7 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.google.common.base.Preconditions;
 
@@ -39,42 +39,43 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The <code>TAG_Double</code> tag.
+ * The <code>TAG_Float</code> tag.
  *
  * @author Graham Edgecombe
  */
-public final class DoubleTag extends Tag<Double> {
+@SuppressWarnings("WeakerAccess")
+public final class FloatTag extends Tag<Float> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagDouble");
+    static final Class<?> CLASS = getNNTClass("NBTTagFloat");
 
     /**
      * Creates the tag.
      *
      * @param value The value.
      */
-    public DoubleTag(double value) {
-        super(value, CLASS, double.class);
+    public FloatTag(float value) {
+        super(value, CLASS, float.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.writeDouble(value);
+        os.writeFloat(value);
     }
 
-    public static DoubleTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to DoubleTag!");
+    public static FloatTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
-            double value = plugin.getNMSTags().getNBTDoubleValue(tag);
-            return new DoubleTag(value);
+            float value = plugin.getNMSTags().getNBTFloatValue(tag);
+            return new FloatTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static DoubleTag fromStream(DataInputStream is) throws IOException{
-        return new DoubleTag(is.readDouble());
+    public static FloatTag fromStream(DataInputStream is) throws IOException{
+        return new FloatTag(is.readFloat());
     }
 
 }

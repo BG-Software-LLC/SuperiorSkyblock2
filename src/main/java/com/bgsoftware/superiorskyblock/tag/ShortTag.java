@@ -30,7 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.google.common.base.Preconditions;
 
@@ -39,43 +39,37 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The <code>TAG_Float</code> tag.
+ * The <code>TAG_Short</code> tag.
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
-public final class FloatTag extends Tag<Float> {
+public final class ShortTag extends Tag<Short> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagFloat");
+    protected static final Class<?> CLASS = getNNTClass("NBTTagShort");
 
-    /**
-     * Creates the tag.
-     *
-     * @param value The value.
-     */
-    public FloatTag(float value) {
-        super(value, CLASS, float.class);
+    public ShortTag(short value) {
+        super(value, CLASS, short.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.writeFloat(value);
+        os.writeShort(value);
     }
 
-    public static FloatTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to FloatTag!");
+    public static ShortTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ShortTag!");
 
         try {
-            float value = plugin.getNMSTags().getNBTFloatValue(tag);
-            return new FloatTag(value);
+            short value = plugin.getNMSTags().getNBTShortValue(tag);
+            return new ShortTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static FloatTag fromStream(DataInputStream is) throws IOException{
-        return new FloatTag(is.readFloat());
+    public static ShortTag fromStream(DataInputStream is) throws IOException{
+        return new ShortTag(is.readShort());
     }
 
 }

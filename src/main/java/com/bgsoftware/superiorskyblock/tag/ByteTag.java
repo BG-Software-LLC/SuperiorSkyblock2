@@ -30,7 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.google.common.base.Preconditions;
 
@@ -39,38 +39,42 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * The <code>TAG_Long</code> tag.
+ * The <code>TAG_Byte</code> tag.
  *
  * @author Graham Edgecombe
  */
-@SuppressWarnings("WeakerAccess")
-public final class LongTag extends Tag<Long> {
+public final class ByteTag extends Tag<Byte> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagLong");
+    static final Class<?> CLASS = getNNTClass("NBTTagByte");
 
-    public LongTag(long value) {
-        super(value, CLASS, long.class);
+    /**
+     * Creates the tag.
+     *
+     * @param value The value.
+     */
+    public ByteTag(byte value) {
+        super(value, CLASS, byte.class);
     }
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.writeLong(value);
+        os.writeByte(value);
     }
 
-    public static LongTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
+    public static ByteTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {
-            long value = plugin.getNMSTags().getNBTLongValue(tag);
-            return new LongTag(value);
+            byte value = plugin.getNMSTags().getNBTByteValue(tag);
+            return new ByteTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static LongTag fromStream(DataInputStream is) throws IOException{
-        return new LongTag(is.readLong());
+    public static ByteTag fromStream(DataInputStream is) throws IOException{
+        return new ByteTag(is.readByte());
     }
 
 }

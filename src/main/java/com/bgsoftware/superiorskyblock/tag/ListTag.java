@@ -30,7 +30,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.google.common.base.Preconditions;
@@ -50,7 +50,7 @@ import java.util.List;
 @SuppressWarnings("rawtypes")
 public final class ListTag extends Tag<List<Tag<?>>> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagList");
+    static final Class<?> CLASS = getNNTClass("NBTTagList");
     private static final ReflectMethod<Integer> SIZE = new ReflectMethod<>(CLASS, "size", new Class[0]);
 
     /**

@@ -30,25 +30,47 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE. 
  */
-package com.bgsoftware.superiorskyblock.utils.tags;
+package com.bgsoftware.superiorskyblock.tag;
 
-public final class NBTTags {
+import com.google.common.base.Preconditions;
 
-    private NBTTags() {
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
+/**
+ * The <code>TAG_Long</code> tag.
+ *
+ * @author Graham Edgecombe
+ */
+@SuppressWarnings("WeakerAccess")
+public final class LongTag extends Tag<Long> {
+
+    static final Class<?> CLASS = getNNTClass("NBTTagLong");
+
+    public LongTag(long value) {
+        super(value, CLASS, long.class);
     }
 
-    public static final int TYPE_END = 0;
-    public static final int TYPE_BYTE = 1;
-    public static final int TYPE_SHORT = 2;
-    public static final int TYPE_INT = 3;
-    public static final int TYPE_LONG = 4;
-    public static final int TYPE_FLOAT = 5;
-    public static final int TYPE_DOUBLE = 6;
-    public static final int TYPE_BYTE_ARRAY = 7;
-    public static final int TYPE_STRING = 8;
-    public static final int TYPE_LIST = 9;
-    public static final int TYPE_COMPOUND = 10;
-    public static final int TYPE_INT_ARRAY = 11;
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeLong(value);
+    }
+
+    public static LongTag fromNBT(Object tag){
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
+
+        try {
+            long value = plugin.getNMSTags().getNBTLongValue(tag);
+            return new LongTag(value);
+        }catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    public static LongTag fromStream(DataInputStream is) throws IOException{
+        return new LongTag(is.readLong());
+    }
 
 }
