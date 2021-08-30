@@ -158,7 +158,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         sqlSession = new SQLSession(plugin, true);
 
         if (!sqlSession.isUsingMySQL()) {
-            databaseFile = new File("plugins", "SuperiorSkyblock2\\database.db");
+            databaseFile = new File(plugin.getDataFolder(), "database.db");
 
             if (!databaseFile.exists())
                 return false;
