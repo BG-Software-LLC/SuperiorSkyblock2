@@ -2,8 +2,7 @@ package com.bgsoftware.superiorskyblock.schematics;
 
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
-import org.bukkit.Location;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 
 import java.util.Set;
 

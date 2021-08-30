@@ -53,7 +53,7 @@ import com.bgsoftware.superiorskyblock.hooks.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.hooks.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;

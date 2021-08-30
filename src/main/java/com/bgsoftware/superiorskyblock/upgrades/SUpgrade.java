@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.upgrades;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.upgrades.cost.EmptyUpgradeCost;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.World;
 

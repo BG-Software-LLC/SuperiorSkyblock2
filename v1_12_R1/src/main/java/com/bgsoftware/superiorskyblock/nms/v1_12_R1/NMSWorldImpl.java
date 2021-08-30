@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import net.minecraft.server.v1_12_R1.BiomeBase;

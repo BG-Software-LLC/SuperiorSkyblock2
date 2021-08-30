@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;

@@ -1,5 +1,6 @@
-package com.bgsoftware.superiorskyblock.utils.key;
+package com.bgsoftware.superiorskyblock.key.dataset;
 
+import com.bgsoftware.superiorskyblock.key.Key;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -74,15 +75,15 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
     }
 
     public V get(ItemStack itemStack) {
-        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(itemStack));
+        return get(Key.of(itemStack));
     }
 
     public V get(Material material, short data) {
-        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(material, data));
+        return get(Key.of(material, data));
     }
 
     public V get(String key) {
-        return get(com.bgsoftware.superiorskyblock.utils.key.Key.of(key));
+        return get(Key.of(key));
     }
 
     @Override

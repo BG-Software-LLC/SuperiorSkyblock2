@@ -23,7 +23,7 @@ import com.bgsoftware.superiorskyblock.utils.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.StackedBlockAttributes;
 import com.bgsoftware.superiorskyblock.utils.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

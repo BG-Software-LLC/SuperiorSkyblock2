@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.key;
+package com.bgsoftware.superiorskyblock.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;

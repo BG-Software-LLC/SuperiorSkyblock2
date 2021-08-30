@@ -52,7 +52,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
         RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
                 .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
                 .forEach(entry -> {
-                    com.bgsoftware.superiorskyblock.api.key.Key blockKey = com.bgsoftware.superiorskyblock.utils.key.Key.of(entry.getKey());
+                    com.bgsoftware.superiorskyblock.api.key.Key blockKey = com.bgsoftware.superiorskyblock.key.Key.of(entry.getKey());
                     blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
                 });
         return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());

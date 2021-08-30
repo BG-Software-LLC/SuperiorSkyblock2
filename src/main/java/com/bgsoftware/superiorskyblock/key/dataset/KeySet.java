@@ -1,5 +1,6 @@
-package com.bgsoftware.superiorskyblock.utils.key;
+package com.bgsoftware.superiorskyblock.key.dataset;
 
+import com.bgsoftware.superiorskyblock.key.Key;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -34,18 +35,18 @@ public final class KeySet extends AbstractSet<com.bgsoftware.superiorskyblock.ap
 
 
     public boolean contains(Block block) {
-        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(block));
+        return contains(Key.of(block));
     }
     public boolean contains(ItemStack itemStack) {
-        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(itemStack));
+        return contains(Key.of(itemStack));
     }
 
     public boolean contains(Material material, short data) {
-        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(material, data));
+        return contains(Key.of(material, data));
     }
 
     public boolean contains(String key) {
-        return contains(com.bgsoftware.superiorskyblock.utils.key.Key.of(key));
+        return contains(Key.of(key));
     }
 
     @Override

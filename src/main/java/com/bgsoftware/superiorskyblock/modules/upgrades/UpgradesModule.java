@@ -25,7 +25,7 @@ import com.bgsoftware.superiorskyblock.modules.upgrades.listeners.UpgradesListen
 import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;

@@ -19,7 +19,7 @@ import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
-import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
+import com.bgsoftware.superiorskyblock.key.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.ModulesHandler;

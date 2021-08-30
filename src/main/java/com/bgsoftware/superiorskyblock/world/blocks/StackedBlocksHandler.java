@@ -256,7 +256,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         int amount = resultSet.getInt("amount");
 
         String item = resultSet.getString("block_type");
-        com.bgsoftware.superiorskyblock.utils.key.Key blockKey = item == null || item.isEmpty() ? null : com.bgsoftware.superiorskyblock.utils.key.Key.of(item);
+        com.bgsoftware.superiorskyblock.key.Key blockKey = item == null || item.isEmpty() ? null : com.bgsoftware.superiorskyblock.key.Key.of(item);
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(SBlockPosition.of(location).parse());
         stackedBlock.setAmount(amount);

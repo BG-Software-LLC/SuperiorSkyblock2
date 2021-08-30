@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.holograms.Hologram;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import org.bukkit.Location;
 
 public final class StackedBlock {
