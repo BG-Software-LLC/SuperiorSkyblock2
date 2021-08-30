@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
@@ -220,7 +220,7 @@ public final class NMSChunksImpl implements NMSChunks {
     private static void removeBlocks(Chunk chunk) {
         WorldServer worldServer = (WorldServer) chunk.world;
 
-        if (worldServer.generator != null && !(worldServer.generator instanceof WorldGenerator)) {
+        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
             CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
             Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunk.locX, chunk.locZ);
 

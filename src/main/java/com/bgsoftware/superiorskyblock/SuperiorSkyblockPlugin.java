@@ -5,7 +5,6 @@ import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
-import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -18,8 +17,9 @@ import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.handlers.GridHandler;
+import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
@@ -73,6 +73,8 @@ import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContaine
 import com.bgsoftware.superiorskyblock.values.container.GeneralBlockValuesContainer;
 import com.bgsoftware.superiorskyblock.world.blocks.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.world.blocks.container.DefaultStackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
+import com.bgsoftware.superiorskyblock.world.purge.DefaultIslandsPurger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -98,7 +100,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
 
-    private final GridHandler gridHandler = new GridHandler(this);
+    private final GridHandler gridHandler = new GridHandler(this,
+            new DefaultIslandsPurger(), new DefaultIslandPreviews(), new DefaultIslandsContainer(this));
 
     private final StackedBlocksHandler stackedBlocksHandler = new StackedBlocksHandler(this,
             new DefaultStackedBlocksContainer());
@@ -364,7 +367,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if(worldGenerator == null) {
             loadGeneratorFromFile();
             if (worldGenerator == null)
-                worldGenerator = new WorldGenerator(settingsHandler.defaultWorldEnvironment);
+                worldGenerator = new IslandsGenerator(settingsHandler.defaultWorldEnvironment);
         }
 
         return worldGenerator;

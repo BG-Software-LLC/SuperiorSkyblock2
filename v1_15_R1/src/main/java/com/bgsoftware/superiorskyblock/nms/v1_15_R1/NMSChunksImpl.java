@@ -4,7 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_15_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
@@ -140,7 +140,7 @@ public final class NMSChunksImpl implements NMSChunks {
             levelCompound.set("TileEntities", tileEntities);
             levelCompound.set("Entities", new NBTTagList());
 
-            if (!(worldServer.generator instanceof WorldGenerator)) {
+            if (!(worldServer.generator instanceof IslandsGenerator)) {
                 ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
 
                 try {
@@ -327,7 +327,7 @@ public final class NMSChunksImpl implements NMSChunks {
         ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = (WorldServer) chunk.world;
 
-        if (worldServer.generator != null && !(worldServer.generator instanceof WorldGenerator)) {
+        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
             CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, worldServer.generator);
             ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
             customChunkGenerator.buildBase(null, protoChunk);

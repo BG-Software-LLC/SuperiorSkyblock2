@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.generator;
+package com.bgsoftware.superiorskyblock.world.generator;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Location;
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("deprecation")
-public final class WorldGenerator extends ChunkGenerator {
+public final class IslandsGenerator extends ChunkGenerator {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Biome NETHER_BIOME = getNetherBiome();
     private final World.Environment defaultWorldEnvironment;
 
-    public WorldGenerator(World.Environment defaultWorldEnvironment) {
+    public IslandsGenerator(World.Environment defaultWorldEnvironment) {
         this.defaultWorldEnvironment = defaultWorldEnvironment;
     }
 
