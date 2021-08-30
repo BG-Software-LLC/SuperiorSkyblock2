@@ -25,7 +25,6 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
 import com.bgsoftware.superiorskyblock.utils.registry.IslandRegistry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -45,8 +44,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,13 +59,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Map<UUID, IslandPreview> islandPreviews = new ConcurrentHashMap<>();
     private final Set<UUID> customWorlds = Sets.newHashSet();
-    private final StackedBlocksHandler stackedBlocks;
     private final IslandRegistry islands;
     private final DatabaseBridge databaseBridge;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
-    private boolean blockFailed = false;
 
     private BigDecimal totalWorth = BigDecimal.ZERO;
     private long lastTimeWorthUpdate = 0;
@@ -79,7 +74,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public GridHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
-        stackedBlocks = new StackedBlocksHandler(plugin);
         islands = new IslandRegistry(plugin);
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         databaseBridge.startSavingData();
@@ -471,81 +465,27 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
+    @Deprecated
     public int getBlockAmount(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
         return getBlockAmount(block.getLocation());
     }
 
     @Override
+    @Deprecated
     public int getBlockAmount(Location location) {
-        Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
-        return stackedBlocks.getBlockAmount(SBlockPosition.of(location), 1);
-    }
-
-    public Key getBlockKey(Location location) {
-        return stackedBlocks.getBlockKey(SBlockPosition.of(location), Key.of(location.getBlock()));
-    }
-
-    public Set<StackedBlocksHandler.StackedBlock> getStackedBlocks(ChunkPosition chunkPosition) {
-        return new HashSet<>(stackedBlocks.getStackedBlocks(chunkPosition).values());
+        return plugin.getStackedBlocks().getStackedBlockAmount(location);
     }
 
     @Override
+    @Deprecated
     public void setBlockAmount(Block block, int amount) {
-        Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + block.getType() + ", Amount: " + amount);
-
-        Key originalBlock = stackedBlocks.getBlockKey(SBlockPosition.of(block.getLocation()), null);
-        Key currentBlock = Key.of(block);
-
-        blockFailed = false;
-
-        if (originalBlock != null && !currentBlock.equals(originalBlock)) {
-            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + SBlockPosition.of(block.getLocation()) + " - fixing it...");
-            amount = 0;
-            blockFailed = true;
-        }
-
-        if (amount > 1) {
-            StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.setStackedBlock(block.getLocation(), amount, currentBlock);
-            Executor.sync(stackedBlock::updateName, 5L);
-            GridDatabaseBridge.saveStackedBlock(this, stackedBlock);
-        } else {
-            StackedBlocksHandler.StackedBlock stackedBlock = stackedBlocks.removeStackedBlock(SBlockPosition.of(block.getLocation()));
-            if(stackedBlock != null)
-                GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
-        }
+        plugin.getStackedBlocks().setStackedBlock(block, amount);
     }
 
     @Override
     public List<Location> getStackedBlocks() {
-        List<Location> stackedBlocks = new ArrayList<>();
-        this.stackedBlocks.getStackedBlocks().forEach(map -> stackedBlocks.addAll(map.keySet().stream().map(SBlockPosition::parse).collect(Collectors.toList())));
-        return stackedBlocks;
-    }
-
-    public boolean hasBlockFailed() {
-        return blockFailed;
-    }
-
-    public void removeStackedBlocks(Island island, ChunkPosition chunkPosition) {
-        try {
-            databaseBridge.batchOperations(true);
-
-            Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks =
-                    this.stackedBlocks.removeStackedBlocks(chunkPosition);
-
-            if (stackedBlocks != null) {
-                stackedBlocks.values().forEach(stackedBlock -> {
-                    stackedBlock.removeHologram();
-                    SBlockPosition blockPosition = stackedBlock.getBlockPosition();
-                    GridDatabaseBridge.deleteStackedBlock(this, stackedBlock);
-                });
-            }
-        } finally {
-            databaseBridge.batchOperations(false);
-        }
+        return Collections.unmodifiableList(new ArrayList<>(plugin.getStackedBlocks().getStackedBlocks().keySet()));
     }
 
     @Override
@@ -676,26 +616,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         }
     }
 
-    public void loadStackedBlocks(DatabaseResult resultSet) {
-        String location = resultSet.getString("location");;
-        int amount = resultSet.getInt("amount");
-
-        String item = resultSet.getString("block_type");
-        Key blockKey = item == null || item.isEmpty() ? null : Key.of(item);
-
-        stackedBlocks.setStackedBlock(SBlockPosition.of(location), amount, blockKey);
-    }
-
-    public void updateStackedBlockKeys() {
-        stackedBlocks.getStackedBlocks().forEach(map -> map.forEach((blockPosition, stackedBlock) -> {
-            try {
-                stackedBlock.setBlockKey(Key.of(blockPosition.getBlock()));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }));
-    }
-
     public void saveIslands() {
         List<Island> onlineIslands = Bukkit.getOnlinePlayers().stream()
                 .map(player -> plugin.getPlayers().getSuperiorPlayer(player).getIsland())
@@ -713,24 +633,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             modifiedIslands.forEach(IslandsDatabaseBridge::executeFutureSaves);
 
         getIslands().forEach(Island::removeEffects);
-    }
-
-    public void saveStackedBlocks() {
-        Map<SBlockPosition, StackedBlocksHandler.StackedBlock> stackedBlocks = new HashMap<>();
-        this.stackedBlocks.getStackedBlocks().forEach(stackedBlocks::putAll);
-
-        GridDatabaseBridge.deleteStackedBlocks(this);
-
-        try {
-            databaseBridge.batchOperations(true);
-            for (StackedBlocksHandler.StackedBlock stackedBlock : stackedBlocks.values()) {
-                if (stackedBlock.getAmount() > 1) {
-                    GridDatabaseBridge.saveStackedBlock(this, stackedBlock);
-                }
-            }
-        } finally {
-            databaseBridge.batchOperations(false);
-        }
     }
 
     private void setLastIsland(SBlockPosition lastIsland) {

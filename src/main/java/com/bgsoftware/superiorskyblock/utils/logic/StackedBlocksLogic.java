@@ -81,8 +81,12 @@ public final class StackedBlocksLogic {
 
     public static boolean tryStack(SuperiorSkyblockPlugin plugin, Player player, int amount, Location stackedBlock, Consumer<Integer> depositedAmount){
         // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
-        int blockAmount = plugin.getGrid().getBlockAmount(stackedBlock);
-        Key blockKey = plugin.getGrid().getBlockKey(stackedBlock);
+        int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(stackedBlock);
+        Key blockKey = (Key) plugin.getStackedBlocks().getStackedBlockKey(stackedBlock);
+
+        if(blockKey == null)
+            blockKey = Key.of(stackedBlock.getBlock());
+
         int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(blockKey, Integer.MAX_VALUE);
 
         if(amount + blockAmount > blockLimit){
@@ -125,9 +129,7 @@ public final class StackedBlocksLogic {
             }
         }
 
-        plugin.getGrid().setBlockAmount(block, blockAmount + amount);
-
-        if(plugin.getGrid().hasBlockFailed()) {
+        if(!plugin.getStackedBlocks().setStackedBlock(block, blockAmount + amount)){
             depositedAmount.accept(0);
             return false;
         }
@@ -144,7 +146,7 @@ public final class StackedBlocksLogic {
     }
 
     public static boolean tryUnstack(Player player, Block block, SuperiorSkyblockPlugin plugin){
-        int blockAmount = plugin.getGrid().getBlockAmount(block);
+        int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(block);
 
         if(blockAmount <= 1)
             return false;
@@ -160,13 +162,13 @@ public final class StackedBlocksLogic {
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
 
-        plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
+        boolean stackedBlockSuccess = plugin.getStackedBlocks().setStackedBlock(block, (leftAmount = blockAmount - amount));
 
         plugin.getNMSWorld().playBreakAnimation(block);
 
         CoreProtectHook.recordBlockChange(player, block, false);
 
-        if(plugin.getGrid().hasBlockFailed()) {
+        if(!stackedBlockSuccess) {
             if(island != null)
                 island.handleBlockBreak(Key.of(block), blockAmount - 1);
             leftAmount = 0;

@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
@@ -23,68 +21,67 @@ public final class ChunksListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public ChunksListener(SuperiorSkyblockPlugin plugin){
+    public ChunksListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onChunkUnloadMonitor(ChunkUnloadEvent e){
-        if(!plugin.getGrid().isIslandsWorld(e.getWorld()))
+    public void onChunkUnloadMonitor(ChunkUnloadEvent e) {
+        if (!plugin.getGrid().isIslandsWorld(e.getWorld()))
             return;
 
-        plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk()))
-                .forEach(StackedBlocksHandler.StackedBlock::removeHologram);
+        plugin.getStackedBlocks().removeStackedBlockHolograms(e.getChunk());
 
         Island island = plugin.getGrid().getIslandAt(e.getChunk());
 
-        if(island == null)
+        if (island == null)
             return;
 
         plugin.getNMSChunks().startTickingChunk(island, e.getChunk(), true);
 
-        if(!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
+        if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
     }
 
     @EventHandler
-    public void onChunkLoad(ChunkLoadEvent e){
+    public void onChunkLoad(ChunkLoadEvent e) {
         Location firstBlock = e.getChunk().getBlock(0, 100, 0).getLocation();
         Island island = plugin.getGrid().getIslandAt(firstBlock);
 
-        if(island == null || island.isSpawn())
+        if (island == null || island.isSpawn())
             return;
 
-        if(e.getWorld().getEnvironment() == plugin.getSettings().defaultWorldEnvironment) {
+        if (e.getWorld().getEnvironment() == plugin.getSettings().defaultWorldEnvironment) {
             island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
         }
 
         plugin.getNMSChunks().injectChunkSections(e.getChunk());
 
-        if(island.isInsideRange(e.getChunk()))
+        if (island.isInsideRange(e.getChunk()))
             plugin.getNMSChunks().startTickingChunk(island, e.getChunk(), false);
 
-        if(!plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
+        if (!plugin.getNMSChunks().isChunkEmpty(e.getChunk()))
             ChunksTracker.markDirty(island, e.getChunk(), true);
 
         // We want to delete old holograms of stacked blocks
-        for(Entity entity : e.getChunk().getEntities()){
-            if(entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
-                    plugin.getGrid().getBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+        for (Entity entity : e.getChunk().getEntities()) {
+            if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
+                    plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
                 entity.remove();
         }
 
-        plugin.getGrid().getStackedBlocks(ChunkPosition.of(e.getChunk())).forEach(StackedBlocksHandler.StackedBlock::updateName);
+        plugin.getStackedBlocks().updateStackedBlockHolograms(e.getChunk());
     }
 
     // Should potentially fix crop growth tile entities "disappearing"
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onBlockGrow(BlockGrowEvent e){
+    public void onBlockGrow(BlockGrowEvent e) {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-        if(island != null && island.isInsideRange(e.getBlock().getLocation()))
+        if (island != null && island.isInsideRange(e.getBlock().getLocation()))
             plugin.getNMSChunks().startTickingChunk(island, e.getBlock().getChunk(), false);
     }
 
-    private static boolean isHologram(ArmorStand armorStand){
+    private static boolean isHologram(ArmorStand armorStand) {
         return !armorStand.hasGravity() && armorStand.isSmall() && !armorStand.isVisible() &&
                 armorStand.isCustomNameVisible() && armorStand.isMarker() && armorStand.getCustomName() != null;
     }

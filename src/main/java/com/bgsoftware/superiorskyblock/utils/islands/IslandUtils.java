@@ -230,7 +230,7 @@ public final class IslandUtils {
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish){
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
-            plugin.getGrid().removeStackedBlocks(island, chunkPosition);
+            plugin.getStackedBlocks().removeStackedBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
             EventsCaller.callIslandChunkResetEvent(island, chunkPosition);
         });
     }

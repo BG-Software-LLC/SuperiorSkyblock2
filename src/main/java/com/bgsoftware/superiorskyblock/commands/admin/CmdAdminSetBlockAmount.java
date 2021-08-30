@@ -73,7 +73,7 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
         int amount = arguments.getKey();
 
-        plugin.getGrid().setBlockAmount(location.getBlock(), amount);
+        plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
 
         String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
         Locale.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);

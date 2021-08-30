@@ -67,7 +67,6 @@ public final class DataHandler extends AbstractHandler {
         loadPlayers();
         loadIslands();
         loadGrid();
-        loadStackedBlocks();
         loadBankTransactions();
 
         /*
@@ -142,28 +141,6 @@ public final class DataHandler extends AbstractHandler {
                 resultSet -> plugin.getGrid().loadGrid(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished grid!");
-    }
-
-    private void loadStackedBlocks(){
-        SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
-
-        DatabaseBridge gridLoader = plugin.getFactory().createDatabaseBridge((GridManager) null);
-
-        AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
-
-        gridLoader.loadAllObjects("stacked_blocks", _resultSet -> {
-            DatabaseResult resultSet = new DatabaseResult(_resultSet);
-            plugin.getGrid().loadStackedBlocks(resultSet);
-            String item = resultSet.getString("block_type");
-            if (item == null || item.isEmpty())
-                updateBlockKeys.set(true);
-        });
-
-        if (updateBlockKeys.get()) {
-            Executor.sync(() -> plugin.getGrid().updateStackedBlockKeys());
-        }
-
-        SuperiorSkyblockPlugin.log("Finished stacked blocks!");
     }
 
     private void loadBankTransactions() {

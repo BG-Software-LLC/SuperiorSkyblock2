@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
+import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -104,6 +105,12 @@ public final class FactoriesHandler implements FactoriesManager {
         SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
+    }
+
+    public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager){
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
+        return databaseBridgeFactory == null ? databaseBridge :
+                databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);
     }
 
 }

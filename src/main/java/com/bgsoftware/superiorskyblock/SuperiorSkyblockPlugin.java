@@ -12,13 +12,12 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
-import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
-import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
+import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.handlers.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
@@ -62,9 +61,12 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContainer;
 import com.bgsoftware.superiorskyblock.values.container.GeneralBlockValuesContainer;
+import com.bgsoftware.superiorskyblock.world.blocks.StackedBlocksHandler;
+import com.bgsoftware.superiorskyblock.world.blocks.container.DefaultStackedBlocksContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -91,6 +93,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
 
     private final GridHandler gridHandler = new GridHandler(this);
+
+    private final StackedBlocksHandler stackedBlocksHandler = new StackedBlocksHandler(this,
+            new DefaultStackedBlocksContainer());
 
     private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this,
             new BlockWorthValuesContainer(), new BlockLevelsContainer(),
@@ -291,7 +296,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             playersHandler.savePlayers();
             gridHandler.saveIslands();
-            gridHandler.saveStackedBlocks();
+            stackedBlocksHandler.saveStackedBlocks();
 
             modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
 
@@ -488,6 +493,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public GridHandler getGrid(){
         return gridHandler;
+    }
+
+    @Override
+    public StackedBlocksHandler getStackedBlocks() {
+        return stackedBlocksHandler;
     }
 
     @Override

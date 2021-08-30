@@ -483,7 +483,7 @@ public final class PlayersListener implements Listener {
         if(island == null || island.isSpawn() || !island.hasPermission(e.getPlayer(), IslandPrivileges.BREAK))
             return;
 
-        if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) != 1)
+        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) != 1)
             return;
 
         e.setCancelled(true);

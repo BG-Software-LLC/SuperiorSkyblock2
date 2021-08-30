@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
+import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 
@@ -22,6 +23,11 @@ public interface SuperiorSkyblock {
      * Get the grid of the core.
      */
     GridManager getGrid();
+
+    /**
+     * Get the stacked-blocks manager of the core.
+     */
+    StackedBlocksManager getStackedBlocks();
 
     /**
      * Get the blocks manager of the core.
