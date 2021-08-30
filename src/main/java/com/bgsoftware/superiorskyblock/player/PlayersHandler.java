@@ -8,27 +8,26 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.player.container.PlayersContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler extends AbstractHandler implements PlayersManager {
 
-    private final Map<UUID, SuperiorPlayer> players = new ConcurrentHashMap<>();
+    private final PlayersContainer playersContainer;
 
-    public PlayersHandler(SuperiorSkyblockPlugin plugin) {
+    public PlayersHandler(SuperiorSkyblockPlugin plugin, PlayersContainer playersContainer) {
         super(plugin);
+        this.playersContainer = playersContainer;
     }
 
     @Override
@@ -38,15 +37,8 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public SuperiorPlayer getSuperiorPlayer(String name) {
-        if (name == null)
-            return null;
-
-        for (SuperiorPlayer superiorPlayer : players.values()) {
-            if (superiorPlayer.getName().equalsIgnoreCase(name))
-                return superiorPlayer;
-        }
-
-        return null;
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        return this.playersContainer.getSuperiorPlayer(name);
     }
 
     public SuperiorPlayer getSuperiorPlayer(CommandSender commandSender) {
@@ -62,21 +54,27 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     @Override
     public SuperiorPlayer getSuperiorPlayer(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
-        if (!players.containsKey(uuid)) {
-            SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(uuid);
-            players.put(uuid, superiorPlayer);
-            Executor.async(() -> PlayersDatabaseBridge.insertPlayer(superiorPlayer), 1L);
+        SuperiorPlayer superiorPlayer = this.playersContainer.getSuperiorPlayer(uuid);
+
+        if (superiorPlayer == null) {
+            superiorPlayer = plugin.getFactory().createPlayer(uuid);
+            this.playersContainer.addPlayer(superiorPlayer);
+            PlayersDatabaseBridge.insertPlayer(superiorPlayer);
         }
-        return players.get(uuid);
+
+        return superiorPlayer;
     }
 
     public List<SuperiorPlayer> matchAllPlayers(Predicate<? super SuperiorPlayer> predicate) {
-        return players.values().stream().filter(predicate).collect(Collectors.toList());
+        return Collections.unmodifiableList(this.playersContainer.getAllPlayers().stream()
+                .filter(predicate)
+                .collect(Collectors.toList())
+        );
     }
 
     @Override
     public List<SuperiorPlayer> getAllPlayers() {
-        return new ArrayList<>(players.values());
+        return this.playersContainer.getAllPlayers();
     }
 
     @Override
@@ -127,15 +125,13 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         return plugin.getRoles().getRoles();
     }
 
-    public SuperiorPlayer loadPlayer(DatabaseResult resultSet) {
-        UUID player = UUID.fromString(resultSet.getString("uuid"));
+    public void loadPlayer(DatabaseResult resultSet) {
         SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(resultSet);
-        players.put(player, superiorPlayer);
-        return superiorPlayer;
+        this.playersContainer.addPlayer(superiorPlayer);
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {
-        players.remove(originPlayer.getUniqueId());
+        this.playersContainer.removePlayer(originPlayer);
 
         for (Island island : plugin.getGrid().getIslands())
             island.replacePlayers(originPlayer, newPlayer);

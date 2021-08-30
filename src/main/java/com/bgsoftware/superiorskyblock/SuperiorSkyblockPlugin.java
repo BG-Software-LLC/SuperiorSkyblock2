@@ -49,6 +49,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
@@ -108,7 +109,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
 
-    private final PlayersHandler playersHandler = new PlayersHandler(this);
+    private final PlayersHandler playersHandler = new PlayersHandler(this,
+            new DefaultPlayersContainer());
 
     private final RolesHandler rolesHandler = new RolesHandler(this,
             new DefaultRolesContainer());
