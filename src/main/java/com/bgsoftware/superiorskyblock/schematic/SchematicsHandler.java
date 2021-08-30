@@ -1,28 +1,25 @@
-package com.bgsoftware.superiorskyblock.handlers;
+package com.bgsoftware.superiorskyblock.schematic;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
 import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
-import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
+import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.FloatTag;
+import com.bgsoftware.superiorskyblock.tag.IntTag;
+import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.tag.TagBuilder;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.tags.FloatTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.schematics.SuperiorSchematic;
-import com.bgsoftware.superiorskyblock.schematics.TagBuilder;
-import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
-
+import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,7 +36,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,10 +46,11 @@ import java.util.zip.GZIPOutputStream;
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class SchematicsHandler extends AbstractHandler implements SchematicManager {
 
-    private final Map<String, Schematic> schematics = new HashMap<>();
+    private final SchematicsContainer schematicsContainer;
 
-    public SchematicsHandler(SuperiorSkyblockPlugin plugin){
+    public SchematicsHandler(SuperiorSkyblockPlugin plugin, SchematicsContainer schematicsContainer){
         super(plugin);
+        this.schematicsContainer = schematicsContainer;
     }
 
     @Override
@@ -78,7 +75,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
             Schematic schematic = loadFromFile(schemName, schemFile);
             if(schematic != null) {
-                schematics.put(schemName, schematic);
+                this.schematicsContainer.addSchematic(schematic);
                 SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
                         (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
             }
@@ -91,19 +88,19 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
     @Override
     public Schematic getSchematic(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return schematics.get(name.toLowerCase());
+        return this.schematicsContainer.getSchematic(name);
     }
 
     @Override
     public List<String> getSchematics(){
-        return Lists.newArrayList(schematics.keySet());
+        return this.schematicsContainer.getSchematicNames();
     }
 
     public String getDefaultSchematic(World.Environment environment){
         String suffix = environment == World.Environment.NETHER ? "_nether" : "_the_end";
-        for(Map.Entry<String, Schematic> entry : schematics.entrySet()){
-            if(getSchematic(entry.getKey() + suffix) != null)
-                return entry.getKey();
+        for(String schematicName : this.schematicsContainer.getSchematicNames()) {
+            if(getSchematic(schematicName + suffix) != null)
+                return schematicName;
         }
 
         return "";
@@ -217,7 +214,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
         SuperiorSchematic schematic = new SuperiorSchematic(schematicName, new CompoundTag(compoundValue));
-        schematics.put(schematicName, schematic);
+        this.schematicsContainer.addSchematic(schematic);
         saveIntoFile(schematicName, schematic);
 
         if(runnable != null)

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.schematics;
+package com.bgsoftware.superiorskyblock.schematic;
 
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;

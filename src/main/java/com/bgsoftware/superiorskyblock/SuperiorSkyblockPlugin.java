@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
+import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -27,7 +28,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
 import com.bgsoftware.superiorskyblock.module.ModulesHandler;
 import com.bgsoftware.superiorskyblock.player.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
-import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
+import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
@@ -111,7 +112,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             new BlockWorthValuesContainer(), new BlockLevelsContainer(),
             new GeneralBlockValuesContainer(), new GeneralBlockValuesContainer());
 
-    private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
+    private final SchematicsHandler schematicsHandler = new SchematicsHandler(this,
+            new DefaultSchematicsContainer());
 
     private final PlayersHandler playersHandler = new PlayersHandler(this,
             new DefaultPlayersContainer());

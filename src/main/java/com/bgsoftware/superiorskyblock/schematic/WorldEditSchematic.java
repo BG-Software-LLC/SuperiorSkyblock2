@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.schematics;
+package com.bgsoftware.superiorskyblock.schematic;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.schematics.WorldEditSchematic;
+import com.bgsoftware.superiorskyblock.schematic.WorldEditSchematic;
 import com.boydti.fawe.FaweAPI;
 import org.bukkit.Bukkit;
 
