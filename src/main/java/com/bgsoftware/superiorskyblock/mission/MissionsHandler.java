@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.handlers;
+package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -27,27 +29,22 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public final class MissionsHandler extends AbstractHandler implements MissionsManager {
 
-    private final static Map<String, Mission<?>> missionMap = new HashMap<>();
-    private final static Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
+    private final MissionsContainer missionsContainer;
 
-    public MissionsHandler(SuperiorSkyblockPlugin plugin){
+    public MissionsHandler(SuperiorSkyblockPlugin plugin, MissionsContainer missionsContainer) {
         super(plugin);
+        this.missionsContainer = missionsContainer;
     }
 
     @Override
-    public void loadData(){
-        if(!BuiltinModules.MISSIONS.isEnabled())
+    public void loadData() {
+        if (!BuiltinModules.MISSIONS.isEnabled())
             return;
 
         Executor.asyncTimer(this::saveMissionsData, 6000L); // Save missions data every 5 minutes
@@ -56,22 +53,22 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @Override
     public Mission<?> getMission(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return missionMap.get(name.toLowerCase());
+        return this.missionsContainer.getMission(name);
     }
 
     @Override
     public List<Mission<?>> getAllMissions() {
-        return getFilteredMissions(missionData -> true);
+        return this.missionsContainer.getAllMissions();
     }
 
     @Override
     public List<Mission<?>> getPlayerMissions() {
-        return getFilteredMissions(missionData -> !missionData.islandMission);
+        return this.missionsContainer.getPlayerMissions();
     }
 
     @Override
     public List<Mission<?>> getIslandMissions() {
-        return getFilteredMissions(missionData -> missionData.islandMission);
+        return this.missionsContainer.getIslandMissions();
     }
 
     @Override
@@ -81,18 +78,17 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
-        if(!missionDataOptional.isPresent())
+        if (!missionDataOptional.isPresent())
             return false;
 
         MissionData missionData = missionDataOptional.get();
 
         Island playerIsland = superiorPlayer.getIsland();
 
-        if(missionData.islandMission){
-            if(playerIsland != null)
+        if (missionData.isIslandMission()) {
+            if (playerIsland != null)
                 return playerIsland.hasCompletedMission(mission);
-        }
-        else{
+        } else {
             return superiorPlayer.hasCompletedMission(mission);
         }
 
@@ -106,18 +102,17 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
-        if(!missionDataOptional.isPresent())
+        if (!missionDataOptional.isPresent())
             return false;
 
         MissionData missionData = missionDataOptional.get();
 
         Island playerIsland = superiorPlayer.getIsland();
 
-        if(missionData.islandMission){
-            if(playerIsland != null)
+        if (missionData.isIslandMission()) {
+            if (playerIsland != null)
                 return playerIsland.canCompleteMissionAgain(mission);
-        }
-        else{
+        } else {
             return superiorPlayer.canCompleteMissionAgain(mission);
         }
 
@@ -140,7 +135,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @Override
-    public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission){
+    public boolean hasAllRequiredMissions(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return mission.getRequiredMissions().stream().allMatch(_mission -> {
@@ -150,14 +145,14 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @Override
-    public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission<?> mission){
+    public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return mission.getRequiredChecks().stream().allMatch(check -> {
             check = PlaceholderHook.parse(superiorPlayer, check);
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
-            }catch(ScriptException ex){
+            } catch (ScriptException ex) {
                 return false;
             }
         });
@@ -182,15 +177,15 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        if(Bukkit.isPrimaryThread()){
+        if (Bukkit.isPrimaryThread()) {
             Executor.async(() -> rewardMission(mission, superiorPlayer, checkAutoReward, forceReward, result));
             return;
         }
 
         Optional<MissionData> missionDataOptional = getMissionData(mission);
 
-        if(!missionDataOptional.isPresent()) {
-            if(result != null)
+        if (!missionDataOptional.isPresent()) {
+            if (result != null)
                 result.accept(false);
             return;
         }
@@ -204,20 +199,20 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             if (!forceReward) {
                 if (!canCompleteAgain(superiorPlayer, mission)) {
                     mission.onCompleteFail(superiorPlayer);
-                    if(result != null)
+                    if (result != null)
                         result.accept(false);
                     return;
                 }
 
                 if (!canComplete(superiorPlayer, mission)) {
-                    if(result != null)
+                    if (result != null)
                         result.accept(false);
                     return;
                 }
 
-                if (missionData.islandMission && playerIsland == null) {
+                if (missionData.isIslandMission() && playerIsland == null) {
                     mission.onCompleteFail(superiorPlayer);
-                    if(result != null)
+                    if (result != null)
                         result.accept(false);
                     throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
                 }
@@ -225,7 +220,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
                         Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
-                        if(result != null)
+                        if (result != null)
                             result.accept(false);
                         return;
                     }
@@ -237,17 +232,17 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
             //noinspection SynchronizationOnLocalVariableOrMethodParameter
             synchronized (missionData) {
-                missionData.itemRewards.forEach(itemStack -> itemRewards.add(itemStack.clone()));
-                commandRewards = new ArrayList<>(missionData.commandRewards);
+                missionData.getItemRewards().forEach(itemStack -> itemRewards.add(itemStack.clone()));
+                commandRewards = new ArrayList<>(missionData.getCommandRewards());
             }
 
-            EventResult<Pair<List<ItemStack>, List<String>>> event = EventsCaller
-                    .callMissionCompleteEvent(superiorPlayer, mission, missionData.islandMission, itemRewards, commandRewards);
+            EventResult<Pair<List<ItemStack>, List<String>>> event = EventsCaller.callMissionCompleteEvent(
+                    superiorPlayer, mission, missionData.isIslandMission(), itemRewards, commandRewards);
 
             if (event.isCancelled()) {
                 if (!forceReward)
                     mission.onCompleteFail(superiorPlayer);
-                if(result != null)
+                if (result != null)
                     result.accept(false);
                 return;
             }
@@ -255,14 +250,14 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             if (!forceReward)
                 mission.onComplete(superiorPlayer);
 
-            if (missionData.islandMission) {
+            if (missionData.isIslandMission()) {
                 assert playerIsland != null;
                 playerIsland.completeMission(mission);
             } else {
                 superiorPlayer.completeMission(mission);
             }
 
-            if(result != null)
+            if (result != null)
                 result.accept(true);
 
             for (ItemStack itemStack : event.getResult().getKey()) {
@@ -294,26 +289,26 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     public void saveMissionsData() {
         File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
 
-        if(!file.exists()){
+        if (!file.exists()) {
             try {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
-            }catch(IOException ex){
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
         YamlConfiguration data = new YamlConfiguration();
 
-        for(Mission<?> mission : getAllMissions()){
+        for (Mission<?> mission : getAllMissions()) {
             ConfigurationSection section = data.createSection(mission.getName());
             mission.saveProgress(section);
             data.set(mission.getName(), section);
         }
 
-        try{
+        try {
             data.save(file);
-        }catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
@@ -323,8 +318,27 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         loadMissionsData(getAllMissions());
     }
 
+    public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted){
+        if(mission.isOnlyShowIfRequiredCompleted()) {
+            if (!hasAllRequiredMissions(superiorPlayer, mission))
+                return false;
+
+            if (!canPassAllChecks(superiorPlayer, mission))
+                return false;
+        }
+
+        if(removeCompleted){
+            if(mission.getIslandMission() ? superiorPlayer.getIsland() != null &&
+                    !superiorPlayer.getIsland().canCompleteMissionAgain(mission) :
+                    !superiorPlayer.canCompleteMissionAgain(mission))
+                return false;
+        }
+
+        return true;
+    }
+
     @SuppressWarnings("deprecation")
-    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection){
+    public Mission<?> loadMission(String missionName, File missionsFolder, ConfigurationSection missionSection) {
         Mission<?> newMission = null;
 
         try {
@@ -346,11 +360,11 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
                 mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                 mission.load(plugin, missionSection);
-                missionMap.put(missionName.toLowerCase(), mission);
+                this.missionsContainer.addMission(mission);
                 newMission = mission;
             }
 
-            missionDataMap.put(mission, new MissionsHandler.MissionData(mission, missionSection));
+            this.missionsContainer.addMissionData(new MissionData(mission, missionSection));
 
             SuperiorSkyblockPlugin.log("Registered mission " + missionName);
         } catch (Exception ex) {
@@ -367,54 +381,38 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
 
-        if(!file.exists()){
+        if (!file.exists()) {
             try {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
-            }catch(IOException ex){
+            } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
 
         YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
 
-        for(Mission<?> mission : missionsList){
-            if(data.contains(mission.getName()))
+        for (Mission<?> mission : missionsList) {
+            if (data.contains(mission.getName()))
                 mission.loadProgress(data.getConfigurationSection(mission.getName()));
         }
     }
 
-    public Optional<MissionData> getMissionData(Mission<?> mission){
-        MissionData missionData = missionDataMap.get(mission);
-
-        if(missionData == null){
-            missionDataMap.remove(mission);
-            if(mission != null)
-                missionMap.remove(mission.getName());
-            return Optional.empty();
-        }
-
-        return Optional.of(missionData);
+    public Optional<MissionData> getMissionData(Mission<?> mission) {
+        return Optional.ofNullable(this.missionsContainer.getMissionData(mission));
     }
 
-    private boolean isAutoReward(Mission<?> mission){
+    private boolean isAutoReward(Mission<?> mission) {
         Optional<MissionData> missionDataOptional = getMissionData(mission);
-        return missionDataOptional.isPresent() && missionDataOptional.get().autoReward;
+        return missionDataOptional.isPresent() && missionDataOptional.get().isAutoReward();
     }
 
-    private List<Mission<?>> getFilteredMissions(Predicate<MissionData> predicate) {
-        return missionDataMap.values().stream().filter(predicate)
-                .sorted(Comparator.comparingInt(o -> o.index))
-                .map(missionData -> missionData.mission)
-                .collect(Collectors.toList());
-    }
-
-    private Mission<?> createInstance(Class<?> clazz, String name, boolean islandMission, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception{
+    private Mission<?> createInstance(Class<?> clazz, String name, boolean islandMission, List<String> requiredMissions, List<String> requiredChecks, boolean onlyShowIfRequiredCompleted) throws Exception {
         Preconditions.checkArgument(Mission.class.isAssignableFrom(clazz), "Class " + clazz + " is not a Mission.");
 
-        for(Constructor<?> constructor : clazz.getConstructors()){
-            if(constructor.getParameterCount() == 0) {
-                if(!constructor.isAccessible())
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            if (constructor.getParameterCount() == 0) {
+                if (!constructor.isAccessible())
                     constructor.setAccessible(true);
 
                 Mission<?> mission = (Mission<?>) constructor.newInstance();
@@ -422,7 +420,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 mission.setIslandMission(islandMission);
                 mission.addRequiredMission(requiredMissions.toArray(new String[0]));
                 mission.addRequiredCheck(requiredChecks.toArray(new String[0]));
-                if(onlyShowIfRequiredCompleted)
+                if (onlyShowIfRequiredCompleted)
                     mission.toggleOnlyShowIfRequiredCompleted();
 
                 return mission;
@@ -430,49 +428,6 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
 
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
-    }
-
-    private static int currentIndex = 0;
-
-    public static class MissionData{
-
-        private final int index;
-        private final Mission<?> mission;
-        private final List<ItemStack> itemRewards = new ArrayList<>();
-        private final List<String> commandRewards = new ArrayList<>();
-        private final boolean autoReward, islandMission;
-        public final boolean disbandReset, leaveReset;
-        public final ItemBuilder notCompleted, canComplete, completed;
-        public final int resetAmount;
-
-        MissionData(Mission<?> mission, ConfigurationSection section){
-            this.index = currentIndex++;
-            this.mission = mission;
-            this.islandMission = section.getBoolean("island", false);
-            this.autoReward = section.getBoolean("auto-reward", true);
-            this.disbandReset = section.getBoolean("disband-reset", false);
-            this.leaveReset = section.getBoolean("leave-reset", false);
-            this.resetAmount = section.getInt("reset-amount", 1);
-
-            if(section.contains("rewards.items")){
-                for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                    ItemStack itemStack = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key)).build();
-                    itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
-                    this.itemRewards.add(itemStack);
-                }
-            }
-
-            this.commandRewards.addAll(section.getStringList("rewards.commands"));
-
-            this.notCompleted = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
-            this.canComplete = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
-            this.completed = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
-        }
-
-        @Override
-        public String toString() {
-            return "MissionData{name=" + mission.getName() + "}";
-        }
     }
 
 }

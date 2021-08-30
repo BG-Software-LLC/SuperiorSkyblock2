@@ -4,10 +4,9 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
-import com.bgsoftware.superiorskyblock.utils.missions.MissionUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,7 +31,7 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
         super("menuPlayerMissions", superiorPlayer);
         if(superiorPlayer != null) {
             this.missions = plugin.getMissions().getPlayerMissions().stream()
-                    .filter(mission -> MissionUtils.canDisplayMission(mission, superiorPlayer, removeCompleted))
+                    .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
             if(sortByCompletion)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
@@ -66,24 +65,24 @@ public final class MenuPlayerMissions extends PagedSuperiorMenu<Mission<?>> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, Mission<?> mission) {
         try {
-            Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
+            Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
             if (!missionDataOptional.isPresent())
                 return clickedItem;
 
-            MissionsHandler.MissionData missionData = missionDataOptional.get();
+            MissionData missionData = missionDataOptional.get();
             boolean completed = !superiorPlayer.canCompleteMissionAgain(mission);
             int percentage = getPercentage(mission.getProgress(superiorPlayer));
             int progressValue = mission.getProgressValue(superiorPlayer);
             int amountCompleted = superiorPlayer.getAmountMissionCompleted(mission);
 
-            ItemStack itemStack = completed ? missionData.completed.clone().build(superiorPlayer) :
+            ItemStack itemStack = completed ? missionData.getCompleted().build(superiorPlayer) :
                     plugin.getMissions().canComplete(superiorPlayer, mission) ?
-                            missionData.canComplete.clone()
+                            missionData.getCanComplete()
                                     .replaceAll("{0}", percentage + "")
                                     .replaceAll("{1}", progressValue + "")
                                     .replaceAll("{2}", amountCompleted + "").build(superiorPlayer) :
-                            missionData.notCompleted.clone()
+                            missionData.getNotCompleted()
                                     .replaceAll("{0}", percentage + "")
                                     .replaceAll("{1}", progressValue + "")
                                     .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);

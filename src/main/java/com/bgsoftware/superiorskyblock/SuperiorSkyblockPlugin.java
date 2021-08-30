@@ -21,7 +21,7 @@ import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
 import com.bgsoftware.superiorskyblock.handlers.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
-import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
 import com.bgsoftware.superiorskyblock.handlers.ModulesHandler;
 import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
@@ -37,6 +37,7 @@ import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
 import com.bgsoftware.superiorskyblock.listeners.ProtectionListener;
 import com.bgsoftware.superiorskyblock.listeners.SettingsListener;
 import com.bgsoftware.superiorskyblock.metrics.Metrics;
+import com.bgsoftware.superiorskyblock.mission.container.DefaultMissionsContainer;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
@@ -105,7 +106,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final PlayersHandler playersHandler = new PlayersHandler(this);
 
-    private final MissionsHandler missionsHandler = new MissionsHandler(this);
+    private final MissionsHandler missionsHandler = new MissionsHandler(this,
+            new DefaultMissionsContainer());
 
     private final MenusHandler menusHandler = new MenusHandler(this);
 
