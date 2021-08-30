@@ -63,6 +63,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         plugin.getNMSAlgorithms().registerCommand(pluginCommand);
 
         playerCommandsMap.loadDefaultCommands();
+        adminCommandsMap.loadDefaultCommands();
 
         loadCommands();
 
