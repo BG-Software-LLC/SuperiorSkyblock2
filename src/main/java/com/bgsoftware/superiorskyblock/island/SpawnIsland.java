@@ -22,7 +22,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.data.bridge.EmptyDatabaseBridge;
-import com.bgsoftware.superiorskyblock.hooks.SWMHook;
+import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;

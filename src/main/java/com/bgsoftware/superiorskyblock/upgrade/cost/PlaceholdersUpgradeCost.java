@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.upgrade.cost;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;

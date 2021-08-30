@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
-import com.bgsoftware.superiorskyblock.hooks.FAWEHook;
+import com.bgsoftware.superiorskyblock.hooks.support.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;

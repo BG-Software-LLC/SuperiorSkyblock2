@@ -27,7 +27,7 @@ import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
 import com.bgsoftware.superiorskyblock.module.ModulesHandler;
 import com.bgsoftware.superiorskyblock.player.PlayersHandler;
-import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
+import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
