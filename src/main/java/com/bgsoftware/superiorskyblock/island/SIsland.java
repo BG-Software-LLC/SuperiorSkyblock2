@@ -1072,7 +1072,7 @@ public final class SIsland implements Island {
         if(playerRole != null)
             return playerRole;
 
-        return plugin.getPlayers().getRoles().stream()
+        return plugin.getRoles().getRoles().stream()
                 .filter(_playerRole -> ((SPlayerRole) _playerRole).getDefaultPermissions().hasPermission(islandPrivilege))
                 .min(Comparator.comparingInt(PlayerRole::getWeight)).orElse(SPlayerRole.lastRole());
     }

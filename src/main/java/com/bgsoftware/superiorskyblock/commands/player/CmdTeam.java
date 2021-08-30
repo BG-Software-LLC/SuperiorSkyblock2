@@ -85,7 +85,7 @@ public final class CmdTeam implements ISuperiorCommand {
 
             if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)){
                 Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
-                plugin.getPlayers().getRoles().stream().filter(PlayerRole::isRoleLadder)
+                plugin.getRoles().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
                 rolesStrings.put(SPlayerRole.lastRole(), new StringBuilder());
 

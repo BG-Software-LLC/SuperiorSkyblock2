@@ -5,6 +5,7 @@ import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
+import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -23,7 +24,7 @@ import com.bgsoftware.superiorskyblock.key.KeysHandler;
 import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
 import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
 import com.bgsoftware.superiorskyblock.module.ModulesHandler;
-import com.bgsoftware.superiorskyblock.handlers.PlayersHandler;
+import com.bgsoftware.superiorskyblock.player.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
@@ -48,6 +49,8 @@ import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.role.RolesHandler;
+import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
@@ -106,6 +109,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final SchematicsHandler schematicsHandler = new SchematicsHandler(this);
 
     private final PlayersHandler playersHandler = new PlayersHandler(this);
+
+    private final RolesHandler rolesHandler = new RolesHandler(this,
+            new DefaultRolesContainer());
 
     private final MissionsHandler missionsHandler = new MissionsHandler(this,
             new DefaultMissionsContainer());
@@ -448,6 +454,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         blockValuesHandler.loadData();
         upgradesHandler.loadData();
+        rolesHandler.loadData();
 
         Locale.reload();
 
@@ -463,6 +470,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
+        stackedBlocksHandler.loadData();
 
         if (loadGrid) {
             try {
@@ -517,6 +525,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public PlayersHandler getPlayers() {
         return playersHandler;
+    }
+
+    @Override
+    public RolesHandler getRoles() {
+        return rolesHandler;
     }
 
     @Override

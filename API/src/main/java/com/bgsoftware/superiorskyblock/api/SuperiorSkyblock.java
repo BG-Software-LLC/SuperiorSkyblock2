@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
+import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
@@ -43,6 +44,11 @@ public interface SuperiorSkyblock {
      * Get the players manager of the core.
      */
     PlayersManager getPlayers();
+
+    /**
+     * Get the roles manager of the core.
+     */
+    RolesManager getRoles();
 
     /**
      * Get the missions manager of the core.

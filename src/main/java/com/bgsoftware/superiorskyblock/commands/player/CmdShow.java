@@ -104,7 +104,7 @@ public final class CmdShow implements ISuperiorCommand {
 
         if(!Locale.ISLAND_INFO_ROLES.isEmpty(locale)) {
             Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
-            plugin.getPlayers().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
+            plugin.getRoles().getRoles().stream().filter(playerRole -> playerRole.isRoleLadder() && !playerRole.isLastRole())
                     .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
 
             List<SuperiorPlayer> members = island.getIslandMembers(false);

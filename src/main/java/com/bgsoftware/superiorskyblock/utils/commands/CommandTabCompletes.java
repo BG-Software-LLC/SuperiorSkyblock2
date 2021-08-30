@@ -154,14 +154,14 @@ public final class CommandTabCompletes {
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument){
         String lowerArgument = argument.toLowerCase();
-        return plugin.getPlayers().getRoles().stream()
+        return plugin.getRoles().getRoles().stream()
                 .filter(playerRole -> playerRole.toString().toLowerCase().contains(lowerArgument))
                 .map(PlayerRole::toString).collect(Collectors.toList());
     }
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate){
         String lowerArgument = argument.toLowerCase();
-        return plugin.getPlayers().getRoles().stream()
+        return plugin.getRoles().getRoles().stream()
                 .filter(playerRole -> predicate.test(playerRole) &&  playerRole.toString().toLowerCase().contains(lowerArgument))
                 .map(PlayerRole::toString).collect(Collectors.toList());
     }
