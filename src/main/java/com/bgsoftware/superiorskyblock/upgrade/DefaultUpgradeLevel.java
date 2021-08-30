@@ -1,8 +1,7 @@
-package com.bgsoftware.superiorskyblock.upgrades;
+package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.upgrades.cost.EmptyUpgradeCost;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

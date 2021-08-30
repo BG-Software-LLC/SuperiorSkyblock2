@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.upgrades.cost;
+package com.bgsoftware.superiorskyblock.upgrade.cost;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;

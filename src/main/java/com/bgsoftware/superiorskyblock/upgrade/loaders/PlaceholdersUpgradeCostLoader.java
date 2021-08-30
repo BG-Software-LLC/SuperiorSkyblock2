@@ -1,9 +1,9 @@
-package com.bgsoftware.superiorskyblock.upgrades.loaders;
+package com.bgsoftware.superiorskyblock.upgrade.loaders;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.upgrades.cost.PlaceholdersUpgradeCost;
+import com.bgsoftware.superiorskyblock.upgrade.cost.PlaceholdersUpgradeCost;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;

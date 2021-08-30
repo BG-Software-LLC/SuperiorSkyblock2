@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.data.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
+import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
@@ -28,7 +29,7 @@ import com.bgsoftware.superiorskyblock.player.PlayersHandler;
 import com.bgsoftware.superiorskyblock.handlers.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.handlers.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
-import com.bgsoftware.superiorskyblock.handlers.UpgradesHandler;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -54,8 +55,8 @@ import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
-import com.bgsoftware.superiorskyblock.upgrades.loaders.PlaceholdersUpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.upgrades.loaders.VaultUpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -127,7 +128,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private final ProvidersHandler providersHandler = new ProvidersHandler(this);
 
-    private final UpgradesHandler upgradesHandler = new UpgradesHandler(this);
+    private final UpgradesHandler upgradesHandler = new UpgradesHandler(this,
+            new DefaultUpgradesContainer());
 
     private final CommandsHandler commandsHandler = new CommandsHandler(this,
             new PlayerCommandsMap(this), new AdminCommandsMap(this));

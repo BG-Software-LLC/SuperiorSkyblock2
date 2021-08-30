@@ -24,6 +24,12 @@ public interface UpgradesManager {
     Upgrade getUpgrade(int slot);
 
     /**
+     * Add a new upgrade.
+     * @param upgrade The upgrade to add.
+     */
+    void addUpgrade(Upgrade upgrade);
+
+    /**
      * Get an upgrade object that contains all the default values from config.
      */
     Upgrade getDefaultUpgrade();

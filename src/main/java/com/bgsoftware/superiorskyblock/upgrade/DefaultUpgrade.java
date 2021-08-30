@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.upgrades;
+package com.bgsoftware.superiorskyblock.upgrade;
 
 public final class DefaultUpgrade extends SUpgrade {
 

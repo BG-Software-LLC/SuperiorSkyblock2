@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.upgrades;
+package com.bgsoftware.superiorskyblock.upgrade;
 
 import java.math.BigDecimal;
 import java.util.function.Predicate;

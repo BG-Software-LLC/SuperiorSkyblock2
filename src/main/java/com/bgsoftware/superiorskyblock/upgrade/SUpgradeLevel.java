@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.upgrades;
+package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;

@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;

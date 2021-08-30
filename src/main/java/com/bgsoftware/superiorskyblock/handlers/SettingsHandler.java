@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
 import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;

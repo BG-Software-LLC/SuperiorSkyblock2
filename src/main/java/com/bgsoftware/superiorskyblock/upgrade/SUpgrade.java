@@ -1,9 +1,8 @@
-package com.bgsoftware.superiorskyblock.upgrades;
+package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.upgrades.cost.EmptyUpgradeCost;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 import org.bukkit.World;
 
 import java.util.ArrayList;
@@ -44,11 +43,13 @@ public class SUpgrade implements Upgrade {
         return upgradeLevels.length;
     }
 
-    public int getMenuSlot() {
+    @Override
+    public int getSlot() {
         return slot;
     }
 
-    public void setMenuSlot(int slot){
+    @Override
+    public void setSlot(int slot){
         this.slot = slot;
     }
 

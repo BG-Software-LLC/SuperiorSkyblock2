@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;

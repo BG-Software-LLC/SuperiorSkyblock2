@@ -19,7 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.google.gson.*;
 import org.bukkit.Location;
 import org.bukkit.World;

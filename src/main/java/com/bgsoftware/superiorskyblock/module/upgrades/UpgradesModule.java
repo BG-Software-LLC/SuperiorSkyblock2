@@ -22,11 +22,11 @@ import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgr
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.listeners.UpgradesListener;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
+import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -173,7 +173,7 @@ public final class UpgradesModule extends BuiltinModule {
                             entityLimits, generatorRates, islandEffects, bankLimit, rolesLimits));
                 }
 
-                plugin.getUpgrades().loadUpgrade(upgrade);
+                plugin.getUpgrades().addUpgrade(upgrade);
             }
         }
 

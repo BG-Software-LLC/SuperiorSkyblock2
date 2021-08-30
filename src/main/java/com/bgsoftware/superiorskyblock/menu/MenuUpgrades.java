@@ -4,11 +4,10 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgrade;
-import com.bgsoftware.superiorskyblock.upgrades.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -73,7 +72,7 @@ public final class MenuUpgrades extends SuperiorMenu {
                 if(itemData != null) {
                     boolean nextLevel = levelCost.hasEnoughBalance(superiorPlayer) &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
-                    inv.setItem(((SUpgrade) upgrade).getMenuSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
+                    inv.setItem(upgrade.getSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
                 }
             }
         }
@@ -113,7 +112,7 @@ public final class MenuUpgrades extends SuperiorMenu {
                     }
 
                     int slot = getSlots(upgradeSection, "item", charSlots).get(0);
-                    ((SUpgrade) upgrade).setMenuSlot(slot);
+                    upgrade.setSlot(slot);
 
                     for(String level : upgradeSection.getKeys(false)) {
                         if(NumberUtils.isNumber(level)) {
