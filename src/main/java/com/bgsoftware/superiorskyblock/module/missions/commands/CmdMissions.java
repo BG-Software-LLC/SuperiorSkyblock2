@@ -4,9 +4,8 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
-import com.bgsoftware.superiorskyblock.menu.MenuMissions;
-import com.bgsoftware.superiorskyblock.menu.MenuPlayerMissions;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandMissions;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerMissions;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
@@ -67,7 +66,7 @@ public final class CmdMissions implements ISuperiorCommand {
             }
         }
 
-        MenuMissions.openInventory(superiorPlayer, null);
+        plugin.getMenus().openMissions(superiorPlayer, null);
     }
 
     @Override

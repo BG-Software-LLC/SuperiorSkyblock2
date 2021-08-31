@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandChest;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 
 import java.util.Arrays;
@@ -61,7 +60,7 @@ public final class CmdChest implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        MenuIslandChest.openInventory(superiorPlayer, null, island);
+        plugin.getMenus().openIslandChest(superiorPlayer, null, island);
     }
 
 }

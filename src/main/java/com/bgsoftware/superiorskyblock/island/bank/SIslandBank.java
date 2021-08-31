@@ -9,8 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -103,8 +101,8 @@ public final class SIslandBank implements IslandBank {
 
             IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
 
-            MenuIslandBank.refreshMenus(island);
-            MenuBankLogs.refreshMenus(island);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -128,8 +126,8 @@ public final class SIslandBank implements IslandBank {
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus(island);
-        MenuBankLogs.refreshMenus(island);
+        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshBankLogs(island);
 
         return bankTransaction;
     }
@@ -182,8 +180,8 @@ public final class SIslandBank implements IslandBank {
 
             IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
 
-            MenuIslandBank.refreshMenus(island);
-            MenuBankLogs.refreshMenus(island);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -207,8 +205,8 @@ public final class SIslandBank implements IslandBank {
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus(island);
-        MenuBankLogs.refreshMenus(island);
+        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshBankLogs(island);
 
         return bankTransaction;
     }

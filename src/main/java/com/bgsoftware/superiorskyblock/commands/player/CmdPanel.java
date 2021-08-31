@@ -1,14 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuControlPanel;
-import com.bgsoftware.superiorskyblock.menu.MenuMembers;
-import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
@@ -67,10 +64,10 @@ public final class CmdPanel implements ISuperiorCommand {
 
         if(args.length > 1){
             if(args[1].equalsIgnoreCase("members")){
-                MenuMembers.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                plugin.getMenus().openMembers(superiorPlayer, null, island);
                 return;
             }else if(args[1].equalsIgnoreCase("visitors")){
-                MenuVisitors.openInventory(superiorPlayer, null, superiorPlayer.getIsland());
+                plugin.getMenus().openVisitors(superiorPlayer, null, island);
                 return;
             }else if(args[1].equalsIgnoreCase("toggle")){
                 if(superiorPlayer.hasToggledPanel()){
@@ -84,7 +81,7 @@ public final class CmdPanel implements ISuperiorCommand {
             }
         }
 
-        MenuControlPanel.openInventory(superiorPlayer, null);
+        plugin.getMenus().openControlPanel(superiorPlayer, null, island);
     }
 
     @Override

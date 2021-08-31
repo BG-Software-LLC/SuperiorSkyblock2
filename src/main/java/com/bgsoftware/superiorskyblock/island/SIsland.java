@@ -26,35 +26,19 @@ import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.deserializer.IslandsDeserializer;
-import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
-import com.bgsoftware.superiorskyblock.menu.MenuCoops;
-import com.bgsoftware.superiorskyblock.menu.MenuCounts;
-import com.bgsoftware.superiorskyblock.menu.MenuGlobalWarps;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandMissions;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandRatings;
-import com.bgsoftware.superiorskyblock.menu.MenuMemberManage;
-import com.bgsoftware.superiorskyblock.menu.MenuMemberRole;
-import com.bgsoftware.superiorskyblock.menu.MenuMembers;
-import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
-import com.bgsoftware.superiorskyblock.menu.MenuSettings;
-import com.bgsoftware.superiorskyblock.menu.MenuUniqueVisitors;
-import com.bgsoftware.superiorskyblock.menu.MenuUpgrades;
-import com.bgsoftware.superiorskyblock.menu.MenuValues;
-import com.bgsoftware.superiorskyblock.menu.MenuVisitors;
-import com.bgsoftware.superiorskyblock.menu.MenuWarpCategories;
-import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -71,7 +55,7 @@ import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
+import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -432,7 +416,7 @@ public final class SIsland implements Island {
         superiorPlayer.setIslandLeader(owner);
         superiorPlayer.setPlayerRole(playerRole);
 
-        MenuMembers.refreshMenus(this);
+        plugin.getMenus().refreshMembers(this);
 
         updateLastTime();
 
@@ -468,9 +452,9 @@ public final class SIsland implements Island {
             return missionData != null && missionData.isLeaveReset();
         }).forEach(superiorPlayer::resetMission);
 
-        MenuMemberManage.destroyMenus(superiorPlayer);
-        MenuMemberRole.destroyMenus(superiorPlayer);
-        MenuMembers.refreshMenus(this);
+        plugin.getMenus().destroyMemberManage(superiorPlayer);
+        plugin.getMenus().destroyMemberRole(superiorPlayer);
+        plugin.getMenus().refreshMembers(this);
 
         IslandsDatabaseBridge.removeMember(this, superiorPlayer);
     }
@@ -527,7 +511,7 @@ public final class SIsland implements Island {
         SuperiorSkyblockPlugin.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
         coop.add(superiorPlayer);
-        MenuCoops.refreshMenus(this);
+        plugin.getMenus().refreshCoops(this);
     }
 
     @Override
@@ -544,7 +528,7 @@ public final class SIsland implements Island {
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
         }
 
-        MenuCoops.refreshMenus(this);
+        plugin.getMenus().refreshCoops(this);
     }
 
     @Override
@@ -607,14 +591,14 @@ public final class SIsland implements Island {
                 uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, visitTime)));
             }
 
-            MenuUniqueVisitors.refreshMenus(this);
+            plugin.getMenus().refreshUniqueVisitors(this);
 
             IslandsDatabaseBridge.saveVisitor(this, superiorPlayer, visitTime);
         }
 
         updateLastTime();
 
-        MenuVisitors.refreshMenus(this);
+        plugin.getMenus().refreshVisitors(this);
     }
 
     @Override
@@ -1013,7 +997,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.clearRolePermissions(this);
 
-        MenuPermissions.refreshMenus(this);
+        plugin.getMenus().refreshPermissions(this);
     }
 
     @Override
@@ -1037,7 +1021,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.savePlayerPermission(this, superiorPlayer, islandPrivilege, value);
 
-        MenuPermissions.refreshMenus(this, superiorPlayer);
+        plugin.getMenus().refreshPermissions(this, superiorPlayer);
     }
 
     @Override
@@ -1054,7 +1038,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.clearPlayerPermission(this, superiorPlayer);
 
-        MenuPermissions.refreshMenus(this, superiorPlayer);
+        plugin.getMenus().refreshPermissions(this, superiorPlayer);
     }
 
     @Override
@@ -1212,8 +1196,8 @@ public final class SIsland implements Island {
 
             finishCalcIsland(asker, callback, newIslandLevel, newIslandWorth);
 
-            MenuValues.refreshMenus(this);
-            MenuCounts.refreshMenus(this);
+            plugin.getMenus().refreshValues(this);
+            plugin.getMenus().refreshCounts(this);
 
             saveBlockCounts(oldWorth, oldLevel);
 
@@ -1557,7 +1541,7 @@ public final class SIsland implements Island {
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
 
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
-        MenuIslandBank.refreshMenus(this);
+        plugin.getMenus().refreshIslandBank(this);
 
         setLastInterestTime(currentTime);
 
@@ -1759,8 +1743,8 @@ public final class SIsland implements Island {
                     blocksUpdateCounter = 0;
                     plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
                     plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-                    MenuValues.refreshMenus(this);
-                    MenuCounts.refreshMenus(this);
+                    plugin.getMenus().refreshValues(this);
+                    plugin.getMenus().refreshCounts(this);
                 }
             }
         }
@@ -1887,8 +1871,8 @@ public final class SIsland implements Island {
             blocksUpdateCounter = 0;
             plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
             plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
-            MenuValues.refreshMenus(this);
-            MenuCounts.refreshMenus(this);
+            plugin.getMenus().refreshValues(this);
+            plugin.getMenus().refreshCounts(this);
         }
 
         else{
@@ -1934,7 +1918,7 @@ public final class SIsland implements Island {
         if(upgradeLevel.getBorderSize() != -1)
             updateBorder();
 
-        MenuUpgrades.refreshMenus(this);
+        plugin.getMenus().refreshUpgrades(this);
     }
 
     @Override
@@ -2392,7 +2376,7 @@ public final class SIsland implements Island {
 
             IslandsDatabaseBridge.saveWarpCategory(this, warpCategory);
 
-            MenuWarpCategories.refreshMenus(this);
+            plugin.getMenus().refreshWarpCategories(this);
         }
 
         return warpCategory;
@@ -2431,10 +2415,10 @@ public final class SIsland implements Island {
             boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
             if (shouldSaveWarps) {
                 new ArrayList<>(warpCategory.getWarps()).forEach(islandWarp -> deleteWarp(islandWarp.getName()));
-                MenuWarps.destroyMenus(warpCategory);
+                plugin.getMenus().destroyWarps(warpCategory);
             }
 
-            MenuWarpCategories.destroyMenus(this);
+            plugin.getMenus().destroyWarpCategories(this);
         }
     }
 
@@ -2459,8 +2443,8 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
-        MenuGlobalWarps.refreshMenus();
-        MenuWarps.refreshMenus(warpCategory);
+        plugin.getMenus().refreshGlobalWarps();
+        plugin.getMenus().refreshWarps(warpCategory);
 
         return islandWarp;
     }
@@ -2561,10 +2545,10 @@ public final class SIsland implements Island {
                 deleteCategory(warpCategory);
         }
 
-        MenuGlobalWarps.refreshMenus();
+        plugin.getMenus().refreshGlobalWarps();
 
         if(warpCategory != null)
-            MenuWarps.refreshMenus(warpCategory);
+            plugin.getMenus().refreshWarps(warpCategory);
     }
 
     @Override
@@ -2597,7 +2581,7 @@ public final class SIsland implements Island {
             IslandsDatabaseBridge.saveRating(this, superiorPlayer, rating, System.currentTimeMillis());
         }
 
-        MenuIslandRatings.refreshMenus(this);
+        plugin.getMenus().refreshIslandRatings(this);
     }
 
     @Override
@@ -2627,7 +2611,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.clearRatings(this);
 
-        MenuIslandRatings.refreshMenus(this);
+        plugin.getMenus().refreshIslandRatings(this);
     }
 
     /*
@@ -2802,7 +2786,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 1);
 
-        MenuSettings.refreshMenus(this);
+        plugin.getMenus().refreshSettings(this);
     }
 
     @Override
@@ -2835,7 +2819,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 0);
 
-        MenuSettings.refreshMenus(this);
+        plugin.getMenus().refreshSettings(this);
     }
 
     /*

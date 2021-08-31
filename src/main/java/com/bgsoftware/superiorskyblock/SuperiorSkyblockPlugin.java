@@ -23,7 +23,7 @@ import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContaine
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
-import com.bgsoftware.superiorskyblock.handlers.MenusHandler;
+import com.bgsoftware.superiorskyblock.menu.MenusHandler;
 import com.bgsoftware.superiorskyblock.mission.MissionsHandler;
 import com.bgsoftware.superiorskyblock.module.ModulesHandler;
 import com.bgsoftware.superiorskyblock.player.PlayersHandler;

@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 
@@ -104,7 +104,7 @@ public final class CmdCreate implements ISuperiorCommand {
         }
 
         if(schematicName == null) {
-            MenuIslandCreation.openInventory(superiorPlayer, null, islandName);
+            plugin.getMenus().openIslandCreation(superiorPlayer, null, islandName);
         }
         else{
             MenuIslandCreation.simulateClick(superiorPlayer, islandName, schematicName, false);

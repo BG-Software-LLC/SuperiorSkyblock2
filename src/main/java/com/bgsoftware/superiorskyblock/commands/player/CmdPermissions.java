@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.menu.MenuPermissions;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 
@@ -86,7 +85,11 @@ public final class CmdPermissions implements IPermissibleCommand {
         }
 
         if(!setToDefault){
-            MenuPermissions.openInventory(superiorPlayer, null, island, permissionHolder);
+            if (permissionHolder instanceof PlayerRole) {
+                plugin.getMenus().openPermissions(superiorPlayer, null, island, (PlayerRole) permissionHolder);
+            } else {
+                plugin.getMenus().openPermissions(superiorPlayer, null, island, (SuperiorPlayer) permissionHolder);
+            }
         }
 
         else{

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
@@ -17,6 +18,7 @@ import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.support.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
@@ -69,6 +71,7 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -87,6 +90,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private VanishProvider vanishProvider = player -> false;
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
+    private MenusProvider menusProvider;
 
     private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
 
@@ -95,6 +99,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     public ProvidersHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
+        this.menusProvider = new MenusProvider_Default(plugin);
     }
 
     @Override
@@ -119,9 +124,19 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
+    public SpawnersProvider getSpawnersProvider() {
+        return this.spawnersProvider;
+    }
+
+    @Override
     public void setStackedBlocksProvider(StackedBlocksProvider stackedBlocksProvider) {
         Preconditions.checkNotNull(stackedBlocksProvider, "stackedBlocksProvider parameter cannot be null.");
         this.stackedBlocksProvider = stackedBlocksProvider;
+    }
+
+    @Override
+    public StackedBlocksProvider getStackedBlocksProvider() {
+        return this.stackedBlocksProvider;
     }
 
     @Override
@@ -131,9 +146,19 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
+    public EconomyProvider getEconomyProvider() {
+        return this.economyProvider;
+    }
+
+    @Override
     public void setWorldsProvider(WorldsProvider worldsProvider) {
         Preconditions.checkNotNull(worldsProvider, "worldsProvider parameter cannot be null.");
         this.worldsProvider = worldsProvider;
+    }
+
+    @Override
+    public WorldsProvider getWorldsProvider() {
+        return this.worldsProvider;
     }
 
     @Override
@@ -143,9 +168,30 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
+    public EconomyProvider getBankEconomyProvider() {
+        return this.bankEconomyProvider;
+    }
+
+    @Override
     public void addAFKProvider(AFKProvider afkProvider) {
         Preconditions.checkNotNull(afkProvider, "afkProvider parameter cannot be null.");
         AFKProvidersList.add(afkProvider);
+    }
+
+    @Override
+    public List<AFKProvider> getAFKProviders() {
+        return Collections.unmodifiableList(this.AFKProvidersList);
+    }
+
+    @Override
+    public void setMenusProvider(MenusProvider menusProvider) {
+        Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
+        this.menusProvider = menusProvider;
+    }
+
+    @Override
+    public MenusProvider getMenusProvider() {
+        return this.menusProvider;
     }
 
     public Pair<Integer, String> getSpawner(Location location) {

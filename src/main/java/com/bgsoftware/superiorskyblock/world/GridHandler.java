@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.container.IslandsContainer;
-import com.bgsoftware.superiorskyblock.menu.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -441,7 +440,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
 
         this.islandsContainer.sortIslands(sortingType, () -> {
-            MenuTopIslands.refreshMenus(sortingType);
+            plugin.getMenus().refreshTopIslands(sortingType);
             if (onFinish != null)
                 onFinish.run();
         });

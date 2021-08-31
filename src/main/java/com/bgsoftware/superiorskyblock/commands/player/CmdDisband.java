@@ -1,17 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -72,16 +71,14 @@ public final class CmdDisband implements IPermissibleCommand {
             return;
         }
 
-        if(plugin.getSettings().disbandConfirm) {
-            MenuConfirmDisband.openInventory(superiorPlayer, null);
-        }
-
-        else if(EventsCaller.callIslandDisbandEvent(superiorPlayer, island)){
+        if (plugin.getSettings().disbandConfirm) {
+            plugin.getMenus().openConfirmDisband(superiorPlayer, null, island);
+        } else if (EventsCaller.callIslandDisbandEvent(superiorPlayer, island)) {
             IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
             Locale.DISBANDED_ISLAND.send(superiorPlayer);
 
-            if(BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
+            if (BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
                 Locale.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
                         .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
