@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -68,7 +69,7 @@ public final class DefaultModulesContainer implements ModulesContainer {
 
     @Override
     public Collection<PluginModule> getModules() {
-        return Collections.unmodifiableCollection(modulesMap.values());
+        return Collections.unmodifiableCollection(new ArrayList<>(modulesMap.values()));
     }
 
     @Override
