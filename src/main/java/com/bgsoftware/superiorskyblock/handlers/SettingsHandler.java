@@ -2,18 +2,18 @@ package com.bgsoftware.superiorskyblock.handlers;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -403,7 +403,7 @@ public final class SettingsHandler extends AbstractHandler {
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
-                            CompoundTag itemCompound = plugin.getNMSTags().getNBTTag(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);

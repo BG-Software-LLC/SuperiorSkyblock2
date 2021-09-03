@@ -13,6 +13,8 @@ public interface NMSTags {
 
     CompoundTag getNBTTag(ItemStack itemStack);
 
+    CompoundTag convertToNBT(ItemStack itemStack);
+
     ItemStack getFromNBTTag(ItemStack itemStack, CompoundTag compoundTag);
 
     CompoundTag getNBTTag(Entity entity);

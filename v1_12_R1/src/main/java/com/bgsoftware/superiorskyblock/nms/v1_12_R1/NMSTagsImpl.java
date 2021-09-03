@@ -40,6 +40,11 @@ public final class NMSTagsImpl implements NMSTags {
     }
 
     @Override
+    public CompoundTag convertToNBT(org.bukkit.inventory.ItemStack bukkitItem) {
+        return CompoundTag.fromNBT(CraftItemStack.asNMSCopy(bukkitItem).save(new NBTTagCompound()));
+    }
+
+    @Override
     public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
         itemStack.setTag((NBTTagCompound) compoundTag.toNBT());

@@ -270,7 +270,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     if(item.getValue() instanceof CompoundTag) {
                         try {
                             ItemStack itemStack = TagUtils.compoundToItem((CompoundTag) item.getValue());
-                            CompoundTag itemCompound = plugin.getNMSTags().getNBTTag(itemStack);
+                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
                         } catch (Exception ignored) {
