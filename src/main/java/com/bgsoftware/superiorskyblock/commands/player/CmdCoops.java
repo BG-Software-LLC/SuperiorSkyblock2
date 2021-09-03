@@ -61,7 +61,7 @@ public final class CmdCoops implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        plugin.getMenus().openCounts(superiorPlayer, null, island);
+        plugin.getMenus().openCoops(superiorPlayer, null, island);
     }
 
     @Override
