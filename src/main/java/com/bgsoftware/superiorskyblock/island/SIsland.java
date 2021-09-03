@@ -411,6 +411,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Add Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Role: " + playerRole);
 
+        // Removing player from being a coop.
+        if(isCoop(superiorPlayer))
+            removeCoop(superiorPlayer);
+
         members.write(members -> members.add(superiorPlayer));
 
         superiorPlayer.setIslandLeader(owner);
