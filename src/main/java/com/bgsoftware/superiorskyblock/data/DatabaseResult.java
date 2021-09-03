@@ -34,7 +34,7 @@ public final class DatabaseResult {
     }
 
     public double getDouble(String key){
-        Object value = getObject(key, 0L);
+        Object value = getObject(key, 0D);
 
         if(value instanceof Double){
             return (double) value;
@@ -44,6 +44,9 @@ public final class DatabaseResult {
         }
         else if(value instanceof Integer) {
             return (double) (int) value;
+        }
+        else if(value instanceof BigDecimal) {
+            return ((BigDecimal) value).doubleValue();
         }
         else {
             return 0L;
