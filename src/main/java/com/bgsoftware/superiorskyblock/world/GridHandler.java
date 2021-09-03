@@ -171,7 +171,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
                 this.islandsContainer.addIsland(island);
                 setLastIsland(SBlockPosition.of(islandLocation));
-                IslandsDatabaseBridge.insertIsland(island);
 
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
@@ -179,6 +178,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                 island.setBiome(biome);
                 island.setTeleportLocation(schematic.adjustRotation(islandLocation));
+
+                IslandsDatabaseBridge.insertIsland(island);
 
                 superiorPlayer.runIfOnline(player -> {
                     Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
