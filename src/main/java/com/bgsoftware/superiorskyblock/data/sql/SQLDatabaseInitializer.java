@@ -277,14 +277,14 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
                 "island UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name VARCHAR(255), " +
                 "slot INTEGER, " +
                 "icon TEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warps (" +
                 "island UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name VARCHAR(255), " +
                 "category TEXT, " +
                 "location TEXT, " +
                 "private BOOLEAN, " +
