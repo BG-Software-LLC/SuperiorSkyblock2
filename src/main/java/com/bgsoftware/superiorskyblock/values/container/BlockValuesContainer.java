@@ -31,6 +31,10 @@ public abstract class BlockValuesContainer {
         return valuesMap.containsKey(key);
     }
 
+    public boolean containsKeyRaw(Key key) {
+        return valuesMap.getKey(key) == key;
+    }
+
     public Key getBlockValueKey(Key key) {
         return valuesMap.getKey(key);
     }

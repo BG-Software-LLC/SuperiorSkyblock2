@@ -120,24 +120,26 @@ public final class NMSChunksImpl implements NMSChunks {
                 if (chunkSection != null) {
                     for (BlockPosition bp : BlockPosition.b(new BlockPosition(0, 0, 0), new BlockPosition(15, 15, 15))) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        if (blockData.getBlock() != Blocks.AIR) {
+                        Block block = blockData.getBlock();
+                        if (block != Blocks.AIR) {
                             Location location = new Location(worldServer.getWorld(),
                                     (chunkPosition.getX() << 4) + bp.getX(),
                                     chunkSection.getYPosition() + bp.getY(),
                                     (chunkPosition.getZ() << 4) + bp.getZ());
                             int blockAmount = 1;
 
-                            if (blockData.getBlock() instanceof BlockDoubleStep) {
+                            if (block instanceof BlockDoubleStep) {
                                 blockAmount = 2;
                                 // Converts the block data to a regular slab
-                                MinecraftKey blockKey = Block.REGISTRY.c(blockData.getBlock());
+                                MinecraftKey blockKey = Block.REGISTRY.c(block);
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
                             }
 
-                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
+                            Material type = CraftMagicNumbers.getMaterial(block);
+                            byte data = (byte) block.toLegacyData(blockData);
+                            Key blockKey = Key.of(type, data, location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                             if (type == Material.MOB_SPAWNER) {
                                 spawnersLocations.add(location);

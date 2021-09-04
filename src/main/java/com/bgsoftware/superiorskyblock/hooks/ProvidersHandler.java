@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.support.ChangeSkinHook;
 import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
@@ -78,7 +79,6 @@ import java.util.function.Consumer;
 
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
-    private final BigDecimal INVALID_WORTH = BigDecimal.valueOf(-1);
     private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
@@ -86,7 +86,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private EconomyProvider economyProvider = new EconomyProvider_Default();
     private EconomyProvider bankEconomyProvider = new EconomyProvider_Default();
     private PermissionsProvider permissionsProvider = new PermissionsProvider_Default();
-    private PricesProvider pricesProvider = itemStack -> INVALID_WORTH;
+    private PricesProvider pricesProvider = new PricesProvider_Default();
     private VanishProvider vanishProvider = player -> false;
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
@@ -237,6 +237,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public BigDecimal getPrice(Key key) {
         return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey(), "0") : key);
+    }
+
+    public Key getPriceBlockKey(Key key) {
+        return pricesProvider.getBlockKey(key);
     }
 
     public boolean isVanished(Player player) {
