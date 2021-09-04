@@ -172,7 +172,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_chests (" +
                 "island UUID, " +
                 "`index` INTEGER, " +
-                "contents TEXT" +
+                "contents LONGTEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_effects (" +
