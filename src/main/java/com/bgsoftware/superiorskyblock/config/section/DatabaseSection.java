@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
@@ -38,6 +39,8 @@ public final class DatabaseSection implements SettingsManager.Database {
 
     @Override
     public String getPassword() {
+        SuperiorSkyblockPlugin.log("&cWarning: A plugin attempts to read the password of the database. Stack trace:");
+        new Exception().printStackTrace();
         return this.container.databaseMySQLPassword;
     }
 
