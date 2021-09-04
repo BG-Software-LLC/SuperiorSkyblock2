@@ -54,8 +54,17 @@ public final class DatabaseResult {
     }
 
     public boolean getBoolean(String key){
-        int value = getInt(key);
-        return value == 1;
+        Object value = getObject(key, false);
+
+        if(value instanceof Integer) {
+            return (int) value == 1;
+        }
+        else if(value instanceof Boolean) {
+            return (boolean) value;
+        }
+        else {
+            return false;
+        }
     }
 
     public BigDecimal getBigDecimal(String key){
