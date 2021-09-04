@@ -244,10 +244,12 @@ public class SUpgradeLevel implements UpgradeLevel {
         Map<Key, UpgradeValue<Integer>>[] generatorRates = new Map[this.generatorRates.length];
 
         for(int i = 0; i < generatorRates.length; ++i) {
-            generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    entry -> new UpgradeValue<>(entry.getValue(), true))
-            );
+            if(this.generatorRates[i] != null) {
+                generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new UpgradeValue<>(entry.getValue(), true))
+                );
+            }
         }
 
         return generatorRates;
