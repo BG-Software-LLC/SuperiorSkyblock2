@@ -3,12 +3,15 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,7 +33,8 @@ public final class CmdWarp implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         return "warp [" +
                 Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
+                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
     }
 
     @Override
@@ -45,7 +49,7 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -60,17 +64,76 @@ public final class CmdWarp implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        plugin.getMenus().openWarpCategories(superiorPlayer, null, island);
+
+        switch (args.length) {
+            case 3:
+                IslandWarp warp = island.getWarp(args[2]);
+                if (warp == null) {
+                    Locale.INVALID_WARP.send(superiorPlayer, args[2]);
+                    return;
+                }
+                warpPlayer(warp, superiorPlayer, island);
+                break;
+            case 2:
+                warp = island.getWarp(args[1]);
+                if (warp != null) {
+                    warpPlayer(warp, superiorPlayer, island);
+                    return;
+                }
+                plugin.getMenus().openWarpCategories(superiorPlayer, null, island);
+                break;
+            default:
+                plugin.getMenus().openWarpCategories(superiorPlayer, null, island);
+                break;
+        }
+
+    }
+
+    private void warpPlayer(IslandWarp warp, SuperiorPlayer superiorPlayer, Island island) {
+        if (!warp.getIsland().isMember(superiorPlayer) && warp.hasPrivateFlag()) {
+            Locale.INVALID_WARP.send(superiorPlayer, warp.getName());
+        } else {
+            MenuWarps.simulateClick(superiorPlayer, island, warp.getName());
+        }
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().tabCompleteHideVanished) : new ArrayList<>();
+        List<String> tabCompletes = args.length < 2 ? new ArrayList<>() :
+                CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+                        plugin.getSettings().tabCompleteHideVanished, (onlinePlayer, onlineIsland) ->
+                                onlineIsland.getIslandWarps().values().stream()
+                                        .anyMatch(islandWarp -> !islandWarp.hasPrivateFlag()));
+
+        switch (args.length) {
+            case 2: {
+                SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
+                Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
+                if (island != null) {
+                    tabCompletes.addAll(CommandTabCompletes.getIslandWarps(island, args[1]));
+                }
+                break;
+            }
+            case 3: {
+                if (!tabCompletes.isEmpty()) {
+                    SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
+                    Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
+                    if(island != null) {
+                        tabCompletes = CommandTabCompletes.getIslandWarps(island, args[2]);
+                    }
+                }
+                break;
+            }
+            default:
+                tabCompletes.clear();
+                break;
+        }
+
+        return tabCompletes;
     }
 
 }
