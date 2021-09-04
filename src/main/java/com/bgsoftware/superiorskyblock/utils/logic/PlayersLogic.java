@@ -65,7 +65,7 @@ public final class PlayersLogic {
         boolean toInsideRange = toLocation != null && toIsland != null && toIsland.isInsideRange(toLocation);
 
         //Checking for the stop leaving feature.
-        if (plugin.getSettings().stopLeaving && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
+        if (plugin.getSettings().isStopLeaving() && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
                 !fromIsland.isSpawn() && equalWorlds) {
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
             superiorPlayer.setLeavingFlag(true);
@@ -184,7 +184,7 @@ public final class PlayersLogic {
 
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
             Locale.ENTER_PVP_ISLAND.send(superiorPlayer);
-            if (plugin.getSettings().immuneToPVPWhenTeleport) {
+            if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
                 superiorPlayer.setImmunedToPvP(true);
                 Executor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);
             }
@@ -193,7 +193,7 @@ public final class PlayersLogic {
         superiorPlayer.setImmunedToPortals(true);
         Executor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
 
-        if (plugin.getSettings().spawnProtection || !toIsland.isSpawn()) {
+        if (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn()) {
             if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
                 player.setPlayerTime(0, false);
             } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {

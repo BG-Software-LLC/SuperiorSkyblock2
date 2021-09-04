@@ -62,7 +62,7 @@ public final class StackedBlock {
             if (hologram == null)
                 hologram = plugin.getNMSHolograms().createHologram(getLocation().add(0.5, 1, 0.5));
 
-            hologram.setHologramName(plugin.getSettings().stackedBlocksName
+            hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                     .replace("{0}", String.valueOf(amount))
                     .replace("{1}", StringUtils.format(blockKey.getGlobalKey()))
                     .replace("{2}", StringUtils.format(amount))

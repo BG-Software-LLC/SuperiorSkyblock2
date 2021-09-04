@@ -112,7 +112,7 @@ public final class NMSUtils {
     public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
-        if (blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+        if (blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }

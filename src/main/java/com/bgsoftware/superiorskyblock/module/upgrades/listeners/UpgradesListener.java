@@ -112,7 +112,7 @@ public final class UpgradesListener implements Listener {
         if(e.getEntity() instanceof Player)
             return;
 
-        if(plugin.getSettings().dropsUpgradePlayersMultiply){
+        if(plugin.getSettings().isDropsUpgradePlayersMultiply()){
             EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
             if(!(lastDamage instanceof EntityDamageByEntityEvent) ||
                     EntityUtils.getPlayerDamager((EntityDamageByEntityEvent) lastDamage) == null)

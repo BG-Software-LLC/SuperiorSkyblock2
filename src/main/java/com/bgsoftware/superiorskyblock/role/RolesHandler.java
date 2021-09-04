@@ -26,7 +26,7 @@ public final class RolesHandler extends AbstractHandler implements RolesManager 
 
     @Override
     public void loadData() {
-        ConfigurationSection rolesSection = plugin.getSettings().islandRolesSection;
+        ConfigurationSection rolesSection = plugin.getSettings().getIslandRoles().getSection();
         loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX, null);
         loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX, (SPlayerRole) getGuestRole());
         SPlayerRole previousRole = (SPlayerRole) getCoopRole();

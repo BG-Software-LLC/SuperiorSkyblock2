@@ -29,10 +29,10 @@ public final class StackedBlocksLogic {
     }
 
     public static boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
-        if(!plugin.getSettings().stackedBlocksEnabled)
+        if(!plugin.getSettings().getStackedBlocks().isEnabled())
             return false;
 
-        if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(againstBlock.getWorld().getName()))
+        if(plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(againstBlock.getWorld().getName()))
             return false;
 
         if(placeItem.hasItemMeta() && (placeItem.getItemMeta().hasDisplayName() || placeItem.getItemMeta().hasLore()))
@@ -57,7 +57,7 @@ public final class StackedBlocksLogic {
                 (replaceState != null && replaceState.getType() != Material.AIR))
             return false;
 
-        if(!plugin.getSettings().whitelistedStackedBlocks.contains(againstBlock))
+        if(!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(againstBlock)))
             return false;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
@@ -87,7 +87,7 @@ public final class StackedBlocksLogic {
         if(blockKey == null)
             blockKey = Key.of(stackedBlock.getBlock());
 
-        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(blockKey, Integer.MAX_VALUE);
+        int blockLimit = plugin.getSettings().getStackedBlocks().getLimits().getOrDefault(blockKey, Integer.MAX_VALUE);
 
         if(amount + blockAmount > blockLimit){
             amount = blockLimit - blockAmount;
@@ -196,7 +196,7 @@ public final class StackedBlocksLogic {
         }
 
         // Dropping the item
-        if(player != null && plugin.getSettings().stackedBlocksAutoPickup){
+        if(player != null && plugin.getSettings().getStackedBlocks().isAutoCollect()){
             ItemUtils.addItem(blockItem, player.getInventory(), block.getLocation());
         }
         else {

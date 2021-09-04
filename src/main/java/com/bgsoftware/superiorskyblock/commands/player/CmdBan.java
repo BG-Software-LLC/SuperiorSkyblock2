@@ -72,7 +72,7 @@ public final class CmdBan implements IPermissibleCommand {
         if(!IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer))
             return;
 
-        if(plugin.getSettings().banConfirm){
+        if(plugin.getSettings().isBanConfirm()){
             plugin.getMenus().openConfirmBan(superiorPlayer, null, island, targetPlayer);
         }
         else {

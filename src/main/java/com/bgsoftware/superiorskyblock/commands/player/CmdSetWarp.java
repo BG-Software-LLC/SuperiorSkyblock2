@@ -33,7 +33,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
         StringBuilder usage = new StringBuilder("setwarp <")
                 .append(Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale)).append(">");
 
-        if(plugin.getSettings().warpCategories)
+        if(plugin.getSettings().isWarpCategories())
             usage.append(" [").append(Locale.COMMAND_ARGUMENT_WARP_CATEGORY.getMessage(locale)).append("]");
 
         return usage.toString();
@@ -51,7 +51,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public int getMaxArgs() {
-        return plugin.getSettings().warpCategories ? 3 : 2;
+        return plugin.getSettings().isWarpCategories() ? 3 : 2;
     }
 
     @Override

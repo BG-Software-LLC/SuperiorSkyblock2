@@ -82,12 +82,12 @@ public final class BlockData {
                 );
         }
 
-        if(plugin.getSettings().defaultContainersEnabled) {
+        if(plugin.getSettings().getDefaultContainers().isEnabled()) {
             String inventoryType = clonedTileEntity.getString("inventoryType");
             if (inventoryType != null) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(inventoryType);
-                    ListTag items = plugin.getSettings().defaultContainersContents.get(containerType);
+                    ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
                     if(items != null)
                         clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
                 }catch (Exception ignored){}
@@ -102,8 +102,8 @@ public final class BlockData {
     }
 
     private static String getSignLine(int index, String def){
-        return index >= plugin.getSettings().defaultSignLines.size() ? def :
-                plugin.getSettings().defaultSignLines.get(index);
+        return index >= plugin.getSettings().getDefaultSign().size() ? def :
+                plugin.getSettings().getDefaultSign().get(index);
     }
 
 }

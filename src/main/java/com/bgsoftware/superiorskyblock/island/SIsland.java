@@ -166,7 +166,7 @@ public final class SIsland implements Island {
     private final String schemName;
     private final AtomicInteger unlockedWorlds = new AtomicInteger(0);
     private volatile long lastTimeUpdate = -1;
-    private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().islandChestsDefaultPage]);
+    private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
     private volatile long lastInterest = -1L;
     private volatile long lastUpgradeTime = -1L;
 
@@ -274,7 +274,7 @@ public final class SIsland implements Island {
         this.islandRawName = StringUtils.stripColors(islandName);
         this.schemName = schemName;
 
-        setSchematicGenerate(plugin.getSettings().defaultWorldEnvironment);
+        setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
         setLastInterestTime(currentTime);
         updateDatesFormatter();
         assignIslandChest();
@@ -443,7 +443,7 @@ public final class SIsland implements Island {
 
         if (superiorPlayer.isOnline()) {
             SuperiorMenu.killMenu(superiorPlayer);
-            if(plugin.getSettings().teleportOnKick && getAllPlayersInside().contains(superiorPlayer)) {
+            if(plugin.getSettings().isTeleportOnKick() && getAllPlayersInside().contains(superiorPlayer)) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
             else{
@@ -634,7 +634,7 @@ public final class SIsland implements Island {
         if(visitorsLocation == null)
             return null;
 
-        World world = plugin.getGrid().getIslandsWorld(this, plugin.getSettings().defaultWorldEnvironment);
+        World world = plugin.getGrid().getIslandsWorld(this, plugin.getSettings().getWorlds().getDefaultWorld());
         visitorsLocation.setWorld(world);
 
         return visitorsLocation;
@@ -705,26 +705,28 @@ public final class SIsland implements Island {
 
     @Override
     public Location getMinimum(){
-        int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandDistance, 0, islandDistance);
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMinimumProtected() {
         int islandSize = getIslandSize();
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandSize, 0, islandSize);
     }
 
     @Override
     public Location getMaximum(){
-        int islandDistance = (int) Math.round(plugin.getSettings().maxIslandSize * (plugin.getSettings().buildOutsideIsland ? 1.5 : 1D));
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandDistance, 0, islandDistance);
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandDistance, 0, islandDistance);
     }
 
     @Override
     public Location getMaximumProtected() {
         int islandSize = getIslandSize();
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandSize, 0, islandSize);
     }
 
     @Override
@@ -1086,7 +1088,7 @@ public final class SIsland implements Island {
 
     @Override
     public String getName() {
-        return plugin.getSettings().islandNamesColorSupport ? islandName : islandRawName;
+        return plugin.getSettings().getIslandNames().isColorSupport() ? islandName : islandRawName;
     }
 
     @Override
@@ -1126,7 +1128,7 @@ public final class SIsland implements Island {
             if (isMember(superiorPlayer))
                 kickMember(superiorPlayer);
 
-            if (plugin.getSettings().disbandInventoryClear)
+            if (plugin.getSettings().isDisbandInventoryClear())
                 plugin.getNMSPlayers().clearInventory(superiorPlayer.asOfflinePlayer());
 
             plugin.getMissions().getAllMissions().stream().filter(mission -> {
@@ -1223,8 +1225,8 @@ public final class SIsland implements Island {
 
     @Override
     public int getIslandSize() {
-        if(plugin.getSettings().buildOutsideIsland)
-            return (int) Math.round(plugin.getSettings().maxIslandSize * 1.5);
+        if(plugin.getSettings().isBuildOutsideIsland())
+            return (int) Math.round(plugin.getSettings().getMaxIslandSize() * 1.5);
 
         return this.islandSize.get();
     }
@@ -1300,7 +1302,7 @@ public final class SIsland implements Island {
             List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
 
             {
-                World normalWorld = getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
+                World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
                 List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, false, false);
                 plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
             }
@@ -1787,7 +1789,7 @@ public final class SIsland implements Island {
 
         finalIslandWorth = finalIslandWorth.add(bonusWorth);
 
-        if(!plugin.getSettings().negativeWorth && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
+        if(!plugin.getSettings().isNegativeWorth() && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
             finalIslandWorth = BigDecimal.ZERO;
 
         return finalIslandWorth;
@@ -1838,11 +1840,11 @@ public final class SIsland implements Island {
     public BigDecimal getIslandLevel() {
         BigDecimal bonusLevel = this.bonusLevel.get(), islandLevel = this.islandLevel.get().add(bonusLevel);
 
-        if(plugin.getSettings().roundedIslandLevel) {
+        if(plugin.getSettings().isRoundedIslandLevels()) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
 
-        if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
+        if(!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
             islandLevel = BigDecimal.ZERO;
 
         return islandLevel;
@@ -1852,11 +1854,11 @@ public final class SIsland implements Island {
     public BigDecimal getRawLevel() {
         BigDecimal islandLevel = this.islandLevel.get();
 
-        if(plugin.getSettings().roundedIslandLevel) {
+        if(plugin.getSettings().isRoundedIslandLevels()) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
         }
 
-        if(!plugin.getSettings().negativeLevel && islandLevel.compareTo(BigDecimal.ZERO) < 0)
+        if(!plugin.getSettings().isNegativeLevel() && islandLevel.compareTo(BigDecimal.ZERO) < 0)
             islandLevel = BigDecimal.ZERO;
 
         return islandLevel;
@@ -1969,7 +1971,7 @@ public final class SIsland implements Island {
     @Override
     public boolean hasActiveUpgradeCooldown() {
         long lastTimeUpgrade = getLastTimeUpgrade(), currentTime = System.currentTimeMillis(),
-                upgradeCooldown = plugin.getSettings().upgradeCooldown;
+                upgradeCooldown = plugin.getSettings().getUpgradeCooldown();
         return upgradeCooldown > 0 && lastTimeUpgrade > 0 && currentTime - lastTimeUpgrade <= upgradeCooldown;
     }
 
@@ -2481,11 +2483,12 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(warp, "warp parameter cannot be null.");
 
-        if(plugin.getSettings().warpsWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
+        if(plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
+                !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    plugin.getSettings().warpsWarmup, TimeUnit.MILLISECONDS));
+                    plugin.getSettings().getWarpsWarmup(), TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().warpsWarmup / 50));
+                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().getWarpsWarmup() / 50));
         }
         else {
             warpPlayerWithoutWarmup(superiorPlayer, warp);
@@ -2693,7 +2696,7 @@ public final class SIsland implements Island {
     @Override
     public boolean hasSettingsEnabled(IslandFlag settings) {
         Preconditions.checkNotNull(settings, "settings parameter cannot be null.");
-        return islandSettings.getOrDefault(settings, (byte) (plugin.getSettings().defaultSettings.contains(settings.getName()) ? 1 : 0)) == 1;
+        return islandSettings.getOrDefault(settings, (byte) (plugin.getSettings().getDefaultSettings().contains(settings.getName()) ? 1 : 0)) == 1;
     }
 
     @Override
@@ -2761,7 +2764,7 @@ public final class SIsland implements Island {
                 disableWeather = true;
                 break;
             case "PVP":
-                if(plugin.getSettings().teleportOnPVPEnable)
+                if(plugin.getSettings().isTeleportOnPvPEnable())
                     getIslandVisitors().forEach(superiorPlayer -> {
                         superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                         Locale.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
@@ -3026,7 +3029,7 @@ public final class SIsland implements Island {
             islandChests = Arrays.copyOf(islandChests, index + 1);
             islandChest.set(islandChests);
             for(int i = oldSize; i <= index; i++) {
-                (islandChests[i] = new SIslandChest(this, i)).setRows(plugin.getSettings().islandChestsDefaultSize);
+                (islandChests[i] = new SIslandChest(this, i)).setRows(plugin.getSettings().getIslandChests().getDefaultSize());
             }
         }
 
@@ -3070,7 +3073,7 @@ public final class SIsland implements Island {
         if(other == null)
             return -1;
 
-        if(plugin.getSettings().islandTopOrder.equals("WORTH")){
+        if(plugin.getSettings().getIslandTopOrder().equals("WORTH")){
             int compare = getWorth().compareTo(other.getWorth());
             if(compare != 0) return compare;
         }
@@ -3090,7 +3093,7 @@ public final class SIsland implements Island {
         islandChest.write(islandChests -> {
             for(int i = 0; i < islandChests.length; i++) {
                 islandChests[i] = new SIslandChest(this, i);
-                islandChests[i].setRows(plugin.getSettings().islandChestsDefaultSize);
+                islandChests[i].setRows(plugin.getSettings().getIslandChests().getDefaultSize());
             }
         });
     }
@@ -3134,49 +3137,49 @@ public final class SIsland implements Island {
 
     private void updateOldUpgradeValues(){
         for(com.bgsoftware.superiorskyblock.api.key.Key key : blockLimits.keySet()){
-            UpgradeValue<Integer> defaultValue = plugin.getSettings().defaultBlockLimits.get(key);
-            if(defaultValue != null && (int) blockLimits.get(key).get() == defaultValue.get())
-                blockLimits.put(key, defaultValue);
+            Integer defaultValue = plugin.getSettings().getDefaultValues().getBlockLimits().get(key);
+            if(defaultValue != null && (int) blockLimits.get(key).get() == defaultValue)
+                blockLimits.put(key, new UpgradeValue<>(defaultValue, true));
         }
 
         for(com.bgsoftware.superiorskyblock.api.key.Key key : entityLimits.keySet()){
-            UpgradeValue<Integer> defaultValue = plugin.getSettings().defaultEntityLimits.get(key);
-            if(defaultValue != null && (int) entityLimits.get(key).get() == defaultValue.get())
-                entityLimits.put(key, defaultValue);
+            Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(key);
+            if(defaultValue != null && (int) entityLimits.get(key).get() == defaultValue)
+                entityLimits.put(key, new UpgradeValue<>(defaultValue, true));
         }
 
         for(int i = 0; i < cobbleGeneratorValues.length; i++){
-            KeyMap<UpgradeValue<Integer>> defaultGenerator = plugin.getSettings().defaultGenerator[i];
+            Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGenerators()[i];
             if(defaultGenerator != null){
                 if(cobbleGeneratorValues[i] == null)
                     cobbleGeneratorValues[i] = new KeyMap<>();
                 for(com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues[i].keySet()){
-                    UpgradeValue<Integer> defaultValue = defaultGenerator.get(key);
-                    if(defaultValue != null && (int) cobbleGeneratorValues[i].get(key).get() == defaultValue.get())
-                        cobbleGeneratorValues[i].put(key, defaultValue);
+                    Integer defaultValue = defaultGenerator.get(key);
+                    if(defaultValue != null && (int) cobbleGeneratorValues[i].get(key).get() == defaultValue)
+                        cobbleGeneratorValues[i].put(key, new UpgradeValue<>(defaultValue, true));
                 }
             }
         }
 
-        if(getIslandSize() == plugin.getSettings().defaultIslandSize)
+        if(getIslandSize() == plugin.getSettings().getDefaultValues().getIslandSize())
             islandSize = DefaultUpgradeLevel.getInstance().getBorderSizeUpgradeValue();
 
-        if(getWarpsLimit() == plugin.getSettings().defaultWarpsLimit)
+        if(getWarpsLimit() == plugin.getSettings().getDefaultValues().getWarpsLimit())
             warpsLimit = DefaultUpgradeLevel.getInstance().getWarpsLimitUpgradeValue();
 
-        if(getTeamLimit() == plugin.getSettings().defaultTeamLimit)
+        if(getTeamLimit() == plugin.getSettings().getDefaultValues().getTeamLimit())
             teamLimit = DefaultUpgradeLevel.getInstance().getTeamLimitUpgradeValue();
 
-        if(getCoopLimit() == plugin.getSettings().defaultCoopLimit)
+        if(getCoopLimit() == plugin.getSettings().getDefaultValues().getCoopLimit())
             coopLimit = DefaultUpgradeLevel.getInstance().getCoopLimitUpgradeValue();
 
-        if(getCropGrowthMultiplier() == plugin.getSettings().defaultCropGrowth)
+        if(getCropGrowthMultiplier() == plugin.getSettings().getDefaultValues().getCropGrowth())
             cropGrowth = DefaultUpgradeLevel.getInstance().getCropGrowthUpgradeValue();
 
-        if(getSpawnerRatesMultiplier() == plugin.getSettings().defaultSpawnerRates)
+        if(getSpawnerRatesMultiplier() == plugin.getSettings().getDefaultValues().getSpawnerRates())
             spawnerRates = DefaultUpgradeLevel.getInstance().getSpawnerRatesUpgradeValue();
 
-        if(getMobDropsMultiplier() == plugin.getSettings().defaultMobDrops)
+        if(getMobDropsMultiplier() == plugin.getSettings().getDefaultValues().getMobDrops())
             mobDrops = DefaultUpgradeLevel.getInstance().getMobDropsUpgradeValue();
     }
 
@@ -3285,7 +3288,7 @@ public final class SIsland implements Island {
         }
 
         for(int i = 0; i < cobbleGeneratorValues.length; i++) {
-            KeyMap<UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+            Map<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
             if(levelGenerator != null) {
                 KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
 

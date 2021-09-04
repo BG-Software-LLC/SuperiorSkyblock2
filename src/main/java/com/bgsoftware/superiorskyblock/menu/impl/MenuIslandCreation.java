@@ -77,7 +77,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
     private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean rightClick, boolean fromInventory){
         // Checking for preview of islands.
         if(rightClick){
-            Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schematic);
+            Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic);
             if(previewLocation != null){
                 plugin.getGrid().startIslandPreview(menu.superiorPlayer, schematic, menu.islandName);
                 return;
@@ -113,9 +113,10 @@ public final class MenuIslandCreation extends SuperiorMenu {
 
             Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
 
-            World.Environment environment = plugin.getSettings().defaultWorldEnvironment;
-            offset |= environment == World.Environment.NORMAL ? plugin.getSettings().normalSchematicOffset :
-                    environment == World.Environment.NETHER ? plugin.getSettings().netherSchematicOffset : plugin.getSettings().endSchematicOffset;
+            World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
+            offset |= environment == World.Environment.NORMAL ? plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :
+                    environment == World.Environment.NETHER ? plugin.getSettings().getWorlds().getNether().isSchematicOffset() :
+                            plugin.getSettings().getWorlds().getEnd().isSchematicOffset();
 
             plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, bonusLevel, biome, menu.islandName, offset);
         }
@@ -228,7 +229,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
 
         menuIslandCreation.setBackButton(backButton);
 
-        if(plugin.getSettings().onlyBackButton && backButton == -1)
+        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         menuIslandCreation.markCompleted();
@@ -236,7 +237,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, String islandName){
         MenuIslandCreation menuIslandCreation = new MenuIslandCreation(superiorPlayer, islandName);
-        if(plugin.getSettings().skipOneItemMenus && menuIslandCreation.hasOnlyOneItem()){
+        if(plugin.getSettings().isSkipOneItemMenus() && menuIslandCreation.hasOnlyOneItem()){
             clickSchematic(menuIslandCreation.getOnlyOneItem(), menuIslandCreation, false, false);
         }
         else {

@@ -195,10 +195,10 @@ public final class NMSChunksImpl implements NMSChunks {
         // Update lights for the blocks.
         for (BlockData blockData : blockDataList) {
             BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-            if (plugin.getSettings().lightsUpdate && blockData.getBlockLightLevel() > 0)
+            if (plugin.getSettings().isLightsUpdate() && blockData.getBlockLightLevel() > 0)
                 world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
 
-            byte skyLight = plugin.getSettings().lightsUpdate ? blockData.getSkyLightLevel() : 15;
+            byte skyLight = plugin.getSettings().isLightsUpdate() ? blockData.getSkyLightLevel() : 15;
 
             if (skyLight > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
                 world.a(EnumSkyBlock.SKY, blockPosition, skyLight);

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 
 import java.math.BigDecimal;
@@ -16,19 +17,19 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
 
     private DefaultUpgradeLevel(){
         super(-1, EmptyUpgradeCost.getInstance(), new ArrayList<>(), "", new HashSet<>(),
-                newSyncedDoubleValue(v -> (double) plugin.getSettings().defaultCropGrowth),
-                newSyncedDoubleValue(v -> plugin.getSettings().defaultSpawnerRates),
-                newSyncedDoubleValue(v -> plugin.getSettings().defaultMobDrops),
-                newSyncedIntegerValue(v -> plugin.getSettings().defaultTeamLimit),
-                newSyncedIntegerValue(v -> plugin.getSettings().defaultWarpsLimit),
-                newSyncedIntegerValue(v -> plugin.getSettings().defaultCoopLimit),
-                newSyncedIntegerValue(v -> plugin.getSettings().defaultIslandSize),
-                plugin.getSettings().defaultBlockLimits,
-                plugin.getSettings().defaultEntityLimits,
-                plugin.getSettings().defaultGenerator,
+                newSyncedDoubleValue(v -> plugin.getSettings().getDefaultValues().getCropGrowth()),
+                newSyncedDoubleValue(v -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
+                newSyncedDoubleValue(v -> plugin.getSettings().getDefaultValues().getMobDrops()),
+                newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getTeamLimit()),
+                newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
+                newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getCoopLimit()),
+                newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getIslandSize()),
+                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
+                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
+                (KeyMap<Integer>[]) plugin.getSettings().getDefaultValues().getGenerators(),
                 new HashMap<>(),
-                newSyncedBigDecimalValue(v -> plugin.getSettings().defaultBankLimit),
-                plugin.getSettings().defaultRoleLimits
+                newSyncedBigDecimalValue(v -> plugin.getSettings().getDefaultValues().getBankLimit()),
+                plugin.getSettings().getDefaultValues().getRoleLimits()
         );
     }
 

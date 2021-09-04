@@ -89,7 +89,7 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         try {
-            if (!plugin.getSettings().worldBordersEnabled)
+            if (!plugin.getSettings().isWorldBorders())
                 return;
 
             Player player = superiorPlayer.asPlayer();
@@ -102,7 +102,8 @@ public final class NMSWorldImpl implements NMSWorld {
 
             WorldBorder worldBorder;
 
-            if (!superiorPlayer.hasWorldBorderEnabled() || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())) {
+            if (!superiorPlayer.hasWorldBorderEnabled() || island == null ||
+                    (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
                 worldBorder = worldServer.getWorldBorder();
             } else {
                 worldBorder = new WorldBorder();

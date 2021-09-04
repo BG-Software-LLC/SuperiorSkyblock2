@@ -20,8 +20,8 @@ public final class GridDatabaseBridge {
     public static void insertGrid(GridManager gridManager) {
         gridManager.getDatabaseBridge().insertObject("grid",
                 new Pair<>("last_island", SBlockPosition.of(gridManager.getLastIslandLocation()).toString()),
-                new Pair<>("max_island_size", plugin.getSettings().maxIslandSize),
-                new Pair<>("world", plugin.getSettings().islandWorldName)
+                new Pair<>("max_island_size", plugin.getSettings().getMaxIslandSize()),
+                new Pair<>("world", plugin.getSettings().getWorlds().getWorldName())
         );
     }
 

@@ -28,7 +28,7 @@ public final class SQLSession {
     public SQLSession(SuperiorSkyblockPlugin plugin, boolean logging){
         this.plugin = plugin;
         this.logging = logging;
-        this.usesMySQL = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL");
+        this.usesMySQL = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL");
     }
 
     private void log(String message){
@@ -38,7 +38,7 @@ public final class SQLSession {
 
     public boolean createConnection(){
         try {
-            log("Trying to connect to " + plugin.getSettings().databaseType + " database...");
+            log("Trying to connect to " + plugin.getSettings().getDatabase().getType() + " database...");
 
             HikariConfig config = new HikariConfig();
             config.setConnectionTestQuery("SELECT 1");
@@ -47,14 +47,14 @@ public final class SQLSession {
             if (usesMySQL) {
                 config.setDriverClassName("com.mysql.jdbc.Driver");
 
-                String address = plugin.getSettings().databaseMySQLAddress;
-                String dbName = plugin.getSettings().databaseMySQLDBName;
-                String userName = plugin.getSettings().databaseMySQLUsername;
-                String password = plugin.getSettings().databaseMySQLPassword;
-                int port = plugin.getSettings().databaseMySQLPort;
+                String address = plugin.getSettings().getDatabase().getAddress();
+                String dbName = plugin.getSettings().getDatabase().getDBName();
+                String userName = plugin.getSettings().getDatabase().getUsername();
+                String password = plugin.getSettings().getDatabase().getPassword();
+                int port = plugin.getSettings().getDatabase().getPort();
 
-                boolean useSSL = plugin.getSettings().databaseMySQLSSL;
-                boolean publicKeyRetrieval = plugin.getSettings().databaseMySQLPublicKeyRetrieval;
+                boolean useSSL = plugin.getSettings().getDatabase().hasSSL();
+                boolean publicKeyRetrieval = plugin.getSettings().getDatabase().hasPublicKeyRetrieval();
 
                 config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + dbName + "?useSSL=" + useSSL);
                 config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=%b&allowPublicKeyRetrieval=%b",
@@ -114,7 +114,7 @@ public final class SQLSession {
     }
 
     public void executeUpdate(String statement, Consumer<SQLException> onFailure){
-        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
+        String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         try{
@@ -151,7 +151,7 @@ public final class SQLSession {
     }
 
     public void executeQuery(String statement, QueryConsumer<ResultSet> callback, Consumer<SQLException> onFailure){
-        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
+        String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
@@ -174,7 +174,7 @@ public final class SQLSession {
     }
 
     public void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
-        String prefix = usesMySQL ? plugin.getSettings().databaseMySQLPrefix : "";
+        String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         try{

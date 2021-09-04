@@ -93,11 +93,11 @@ public final class BlocksLogic {
     }
 
     public static boolean isWarpSign(String firstSignLine){
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().signWarpLine);
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getSignWarpLine());
     }
 
     public static boolean isVisitorsSign(String firstSignLine){
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().visitorsSignLine);
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getLine());
     }
 
     public static boolean handleSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
@@ -156,7 +156,7 @@ public final class BlocksLogic {
             }
         }
         else {
-            List<String> signWarp = plugin.getSettings().signWarp;
+            List<String> signWarp = plugin.getSettings().getSignWarp();
 
             for (int i = 0; i < signWarp.size(); i++)
                 signLines[i] = signWarp.get(i).replace("{0}", warpName);
@@ -190,7 +190,7 @@ public final class BlocksLogic {
 
         String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
 
-        warpLines[0] = plugin.getSettings().visitorsSignActive;
+        warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 
         for (int i = 1; i <= 3; i++)
             warpLines[i] = StringUtils.translateColors(warpLines[i]);
@@ -198,7 +198,7 @@ public final class BlocksLogic {
         Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
         if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
             Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
-            oldWelcomeSign.setLine(0, plugin.getSettings().visitorsSignInactive);
+            oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
             oldWelcomeSign.update();
         }
 
@@ -222,7 +222,7 @@ public final class BlocksLogic {
             island.deleteWarp(superiorPlayer, sign.getLocation());
         }
         else{
-            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
+            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())){
                 island.setVisitorsLocation(null);
             }
         }

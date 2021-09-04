@@ -27,7 +27,7 @@ public final class SQLDatabaseInitializer {
     public void init(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
 
-        this.database = DatabaseType.fromName(plugin.getSettings().databaseType);
+        this.database = DatabaseType.fromName(plugin.getSettings().getDatabase().getType());
 
         if (database == DatabaseType.SQLite)
             createSQLiteFile();

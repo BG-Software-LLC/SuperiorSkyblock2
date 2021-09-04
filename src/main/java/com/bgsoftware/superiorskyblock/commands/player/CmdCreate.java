@@ -33,10 +33,10 @@ public final class CmdCreate implements ISuperiorCommand {
     public String getUsage(java.util.Locale locale) {
         StringBuilder usage = new StringBuilder("create");
 
-        if(plugin.getSettings().islandNamesRequiredForCreation)
+        if(plugin.getSettings().getIslandNames().isRequiredForCreation())
             usage.append(" <").append(Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale)).append(">");
 
-        if(plugin.getSettings().schematicNameArgument)
+        if(plugin.getSettings().isSchematicNameArgument())
             usage.append(" [").append(Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale)).append("]");
 
         return usage.toString();
@@ -49,17 +49,17 @@ public final class CmdCreate implements ISuperiorCommand {
 
     @Override
     public int getMinArgs() {
-        return plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1;
+        return plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1;
     }
 
     @Override
     public int getMaxArgs() {
         int args = 3;
 
-        if(!plugin.getSettings().islandNamesRequiredForCreation)
+        if(!plugin.getSettings().getIslandNames().isRequiredForCreation())
             args--;
 
-        if(!plugin.getSettings().schematicNameArgument)
+        if(!plugin.getSettings().isSchematicNameArgument())
             args--;
 
         return args;
@@ -86,7 +86,7 @@ public final class CmdCreate implements ISuperiorCommand {
 
         String islandName = "", schematicName = null;
 
-        if(plugin.getSettings().islandNamesRequiredForCreation) {
+        if(plugin.getSettings().getIslandNames().isRequiredForCreation()) {
             if (args.length >= 2) {
                 islandName = args[1];
                 if(!StringUtils.isValidName(sender, null, islandName))
@@ -94,8 +94,9 @@ public final class CmdCreate implements ISuperiorCommand {
             }
         }
 
-        if(plugin.getSettings().schematicNameArgument && args.length == (plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2)){
-            schematicName = args[plugin.getSettings().islandNamesRequiredForCreation ? 2 : 1];
+        if(plugin.getSettings().isSchematicNameArgument() &&
+                args.length == (plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2)){
+            schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
             Schematic schematic = plugin.getSchematics().getSchematic(schematicName);
             if(schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")){
                 Locale.INVALID_SCHEMATIC.send(sender, schematicName);
@@ -113,8 +114,8 @@ public final class CmdCreate implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        int argumentLength = plugin.getSettings().islandNamesRequiredForCreation ? 3 : 2;
-        return plugin.getSettings().schematicNameArgument && args.length == argumentLength ?
+        int argumentLength = plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2;
+        return plugin.getSettings().isSchematicNameArgument() && args.length == argumentLength ?
                 CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : new ArrayList<>();
     }
 

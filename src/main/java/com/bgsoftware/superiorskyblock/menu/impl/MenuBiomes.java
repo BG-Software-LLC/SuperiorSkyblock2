@@ -206,7 +206,7 @@ public final class MenuBiomes extends SuperiorMenu {
 
         menuBiomes.setBackButton(backButton);
 
-        if(plugin.getSettings().onlyBackButton && backButton == -1)
+        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         menuBiomes.markCompleted();

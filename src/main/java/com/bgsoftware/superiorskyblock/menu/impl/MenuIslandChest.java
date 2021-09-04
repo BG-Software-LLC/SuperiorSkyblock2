@@ -115,7 +115,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
         MenuIslandChest menuIslandChest = new MenuIslandChest(superiorPlayer, island);
-        if(plugin.getSettings().skipOneItemMenus && island.getChest().length == 1){
+        if(plugin.getSettings().isSkipOneItemMenus() && island.getChest().length == 1){
             menuIslandChest.onPlayerClick(null, island.getChest()[0]);
         }
         else {

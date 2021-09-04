@@ -64,11 +64,11 @@ public final class CmdTeleport implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        if(plugin.getSettings().homeWarmup > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
+        if(plugin.getSettings().getHomeWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    plugin.getSettings().homeWarmup, TimeUnit.MILLISECONDS));
+                    plugin.getSettings().getHomeWarmup(), TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
-                    teleportToIsland(superiorPlayer, island), plugin.getSettings().homeWarmup / 50));
+                    teleportToIsland(superiorPlayer, island), plugin.getSettings().getHomeWarmup() / 50));
         }
         else {
             teleportToIsland(superiorPlayer, island);

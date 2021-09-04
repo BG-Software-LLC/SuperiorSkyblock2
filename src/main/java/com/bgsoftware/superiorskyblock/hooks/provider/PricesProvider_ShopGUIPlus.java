@@ -32,7 +32,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
                     if (Key.of(shopItem.getItem()).equals(key)) {
                         double shopPrice;
 
-                        switch (plugin.getSettings().syncWorth) {
+                        switch (plugin.getSettings().getSyncWorth()) {
                             case BUY:
                                 //noinspection deprecation
                                 shopPrice = shopItem.getBuyPriceForAmount(1);

@@ -183,12 +183,12 @@ public final class NMSUtils {
             }
         }
 
-        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) || blockData.getBlock() instanceof BlockBed) {
+        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) || blockData.getBlock() instanceof BlockBed) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
-        if (plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().isLightsUpdate()) {
             chunk.setType(blockPosition, blockData, true, true);
         } else {
             int indexY = blockPosition.getY() >> 4;

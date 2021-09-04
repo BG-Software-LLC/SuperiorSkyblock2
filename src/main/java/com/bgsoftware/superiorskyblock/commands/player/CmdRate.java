@@ -70,7 +70,7 @@ public final class CmdRate implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if(!plugin.getSettings().rateOwnIsland && island.equals(superiorPlayer.getIsland())){
+        if(!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())){
             Locale.RATE_OWN_ISLAND.send(superiorPlayer);
             return;
         }
@@ -82,8 +82,10 @@ public final class CmdRate implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
-                (onlinePlayer, onlineIsland) -> onlineIsland != null && (plugin.getSettings().rateOwnIsland || !onlineIsland.equals(island))) : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+                plugin.getSettings().isTabCompleteHideVanished(),
+                (onlinePlayer, onlineIsland) -> onlineIsland != null &&
+                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island))) : new ArrayList<>();
     }
 
 }

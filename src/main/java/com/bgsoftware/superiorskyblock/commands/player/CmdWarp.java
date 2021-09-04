@@ -105,7 +105,7 @@ public final class CmdWarp implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         List<String> tabCompletes = args.length < 2 ? new ArrayList<>() :
                 CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                        plugin.getSettings().tabCompleteHideVanished, (onlinePlayer, onlineIsland) ->
+                        plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
                                 onlineIsland.getIslandWarps().values().stream()
                                         .anyMatch(islandWarp -> !islandWarp.hasPrivateFlag()));
 

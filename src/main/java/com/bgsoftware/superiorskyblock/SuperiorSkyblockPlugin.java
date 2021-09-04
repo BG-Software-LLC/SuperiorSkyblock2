@@ -29,7 +29,7 @@ import com.bgsoftware.superiorskyblock.module.ModulesHandler;
 import com.bgsoftware.superiorskyblock.player.PlayersHandler;
 import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
-import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
+import com.bgsoftware.superiorskyblock.config.SettingsHandler;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
@@ -246,7 +246,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new BlocksListener(this));
                 safeEventsRegister(new ChunksListener(this));
                 safeEventsRegister(new CustomEventsListener(this));
-                if(settingsHandler.endDragonFight)
+                if(settingsHandler.getWorlds().getEnd().isDragonFight())
                     safeEventsRegister(new DragonListener(this));
                 safeEventsRegister(new MenusListener(this));
                 safeEventsRegister(new PlayersListener(this));
@@ -348,7 +348,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         try {
             nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
             nmsChunks = loadNMSClass("NMSChunksImpl", version);
-            nmsDragonFight = new SettingsHandler(this).endDragonFight ?
+            nmsDragonFight = new SettingsHandler(this).getWorlds().getEnd().isDragonFight() ?
                     loadNMSClass("NMSDragonFightImpl", version) : new NMSDragonFightImpl();
             nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
             nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
@@ -371,7 +371,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if(worldGenerator == null) {
             loadGeneratorFromFile();
             if (worldGenerator == null)
-                worldGenerator = new IslandsGenerator(settingsHandler.defaultWorldEnvironment);
+                worldGenerator = new IslandsGenerator(settingsHandler.getWorlds().getDefaultWorld());
         }
 
         return worldGenerator;

@@ -1304,7 +1304,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                             String[] settingSections = setting.split("=");
                             islandSettings.put(IslandFlag.getByName(settingSections[0]), Byte.valueOf(settingSections[1]));
                         } else {
-                            if (!plugin.getSettings().defaultSettings.contains(setting))
+                            if (!plugin.getSettings().getDefaultSettings().contains(setting))
                                 islandSettings.put(IslandFlag.getByName(setting), (byte) 1);
                         }
                     } catch (Exception ignored) {

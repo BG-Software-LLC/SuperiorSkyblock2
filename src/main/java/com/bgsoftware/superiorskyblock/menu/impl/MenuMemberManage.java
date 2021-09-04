@@ -40,7 +40,7 @@ public final class MenuMemberManage extends SuperiorMenu {
         }
 
         else if(banSlot.contains(e.getRawSlot())){
-            if(plugin.getSettings().banConfirm){
+            if(plugin.getSettings().isBanConfirm()){
                 Island island = superiorPlayer.getIsland();
                 if(IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer)) {
                     previousMove = false;
@@ -53,7 +53,7 @@ public final class MenuMemberManage extends SuperiorMenu {
         }
 
         else if(kickSlot.contains(e.getRawSlot())){
-            if(plugin.getSettings().kickConfirm){
+            if(plugin.getSettings().isKickConfirm()){
                 Island island = superiorPlayer.getIsland();
                 if(island == null)
                     return;

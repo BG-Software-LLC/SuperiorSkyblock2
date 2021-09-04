@@ -51,7 +51,7 @@ public final class ChunksListener implements Listener {
         if (island == null || island.isSpawn())
             return;
 
-        if (e.getWorld().getEnvironment() == plugin.getSettings().defaultWorldEnvironment) {
+        if (e.getWorld().getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
             island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
         }
 

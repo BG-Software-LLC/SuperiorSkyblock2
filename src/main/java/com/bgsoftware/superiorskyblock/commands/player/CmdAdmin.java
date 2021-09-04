@@ -142,7 +142,7 @@ public final class CmdAdmin implements ISuperiorCommand {
             for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
                 if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
                     for (String _aliases : aliases) {
                         if (_aliases.contains(args[1].toLowerCase())) {
                             list.add(_aliases);

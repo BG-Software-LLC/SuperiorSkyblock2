@@ -112,7 +112,7 @@ public final class ProtectionListener implements Listener {
         if (e.getClickedBlock() == null)
             return;
 
-        if (!plugin.getSettings().interactables.contains(e.getClickedBlock().getType().name()) &&
+        if (!plugin.getSettings().getInteractables().contains(e.getClickedBlock().getType().name()) &&
                 plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) <= 1)
             return;
 
@@ -155,7 +155,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if (plugin.getSettings().valuableBlocks.contains(Key.of(blockState)) &&
+        if (plugin.getSettings().getValuableBlocks().contains(Key.of(blockState)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());

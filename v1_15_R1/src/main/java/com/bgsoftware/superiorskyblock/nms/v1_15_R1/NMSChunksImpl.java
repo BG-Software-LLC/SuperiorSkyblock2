@@ -234,7 +234,7 @@ public final class NMSChunksImpl implements NMSChunks {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         WorldServer world = (WorldServer) chunk.getWorld();
 
-        if (plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().isLightsUpdate()) {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
             Executor.sync(() -> {

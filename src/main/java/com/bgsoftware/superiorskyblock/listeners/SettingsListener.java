@@ -74,7 +74,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getToBlock().getLocation());
 
         if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(e.getBlock().getType().name().contains("WATER") ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW))
@@ -87,7 +87,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.CROPS_GROWTH))
@@ -100,7 +100,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
         if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.TREE_GROWTH))
@@ -113,7 +113,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
@@ -129,7 +129,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.FIRE_SPREAD))
@@ -145,7 +145,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if(island != null) {
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.ENDERMAN_GRIEF))
@@ -161,7 +161,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
             if(!island.hasSettingsEnabled(IslandFlags.EGG_LAY)) {
@@ -183,7 +183,7 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity().getShooter());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()) || island.hasSettingsEnabled(IslandFlags.PVP))
+        if(island == null || (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn()) || island.hasSettingsEnabled(IslandFlags.PVP))
             return;
 
         for(Entity entity : e.getEntity().getNearbyEntities(2, 2, 2)){
@@ -207,7 +207,7 @@ public final class SettingsListener implements Listener {
         SuperiorPlayer damagerPlayer = plugin.getPlayers().getSuperiorPlayer((Player) e.getEntity().getShooter());
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
-        if(island == null || (!plugin.getSettings().spawnProtection && island.isSpawn()))
+        if(island == null || (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn()))
             return;
 
         Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
@@ -255,7 +255,7 @@ public final class SettingsListener implements Listener {
 
     private boolean handleEntityExplode(Entity source, Location explodeLocation){
         Island island = plugin.getGrid().getIslandAt(explodeLocation);
-        if(island != null && (plugin.getSettings().spawnProtection || !island.isSpawn())){
+        if(island != null && (plugin.getSettings().getSpawn().isProtected() || !island.isSpawn())){
             if((source instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
                     (source instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION)) ||
                     ((source instanceof Wither || source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
@@ -271,7 +271,7 @@ public final class SettingsListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if(island != null){
-            if(!plugin.getSettings().spawnProtection && island.isSpawn())
+            if(!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return false;
 
             switch (spawnReason.name()){

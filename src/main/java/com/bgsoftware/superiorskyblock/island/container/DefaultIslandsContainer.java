@@ -35,7 +35,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public void addIsland(Island island) {
-        Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
+        Location islandLocation = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
         this.islandsByPositions.put(IslandPosition.of(islandLocation), island);
 
         if(plugin.getProviders().hasCustomWorldsSupport()){
@@ -53,7 +53,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public void removeIsland(Island island) {
-        Location islandLocation = island.getCenter(plugin.getSettings().defaultWorldEnvironment);
+        Location islandLocation = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
 
         sortedIslands.remove(island.getOwner().getUniqueId());
         islandsByUUID.remove(island.getUniqueId());

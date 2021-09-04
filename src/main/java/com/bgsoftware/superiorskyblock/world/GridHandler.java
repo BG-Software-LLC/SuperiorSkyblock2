@@ -84,7 +84,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void loadData() {
-        lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName, 0, 100, 0);
+        lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
@@ -149,8 +149,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         Location islandLocation = plugin.getProviders().getNextLocation(
                 lastIsland.parse().clone(),
-                plugin.getSettings().islandsHeight,
-                plugin.getSettings().maxIslandSize,
+                plugin.getSettings().getIslandHeight(),
+                plugin.getSettings().getMaxIslandSize(),
                 superiorPlayer.getUniqueId(),
                 islandUUID
         );
@@ -189,9 +189,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         superiorPlayer.teleport(island, result -> {
                             if (result) {
                                 Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
-                                if (plugin.getSettings().defaultWorldEnvironment == World.Environment.THE_END) {
+                                if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                     plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                    if (plugin.getSettings().endDragonFight)
+                                    if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
                                         plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
                                 }
                             }
@@ -231,7 +231,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().islandPreviewLocations.get(schemName.toLowerCase());
+        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase());
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
@@ -592,8 +592,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void loadGrid(DatabaseResult resultSet) {
         lastIsland = SBlockPosition.of(resultSet.getString("last_island"));
-        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().defaultWorldName)) {
-            lastIsland = SBlockPosition.of(plugin.getSettings().defaultWorldName,
+        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getWorldName())) {
+            lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 
@@ -601,13 +601,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         String world = resultSet.getString("world");
 
         try {
-            if (plugin.getSettings().maxIslandSize != maxIslandSize) {
+            if (plugin.getSettings().getMaxIslandSize() != maxIslandSize) {
                 SuperiorSkyblockPlugin.log("&cYou have changed the max-island-size value without deleting database.");
                 SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
                 plugin.getSettings().updateValue("max-island-size", maxIslandSize);
             }
 
-            if (!plugin.getSettings().islandWorldName.equals(world)) {
+            if (!plugin.getSettings().getWorlds().getWorldName().equals(world)) {
                 SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
                 SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
                 plugin.getSettings().updateValue("worlds.normal-world", world);

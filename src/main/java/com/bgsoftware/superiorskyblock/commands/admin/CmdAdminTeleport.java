@@ -66,9 +66,9 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         World.Environment environment = args.length == 4 ? World.Environment.valueOf(args[3].toUpperCase()) :
-                plugin.getSettings().defaultWorldEnvironment;
+                plugin.getSettings().getWorlds().getDefaultWorld();
 
-        if(environment != plugin.getSettings().defaultWorldEnvironment){
+        if(environment != plugin.getSettings().getWorlds().getDefaultWorld()){
             if(!island.wasSchematicGenerated(environment)) {
                 PortalsLogic.handlePlayerPortal((Player) sender, ((Player) sender).getLocation(),
                         environment == World.Environment.NETHER ? PlayerTeleportEvent.TeleportCause.NETHER_PORTAL :

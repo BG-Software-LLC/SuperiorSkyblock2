@@ -49,7 +49,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public void loadData() {
-        String islandCommand = plugin.getSettings().islandCommand;
+        String islandCommand = plugin.getSettings().getIslandCommand();
         label = islandCommand.split(",")[0];
 
         PluginCommand pluginCommand = new PluginCommand(label);
@@ -220,7 +220,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
                     String commandLabel = command.getAliases().get(0);
 
-                    if(sender instanceof Player && plugin.getSettings().commandsCooldown.containsKey(commandLabel)) {
+                    if(sender instanceof Player && plugin.getSettings().getCommandsCooldown().containsKey(commandLabel)) {
                         UUID uuid = ((Player) sender).getUniqueId();
 
                         long timeToExecute = commandsCooldown.containsKey(uuid) && commandsCooldown.get(uuid).containsKey(commandLabel) ?
@@ -239,7 +239,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                         }
 
                         commandsCooldown.get(uuid).put(commandLabel,
-                                timeNow + plugin.getSettings().commandsCooldown.get(commandLabel).getKey());
+                                timeNow + plugin.getSettings().getCommandsCooldown().get(commandLabel).getKey());
                     }
 
                     command.execute(plugin, sender, args);
@@ -291,7 +291,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             for(SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().commandAliases.getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
                     for (String _aliases : aliases) {
                         if (_aliases.contains(args[0].toLowerCase())) {
                             list.add(_aliases);

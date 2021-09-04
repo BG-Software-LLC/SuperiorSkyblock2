@@ -412,7 +412,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         if (!(spawnersProvider instanceof SpawnersProvider_AutoDetect))
             return;
 
-        String spawnersProvider = plugin.getSettings().spawnersProvider;
+        String spawnersProvider = plugin.getSettings().getSpawnersProvider();
         boolean auto = spawnersProvider.equalsIgnoreCase("Auto");
 
         if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
@@ -459,7 +459,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         if (!(stackedBlocksProvider instanceof StackedBlocksProvider_AutoDetect))
             return;
 
-        String stackedBlocksProvider = plugin.getSettings().stackedBlocksProvider;
+        String stackedBlocksProvider = plugin.getSettings().getStackedBlocksProvider();
         boolean auto = stackedBlocksProvider.equalsIgnoreCase("Auto");
 
         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&

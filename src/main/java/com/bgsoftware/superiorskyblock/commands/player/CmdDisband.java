@@ -66,12 +66,12 @@ public final class CmdDisband implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if (!superiorPlayer.hasDisbands() && plugin.getSettings().disbandCount > 0) {
+        if (!superiorPlayer.hasDisbands() && plugin.getSettings().getDisbandCount() > 0) {
             Locale.NO_MORE_DISBANDS.send(superiorPlayer);
             return;
         }
 
-        if (plugin.getSettings().disbandConfirm) {
+        if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, null, island);
         } else if (EventsCaller.callIslandDisbandEvent(superiorPlayer, island)) {
             IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());

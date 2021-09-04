@@ -229,7 +229,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             this.world = worldServer;
             this.bossBattle = BATTLE_BOSS_SERVER.get(this);
 
-            int radius = plugin.getSettings().maxIslandSize;
+            int radius = plugin.getSettings().getMaxIslandSize();
             this.borderArea = new AxisAlignedBB(islandBlockPosition.a(-radius, -radius, -radius), islandBlockPosition.a(radius, radius, radius));
         }
 

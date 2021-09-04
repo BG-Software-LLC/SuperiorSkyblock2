@@ -71,7 +71,7 @@ public final class CmdVisit implements ISuperiorCommand {
             if(!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
+            visitLocation = targetIsland.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
             Locale.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 
@@ -86,7 +86,8 @@ public final class CmdVisit implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+                plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null && (onlineIsland.getVisitorsLocation() != null ||
                         superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
                         onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : new ArrayList<>();

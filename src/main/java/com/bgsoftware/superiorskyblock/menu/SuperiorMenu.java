@@ -241,7 +241,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                 runCommand(args, e, e.getWhoClicked());
                 break;
             case "admin":
-                String commandLabel = plugin.getSettings().islandCommand.split(",")[0];
+                String commandLabel = plugin.getSettings().getIslandCommand().split(",")[0];
                 runCommand(commandLabel + " admin " + args, e, sender);
                 break;
             case "close":
@@ -332,7 +332,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
         Executor.sync(() -> {
-            if(!nextMove && !closeButton && plugin.getSettings().onlyBackButton) {
+            if(!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
                 open(previousMenu);
             }
 

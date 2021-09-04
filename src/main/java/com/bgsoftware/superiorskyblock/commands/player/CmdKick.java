@@ -72,7 +72,7 @@ public final class CmdKick implements IPermissibleCommand {
         if(!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer))
             return;
 
-        if(plugin.getSettings().kickConfirm) {
+        if(plugin.getSettings().isKickConfirm()) {
             plugin.getMenus().openConfirmKick(superiorPlayer, null, island, targetPlayer);
         }
         else {

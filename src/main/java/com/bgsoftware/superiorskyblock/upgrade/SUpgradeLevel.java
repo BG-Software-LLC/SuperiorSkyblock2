@@ -38,21 +38,21 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Set<Pair<String, String>> requirements;
     private final UpgradeValue<Double> cropGrowth, spawnerRates, mobDrops;
     private final UpgradeValue<Integer> teamLimit, warpsLimit, coopLimit, borderSize;
-    private final KeyMap<UpgradeValue<Integer>> blockLimits, entityLimits;
-    private final KeyMap<UpgradeValue<Integer>>[] generatorRates;
-    private final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects;
+    private final KeyMap<Integer> blockLimits, entityLimits;
+    private final KeyMap<Integer>[] generatorRates;
+    private final Map<PotionEffectType, Integer> islandEffects;
     private final UpgradeValue<BigDecimal> bankLimit;
-    private final Map<Integer, UpgradeValue<Integer>> roleLimits;
+    private final Map<Integer, Integer> roleLimits;
 
     private ItemData itemData;
 
     public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<Pair<String, String>> requirements,
                          UpgradeValue<Double> cropGrowth, UpgradeValue<Double> spawnerRates, UpgradeValue<Double> mobDrops,
                          UpgradeValue<Integer> teamLimit, UpgradeValue<Integer> warpsLimit, UpgradeValue<Integer> coopLimit,
-                         UpgradeValue<Integer> borderSize, KeyMap<UpgradeValue<Integer>> blockLimits,
-                         KeyMap<UpgradeValue<Integer>> entityLimits, KeyMap<UpgradeValue<Integer>>[] generatorRates,
-                         Map<PotionEffectType, UpgradeValue<Integer>> islandEffects, UpgradeValue<BigDecimal> bankLimit,
-                         Map<Integer, UpgradeValue<Integer>> roleLimits){
+                         UpgradeValue<Integer> borderSize, KeyMap<Integer> blockLimits,
+                         KeyMap<Integer> entityLimits, KeyMap<Integer>[] generatorRates,
+                         Map<PotionEffectType, Integer> islandEffects, UpgradeValue<BigDecimal> bankLimit,
+                         Map<Integer, Integer> roleLimits){
         this.level = level;
         this.cost = cost;
         this.commands = commands;
@@ -142,23 +142,25 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
+        return blockLimits.getOrDefault(key, -1);
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getRaw(key, IslandUtils.NO_LIMIT).get();
+        return blockLimits.getRaw(key, -1);
     }
 
     @Override
     public Map<Key, Integer> getBlockLimits() {
-        return blockLimits.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> entry.getValue().get()));
+        return Collections.unmodifiableMap(blockLimits);
     }
 
-    public KeyMap<UpgradeValue<Integer>> getBlockLimitsUpgradeValue(){
-        return blockLimits;
+    public Map<Key, UpgradeValue<Integer>> getBlockLimitsUpgradeValue(){
+        return blockLimits.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
     }
 
     @Override
@@ -170,17 +172,19 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return entityLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
+        return entityLimits.getOrDefault(key, -1);
     }
 
     @Override
     public Map<Key, Integer> getEntityLimitsAsKeys() {
-        return entityLimits.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> entry.getValue().get()));
+        return Collections.unmodifiableMap(entityLimits);
     }
 
-    public KeyMap<UpgradeValue<Integer>> getEntityLimitsUpgradeValue(){
-        return entityLimits;
+    public Map<Key, UpgradeValue<Integer>> getEntityLimitsUpgradeValue(){
+        return entityLimits.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
     }
 
     @Override
@@ -223,37 +227,48 @@ public class SUpgradeLevel implements UpgradeLevel {
     public int getGeneratorAmount(Key key, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
-        return (generatorRates == null ? UpgradeValue.ZERO : generatorRates.getOrDefault(key, UpgradeValue.ZERO)).get();
+        KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
+        return (generatorRates == null ? 0 : generatorRates.getOrDefault(key, 0));
     }
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        KeyMap<UpgradeValue<Integer>> generatorRates = this.generatorRates[environment.ordinal()];
+        KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
         return generatorRates == null ? new HashMap<>() : generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
-                entry -> entry.getValue().get()));
+                Map.Entry::getValue));
     }
 
-    public KeyMap<UpgradeValue<Integer>>[] getGeneratorUpgradeValue(){
+    public Map<Key, UpgradeValue<Integer>>[] getGeneratorUpgradeValue(){
+        Map<Key, UpgradeValue<Integer>>[] generatorRates = new Map[this.generatorRates.length];
+
+        for(int i = 0; i < generatorRates.length; ++i) {
+            generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> new UpgradeValue<>(entry.getValue(), true))
+            );
+        }
+
         return generatorRates;
     }
 
     @Override
     public int getPotionEffect(PotionEffectType potionEffectType) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
-        return islandEffects.getOrDefault(potionEffectType, UpgradeValue.ZERO).get();
+        return islandEffects.getOrDefault(potionEffectType, 0);
     }
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        return islandEffects.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> entry.getValue().get()));
+        return Collections.unmodifiableMap(islandEffects);
     }
 
     public Map<PotionEffectType, UpgradeValue<Integer>> getPotionEffectsUpgradeValue(){
-        return islandEffects;
+        return islandEffects.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
     }
 
     @Override
@@ -268,7 +283,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        return roleLimits.getOrDefault(playerRole.getId(), UpgradeValue.ZERO).get();
+        return roleLimits.getOrDefault(playerRole.getId(), 0);
     }
 
     @Override
@@ -277,7 +292,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
                 .collect(Collectors.toMap(
                         entry -> SPlayerRole.fromId(entry.getKey()),
-                        entry -> entry.getValue().get()
+                        Map.Entry::getValue
                 ));
     }
 
@@ -286,7 +301,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
                 .collect(Collectors.toMap(
                         entry -> SPlayerRole.fromId(entry.getKey()),
-                        Map.Entry::getValue
+                        entry -> new UpgradeValue<>(entry.getValue(), true)
                 ));
     }
 

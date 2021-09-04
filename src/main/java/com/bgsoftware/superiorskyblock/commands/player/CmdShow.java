@@ -82,7 +82,7 @@ public final class CmdShow implements ISuperiorCommand {
             infoMessage.append(Locale.ISLAND_INFO_NAME.getMessage(locale, island.getName())).append("\n");
         if(!Locale.ISLAND_INFO_LOCATION.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_LOCATION.getMessage(locale,
-                    SBlockPosition.of(island.getCenter(plugin.getSettings().defaultWorldEnvironment)))).append("\n");
+                    SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())))).append("\n");
         if(!Locale.ISLAND_INFO_CREATION_TIME.isEmpty(locale))
             infoMessage.append(Locale.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if(!Locale.ISLAND_INFO_RATE.isEmpty(locale)) {
@@ -135,7 +135,7 @@ public final class CmdShow implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().tabCompleteHideVanished) : new ArrayList<>();
+                plugin.getSettings().isTabCompleteHideVanished()) : new ArrayList<>();
     }
 
 }

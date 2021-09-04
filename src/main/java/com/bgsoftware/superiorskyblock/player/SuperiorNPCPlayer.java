@@ -165,7 +165,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island, Consumer<Boolean> teleportResult) {
-        teleport(island.getCenter(plugin.getSettings().defaultWorldEnvironment), teleportResult);
+        teleport(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()), teleportResult);
     }
 
     @Override

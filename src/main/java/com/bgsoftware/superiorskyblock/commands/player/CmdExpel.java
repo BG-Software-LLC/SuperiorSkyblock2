@@ -101,7 +101,7 @@ public final class CmdExpel implements IPermissibleCommand {
 
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
         target.getLocation().setDirection(plugin.getGrid().getSpawnIsland()
-                .getCenter(plugin.getSettings().defaultWorldEnvironment).getDirection());
+                .getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getDirection());
         Locale.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
         Locale.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }
@@ -109,7 +109,7 @@ public final class CmdExpel implements IPermissibleCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return args.length != 2 ? new ArrayList<>() : island != null ? CommandTabCompletes.getIslandVisitors(island, args[1]) :
-                CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
+                CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
                         onlinePlayer -> plugin.getGrid().getIslandAt(onlinePlayer.getLocation()) != null);
     }
 

@@ -784,7 +784,7 @@ public enum Locale {
 
             locales.add(fileLocale);
 
-            if(plugin.getSettings().defaultLanguage.equalsIgnoreCase(fileName))
+            if(plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName))
                 defaultLocale = fileLocale;
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
@@ -839,7 +839,7 @@ public enum Locale {
         if(!noInteractMessages.contains(player.getUniqueId())){
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player, locale);
-            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().protectedMessageDelay);
+            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().getProtectedMessageDelay());
         }
     }
 

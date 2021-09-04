@@ -240,7 +240,7 @@ public final class IslandsDeserializer {
 
             while (index > islandChestList.size()){
                 IslandChest newIslandChest = new SIslandChest(island, islandChestList.size());
-                newIslandChest.setRows(plugin.getSettings().islandChestsDefaultSize);
+                newIslandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
                 islandChestList.add(newIslandChest);
             }
 

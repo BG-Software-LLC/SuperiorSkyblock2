@@ -32,7 +32,7 @@ public final class SIslandWarp implements IslandWarp {
         this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
                 location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
         this.warpCategory = warpCategory;
-        this.privateFlag = !plugin.getSettings().publicWarps;
+        this.privateFlag = !plugin.getSettings().isPublicWarps();
     }
 
     @Override

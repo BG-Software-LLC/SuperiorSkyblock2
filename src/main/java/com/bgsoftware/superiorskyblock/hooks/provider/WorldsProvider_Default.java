@@ -30,13 +30,13 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public void prepareWorlds() {
-        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().worldsDifficulty.toUpperCase());
-        if (plugin.getSettings().normalWorldEnabled)
-            loadWorld(plugin.getSettings().islandWorldName, difficulty, World.Environment.NORMAL);
-        if (plugin.getSettings().netherWorldEnabled)
-            loadWorld(plugin.getSettings().netherWorldName, difficulty, World.Environment.NETHER);
-        if (plugin.getSettings().endWorldEnabled)
-            loadWorld(plugin.getSettings().endWorldName, difficulty, World.Environment.THE_END);
+        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty().toUpperCase());
+        if (plugin.getSettings().getWorlds().getNormal().isEnabled())
+            loadWorld(plugin.getSettings().getWorlds().getWorldName(), difficulty, World.Environment.NORMAL);
+        if (plugin.getSettings().getWorlds().getNether().isEnabled())
+            loadWorld(plugin.getSettings().getWorlds().getNether().getName(), difficulty, World.Environment.NETHER);
+        if (plugin.getSettings().getWorlds().getEnd().isEnabled())
+            loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
     }
 
     @Override
@@ -105,32 +105,32 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public boolean isNormalEnabled() {
-        return plugin.getSettings().normalWorldEnabled;
+        return plugin.getSettings().getWorlds().getNormal().isEnabled();
     }
 
     @Override
     public boolean isNormalUnlocked() {
-        return plugin.getSettings().normalWorldUnlocked;
+        return plugin.getSettings().getWorlds().getNormal().isUnlocked();
     }
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getSettings().netherWorldEnabled;
+        return plugin.getSettings().getWorlds().getNether().isEnabled();
     }
 
     @Override
     public boolean isNetherUnlocked() {
-        return plugin.getSettings().netherWorldUnlocked;
+        return plugin.getSettings().getWorlds().getNether().isUnlocked();
     }
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getSettings().endWorldEnabled;
+        return plugin.getSettings().getWorlds().getEnd().isEnabled();
     }
 
     @Override
     public boolean isEndUnlocked() {
-        return plugin.getSettings().endWorldUnlocked;
+        return plugin.getSettings().getWorlds().getEnd().isUnlocked();
     }
 
     private BlockFace getIslandFace(Location location) {

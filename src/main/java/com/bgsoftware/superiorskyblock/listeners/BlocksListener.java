@@ -63,7 +63,7 @@ public final class BlocksListener implements Listener {
 
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        if(plugin.getSettings().physicsListener)
+        if(plugin.getSettings().isPhysicsListener())
             Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
     }
 
@@ -243,7 +243,7 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockRedstone(BlockRedstoneEvent e){
-        if(!plugin.getSettings().disableRedstoneOffline && !plugin.getSettings().disableRedstoneAFK)
+        if(!plugin.getSettings().isDisableRedstoneOffline() && !plugin.getSettings().getAFKIntegrations().isDisableRedstone())
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
@@ -251,15 +251,16 @@ public final class BlocksListener implements Listener {
         if(island == null || island.isSpawn())
             return;
 
-        if((plugin.getSettings().disableRedstoneOffline && island.getLastTimeUpdate() != -1) ||
-                (plugin.getSettings().disableRedstoneAFK && island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
+        if((plugin.getSettings().isDisableRedstoneOffline() && island.getLastTimeUpdate() != -1) ||
+                (plugin.getSettings().getAFKIntegrations().isDisableRedstone() &&
+                        island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
             e.setNewCurrent(0);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(!plugin.getSettings().disableSpawningAFK)
+        if(!plugin.getSettings().getAFKIntegrations().isDisableSpawning())
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
@@ -314,7 +315,7 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if(plugin.getSettings().stackedBlocksMenuEnabled && e.getPlayer().isSneaking() &&
+        if(plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking() &&
                 plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) > 1){
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
@@ -341,7 +342,7 @@ public final class BlocksListener implements Listener {
 
         for(Block block : blockList){
             // Check if block is stackable
-            if(!plugin.getSettings().whitelistedStackedBlocks.contains(block))
+            if(!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(block)))
                 continue;
 
             int amount = plugin.getStackedBlocks().getStackedBlockAmount(block);

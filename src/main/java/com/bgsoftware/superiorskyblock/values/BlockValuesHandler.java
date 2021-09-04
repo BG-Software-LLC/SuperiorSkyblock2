@@ -67,7 +67,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return value;
         }
 
-        if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
+        if(plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
             SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price");
             return price;
@@ -128,7 +128,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return convertedKey;
         }
         else {
-            if(plugin.getSettings().syncWorth != SyncWorthStatus.NONE) {
+            if(plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
                 Key newKey = plugin.getProviders().getPriceBlockKey((Key) key);
                 if(newKey != key) {
                     return newKey;
@@ -201,7 +201,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     public BigDecimal convertValueToLevel(BigDecimal value){
         try {
-            Object obj = plugin.getScriptEngine().eval(plugin.getSettings().islandLevelFormula
+            Object obj = plugin.getScriptEngine().eval(plugin.getSettings().getIslandLevelFormula()
                     .replace("{}", value.toString()), bindings);
 
             // Checking for division by 0
@@ -227,22 +227,6 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         SimpleBindings bindings = new SimpleBindings();
         bindings.put("Math", Math.class);
         return bindings;
-    }
-
-    public enum SyncWorthStatus{
-
-        NONE,
-        BUY,
-        SELL;
-
-        public static SyncWorthStatus of(String name){
-            try{
-                return valueOf(name);
-            }catch (Exception ex){
-                return NONE;
-            }
-        }
-
     }
 
 }

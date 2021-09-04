@@ -94,7 +94,7 @@ public final class CmdRankup implements IPermissibleCommand {
         if(island.hasActiveUpgradeCooldown()){
             long timeNow = System.currentTimeMillis(), lastUpgradeTime = island.getLastTimeUpgrade();
             Locale.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    lastUpgradeTime + plugin.getSettings().upgradeCooldown - timeNow, TimeUnit.MILLISECONDS));
+                    lastUpgradeTime + plugin.getSettings().getUpgradeCooldown() - timeNow, TimeUnit.MILLISECONDS));
             hasNextLevel = false;
         }
         else {

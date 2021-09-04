@@ -78,9 +78,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     .asSkullOf(islandOwner);
 
             if (island != null && islandOwner != null) {
-                String islandName = !plugin.getSettings().islandNamesIslandTop || island.getName().isEmpty() ?
-                        islandOwner.getName() : plugin.getSettings().islandNamesColorSupport ?
-                        StringUtils.translateColors(island.getName()) : island.getName();
+                String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
+                        island.getName().isEmpty() ? islandOwner.getName() :
+                        plugin.getSettings().getIslandNames().isColorSupport() ?
+                                StringUtils.translateColors(island.getName()) : island.getName();
 
                 itemBuilder.replaceName("{0}", islandName)
                         .replaceName("{1}", String.valueOf(place))
@@ -98,7 +99,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
                     for (String line : itemBuilder.getItemMeta().getLore()) {
                         if (line.contains("{4}")) {
-                            List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().islandTopIncludeLeader);
+                            List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader());
                             String memberFormat = line.split("\\{4}:")[1];
                             if (members.size() == 0) {
                                 lore.add(memberFormat.replace("{}", "None"));
@@ -217,7 +218,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                 else {
                     plugin.getMenus().openWarpCategories(superiorPlayer, this, island);
                 }
-            } else if(plugin.getSettings().valuesMenu) {
+            } else if(plugin.getSettings().isValuesMenu()) {
                 plugin.getMenus().openValues(superiorPlayer, this, island);
             }
 
@@ -312,7 +313,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
         menuTopIslands.setBackButton(backButton);
 
-        if(plugin.getSettings().onlyBackButton && backButton == -1)
+        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[top-islands.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         if(cfg.contains("worth-sort")) {

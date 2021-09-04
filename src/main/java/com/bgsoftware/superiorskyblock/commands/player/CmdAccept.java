@@ -97,17 +97,18 @@ public final class CmdAccept implements ISuperiorCommand {
         else
             Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
-        if(plugin.getSettings().teleportOnJoin)
+        if(plugin.getSettings().isTeleportOnJoin())
             superiorPlayer.teleport(island);
-        if(plugin.getSettings().clearOnJoin)
+        if(plugin.getSettings().isClearOnJoin())
             plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer());
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1], plugin.getSettings().tabCompleteHideVanished,
-                (onlinePlayer, onlineIsland) -> onlineIsland != null && onlineIsland.isInvited(superiorPlayer)) : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
+                plugin.getSettings().isTabCompleteHideVanished(), (onlinePlayer, onlineIsland) ->
+                        onlineIsland != null && onlineIsland.isInvited(superiorPlayer)) : new ArrayList<>();
     }
 
 }

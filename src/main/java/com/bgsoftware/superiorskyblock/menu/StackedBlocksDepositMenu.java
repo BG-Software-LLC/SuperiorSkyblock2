@@ -21,7 +21,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
     private final Location stackedBlock;
 
     public StackedBlocksDepositMenu(Location stackedBlock){
-        this.inventory = Bukkit.createInventory(this, 36, plugin.getSettings().stackedBlocksMenuTitle);
+        this.inventory = Bukkit.createInventory(this, 36, plugin.getSettings().getStackedBlocks().getDepositMenu().getTitle());
         this.stackedBlock = stackedBlock;
     }
 

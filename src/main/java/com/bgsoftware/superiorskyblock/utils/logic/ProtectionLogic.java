@@ -88,7 +88,7 @@ public final class ProtectionLogic {
             return false;
         }
 
-        if(plugin.getSettings().valuableBlocks.contains(Key.of(block)) &&
+        if(plugin.getSettings().getValuableBlocks().contains(Key.of(block)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)){
             if(sendMessages)
                 Locale.sendProtectionMessage(player);

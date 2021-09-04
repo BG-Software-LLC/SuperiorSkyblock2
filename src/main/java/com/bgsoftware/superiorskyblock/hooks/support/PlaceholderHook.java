@@ -131,7 +131,7 @@ public abstract class PlaceholderHook {
                     island = plugin.getGrid().getIslandAt(player.getLocation());
 
                     if (island == null || island instanceof SpawnIsland)
-                        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
+                        return plugin.getSettings().getDefaultPlaceholders().getOrDefault(placeholder, "");
 
                     subPlaceholder = subPlaceholder.replace("location_", "");
                 }
@@ -270,15 +270,15 @@ public abstract class PlaceholderHook {
 
                 else switch (subPlaceholder) {
                     case "center":
-                        return SBlockPosition.of(island.getCenter(plugin.getSettings().defaultWorldEnvironment)).toString();
+                        return SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())).toString();
                     case "x":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockX());
+                        return String.valueOf(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockX());
                     case "y":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockY());
+                        return String.valueOf(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockY());
                     case "z":
-                        return String.valueOf(island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlockZ());
+                        return String.valueOf(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockZ());
                     case "world":
-                        return island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld().getName();
+                        return island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld().getName();
                     case "team_size":
                         return String.valueOf(island.getIslandMembers(true).size());
                     case "team_size_online":
@@ -348,9 +348,11 @@ public abstract class PlaceholderHook {
                     case "locked":
                         return island.isLocked() ? "Yes" : "No";
                     case "name":
-                        return plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName();
+                        return plugin.getSettings().getIslandNames().isColorSupport() ?
+                                StringUtils.translateColors(island.getName()) : island.getName();
                     case "name_leader":
-                        return island.getName().isEmpty() ? island.getOwner().getName() : plugin.getSettings().islandNamesColorSupport ?
+                        return island.getName().isEmpty() ? island.getOwner().getName() :
+                                plugin.getSettings().getIslandNames().isColorSupport() ?
                                 StringUtils.translateColors(island.getName()) : island.getName();
                     case "is_leader":
                         return island.getOwner().equals(superiorPlayer) ? "Yes" : "No";
@@ -385,7 +387,7 @@ public abstract class PlaceholderHook {
             }
         }catch(NullPointerException ignored){}
 
-        return plugin.getSettings().defaultPlaceholders.getOrDefault(placeholder, "");
+        return plugin.getSettings().getDefaultPlaceholders().getOrDefault(placeholder, "");
     }
 
 }

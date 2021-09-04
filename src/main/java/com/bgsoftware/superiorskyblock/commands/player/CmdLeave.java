@@ -68,7 +68,7 @@ public final class CmdLeave implements ISuperiorCommand {
             return;
         }
 
-        if (plugin.getSettings().leaveConfirm) {
+        if (plugin.getSettings().isLeaveConfirm()) {
             plugin.getMenus().openConfirmLeave(superiorPlayer, null);
             return;
         }

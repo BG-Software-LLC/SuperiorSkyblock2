@@ -60,13 +60,13 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
     public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {
 
-        if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().chargeOnWarp > 0) {
-            if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().chargeOnWarp)) < 0){
+        if(!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
+            if(plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0){
                 Locale.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
                 return;
             }
 
-            plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().chargeOnWarp);
+            plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().getChargeOnWarp());
         }
 
         Executor.sync(() -> {
@@ -152,7 +152,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, WarpCategory warpCategory){
         MenuWarps menuWarps = new MenuWarps(superiorPlayer, warpCategory);
-        if(plugin.getSettings().skipOneItemMenus && hasOnlyOneItem(warpCategory, superiorPlayer) &&
+        if(plugin.getSettings().isSkipOneItemMenus() && hasOnlyOneItem(warpCategory, superiorPlayer) &&
                 !warpCategory.getIsland().hasPermission(superiorPlayer, IslandPrivileges.SET_WARP)){
             menuWarps.onPlayerClick(null, getOnlyOneItem(warpCategory, superiorPlayer));
         }

@@ -109,7 +109,7 @@ public final class IslandUtils {
 
         {
             if(plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
-                World normalWorld = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
+                World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
                 chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
             }
         }

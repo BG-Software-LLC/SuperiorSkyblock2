@@ -125,17 +125,17 @@ public final class UpgradesModule extends BuiltinModule {
                     UpgradeValue<Integer> coopLimit = new UpgradeValue<>(levelSection.getInt("coop-limit", -1), true);
                     UpgradeValue<Integer> borderSize = new UpgradeValue<>(levelSection.getInt("border-size", -1), true);
                     UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
-                    KeyMap<UpgradeValue<Integer>> blockLimits = new KeyMap<>();
+                    KeyMap<Integer> blockLimits = new KeyMap<>();
                     if(levelSection.contains("block-limits")){
                         for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
-                            blockLimits.put(block, new UpgradeValue<>(levelSection.getInt("block-limits." + block), true));
+                            blockLimits.put(block, levelSection.getInt("block-limits." + block));
                     }
-                    KeyMap<UpgradeValue<Integer>> entityLimits = new KeyMap<>();
+                    KeyMap<Integer> entityLimits = new KeyMap<>();
                     if(levelSection.contains("entity-limits")){
                         for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
-                            entityLimits.put(entity.toUpperCase(), new UpgradeValue<>(levelSection.getInt("entity-limits." + entity), true));
+                            entityLimits.put(entity.toUpperCase(), levelSection.getInt("entity-limits." + entity));
                     }
-                    KeyMap<UpgradeValue<Integer>>[] generatorRates = new KeyMap[World.Environment.values().length];
+                    KeyMap<Integer>[] generatorRates = new KeyMap[World.Environment.values().length];
                     if(levelSection.contains("generator-rates")){
                         for(String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
                             try{
@@ -143,28 +143,28 @@ public final class UpgradesModule extends BuiltinModule {
                                 for(String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
                                     if(generatorRates[index] == null)
                                         generatorRates[index] = new KeyMap<>();
-                                    generatorRates[index].put(block, new UpgradeValue<>(levelSection.getInt("generator-rates." + blockOrEnv + "." + block), true));
+                                    generatorRates[index].put(block, levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                                 }
                             }catch (Exception ex) {
                                 if(generatorRates[0] == null)
                                     generatorRates[0] = new KeyMap<>();
-                                generatorRates[0].put(blockOrEnv, new UpgradeValue<>(levelSection.getInt("generator-rates." + blockOrEnv), true));
+                                generatorRates[0].put(blockOrEnv, levelSection.getInt("generator-rates." + blockOrEnv));
                             }
                         }
                     }
-                    Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
+                    Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
                     if(levelSection.contains("island-effects")){
                         for(String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                             PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
                             if(potionEffectType != null)
-                                islandEffects.put(potionEffectType, new UpgradeValue<>(levelSection.getInt("island-effects." + effect) - 1, true));
+                                islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
                         }
                     }
-                    Map<Integer, UpgradeValue<Integer>> rolesLimits = new HashMap<>();
+                    Map<Integer, Integer> rolesLimits = new HashMap<>();
                     if(levelSection.contains("role-limits")){
                         for(String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                             try {
-                                rolesLimits.put(Integer.parseInt(roleId), new UpgradeValue<>(levelSection.getInt("role-limits." + roleId), true));
+                                rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
                             }catch (NumberFormatException ignored){}
                         }
                     }
