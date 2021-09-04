@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api;
 
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
@@ -79,6 +80,11 @@ public interface SuperiorSkyblock {
      * Get the commands manager of the core.
      */
     CommandsManager getCommands();
+
+    /**
+     * Get the settings of the plugin.
+     */
+    SettingsManager getSettings();
 
     /**
      * Get the objects factory of the plugin.

@@ -571,6 +571,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return commandsHandler;
     }
 
+    @Override
     public SettingsHandler getSettings() {
         return settingsHandler;
     }
