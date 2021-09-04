@@ -100,7 +100,7 @@ public final class CmdWarp implements ISuperiorCommand {
     private void warpPlayer(IslandWarp warp, SuperiorPlayer superiorPlayer, Island island) {
 
         if (!warp.getIsland().isMember(superiorPlayer) && warp.hasPrivateFlag()) {
-            Locale.INVALID_WARP.send(superiorPlayer);
+            Locale.INVALID_WARP.send(superiorPlayer, warp.getName());
             return;
         }
 
