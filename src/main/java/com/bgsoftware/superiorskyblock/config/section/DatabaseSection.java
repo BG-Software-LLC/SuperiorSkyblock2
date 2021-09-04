@@ -57,4 +57,13 @@ public final class DatabaseSection implements SettingsManager.Database {
         return this.container.databaseMySQLPublicKeyRetrieval;
     }
 
+    @Override
+    public long getWaitTimeout() {
+        return this.container.databaseMySQLWaitTimeout;
+    }
+
+    @Override
+    public long getMaxLifetime() {
+        return this.container.databaseMySQLMaxLifetime;
+    }
 }

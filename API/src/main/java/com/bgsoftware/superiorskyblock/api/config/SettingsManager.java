@@ -608,6 +608,20 @@ public interface SettingsManager {
          */
         boolean hasPublicKeyRetrieval();
 
+        /**
+         * The wait-timeout of the database, in milliseconds.
+         * Used for MySQL only.
+         * Config-path: database.waitTimeout
+         */
+        long getWaitTimeout();
+
+        /**
+         * The max-lifetime of the database, in milliseconds.
+         * Used for MySQL only.
+         * Config-path: database.maxLifetime
+         */
+        long getMaxLifetime();
+
     }
 
     interface DefaultValues {

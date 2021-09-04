@@ -64,8 +64,8 @@ public final class SQLSession {
                 config.setMinimumIdle(5);
                 config.setMaximumPoolSize(50);
                 config.setConnectionTimeout(10000);
-                config.setIdleTimeout(600000);
-                config.setMaxLifetime(1800000);
+                config.setIdleTimeout(plugin.getSettings().getDatabase().getWaitTimeout());
+                config.setMaxLifetime(plugin.getSettings().getDatabase().getMaxLifetime());
                 config.addDataSourceProperty("characterEncoding","utf8");
                 config.addDataSourceProperty("useUnicode","true");
 

@@ -40,6 +40,8 @@ public final class SettingsContainer {
     public final String databaseMySQLPrefix;
     public final boolean databaseMySQLSSL;
     public final boolean databaseMySQLPublicKeyRetrieval;
+    public final long databaseMySQLWaitTimeout;
+    public final long databaseMySQLMaxLifetime;
     public final int maxIslandSize;
     public final String islandCommand;
     public final int defaultIslandSize;
@@ -188,6 +190,8 @@ public final class SettingsContainer {
         databaseMySQLPrefix = config.getString("database.prefix");
         databaseMySQLSSL = config.getBoolean("database.useSSL");
         databaseMySQLPublicKeyRetrieval = config.getBoolean("database.allowPublicKeyRetrieval");
+        databaseMySQLWaitTimeout = config.getLong("database.waitTimeout");
+        databaseMySQLMaxLifetime = config.getLong("database.maxLifetime");
 
         calcInterval = config.getLong("calc-interval", 6000);
         islandCommand = config.getString("island-command", "island,is,islands");
