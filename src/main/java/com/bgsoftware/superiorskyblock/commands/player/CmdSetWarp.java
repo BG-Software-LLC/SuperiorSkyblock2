@@ -83,6 +83,11 @@ public final class CmdSetWarp implements IPermissibleCommand {
             return;
         }
 
+        if(!IslandUtils.isWarpNameLengthValid(warpName)) {
+            Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
+            return;
+        }
+
         if(island.getWarp(warpName) != null){
             Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
             return;
@@ -99,6 +104,11 @@ public final class CmdSetWarp implements IPermissibleCommand {
             categoryName = IslandUtils.getWarpName(args[2]);
             if(categoryName.isEmpty()){
                 Locale.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
+                return;
+            }
+
+            if(!IslandUtils.isWarpNameLengthValid(categoryName)) {
+                Locale.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
                 return;
             }
         }

@@ -51,6 +51,11 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
                         return true;
                     }
 
+                    if(!IslandUtils.isWarpNameLengthValid(newName)) {
+                        Locale.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+                        return true;
+                    }
+
                     warpCategory.getIsland().renameCategory(warpCategory, newName);
 
                     Locale.WARP_CATEGORY_RENAME_SUCCESS.send(e.getWhoClicked(), newName);

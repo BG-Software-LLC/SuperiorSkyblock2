@@ -243,4 +243,12 @@ public final class IslandUtils {
         return StringUtils.removeNonAlphabet(rawName, Collections.singletonList('_'));
     }
 
+    public static boolean isWarpNameLengthValid(String warpName) {
+        return warpName.length() <= 32;
+    }
+
+    public static int getMaxWarpNameLength() {
+        return 32;
+    }
+
 }

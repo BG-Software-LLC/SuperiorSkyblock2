@@ -1241,6 +1241,12 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                     if(name.isEmpty())
                         continue;
 
+                    if(!IslandUtils.isWarpNameLengthValid(name))
+                        name = name.substring(0, IslandUtils.getMaxWarpNameLength());
+
+                    if(!IslandUtils.isWarpNameLengthValid(category))
+                        category = category.substring(0, IslandUtils.getMaxWarpNameLength());
+
                     warpAttributes.add(new IslandWarpAttributes()
                             .setValue(IslandWarpAttributes.Field.NAME, name)
                             .setValue(IslandWarpAttributes.Field.CATEGORY, category)

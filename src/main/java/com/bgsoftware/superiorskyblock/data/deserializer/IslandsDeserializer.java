@@ -113,6 +113,9 @@ public final class IslandsDeserializer {
             if(name.isEmpty())
                 return;
 
+            if(!IslandUtils.isWarpNameLengthValid(name))
+                name = name.substring(0, IslandUtils.getMaxWarpNameLength());
+
             WarpCategory warpCategory = null;
             if (!((String) islandWarpRow.getOrDefault("category", "")).isEmpty())
                 warpCategory = island.createWarpCategory((String) islandWarpRow.get("category"));

@@ -130,14 +130,27 @@ public final class BlocksLogic {
         String warpName = IslandUtils.getWarpName(StringUtils.stripColors(signLines[1].trim()));
         boolean privateFlag = signLines[2].equalsIgnoreCase("private");
 
-        if(warpName.isEmpty() || island.getWarp(warpName) != null){
-            if(sendMessage) {
-                if(warpName.isEmpty())
-                    Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
-                else
-                    Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
-            }
+        boolean creationFailed = false;
 
+        if(warpName.isEmpty()) {
+            if(sendMessage)
+                Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        else if(island.getWarp(warpName) != null) {
+            if(sendMessage)
+                Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        else if(!IslandUtils.isWarpNameLengthValid(warpName)) {
+            if(sendMessage)
+                Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        if(creationFailed){
             for (int i = 0; i < 4; i++) {
                 signLines[i] = "";
             }
