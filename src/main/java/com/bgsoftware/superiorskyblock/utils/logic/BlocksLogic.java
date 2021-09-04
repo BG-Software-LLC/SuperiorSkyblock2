@@ -48,7 +48,7 @@ public final class BlocksLogic {
 
         for(BlockFace nearbyFace : NEARBY_BLOCKS){
             Block nearbyBlock = block.getRelative(nearbyFace);
-            if(!nearbyBlock.getType().isBlock()) {
+            if(!nearbyBlock.getType().isSolid()) {
                 Key nearbyBlockKey = Key.of(nearbyBlock);
                 if (!nearbyBlockKey.getGlobalKey().equals("AIR"))
                     nearbyBlocks.put(nearbyFace, nearbyBlockKey);
