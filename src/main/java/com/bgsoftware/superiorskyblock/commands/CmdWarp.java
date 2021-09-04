@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuWarps;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,15 +103,37 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        List<String> tabCompletes = args.length < 2 ? new ArrayList<>() :
+                CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
+                        plugin.getSettings().tabCompleteHideVanished, (onlinePlayer, onlineIsland) ->
+                                onlineIsland.getIslandWarps().values().stream()
+                                        .anyMatch(islandWarp -> !islandWarp.hasPrivateFlag()));
+
         switch (args.length) {
-            case 2:
-                return CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                        plugin.getSettings().tabCompleteHideVanished);
-            case 3:
-                return CommandTabCompletes.getIslandWarps(CommandArguments.getIsland(plugin, sender, args[1]).getKey(), args[2]);
+            case 2: {
+                SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
+                Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
+                if (island != null) {
+                    tabCompletes.addAll(CommandTabCompletes.getIslandWarps(island, args[1]));
+                }
+                break;
+            }
+            case 3: {
+                if (!tabCompletes.isEmpty()) {
+                    SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
+                    Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
+                    if(island != null) {
+                        tabCompletes = CommandTabCompletes.getIslandWarps(island, args[2]);
+                    }
+                }
+                break;
+            }
             default:
-                return new ArrayList<>();
+                tabCompletes.clear();
+                break;
         }
+
+        return tabCompletes;
     }
 
 }
