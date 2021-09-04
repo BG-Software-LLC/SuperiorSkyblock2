@@ -583,7 +583,6 @@ public interface SettingsManager {
         /**
          * The password used to connect to the database.
          * Used for MySQL only.
-         * Calling this method will print a warning in console, so use this with caution.
          * Config-path: database.password
          */
         String getPassword();

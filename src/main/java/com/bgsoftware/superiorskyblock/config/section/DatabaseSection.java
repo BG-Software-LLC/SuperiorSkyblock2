@@ -39,8 +39,6 @@ public final class DatabaseSection implements SettingsManager.Database {
 
     @Override
     public String getPassword() {
-        SuperiorSkyblockPlugin.log("&cWarning: A plugin attempts to read the password of the database. Stack trace:");
-        new Exception().printStackTrace();
         return this.container.databaseMySQLPassword;
     }
 
