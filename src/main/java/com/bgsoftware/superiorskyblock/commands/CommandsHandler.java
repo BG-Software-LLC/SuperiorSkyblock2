@@ -209,6 +209,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                     }
 
                     if(!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                        SuperiorSkyblockPlugin.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
                         Locale.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }
