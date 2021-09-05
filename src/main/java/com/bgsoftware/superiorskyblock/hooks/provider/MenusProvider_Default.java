@@ -92,6 +92,7 @@ public final class MenusProvider_Default implements MenusProvider {
         handleExceptions(MenuMemberRole::init);
         handleExceptions(MenuMembers::init);
         handleExceptions(MenuMissions::init);
+        handleExceptions(MenuMissionsCategory::init);
         handleExceptions(MenuPermissions::init);
         handleExceptions(MenuPlayerLanguage::init);
         handleExceptions(MenuSettings::init);
