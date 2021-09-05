@@ -6,7 +6,7 @@
 ######################################################
 
 # The mission file to use
-mission-file: BlocksMissions2
+mission-file: BlocksMissions
 
 # Whether the mission should be given when completing all requirements.
 auto-reward: true
