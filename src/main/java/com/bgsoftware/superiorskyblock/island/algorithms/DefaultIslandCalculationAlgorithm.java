@@ -4,16 +4,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.handlers.StackedBlocksHandler;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.blocks.StackedBlock;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 
@@ -90,7 +90,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                 }
 
                 // Load built-in stacked blocks
-                for (StackedBlocksHandler.StackedBlock stackedBlock : plugin.getGrid().getStackedBlocks(calculatedChunk.getPosition()))
+                for (StackedBlock stackedBlock : plugin.getStackedBlocks().getRealStackedBlocks(calculatedChunk.getPosition()))
                     blockCounts.addCounts(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1);
 
                 plugin.getProviders().releaseSnapshots(calculatedChunk.getPosition());

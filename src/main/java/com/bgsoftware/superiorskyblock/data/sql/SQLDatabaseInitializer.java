@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.data.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.data.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public final class SQLDatabaseInitializer {
     public void init(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
 
-        this.database = DatabaseType.fromName(plugin.getSettings().databaseType);
+        this.database = DatabaseType.fromName(plugin.getSettings().getDatabase().getType());
 
         if (database == DatabaseType.SQLite)
             createSQLiteFile();
@@ -172,7 +172,7 @@ public final class SQLDatabaseInitializer {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_chests (" +
                 "island UUID, " +
                 "`index` INTEGER, " +
-                "contents TEXT" +
+                "contents LONGTEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_effects (" +
@@ -277,14 +277,14 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
                 "island UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name VARCHAR(255), " +
                 "slot INTEGER, " +
                 "icon TEXT" +
                 ");");
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warps (" +
                 "island UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name VARCHAR(255), " +
                 "category TEXT, " +
                 "location TEXT, " +
                 "private BOOLEAN, " +

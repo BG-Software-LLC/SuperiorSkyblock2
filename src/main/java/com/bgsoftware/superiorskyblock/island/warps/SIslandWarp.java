@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
@@ -32,7 +32,7 @@ public final class SIslandWarp implements IslandWarp {
         this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
                 location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
         this.warpCategory = warpCategory;
-        this.privateFlag = !plugin.getSettings().publicWarps;
+        this.privateFlag = !plugin.getSettings().isPublicWarps();
     }
 
     @Override

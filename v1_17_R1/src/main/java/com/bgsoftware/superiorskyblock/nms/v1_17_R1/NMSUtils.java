@@ -4,11 +4,11 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
-import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.tag.ByteTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
+import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPosition;
@@ -181,13 +181,13 @@ public final class NMSUtils {
             }
         }
 
-        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) ||
+        if ((blockData.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) ||
                 blockData.getBlock() instanceof BlockBed) {
             chunk.getWorld().setTypeAndData(blockPosition, blockData, 3);
             return;
         }
 
-        if (plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().isLightsUpdate()) {
             chunk.setType(blockPosition, blockData, true, true);
         } else {
             int indexY = chunk.getSectionIndex(blockPosition.getY());

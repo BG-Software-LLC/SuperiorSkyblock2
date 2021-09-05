@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityTypes;
 import net.minecraft.server.v1_8_R3.ItemStack;
@@ -36,6 +36,11 @@ public final class NMSTagsImpl implements NMSTags {
         ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
         NBTTagCompound nbtTagCompound = itemStack.hasTag() ? itemStack.getTag() : new NBTTagCompound();
         return CompoundTag.fromNBT(nbtTagCompound);
+    }
+
+    @Override
+    public CompoundTag convertToNBT(org.bukkit.inventory.ItemStack bukkitItem) {
+        return CompoundTag.fromNBT(CraftItemStack.asNMSCopy(bukkitItem).save(new NBTTagCompound()));
     }
 
     @Override

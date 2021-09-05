@@ -185,7 +185,7 @@ public final class CustomEventsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onIslandEvent(IslandEvent e) {
-        List<String> commands = plugin.getSettings().eventCommands.get(e.getClass().getSimpleName().toLowerCase());
+        List<String> commands = plugin.getSettings().getEventCommands().get(e.getClass().getSimpleName().toLowerCase());
 
         if (commands == null)
             return;

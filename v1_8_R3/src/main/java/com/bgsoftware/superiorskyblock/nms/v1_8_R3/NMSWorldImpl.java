@@ -8,9 +8,9 @@ import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import net.minecraft.server.v1_8_R3.BiomeBase;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -89,7 +89,7 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         try {
-            if (!plugin.getSettings().worldBordersEnabled)
+            if (!plugin.getSettings().isWorldBorders())
                 return;
 
             Player player = superiorPlayer.asPlayer();
@@ -102,7 +102,8 @@ public final class NMSWorldImpl implements NMSWorld {
 
             WorldBorder worldBorder;
 
-            if (!superiorPlayer.hasWorldBorderEnabled() || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())) {
+            if (!superiorPlayer.hasWorldBorderEnabled() || island == null ||
+                    (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
                 worldBorder = worldServer.getWorldBorder();
             } else {
                 worldBorder = new WorldBorder();

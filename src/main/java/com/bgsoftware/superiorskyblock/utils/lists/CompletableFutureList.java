@@ -31,10 +31,10 @@ public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<
             return null;
         });
 
-        if (plugin.getSettings().recalcTaskTimeout <= 0L) {
+        if (plugin.getSettings().getRecalcTaskTimeout() <= 0L) {
             allTasks.join();
         } else try {
-            allTasks.get(plugin.getSettings().recalcTaskTimeout, TimeUnit.SECONDS);
+            allTasks.get(plugin.getSettings().getRecalcTaskTimeout(), TimeUnit.SECONDS);
         } catch (Throwable error) {
             onFailure.accept(error);
         }

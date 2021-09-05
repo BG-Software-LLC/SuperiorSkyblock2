@@ -186,7 +186,7 @@ public final class FileUtils {
 
         menu.setBackButton(backButton);
 
-        if(plugin.getSettings().onlyBackButton && backButton == -1)
+        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] Menu doesn't have a back button, it's impossible to close it.");
 
         return charSlots;

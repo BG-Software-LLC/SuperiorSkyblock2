@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.factory;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
+import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
@@ -32,5 +33,13 @@ public interface DatabaseBridgeFactory {
      * @param original The original database-bridge that was created.
      */
     DatabaseBridge createGridDatabaseBridge(@Nullable GridManager gridManager, DatabaseBridge original);
+
+    /**
+     * Create a new database bridge for the stacked-blocks manager.
+     * @param stackedBlocksManager The stacked-blocks manager to create the database-bridge for.
+     *                    If manager is null, then the database-bridge is used as a loader from the database.
+     * @param original The original database-bridge that was created.
+     */
+    DatabaseBridge createStackedBlocksDatabaseBridge(@Nullable StackedBlocksManager stackedBlocksManager, DatabaseBridge original);
 
 }

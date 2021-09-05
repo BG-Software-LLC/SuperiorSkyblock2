@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import org.bukkit.Bukkit;
@@ -112,8 +112,8 @@ public final class ProtectionListener implements Listener {
         if (e.getClickedBlock() == null)
             return;
 
-        if (!plugin.getSettings().interactables.contains(e.getClickedBlock().getType().name()) &&
-                plugin.getGrid().getBlockAmount(e.getClickedBlock()) <= 1)
+        if (!plugin.getSettings().getInteractables().contains(e.getClickedBlock().getType().name()) &&
+                plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) <= 1)
             return;
 
         Block clickedBlock = e.getClickedBlock();
@@ -146,7 +146,7 @@ public final class ProtectionListener implements Listener {
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
         else if (blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
-        else if (plugin.getGrid().getBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
+        else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
         else requiredPrivilege = IslandPrivileges.INTERACT;
 
         if (!island.hasPermission(superiorPlayer, requiredPrivilege)) {
@@ -155,7 +155,7 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if (plugin.getSettings().valuableBlocks.contains(Key.of(blockState)) &&
+        if (plugin.getSettings().getValuableBlocks().contains(Key.of(blockState)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
             e.setCancelled(true);
             Locale.sendProtectionMessage(e.getPlayer());

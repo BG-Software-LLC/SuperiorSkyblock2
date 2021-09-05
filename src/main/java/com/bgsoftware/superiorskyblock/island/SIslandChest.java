@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ public final class SIslandChest implements IslandChest {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().islandChestTitle);
+    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
     private int contentsUpdateCounter = 0;
 
@@ -56,7 +56,7 @@ public final class SIslandChest implements IslandChest {
                 ItemStack[] oldContents = inventory.getContents();
                 List<HumanEntity> toUpdate = new ArrayList<>(inventory.getViewers());
                 Inventory oldInventory = inventory;
-                inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().islandChestTitle);
+                inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
                 toUpdate.forEach(humanEntity -> {
                     if(humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
@@ -100,7 +100,7 @@ public final class SIslandChest implements IslandChest {
 
     public static SIslandChest createChest(Island island, int index, ItemStack[] contents){
         SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().islandChestTitle);
+        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
         islandChest.inventory.setContents(contents);
         return islandChest;
     }

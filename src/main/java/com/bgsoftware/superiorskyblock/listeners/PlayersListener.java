@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.SkinsRestorerHook;
+import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
@@ -20,7 +20,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -193,7 +193,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onMinecartRightClick(PlayerInteractAtEntityEvent e){
-        if(!plugin.getSettings().stopLeaving)
+        if(!plugin.getSettings().isStopLeaving())
             return;
 
         Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
@@ -210,7 +210,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onMinecartRightClick(VehicleEnterEvent e){
-        if(!plugin.getSettings().stopLeaving)
+        if(!plugin.getSettings().isStopLeaving())
             return;
 
         Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
@@ -227,7 +227,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onVehicleRide(VehicleMoveEvent e){
-        if(plugin.getSettings().stopLeaving && e.getTo() != null) {
+        if(plugin.getSettings().isStopLeaving() && e.getTo() != null) {
             Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
             Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
 
@@ -245,7 +245,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerMoveOutside(PlayerMoveEvent e){
-        if(!plugin.getSettings().stopLeaving)
+        if(!plugin.getSettings().isStopLeaving())
             return;
 
         Location from = e.getFrom(), to = e.getTo();
@@ -285,9 +285,9 @@ public final class PlayersListener implements Listener {
 
         if(damagerPlayer == null) {
             if(island != null){
-                if(island.isSpawn() ? (plugin.getSettings().spawnProtection && !plugin.getSettings().spawnDamage) :
-                        ((!plugin.getSettings().visitorsDamage && island.isVisitor(targetPlayer, false)) ||
-                                (!plugin.getSettings().coopDamage && island.isVisitor(targetPlayer, true))))
+                if(island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
+                        ((!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, false)) ||
+                                (!plugin.getSettings().isCoopDamage() && island.isVisitor(targetPlayer, true))))
                     e.setCancelled(true);
             }
 
@@ -357,7 +357,7 @@ public final class PlayersListener implements Listener {
 
         else{
             String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
-                    plugin.getSettings().islandNamesColorSupport ? StringUtils.translateColors(island.getName()) : island.getName());
+                    plugin.getSettings().getIslandNames().isColorSupport() ? StringUtils.translateColors(island.getName()) : island.getName());
 
             e.setFormat(e.getFormat()
                     .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
@@ -410,7 +410,7 @@ public final class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         if(island == null || (island.isVisitor(superiorPlayer, false) ?
-                !plugin.getSettings().voidTeleportVisitors : !plugin.getSettings().voidTeleportMembers))
+                !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
             return;
 
         SuperiorSkyblockPlugin.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
@@ -473,7 +473,7 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onObsidianClick(PlayerInteractEvent e){
-        if(!plugin.getSettings().obsidianToLava || e.getItem() == null || e.getClickedBlock() == null ||
+        if(!plugin.getSettings().isObsidianToLava() || e.getItem() == null || e.getClickedBlock() == null ||
                 e.getItem().getType() != Material.BUCKET || e.getClickedBlock().getType() != Material.OBSIDIAN)
             return;
 
@@ -483,7 +483,7 @@ public final class PlayersListener implements Listener {
         if(island == null || island.isSpawn() || !island.hasPermission(e.getPlayer(), IslandPrivileges.BREAK))
             return;
 
-        if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) != 1)
+        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) != 1)
             return;
 
         e.setCancelled(true);
@@ -510,7 +510,7 @@ public final class PlayersListener implements Listener {
 
         String message = e.getMessage().toLowerCase();
         if(island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, false) &&
-                plugin.getSettings().blockedVisitorsCommands.stream().anyMatch(message::contains)){
+                plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(message::contains)){
             e.setCancelled(true);
             Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }

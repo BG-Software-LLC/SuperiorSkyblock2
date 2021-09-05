@@ -69,7 +69,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         if(environment == null)
             return;
 
-        if(environment == plugin.getSettings().defaultWorldEnvironment){
+        if(environment == plugin.getSettings().getWorlds().getDefaultWorld()){
             Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
@@ -114,7 +114,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         List<String> environments = new ArrayList<>();
 
         for(World.Environment environment : World.Environment.values()){
-            if(environment != plugin.getSettings().defaultWorldEnvironment) {
+            if(environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
                 switch (environment){
                     case NORMAL:
                         if(island.isNormalEnabled())

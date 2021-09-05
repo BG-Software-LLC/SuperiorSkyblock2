@@ -210,7 +210,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             this.islandChunkCoord = new ChunkCoordIntPair(islandBlockPosition);
             this.island = island;
 
-            int radius = plugin.getSettings().maxIslandSize;
+            int radius = plugin.getSettings().getMaxIslandSize();
             this.borderArea = new AxisAlignedBB(islandBlockPosition.add(-radius, -radius, -radius), islandBlockPosition.add(radius, radius, radius));
 
             spawnEnderDragon();

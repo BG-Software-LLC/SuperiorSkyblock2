@@ -36,7 +36,7 @@ public final class IslandPosition {
     }
 
     public static IslandPosition of(Location location){
-        int radius = plugin.getSettings().maxIslandSize * 3;
+        int radius = plugin.getSettings().getMaxIslandSize() * 3;
         int x = (Math.abs(location.getBlockX()) + (radius / 2)) / radius;
         int z = (Math.abs(location.getBlockZ()) + (radius / 2)) / radius;
         String worldName = plugin.getProviders().hasCustomWorldsSupport() && location.getWorld() != null ?

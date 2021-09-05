@@ -2,15 +2,15 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSection;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
@@ -133,24 +133,26 @@ public final class NMSChunksImpl implements NMSChunks {
                 if (chunkSection != null && chunkSection != Chunk.a) {
                     for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
                         IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                        if (blockData.getBlock() != Blocks.AIR) {
+                        Block block = blockData.getBlock();
+                        if (block != Blocks.AIR) {
                             Location location = new Location(worldServer.getWorld(),
                                     (chunkPosition.getX() << 4) + bp.getX(),
                                     chunkSection.getYPosition() + bp.getY(),
                                     (chunkPosition.getZ() << 4) + bp.getZ());
                             int blockAmount = 1;
 
-                            if (blockData.getBlock() instanceof BlockDoubleStep) {
+                            if (block instanceof BlockDoubleStep) {
                                 blockAmount = 2;
                                 // Converts the block data to a regular slab
-                                MinecraftKey blockKey = Block.REGISTRY.b(blockData.getBlock());
+                                MinecraftKey blockKey = Block.REGISTRY.b(block);
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
                             }
 
-                            Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                            Key blockKey = Key.of(type.name() + "", "", location);
+                            Material type = CraftMagicNumbers.getMaterial(block);
+                            byte data = (byte) block.toLegacyData(blockData);
+                            Key blockKey = Key.of(type, data, location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                             if (type == Material.MOB_SPAWNER) {
                                 spawnersLocations.add(location);
@@ -193,10 +195,10 @@ public final class NMSChunksImpl implements NMSChunks {
         // Update lights for the blocks.
         for (BlockData blockData : blockDataList) {
             BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-            if (plugin.getSettings().lightsUpdate && blockData.getBlockLightLevel() > 0)
+            if (plugin.getSettings().isLightsUpdate() && blockData.getBlockLightLevel() > 0)
                 world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
 
-            byte skyLight = plugin.getSettings().lightsUpdate ? blockData.getSkyLightLevel() : 15;
+            byte skyLight = plugin.getSettings().isLightsUpdate() ? blockData.getSkyLightLevel() : 15;
 
             if (skyLight > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
                 world.a(EnumSkyBlock.SKY, blockPosition, skyLight);
@@ -237,7 +239,7 @@ public final class NMSChunksImpl implements NMSChunks {
     private static void removeBlocks(Chunk chunk) {
         WorldServer worldServer = (WorldServer) chunk.world;
 
-        if (worldServer.generator != null && !(worldServer.generator instanceof WorldGenerator)) {
+        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
             CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
             Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunk.locX, chunk.locZ);
 

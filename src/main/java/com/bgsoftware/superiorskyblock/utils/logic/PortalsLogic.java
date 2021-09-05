@@ -93,7 +93,7 @@ public final class PortalsLogic {
 
                 if (destinationEnvironment == World.Environment.THE_END) {
                     plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                    if (plugin.getSettings().endDragonFight)
+                    if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
                         plugin.getNMSDragonFight().startDragonBattle(island, destinationLocation);
                 }
 
@@ -108,11 +108,11 @@ public final class PortalsLogic {
     public static boolean shouldOffsetSchematic(World.Environment environment) {
         switch (environment) {
             case NORMAL:
-                return plugin.getSettings().normalSchematicOffset;
+                return plugin.getSettings().getWorlds().getNormal().isSchematicOffset();
             case NETHER:
-                return plugin.getSettings().netherSchematicOffset;
+                return plugin.getSettings().getWorlds().getNether().isSchematicOffset();
             case THE_END:
-                return plugin.getSettings().endSchematicOffset;
+                return plugin.getSettings().getWorlds().getEnd().isSchematicOffset();
             default:
                 return false;
         }

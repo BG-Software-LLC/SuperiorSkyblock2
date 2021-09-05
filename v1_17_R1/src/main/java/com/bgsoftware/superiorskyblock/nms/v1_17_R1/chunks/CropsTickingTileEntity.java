@@ -61,7 +61,7 @@ public final class CropsTickingTileEntity extends TileEntity {
     }
 
     public void tick() {
-        if (++currentTick <= plugin.getSettings().cropsInterval)
+        if (++currentTick <= plugin.getSettings().getCropsInterval())
             return;
 
         Chunk chunk = this.chunk.get();
@@ -78,7 +78,7 @@ public final class CropsTickingTileEntity extends TileEntity {
         int worldRandomTick = world.getGameRules().getInt(GameRules.n);
         double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
-        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
+        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
 
         if (chunkRandomTickSpeed > 0) {
             for (ChunkSection chunkSection : chunk.getSections()) {
@@ -91,7 +91,7 @@ public final class CropsTickingTileEntity extends TileEntity {
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
                         Block block = blockData.getBlock();
-                        if (block.isTicking(blockData) && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
+                        if (block.isTicking(blockData) && plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
                             BlockPosition blockPosition = new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4));
                             blockData.b((WorldServer) world, blockPosition, ThreadLocalRandom.current());
                         }

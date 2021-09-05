@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.upgrades.UpgradeValue;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -109,7 +109,7 @@ public final class IslandUtils {
 
         {
             if(plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
-                World normalWorld = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld();
+                World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
                 chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
             }
         }
@@ -230,7 +230,7 @@ public final class IslandUtils {
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish){
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
-            plugin.getGrid().removeStackedBlocks(island, chunkPosition);
+            plugin.getStackedBlocks().removeStackedBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
             EventsCaller.callIslandChunkResetEvent(island, chunkPosition);
         });
     }
@@ -241,6 +241,14 @@ public final class IslandUtils {
 
     public static String getWarpName(String rawName){
         return StringUtils.removeNonAlphabet(rawName, Collections.singletonList('_'));
+    }
+
+    public static boolean isWarpNameLengthValid(String warpName) {
+        return warpName.length() <= 32;
+    }
+
+    public static int getMaxWarpNameLength() {
+        return 32;
     }
 
 }

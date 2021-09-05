@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
+import com.bgsoftware.superiorskyblock.config.SettingsHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -90,7 +90,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     }
 
     @Override
-    public void open(SuperiorMenu previousMenu) {
+    public void open(ISuperiorMenu previousMenu) {
         lastPage.put(superiorPlayer.getUniqueId(), currentPage);
         super.open(previousMenu);
     }
@@ -118,7 +118,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     }
 
     @Override
-    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
         openInventory(superiorPlayer, previousMenu);
     }
 
@@ -152,11 +152,11 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
         menuConfigSettings.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
         openInventory(superiorPlayer, previousMenu, 1);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, int page){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, int page){
         SuperiorMenuSettings superiorMenuSettings = new SuperiorMenuSettings(superiorPlayer);
         superiorMenuSettings.currentPage = page;
         superiorMenuSettings.open(previousMenu);

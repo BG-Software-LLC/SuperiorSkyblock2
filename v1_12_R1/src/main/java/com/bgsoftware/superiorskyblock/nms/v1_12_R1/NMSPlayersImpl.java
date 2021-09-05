@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityItem;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.MinecraftServer;
@@ -82,7 +83,8 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
     @Override
     public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
-        return player.getName().equals(((EntityItem) ((CraftItem) item).getHandle()).n());
+        Entity entity = ((CraftItem) item).getHandle();
+        return entity instanceof EntityItem && player.getName().equals(((EntityItem) entity).n());
     }
 
 }

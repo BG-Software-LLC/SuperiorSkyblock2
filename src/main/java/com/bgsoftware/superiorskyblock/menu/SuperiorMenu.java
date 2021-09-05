@@ -3,9 +3,10 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -18,6 +19,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class SuperiorMenu implements InventoryHolder {
+public abstract class SuperiorMenu implements ISuperiorMenu {
 
     protected static final String[] MENU_IGNORED_SECTIONS = new String[] {
             "items", "sounds", "commands", "back"
@@ -59,7 +61,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
     protected final SuperiorPlayer superiorPlayer;
     protected SuperiorPlayer targetPlayer = null;
 
-    protected SuperiorMenu previousMenu;
+    protected ISuperiorMenu previousMenu;
     protected boolean previousMove = true, closeButton = false, nextMove = false;
     private boolean refreshing = false;
 
@@ -153,6 +155,17 @@ public abstract class SuperiorMenu implements InventoryHolder {
         return buildInventory(null);
     }
 
+    @Override
+    public void setPreviousMove(boolean previousMove) {
+        this.previousMove = previousMove;
+    }
+
+    @Nullable
+    @Override
+    public ISuperiorMenu getPreviousMenu() {
+        return this.previousMenu;
+    }
+
     public final void onClick(InventoryClickEvent e){
         if(refreshing)
             return;
@@ -228,7 +241,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
                 runCommand(args, e, e.getWhoClicked());
                 break;
             case "admin":
-                String commandLabel = plugin.getSettings().islandCommand.split(",")[0];
+                String commandLabel = plugin.getSettings().getIslandCommand().split(",")[0];
                 runCommand(commandLabel + " admin " + args, e, sender);
                 break;
             case "close":
@@ -248,9 +261,9 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     protected abstract void onPlayerClick(InventoryClickEvent e);
 
-    protected abstract void cloneAndOpen(SuperiorMenu previousMenu);
+    public abstract void cloneAndOpen(ISuperiorMenu previousMenu);
 
-    public void open(SuperiorMenu previousMenu){
+    public void open(ISuperiorMenu previousMenu){
         if(Bukkit.isPrimaryThread()){
             Executor.async(() -> open(previousMenu));
             return;
@@ -302,7 +315,7 @@ public abstract class SuperiorMenu implements InventoryHolder {
                 return;
 
             if(previousMenu != null)
-                previousMenu.previousMove = false;
+                previousMenu.setPreviousMove(false);
 
             player.openInventory(inventory);
 
@@ -319,13 +332,13 @@ public abstract class SuperiorMenu implements InventoryHolder {
 
     public void closeInventory(SuperiorPlayer superiorPlayer){
         Executor.sync(() -> {
-            if(!nextMove && !closeButton && plugin.getSettings().onlyBackButton) {
+            if(!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
                 open(previousMenu);
             }
 
             else if(previousMenu != null && (boolean) getData("previous-menu", true)) {
                 if (previousMove)
-                    previousMenu.cloneAndOpen(previousMenu.previousMenu);
+                    previousMenu.cloneAndOpen(previousMenu.getPreviousMenu());
                 else
                     previousMove = true;
             }

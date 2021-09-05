@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
+import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 
 import javax.annotation.Nullable;
@@ -38,5 +39,17 @@ public interface ModulesManager {
      * Get all the active modules currently running.
      */
     Collection<PluginModule> getModules();
+
+    /**
+     * Enable a specific module.
+     * @param pluginModule The module to load.
+     */
+    void enableModule(PluginModule pluginModule);
+
+    /**
+     * Enable all modules with a specific module load time.
+     * @param moduleLoadTime The module load time to load modules with.
+     */
+    void enableModules(ModuleLoadTime moduleLoadTime);
 
 }

@@ -38,10 +38,17 @@ public final class CommandTabCompletes {
     }
 
     public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument, boolean hideVanish){
+        return getPlayerIslandsExceptSender(plugin, sender, argument, hideVanish, (onlinePlayer, onlineIsland) -> true);
+    }
+
+    public static List<String> getPlayerIslandsExceptSender(SuperiorSkyblockPlugin plugin, CommandSender sender,
+                                                            String argument, boolean hideVanish,
+                                                            BiPredicate<SuperiorPlayer, Island> islandPredicate){
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
         Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
         return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
-                onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)));
+                onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)) &&
+                        islandPredicate.test(onlinePlayer, onlineIsland));
     }
 
     public static List<String> getIslandMembersWithLowerRole(Island island, String argument, PlayerRole maxRole){
@@ -154,14 +161,14 @@ public final class CommandTabCompletes {
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument){
         String lowerArgument = argument.toLowerCase();
-        return plugin.getPlayers().getRoles().stream()
+        return plugin.getRoles().getRoles().stream()
                 .filter(playerRole -> playerRole.toString().toLowerCase().contains(lowerArgument))
                 .map(PlayerRole::toString).collect(Collectors.toList());
     }
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate){
         String lowerArgument = argument.toLowerCase();
-        return plugin.getPlayers().getRoles().stream()
+        return plugin.getRoles().getRoles().stream()
                 .filter(playerRole -> predicate.test(playerRole) &&  playerRole.toString().toLowerCase().contains(lowerArgument))
                 .map(PlayerRole::toString).collect(Collectors.toList());
     }

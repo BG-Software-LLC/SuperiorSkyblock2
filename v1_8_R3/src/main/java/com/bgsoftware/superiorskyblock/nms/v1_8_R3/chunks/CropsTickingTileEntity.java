@@ -53,7 +53,7 @@ public final class CropsTickingTileEntity extends TileEntity implements IUpdateP
 
     @Override
     public void c() {
-        if (++currentTick <= plugin.getSettings().cropsInterval)
+        if (++currentTick <= plugin.getSettings().getCropsInterval())
             return;
 
         Chunk chunk = this.chunk.get();
@@ -69,7 +69,7 @@ public final class CropsTickingTileEntity extends TileEntity implements IUpdateP
         int worldRandomTick = world.getGameRules().c("randomTickSpeed");
         double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
-        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().cropsInterval);
+        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
 
         if (chunkRandomTickSpeed > 0) {
             for (ChunkSection chunkSection : chunk.getSections()) {
@@ -82,7 +82,7 @@ public final class CropsTickingTileEntity extends TileEntity implements IUpdateP
                         int y = factor >> 16 & 15;
                         IBlockData blockData = chunkSection.getType(x, y, z);
                         Block block = blockData.getBlock();
-                        if (block.isTicking() && plugin.getSettings().cropsToGrow.contains(CraftMagicNumbers.getMaterial(block).name())) {
+                        if (block.isTicking() && plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
                             block.a(world, new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4)),
                                     blockData, ThreadLocalRandom.current());
                         }

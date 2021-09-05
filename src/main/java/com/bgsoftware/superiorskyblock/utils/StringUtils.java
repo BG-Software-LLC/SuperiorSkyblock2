@@ -302,27 +302,28 @@ public final class StringUtils {
     }
 
     public static boolean isValidName(CommandSender sender, Island currentIsland, String islandName){
-        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.translateColors(islandName) : islandName;
-        String strippedName = plugin.getSettings().islandNamesColorSupport ?
+        String strippedName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.stripColors(coloredName) : islandName;
 
-        if(strippedName.length() > plugin.getSettings().islandNamesMaxLength){
+        if(strippedName.length() > plugin.getSettings().getIslandNames().getMaxLength()){
             Locale.NAME_TOO_LONG.send(sender);
             return false;
         }
 
-        if(strippedName.length() < plugin.getSettings().islandNamesMinLength){
+        if(strippedName.length() < plugin.getSettings().getIslandNames().getMinLength()){
             Locale.NAME_TOO_SHORT.send(sender);
             return false;
         }
 
-        if(plugin.getSettings().islandNamesPreventPlayerNames && plugin.getPlayers().getSuperiorPlayer(strippedName) != null){
+        if(plugin.getSettings().getIslandNames().isPreventPlayerNames() && plugin.getPlayers().getSuperiorPlayer(strippedName) != null){
             Locale.NAME_SAME_AS_PLAYER.send(sender);
             return false;
         }
 
-        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
+        if(plugin.getSettings().getIslandNames().getFilteredNames().stream()
+                .anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
             Locale.NAME_BLACKLISTED.send(sender);
             return false;
         }

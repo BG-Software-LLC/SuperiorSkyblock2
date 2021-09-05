@@ -10,6 +10,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.level.World;
 import org.bukkit.Bukkit;
@@ -86,7 +87,8 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
     @Override
     public boolean wasThrownByPlayer(Item item, Player player) {
-        return player.getUniqueId().equals(((EntityItem) ((CraftItem) item).getHandle()).getThrower());
+        Entity entity = ((CraftItem) item).getHandle();
+        return entity instanceof EntityItem && player.getUniqueId().equals(((EntityItem) entity).getThrower());
     }
 
 }

@@ -15,7 +15,7 @@ public final class SortingTypes {
     public static SortingType BY_PLAYERS = SortingType.getByName("PLAYERS");
 
     public static SortingType getDefaultSorting(){
-        return SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().islandTopOrder);
+        return SortingType.getByName(SuperiorSkyblockPlugin.getPlugin().getSettings().getIslandTopOrder());
     }
 
 }

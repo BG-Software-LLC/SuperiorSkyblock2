@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
+import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityItem;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
@@ -98,7 +99,8 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
     @Override
     public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
-        return player.getName().equals(((EntityItem) ((CraftItem) item).getHandle()).n());
+        Entity entity = ((CraftItem) item).getHandle();
+        return entity instanceof EntityItem && player.getName().equals(((EntityItem) entity).n());
     }
 
 }

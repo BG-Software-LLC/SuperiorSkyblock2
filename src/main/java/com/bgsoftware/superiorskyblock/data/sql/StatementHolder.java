@@ -11,7 +11,8 @@ import java.util.Map;
 public final class StatementHolder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final String prefix = plugin.getSettings().databaseType.equalsIgnoreCase("MySQL") ? plugin.getSettings().databaseMySQLPrefix : "";
+    private static final String prefix = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL") ?
+            plugin.getSettings().getDatabase().getPrefix() : "";
 
     private final List<Map<Integer, Object>> batches = new ArrayList<>();
 

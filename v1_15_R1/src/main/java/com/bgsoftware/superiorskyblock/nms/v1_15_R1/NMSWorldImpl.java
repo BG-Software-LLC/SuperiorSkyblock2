@@ -9,13 +9,13 @@ import com.bgsoftware.superiorskyblock.nms.v1_15_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.tags.ByteTag;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
-import com.bgsoftware.superiorskyblock.utils.tags.StringTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
+import com.bgsoftware.superiorskyblock.tag.ByteTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
+import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
@@ -108,7 +108,7 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public void setWorldBorder(SuperiorPlayer superiorPlayer, Island island) {
         try {
-            if (!plugin.getSettings().worldBordersEnabled)
+            if (!plugin.getSettings().isWorldBorders())
                 return;
 
             boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
@@ -123,7 +123,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
             WorldBorder worldBorder;
 
-            if (disabled || island == null || (!plugin.getSettings().spawnWorldBorder && island.isSpawn())) {
+            if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
                 worldBorder = worldServer.getWorldBorder();
             } else {
                 worldBorder = new WorldBorder();

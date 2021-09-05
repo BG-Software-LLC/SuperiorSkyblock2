@@ -5,15 +5,15 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.generator.WorldGenerator;
+import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.IslandsChunkGenerator;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.minecraft.core.BlockPosition;
@@ -152,7 +152,7 @@ public final class NMSChunksImpl implements NMSChunks {
             levelCompound.set("TileEntities", tileEntities);
             levelCompound.set("Entities", new NBTTagList());
 
-            if (!(worldServer.generator instanceof WorldGenerator)) {
+            if (!(worldServer.generator instanceof IslandsGenerator)) {
                 ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
 
                 try {
@@ -257,7 +257,7 @@ public final class NMSChunksImpl implements NMSChunks {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         WorldServer world = (WorldServer) chunk.getWorld();
 
-        if (plugin.getSettings().lightsUpdate) {
+        if (plugin.getSettings().isLightsUpdate()) {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
             Executor.sync(() -> {
@@ -378,7 +378,7 @@ public final class NMSChunksImpl implements NMSChunks {
         ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
-        if (!(worldServer.generator instanceof WorldGenerator)) {
+        if (!(worldServer.generator instanceof IslandsGenerator)) {
             IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
             ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
             //noinspection ConstantConditions

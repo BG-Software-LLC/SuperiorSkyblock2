@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api;
 
+import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
@@ -10,7 +11,9 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
+import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
+import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 
@@ -22,6 +25,11 @@ public interface SuperiorSkyblock {
      * Get the grid of the core.
      */
     GridManager getGrid();
+
+    /**
+     * Get the stacked-blocks manager of the core.
+     */
+    StackedBlocksManager getStackedBlocks();
 
     /**
      * Get the blocks manager of the core.
@@ -37,6 +45,11 @@ public interface SuperiorSkyblock {
      * Get the players manager of the core.
      */
     PlayersManager getPlayers();
+
+    /**
+     * Get the roles manager of the core.
+     */
+    RolesManager getRoles();
 
     /**
      * Get the missions manager of the core.
@@ -67,6 +80,11 @@ public interface SuperiorSkyblock {
      * Get the commands manager of the core.
      */
     CommandsManager getCommands();
+
+    /**
+     * Get the settings of the plugin.
+     */
+    SettingsManager getSettings();
 
     /**
      * Get the objects factory of the plugin.

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -112,7 +112,7 @@ public final class NMSUtils {
     public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag tileEntity) {
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
-        if (blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().liquidUpdate) {
+        if (blockData.getBlock().getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) {
             chunk.world.setTypeAndData(blockPosition, blockData, 3);
             return;
         }

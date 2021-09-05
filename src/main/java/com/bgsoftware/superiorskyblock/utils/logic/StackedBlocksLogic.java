@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.utils.logic;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.CoreProtectHook;
+import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.Key;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,10 +29,10 @@ public final class StackedBlocksLogic {
     }
 
     public static boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState){
-        if(!plugin.getSettings().stackedBlocksEnabled)
+        if(!plugin.getSettings().getStackedBlocks().isEnabled())
             return false;
 
-        if(plugin.getSettings().stackedBlocksDisabledWorlds.contains(againstBlock.getWorld().getName()))
+        if(plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(againstBlock.getWorld().getName()))
             return false;
 
         if(placeItem.hasItemMeta() && (placeItem.getItemMeta().hasDisplayName() || placeItem.getItemMeta().hasLore()))
@@ -57,7 +57,7 @@ public final class StackedBlocksLogic {
                 (replaceState != null && replaceState.getType() != Material.AIR))
             return false;
 
-        if(!plugin.getSettings().whitelistedStackedBlocks.contains(againstBlock))
+        if(!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(againstBlock)))
             return false;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
@@ -81,9 +81,13 @@ public final class StackedBlocksLogic {
 
     public static boolean tryStack(SuperiorSkyblockPlugin plugin, Player player, int amount, Location stackedBlock, Consumer<Integer> depositedAmount){
         // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
-        int blockAmount = plugin.getGrid().getBlockAmount(stackedBlock);
-        Key blockKey = plugin.getGrid().getBlockKey(stackedBlock);
-        int blockLimit = plugin.getSettings().stackedBlocksLimits.getOrDefault(blockKey, Integer.MAX_VALUE);
+        int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(stackedBlock);
+        Key blockKey = (Key) plugin.getStackedBlocks().getStackedBlockKey(stackedBlock);
+
+        if(blockKey == null)
+            blockKey = Key.of(stackedBlock.getBlock());
+
+        int blockLimit = plugin.getSettings().getStackedBlocks().getLimits().getOrDefault(blockKey, Integer.MAX_VALUE);
 
         if(amount + blockAmount > blockLimit){
             amount = blockLimit - blockAmount;
@@ -125,9 +129,7 @@ public final class StackedBlocksLogic {
             }
         }
 
-        plugin.getGrid().setBlockAmount(block, blockAmount + amount);
-
-        if(plugin.getGrid().hasBlockFailed()) {
+        if(!plugin.getStackedBlocks().setStackedBlock(block, blockAmount + amount)){
             depositedAmount.accept(0);
             return false;
         }
@@ -144,7 +146,7 @@ public final class StackedBlocksLogic {
     }
 
     public static boolean tryUnstack(Player player, Block block, SuperiorSkyblockPlugin plugin){
-        int blockAmount = plugin.getGrid().getBlockAmount(block);
+        int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(block);
 
         if(blockAmount <= 1)
             return false;
@@ -160,13 +162,13 @@ public final class StackedBlocksLogic {
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
 
-        plugin.getGrid().setBlockAmount(block, (leftAmount = blockAmount - amount));
+        boolean stackedBlockSuccess = plugin.getStackedBlocks().setStackedBlock(block, (leftAmount = blockAmount - amount));
 
         plugin.getNMSWorld().playBreakAnimation(block);
 
         CoreProtectHook.recordBlockChange(player, block, false);
 
-        if(plugin.getGrid().hasBlockFailed()) {
+        if(!stackedBlockSuccess) {
             if(island != null)
                 island.handleBlockBreak(Key.of(block), blockAmount - 1);
             leftAmount = 0;
@@ -194,7 +196,7 @@ public final class StackedBlocksLogic {
         }
 
         // Dropping the item
-        if(player != null && plugin.getSettings().stackedBlocksAutoPickup){
+        if(player != null && plugin.getSettings().getStackedBlocks().isAutoCollect()){
             ItemUtils.addItem(blockItem, player.getInventory(), block.getLocation());
         }
         else {

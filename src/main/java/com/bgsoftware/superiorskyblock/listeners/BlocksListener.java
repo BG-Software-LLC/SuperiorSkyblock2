@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -63,7 +63,7 @@ public final class BlocksListener implements Listener {
 
     public BlocksListener(SuperiorSkyblockPlugin plugin){
         this.plugin = plugin;
-        if(plugin.getSettings().physicsListener)
+        if(plugin.getSettings().isPhysicsListener())
             Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
     }
 
@@ -243,7 +243,7 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockRedstone(BlockRedstoneEvent e){
-        if(!plugin.getSettings().disableRedstoneOffline && !plugin.getSettings().disableRedstoneAFK)
+        if(!plugin.getSettings().isDisableRedstoneOffline() && !plugin.getSettings().getAFKIntegrations().isDisableRedstone())
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
@@ -251,15 +251,16 @@ public final class BlocksListener implements Listener {
         if(island == null || island.isSpawn())
             return;
 
-        if((plugin.getSettings().disableRedstoneOffline && island.getLastTimeUpdate() != -1) ||
-                (plugin.getSettings().disableRedstoneAFK && island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
+        if((plugin.getSettings().isDisableRedstoneOffline() && island.getLastTimeUpdate() != -1) ||
+                (plugin.getSettings().getAFKIntegrations().isDisableRedstone() &&
+                        island.getAllPlayersInside().stream().allMatch(SuperiorPlayer::isAFK))) {
             e.setNewCurrent(0);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e){
-        if(!plugin.getSettings().disableSpawningAFK)
+        if(!plugin.getSettings().getAFKIntegrations().isDisableSpawning())
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
@@ -277,7 +278,7 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockStack(PlayerInteractEvent e){
         if(e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DRAGON_EGG){
-            if(plugin.getGrid().getBlockAmount(e.getClickedBlock()) > 1) {
+            if(plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) > 1) {
                 e.setCancelled(true);
                 if(e.getItem() == null)
                     StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin);
@@ -292,8 +293,8 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockStack(BlockPlaceEvent e){
-        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
-            plugin.getGrid().setBlockAmount(e.getBlock(), 1);
+        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
+            plugin.getStackedBlocks().setStackedBlock(e.getBlock(), 1);
 
         if(!StackedBlocksLogic.canStackBlocks(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e.getBlockReplacedState()))
             return;
@@ -314,8 +315,8 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if(plugin.getSettings().stackedBlocksMenuEnabled && e.getPlayer().isSneaking() &&
-                plugin.getGrid().getBlockAmount(e.getClickedBlock()) > 1){
+        if(plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking() &&
+                plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) > 1){
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
         }
@@ -341,10 +342,10 @@ public final class BlocksListener implements Listener {
 
         for(Block block : blockList){
             // Check if block is stackable
-            if(!plugin.getSettings().whitelistedStackedBlocks.contains(block))
+            if(!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(block)))
                 continue;
 
-            int amount = plugin.getGrid().getBlockAmount(block);
+            int amount = plugin.getStackedBlocks().getStackedBlockAmount(block);
 
             if(amount <= 1)
                 continue;
@@ -354,22 +355,24 @@ public final class BlocksListener implements Listener {
 
             blockItem = block.getState().getData().toItemStack(amount);
 
-            Island island = plugin.getGrid().getIslandAt(block.getLocation());
+            Location location = block.getLocation();
+
+            Island island = plugin.getGrid().getIslandAt(location);
             if(island != null)
                 island.handleBlockBreak(block, amount);
 
-            plugin.getGrid().setBlockAmount(block, 0);
+            plugin.getStackedBlocks().removeStackedBlock(location);
             block.setType(Material.AIR);
 
             // Dropping the item
-            block.getWorld().dropItemNaturally(block.getLocation(), blockItem);
+            block.getWorld().dropItemNaturally(location, blockItem);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e){
         for(Block block : e.getBlocks()) {
-            if (plugin.getGrid().getBlockAmount(block) > 1) {
+            if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled(true);
                 break;
             }
@@ -379,7 +382,7 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e){
         for(Block block : e.getBlocks()) {
-            if (plugin.getGrid().getBlockAmount(block) > 1) {
+            if (plugin.getStackedBlocks().getStackedBlockAmount(block) > 1) {
                 e.setCancelled(true);
                 break;
             }
@@ -425,7 +428,7 @@ public final class BlocksListener implements Listener {
             blocksToCheck.add(entityLocation.clone().add(-1, 2, -1));
         }
 
-        if(blocksToCheck.stream().anyMatch(location -> plugin.getGrid().getBlockAmount(location) > 1))
+        if(blocksToCheck.stream().anyMatch(location -> plugin.getStackedBlocks().getStackedBlockAmount(location) > 1))
             e.setCancelled(true);
     }
 
@@ -450,7 +453,7 @@ public final class BlocksListener implements Listener {
 
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onStackedBlockPhysics(BlockPhysicsEvent e){
-            if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
+            if(plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
                 e.setCancelled(true);
         }
 

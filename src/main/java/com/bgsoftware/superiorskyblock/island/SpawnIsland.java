@@ -21,8 +21,8 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
-import com.bgsoftware.superiorskyblock.data.EmptyDatabaseBridge;
-import com.bgsoftware.superiorskyblock.hooks.SWMHook;
+import com.bgsoftware.superiorskyblock.data.bridge.EmptyDatabaseBridge;
+import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
@@ -32,7 +32,7 @@ import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -74,13 +74,13 @@ public final class SpawnIsland implements Island {
     public SpawnIsland(SuperiorSkyblockPlugin plugin){
         SpawnIsland.plugin = plugin;
 
-        String spawnLocation = plugin.getSettings().spawnLocation.replace(" ", "");
+        String spawnLocation = plugin.getSettings().getSpawn().getLocation().replace(" ", "");
 
         SmartLocation smartCenter = LocationUtils.getLocation(spawnLocation);
         assert smartCenter != null;
         center = smartCenter.add(0.5, 0, 0.5);
-        islandSize = plugin.getSettings().spawnSize;
-        islandSettings = plugin.getSettings().spawnSettings.stream().map(IslandFlag::getByName).collect(Collectors.toList());
+        islandSize = plugin.getSettings().getSpawn().getSize();
+        islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
         if(center.getWorld() == null)
             SWMHook.tryWorldLoad(spawnLocation.split(",")[0]);
@@ -91,7 +91,7 @@ public final class SpawnIsland implements Island {
             return;
         }
 
-        Executor.sync(() -> biome = getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock().getBiome());
+        Executor.sync(() -> biome = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock().getBiome());
     }
 
     @Override
@@ -275,13 +275,13 @@ public final class SpawnIsland implements Island {
     @Override
     public Map<World.Environment, Location> getTeleportLocations() {
         Map<World.Environment, Location> map = new HashMap<>();
-        map.put(plugin.getSettings().defaultWorldEnvironment, center);
+        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), center);
         return map;
     }
 
     @Override
     public Location getVisitorsLocation() {
-        return getCenter(plugin.getSettings().defaultWorldEnvironment);
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
     }
 
     @Override
@@ -301,7 +301,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).subtract(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandSize, 0, islandSize);
     }
 
     @Override
@@ -311,7 +311,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        return getCenter(plugin.getSettings().defaultWorldEnvironment).add(islandSize, 0, islandSize);
+        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandSize, 0, islandSize);
     }
 
     @Override
@@ -326,7 +326,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(boolean onlyProtected) {
-        return getAllChunks(plugin.getSettings().defaultWorldEnvironment, onlyProtected);
+        return getAllChunks(plugin.getSettings().getWorlds().getDefaultWorld(), onlyProtected);
     }
 
     @Override
@@ -361,7 +361,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        return getLoadedChunks(plugin.getSettings().defaultWorldEnvironment, onlyProtected, noEmptyChunks);
+        return getLoadedChunks(plugin.getSettings().getWorlds().getDefaultWorld(), onlyProtected, noEmptyChunks);
     }
 
     @Override
@@ -415,7 +415,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        if(!location.getWorld().equals(getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld()))
+        if(!location.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -435,7 +435,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        if(!chunk.getWorld().equals(getCenter(plugin.getSettings().defaultWorldEnvironment).getWorld()))
+        if(!chunk.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -486,7 +486,7 @@ public final class SpawnIsland implements Island {
     @Override
     public boolean hasPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege) {
         boolean checkForProtection = islandPrivilege != IslandPrivileges.FLY;
-        return (checkForProtection && !plugin.getSettings().spawnProtection) || superiorPlayer.hasBypassModeEnabled() ||
+        return (checkForProtection && !plugin.getSettings().getSpawn().isProtected()) || superiorPlayer.hasBypassModeEnabled() ||
                 superiorPlayer.hasPermissionWithoutOP("superior.admin.bypass." + islandPrivilege.getName()) ||
                 hasPermission(SPlayerRole.guestRole(), islandPrivilege);
     }
@@ -523,7 +523,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public PlayerRole getRequiredPlayerRole(IslandPrivilege islandPrivilege) {
-        return plugin.getSettings().spawnPermissions.contains(islandPrivilege.getName()) ?
+        return plugin.getSettings().getSpawn().getPermissions().contains(islandPrivilege.getName()) ?
                 SPlayerRole.guestRole() : SPlayerRole.lastRole();
     }
 

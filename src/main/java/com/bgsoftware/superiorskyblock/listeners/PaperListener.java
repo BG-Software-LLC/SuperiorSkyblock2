@@ -6,6 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 
+@SuppressWarnings("unused")
 public final class PaperListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
@@ -16,7 +17,7 @@ public final class PaperListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSpongeAbsorb(SpongeAbsorbEvent e){
-        if(plugin.getGrid().getBlockAmount(e.getBlock()) > 1)
+        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
             e.setCancelled(true);
     }
 

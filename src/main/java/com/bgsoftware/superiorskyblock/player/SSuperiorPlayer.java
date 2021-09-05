@@ -15,13 +15,13 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
-import com.bgsoftware.superiorskyblock.data.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.PlayersDeserializer;
-import com.bgsoftware.superiorskyblock.handlers.MissionsHandler;
+import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.data.deserializer.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -74,18 +74,18 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
 
-    private boolean worldBorderEnabled = plugin.getSettings().defaultWorldBorder;
-    private boolean blocksStackerEnabled = plugin.getSettings().defaultBlocksStacker;
+    private boolean worldBorderEnabled = plugin.getSettings().isDefaultWorldBorder();
+    private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
-    private boolean toggledPanel = plugin.getSettings().defaultToggledPanel;
-    private boolean islandFly = plugin.getSettings().defaultIslandFly;
+    private boolean toggledPanel = plugin.getSettings().isDefaultToggledPanel();
+    private boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     private boolean adminSpyEnabled = false;
 
     private SBlockPosition schematicPos1 = null, schematicPos2 = null;
     private int disbands;
-    private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().defaultBorderColor, BorderColor.BLUE);
+    private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
     private long lastTimeStatus = -1;
 
     private boolean immuneToPvP = false;
@@ -120,7 +120,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.uuid = player;
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
         this.playerRole = SPlayerRole.guestRole();
-        this.disbands = plugin.getSettings().disbandCount;
+        this.disbands = plugin.getSettings().getDisbandCount();
         this.userLocale = LocaleUtils.getDefault();
         databaseBridge.startSavingData();
     }
@@ -256,7 +256,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         // Checks for island teammates pvp
         if(getIslandLeader().equals(otherPlayer.getIslandLeader()) &&
-                (world == null || !plugin.getSettings().pvpWorlds.contains(world.getName())))
+                (world == null || !plugin.getSettings().getPvPWorlds().contains(world.getName())))
             return HitActionResult.ISLAND_TEAM_PVP;
 
         // Checks if this player can bypass all pvp restrictions
@@ -318,7 +318,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         if (!isOnline())
             return;
 
-        Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().defaultWorldEnvironment);
+        Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
         assert islandTeleportLocation != null;
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
 
@@ -337,7 +337,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 return;
             }
 
-            Block islandCenterBlock = island.getCenter(plugin.getSettings().defaultWorldEnvironment).getBlock();
+            Block islandCenterBlock = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock();
             float rotationYaw = islandTeleportLocation.getYaw();
             float rotationPitch = islandTeleportLocation.getPitch();
 
@@ -374,7 +374,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                  */
 
                 List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
-                                plugin.getSettings().defaultWorldEnvironment, true, true, null)
+                                plugin.getSettings().getWorlds().getDefaultWorld(), true, true, null)
                         .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
                 Executor.createTask().runAsync(v -> {
@@ -729,8 +729,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean canCompleteMissionAgain(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        Optional<MissionsHandler.MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
-        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) < missionDataOptional.get().resetAmount;
+        Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
+        return missionDataOptional.isPresent() && getAmountMissionCompleted(mission) <
+                missionDataOptional.get().getResetAmount();
     }
 
     @Override
@@ -898,17 +899,17 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         Island standingIsland = plugin.getGrid().getIslandAt(player.getLocation());
 
-        if(standingIsland != null && (plugin.getSettings().spawnProtection || !standingIsland.isSpawn())){
+        if(standingIsland != null && (plugin.getSettings().getSpawn().isProtected() || !standingIsland.isSpawn())){
             // Checks for pvp status
             if(!standingIsland.hasSettingsEnabled(IslandFlags.PVP))
                 return target ? HitActionResult.TARGET_ISLAND_PVP_DISABLE : HitActionResult.ISLAND_PVP_DISABLE;
 
             // Checks for coop damage
-            if(standingIsland.isCoop(player) && !plugin.getSettings().coopDamage)
+            if(standingIsland.isCoop(player) && !plugin.getSettings().isCoopDamage())
                 return target ? HitActionResult.TARGET_COOP_DAMAGE : HitActionResult.COOP_DAMAGE;
 
             // Checks for visitors damage
-            if(standingIsland.isVisitor(player, false) && !plugin.getSettings().visitorsDamage)
+            if(standingIsland.isVisitor(player, false) && !plugin.getSettings().isVisitorsDamage())
                 return target ? HitActionResult.TARGET_VISITOR_DAMAGE : HitActionResult.VISITOR_DAMAGE;
         }
 

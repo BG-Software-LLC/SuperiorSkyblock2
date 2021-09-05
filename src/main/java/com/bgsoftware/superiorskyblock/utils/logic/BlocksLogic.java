@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
@@ -48,7 +48,7 @@ public final class BlocksLogic {
 
         for(BlockFace nearbyFace : NEARBY_BLOCKS){
             Block nearbyBlock = block.getRelative(nearbyFace);
-            if(!nearbyBlock.getType().isBlock()) {
+            if(!nearbyBlock.getType().isSolid()) {
                 Key nearbyBlockKey = Key.of(nearbyBlock);
                 if (!nearbyBlockKey.getGlobalKey().equals("AIR"))
                     nearbyBlocks.put(nearbyFace, nearbyBlockKey);
@@ -93,11 +93,11 @@ public final class BlocksLogic {
     }
 
     public static boolean isWarpSign(String firstSignLine){
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().signWarpLine);
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getSignWarpLine());
     }
 
     public static boolean isVisitorsSign(String firstSignLine){
-        return firstSignLine.equalsIgnoreCase(plugin.getSettings().visitorsSignLine);
+        return firstSignLine.equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getLine());
     }
 
     public static boolean handleSignPlace(SuperiorPlayer superiorPlayer, Island island, Location warpLocation,
@@ -130,20 +130,33 @@ public final class BlocksLogic {
         String warpName = IslandUtils.getWarpName(StringUtils.stripColors(signLines[1].trim()));
         boolean privateFlag = signLines[2].equalsIgnoreCase("private");
 
-        if(warpName.isEmpty() || island.getWarp(warpName) != null){
-            if(sendMessage) {
-                if(warpName.isEmpty())
-                    Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
-                else
-                    Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
-            }
+        boolean creationFailed = false;
 
+        if(warpName.isEmpty()) {
+            if(sendMessage)
+                Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        else if(island.getWarp(warpName) != null) {
+            if(sendMessage)
+                Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        else if(!IslandUtils.isWarpNameLengthValid(warpName)) {
+            if(sendMessage)
+                Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
+            creationFailed = true;
+        }
+
+        if(creationFailed){
             for (int i = 0; i < 4; i++) {
                 signLines[i] = "";
             }
         }
         else {
-            List<String> signWarp = plugin.getSettings().signWarp;
+            List<String> signWarp = plugin.getSettings().getSignWarp();
 
             for (int i = 0; i < signWarp.size(); i++)
                 signLines[i] = signWarp.get(i).replace("{0}", warpName);
@@ -177,7 +190,7 @@ public final class BlocksLogic {
 
         String description = descriptionBuilder.length() < 1 ? "" : descriptionBuilder.substring(1);
 
-        warpLines[0] = plugin.getSettings().visitorsSignActive;
+        warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 
         for (int i = 1; i <= 3; i++)
             warpLines[i] = StringUtils.translateColors(warpLines[i]);
@@ -185,7 +198,7 @@ public final class BlocksLogic {
         Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
         if(oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
             Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
-            oldWelcomeSign.setLine(0, plugin.getSettings().visitorsSignInactive);
+            oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
             oldWelcomeSign.update();
         }
 
@@ -209,7 +222,7 @@ public final class BlocksLogic {
             island.deleteWarp(superiorPlayer, sign.getLocation());
         }
         else{
-            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().visitorsSignActive)){
+            if(sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())){
                 island.setVisitorsLocation(null);
             }
         }

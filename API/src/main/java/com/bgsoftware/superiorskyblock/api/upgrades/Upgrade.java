@@ -19,4 +19,15 @@ public interface Upgrade {
      */
     int getMaxUpgradeLevel();
 
+    /**
+     * Get the slot the upgrade is in the upgrades menu.
+     */
+    int getSlot();
+
+    /**
+     * Set the slot the upgrade is in the upgrades menu.
+     * @param slot The slot to set the upgrade item in.
+     */
+    void setSlot(int slot);
+
 }
