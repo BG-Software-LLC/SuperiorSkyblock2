@@ -91,6 +91,7 @@ dependencies {
     compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
     compileOnly 'me.mrcookieslime:Slimefun4:latest'
     compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
     compileOnly 'de.myzelyam:SuperVanish:latest'
     compileOnly 'com.songoda:UltimateStacker:latest'
     compileOnly 'org.kitteh:VanishNoPacket:latest'
