@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.utils.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.StackedBlock;
 import org.bukkit.Location;

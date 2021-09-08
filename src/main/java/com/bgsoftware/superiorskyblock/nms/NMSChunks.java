@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.objects.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.utils.chunks.CalculatedChunk;
 import org.bukkit.Chunk;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;

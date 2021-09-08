@@ -91,6 +91,7 @@ dependencies {
     compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
     compileOnly 'me.mrcookieslime:Slimefun4:latest'
     compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
     compileOnly 'de.myzelyam:SuperVanish:latest'
     compileOnly 'com.songoda:UltimateStacker:latest'
     compileOnly 'org.kitteh:VanishNoPacket:latest'
@@ -122,7 +123,7 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
-    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.data.sql.hikari'
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
 
     if(System.getenv("BUILD_NUMBER") == null){
         archiveName = rootProject.name + ".jar"

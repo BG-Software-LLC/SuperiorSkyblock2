@@ -1,6 +1,5 @@
-package com.bgsoftware.superiorskyblock.utils.objects;
+package com.bgsoftware.superiorskyblock.utils.chunks;
 
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import org.bukkit.Location;
 
