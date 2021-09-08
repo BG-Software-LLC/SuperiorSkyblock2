@@ -1,0 +1,92 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FishingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 50000'
+    - 'is admin msg %player% &e&lFisherman | &7Successfully finished the mission Fisherman III!'
+    - 'is admin msg %player% &e&lFisherman | &7Now you know how fishing works!'
+    - 'is admin msg %player% &e&lFisherman | &7&oYou are now a professional Fisherman, congratz!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'fisherman_1'
+  - 'fisherman_2'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-caughts:
+  '1':
+    types:
+      - 'BOW'
+      - 'ENCHANTED_BOOK'
+      - 'FISHING_ROD'
+      - 'NAME_TAG'
+      - 'SADDLE'
+      - 'NAUTILUS_SHELL'
+    amount: 3
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFisherman III'
+    lore:
+      - '&7It''s possible to catch treasure in the ocean.'
+      - '&7Catch 3 treasure items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x3 Treasure Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$50,000'
+      - ''
+      - '&6Treasure Items: &7{1}/3'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFisherman III'
+    lore:
+      - '&7It''s possible to catch treasure in the ocean.'
+      - '&7Catch 3 treasure items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x3 Treasure Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$50,000'
+      - ''
+      - '&6Treasure Items: &73/3'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFisherman III'
+    lore:
+      - '&7It''s possible to catch treasure in the ocean.'
+      - '&7Catch 3 treasure items.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$50,000'
+      - ''
+      - '&6Treasure Items: &73/3'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'
