@@ -19,7 +19,9 @@ rewards:
   commands:
     - 'eco give %player% 1000000'
     - 'is admin rankup %player% crop-growth'
-    - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Farmer V!'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer V!'
+    - 'is admin msg %player% &e&lFarmer | &7There is nothing you don''t know how to grow.'
+    - 'is admin msg %player% &e&lFarmer | &7&oYou are now a professional Framer, congratz!'
 
 # List of required missions that must be completed before completing this one.
 required-missions:

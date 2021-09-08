@@ -18,7 +18,7 @@ reset-after-finish: true
 rewards:
   commands:
     - 'eco give %player% 25000'
-    - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Farmer IV!'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer IV!'
 
 # List of required missions that must be completed before completing this one.
 required-missions:

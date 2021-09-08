@@ -28,7 +28,7 @@ rewards:
       amount: 1
   commands:
     - 'eco give %player% 2500'
-    - 'is admin msg %player% &e&lMission | &7Successfully finished the mission Farmer I!'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer I!'
 
 # List of all required blocks must be gathered in order to complete the mission.
 required-plants:
