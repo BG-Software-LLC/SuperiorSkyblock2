@@ -27,6 +27,8 @@ public final class ChunksProvider {
     }
 
     public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> onLoadConsumer) {
+        SuperiorSkyblockPlugin.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString());
+
         Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);
 
         if (chunkInfo != null) {
@@ -69,11 +71,15 @@ public final class ChunksProvider {
 
         @Override
         public void work() {
+            SuperiorSkyblockPlugin.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
             plugin.getProviders().loadChunk(chunkPosition, this::finishLoad);
         }
 
         private void finishLoad(Chunk chunk) {
+            SuperiorSkyblockPlugin.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString());
+
             Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.remove(chunkPosition);
+
             if (chunkInfo != null) {
                 chunkInfo.getValue().forEach(chunkConsumer -> chunkConsumer.accept(chunk));
                 chunkInfo.getKey().complete(chunk);
