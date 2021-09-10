@@ -148,6 +148,7 @@ public final class NMSChunksImpl implements NMSChunks {
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.getKey()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                                block = blockData.getBlock();
                             }
 
                             Material type = CraftMagicNumbers.getMaterial(block);
