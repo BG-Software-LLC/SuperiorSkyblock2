@@ -61,6 +61,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
         Executor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
+                SuperiorSkyblockPlugin.debug("Action: Chunk Calculation, Island: " + island.getOwner().getName() + ", Chunk: " + calculatedChunk.getPosition());
+
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->
                         key.getGlobalKey().equals(ConstantKeys.MOB_SPAWNER.getGlobalKey()));
