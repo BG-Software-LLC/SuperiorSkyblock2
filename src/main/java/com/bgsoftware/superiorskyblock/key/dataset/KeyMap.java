@@ -57,12 +57,16 @@ public final class KeyMap<V> extends AbstractMap<com.bgsoftware.superiorskyblock
     }
 
     public Key getKey(Key key){
+        return getKey(key, key);
+    }
+
+    public Key getKey(Key key, Key def){
         if(innerMap.containsKey(key.toString()))
             return key;
         else if(innerMap.containsKey(key.getGlobalKey()))
             return Key.of(key.getGlobalKey(), "");
         else
-            return key;
+            return def;
     }
 
     @Override

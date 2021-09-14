@@ -148,13 +148,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         }
 
         public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, int amount) {
-            this.addCounts(blockKey, BigInteger.valueOf(amount));
-        }
-
-        public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, BigInteger amount) {
-            blockKey = plugin.getBlockValues().getBlockKey(blockKey);
-            BigInteger currentAmount = blockCounts.getOrDefault(blockKey, BigInteger.ZERO);
-            blockCounts.put(blockKey, currentAmount.add(amount));
+            blockCounts.put(blockKey, blockCounts.getRaw(blockKey, BigInteger.ZERO).add(BigInteger.valueOf(amount)));
         }
 
         public void addCounts(KeyMap<Integer> other) {
