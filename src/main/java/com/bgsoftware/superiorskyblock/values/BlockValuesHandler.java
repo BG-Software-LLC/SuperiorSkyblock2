@@ -60,17 +60,26 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return customBlockValue;
         }
 
-        BigDecimal value = blockWorthValues.getBlockValue(key);
+        if(blockWorthValues.containsKeyRaw((Key) key)) {
+            BigDecimal value = blockWorthValues.getBlockValue(key);
 
-        if(value != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
-            return value;
+            if (value != null) {
+                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+                return value;
+            }
         }
 
         if(plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
             SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price");
             return price;
+        }
+
+        BigDecimal value = blockWorthValues.getBlockValue(key);
+
+        if (value != null) {
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+            return value;
         }
 
         return BigDecimal.ZERO;
@@ -135,7 +144,8 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
                 }
             }
 
-            return (Key) key;
+            return blockWorthValues.containsKey(key) ? blockWorthValues.getBlockValueKey((Key) key) :
+                    blockLevels.getBlockValueKey((Key) key);
         }
     }
 
