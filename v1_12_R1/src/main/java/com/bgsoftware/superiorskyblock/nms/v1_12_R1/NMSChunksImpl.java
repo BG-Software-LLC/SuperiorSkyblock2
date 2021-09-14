@@ -102,7 +102,11 @@ public final class NMSChunksImpl implements NMSChunks {
 
             removeEntities(chunk);
 
-            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::s);
+            for(Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
+                worldServer.tileEntityListTick.remove(tileEntityEntry.getValue());
+                worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+            }
+
             chunk.tileEntities.clear();
 
             removeBlocks(chunk);
