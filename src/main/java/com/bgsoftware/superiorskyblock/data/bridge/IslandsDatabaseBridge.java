@@ -579,14 +579,14 @@ public final class IslandsDatabaseBridge {
 
         island.getDatabaseBridge().insertObject("islands_settings",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("size", island.getIslandSize()),
-                new Pair<>("bank_limit", island.getBankLimit() + ""),
-                new Pair<>("coops_limit", island.getCoopLimit()),
-                new Pair<>("members_limit", island.getTeamLimit()),
-                new Pair<>("warps_limit", island.getWarpsLimit()),
-                new Pair<>("crop_growth_multiplier", island.getCropGrowthMultiplier()),
-                new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesMultiplier()),
-                new Pair<>("mob_drops_multiplier", island.getMobDropsMultiplier())
+                new Pair<>("size", island.getIslandSizeRaw()),
+                new Pair<>("bank_limit", island.getBankLimitRaw() + ""),
+                new Pair<>("coops_limit", island.getCoopLimitRaw()),
+                new Pair<>("members_limit", island.getTeamLimitRaw()),
+                new Pair<>("warps_limit", island.getWarpsLimitRaw()),
+                new Pair<>("crop_growth_multiplier", island.getCropGrowthRaw()),
+                new Pair<>("spawner_rates_multiplier", island.getSpawnerRatesRaw()),
+                new Pair<>("mob_drops_multiplier", island.getMobDropsRaw())
         );
     }
 
