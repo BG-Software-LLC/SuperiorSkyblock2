@@ -219,7 +219,8 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public boolean isWaterLogged(Block block) {
-        return block.getType().name().contains("WATER");
+        Material blockType = block.getType();
+        return blockType == Material.WATER || blockType == Material.STATIONARY_WATER;
     }
 
     @Override
