@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.attributes;
+package com.bgsoftware.superiorskyblock.data.loader.attributes;
 
 public final class WarpCategoryAttributes extends AttributesRegistry<WarpCategoryAttributes.Field> {
 
