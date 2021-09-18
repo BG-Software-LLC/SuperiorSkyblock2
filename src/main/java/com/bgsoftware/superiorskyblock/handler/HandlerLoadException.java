@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.exceptions;
+package com.bgsoftware.superiorskyblock.handler;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.Bukkit;

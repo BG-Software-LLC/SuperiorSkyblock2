@@ -50,7 +50,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 

@@ -9,11 +9,11 @@ import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.data.loader.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.data.sql.SQLDatabaseInitializer;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
 

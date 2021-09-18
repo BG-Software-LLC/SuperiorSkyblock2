@@ -1,7 +1,6 @@
-package com.bgsoftware.superiorskyblock.handlers;
+package com.bgsoftware.superiorskyblock.handler;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
 
 public abstract class AbstractHandler {
 

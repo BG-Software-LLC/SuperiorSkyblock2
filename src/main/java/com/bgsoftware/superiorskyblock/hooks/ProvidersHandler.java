@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;

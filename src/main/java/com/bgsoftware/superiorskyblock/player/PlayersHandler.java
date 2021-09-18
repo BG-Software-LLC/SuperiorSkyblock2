@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.player.container.PlayersContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;

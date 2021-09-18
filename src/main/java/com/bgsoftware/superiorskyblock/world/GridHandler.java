@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.data.DatabaseResult;
 import com.bgsoftware.superiorskyblock.data.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.island.container.IslandsContainer;
