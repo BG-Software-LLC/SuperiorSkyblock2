@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.menus;
+package com.bgsoftware.superiorskyblock.menu.converter;
 
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import org.bukkit.configuration.ConfigurationSection;
