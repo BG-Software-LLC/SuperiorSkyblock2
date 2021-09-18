@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.island.bank;
 
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.data.DatabaseResult;
+import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
 import java.math.BigDecimal;
