@@ -20,15 +20,17 @@ public final class TeleportUtils {
     public static void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult){
         Island island = plugin.getGrid().getIslandAt(location);
 
-        Runnable teleportTask = () -> plugin.getProviders().teleport(entity, location,
-                teleportResult == null ? r-> {} : teleportResult);
-
         if(island != null){
-            plugin.getProviders().prepareTeleport(island, location.clone(), teleportTask);
+            plugin.getProviders().prepareTeleport(island, location.clone(),
+                    () -> _teleport(entity, location, teleportResult));
         }
         else{
-            teleportTask.run();
+            _teleport(entity, location, teleportResult);
         }
+    }
+
+    private static void _teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
+        plugin.getProviders().teleport(entity, location, teleportResult);
     }
     
 }
