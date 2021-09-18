@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.registry;
+package com.bgsoftware.superiorskyblock.structure;
 
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;

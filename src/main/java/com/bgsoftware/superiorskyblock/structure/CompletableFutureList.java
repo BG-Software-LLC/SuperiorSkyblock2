@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.lists;
+package com.bgsoftware.superiorskyblock.structure;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
