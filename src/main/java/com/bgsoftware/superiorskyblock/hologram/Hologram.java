@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.holograms;
+package com.bgsoftware.superiorskyblock.hologram;
 
 public interface Hologram {
 
