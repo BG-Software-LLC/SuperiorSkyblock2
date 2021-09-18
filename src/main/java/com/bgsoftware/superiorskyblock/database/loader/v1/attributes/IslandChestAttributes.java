@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.database.loader.attributes;
+package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class IslandChestAttributes extends AttributesRegistry<IslandChestAttributes.Field> {
 
