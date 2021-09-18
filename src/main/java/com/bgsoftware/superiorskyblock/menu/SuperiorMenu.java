@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -254,7 +253,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                 e.getWhoClicked().closeInventory();
                 break;
             default:
-                CommandUtils.dispatchSubCommand(sender, subCommand, args);
+                plugin.getCommands().dispatchSubCommand(sender, subCommand, args);
                 break;
         }
     }

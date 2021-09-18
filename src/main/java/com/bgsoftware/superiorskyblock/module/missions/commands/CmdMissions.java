@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerMissions;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

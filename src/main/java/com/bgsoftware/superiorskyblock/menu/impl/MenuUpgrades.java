@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -45,7 +44,7 @@ public final class MenuUpgrades extends SuperiorMenu {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(e.getRawSlot());
 
         if(upgrade != null){
-            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "rankup " + upgrade.getName());
+            plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "rankup", upgrade.getName());
             previousMove = false;
             open(previousMenu);
         }

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.commands;
+package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;

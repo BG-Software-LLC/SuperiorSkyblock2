@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -213,7 +212,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
 
             if(inventoryAction == InventoryAction.PICKUP_HALF) {
                 if(MenuGlobalWarps.visitorWarps){
-                    CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
+                    plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "visit", island.getOwner().getName());
                 }
                 else {
                     plugin.getMenus().openWarpCategories(superiorPlayer, this, island);

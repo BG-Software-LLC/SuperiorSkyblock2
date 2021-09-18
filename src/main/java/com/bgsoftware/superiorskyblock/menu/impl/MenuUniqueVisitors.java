@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -36,9 +35,9 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
     @Override
     protected void onPlayerClick(InventoryClickEvent event, Pair<SuperiorPlayer, Long> pair) {
         if (event.getClick().name().contains("RIGHT")) {
-            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "invite " + pair.getKey().getName());
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "invite", pair.getKey().getName());
         } else if (event.getClick().name().contains("LEFT")) {
-            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + pair.getKey().getName());
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "expel", pair.getKey().getName());
         }
     }
 

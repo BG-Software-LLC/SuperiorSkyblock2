@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import org.bukkit.command.CommandSender;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -56,5 +57,20 @@ public interface CommandsManager {
      */
     @Nullable
     SuperiorCommand getAdminCommand(String commandLabel);
+
+    /**
+     * Dispatch a sub command.
+     * @param sender The sender to dispatch the command.
+     * @param subCommand The sub-command to dispatch.
+     */
+    void dispatchSubCommand(CommandSender sender, String subCommand);
+
+    /**
+     * Dispatch a sub command.
+     * @param sender The sender to dispatch the command.
+     * @param subCommand The sub-command to dispatch.
+     * @param args List of arguments of the sub-command.
+     */
+    void dispatchSubCommand(CommandSender sender, String subCommand, String args);
 
 }

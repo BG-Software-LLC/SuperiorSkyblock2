@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
@@ -37,7 +36,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
     protected void onPlayerClick(InventoryClickEvent event, Island island) {
         if(visitorWarps){
             previousMove = false;
-            CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "visit " + island.getOwner().getName());
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "visit", island.getOwner().getName());
         }
         else{
             plugin.getMenus().openWarpCategories(superiorPlayer, this, island);

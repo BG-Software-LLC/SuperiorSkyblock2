@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

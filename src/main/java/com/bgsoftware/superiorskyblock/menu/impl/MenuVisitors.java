@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -39,9 +38,9 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
         }
         else if(targetPlayer != null){
             if (event.getClick().name().contains("RIGHT")) {
-                CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "invite " + targetPlayer.getName());
+                plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "invite", targetPlayer.getName());
             } else if (event.getClick().name().contains("LEFT")) {
-                CommandUtils.dispatchSubCommand(superiorPlayer.asPlayer(), "expel " + targetPlayer.getName());
+                plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "expel", targetPlayer.getName());
             }
         }
     }
