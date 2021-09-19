@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;

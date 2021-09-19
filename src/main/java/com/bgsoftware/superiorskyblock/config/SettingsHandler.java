@@ -18,8 +18,8 @@ import com.bgsoftware.superiorskyblock.config.section.StackedBlocksSection;
 import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
 import com.bgsoftware.superiorskyblock.config.section.VoidTeleportSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
-import com.bgsoftware.superiorskyblock.utils.exceptions.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 

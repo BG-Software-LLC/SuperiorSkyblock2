@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 
 import java.util.ArrayList;

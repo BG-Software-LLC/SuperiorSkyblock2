@@ -60,7 +60,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
 
     @Override
     public com.bgsoftware.superiorskyblock.key.Key getBlockKey(com.bgsoftware.superiorskyblock.key.Key blockKey) {
-        return cachedPrices.getKey(blockKey);
+        return cachedPrices.getKey(blockKey, null);
     }
 
 }

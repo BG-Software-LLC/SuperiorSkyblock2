@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
-import com.bgsoftware.superiorskyblock.utils.holograms.Hologram;
+import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.sounds.SoundEffect;

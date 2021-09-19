@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -39,6 +39,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     private Set<Runnable> pendingCommands = new HashSet<>();
 
+    private PluginCommand pluginCommand;
     private String label = null;
 
     public CommandsHandler(SuperiorSkyblockPlugin plugin, CommandsMap playerCommandsMap, CommandsMap adminCommandsMap){
@@ -52,7 +53,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         String islandCommand = plugin.getSettings().getIslandCommand();
         label = islandCommand.split(",")[0];
 
-        PluginCommand pluginCommand = new PluginCommand(label);
+        pluginCommand = new PluginCommand(label);
 
         String[] commandSections = islandCommand.split(",");
 
@@ -122,6 +123,20 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     @Override
     public SuperiorCommand getAdminCommand(String commandLabel) {
         return adminCommandsMap.getCommand(commandLabel);
+    }
+
+    @Override
+    public void dispatchSubCommand(CommandSender sender, String subCommand) {
+        dispatchSubCommand(sender, subCommand, "");
+    }
+
+    @Override
+    public void dispatchSubCommand(CommandSender sender, String subCommand, String args) {
+        String[] argsSplit = args.split(" ");
+        String[] commandArguments = new String[argsSplit.length + 1];
+        commandArguments[0] = subCommand;
+        System.arraycopy(argsSplit, 0, commandArguments, 1, argsSplit.length);
+        pluginCommand.execute(sender, "", commandArguments);
     }
 
     public String getLabel(){

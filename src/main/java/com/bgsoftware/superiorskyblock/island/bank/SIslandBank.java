@@ -8,14 +8,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -29,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +40,7 @@ public final class SIslandBank implements IslandBank {
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    private final SyncedObject<UniquePriorityQueue<BankTransaction>> transactions = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.BANK_TRANSACTIONS_COMPARATOR));
+    private final SyncedObject<SortedSet<BankTransaction>> transactions = SyncedObject.of(new TreeSet<>(SortingComparators.BANK_TRANSACTIONS_COMPARATOR));
     private final Map<UUID, SyncedObject<List<BankTransaction>>> transactionsByPlayers = new ConcurrentHashMap<>();
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
@@ -91,7 +92,7 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(UniquePriorityQueue::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
@@ -119,7 +120,7 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(UniquePriorityQueue::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
         increaseBalance(amount);
@@ -170,7 +171,7 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(UniquePriorityQueue::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
@@ -198,7 +199,7 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(UniquePriorityQueue::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", amount);
         decreaseBalance(amount);

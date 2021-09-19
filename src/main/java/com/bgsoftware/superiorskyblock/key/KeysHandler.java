@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

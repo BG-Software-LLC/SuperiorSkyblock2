@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.google.common.base.Preconditions;
 
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
 public final class SPlayerRole implements PlayerRole {
@@ -84,6 +85,19 @@ public final class SPlayerRole implements PlayerRole {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SPlayerRole that = (SPlayerRole) o;
+        return id == that.id;
     }
 
     public RolePermissionNode getDefaultPermissions() {

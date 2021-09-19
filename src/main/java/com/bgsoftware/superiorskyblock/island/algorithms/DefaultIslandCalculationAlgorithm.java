@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.utils.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.StackedBlock;
@@ -61,6 +61,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
         Executor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
+                SuperiorSkyblockPlugin.debug("Action: Chunk Calculation, Island: " + island.getOwner().getName() + ", Chunk: " + calculatedChunk.getPosition());
+
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->
                         key.getGlobalKey().equals(ConstantKeys.MOB_SPAWNER.getGlobalKey()));
@@ -146,13 +148,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         }
 
         public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, int amount) {
-            this.addCounts(blockKey, BigInteger.valueOf(amount));
-        }
-
-        public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, BigInteger amount) {
-            blockKey = plugin.getBlockValues().getBlockKey(blockKey);
-            BigInteger currentAmount = blockCounts.getOrDefault(blockKey, BigInteger.ZERO);
-            blockCounts.put(blockKey, currentAmount.add(amount));
+            blockCounts.put(blockKey, blockCounts.getRaw(blockKey, BigInteger.ZERO).add(BigInteger.valueOf(amount)));
         }
 
         public void addCounts(KeyMap<Integer> other) {

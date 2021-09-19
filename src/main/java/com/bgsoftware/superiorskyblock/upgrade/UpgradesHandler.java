@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.upgrade.container.UpgradesContainer;
 import com.google.common.base.Preconditions;
 

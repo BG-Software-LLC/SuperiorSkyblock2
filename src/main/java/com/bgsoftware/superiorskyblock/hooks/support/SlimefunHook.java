@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
+import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
@@ -38,7 +39,7 @@ public final class SlimefunHook {
         try {
             Class.forName("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule");
             new Slimefun4RelocationsProtectionModule().register();
-        } catch (Throwable ex) {
+        } catch (ClassNotFoundException ex) {
             new Slimefun4ProtectionModule().register();
         }
     }
@@ -159,7 +160,9 @@ public final class SlimefunHook {
         }
 
         public void register() {
-            Slimefun.getProtectionManager().registerModule(Bukkit.getServer(), plugin.getName(), pl -> this);
+            Executor.sync(() -> {
+                Slimefun.getProtectionManager().registerModule(Bukkit.getServer(), plugin.getName(), pl -> this);
+            }, 2L);
         }
 
     }

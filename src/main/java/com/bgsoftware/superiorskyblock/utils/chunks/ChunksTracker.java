@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;

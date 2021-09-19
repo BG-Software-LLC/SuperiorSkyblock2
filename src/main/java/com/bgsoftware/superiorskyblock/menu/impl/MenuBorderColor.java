@@ -8,9 +8,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
@@ -39,7 +38,7 @@ public final class MenuBorderColor extends SuperiorMenu {
         BorderColor borderColor;
 
         if(toggleBorderSlot.contains(e.getRawSlot())){
-            CommandUtils.dispatchSubCommand(e.getWhoClicked(), "toggle", "border");
+            plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "toggle", "border");
         }
 
         else {

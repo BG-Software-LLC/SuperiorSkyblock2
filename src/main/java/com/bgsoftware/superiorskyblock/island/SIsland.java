@@ -22,10 +22,10 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.DatabaseResult;
-import com.bgsoftware.superiorskyblock.data.EmptyDataHandler;
-import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.data.deserializer.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.deserializer.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
@@ -35,6 +35,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.upgrade.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
@@ -50,8 +51,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.utils.lists.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.utils.queue.UniquePriorityQueue;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -88,6 +87,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -131,9 +132,9 @@ public final class SIsland implements Island {
     private final IslandBank islandBank = plugin.getFactory().createIslandBank(this);
     private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
 
-    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> members = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
-    private final SyncedObject<UniquePriorityQueue<SuperiorPlayer>> playersInside = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<UniquePriorityQueue<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new UniquePriorityQueue<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
+    private final SyncedObject<SortedSet<SuperiorPlayer>> members = SyncedObject.of(new TreeSet<>(SortingComparators.ISLAND_MEMBERS_COMPARATOR));
+    private final SyncedObject<SortedSet<SuperiorPlayer>> playersInside = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final SyncedObject<SortedSet<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
     private final Set<SuperiorPlayer> banned = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> coop = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
@@ -3337,36 +3338,31 @@ public final class SIsland implements Island {
     }
 
     private void _handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> blocks) {
-        try {
-            rawKeyPlacements = true;
-            for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : blocks.entrySet()) {
-                BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
-                BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
+        for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : blocks.entrySet()) {
+            BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(entry.getKey());
+            BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(entry.getKey());
 
-                boolean increaseAmount = false;
+            boolean increaseAmount = false;
 
-                if (blockValue.doubleValue() != 0) {
-                    this.islandWorth.updateAndGet(islandWorth ->
-                            islandWorth.add(blockValue.multiply(new BigDecimal(entry.getValue()))));
-                    increaseAmount = true;
-                }
-
-                if (blockLevel.doubleValue() != 0) {
-                    this.islandLevel.updateAndGet(islandLevel ->
-                            islandLevel.add(blockLevel.multiply(new BigDecimal(entry.getValue()))));
-                    increaseAmount = true;
-                }
-
-                boolean hasBlockLimit = blockLimits.containsKey(entry.getKey()),
-                        valuesMenu = plugin.getBlockValues().isValuesMenu(entry.getKey());
-
-                if (increaseAmount || hasBlockLimit || valuesMenu) {
-                    SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
-                    addCounts(entry.getKey(), entry.getValue());
-                }
+            if (blockValue.doubleValue() != 0) {
+                this.islandWorth.updateAndGet(islandWorth ->
+                        islandWorth.add(blockValue.multiply(new BigDecimal(entry.getValue()))));
+                increaseAmount = true;
             }
-        } finally {
-            rawKeyPlacements = false;
+
+            if (blockLevel.doubleValue() != 0) {
+                this.islandLevel.updateAndGet(islandLevel ->
+                        islandLevel.add(blockLevel.multiply(new BigDecimal(entry.getValue()))));
+                increaseAmount = true;
+            }
+
+            boolean hasBlockLimit = blockLimits.containsKey(entry.getKey()),
+                    valuesMenu = plugin.getBlockValues().isValuesMenu(entry.getKey());
+
+            if (increaseAmount || hasBlockLimit || valuesMenu) {
+                SuperiorSkyblockPlugin.debug("Action: Block Place, Island: " + owner.getName() + ", Block: " + entry.getKey() + ", Amount: " + entry.getValue());
+                addCounts(entry.getKey(), entry.getValue());
+            }
         }
     }
 
@@ -3384,7 +3380,7 @@ public final class SIsland implements Island {
             boolean limitCount = false;
 
             if (!limitKey.equals(valueKey)) {
-                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount);
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount + " - Limit Key");
                 currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
                 blockCounts.put(limitKey, currentAmount.add(amount));
                 limitCount = true;
@@ -3393,7 +3389,7 @@ public final class SIsland implements Island {
             if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
                     (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                             plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount);
+                SuperiorSkyblockPlugin.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount + " - Global Key");
                 currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
                 blockCounts.put(globalKey, currentAmount.add(amount));
             }

@@ -7,9 +7,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.menus.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -48,7 +47,7 @@ public final class MenuMemberManage extends SuperiorMenu {
                 }
             }
             else {
-                CommandUtils.dispatchSubCommand(e.getWhoClicked(), "ban " + targetPlayer.getName());
+                plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "ban", targetPlayer.getName());
             }
         }
 
@@ -63,7 +62,7 @@ public final class MenuMemberManage extends SuperiorMenu {
                 }
             }
             else {
-                CommandUtils.dispatchSubCommand(e.getWhoClicked(), "kick " + targetPlayer.getName());
+                plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "kick", targetPlayer.getName());
             }
         }
     }

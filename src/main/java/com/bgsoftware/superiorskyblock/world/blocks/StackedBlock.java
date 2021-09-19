@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world.blocks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.holograms.Hologram;
+import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import org.bukkit.Location;
 

@@ -23,7 +23,7 @@ public final class DefaultValuesSection implements SettingsManager.DefaultValues
 
     @Override
     public Map<Key, Integer> getBlockLimits() {
-        return this.container.stackedBlocksLimits;
+        return this.container.defaultBlockLimits;
     }
 
     @Override

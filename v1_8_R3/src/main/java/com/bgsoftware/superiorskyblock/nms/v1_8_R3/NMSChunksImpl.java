@@ -88,7 +88,12 @@ public final class NMSChunksImpl implements NMSChunks {
 
             removeEntities(chunk);
 
-            new HashSet<>(chunk.tileEntities.keySet()).forEach(chunk.world::t);
+            for(Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
+                worldServer.tileEntityList.remove(tileEntityEntry.getValue());
+                worldServer.h.remove(tileEntityEntry.getValue());
+                worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
+            }
+
             chunk.tileEntities.clear();
 
             removeBlocks(chunk);
@@ -135,6 +140,7 @@ public final class NMSChunksImpl implements NMSChunks {
                                 blockData = Block.REGISTRY.get(new MinecraftKey(blockKey.a()
                                                 .replace("double_", ""))).getBlockData()
                                         .set(BlockDoubleStepAbstract.VARIANT, blockData.get(BlockDoubleStepAbstract.VARIANT));
+                                block = blockData.getBlock();
                             }
 
                             Material type = CraftMagicNumbers.getMaterial(block);

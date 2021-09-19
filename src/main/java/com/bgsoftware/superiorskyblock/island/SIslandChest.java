@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.data.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;

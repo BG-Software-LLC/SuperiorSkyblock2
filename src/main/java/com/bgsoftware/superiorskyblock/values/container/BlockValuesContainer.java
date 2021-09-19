@@ -35,6 +35,10 @@ public abstract class BlockValuesContainer {
         return valuesMap.getKey(key) == key;
     }
 
+    public boolean containsKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        return valuesMap.containsKey(key);
+    }
+
     public Key getBlockValueKey(Key key) {
         return valuesMap.getKey(key);
     }

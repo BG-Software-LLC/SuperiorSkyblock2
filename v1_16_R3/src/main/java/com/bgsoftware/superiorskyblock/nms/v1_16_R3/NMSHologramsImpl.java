@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
-import com.bgsoftware.superiorskyblock.utils.holograms.Hologram;
+import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import net.minecraft.server.v1_16_R3.AxisAlignedBB;
 import net.minecraft.server.v1_16_R3.DamageSource;
 import net.minecraft.server.v1_16_R3.EntityArmorStand;

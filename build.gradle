@@ -93,7 +93,7 @@ dependencies {
     compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
     compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
     compileOnly 'de.myzelyam:SuperVanish:latest'
-    compileOnly 'com.songoda:UltimateStacker:latest'
+    compileOnly 'com.songoda:UltimateStacker:2.1.7'
     compileOnly 'org.kitteh:VanishNoPacket:latest'
     compileOnly 'net.milkbowl:Vault:latest'
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'

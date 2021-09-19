@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.values;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
@@ -60,17 +60,26 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return customBlockValue;
         }
 
-        BigDecimal value = blockWorthValues.getBlockValue(key);
+        if(blockWorthValues.containsKeyRaw((Key) key)) {
+            BigDecimal value = blockWorthValues.getBlockValue(key);
 
-        if(value != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
-            return value;
+            if (value != null) {
+                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+                return value;
+            }
         }
 
         if(plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
             SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price");
             return price;
+        }
+
+        BigDecimal value = blockWorthValues.getBlockValue(key);
+
+        if (value != null) {
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+            return value;
         }
 
         return BigDecimal.ZERO;
@@ -129,13 +138,14 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         }
         else {
             if(plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-                Key newKey = plugin.getProviders().getPriceBlockKey((Key) key);
-                if(newKey != key) {
+                Key newKey = plugin.getProviders().getPriceBlockKey(convertedKey);
+                if(newKey != null) {
                     return newKey;
                 }
             }
 
-            return (Key) key;
+            return blockWorthValues.containsKey(key) ? blockWorthValues.getBlockValueKey(convertedKey) :
+                    blockLevels.getBlockValueKey(convertedKey);
         }
     }
 
