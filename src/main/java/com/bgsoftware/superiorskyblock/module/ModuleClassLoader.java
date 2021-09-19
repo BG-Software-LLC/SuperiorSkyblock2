@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.module;
 
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.google.common.io.ByteStreams;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,6 +83,13 @@ public final class ModuleClassLoader extends URLClassLoader {
         }
 
         return result;
+    }
+
+    @Nullable
+    @Override
+    public URL getResource(String name) {
+        URL url = findResource(name);
+        return url == null ? super.getResource(name) : url;
     }
 
     @Override
