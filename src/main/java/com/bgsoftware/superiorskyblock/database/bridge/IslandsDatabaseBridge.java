@@ -256,7 +256,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_block_limits",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("block", block.toString()),
-                new Pair<>("`limit`", limit)
+                new Pair<>("limit", limit)
         );
     }
 
@@ -275,7 +275,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_entity_limits",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("entity", entityType.toString()),
-                new Pair<>("`limit`", limit)
+                new Pair<>("limit", limit)
         );
     }
 
@@ -319,7 +319,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_role_limits",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("role", playerRole.getId()),
-                new Pair<>("`limit`", limit)
+                new Pair<>("limit", limit)
         );
     }
 
@@ -460,7 +460,7 @@ public final class IslandsDatabaseBridge {
     public static void saveIslandChest(Island island, IslandChest islandChest) {
         island.getDatabaseBridge().insertObject("islands_chests",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("`index`", islandChest.getIndex()),
+                new Pair<>("index", islandChest.getIndex()),
                 new Pair<>("contents", ItemUtils.serialize(islandChest.getContents()))
         );
     }
