@@ -68,6 +68,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
 
         PluginModule pluginModule = createInstance(moduleClass.get());
+        pluginModule.initModuleLoader(moduleFile, moduleClassLoader);
 
         registerModule(pluginModule);
 
