@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import org.jetbrains.annotations.Nullable;
 
 public final class MenusHandler extends AbstractHandler implements MenusManager {
