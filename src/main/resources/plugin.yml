@@ -1,12 +1,44 @@
 name: SuperiorSkyblock2
 version: ${project.version}
-author: Ome_R
-description: Feature packed Skyblock core.
 main: com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin
+
+description: Feature packed Skyblock core.
 website: https://bg-software.com/
 api-version: '1.13'
-softdepend: [AdvancedSpawners, ChangeSkin, CMI, EpicSpawners, Essentials, JetsMinions, LeaderHeads, MergedSpawner, MVdWPlaceholderAPI, PlaceholderAPI, PvpingSpawners, SilkSpawners, ShopGUIPlus, SkinsRestorer, VanishNoPacket, Vault, WildStacker, WorldEdit]
-loadbefore: [Multiverse-Core, Slimefun, My_Worlds]
+author: Ome_R
+
+softdepend:
+  - AdvancedSpawners
+  - CMI
+  - ChangeSkin
+  - CoreProtect
+  - EpicSpawners
+  - Essentials
+  - FastAsyncWorldEdit
+  - JetsMinions
+  - LeaderHeads
+  - LuckPerms
+  - MVdWPlaceholderAPI
+  - MergedSpawner
+  - PlaceholderAPI
+  - PvpingSpawners
+  - RoseStacker
+  - ShopGUIPlus
+  - SilkSpawners
+  - SkinsRestorer
+  - SlimeWorldManager
+  - SuperVanish
+  - UltimateStacker
+  - VanishNoPacket
+  - Vault
+  - WildStacker
+  - WorldEdit
+
+loadbefore:
+  - Multiverse-Core
+  - Slimefun
+  - My_Worlds
+
 permissions:
   superior.*:
     description: Permission for all admin & island commands

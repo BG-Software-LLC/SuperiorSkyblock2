@@ -84,7 +84,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 columnsBuilder.append(",");
             if(valuesBuilder.length() != 0)
                 valuesBuilder.append(",");
-            columnsBuilder.append(column.getKey());
+            columnsBuilder.append("`").append(column.getKey()).append("`");
             valuesBuilder.append("?");
         }
 

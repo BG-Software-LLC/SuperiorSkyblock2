@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "1.7.0"
+version = "1.8"
 
 subprojects {
     apply plugin: 'java'
@@ -126,10 +126,10 @@ shadowJar {
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
 
     if(System.getenv("BUILD_NUMBER") == null){
-        archiveName = rootProject.name + ".jar"
+        archiveName = rootProject.name + "-" + version + ".jar"
     }
     else{
-        archiveName = rootProject.name + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
+        archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
     }
 
     delete fileTree('./target/') {
