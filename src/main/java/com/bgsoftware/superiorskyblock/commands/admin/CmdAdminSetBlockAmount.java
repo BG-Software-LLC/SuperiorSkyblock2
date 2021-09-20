@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -73,7 +73,7 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
 
         int amount = arguments.getKey();
 
-        plugin.getGrid().setBlockAmount(location.getBlock(), amount);
+        plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
 
         String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
         Locale.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);

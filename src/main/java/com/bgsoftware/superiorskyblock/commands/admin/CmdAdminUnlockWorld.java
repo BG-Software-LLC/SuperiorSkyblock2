@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -67,7 +67,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
         if(environment == null)
             return;
 
-        if(environment == plugin.getSettings().defaultWorldEnvironment){
+        if(environment == plugin.getSettings().getWorlds().getDefaultWorld()){
             Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }

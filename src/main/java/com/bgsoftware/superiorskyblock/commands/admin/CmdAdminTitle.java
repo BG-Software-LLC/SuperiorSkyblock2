@@ -6,9 +6,8 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,8 +92,12 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
             return;
         }
 
-        plugin.getNMSAdapter().sendTitle(targetPlayer.asPlayer(), title == null ? null : StringUtils.translateColors(title),
-                subtitle == null ? null : StringUtils.translateColors(subtitle), fadeIn.getKey(), duration.getKey(), fadeOut.getKey());
+        plugin.getNMSPlayers().sendTitle(targetPlayer.asPlayer(),
+                title == null ? null : StringUtils.translateColors(title),
+                subtitle == null ? null : StringUtils.translateColors(subtitle),
+                fadeIn.getKey(),
+                duration.getKey(),
+                fadeOut.getKey());
 
         Locale.TITLE_SENT.send(sender, targetPlayer.getName());
     }

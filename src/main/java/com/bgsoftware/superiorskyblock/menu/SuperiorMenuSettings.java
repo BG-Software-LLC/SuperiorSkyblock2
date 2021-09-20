@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.handlers.SettingsHandler;
+import com.bgsoftware.superiorskyblock.config.SettingsHandler;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -33,11 +37,11 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     private static final List<String> pathSlots = new ArrayList<>();
     private static final String[] ignorePaths = new String[] { "database", "max-island-size", "island-roles",
             "worlds.normal-world", "commands-cooldown", "starter-chest", "event-commands" };
-    public static final Map<UUID, String> configValues = new HashMap<>();
-    public static final Map<UUID, Integer> lastPage = new HashMap<>();
-    public static final Set<UUID> pageMove = new HashSet<>();
+    private static final Map<UUID, Integer> lastPage = new HashMap<>();
+    private static final Set<UUID> pageMove = new HashSet<>();
+    private static final Set<UUID> activePlayers = new HashSet<>();
 
-    public static CommentedConfiguration config;
+    private static CommentedConfiguration config;
 
     private SuperiorMenuSettings(SuperiorPlayer superiorPlayer){
         super("menuConfigSettings", superiorPlayer, true);
@@ -58,24 +62,35 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
         }
 
         try{
-            String value = pathSlots.get((currentPage - 1) * 36 + e.getRawSlot());
+            String path = pathSlots.get((currentPage - 1) * 36 + e.getRawSlot());
 
-            if(value == null)
+            if(path == null)
                 return;
 
-            configValues.put(player.getUniqueId(), value);
-            player.closeInventory();
-            player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
+            if(config.isBoolean(path)){
+                updateConfig(player, path, !config.getBoolean(path));
+                activePlayers.add(player.getUniqueId());
 
-            if(config.isList(configValues.get(player.getUniqueId())) ||
-                    config.isConfigurationSection(configValues.get(player.getUniqueId()))){
-                player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
+                previousMove = false;
+                player.closeInventory();
+                reopenMenu(player);
+            }
+            else {
+                activePlayers.add(player.getUniqueId());
+                PlayerChat.listen(player, message -> onPlayerChat(player, message, path));
+
+                player.closeInventory();
+                player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
+
+                if (config.isList(path) || config.isConfigurationSection(path)) {
+                    player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
+                }
             }
         }catch(Exception ignored){}
     }
 
     @Override
-    public void open(SuperiorMenu previousMenu) {
+    public void open(ISuperiorMenu previousMenu) {
         lastPage.put(superiorPlayer.getUniqueId(), currentPage);
         super.open(previousMenu);
     }
@@ -83,7 +98,8 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     @Override
     public void closeInventory(SuperiorPlayer superiorPlayer) {
         super.closeInventory(superiorPlayer);
-        if(!pageMove.remove(superiorPlayer.getUniqueId()) && !configValues.containsKey(superiorPlayer.getUniqueId())) {
+
+        if(!activePlayers.remove(superiorPlayer.getUniqueId()) && !pageMove.remove(superiorPlayer.getUniqueId())) {
             reloadConfiguration();
             lastPage.remove(superiorPlayer.getUniqueId());
         }
@@ -102,25 +118,8 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     }
 
     @Override
-    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
         openInventory(superiorPlayer, previousMenu);
-    }
-
-    protected static void saveConfiguration(){
-        try {
-            config.save(new File(plugin.getDataFolder(), "config.yml"));
-            plugin.setSettings(new SettingsHandler(plugin));
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
-    }
-
-    public static void reloadConfiguration(){
-        try {
-            config.load(new File(plugin.getDataFolder(), "config.yml"));
-        }catch(Exception ex){
-            ex.printStackTrace();
-        }
     }
 
     public static void init(){
@@ -153,14 +152,124 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
         menuConfigSettings.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
         openInventory(superiorPlayer, previousMenu, 1);
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu, int page){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, int page){
         SuperiorMenuSettings superiorMenuSettings = new SuperiorMenuSettings(superiorPlayer);
         superiorMenuSettings.currentPage = page;
         superiorMenuSettings.open(previousMenu);
+    }
+
+    private static boolean onPlayerChat(Player player, Object message, String path){
+        if(!message.toString().equalsIgnoreCase("-cancel")){
+            if(config.isConfigurationSection(path)){
+                Matcher matcher;
+                if(!(matcher = Pattern.compile("(.*):(.*)").matcher(message.toString())).matches()){
+                    player.sendMessage(ChatColor.RED + "Please follow the <sub-section>:<value> format");
+                }else {
+                    path = path + "." + matcher.group(1);
+                    message = matcher.group(2);
+
+                    if(config.get(path) != null && config.get(path).toString().equals(message)){
+                        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Removed the value " + matcher.group(1) + " from " + path);
+                        message = null;
+                    }else{
+                        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Added the value " + message.toString() + " to " + path);
+
+                        try{
+                            message = Integer.valueOf(message.toString());
+                        }catch(IllegalArgumentException ex){
+                            if(message.toString().equalsIgnoreCase("true") || message.toString().equalsIgnoreCase("false")){
+                                message = Boolean.valueOf(message.toString());
+                            }
+                        }
+
+                    }
+
+                    config.set(path, message);
+                }
+            }
+
+            else if(config.isList(path)){
+                List<String> list = config.getStringList(path);
+
+                if (list.contains(message.toString())) {
+                    list.remove(message.toString());
+                    player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Removed the value " + message + " from " + path);
+                } else {
+                    list.add(message.toString());
+                    player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Added the value " + message + " to " + path);
+                }
+
+                config.set(path, list);
+            }
+
+            else{
+                boolean valid = true;
+                if(config.isInt(path)){
+                    try{
+                        message = Integer.valueOf(message.toString());
+                    }catch(IllegalArgumentException ex){
+                        player.sendMessage(ChatColor.RED + "Please specify a valid number");
+                        valid = false;
+                    }
+                }
+
+                else if(config.isDouble(path)) {
+                    try {
+                        message = Double.valueOf(message.toString());
+                    } catch (IllegalArgumentException ex) {
+                        player.sendMessage(ChatColor.RED + "Please specify a valid number");
+                        valid = false;
+                    }
+                }
+
+                if(valid) {
+                    updateConfig(player, path, message);
+                }
+            }
+        }
+
+        reopenMenu(player);
+
+        return true;
+    }
+
+    private static void updateConfig(Player player, String path, Object value){
+        config.set(path, value);
+        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY +
+                " Changed value of " + path + " to " + value);
+    }
+
+    private static void reopenMenu(Player player){
+        Executor.sync(() -> {
+            Integer page = lastPage.remove(player.getUniqueId());
+
+            if(page == null)
+                page = 1;
+
+            PlayerChat.remove(player);
+            SuperiorMenuSettings.openInventory(plugin.getPlayers().getSuperiorPlayer(player), null, Math.max(1, page));
+        });
+    }
+
+    private static void saveConfiguration(){
+        try {
+            config.save(new File(plugin.getDataFolder(), "config.yml"));
+            plugin.setSettings(new SettingsHandler(plugin));
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private static void reloadConfiguration(){
+        try {
+            config.load(new File(plugin.getDataFolder(), "config.yml"));
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     private static void buildFromSection(List<ItemStack> itemStacks, ConfigurationSection section){

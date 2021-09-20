@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;

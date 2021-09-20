@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.Tag;
-import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;

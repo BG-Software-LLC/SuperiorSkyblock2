@@ -6,11 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+
+import java.util.Map;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
@@ -18,14 +16,8 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
     protected final Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island){
-        this(superiorPlayer, island, (JsonArray) null);
-    }
-
-    public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, JsonArray permsArray){
         this.superiorPlayer = superiorPlayer;
         this.island = island;
-        if(permsArray != null)
-            deserialize(permsArray);
     }
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island, String permissions){
@@ -34,7 +26,7 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         setPermissions(permissions, false);
     }
 
-    private PlayerPermissionNode(Registry<IslandPrivilege, PrivilegeStatus> privileges, SuperiorPlayer superiorPlayer, Island island){
+    private PlayerPermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SuperiorPlayer superiorPlayer, Island island){
         super(privileges);
 
         this.superiorPlayer = superiorPlayer;
@@ -52,35 +44,20 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         return new PlayerPermissionNode(privileges, superiorPlayer, island);
     }
 
-    public JsonArray serialize() {
-        JsonArray permsArray = new JsonArray();
-        privileges.entries().forEach(entry -> {
-            JsonObject permObject = new JsonObject();
-            permObject.addProperty("name", entry.getKey().getName());
-            permObject.addProperty("status", entry.getValue().toString());
-            permsArray.add(permObject);
-        });
-        return permsArray;
-    }
-
-    private void deserialize(JsonArray permsArray){
-        for(JsonElement permElement : permsArray){
-            try {
-                JsonObject permObject = permElement.getAsJsonObject();
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
-                PrivilegeStatus privilegeStatus = PrivilegeStatus.of(permObject.get("status").getAsString());
-                privileges.add(islandPrivilege, privilegeStatus);
-            }catch (Exception ignored){}
-        }
+    public void loadPrivilege(IslandPrivilege islandPrivilege, byte status){
+        privileges.put(islandPrivilege, PrivilegeStatus.of(status));
     }
 
     protected PrivilegeStatus getStatus(IslandPrivilege islandPrivilege) {
-        PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() : island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+        PrivilegeStatus cachedStatus = privileges.getOrDefault(islandPrivilege, PrivilegeStatus.DEFAULT);
 
-        if(island.hasPermission(playerRole, islandPrivilege))
-            return PrivilegeStatus.ENABLED;
+        if(cachedStatus != PrivilegeStatus.DEFAULT)
+            return cachedStatus;
 
-        return privileges.get(islandPrivilege, PrivilegeStatus.DISABLED);
+        PlayerRole playerRole = island.isMember(superiorPlayer) ? superiorPlayer.getPlayerRole() :
+                island.isCoop(superiorPlayer) ? SPlayerRole.coopRole() : SPlayerRole.guestRole();
+
+        return island.hasPermission(playerRole, islandPrivilege) ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED;
     }
 
     public static class EmptyPlayerPermissionNode extends PlayerPermissionNode{

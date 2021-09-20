@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
@@ -68,7 +68,7 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
 
         int size = arguments.getKey();
 
-        if(size > plugin.getSettings().maxIslandSize){
+        if(size > plugin.getSettings().getMaxIslandSize()){
             Locale.SIZE_BIGGER_MAX.send(sender);
             return;
         }
@@ -85,7 +85,7 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
         else
             Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
 
-        if(plugin.getSettings().buildOutsideIsland)
+        if(plugin.getSettings().isBuildOutsideIsland())
             Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
     }
 

@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,7 +27,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -133,8 +134,8 @@ public final class FileUtils {
         return itemBuilder;
     }
 
-    public static Registry<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
-        Registry<Character, List<Integer>> charSlots = Registry.createRegistry();
+    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
+        Map<Character, List<Integer>> charSlots = new HashMap<>();
 
         menu.resetData();
 
@@ -169,7 +170,7 @@ public final class FileUtils {
                     }
 
                     if(!charSlots.containsKey(ch))
-                        charSlots.add(ch, new ArrayList<>());
+                        charSlots.put(ch, new ArrayList<>());
 
                     charSlots.get(ch).add(slot);
 
@@ -178,10 +179,14 @@ public final class FileUtils {
             }
         }
 
-        int backButton = charSlots.get(cfg.getString("back", " ").charAt(0), Collections.singletonList(-1)).get(0);
+        int backButton = charSlots.getOrDefault(
+                cfg.getString("back", " ").charAt(0),
+                Collections.singletonList(-1)
+        ).get(0);
+
         menu.setBackButton(backButton);
 
-        if(plugin.getSettings().onlyBackButton && backButton == -1)
+        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] Menu doesn't have a back button, it's impossible to close it.");
 
         return charSlots;

@@ -5,7 +5,7 @@
 ##                                                  ##
 ######################################################
 
-title: '&lTransaction Logs'
+title: '&lTransaction Logs &r{0}'
 previous-menu: true
 
 pattern:

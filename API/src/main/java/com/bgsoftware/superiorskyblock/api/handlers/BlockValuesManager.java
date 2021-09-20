@@ -44,4 +44,20 @@ public interface BlockValuesManager {
      */
     void registerKeyParser(CustomKeyParser customKeyParser, Key... blockTypes);
 
+    enum SyncWorthStatus{
+
+        NONE,
+        BUY,
+        SELL;
+
+        public static SyncWorthStatus of(String name){
+            try{
+                return valueOf(name);
+            }catch (Exception ex){
+                return NONE;
+            }
+        }
+
+    }
+
 }

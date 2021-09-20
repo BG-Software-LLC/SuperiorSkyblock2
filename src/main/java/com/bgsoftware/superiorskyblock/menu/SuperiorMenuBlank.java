@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu;
 
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -23,7 +24,7 @@ public final class SuperiorMenuBlank extends SuperiorMenu {
     }
 
     @Override
-    protected void cloneAndOpen(SuperiorMenu previousMenu) {
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
         open(previousMenu);
     }
 
@@ -47,7 +48,7 @@ public final class SuperiorMenuBlank extends SuperiorMenu {
         superiorMenuBlank.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, SuperiorMenu previousMenu){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
         new SuperiorMenuBlank(superiorPlayer).open(previousMenu);
     }
 

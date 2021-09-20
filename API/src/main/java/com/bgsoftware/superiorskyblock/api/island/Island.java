@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
@@ -153,6 +154,14 @@ public interface Island extends Comparable<Island> {
      * @param superiorPlayer The player to ban.
      */
     void banMember(SuperiorPlayer superiorPlayer);
+
+    /**
+     * Ban a member from the island.
+     * @param superiorPlayer The player to ban.
+     * @param whom The player that executed the ban command.
+     *             If null, CONSOLE will be chosen as the banner.
+     */
+    void banMember(SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer whom);
 
     /**
      * Unban a player from the island.
@@ -757,6 +766,12 @@ public interface Island extends Comparable<Island> {
      */
     long getNextInterest();
 
+    /**
+     * Set the last time that the bank interest was given.
+     * @param lastInterest The time it was given.
+     */
+    void setLastInterestTime(long lastInterest);
+
     /*
      *  Worth related methods
      */
@@ -804,6 +819,15 @@ public interface Island extends Comparable<Island> {
      * @param save Whether or not the block counts should be saved into database.
      */
     void handleBlockPlace(Key key, BigInteger amount, boolean save);
+
+    /**
+     * Handle a placement of a block's key with a specific amount.
+     * @param key The block's key that was placed.
+     * @param amount The amount of the block.
+     * @param save Whether or not the block counts should be saved into database.
+     * @param updateLastTimeStatus Whether to update last time island was updated or not.
+     */
+    void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus);
 
     /**
      * Handle placements of many blocks in one time.
@@ -1576,7 +1600,14 @@ public interface Island extends Comparable<Island> {
 
     /**
      * Get the data handler of the object.
+     * @deprecated See getDatabaseBridge
      */
+    @Deprecated
     IslandDataHandler getDataHandler();
+
+    /**
+     * Get the current database bridge of the island.
+     */
+    DatabaseBridge getDatabaseBridge();
 
 }

@@ -6,7 +6,7 @@
 <p align="center">
 <a href="https://bg-software.com/discord/"><img src="https://img.shields.io/discord/293212540723396608?color=7289DA&label=Discord&logo=discord&logoColor=7289DA&link=https://bg-software.com/discord/"></a>
 <a href="https://bg-software.com/patreon/"><img src="https://img.shields.io/badge/-Support_on_Patreon-F96854.svg?logo=patreon&style=flat&logoColor=white&link=https://bg-software.com/patreon/"></a><br>
-<a href=""><img src="https://img.shields.io/maintenance/yes/2020"></a>
+<a href=""><img src="https://img.shields.io/maintenance/yes/2021"></a>
 </p>
 
 ## Compiling

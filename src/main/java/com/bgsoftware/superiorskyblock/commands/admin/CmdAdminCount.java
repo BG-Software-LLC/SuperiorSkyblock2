@@ -5,11 +5,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.menu.MenuCounts;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -74,7 +73,8 @@ public final class CmdAdminCount implements IAdminIslandCommand {
                 return;
             }
 
-            MenuCounts.openInventory(plugin.getPlayers().getSuperiorPlayer(sender), null, island);
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+            plugin.getMenus().openCounts(superiorPlayer, null, island);
             return;
         }
 

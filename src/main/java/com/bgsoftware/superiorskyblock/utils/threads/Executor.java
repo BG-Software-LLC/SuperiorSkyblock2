@@ -18,90 +18,89 @@ public final class Executor {
     private static ExecutorService databaseExecutor;
     private static boolean shutdown = false;
 
-    private Executor(){
+    private Executor() {
 
     }
 
-    public static void init(SuperiorSkyblockPlugin plugin){
+    public static void init(SuperiorSkyblockPlugin plugin) {
         Executor.plugin = plugin;
         databaseExecutor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
     }
 
-    public static void ensureMain(Runnable runnable){
-        if(shutdown)
+    public static void ensureMain(Runnable runnable) {
+        if (shutdown)
             return;
 
-        if(!Bukkit.isPrimaryThread()){
+        if (!Bukkit.isPrimaryThread()) {
             sync(runnable);
-        }
-        else{
+        } else {
             runnable.run();
         }
     }
 
-    public static BukkitTask sync(Runnable runnable){
-        if(shutdown)
+    public static BukkitTask sync(Runnable runnable) {
+        if (shutdown)
             return null;
 
         return sync(runnable, 0);
     }
 
-    public static BukkitTask sync(Runnable runnable, long delay){
-        if(shutdown)
+    public static BukkitTask sync(Runnable runnable, long delay) {
+        if (shutdown)
             return null;
 
         return Bukkit.getScheduler().runTaskLater(plugin, runnable, delay);
     }
 
-    public static void data(Runnable runnable){
-        if(shutdown)
+    public static void data(Runnable runnable) {
+        if (shutdown)
             return;
 
         databaseExecutor.execute(runnable);
     }
 
-    public static boolean isDataThread(){
+    public static boolean isDataThread() {
         return Thread.currentThread().getName().contains("SuperiorSkyblock Database Thread");
     }
 
-    public static void async(Runnable runnable){
-        if(shutdown)
+    public static void async(Runnable runnable) {
+        if (shutdown)
             return;
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, runnable);
     }
 
-    public static void async(Runnable runnable, long delay){
-        if(shutdown)
+    public static void async(Runnable runnable, long delay) {
+        if (shutdown)
             return;
 
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, runnable, delay);
     }
 
-    public static void asyncTimer(Runnable runnable, long delay){
-        if(shutdown)
+    public static void asyncTimer(Runnable runnable, long delay) {
+        if (shutdown)
             return;
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, runnable, delay, delay);
     }
 
-    public static void timer(Runnable runnable, long delay){
-        if(shutdown)
+    public static void timer(Runnable runnable, long delay) {
+        if (shutdown)
             return;
 
         Bukkit.getScheduler().runTaskTimer(plugin, runnable, delay, delay);
     }
 
-    public static NestedTask<Void> createTask(){
+    public static NestedTask<Void> createTask() {
         return new NestedTask<Void>().complete();
     }
 
-    public static void close(){
-        try{
+    public static void close() {
+        try {
             shutdown = true;
-            System.out.println("Shutting down database executor");
+            SuperiorSkyblockPlugin.log("Shutting down database executor");
             shutdownAndAwaitTermination();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -124,20 +123,20 @@ public final class Executor {
         }
     }
 
-    public static final class NestedTask<T>{
+    public static final class NestedTask<T> {
 
         private final CompletableFuture<T> value = new CompletableFuture<>();
 
-        NestedTask(){
+        NestedTask() {
         }
 
-        public <R> NestedTask<R> runSync(Function<T, R> function){
+        public <R> NestedTask<R> runSync(Function<T, R> function) {
             NestedTask<R> nestedTask = new NestedTask<>();
             value.whenComplete((value, ex) -> Executor.ensureMain(() -> nestedTask.value.complete(function.apply(value))));
             return nestedTask;
         }
 
-        public NestedTask<Void> runSync(Consumer<T> consumer){
+        public NestedTask<Void> runSync(Consumer<T> consumer) {
             NestedTask<Void> nestedTask = new NestedTask<>();
             value.whenComplete((value, ex) -> Executor.ensureMain(() -> {
                 consumer.accept(value);
@@ -146,13 +145,13 @@ public final class Executor {
             return nestedTask;
         }
 
-        public <R> NestedTask<R> runAsync(Function<T, R> function){
+        public <R> NestedTask<R> runAsync(Function<T, R> function) {
             NestedTask<R> nestedTask = new NestedTask<>();
             value.whenComplete((value, ex) -> Executor.async(() -> nestedTask.value.complete(function.apply(value))));
             return nestedTask;
         }
 
-        public NestedTask<Void> runAsync(Consumer<T> consumer){
+        public NestedTask<Void> runAsync(Consumer<T> consumer) {
             NestedTask<Void> nestedTask = new NestedTask<>();
             value.whenComplete((value, ex) -> Executor.async(() -> {
                 consumer.accept(value);
@@ -161,7 +160,7 @@ public final class Executor {
             return nestedTask;
         }
 
-        private NestedTask<T> complete(){
+        private NestedTask<T> complete() {
             value.complete(null);
             return this;
         }

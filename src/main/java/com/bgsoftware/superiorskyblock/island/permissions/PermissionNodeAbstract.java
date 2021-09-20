@@ -2,20 +2,22 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.google.common.base.Preconditions;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class PermissionNodeAbstract implements PermissionNode {
 
-    protected final Registry<IslandPrivilege, PrivilegeStatus> privileges;
+    protected final Map<IslandPrivilege, PrivilegeStatus> privileges = new ConcurrentHashMap<>();
 
     protected PermissionNodeAbstract(){
-        this.privileges = Registry.createRegistry();
     }
 
-    protected PermissionNodeAbstract(Registry<IslandPrivilege, PrivilegeStatus> privileges){
-        this.privileges = Registry.createRegistry(privileges);
+    protected PermissionNodeAbstract(Map<IslandPrivilege, PrivilegeStatus> privileges){
+        this.privileges.putAll(privileges);
     }
 
     protected void setPermissions(String permissions, boolean checkDefaults){
@@ -26,10 +28,10 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                 try {
                     IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permissionSections[0]);
                     if (permissionSections.length == 2) {
-                        privileges.add(islandPrivilege, PrivilegeStatus.of(permissionSections[1]));
+                        privileges.put(islandPrivilege, PrivilegeStatus.of(permissionSections[1]));
                     } else {
                         if(!checkDefaults || !isDefault(islandPrivilege))
-                            privileges.add(islandPrivilege, PrivilegeStatus.ENABLED);
+                            privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
                     }
                 }catch(Exception ignored){}
             }
@@ -42,7 +44,15 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     @Override
     public void setPermission(IslandPrivilege islandPrivilege, boolean value){
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        privileges.add(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
+        privileges.put(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
+    }
+
+    @Override
+    public Map<IslandPrivilege, Boolean> getCustomPermissions() {
+        return privileges.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue() == PrivilegeStatus.ENABLED
+        ));
     }
 
     @Override
@@ -70,7 +80,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
             }
         }
 
-        static PrivilegeStatus of(String value) throws IllegalArgumentException{
+        static PrivilegeStatus of(String value) throws IllegalArgumentException {
             switch (value){
                 case "0":
                     return DISABLED;
@@ -78,6 +88,17 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                     return ENABLED;
                 default:
                     return valueOf(value);
+            }
+        }
+
+        static PrivilegeStatus of(byte value) throws IllegalArgumentException {
+            switch (value){
+                case 0:
+                    return DISABLED;
+                case 1:
+                    return ENABLED;
+                default:
+                    throw new IllegalArgumentException("Invalid privilege status: " + value);
             }
         }
 

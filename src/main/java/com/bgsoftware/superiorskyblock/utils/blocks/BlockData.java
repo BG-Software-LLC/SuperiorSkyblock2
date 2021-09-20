@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.utils.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
@@ -82,12 +82,12 @@ public final class BlockData {
                 );
         }
 
-        if(plugin.getSettings().defaultContainersEnabled) {
+        if(plugin.getSettings().getDefaultContainers().isEnabled()) {
             String inventoryType = clonedTileEntity.getString("inventoryType");
             if (inventoryType != null) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(inventoryType);
-                    ListTag items = plugin.getSettings().defaultContainersContents.get(containerType);
+                    ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
                     if(items != null)
                         clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
                 }catch (Exception ignored){}
@@ -98,12 +98,12 @@ public final class BlockData {
     public void doPostPlace(Island island){
         if(clonedTileEntity != null && (clonedTileEntity.containsKey("Text1") || clonedTileEntity.containsKey("Text2") ||
                 clonedTileEntity.containsKey("Text3") || clonedTileEntity.containsKey("Text4")))
-            plugin.getNMSBlocks().handleSignPlace(island, location);
+            plugin.getNMSWorld().placeSign(island, location);
     }
 
     private static String getSignLine(int index, String def){
-        return index >= plugin.getSettings().defaultSignLines.size() ? def :
-                plugin.getSettings().defaultSignLines.get(index);
+        return index >= plugin.getSettings().getDefaultSign().size() ? def :
+                plugin.getSettings().getDefaultSign().get(index);
     }
 
 }

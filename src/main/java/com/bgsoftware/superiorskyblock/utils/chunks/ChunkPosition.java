@@ -61,11 +61,7 @@ public final class ChunkPosition {
 
     @Override
     public String toString() {
-        return "ChunkPosition{" +
-                "world=" + worldName +
-                ", x=" + x +
-                ", z=" + z +
-                '}';
+        return worldName + ", " + x + ", " + z;
     }
 
 

@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.listeners.PlayersListener;
-import com.bgsoftware.superiorskyblock.utils.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -66,11 +66,11 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         World.Environment environment = args.length == 4 ? World.Environment.valueOf(args[3].toUpperCase()) :
-                plugin.getSettings().defaultWorldEnvironment;
+                plugin.getSettings().getWorlds().getDefaultWorld();
 
-        if(environment != plugin.getSettings().defaultWorldEnvironment){
+        if(environment != plugin.getSettings().getWorlds().getDefaultWorld()){
             if(!island.wasSchematicGenerated(environment)) {
-                PlayersListener.handlePlayerPortal(plugin, (Player) sender, ((Player) sender).getLocation(),
+                PortalsLogic.handlePlayerPortal((Player) sender, ((Player) sender).getLocation(),
                         environment == World.Environment.NETHER ? PlayerTeleportEvent.TeleportCause.NETHER_PORTAL :
                                 PlayerTeleportEvent.TeleportCause.END_PORTAL, null);
                 return;

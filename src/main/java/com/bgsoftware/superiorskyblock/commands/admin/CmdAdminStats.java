@@ -3,8 +3,6 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.utils.database.StatementHolder;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -55,12 +53,10 @@ public final class CmdAdminStats implements ISuperiorCommand {
 
         //Islands Stats
         statsMessage.append(" - Islands: ").append(plugin.getGrid().getSize()).append("\n");
-        //Pending Chunks Stats
-        statsMessage.append(" - Pending Chunks: ").append(ChunksProvider.getSize()).append("\n");
         //Query Stats
-        statsMessage.append(" - Database Queries:");
-        StatementHolder.getQueryCalls().forEach((q, i) -> statsMessage.append("\n    * ")
-                .append(q).append(" (").append(i.get()).append(")"));
+//        statsMessage.append(" - Database Queries:");
+//        StatementHolder.getQueryCalls().forEach((q, i) -> statsMessage.append("\n    * ")
+//                .append(q).append(" (").append(i.get()).append(")"));
 
         sender.sendMessage(statsMessage.toString());
     }

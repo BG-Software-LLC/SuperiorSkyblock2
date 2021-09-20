@@ -7,7 +7,7 @@ java {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:v1_17_R1:latest"
+    compileOnly "org.spigotmc:v1_17_R1-Tuinity:latest"
     compileOnly project(":API")
     compileOnly parent
 }

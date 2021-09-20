@@ -68,7 +68,7 @@ public final class CmdAdminName implements IAdminIslandCommand {
         String oldName = island.getName();
         island.setName(islandName);
 
-        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.translateColors(islandName) : islandName;
 
         for(Player player : Bukkit.getOnlinePlayers())

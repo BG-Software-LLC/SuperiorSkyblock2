@@ -3,22 +3,23 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
-import com.bgsoftware.superiorskyblock.utils.tags.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.tags.IntArrayTag;
-import com.bgsoftware.superiorskyblock.utils.tags.ListTag;
-import com.bgsoftware.superiorskyblock.utils.tags.TagUtils;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
+import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
 public final class HeadUtils {
 
     private static final String NULL_PLAYER_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYmFkYzA0OGE3Y2U3OGY3ZGFkNzJhMDdkYTI3ZDg1YzA5MTY4ODFlNTUyMmVlZWQxZTNkYWYyMTdhMzhjMWEifX19";
-    private static final Registry<String, String> entitySkullTextures = Registry.createRegistry();
+    private static final Map<String, String> entitySkullTextures = new HashMap<>();
 
     private HeadUtils(){
 
@@ -41,7 +42,7 @@ public final class HeadUtils {
         }
 
         for(String entityType : cfg.getConfigurationSection("").getKeys(false))
-            entitySkullTextures.add(entityType, cfg.getString(entityType));
+            entitySkullTextures.put(entityType, cfg.getString(entityType));
     }
 
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture){
@@ -83,7 +84,7 @@ public final class HeadUtils {
     }
 
     public static String getTexture(String entityType){
-        return entitySkullTextures.get(entityType, "");
+        return entitySkullTextures.getOrDefault(entityType, "");
     }
 
 }

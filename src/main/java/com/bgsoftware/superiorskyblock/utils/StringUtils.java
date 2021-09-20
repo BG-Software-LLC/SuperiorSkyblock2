@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -15,9 +16,11 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,7 +30,6 @@ public final class StringUtils {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
-    private static final long D = 86400000L, H = 3600000L, MIN = 60000L, S = 1000L;
     private static final char SPACE_ASCII = 160;
 
     @SuppressWarnings("all")
@@ -89,7 +91,7 @@ public final class StringUtils {
         for(String subKey : type.split("_"))
             formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase()).append(subKey.substring(1).toLowerCase());
 
-        return formattedKey.toString().substring(1);
+        return formattedKey.substring(1);
     }
 
 
@@ -157,74 +159,91 @@ public final class StringUtils {
     public static String getPermissionsString(){
         StringBuilder stringBuilder = new StringBuilder();
         IslandPrivilege.values().stream().sorted(Comparator.comparing(IslandPrivilege::getName)).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
     public static String getSettingsString(){
         StringBuilder stringBuilder = new StringBuilder();
         IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName)).forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
     public static String getUpgradesString(SuperiorSkyblockPlugin plugin){
         StringBuilder stringBuilder = new StringBuilder();
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> stringBuilder.append(", ").append(upgrade.getName()));
-        return stringBuilder.toString().substring(2);
+        return stringBuilder.substring(2);
     }
 
-    public static String formatTime(java.util.Locale locale, long time){
+    public static String formatTime(java.util.Locale locale, long time, TimeUnit timeUnit){
+        return formatTimeFromMilliseconds(locale, timeUnit.toMillis(time));
+    }
+
+    private static String formatTimeFromMilliseconds(java.util.Locale locale, long millis){
+        Duration duration = Duration.ofMillis(millis);
         StringBuilder timeBuilder = new StringBuilder();
-        long timeUnitValue;
         boolean RTL = LocaleUtils.isRightToLeft(locale);
 
-        if(time > D){
-            timeUnitValue = time / D;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+        {
+            long days = duration.toDays();
+
+            if(days > 0){
+                if(RTL){
+                    timeBuilder.insert(0, days).insert(0, " ").insert(0, days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+                }
+                else {
+                    timeBuilder.append(days).append(" ").append(days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
+                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
+                }
+                duration = duration.minusDays(days);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                        Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
-            }
-            time %= D;
         }
 
-        if(time > H){
-            timeUnitValue = time / H;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+        {
+            long hours = duration.toHours();
+
+            if(hours > 0){
+                if(RTL){
+                    timeBuilder.insert(0, hours).insert(0, " ").insert(0, hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+                }
+                else {
+                    timeBuilder.append(hours).append(" ").append(hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
+                }
+
+                duration = duration.minusHours(hours);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                        Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
-            }
-            time %= H;
         }
 
-        if(time > MIN){
-            timeUnitValue = time / MIN;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+        {
+            long minutes = duration.toMinutes();
+
+            if(minutes > 0){
+                if(RTL){
+                    timeBuilder.insert(0, minutes).insert(0, " ").insert(0, minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+                }
+                else {
+                    timeBuilder.append(minutes).append(" ").append(minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
+                }
+                duration = duration.minusMinutes(minutes);
             }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                        Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
-            }
-            time %= MIN;
         }
 
-        if(time > S){
-            timeUnitValue = time / S;
-            if(RTL){
-                timeBuilder.insert(0, timeUnitValue).insert(0, " ").insert(0, timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
-            }
-            else {
-                timeBuilder.append(timeUnitValue).append(" ").append(timeUnitValue == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                        Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
+        {
+            long seconds = duration.getSeconds();
+
+            if(seconds > 0){
+                if(RTL){
+                    timeBuilder.insert(0, seconds).insert(0, " ").insert(0, seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
+                }
+                else {
+                    timeBuilder.append(seconds).append(" ").append(seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
+                }
             }
         }
 
@@ -283,27 +302,28 @@ public final class StringUtils {
     }
 
     public static boolean isValidName(CommandSender sender, Island currentIsland, String islandName){
-        String coloredName = plugin.getSettings().islandNamesColorSupport ?
+        String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.translateColors(islandName) : islandName;
-        String strippedName = plugin.getSettings().islandNamesColorSupport ?
+        String strippedName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.stripColors(coloredName) : islandName;
 
-        if(strippedName.length() > plugin.getSettings().islandNamesMaxLength){
+        if(strippedName.length() > plugin.getSettings().getIslandNames().getMaxLength()){
             Locale.NAME_TOO_LONG.send(sender);
             return false;
         }
 
-        if(strippedName.length() < plugin.getSettings().islandNamesMinLength){
+        if(strippedName.length() < plugin.getSettings().getIslandNames().getMinLength()){
             Locale.NAME_TOO_SHORT.send(sender);
             return false;
         }
 
-        if(plugin.getSettings().islandNamesPreventPlayerNames && plugin.getPlayers().getSuperiorPlayer(strippedName) != null){
+        if(plugin.getSettings().getIslandNames().isPreventPlayerNames() && plugin.getPlayers().getSuperiorPlayer(strippedName) != null){
             Locale.NAME_SAME_AS_PLAYER.send(sender);
             return false;
         }
 
-        if(plugin.getSettings().filteredIslandNames.stream().anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
+        if(plugin.getSettings().getIslandNames().getFilteredNames().stream()
+                .anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))){
             Locale.NAME_BLACKLISTED.send(sender);
             return false;
         }
@@ -335,6 +355,19 @@ public final class StringUtils {
         }
 
         return newText.toString();
+    }
+
+    public static String format(java.util.Locale userLocale, BorderColor borderColor){
+        switch (borderColor){
+            case RED:
+                return Locale.BORDER_PLAYER_COLOR_NAME_RED.getMessage(userLocale);
+            case BLUE:
+                return Locale.BORDER_PLAYER_COLOR_NAME_BLUE.getMessage(userLocale);
+            case GREEN:
+                return Locale.BORDER_PLAYER_COLOR_NAME_GREEN.getMessage(userLocale);
+        }
+
+        throw new IllegalArgumentException("Invalid border color: " + borderColor.name());
     }
 
     private static String parseHexColor(String hexColor){

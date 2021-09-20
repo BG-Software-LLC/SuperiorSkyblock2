@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.data;
 
+@Deprecated
 public interface IslandDataHandler {
 
     /**

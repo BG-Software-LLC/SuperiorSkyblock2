@@ -23,6 +23,8 @@ database:
   prefix: ''
   useSSL: false
   allowPublicKeyRetrieval: true
+  waitTimeout: 600000
+  maxLifetime: 1800000
 
 # Set the main command of the plugin.
 # You can add aliases by adding "," after the command name, and split them using ",".
@@ -179,6 +181,7 @@ island-roles:
     - MINECART_OPEN
     - MINECART_PLACE
     - MONSTER_DAMAGE
+    - NAME_ENTITY
     - PAINTING
     - PICKUP_DROPS
     - PICKUP_FISH
@@ -308,9 +311,6 @@ worlds:
     # Should dragon fight be enabled? This will spawn dragons for each island.
     # This feature is in beta, expect bugs!
     dragon-fight: false
-  # Should the plugin optimize the island worlds?
-  # When enabled, only chunks of islands will be saved from the island worlds.
-  optimize: false
   # The difficulty of the island worlds.
   difficulty: EASY
 
@@ -389,6 +389,10 @@ leave-confirm: true
 # If you want a specific spawners provider to use, specify it here.
 # Providers: Auto, WildStacker, EpicSpawners, MergedSpawner, PvpingSpawners, SilkSpawners, RoseStacker
 spawners-provider: 'AUTO'
+
+# If you want a specific stacked-blocks provider to use, specify it here.
+# Providers: Auto, WildStacker, RoseStacker
+stacked-blocks-provider: 'AUTO'
 
 # Should inventories of island members get cleared after disbanding their island?
 disband-inventory-clear: true
@@ -581,9 +585,6 @@ stop-leaving: false
 # Should the values menu be enabled?
 values-menu: true
 
-# How many chunks should be loaded in one tick by SuperiorSkyblock?
-chunks-per-tick: 10
-
 # A list of crops that will be affected by the crop growth multiplier.
 # You can find a list of materials here: https://bg-software.com/materials/
 crops-to-grow:
@@ -715,3 +716,7 @@ charge-on-warp: 0
 
 # Should island warps be public by default?
 public-warps: false
+
+# Timeout for the recalculate task, in seconds.
+# If you want to disable the timeout, set this to 0 or below.
+recalc-task-timeout: 10

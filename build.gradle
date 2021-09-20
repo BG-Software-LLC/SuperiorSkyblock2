@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "1.7.0"
+version = "1.8"
 
 subprojects {
     apply plugin: 'java'
@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
+    implementation 'com.bgsoftware.common.executors:Executors:latest'
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'
@@ -90,8 +91,9 @@ dependencies {
     compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
     compileOnly 'me.mrcookieslime:Slimefun4:latest'
     compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
     compileOnly 'de.myzelyam:SuperVanish:latest'
-    compileOnly 'com.songoda:UltimateStacker:latest'
+    compileOnly 'com.songoda:UltimateStacker:2.1.7'
     compileOnly 'org.kitteh:VanishNoPacket:latest'
     compileOnly 'net.milkbowl:Vault:latest'
     compileOnly 'com.bgsoftware:WildStackerAPI:latest'
@@ -121,11 +123,13 @@ processResources {
 shadowJar {
     dependsOn(jar)
 
+    relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
+
     if(System.getenv("BUILD_NUMBER") == null){
-        archiveName = rootProject.name + ".jar"
+        archiveName = rootProject.name + "-" + version + ".jar"
     }
     else{
-        archiveName = rootProject.name + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
+        archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
     }
 
     delete fileTree('./target/') {

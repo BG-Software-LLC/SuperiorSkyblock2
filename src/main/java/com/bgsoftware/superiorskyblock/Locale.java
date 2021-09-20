@@ -4,7 +4,6 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -18,8 +17,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -53,6 +54,9 @@ public enum Locale {
     BLOCK_VALUE,
     BLOCK_VALUE_WORTHLESS,
     BONUS_SET_SUCCESS,
+    BORDER_PLAYER_COLOR_NAME_BLUE,
+    BORDER_PLAYER_COLOR_NAME_RED,
+    BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_UPDATED,
     BUILD_OUTSIDE_ISLAND,
     CANNOT_SET_ROLE,
@@ -478,7 +482,9 @@ public enum Locale {
     ISLAND_WARP_PUBLIC,
     ISLAND_WARP_PRIVATE,
     ISLAND_WAS_CLOSED,
+    ISLAND_WORTH_ERROR,
     ISLAND_WORTH_RESULT,
+    ISLAND_WORTH_TIME_OUT,
     JOINED_ISLAND,
     JOINED_ISLAND_NAME,
     JOINED_ISLAND_AS_COOP,
@@ -672,6 +678,7 @@ public enum Locale {
     WARP_CATEGORY_ICON_NEW_TYPE,
     WARP_CATEGORY_ICON_UPDATED,
     WARP_CATEGORY_ILLEGAL_NAME,
+    WARP_CATEGORY_NAME_TOO_LONG,
     WARP_CATEGORY_SLOT,
     WARP_CATEGORY_SLOT_ALREADY_TAKEN,
     WARP_CATEGORY_SLOT_SUCCESS,
@@ -684,6 +691,7 @@ public enum Locale {
     WARP_ICON_UPDATED,
     WARP_ILLEGAL_NAME,
     WARP_LOCATION_UPDATE,
+    WARP_NAME_TOO_LONG,
     WARP_PUBLIC_UPDATE,
     WARP_PRIVATE_UPDATE,
     WARP_RENAME,
@@ -697,7 +705,7 @@ public enum Locale {
     WORLD_NOT_UNLOCKED;
 
     private final String defaultMessage;
-    private final Registry<java.util.Locale, MessageContainer> messages = Registry.createRegistry();
+    private final Map<java.util.Locale, MessageContainer> messages = new HashMap<>();
 
     Locale(){
         this(null);
@@ -731,7 +739,7 @@ public enum Locale {
     }
 
     private void setMessage(java.util.Locale locale, MessageContainer messageContainer){
-        messages.add(locale, messageContainer);
+        messages.put(locale, messageContainer);
     }
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -776,7 +784,7 @@ public enum Locale {
 
             locales.add(fileLocale);
 
-            if(plugin.getSettings().defaultLanguage.equalsIgnoreCase(fileName))
+            if(plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName))
                 defaultLocale = fileLocale;
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
@@ -831,7 +839,7 @@ public enum Locale {
         if(!noInteractMessages.contains(player.getUniqueId())){
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player, locale);
-            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().protectedMessageDelay);
+            Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().getProtectedMessageDelay());
         }
     }
 
@@ -982,9 +990,9 @@ public enum Locale {
                     ((Player) sender).spigot().sendMessage(duplicate);
 
                 if(actionBarMessage != null)
-                    plugin.getNMSAdapter().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
+                    plugin.getNMSPlayers().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
 
-                plugin.getNMSAdapter().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
+                plugin.getNMSPlayers().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
                         Locale.replaceArgs(subtitleMessage, objects), fadeIn, duration, fadeOut);
             }
         }

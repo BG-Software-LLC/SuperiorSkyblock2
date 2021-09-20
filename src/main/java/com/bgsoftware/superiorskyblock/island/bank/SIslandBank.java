@@ -8,16 +8,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.data.SIslandDataHandler;
-import com.bgsoftware.superiorskyblock.menu.MenuBankLogs;
-import com.bgsoftware.superiorskyblock.menu.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.modules.BuiltinModules;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.database.Query;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.registry.Registry;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -26,10 +23,16 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class SIslandBank implements IslandBank {
 
@@ -37,9 +40,9 @@ public final class SIslandBank implements IslandBank {
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    private final SyncedObject<List<BankTransaction>> transactions = SyncedObject.of(new ArrayList<>());
-    private final Registry<UUID, SyncedObject<List<BankTransaction>>> transactionsByPlayers = Registry.createRegistry();
-    private final SyncedObject<BigDecimal> balance = SyncedObject.of(BigDecimal.ZERO);
+    private final SyncedObject<SortedSet<BankTransaction>> transactions = SyncedObject.of(new TreeSet<>(SortingComparators.BANK_TRANSACTIONS_COMPARATOR));
+    private final Map<UUID, SyncedObject<List<BankTransaction>>> transactionsByPlayers = new ConcurrentHashMap<>();
+    private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
 
     public SIslandBank(Island island){
@@ -53,7 +56,7 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public void setBalance(BigDecimal balance) {
-        setBalance(balance, false);
+        this.balance.set(balance.setScale(2, RoundingMode.HALF_DOWN));
     }
 
     @Override
@@ -89,18 +92,18 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(List::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
-            setBalance(this.balance.get().add(amount), true);
+            increaseBalance(amount);
 
             addTransaction(bankTransaction, true);
 
             IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
 
-            MenuIslandBank.refreshMenus(island);
-            MenuBankLogs.refreshMenus(island);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -117,22 +120,17 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(List::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
-        setBalance(this.balance.get().add(amount), true);
+        increaseBalance(amount);
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus(island);
-        MenuBankLogs.refreshMenus(island);
+        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshBankLogs(island);
 
         return bankTransaction;
-    }
-
-    public void giveMoneyRaw(BigDecimal amount){
-        setBalance(this.balance.get().add(amount), true);
-        MenuIslandBank.refreshMenus(island);
     }
 
     @Override
@@ -173,18 +171,18 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(List::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         if(failureReason == null || failureReason.isEmpty()){
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
-            setBalance(this.balance.get().subtract(withdrawAmount), true);
+            decreaseBalance(withdrawAmount);
 
             addTransaction(bankTransaction, true);
 
             IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
 
-            MenuIslandBank.refreshMenus(island);
-            MenuBankLogs.refreshMenus(island);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
         }
         else{
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
@@ -201,22 +199,22 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(List::size) + 1;
+        int position = transactions.readAndGet(SortedSet::size) + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", amount);
-        setBalance(this.balance.get().subtract(amount), true);
+        decreaseBalance(amount);
 
         addTransaction(bankTransaction, true);
 
-        MenuIslandBank.refreshMenus(island);
-        MenuBankLogs.refreshMenus(island);
+        plugin.getMenus().refreshBankLogs(island);
+        plugin.getMenus().refreshBankLogs(island);
 
         return bankTransaction;
     }
 
     @Override
     public List<BankTransaction> getAllTransactions() {
-        return transactions.readAndGet(Collections::unmodifiableList);
+        return transactions.readAndGet(bankTransactions -> Collections.unmodifiableList(new ArrayList<>(bankTransactions)));
     }
 
     @Override
@@ -229,6 +227,7 @@ public final class SIslandBank implements IslandBank {
         return getTransactions(CONSOLE_UUID);
     }
 
+    @Override
     public void loadTransaction(BankTransaction bankTransaction){
         addTransaction(bankTransaction, false);
     }
@@ -245,32 +244,22 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = bankTransaction.getPlayer();
 
-        transactions.write(transactions -> transactions.add(bankTransaction.getPosition() - 1, bankTransaction));
+        transactions.write(transactions -> transactions.add(bankTransaction));
         transactionsByPlayers.computeIfAbsent(senderUUID != null ? senderUUID : CONSOLE_UUID, p -> SyncedObject.of(new ArrayList<>()))
                 .write(transactions -> transactions.add(bankTransaction));
 
         if(save){
-            Query.TRANSACTION_INSERT.getStatementHolder((SIslandDataHandler) island.getDataHandler())
-                    .setString(island.getUniqueId().toString())
-                    .setString(senderUUID == null ? "" : senderUUID + "")
-                    .setString(bankTransaction.getAction().name())
-                    .setInt(bankTransaction.getPosition())
-                    .setString(bankTransaction.getTime() + "")
-                    .setString(bankTransaction.getFailureReason())
-                    .setString(bankTransaction.getAmount() + "")
-                    .execute(true);
+            IslandsDatabaseBridge.saveBankTransaction(island, bankTransaction);
         }
     }
 
-    private void setBalance(BigDecimal balance, boolean save){
-        this.balance.set(balance);
+    private void decreaseBalance(BigDecimal amount){
+        increaseBalance(amount.negate());
+    }
 
-        if(save){
-            Query.ISLAND_SET_BANK.getStatementHolder((SIslandDataHandler) island.getDataHandler())
-                    .setString(balance + "")
-                    .setString(island.getOwner().getUniqueId() + "")
-                    .execute(true);
-        }
+    private void increaseBalance(BigDecimal amount){
+        this.balance.updateAndGet(bigDecimal -> bigDecimal.add(amount).setScale(2, RoundingMode.HALF_DOWN));
+        IslandsDatabaseBridge.saveBankBalance(island);
     }
 
 }

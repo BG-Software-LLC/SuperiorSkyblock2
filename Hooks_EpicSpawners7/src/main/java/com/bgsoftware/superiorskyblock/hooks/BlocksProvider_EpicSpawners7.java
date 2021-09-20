@@ -2,11 +2,12 @@ package com.bgsoftware.superiorskyblock.hooks;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.utils.key.Key;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -24,7 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("unused")
-public final class BlocksProvider_EpicSpawners7 implements BlocksProvider {
+public final class BlocksProvider_EpicSpawners7 implements SpawnersProvider {
 
     private static boolean registered = false;
 

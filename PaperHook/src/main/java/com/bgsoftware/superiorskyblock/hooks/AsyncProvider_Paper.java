@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
+import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
