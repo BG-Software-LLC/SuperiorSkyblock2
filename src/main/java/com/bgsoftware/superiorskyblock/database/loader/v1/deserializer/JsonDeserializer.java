@@ -72,7 +72,11 @@ public final class JsonDeserializer implements IDeserializer {
     public List<PlayerAttributes> deserializePlayers(String players) {
         List<PlayerAttributes> playerAttributes = new ArrayList<>();
         JsonArray playersArray = gson.fromJson(players, JsonArray.class);
-        playersArray.forEach(uuid -> playerAttributes.add(databaseLoader.getPlayerAttributes(uuid.getAsString())));
+        playersArray.forEach(uuid -> {
+            PlayerAttributes _playerAttributes = databaseLoader.getPlayerAttributes(uuid.getAsString());
+            if(_playerAttributes != null)
+                playerAttributes.add(_playerAttributes);
+        });
         return playerAttributes;
     }
 
