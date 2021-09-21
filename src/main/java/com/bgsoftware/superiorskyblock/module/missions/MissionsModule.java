@@ -122,6 +122,9 @@ public final class MissionsModule extends BuiltinModule {
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_2.yml");
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_3.yml");
             FileUtils.saveResource("modules/missions/categories/slayer/slayer_4.yml");
+            FileUtils.saveResource("modules/missions/categories/fisherman/fisherman_1.yml");
+            FileUtils.saveResource("modules/missions/categories/fisherman/fisherman_2.yml");
+            FileUtils.saveResource("modules/missions/categories/fisherman/fisherman_3.yml");
         }
     }
 
