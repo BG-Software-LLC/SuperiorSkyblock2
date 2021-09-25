@@ -590,6 +590,10 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         cancelAllIslandPreviews();
     }
 
+    public boolean wasPluginDisabled() {
+        return this.pluginDisable;
+    }
+
     public void loadGrid(DatabaseResult resultSet) {
         lastIsland = SBlockPosition.of(resultSet.getString("last_island"));
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getWorldName())) {
