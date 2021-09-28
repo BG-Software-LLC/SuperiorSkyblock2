@@ -586,7 +586,7 @@ public final class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
-        if(island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().isFlying() &&
+        if(island != null && superiorPlayer.hasIslandFlyEnabled() && !e.getPlayer().getAllowFlight() &&
                 island.hasPermission(superiorPlayer, IslandPrivileges.FLY))
             Executor.sync(() -> {
                 e.getPlayer().setAllowFlight(true);

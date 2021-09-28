@@ -622,7 +622,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         if(islandFly && player != null && !player.hasPermission("superior.island.fly")) {
             islandFly = false;
-            if(player.isFlying()){
+            if(player.getAllowFlight()){
                 player.setFlying(false);
                 player.setAllowFlight(false);
             }
