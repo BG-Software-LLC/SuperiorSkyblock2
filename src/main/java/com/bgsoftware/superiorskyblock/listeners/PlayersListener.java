@@ -509,7 +509,7 @@ public final class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
         String message = e.getMessage().toLowerCase();
-        if(island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, false) &&
+        if(island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, true) &&
                 plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(message::contains)){
             e.setCancelled(true);
             Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
