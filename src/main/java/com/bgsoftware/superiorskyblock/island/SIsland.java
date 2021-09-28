@@ -253,6 +253,7 @@ public final class SIsland implements Island {
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
+        updateIslandChests();
 
         databaseBridge.startSavingData();
     }
@@ -3312,6 +3313,22 @@ public final class SIsland implements Island {
             UpgradeValue<Integer> currentValue = roleLimits.get(entry.getKey());
             if(currentValue == null || entry.getValue().get() > currentValue.get())
                 roleLimits.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void updateIslandChests() {
+        List<IslandChest> islandChestList = new ArrayList<>(Arrays.asList(this.islandChest.get()));
+        boolean updatedChests = false;
+
+        while (islandChestList.size() < plugin.getSettings().getIslandChests().getDefaultPages()) {
+            IslandChest newIslandChest = new SIslandChest(this, islandChestList.size());
+            newIslandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
+            islandChestList.add(newIslandChest);
+            updatedChests = true;
+        }
+
+        if(updatedChests) {
+            this.islandChest.set(islandChestList.toArray(new IslandChest[0]));
         }
     }
 
