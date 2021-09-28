@@ -222,10 +222,12 @@ public interface Island extends Comparable<Island> {
     void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside);
 
     /**
-     * Check whether or not a player is a visitor of the island.
+     * Check whether a player is a visitor of the island or not.
      * @param superiorPlayer The player to check.
+     * @param checkCoopStatus Whether to check for coop status or not.
+     *                        If enabled, coops will not be considered as visitors.
      */
-    boolean isVisitor(SuperiorPlayer superiorPlayer, boolean includeCoopStatus);
+    boolean isVisitor(SuperiorPlayer superiorPlayer, boolean checkCoopStatus);
 
     /*
      *  Location related methods
