@@ -22,7 +22,7 @@ public final class WorldsSection implements SettingsManager.Worlds {
 
     @Override
     public String getWorldName() {
-        return this.container.defaultWorldName;
+        return this.container.islandWorldName;
     }
 
     @Override
