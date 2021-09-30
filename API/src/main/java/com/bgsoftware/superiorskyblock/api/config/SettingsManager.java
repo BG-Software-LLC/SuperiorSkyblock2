@@ -816,6 +816,11 @@ public interface SettingsManager {
         String getWorldName();
 
         /**
+         * The name of the default world.
+         */
+        String getDefaultWorldName();
+
+        /**
          * All settings related to the overworld world.
          * Config-path: worlds.normal
          */

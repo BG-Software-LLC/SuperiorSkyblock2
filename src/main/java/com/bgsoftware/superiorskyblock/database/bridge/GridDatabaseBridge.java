@@ -21,7 +21,7 @@ public final class GridDatabaseBridge {
         gridManager.getDatabaseBridge().insertObject("grid",
                 new Pair<>("last_island", SBlockPosition.of(gridManager.getLastIslandLocation()).toString()),
                 new Pair<>("max_island_size", plugin.getSettings().getMaxIslandSize()),
-                new Pair<>("world", plugin.getSettings().getWorlds().getWorldName())
+                new Pair<>("world", plugin.getSettings().getWorlds().getDefaultWorldName())
         );
     }
 

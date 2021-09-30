@@ -26,6 +26,11 @@ public final class WorldsSection implements SettingsManager.Worlds {
     }
 
     @Override
+    public String getDefaultWorldName() {
+        return this.container.defaultWorldName;
+    }
+
+    @Override
     public Normal getNormal() {
         return this.normal;
     }
