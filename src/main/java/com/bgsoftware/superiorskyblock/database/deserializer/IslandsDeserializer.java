@@ -46,7 +46,7 @@ public final class IslandsDeserializer {
             PlayerRole playerRole = SPlayerRole.fromId((int) membersRow.get("role"));
 
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
-            superiorPlayer.setIslandLeader(island.getOwner());
+            superiorPlayer.setIsland(island);
             superiorPlayer.setPlayerRole(playerRole);
 
             membersSet.add(superiorPlayer);

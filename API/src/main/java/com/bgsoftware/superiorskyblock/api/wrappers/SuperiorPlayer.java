@@ -209,7 +209,9 @@ public interface SuperiorPlayer {
      * Set the island owner of the player's island.
      * !Can cause issues if not used properly!
      * @param islandLeader The island owner's player.
+     * @deprecated see {@link #setIsland(Island)}
      */
+    @Deprecated
     void setIslandLeader(SuperiorPlayer islandLeader);
 
     /**
@@ -222,6 +224,14 @@ public interface SuperiorPlayer {
      * Check if this player is a member of an island.
      */
     boolean hasIsland();
+
+    /**
+     * Set the island of the player.
+     * !Can cause issues if not used properly!
+     * @param island The island to set the player to.
+     * @throws IllegalArgumentException if island doesn't contain player as a member.
+     */
+    void setIsland(Island island);
 
     /**
      * Get the role of the player.
