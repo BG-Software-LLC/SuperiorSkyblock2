@@ -18,6 +18,7 @@ import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Map;
 
 public final class BlockValuesHandler extends AbstractHandler implements BlockValuesManager {
@@ -26,6 +27,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     private static final KeyMap<CustomKeyParser> customKeyParsers = new KeyMap<>();
     private static final KeySet valuesMenuBlocks = new KeySet();
+    private static final KeySet customBlockKeys = new KeySet();
 
     private final BlockValuesContainer blockWorthValues, blockLevels, customBlockWorthValues, customBlockLevels;
 
@@ -97,6 +99,14 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         return valuesMenuBlocks.getKey(key);
     }
 
+    public void addCustomBlockKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+        customBlockKeys.add(key);
+    }
+
+    public void addCustomBlockKeys(Collection<com.bgsoftware.superiorskyblock.api.key.Key> blocks) {
+        customBlockKeys.addAll(blocks);
+    }
+
     @Override
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
@@ -129,8 +139,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         if(convertedKey.isAPIKey() || isValuesMenu(convertedKey)) {
             return getValuesKey(convertedKey);
         }
-
-        if(blockWorthValues.containsKeyRaw(convertedKey)) {
+        else if(customBlockKeys.contains(convertedKey)) {
+            return customBlockKeys.getKey(convertedKey);
+        }
+        else if(blockWorthValues.containsKeyRaw(convertedKey)) {
             return convertedKey;
         }
         else if(blockLevels.containsKeyRaw(convertedKey)) {

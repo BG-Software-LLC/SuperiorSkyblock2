@@ -255,6 +255,9 @@ public final class SIsland implements Island {
         updateUpgrades();
         updateIslandChests();
 
+        // We want to save all the limits to the custom block keys
+        plugin.getBlockValues().addCustomBlockKeys(this.blockLimits.keySet());
+
         databaseBridge.startSavingData();
     }
 
@@ -2071,6 +2074,7 @@ public final class SIsland implements Island {
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + finalLimit);
         blockLimits.put(key, new UpgradeValue<>(finalLimit, false));
+        plugin.getBlockValues().addCustomBlockKey(key);
         IslandsDatabaseBridge.saveBlockLimit(this, key, limit);
     }
 

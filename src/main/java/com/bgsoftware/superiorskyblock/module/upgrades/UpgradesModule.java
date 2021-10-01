@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
@@ -127,8 +128,10 @@ public final class UpgradesModule extends BuiltinModule {
                     UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
                     KeyMap<Integer> blockLimits = new KeyMap<>();
                     if(levelSection.contains("block-limits")){
-                        for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false))
+                        for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
                             blockLimits.put(block, levelSection.getInt("block-limits." + block));
+                            plugin.getBlockValues().addCustomBlockKey(Key.of(block));
+                        }
                     }
                     KeyMap<Integer> entityLimits = new KeyMap<>();
                     if(levelSection.contains("entity-limits")){

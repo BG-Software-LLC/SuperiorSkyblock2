@@ -208,7 +208,9 @@ public final class SettingsContainer {
             String gloablKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultBlockLimits.put(Key.of(gloablKey, subKey), Integer.parseInt(limit));
+            Key key = Key.of(gloablKey, subKey);
+            defaultBlockLimits.put(key, Integer.parseInt(limit));
+            plugin.getBlockValues().addCustomBlockKey(key);
         }
         defaultEntityLimits = new KeyMap<>();
         for(String line : config.getStringList("default-values.entity-limits")){
