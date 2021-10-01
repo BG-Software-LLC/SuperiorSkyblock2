@@ -84,7 +84,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void loadData() {
-        lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getWorldName(), 0, 100, 0);
+        lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
@@ -590,10 +590,14 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         cancelAllIslandPreviews();
     }
 
+    public boolean wasPluginDisabled() {
+        return this.pluginDisable;
+    }
+
     public void loadGrid(DatabaseResult resultSet) {
         lastIsland = SBlockPosition.of(resultSet.getString("last_island"));
-        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getWorldName())) {
-            lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getWorldName(),
+        if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
+            lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 
@@ -607,7 +611,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 plugin.getSettings().updateValue("max-island-size", maxIslandSize);
             }
 
-            if (!plugin.getSettings().getWorlds().getWorldName().equals(world)) {
+            if (!plugin.getSettings().getWorlds().getDefaultWorldName().equals(world)) {
                 SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
                 SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
                 plugin.getSettings().updateValue("worlds.normal-world", world);

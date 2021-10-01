@@ -69,7 +69,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final UUID uuid;
 
-    private SuperiorPlayer islandLeader = this;
+    private Island playerIsland = null;
     private String name, textureValue = "";
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
@@ -459,25 +459,30 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public SuperiorPlayer getIslandLeader() {
-        return islandLeader;
+        Island island = getIsland();
+        return island == null ? this : island.getOwner();
     }
 
     @Override
     public void setIslandLeader(SuperiorPlayer islandLeader) {
-        Preconditions.checkNotNull(islandLeader, "islandLeader parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Change Leader, Player: " + getName() + ", Leader: " + islandLeader.getName());
-        this.islandLeader = islandLeader;
-        //PlayersDatabaseBridge.saveIslandLeader(this);
+        setIsland(islandLeader.getIsland());
     }
 
     @Override
     public Island getIsland(){
-        return plugin.getGrid().getIsland(this);
+        return playerIsland;
     }
 
     @Override
     public boolean hasIsland() {
         return getIsland() != null;
+    }
+
+    @Override
+    public void setIsland(Island island) {
+        SuperiorSkyblockPlugin.debug("Action: Change Island, Player: " + getName() + ", New Island: " +
+                (island == null ? "None" : island.getUniqueId().toString()));
+        this.playerIsland = island;
     }
 
     @Override
@@ -622,7 +627,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         if(islandFly && player != null && !player.hasPermission("superior.island.fly")) {
             islandFly = false;
-            if(player.isFlying()){
+            if(player.getAllowFlight()){
                 player.setFlying(false);
                 player.setAllowFlight(false);
             }
@@ -804,6 +809,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(otherPlayer, "otherPlayer parameter cannot be null.");
 
         this.name = otherPlayer.getName();
+        this.playerIsland = otherPlayer.getIsland();
         this.playerRole = otherPlayer.getPlayerRole();
         this.userLocale = otherPlayer.getUserLocale();
         this.worldBorderEnabled |= otherPlayer.hasWorldBorderEnabled();

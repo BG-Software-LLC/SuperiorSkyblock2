@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.database.DataHandler;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
+import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -172,6 +173,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if(!loadNMSAdapter()) {
             shouldEnable = false;
         }
+
+        Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
     }
 
     private static final Pattern LISTENER_REGISTER_FAILURE =

@@ -307,6 +307,9 @@ public final class NMSChunksImpl implements NMSChunks {
 
     @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
+        if(plugin.getSettings().getCropsInterval() <= 0)
+            return;
+
         if (stop) {
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(((CraftChunk) chunk).getHandle().getPos());
             World world = cropsTickingTileEntity == null ? null : cropsTickingTileEntity.getWorld();

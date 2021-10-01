@@ -133,10 +133,10 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {
         this.playersContainer.removePlayer(originPlayer);
 
+        newPlayer.merge(originPlayer);
+
         for (Island island : plugin.getGrid().getIslands())
             island.replacePlayers(originPlayer, newPlayer);
-
-        newPlayer.merge(originPlayer);
     }
 
     // Updating last time status

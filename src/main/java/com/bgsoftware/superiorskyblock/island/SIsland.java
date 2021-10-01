@@ -193,6 +193,7 @@ public final class SIsland implements Island {
     public SIsland(GridHandler grid, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
+        this.owner.setIsland(this);
         this.owner.setPlayerRole(SPlayerRole.lastRole());
         this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
         this.creationTime = resultSet.getLong("creation_time");
@@ -252,6 +253,10 @@ public final class SIsland implements Island {
         checkMembersDuplication();
         updateOldUpgradeValues();
         updateUpgrades();
+        updateIslandChests();
+
+        // We want to save all the limits to the custom block keys
+        plugin.getBlockValues().addCustomBlockKeys(this.blockLimits.keySet());
 
         databaseBridge.startSavingData();
     }
@@ -417,7 +422,7 @@ public final class SIsland implements Island {
 
         members.write(members -> members.add(superiorPlayer));
 
-        superiorPlayer.setIslandLeader(owner);
+        superiorPlayer.setIsland(this);
         superiorPlayer.setPlayerRole(playerRole);
 
         plugin.getMenus().refreshMembers(this);
@@ -439,7 +444,7 @@ public final class SIsland implements Island {
 
         members.write(members -> members.remove(superiorPlayer));
 
-        superiorPlayer.setIslandLeader(superiorPlayer);
+        superiorPlayer.setIsland(null);
 
         if (superiorPlayer.isOnline()) {
             SuperiorMenu.killMenu(superiorPlayer);
@@ -1390,9 +1395,8 @@ public final class SIsland implements Island {
         PlayerRole previousRole = SPlayerRole.lastRole().getPreviousRole();
         previousOwner.setPlayerRole(previousRole == null ? SPlayerRole.lastRole() : previousRole);
 
-        //Changing owner of the island and updating all players
+        //Changing owner of the island.
         owner = superiorPlayer;
-        getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
 
         IslandsDatabaseBridge.saveIslandLeader(this);
         IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
@@ -1411,7 +1415,6 @@ public final class SIsland implements Island {
 
         if(owner == originalPlayer) {
             owner = newPlayer;
-            getIslandMembers(true).forEach(islandMember -> islandMember.setIslandLeader(owner));
             IslandsDatabaseBridge.saveIslandLeader(this);
             plugin.getGrid().transferIsland(originalPlayer.getUniqueId(), owner.getUniqueId());
         }
@@ -1424,6 +1427,28 @@ public final class SIsland implements Island {
             IslandsDatabaseBridge.addMember(this, newPlayer, System.currentTimeMillis());
         }
 
+        replaceVisitor(originalPlayer, newPlayer);
+        replaceBannedPlayer(originalPlayer, newPlayer);
+        replacePermissions(originalPlayer, newPlayer);
+    }
+
+    private void replaceVisitor(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
+        uniqueVisitors.write(uniqueVisitors -> {
+            for(Pair<SuperiorPlayer, Long> uniqueVisitorPair : uniqueVisitors) {
+                if(uniqueVisitorPair.getKey().equals(originalPlayer)) {
+                    uniqueVisitorPair.setKey(newPlayer);
+                }
+            }
+        });
+    }
+
+    private void replaceBannedPlayer(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
+        if(banned.remove(originalPlayer)) {
+            banned.add(newPlayer);
+        }
+    }
+
+    private void replacePermissions(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         PlayerPermissionNode playerPermissionNode = playerPermissions.remove(originalPlayer);
         if(playerPermissionNode != null){
             playerPermissions.put(newPlayer, playerPermissionNode);
@@ -2069,6 +2094,7 @@ public final class SIsland implements Island {
         int finalLimit = Math.max(0, limit);
         SuperiorSkyblockPlugin.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + finalLimit);
         blockLimits.put(key, new UpgradeValue<>(finalLimit, false));
+        plugin.getBlockValues().addCustomBlockKey(key);
         IslandsDatabaseBridge.saveBlockLimit(this, key, limit);
     }
 
@@ -3127,7 +3153,7 @@ public final class SIsland implements Island {
             Iterator<SuperiorPlayer> iterator = members.iterator();
             while (iterator.hasNext()){
                 SuperiorPlayer superiorPlayer = iterator.next();
-                if(superiorPlayer.equals(owner) || !superiorPlayer.getIslandLeader().equals(owner)){
+                if(superiorPlayer.equals(owner) || !this.equals(superiorPlayer.getIsland())){
                     iterator.remove();
                     IslandsDatabaseBridge.removeMember(this, superiorPlayer);
                 }
@@ -3311,6 +3337,22 @@ public final class SIsland implements Island {
             UpgradeValue<Integer> currentValue = roleLimits.get(entry.getKey());
             if(currentValue == null || entry.getValue().get() > currentValue.get())
                 roleLimits.put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    private void updateIslandChests() {
+        List<IslandChest> islandChestList = new ArrayList<>(Arrays.asList(this.islandChest.get()));
+        boolean updatedChests = false;
+
+        while (islandChestList.size() < plugin.getSettings().getIslandChests().getDefaultPages()) {
+            IslandChest newIslandChest = new SIslandChest(this, islandChestList.size());
+            newIslandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
+            islandChestList.add(newIslandChest);
+            updatedChests = true;
+        }
+
+        if(updatedChests) {
+            this.islandChest.set(islandChestList.toArray(new IslandChest[0]));
         }
     }
 

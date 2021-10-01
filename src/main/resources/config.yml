@@ -612,6 +612,8 @@ crops-to-grow:
 - 'POTATO'
 
 # How frequency should the crops task run? (in ticks)
+# You can disable this feature by setting it to 0.
+# Warning: When disabled, crops-growth multiplier will not function!
 crops-interval: 5
 
 # Should only the back button work for closing menus?
