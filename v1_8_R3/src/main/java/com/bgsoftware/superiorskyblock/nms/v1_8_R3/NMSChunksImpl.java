@@ -90,7 +90,10 @@ public final class NMSChunksImpl implements NMSChunks {
 
             for(Map.Entry<BlockPosition, TileEntity> tileEntityEntry : chunk.tileEntities.entrySet()) {
                 worldServer.tileEntityList.remove(tileEntityEntry.getValue());
-                worldServer.h.remove(tileEntityEntry.getValue());
+                try {
+                    // This field doesn't exist in Taco 1.8
+                    worldServer.h.remove(tileEntityEntry.getValue());
+                } catch (Throwable ignored) {}
                 worldServer.capturedTileEntities.remove(tileEntityEntry.getKey());
             }
 
