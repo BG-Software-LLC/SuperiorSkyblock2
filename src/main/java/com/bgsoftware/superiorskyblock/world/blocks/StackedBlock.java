@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public final class StackedBlock {
@@ -53,10 +54,18 @@ public final class StackedBlock {
         if (amount <= 1) {
             removeHologram();
         } else {
+            Key currentBlockKey = Key.of(location.getBlock());
+
             if (blockKey == null || blockKey.equals(ConstantKeys.AIR)) {
-                blockKey = Key.of(location.getBlock());
+                blockKey = currentBlockKey;
                 if (blockKey.equals(ConstantKeys.AIR))
                     return;
+            }
+
+            // Must be checked in order to fix issue #632
+            if(!currentBlockKey.equals(blockKey)) {
+                removeHologram();
+                return;
             }
 
             if (hologram == null)
