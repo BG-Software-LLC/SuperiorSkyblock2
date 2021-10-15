@@ -108,7 +108,8 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         if (amount > 1) {
             stackedBlock.setBlockKey(blockKey);
             stackedBlock.setAmount(amount);
-            stackedBlock.updateName(plugin);
+            // Must be called with delay in order to fix issue #632
+            Executor.sync(() -> stackedBlock.updateName(plugin), 2L);
             StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
         } else {
             stackedBlock.removeHologram();

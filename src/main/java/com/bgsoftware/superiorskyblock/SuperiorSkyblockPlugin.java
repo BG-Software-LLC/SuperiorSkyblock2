@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
+import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandsHandler;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
+import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
@@ -145,6 +147,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler = null;
 
     private IScriptEngine scriptEngine = NashornEngine.getInstance();
+
+    private WorldEventsManager worldEventsManager = new WorldEventsManagerImpl(this);
 
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
@@ -597,6 +601,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void setScriptEngine(@Nullable IScriptEngine scriptEngine) {
         this.scriptEngine = scriptEngine == null ? NashornEngine.getInstance() : scriptEngine;
+    }
+
+    @Override
+    public WorldEventsManager getWorldEventsManager() {
+        return worldEventsManager;
+    }
+
+    @Override
+    public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
+        this.worldEventsManager = worldEventsManager == null ? new WorldEventsManagerImpl(this) : worldEventsManager;
     }
 
     public void setSettings(SettingsHandler settingsHandler){

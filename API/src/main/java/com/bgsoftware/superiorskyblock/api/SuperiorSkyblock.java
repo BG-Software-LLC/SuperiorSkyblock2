@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
+import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 
 import javax.annotation.Nullable;
 
@@ -107,5 +108,17 @@ public interface SuperiorSkyblock {
      *                     When null, the default java script engine will be set instead.
      */
     void setScriptEngine(@Nullable IScriptEngine scriptEngine);
+
+    /**
+     * Get the world events-manager of the plugin.
+     */
+    WorldEventsManager getWorldEventsManager();
+
+    /**
+     * Set a new world events-manager for the plugin.
+     * @param worldEventsManager The new events-manager to set.
+     *                           If null, the default events-manager will be set.
+     */
+    void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager);
 
 }
