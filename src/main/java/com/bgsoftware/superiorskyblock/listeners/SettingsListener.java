@@ -280,6 +280,7 @@ public final class SettingsListener implements Listener {
                 case "NATURAL":
                 case "TRAP":
                 case "MOUNT":
+                case "BEEHIVE":
                 {
                     IslandFlag toCheck = EntityUtils.isMonster(entityType) ? IslandFlags.NATURAL_MONSTER_SPAWN :
                             EntityUtils.isAnimal(entityType) ? IslandFlags.NATURAL_ANIMALS_SPAWN : null;
