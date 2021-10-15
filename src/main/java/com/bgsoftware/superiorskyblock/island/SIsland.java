@@ -264,16 +264,16 @@ public final class SIsland implements Island {
 
     @SuppressWarnings("WeakerAccess")
     public SIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName){
-        if(superiorPlayer != null){
-            this.owner = superiorPlayer.getIslandLeader();
-            superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
-        }else{
-            this.owner = null;
+        this.uuid = uuid;
+        this.owner = superiorPlayer;
+
+        if(this.owner != null){
+            this.owner.setPlayerRole(SPlayerRole.lastRole());
+            this.owner.setIsland(this);
         }
 
         long currentTime = System.currentTimeMillis() / 1000;
 
-        this.uuid = uuid;
         this.center = SBlockPosition.of(location);
         this.creationTime = currentTime;
         this.islandName = islandName;
