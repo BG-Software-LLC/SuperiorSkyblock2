@@ -286,6 +286,8 @@ public final class IslandsDeserializer {
         loadObject(island, "islands_banks", islandBankRow -> {
             BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
             long lastInterestTime = getAsLong(islandBankRow.get("last_interest_time"));
+            if(lastInterestTime > (System.currentTimeMillis() / 1000))
+                lastInterestTime /= 1000;
             island.getIslandBank().setBalance(balance);
             island.setLastInterestTime(lastInterestTime);
         });
