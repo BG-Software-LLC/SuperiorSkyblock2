@@ -71,6 +71,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
@@ -169,6 +170,7 @@ public final class SIsland implements Island {
     private volatile long lastTimeUpdate = -1;
     private final SyncedObject<IslandChest[]> islandChest = SyncedObject.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
     private volatile long lastInterest = -1L;
+    private final SyncedObject<BukkitTask> bankInterestTask = SyncedObject.of(null);
     private volatile long lastUpgradeTime = -1L;
 
     /*
@@ -1589,7 +1591,11 @@ public final class SIsland implements Island {
     public void setLastInterestTime(long lastInterest) {
         if(BuiltinModules.BANK.bankInterestEnabled) {
             long ticksToNextInterest = BuiltinModules.BANK.bankInterestInterval * 20L;
-            Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            this.bankInterestTask.set(bankInterestTask -> {
+                if(bankInterestTask != null)
+                    bankInterestTask.cancel();
+                return Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+            });
         }
 
         this.lastInterest = lastInterest;
@@ -3144,7 +3150,11 @@ public final class SIsland implements Island {
             if (ticksToNextInterest <= 0) {
                 giveInterest(true);
             } else {
-                Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                this.bankInterestTask.set(bankInterestTask -> {
+                    if(bankInterestTask != null)
+                        bankInterestTask.cancel();
+                    return Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                });
             }
         }
     }
