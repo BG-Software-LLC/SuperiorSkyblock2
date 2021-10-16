@@ -35,7 +35,7 @@ public final class MenuMissions extends SuperiorMenu {
     }
 
     public static void init(){
-        MenuMissions menuMissions = new MenuMissions(null);
+        MenuMissions menuMissions = createEmptyInstance();
 
         File file = new File(plugin.getDataFolder(), "menus/missions.yml");
 
@@ -51,6 +51,10 @@ public final class MenuMissions extends SuperiorMenu {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
         new MenuMissions(superiorPlayer).open(previousMenu);
+    }
+
+    public static MenuMissions createEmptyInstance() {
+        return new MenuMissions(null);
     }
 
 }
