@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.world.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
@@ -40,11 +39,9 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     public void loadData() {
         SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
 
-        DatabaseBridge gridLoader = plugin.getFactory().createDatabaseBridge((GridManager) null);
-
         AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
 
-        gridLoader.loadAllObjects("stacked_blocks", _resultSet -> {
+        databaseBridge.loadAllObjects("stacked_blocks", _resultSet -> {
             DatabaseResult resultSet = new DatabaseResult(_resultSet);
             loadStackedBlock(resultSet);
             String item = resultSet.getString("block_type");
