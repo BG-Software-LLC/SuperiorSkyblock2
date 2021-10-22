@@ -405,24 +405,6 @@ public final class UpgradesListener implements Listener {
      *   ISLAND CHEST
      */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onIslandChestInteract(InventoryClickEvent e){
-        InventoryHolder inventoryHolder = e.getView().getTopInventory() == null ? null : e.getView().getTopInventory().getHolder();
-
-        if(!(inventoryHolder instanceof IslandChest))
-            return;
-
-        SIslandChest islandChest = (SIslandChest) inventoryHolder;
-
-        if(islandChest.isUpdating()) {
-            e.setCancelled(true);
-        }
-
-        else{
-            islandChest.updateContents();
-        }
-    }
-
     private ItemStack asItemStack(Entity entity){
         if(entity instanceof Hanging){
             switch (entity.getType()){
