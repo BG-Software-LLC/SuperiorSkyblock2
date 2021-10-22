@@ -343,39 +343,6 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
-  check_permission:
-    display-menu: true
-    permission-enabled:
-      type: COMPASS
-      name: '&6Check Permission'
-      lore:
-        - '&7Access to check other members'' permissions.'
-        - '&7Currently &aENABLED&7.'
-    permission-disabled:
-      type: COMPASS
-      name: '&6Check Permission'
-      lore:
-        - '&7Access to check other members'' permissions.'
-        - '&7Currently &cDISABLED&7.'
-    role-permission:
-      type: COMPASS
-      name: '&6Check Permission'
-      lore:
-        - '&7Access to check other members'' permissions.'
-        - '&7Role: &e{}&7.'
-        - ''
-        - '{0}'
-    has-access:
-      sound:
-        type: ENTITY_EXPERIENCE_ORB_PICKUP
-        volume: 0.2
-        pitch: 0.2
-    no-access:
-      sound:
-        type: BLOCK_ANVIL_PLACE
-        volume: 0.2
-        pitch: 0.2
-
   chest_access:
     display-menu: true
     permission-enabled:
