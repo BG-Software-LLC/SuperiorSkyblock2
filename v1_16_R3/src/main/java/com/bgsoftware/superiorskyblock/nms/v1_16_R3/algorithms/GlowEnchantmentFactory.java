@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms;
 
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import io.papermc.paper.enchantments.EnchantmentRarity;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
