@@ -17,6 +17,7 @@ public final class Executor {
     private static SuperiorSkyblockPlugin plugin;
     private static ExecutorService databaseExecutor;
     private static boolean shutdown = false;
+    private static boolean syncDatabaseCalls = false;
 
     private Executor() {
 
@@ -56,11 +57,16 @@ public final class Executor {
         if (shutdown)
             return;
 
-        databaseExecutor.execute(runnable);
+        if(syncDatabaseCalls) {
+            runnable.run();
+        }
+        else {
+            databaseExecutor.execute(runnable);
+        }
     }
 
     public static boolean isDataThread() {
-        return Thread.currentThread().getName().contains("SuperiorSkyblock Database Thread");
+        return syncDatabaseCalls || Thread.currentThread().getName().contains("SuperiorSkyblock Database Thread");
     }
 
     public static void async(Runnable runnable) {
@@ -93,6 +99,10 @@ public final class Executor {
 
     public static NestedTask<Void> createTask() {
         return new NestedTask<Void>().complete();
+    }
+
+    public static void syncDatabaseCalls() {
+        syncDatabaseCalls = true;
     }
 
     public static void close() {

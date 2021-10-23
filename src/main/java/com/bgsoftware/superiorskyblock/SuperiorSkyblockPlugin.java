@@ -312,6 +312,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             return;
 
         ChunksProvider.stop();
+        Executor.syncDatabaseCalls();
+
         try {
             dataHandler.saveDatabase(false);
 

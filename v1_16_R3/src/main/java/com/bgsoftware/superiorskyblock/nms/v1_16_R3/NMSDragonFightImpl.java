@@ -70,6 +70,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -462,10 +463,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
             }
 
-            for(EntityPlayer entityPlayer : bossBattle.getPlayers()){
-                if(!nearbyPlayers.contains(entityPlayer))
-                    bossBattle.removePlayer(entityPlayer);
-            }
+            bossBattle.getPlayers().removeIf(entityPlayer -> !nearbyPlayers.contains(entityPlayer));
         }
 
         private EntityEnderDragon spawnEnderDragon(){

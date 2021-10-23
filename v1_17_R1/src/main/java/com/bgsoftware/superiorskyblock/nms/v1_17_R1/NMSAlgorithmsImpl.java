@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms.CustomTileEntityHopper;
-import com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms.GlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms.GlowEnchantmentFactory;
 import com.bgsoftware.superiorskyblock.key.Key;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
@@ -92,7 +92,7 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment getGlowEnchant() {
-        return GlowEnchantment.createEnchantment();
+        return GlowEnchantmentFactory.createEnchantment();
     }
 
     @Override
