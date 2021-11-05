@@ -81,7 +81,7 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island){
-        return islandsFactory == null ? new DefaultIslandCalculationAlgorithm(island) :
+        return islandsFactory == null ? new DefaultIslandCalculationAlgorithm() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
     }
 
