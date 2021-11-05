@@ -467,7 +467,9 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
             }
 
-            this.k.getPlayers().removeIf(entityPlayer -> !nearbyPlayers.contains(entityPlayer));
+            this.k.getPlayers().stream()
+                    .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer))
+                    .forEach(this.k::removePlayer);
         }
 
         private EntityEnderDragon spawnEnderDragon(){
