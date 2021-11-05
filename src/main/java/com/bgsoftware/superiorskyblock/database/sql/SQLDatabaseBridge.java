@@ -9,6 +9,16 @@ import java.util.function.Consumer;
 
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
+    private static final SQLDatabaseBridge INSTANCE = new SQLDatabaseBridge();
+
+    public static SQLDatabaseBridge getInstance() {
+        return INSTANCE;
+    }
+
+    private SQLDatabaseBridge() {
+
+    }
+
     private boolean shouldSaveData = false;
     private StatementHolder batchStatementHolder;
 

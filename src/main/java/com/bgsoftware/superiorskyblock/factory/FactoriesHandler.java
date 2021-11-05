@@ -81,7 +81,7 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island){
-        return islandsFactory == null ? new DefaultIslandCalculationAlgorithm() :
+        return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
     }
 
@@ -90,25 +90,25 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public DatabaseBridge createDatabaseBridge(Island island){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
+        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
+        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(GridManager gridManager){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
+        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager){
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
+        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);
     }
