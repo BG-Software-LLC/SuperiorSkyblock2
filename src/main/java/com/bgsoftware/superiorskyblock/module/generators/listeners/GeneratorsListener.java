@@ -87,6 +87,8 @@ public final class GeneratorsListener implements Listener {
 
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
 
+        SuperiorSkyblockPlugin.debug("Action: Generate Block, Island: " + island.getOwner().getName() + ", Block: " + typeSections[0] + ":" + blockData);
+
         plugin.getNMSWorld().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
 
         plugin.getNMSWorld().playGeneratorSound(block.getLocation());
