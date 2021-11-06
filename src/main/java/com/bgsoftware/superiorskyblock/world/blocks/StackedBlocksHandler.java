@@ -26,17 +26,17 @@ import java.util.stream.Collectors;
 public final class StackedBlocksHandler extends AbstractHandler implements StackedBlocksManager {
 
     private final StackedBlocksContainer stackedBlocksContainer;
-    private final DatabaseBridge databaseBridge;
+    private DatabaseBridge databaseBridge;
 
     public StackedBlocksHandler(SuperiorSkyblockPlugin plugin, StackedBlocksContainer stackedBlocksContainer) {
         super(plugin);
         this.stackedBlocksContainer = stackedBlocksContainer;
-        databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-        databaseBridge.startSavingData();
     }
 
     @Override
     public void loadData() {
+        initializeDatabaseBridge();
+
         SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
 
         AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
@@ -265,6 +265,11 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         this.stackedBlocksContainer.getStackedBlocks().values().forEach(stackedBlock -> {
             stackedBlock.setBlockKey(Key.of(stackedBlock.getLocation().getBlock()));
         });
+    }
+
+    private void initializeDatabaseBridge() {
+        databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+        databaseBridge.startSavingData();
     }
 
     private static Map<Location, Integer> convertStackedBlocksMap(Map<Location, StackedBlock> stackedBlocks) {
