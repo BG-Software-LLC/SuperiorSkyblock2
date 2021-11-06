@@ -147,7 +147,7 @@ public final class ProtectionListener implements Listener {
         else if (blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
         else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
-        else if(blockType == Material.PUMPKIN && e.getItem() != null && e.getItem().getType() == Material.SHEARS) requiredPrivilege = IslandPrivileges.BREAK;
+        else if(blockType == Material.PUMPKIN) requiredPrivilege = IslandPrivileges.BREAK;
         else requiredPrivilege = IslandPrivileges.INTERACT;
 
         if (!island.hasPermission(superiorPlayer, requiredPrivilege)) {
