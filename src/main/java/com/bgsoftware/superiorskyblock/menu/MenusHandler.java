@@ -10,10 +10,9 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandMissions;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerMissions;
 import org.jetbrains.annotations.Nullable;
 
 public final class MenusHandler extends AbstractHandler implements MenusManager {
@@ -243,12 +242,18 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
+    public void openMissionsCategory(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, MissionCategory missionCategory) {
+        plugin.getProviders().getMenusProvider().openMissionsCategory(targetPlayer, previousMenu, missionCategory);
+    }
+
+    @Override
     public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
-        if (islandMissions) {
-            MenuIslandMissions.openInventory(superiorPlayer, null);
-        } else {
-            MenuPlayerMissions.openInventory(superiorPlayer, null);
-        }
+
+    }
+
+    @Override
+    public void refreshMissionsCategory(MissionCategory missionCategory) {
+        plugin.getProviders().getMenusProvider().refreshMissionsCategory(missionCategory);
     }
 
     @Override

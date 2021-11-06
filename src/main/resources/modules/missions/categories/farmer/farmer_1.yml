@@ -1,0 +1,114 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FarmingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  items:
+    '1':
+      type: BEETROOT_SEEDS
+      amount: 1
+    '2':
+      type: PUMPKIN_SEEDS
+      amount: 1
+    '3':
+      type: MELON_SEEDS
+      amount: 1
+  commands:
+    - 'eco give %player% 2500'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer I!'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-plants:
+  '1':
+    types:
+      - 'CARROTS'
+    amount: 10
+  '2':
+    types:
+      - 'POTATOES'
+    amount: 10
+  '3':
+    types:
+      - 'WHEAT'
+    amount: 10
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFarmer I'
+    lore:
+      - '&7Plant a small farm.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Carrots'
+      - '&8 - &7x10 Potatoes'
+      - '&8 - &7x10 Wheat'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Beetroot Seed'
+      - '&8 - &7x1 Pumpkin Seed'
+      - '&8 - &7x1 Melon Seed'
+      - '&8 - &7$2,500'
+      - ''
+      - '&6Grown Carrots: &7{value_carrots}/10'
+      - '&6Grown Potatoes: &7{value_potatoes}/10'
+      - '&6Grown Wheat: &7{value_wheat}/10'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFarmer I'
+    lore:
+      - '&7Plant a small farm.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Carrots'
+      - '&8 - &7x10 Potatoes'
+      - '&8 - &7x10 Wheat'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Beetroot Seed'
+      - '&8 - &7x1 Pumpkin Seed'
+      - '&8 - &7x1 Melon Seed'
+      - '&8 - &7$2,500'
+      - ''
+      - '&6Grown Carrots: &710/10'
+      - '&6Grown Potatoes: &710/10'
+      - '&6Grown Wheat: &710/10'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFarmer I'
+    lore:
+      - '&7Plant a small farm.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Beetroot Seed'
+      - '&8 - &7x1 Pumpkin Seed'
+      - '&8 - &7x1 Melon Seed'
+      - '&8 - &7$2,500'
+      - ''
+      - '&6Grown Carrots: &710/10'
+      - '&6Grown Potatoes: &710/10'
+      - '&6Grown Wheat: &710/10'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

@@ -1,0 +1,92 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: BlocksMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Whether only naturally spawned blocks should be counted towards the mission or not.
+only-natural-blocks: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 250000'
+    - 'is admin msg %player% &e&lMiner | &7Successfully finished the mission Miner V!'
+    - 'is admin msg %player% &e&lMiner | &7Diamonds... diamonds... diamonds!'
+    - 'is admin msg %player% &e&lMiner | &7&oYou are now a professional Miner, congratz!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'miner_1'
+  - 'miner_2'
+  - 'miner_3'
+  - 'miner_4'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-blocks:
+  '1':
+    types:
+      - 'DIAMOND_ORE'
+    amount: 32
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aMiner V'
+    lore:
+      - '&7It''s time to buy the best goodies.'
+      - '&7Mine x32 diamond ores.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x32 Diamond Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - ''
+      - '&6Diamond Ore Mined: &7{1}/32'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aMiner V'
+    lore:
+      - '&7It''s time to buy the best goodies.'
+      - '&7Mine x32 diamond ores.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x32 Diamond Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - ''
+      - '&6Diamond Ore Mined: &732/32'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aMiner V'
+    lore:
+      - '&7It''s time to buy the best goodies.'
+      - '&7Mine x32 diamond ores.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - ''
+      - '&6Diamond Ore Mined: &732/32'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

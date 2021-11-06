@@ -1,0 +1,102 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FishingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 15000'
+    - 'is admin msg %player% &e&lFisherman | &7Successfully finished the mission Fisherman II!'
+    - 'is admin msg %player% &e&lFisherman | &7What about testing our luck?'
+    - 'is admin msg %player% &e&lFisherman | &7&oFor more information about the next mission, checkout /is missions'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'fisherman_1'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-caughts:
+  '1':
+    types:
+      - 'BOW'
+      - 'ENCHANTED_BOOK'
+      - 'FISHING_ROD'
+      - 'NAME_TAG'
+      - 'SADDLE'
+      - 'NAUTILUS_SHELL'
+      - 'LILY_PAD'
+      - 'BOWL'
+      - 'LEATHER'
+      - 'LEATHER_BOOTS'
+      - 'ROTTEN_FLESH'
+      - 'STICK'
+      - 'STRING'
+      - 'GLASS_BOTTLE'
+      - 'BONE'
+      - 'INK_SAC'
+      - 'TRIPWIRE_HOOK'
+    amount: 5
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFisherman II'
+    lore:
+      - '&7Cleaning the ocean from junk can be messy, but fun!'
+      - '&7Catch 5 items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x5 Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$15,000'
+      - ''
+      - '&6Items: &7{1}/5'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFisherman II'
+    lore:
+      - '&7Cleaning the ocean from junk can be messy, but fun!'
+      - '&7Catch 5 items.'
+      - ''
+      - '&6Required Caughts:'
+      - '&8 - &7x5 Items'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$15,000'
+      - ''
+      - '&6Items: &75/5'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFisherman II'
+    lore:
+      - '&7Cleaning the ocean from junk can be messy, but fun!'
+      - '&7Catch 5 items.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$15,000'
+      - ''
+      - '&6Items: &75/5'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

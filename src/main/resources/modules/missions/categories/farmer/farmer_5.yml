@@ -1,0 +1,144 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FarmingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 1000000'
+    - 'is admin rankup %player% crop-growth'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer V!'
+    - 'is admin msg %player% &e&lFarmer | &7There is nothing you don''t know how to grow.'
+    - 'is admin msg %player% &e&lFarmer | &7&oYou are now a professional Framer, congratz!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'farmer_1'
+  - 'farmer_2'
+  - 'farmer_3'
+  - 'farmer_4'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-plants:
+  '1':
+    types:
+      - 'CARROTS'
+    amount: 320
+  '2':
+    types:
+      - 'POTATOES'
+    amount: 320
+  '3':
+    types:
+      - 'WHEAT'
+    amount: 320
+  '4':
+    types:
+      - 'BEETROOTS'
+    amount: 320
+  '5':
+    types:
+      - 'PUMPKIN'
+    amount: 320
+  '6':
+    types:
+      - 'MELON'
+    amount: 320
+  '7':
+    types:
+      - 'SUGAR_CANE'
+    amount: 320
+  '8':
+    types:
+      - 'CACTUS'
+    amount: 320
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFarmer V'
+    lore:
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$1,000,000'
+      - '&8 - &7Crops Upgrade'
+      - ''
+      - '&6Grown Carrots: &7{value_carrots}/320'
+      - '&6Grown Potatoes: &7{value_potatoes}/320'
+      - '&6Grown Wheat: &7{value_wheat}/320'
+      - '&6Grown Beetroots: &7{value_beetroots}/320'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/320'
+      - '&6Grown Melons: &7{value_melon}/320'
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/320'
+      - '&6Grown Cactus: &7{value_cactus}/320'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFarmer V'
+    lore:
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$1,000,000'
+      - '&8 - &7Crops Upgrade'
+      - ''
+      - '&6Grown Carrots: &7320/320'
+      - '&6Grown Potatoes: &7320/320'
+      - '&6Grown Wheat: &7320/320'
+      - '&6Grown Beetroots: &7320/320'
+      - '&6Grown Pumpkins: &7320/320'
+      - '&6Grown Melons: &7320/320'
+      - '&6Grown Sugar Canes: &7320/320'
+      - '&6Grown Cactus: &7320/320'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFarmer V'
+    lore:
+      - '&7Let''s go one step further,'
+      - '&7Plant 5 stacks of each crop.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$1,000,000'
+      - '&8 - &7Crops Upgrade'
+      - ''
+      - '&6Grown Carrots: &7320/320'
+      - '&6Grown Potatoes: &7320/320'
+      - '&6Grown Wheat: &7320/320'
+      - '&6Grown Beetroots: &7320/320'
+      - '&6Grown Pumpkins: &7320/320'
+      - '&6Grown Melons: &7320/320'
+      - '&6Grown Sugar Canes: &7320/320'
+      - '&6Grown Cactus: &7320/320'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

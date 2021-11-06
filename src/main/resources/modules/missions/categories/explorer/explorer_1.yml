@@ -1,0 +1,67 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: IslandMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 25000'
+    - 'is admin msg %player% &e&lExplorer | &7Successfully finished the mission Nether Explorer!'
+    - 'is admin msg %player% &e&lExplorer | &7Are you ready for the real challenge?'
+    - 'is admin msg %player% &e&lExplorer | &7&oFor more information about the next mission, checkout /is missions'
+
+# List of events that will trigger the mission.
+events:
+  - IslandSchematicPasteEvent
+
+# Requirement of the event to complete the mission.
+success-check: 'event.getSchematic().endsWith("_nether")'
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aNether Explorer'
+    lore:
+      - '&7Go to the Nether.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aNether Explorer'
+    lore:
+      - '&7Go to the Nether.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aNether Explorer'
+    lore:
+      - '&7Go to the Nether.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&a&l ✔ &7Already Claimed.'

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
@@ -69,6 +70,18 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @Override
     public List<Mission<?>> getIslandMissions() {
         return this.missionsContainer.getIslandMissions();
+    }
+
+    @Nullable
+    @Override
+    public MissionCategory getMissionCategory(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+        return this.missionsContainer.getMissionCategory(name);
+    }
+
+    @Override
+    public List<MissionCategory> getMissionCategories() {
+        return this.missionsContainer.getMissionCategories();
     }
 
     @Override
@@ -318,6 +331,10 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         loadMissionsData(getAllMissions());
     }
 
+    public void loadMissionCategory(MissionCategory missionCategory){
+        this.missionsContainer.addMissionCategory(missionCategory);
+    }
+
     public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted){
         if(mission.isOnlyShowIfRequiredCompleted()) {
             if (!hasAllRequiredMissions(superiorPlayer, mission))
@@ -376,6 +393,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
     public void loadMissionsData(List<Mission<?>> missionsList) {
         Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
 

@@ -1,0 +1,70 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: IslandMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 150000'
+    - 'is admin msg %player% &e&lExplorer | &7Successfully finished the mission The-End Explorer!'
+    - 'is admin msg %player% &e&lExplorer | &7&oYou explored every single world on the server!'
+
+# List of events that will trigger the mission.
+events:
+  - IslandSchematicPasteEvent
+
+# Requirement of the event to complete the mission.
+success-check: 'event.getSchematic().endsWith("_nether")'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'explorer_1'
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aThe-End Explorer'
+    lore:
+      - '&7Go to The-End.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150,000'
+      - ''
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aThe-End Explorer'
+    lore:
+      - '&7Go to The-End.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150,000'
+      - ''
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aThe-End Explorer'
+    lore:
+      - '&7Go to The-End.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$150,000'
+      - ''
+      - '&a&l ✔ &7Already Claimed.'

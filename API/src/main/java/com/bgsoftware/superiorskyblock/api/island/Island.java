@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public interface Island extends Comparable<Island> {
+public interface Island extends Comparable<Island>, IMissionsHolder {
 
     /*
      *  General methods
@@ -1402,50 +1402,6 @@ public interface Island extends Comparable<Island> {
      * Remove all the ratings of the island.
      */
     void removeRatings();
-
-    /*
-     *  Missions related methods
-     */
-
-    /**
-     * Complete a mission.
-     * @param mission The mission to complete.
-     */
-    void completeMission(Mission<?> mission);
-
-    /**
-     * Reset a mission.
-     * @param mission The mission to reset.
-     */
-    void resetMission(Mission<?> mission);
-
-    /**
-     * Check whether the island has completed the mission before.
-     * @param mission The mission to check.
-     */
-    boolean hasCompletedMission(Mission<?> mission);
-
-    /**
-     * Check whether the island can complete a mission again.
-     * @param mission The mission to check.
-     */
-    boolean canCompleteMissionAgain(Mission<?> mission);
-
-    /**
-     * Get the amount of times mission was completed.
-     * @param mission The mission to check.
-     */
-    int getAmountMissionCompleted(Mission<?> mission);
-
-    /**
-     * Get the list of the completed missions of the player.
-     */
-    List<Mission<?>> getCompletedMissions();
-
-    /**
-     * Get all the completed missions with the amount of times they were completed.
-     */
-    Map<Mission<?>, Integer> getCompletedMissionsWithAmounts();
 
     /*
      *  Settings related methods

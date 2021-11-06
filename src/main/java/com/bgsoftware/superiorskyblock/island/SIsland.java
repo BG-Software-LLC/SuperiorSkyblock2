@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandMissions;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
@@ -2678,7 +2677,7 @@ public final class SIsland implements Island {
 
         IslandsDatabaseBridge.saveMission(this, mission, finishCount);
 
-        MenuIslandMissions.refreshMenus(this);
+        plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
     }
 
     @Override
@@ -2699,7 +2698,7 @@ public final class SIsland implements Island {
 
         mission.clearData(getOwner());
 
-        MenuIslandMissions.refreshMenus(this);
+        plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
     }
 
     @Override

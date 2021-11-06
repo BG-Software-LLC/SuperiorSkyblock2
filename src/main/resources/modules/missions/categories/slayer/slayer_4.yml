@@ -1,0 +1,88 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: KillsMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 250000'
+    - 'is admin unlockworld %player% the_end true'
+    - 'is admin msg %player% &e&lSlayer | &7Successfully finished the mission Slayer IV!'
+    - 'is admin msg %player% &e&lSlayer | &7You passed all the tests, you are ready now for the end...'
+    - 'is admin msg %player% &e&lSlayer | &7&oYou are now a professional Slayer, congratz!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'slayer_1'
+  - 'slayer_2'
+  - 'slayer_3'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-entities:
+  '1':
+    types:
+      - 'WITHER'
+    amount: 1
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aSlayer IV'
+    lore:
+      - '&7Before the end, there is one mission left.'
+      - '&7Kill the wither.'
+      - ''
+      - '&6Required Kills:'
+      - '&8 - &7x1 Wither'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - '&8 - &7Unlock The End'
+      - ''
+      - '&6Wither Killed: &c&l ✘'
+  can-complete:
+    type: PAPER
+    name: '&aSlayer IV'
+    lore:
+      - '&7Before the end, there is one mission left.'
+      - '&7Kill the wither.'
+      - ''
+      - '&6Required Kills:'
+      - '&8 - &7x1 Wither'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - '&8 - &7Unlock The End'
+      - ''
+      - '&6Wither Killed: &a&l ✔'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aSlayer IV'
+    lore:
+      - '&7Before the end, there is one mission left.'
+      - '&7Kill the wither.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$250,000'
+      - '&8 - &7Unlock The End'
+      - ''
+      - '&6Wither Killed: &a&l ✔'
+      - '&a&l ✔ &7Click to redeem your reward.'

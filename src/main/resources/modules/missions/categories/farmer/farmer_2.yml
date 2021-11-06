@@ -1,0 +1,112 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FarmingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  items:
+    '1':
+      type: SUGAR_CANE
+      amount: 1
+    '2':
+      type: CACTUS
+      amount: 1
+  commands:
+    - 'eco give %player% 5000'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer II!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'farmer_1'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-plants:
+  '1':
+    types:
+      - 'BEETROOTS'
+    amount: 10
+  '2':
+    types:
+      - 'PUMPKIN'
+    amount: 10
+  '3':
+    types:
+      - 'MELON'
+    amount: 10
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFarmer II'
+    lore:
+      - '&7Expand your farm with beetroots, pumpkin and melons.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Beetroots'
+      - '&8 - &7x10 Pumpkins'
+      - '&8 - &7x10 Melons'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Sugar Cane'
+      - '&8 - &7x1 Cactus'
+      - '&8 - &7$5,000'
+      - ''
+      - '&6Grown Beetroots: &7{value_beetroots}/10'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/10'
+      - '&6Grown Melons: &7{value_melon}/10'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFarmer II'
+    lore:
+      - '&7Expand your farm with beetroots, pumpkin and melons.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7x10 Beetroots'
+      - '&8 - &7x10 Pumpkins'
+      - '&8 - &7x10 Melons'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Sugar Cane'
+      - '&8 - &7x1 Cactus'
+      - '&8 - &7$5,000'
+      - ''
+      - '&6Grown Beetroots: &710/10'
+      - '&6Grown Pumpkins: &710/10'
+      - '&6Grown Melons: &710/10'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFarmer II'
+    lore:
+      - '&7Expand your farm with beetroots, pumpkin and melons.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7x1 Sugar Cane'
+      - '&8 - &7x1 Cactus'
+      - '&8 - &7$5,000'
+      - ''
+      - '&6Grown Beetroots: &710/10'
+      - '&6Grown Pumpkins: &710/10'
+      - '&6Grown Melons: &710/10'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

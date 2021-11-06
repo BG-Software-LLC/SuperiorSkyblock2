@@ -10,37 +10,62 @@ previous-menu: true
 
 pattern:
   - '$ $ $ $ $ $ $ $ $'
-  - '$ # # # # # # # $'
-  - '$ # # @ # ^ # # $'
-  - '$ # # # # # # # $'
+  - '$ * * * * * * * $'
+  - '$ * # @ % ^ & * $'
+  - '$ * * * * * * * $'
   - '$ $ $ $ $ $ $ $ $'
-
-player-missions: '@'
-island-missions: '^'
 
 items:
   '$':
     type: STAINED_GLASS_PANE
     data: 15
-    name: '&f'
+  '#':
+    type: DIAMOND_PICKAXE
+    name: '&eMiner Missions'
+    lore:
+      - '&7Click to start your adventure as a Miner.'
+    flags:
+      - HIDE_ATTRIBUTES
   '@':
     type: SKULL_ITEM
-    data: 3
-    name: '&ePlayer Missions'
+    data: 2
+    name: '&eSlayer Missions'
     lore:
-      - '&7Click to open your missions.'
+      - '&7Click to start your adventure as a Slayer.'
+  '%':
+    type: WHEAT
+    name: '&eFarmer Missions'
+    lore:
+      - '&7Click to start your adventure as a Farmer.'
   '^':
-    type: GRASS
-    name: '&eIsland Missions'
+    type: FISHING_ROD
+    name: '&eFisherman Missions'
     lore:
-      - '&7Click to open your island''s missions.'
+      - '&7Click to start your adventure as a Fisherman.'
+  '&':
+    type: MAP
+    name: '&eExplorer Missions'
+    lore:
+      - '&7Click to start your adventure as an Explorer.'
 
 sounds:
+  '#':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
   '@':
     type: BLOCK_CHEST_OPEN
     volume: 0.8
     pitch: 1
+  '%':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
   '^':
+    type: BLOCK_CHEST_OPEN
+    volume: 0.8
+    pitch: 1
+  '&':
     type: BLOCK_CHEST_OPEN
     volume: 0.8
     pitch: 1

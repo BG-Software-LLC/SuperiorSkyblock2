@@ -151,7 +151,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     private static boolean isDatabaseOldFormat() {
-        sqlSession = new SQLSession(plugin, true);
+        sqlSession = new SQLSession(plugin, false);
 
         if (!sqlSession.isUsingMySQL()) {
             databaseFile = new File(plugin.getDataFolder(), "database.db");

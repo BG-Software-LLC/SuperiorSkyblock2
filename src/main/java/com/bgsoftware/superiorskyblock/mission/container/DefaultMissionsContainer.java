@@ -1,9 +1,12 @@
 package com.bgsoftware.superiorskyblock.mission.container;
 
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +18,7 @@ public final class DefaultMissionsContainer implements MissionsContainer {
 
     private final Map<String, Mission<?>> missionMap = new HashMap<>();
     private final Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();
+    private final Map<String, MissionCategory> missionCategoryMap = new HashMap<>();
 
     @Override
     public void addMission(Mission<?> mission) {
@@ -51,6 +55,22 @@ public final class DefaultMissionsContainer implements MissionsContainer {
     @Override
     public MissionData getMissionData(Mission<?> mission) {
         return this.missionDataMap.get(mission);
+    }
+
+    @Override
+    public void addMissionCategory(MissionCategory missionCategory) {
+        this.missionCategoryMap.put(missionCategory.getName().toLowerCase(), missionCategory);
+    }
+
+    @Nullable
+    @Override
+    public MissionCategory getMissionCategory(String name) {
+        return this.missionCategoryMap.get(name.toLowerCase());
+    }
+
+    @Override
+    public List<MissionCategory> getMissionCategories() {
+        return Collections.unmodifiableList(new ArrayList<>(missionCategoryMap.values()));
     }
 
     private List<Mission<?>> getFilteredMissions(Predicate<MissionData> predicate) {

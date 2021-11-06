@@ -1,0 +1,140 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: FarmingMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 25000'
+    - 'is admin msg %player% &e&lFarmer | &7Successfully finished the mission Farmer IV!'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'farmer_1'
+  - 'farmer_2'
+  - 'farmer_3'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-plants:
+  '1':
+    types:
+      - 'CARROTS'
+    amount: 64
+  '2':
+    types:
+      - 'POTATOES'
+    amount: 64
+  '3':
+    types:
+      - 'WHEAT'
+    amount: 64
+  '4':
+    types:
+      - 'BEETROOTS'
+    amount: 64
+  '5':
+    types:
+      - 'PUMPKIN'
+    amount: 64
+  '6':
+    types:
+      - 'MELON'
+    amount: 64
+  '7':
+    types:
+      - 'SUGAR_CANE'
+    amount: 64
+  '8':
+    types:
+      - 'CACTUS'
+    amount: 64
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aFarmer IV'
+    lore:
+      - '&7Now that you are a professional farmer,'
+      - '&7let''s get the hands dirty.'
+      - '&7Plant x64 of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Grown Carrots: &7{value_carrots}/64'
+      - '&6Grown Potatoes: &7{value_potatoes}/64'
+      - '&6Grown Wheat: &7{value_wheat}/64'
+      - '&6Grown Beetroots: &7{value_beetroots}/64'
+      - '&6Grown Pumpkins: &7{value_pumpkin}/64'
+      - '&6Grown Melons: &7{value_melon}/64'
+      - '&6Grown Sugar Canes: &7{value_sugar_cane}/64'
+      - '&6Grown Cactus: &7{value_cactus}/64'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aFarmer IV'
+    lore:
+      - '&7Now that you are a professional farmer,'
+      - '&7let''s get the hands dirty.'
+      - '&7Plant x64 of each crop.'
+      - ''
+      - '&6Required Plants:'
+      - '&8 - &7Carrots, Potatoes, Wheat, Beetroots,'
+      - '&8 - &7Pumpkins, Melons, Sugar Canes, Cactus'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Grown Carrots: &764/64'
+      - '&6Grown Potatoes: &764/64'
+      - '&6Grown Wheat: &764/64'
+      - '&6Grown Beetroots: &764/64'
+      - '&6Grown Pumpkins: &764/64'
+      - '&6Grown Melons: &764/64'
+      - '&6Grown Sugar Canes: &764/64'
+      - '&6Grown Cactus: &764/64'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aFarmer IV'
+    lore:
+      - '&7Now that you are a professional farmer,'
+      - '&7let''s get the hands dirty.'
+      - '&7Plant x64 of each crop.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Grown Carrots: &764/64'
+      - '&6Grown Potatoes: &764/64'
+      - '&6Grown Wheat: &764/64'
+      - '&6Grown Beetroots: &764/64'
+      - '&6Grown Pumpkins: &764/64'
+      - '&6Grown Melons: &764/64'
+      - '&6Grown Sugar Canes: &764/64'
+      - '&6Grown Cactus: &764/64'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

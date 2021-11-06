@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.mission.container;
 
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 
 import javax.annotation.Nullable;
@@ -23,5 +24,12 @@ public interface MissionsContainer {
 
     @Nullable
     MissionData getMissionData(Mission<?> mission);
+
+    void addMissionCategory(MissionCategory missionCategory);
+
+    @Nullable
+    MissionCategory getMissionCategory(String name);
+
+    List<MissionCategory> getMissionCategories();
 
 }

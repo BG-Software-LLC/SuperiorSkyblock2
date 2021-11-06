@@ -1,0 +1,99 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# The mission file to use
+mission-file: BlocksMissions
+
+# Whether the mission should be given when completing all requirements.
+auto-reward: true
+
+# Should block counts of players get reset when completing the mission?
+reset-after-finish: true
+
+# Whether only naturally spawned blocks should be counted towards the mission or not.
+only-natural-blocks: true
+
+# Rewards given when completing the mission.
+rewards:
+  commands:
+    - 'eco give %player% 25000'
+    - 'is admin msg %player% &e&lMiner | &7Successfully finished the mission Miner III!'
+    - 'is admin msg %player% &e&lMiner | &7Let''s turn you into a professional miner!'
+    - 'is admin msg %player% &e&lMiner | &7&oFor more information about the next mission, checkout /is missions'
+
+# List of required missions that must be completed before completing this one.
+required-missions:
+  - 'miner_1'
+  - 'miner_2'
+
+# List of all required blocks must be gathered in order to complete the mission.
+required-blocks:
+  '1':
+    types:
+      - 'COAL_ORE'
+    amount: 64
+  '2':
+    types:
+      - 'IRON_ORE'
+    amount: 64
+
+# Icons used in the menus.
+icons:
+  not-completed:
+    type: PAPER
+    name: '&aMiner III'
+    lore:
+      - '&7I am willing to buy iron and coal from you.'
+      - '&7Mine x64 coal ore and x64 iron ore.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x64 Coal Ore'
+      - '&8 - &7x64 Iron Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Coal Ore Mined: &7{value_coal_ore}/64'
+      - '&6Iron Ore Mined: &7{value_iron_ore}/64'
+      - '&6Progress: &7{0}%'
+      - '&c&l ✘ &7Not Completed'
+  can-complete:
+    type: PAPER
+    name: '&aMiner III'
+    lore:
+      - '&7I am willing to buy iron and coal from you.'
+      - '&7Mine x64 coal ore and x64 iron ore.'
+      - ''
+      - '&6Required Blocks:'
+      - '&8 - &7x64 Coal Ore'
+      - '&8 - &7x64 Iron Ore'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Coal Ore Mined: &764/64'
+      - '&6Iron Ore Mined: &764/64'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Click to redeem your reward.'
+    enchants:
+      DURABILITY: 1
+    flags:
+      - HIDE_ENCHANTS
+  completed:
+    type: MAP
+    name: '&aMiner III'
+    lore:
+      - '&7I am willing to buy iron and coal from you.'
+      - '&7Mine x64 coal ore and x64 iron ore.'
+      - ''
+      - '&6Rewards:'
+      - '&8 - &7$25,000'
+      - ''
+      - '&6Coal Ore Mined: &764/64'
+      - '&6Iron Ore Mined: &764/64'
+      - '&6Progress: &7100%'
+      - '&a&l ✔ &7Already Claimed.'

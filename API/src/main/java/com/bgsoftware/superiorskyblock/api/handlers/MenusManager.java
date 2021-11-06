@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import javax.annotation.Nullable;
@@ -403,6 +404,15 @@ public interface MenusManager {
     void openIslandMainMissionsMenu(SuperiorPlayer superiorPlayer);
 
     /**
+     * Open the missions-menu of a specific category.
+     *
+     * @param targetPlayer The player to open the menu for.
+     * @param previousMenu The previous menu that was opened, if exists.
+     * @param missionCategory The category to get missions from.
+     */
+    void openMissionsCategory(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, MissionCategory missionCategory);
+
+    /**
      * Open the island missions menu for a player.
      *
      * @param superiorPlayer The player to open the menu for.
@@ -411,6 +421,13 @@ public interface MenusManager {
      */
     @Deprecated
     void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions);
+
+    /**
+     * Refresh the missions-menu for a specific category.
+     *
+     * @param missionCategory The category to refresh the menus for.
+     */
+    void refreshMissionsCategory(MissionCategory missionCategory);
 
     /**
      * Open the permissions-menu.
