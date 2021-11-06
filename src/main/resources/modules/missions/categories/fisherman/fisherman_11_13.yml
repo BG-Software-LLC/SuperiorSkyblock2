@@ -26,8 +26,20 @@ rewards:
 required-caughts:
   '1':
     types:
-      - 'RAW_FISH'
-    amount: 5
+      - 'COD'
+    amount: 1
+  '2':
+    types:
+      - 'SALMON'
+    amount: 1
+  '3':
+    types:
+      - 'TROPICAL_FISH'
+    amount: 1
+  '4':
+    types:
+      - 'PUFFERFISH'
+    amount: 1
 
 # Icons used in the menus.
 icons:
@@ -36,15 +48,21 @@ icons:
     name: '&aFisherman I'
     lore:
       - '&7Let''s make a fish soup.'
-      - '&7Catch 5 fish.'
+      - '&7Catch 1 fish of each type.'
       - ''
       - '&6Required Caughts:'
-      - '&8 - &7x5 Fish'
+      - '&8 - &7x1 Cod'
+      - '&8 - &7x1 Salmon'
+      - '&8 - &7x1 Tropical Fish'
+      - '&8 - &7x1 Pufferfish'
       - ''
       - '&6Rewards:'
       - '&8 - &7$2,500'
       - ''
-      - '&6Fish Caught: &7{1}/5'
+      - '&6Cods Caught: &7{value_cod}/1'
+      - '&6Salmons Caught: &7{value_salmon}/1'
+      - '&6Tropical Fish Caught: &7{value_tropical_fish}/1'
+      - '&6Pufferfish Caught: &7{value_pufferfish}/1'
       - '&6Progress: &7{0}%'
       - '&c&l ✘ &7Not Completed'
   can-complete:
@@ -52,15 +70,21 @@ icons:
     name: '&aFisherman I'
     lore:
       - '&7Let''s make a fish soup.'
-      - '&7Catch 5 fish.'
+      - '&7Catch 1 fish of each type.'
       - ''
       - '&6Required Caughts:'
-      - '&8 - &7x5 Fish'
+      - '&8 - &7x1 Cod'
+      - '&8 - &7x1 Salmon'
+      - '&8 - &7x1 Tropical Fish'
+      - '&8 - &7x1 Pufferfish'
       - ''
       - '&6Rewards:'
       - '&8 - &7$2,500'
       - ''
-      - '&6Fish Caught: &75/5'
+      - '&6Cods Caught: &71/1'
+      - '&6Salmons Caught: &71/1'
+      - '&6Tropical Fish Caught: &71/1'
+      - '&6Pufferfish Caught: &71/1'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Click to redeem your reward.'
     enchants:
@@ -72,11 +96,14 @@ icons:
     name: '&aFisherman I'
     lore:
       - '&7Let''s make a fish soup.'
-      - '&7Catch 5 fish.'
+      - '&7Catch 1 fish of each type.'
       - ''
       - '&6Rewards:'
       - '&8 - &7$2,500'
       - ''
-      - '&6Fish Caught: &75/5'
+      - '&6Cods Caught: &71/1'
+      - '&6Salmons Caught: &71/1'
+      - '&6Tropical Fish Caught: &71/1'
+      - '&6Pufferfish Caught: &71/1'
       - '&6Progress: &7100%'
       - '&a&l ✔ &7Already Claimed.'

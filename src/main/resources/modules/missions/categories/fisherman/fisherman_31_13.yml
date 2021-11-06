@@ -36,6 +36,7 @@ required-caughts:
       - 'FISHING_ROD'
       - 'NAME_TAG'
       - 'SADDLE'
+      - 'NAUTILUS_SHELL'
     amount: 3
 
 # Icons used in the menus.

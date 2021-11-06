@@ -35,8 +35,7 @@ required-caughts:
       - 'FISHING_ROD'
       - 'NAME_TAG'
       - 'SADDLE'
-      - 'NAUTILUS_SHELL'
-      - 'LILY_PAD'
+      - 'WATER_LILY'
       - 'BOWL'
       - 'LEATHER'
       - 'LEATHER_BOOTS'
@@ -45,7 +44,7 @@ required-caughts:
       - 'STRING'
       - 'GLASS_BOTTLE'
       - 'BONE'
-      - 'INK_SAC'
+      - 'INK_SACK'
       - 'TRIPWIRE_HOOK'
     amount: 5
 
