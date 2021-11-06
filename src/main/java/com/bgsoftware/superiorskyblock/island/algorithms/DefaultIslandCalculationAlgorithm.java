@@ -30,14 +30,18 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Island island;
+    private static final DefaultIslandCalculationAlgorithm INSTANCE = new DefaultIslandCalculationAlgorithm();
 
-    public DefaultIslandCalculationAlgorithm(Island island) {
-        this.island = island;
+    public static DefaultIslandCalculationAlgorithm getInstance() {
+        return INSTANCE;
+    }
+
+    private DefaultIslandCalculationAlgorithm() {
+
     }
 
     @Override
-    public CompletableFuture<IslandCalculationResult> calculateIsland() {
+    public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {

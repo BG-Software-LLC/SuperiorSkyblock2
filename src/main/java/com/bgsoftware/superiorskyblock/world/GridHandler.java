@@ -60,7 +60,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private final IslandsPurger islandsPurger;
     private final IslandPreviews islandPreviews;
     private final IslandsContainer islandsContainer;
-    private final DatabaseBridge databaseBridge;
+    private DatabaseBridge databaseBridge;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -78,12 +78,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         this.islandsPurger = islandsPurger;
         this.islandPreviews = islandPreviews;
         this.islandsContainer = islandsContainer;
-        this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-        this.databaseBridge.startSavingData();
     }
 
     @Override
     public void loadData() {
+        initializeDatabaseBridge();
+
         lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
@@ -645,6 +645,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         SuperiorSkyblockPlugin.debug("Action: Set Last Island, Location: " + lastIsland);
         this.lastIsland = lastIsland;
         GridDatabaseBridge.saveLastIsland(this, lastIsland);
+    }
+
+    private void initializeDatabaseBridge() {
+        databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+        databaseBridge.startSavingData();
     }
 
 }

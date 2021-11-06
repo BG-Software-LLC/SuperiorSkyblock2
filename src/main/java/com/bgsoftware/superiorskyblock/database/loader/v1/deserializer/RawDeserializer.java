@@ -80,7 +80,9 @@ public final class RawDeserializer implements IDeserializer {
 
             for (String uuid : players.split(",")) {
                 try {
-                    playerAttributesList.add(databaseLoader.getPlayerAttributes(uuid));
+                    PlayerAttributes playerAttributes = databaseLoader.getPlayerAttributes(uuid);
+                    if(playerAttributes != null)
+                        playerAttributesList.add(playerAttributes);
                 } catch (Exception ignored) {}
             }
         }

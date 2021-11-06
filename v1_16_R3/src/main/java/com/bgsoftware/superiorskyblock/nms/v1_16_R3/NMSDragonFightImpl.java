@@ -463,7 +463,9 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
             }
 
-            bossBattle.getPlayers().removeIf(entityPlayer -> !nearbyPlayers.contains(entityPlayer));
+            bossBattle.getPlayers().stream()
+                    .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer))
+                    .forEach(bossBattle::removePlayer);
         }
 
         private EntityEnderDragon spawnEnderDragon(){

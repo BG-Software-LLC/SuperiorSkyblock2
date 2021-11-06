@@ -1180,7 +1180,17 @@ public final class SIsland implements Island {
 
         BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
 
-        calculationAlgorithm.calculateIsland().whenComplete((result, error) -> {
+        CompletableFuture<IslandCalculationAlgorithm.IslandCalculationResult> calculationResult;
+
+        try {
+            // Legacy support
+            // noinspection deprecation
+            calculationResult = calculationAlgorithm.calculateIsland();
+        } catch (UnsupportedOperationException ex) {
+            calculationResult = calculationAlgorithm.calculateIsland(this);
+        }
+
+        calculationResult.whenComplete((result, error) -> {
             if (error != null) {
                 if (error instanceof TimeoutException) {
                     if (asker != null)

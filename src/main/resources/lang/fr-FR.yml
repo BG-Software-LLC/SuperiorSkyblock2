@@ -38,10 +38,10 @@ BLOCK_LEVEL_WORTHLESS: '&e&lNiveau | &7Le bloc {0} n''a pas de valeur.'
 BLOCK_VALUE: '&e&lValeur | &7La valeur du bloc {0} est de {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lValeur | &7Le bloc {0} n''a pas de valeur.'
 BONUS_SET_SUCCESS: '&e&lIle | &7Bonus de l''île mit à jour sur {0}.'
-BORDER_PLAYER_COLOR_NAME_BLUE: 'Blue'
-BORDER_PLAYER_COLOR_NAME_RED: 'Red'
-BORDER_PLAYER_COLOR_NAME_GREEN: 'Green'
-BORDER_PLAYER_COLOR_UPDATED: '&e&lBordure | &7Couleur de la bordure personnelle changée sur {0}.'
+BORDER_PLAYER_COLOR_NAME_BLUE: 'Bleue'
+BORDER_PLAYER_COLOR_NAME_RED: 'Rouge'
+BORDER_PLAYER_COLOR_NAME_GREEN: 'Verte'
+BORDER_PLAYER_COLOR_UPDATED: '&e&lBordure | &7Votre bordure d''île personnelle est désormais {0}.'
 BUILD_OUTSIDE_ISLAND: '&c&lErreur | &7Vous ne pouvez pas construire en dehors de votre zone de protection.'
 CANNOT_SET_ROLE: '&c&lErreur | &7Vous ne pouvez pas définir le rôle de ce joueur sur {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lErreur | &7Vous pouvez uniquement changer les permissions des rôles d''île inférieurs au votre.'
@@ -101,7 +101,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantité
 COMMAND_ARGUMENT_BIOME: biome
-COMMAND_ARGUMENT_COMMAND: 'command...'
+COMMAND_ARGUMENT_COMMAND: 'commande...'
 COMMAND_ARGUMENT_DISCORD: discord
 COMMAND_ARGUMENT_EFFECT: effet-de-potion
 COMMAND_ARGUMENT_EMAIL: email
@@ -119,7 +119,7 @@ COMMAND_ARGUMENT_MATERIAL: matériau
 COMMAND_ARGUMENT_MENU: nom-du-menu
 COMMAND_ARGUMENT_MESSAGE: message
 COMMAND_ARGUMENT_MISSION_NAME: nom-de-la-mission
-COMMAND_ARGUMENT_MODULE_NAME: 'module-name'
+COMMAND_ARGUMENT_MODULE_NAME: 'nom-du-module'
 COMMAND_ARGUMENT_MULTIPLIER: multiplicateur
 COMMAND_ARGUMENT_NAME: nom
 COMMAND_ARGUMENT_NEW_LEADER: nouveau-chef
@@ -165,7 +165,7 @@ COMMAND_DESCRIPTION_ADMIN_BYPASS: Activer/Désactiver le mode bypass.
 COMMAND_DESCRIPTION_ADMIN_CHEST: Ouvrir le stockage de l'île spécifiée.
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Réinitialiser le taux des générateurs pour l'île spécifié.
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.
-COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
+COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Executer une commande pour tous les membres d''une île.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Vérifier le nombre de blocs sur lîle spécifiée.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
@@ -174,7 +174,7 @@ COMMAND_DESCRIPTION_ADMIN_GIVE_DISBANDS: Donner des suppressions d'île à un jo
 COMMAND_DESCRIPTION_ADMIN_IGNORE: Masquer une île du top des îles.
 COMMAND_DESCRIPTION_ADMIN_JOIN: Rejoindre une île sans invitation.
 COMMAND_DESCRIPTION_ADMIN_KICK: Éjecter un joueur de son île.
-COMMAND_DESCRIPTION_ADMIN_MODULES: 'Manage modules of the plugin.'
+COMMAND_DESCRIPTION_ADMIN_MODULES: 'Gérer les modules du plugin.'
 COMMAND_DESCRIPTION_ADMIN_MISSION: Changer le statut d'une mission pour un joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG: Envoyer un message sans aucun préfixe au joueur.
 COMMAND_DESCRIPTION_ADMIN_MSG_ALL: Envoyer un message sans aucun préfixe à tous les membres de lîle.
@@ -325,8 +325,8 @@ GENERATOR_CLEARED_NAME: '&e&lIle | &7Nettoyage des taux des générateurs pour l
 GENERATOR_CLEARED_ALL: '&e&lIle | &7Nettoyage des taux des générateurs de toutes les îles.'
 GENERATOR_UPDATED: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
 GENERATOR_UPDATED_NAME: '&e&lIle | &7Taux du générateur modifié sur {0} pour l''île de {1}.'
-GLOBAL_COMMAND_EXECUTED: '&e&lIsland | &7Successfully executed the command on {0}''s island members!'
-GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIsland | &7Successfully executed the command on the island members of {0}!'
+GLOBAL_COMMAND_EXECUTED: '&e&lIle | &7Éxécution de la commande sur les membres de l''île de {0} !'
+GLOBAL_COMMAND_EXECUTED_NAME: '&e&lIle | &7Éxécution de la commande sur les membres de : {0} !'
 GENERATOR_UPDATED_ALL: '&e&lIle | &7Taux du générateur modifié sur {0} pour toutes les îles.'
 GLOBAL_MESSAGE_SENT: '&e&lIle | &7Message envoyé à tous les membres de l''île de {0} !'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lIle | &7Message envoyé à tous les membres de l''île {0} !'
@@ -363,9 +363,9 @@ INVALID_ISLAND_PERMISSION: |
 INVALID_LEVEL: '&c&lErreur | &7Niveau invalide: {0}.'
 INVALID_LIMIT: '&c&lErreur | &7Limite invalide: {0}.'
 INVALID_MATERIAL: '&c&lErreur | &7Matériau invalide: {0}.'
-INVALID_MATERIAL_DATA: '&c&lError | &7Invalid material-data {0}.'
-INVALID_MISSION: '&c&lErreur | &7Mission invalide: {0}.'
-INVALID_MODULE: '&c&lError | &7Invalid module {0}.'
+INVALID_MATERIAL_DATA: '&c&lErreur | &7Donnée de matériau {0} invalide.'
+INVALID_MISSION: '&c&lErreur | &7Mission {0} invalide.'
+INVALID_MODULE: '&c&lErreur | &7Module {0} invalide.'
 INVALID_MULTIPLIER: '&c&lErreur | &7Multiplicateur invalide: {0}.'
 INVALID_PAGE: '&c&lErreur | &7Page {0} invalide.'
 INVALID_PERCENTAGE: '&c&lErreur | &7Le poucentage doit être compris entre 0 et 100.'
@@ -493,9 +493,9 @@ ISLAND_TOP_STATUS_ONLINE: '&a(En Ligne)'
 ISLAND_WARP_PUBLIC: ''
 ISLAND_WARP_PRIVATE: '&c[Privé]'
 ISLAND_WAS_CLOSED: '&e&lIle | &7&oL''île sur laquelle vous étiez a été fermée, vous avez donc été téléporté au spawn...'
-ISLAND_WORTH_ERROR: '&c&lError | &7An unexpected error occurred while calculating your island. Contact administrators if the issue persists.'
+ISLAND_WORTH_ERROR: '&c&lErreur | &7Une erreur inattendue est survenue lors du calcul de votre île. Veuillez contacter un administrateur sur le problème persiste.'
 ISLAND_WORTH_RESULT: '&e&lIle | &7La valeur de votre île est {0} [Niveau {1}]'
-ISLAND_WORTH_TIME_OUT: '&c&lError | &7The calculation task has timed out. Try again later...'
+ISLAND_WORTH_TIME_OUT: '&c&lErreur | &7La tâche de calcul des îles a expiré. Veuillez réessayer ultérieurement...'
 JOIN_ADMIN_ANNOUNCEMENT: '&e&lIle | &7{0} a rejoint votre île.'
 JOIN_ANNOUNCEMENT: '&e&lIle | &7{0} a rejoint votre île.'
 JOIN_FULL_ISLAND: '&c&lErreur | &7Cette île a déjà le nombre maximal de membres.'
@@ -527,14 +527,14 @@ MISSION_STATUS_COMPLETE: '&e&lMission | &7Le statut de la mission {0} a été co
 MISSION_STATUS_COMPLETE_ALL: '&e&lMission | &7Toutes les missions ont été completées pour {0}.'
 MISSION_STATUS_RESET: '&e&lMission | &7Le statut de la mission {0} a été réinitialisé sur {1}.'
 MISSION_STATUS_RESET_ALL: '&e&lMission | &7Réinitialisation du statut de toutes les missions pour {0}.'
-MODULE_ALREADY_INITIALIZED: '&e&lModule | &7This module is already loaded.'
+MODULE_ALREADY_INITIALIZED: '&e&lModule | &7Ce module est déjà chargé.'
 MODULE_INFO: |
-  &e&lModule | &7{0} by {1}
+  &e&lModule | &7{0} créé par {1}
   &e&lModule | &7&m--------------------
   &e&lModule | &7{2}
-MODULE_LOADED_SUCCESS: '&e&lModule | &7Successfully loaded the module {0}.'
-MODULE_LOADED_FAILURE: '&e&lModule | &7Couldn''t load the module {0}. Check out the console for more information.'
-MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
+MODULE_LOADED_SUCCESS: '&e&lModule | &7Module {0} activé.'
+MODULE_LOADED_FAILURE: '&e&lModule | &7Une erreur est survenue lors du chargement du module {0}. Vérifiez votre console et vos logs pour plus d''informations.'
+MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Module désactivé.'
 MODULES_LIST: '&fModules ({0}): {1}'
 MODULES_LIST_MODULE_NAME: '&a{0}'
 MODULES_LIST_SEPARATOR: '&f, '
