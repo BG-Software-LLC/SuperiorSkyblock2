@@ -18,7 +18,7 @@ public final class SBankTransaction implements BankTransaction {
     private final String failureReason;
     private final BigDecimal amount;
 
-    public SBankTransaction(UUID player, BankAction bankAction, int position, long time, String failureReason, BigDecimal amount){
+    public SBankTransaction(UUID player, BankAction bankAction, int position, long time, String failureReason, BigDecimal amount) {
         this.player = player;
         this.bankAction = bankAction;
         this.position = position;
@@ -30,7 +30,7 @@ public final class SBankTransaction implements BankTransaction {
 
     public SBankTransaction(DatabaseResult resultSet) {
         String player = resultSet.getString("player");
-        this.player = player == null || player.isEmpty() ? null  : UUID.fromString(player);
+        this.player = player == null || player.isEmpty() ? null : UUID.fromString(player);
         this.bankAction = BankAction.valueOf(resultSet.getString("bank_action"));
         this.position = resultSet.getInt("position");
         this.time = resultSet.getLong("time");

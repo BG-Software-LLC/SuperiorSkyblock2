@@ -20,8 +20,8 @@ public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider
 
     private static boolean registered = false;
 
-    public SpawnersProvider_AdvancedSpawners(){
-        if(!registered) {
+    public SpawnersProvider_AdvancedSpawners() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using AdvancedSpawners as a spawners provider.");
@@ -47,19 +47,19 @@ public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerStack(AdvancedSpawnerPlaceEvent e){
+        public void onSpawnerStack(AdvancedSpawnerPlaceEvent e) {
             Location location = e.getSpawner().getLocation();
 
             Island island = plugin.getGrid().getIslandAt(location);
 
-            if(island != null)
+            if (island != null)
                 island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountPlaced());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerUnstack(AdvancedSpawnersBreakEvent e){
+        public void onSpawnerUnstack(AdvancedSpawnersBreakEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
-            if(island != null)
+            if (island != null)
                 island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountBroken());
         }
 

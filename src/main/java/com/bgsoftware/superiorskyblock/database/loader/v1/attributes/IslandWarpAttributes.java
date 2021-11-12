@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class IslandWarpAttributes extends AttributesRegistry<IslandWarpAttributes.Field> {
 
-    public IslandWarpAttributes(){
+    public IslandWarpAttributes() {
         super(Field.class);
     }
 

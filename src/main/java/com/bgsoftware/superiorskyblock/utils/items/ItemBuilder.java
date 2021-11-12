@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -34,71 +33,71 @@ public final class ItemBuilder implements Cloneable {
     private ItemMeta itemMeta;
     private String textureValue = "";
 
-    public ItemBuilder(ItemStack itemStack){
+    public ItemBuilder(ItemStack itemStack) {
         this(itemStack.getType(), itemStack.getDurability());
         this.itemMeta = itemStack.getItemMeta().clone();
     }
 
-    public ItemBuilder(Material type){
+    public ItemBuilder(Material type) {
         this(type, 0);
     }
 
-    public ItemBuilder(Material type, int damage){
+    public ItemBuilder(Material type, int damage) {
         itemStack = new ItemStack(type, 1, (short) damage);
         itemMeta = itemStack.getItemMeta();
     }
 
-    public ItemBuilder asSkullOf(SuperiorPlayer superiorPlayer){
-        if(itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
-            textureValue = superiorPlayer == null ? HeadUtils.getNullPlayerTexture() :  superiorPlayer.getTextureValue();
+    public ItemBuilder asSkullOf(SuperiorPlayer superiorPlayer) {
+        if (itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
+            textureValue = superiorPlayer == null ? HeadUtils.getNullPlayerTexture() : superiorPlayer.getTextureValue();
         return this;
     }
 
-    public ItemBuilder asSkullOf(String textureValue){
-        if(itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
+    public ItemBuilder asSkullOf(String textureValue) {
+        if (itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
             this.textureValue = textureValue;
         return this;
     }
 
-    public ItemBuilder withName(String name){
-        if(name != null)
+    public ItemBuilder withName(String name) {
+        if (name != null)
             itemMeta.setDisplayName(StringUtils.translateColors(name));
         return this;
     }
 
-    public ItemBuilder replaceName(String regex, String replace){
-        if(itemMeta.hasDisplayName())
+    public ItemBuilder replaceName(String regex, String replace) {
+        if (itemMeta.hasDisplayName())
             withName(itemMeta.getDisplayName().replace(regex, replace));
         return this;
     }
 
-    public ItemBuilder withLore(List<String> lore){
-        if(lore != null)
+    public ItemBuilder withLore(List<String> lore) {
+        if (lore != null)
             itemMeta.setLore(StringUtils.translateColors(lore));
         return this;
     }
 
-    public ItemBuilder appendLore(List<String> lore){
+    public ItemBuilder appendLore(List<String> lore) {
         List<String> currentLore = itemMeta.getLore() == null ? new ArrayList<>() : itemMeta.getLore();
         currentLore.addAll(lore);
         return withLore(currentLore);
     }
 
-    public ItemBuilder withLore(String... lore){
+    public ItemBuilder withLore(String... lore) {
         return withLore(Arrays.asList(lore));
     }
 
-    public ItemBuilder withLore(String firstLine, List<String> listLine){
+    public ItemBuilder withLore(String firstLine, List<String> listLine) {
         List<String> loreList = new ArrayList<>();
 
         firstLine = StringUtils.translateColors(firstLine);
         loreList.add(firstLine);
 
-        for(String line : listLine)
+        for (String line : listLine)
             loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(line));
 
-        if(loreList.size() > 10){
-            for(int i = 10; i < loreList.size(); i++){
+        if (loreList.size() > 10) {
+            for (int i = 10; i < loreList.size(); i++) {
                 loreList.remove(loreList.get(i));
             }
             loreList.add(ChatColor.getLastColors(firstLine) + "...");
@@ -108,18 +107,18 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
-    public ItemBuilder withLore(String firstLine, ConfigurationSection configurationSection){
+    public ItemBuilder withLore(String firstLine, ConfigurationSection configurationSection) {
         List<String> loreList = new ArrayList<>();
 
         firstLine = StringUtils.translateColors(firstLine);
         loreList.add(firstLine);
 
-        for(String section : configurationSection.getKeys(false)){
+        for (String section : configurationSection.getKeys(false)) {
             section = section + ": " + configurationSection.get(section).toString();
             loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(section));
         }
 
-        if(loreList.size() > 16){
+        if (loreList.size() > 16) {
             loreList = loreList.subList(0, 16);
             loreList.add(ChatColor.getLastColors(firstLine) + "...");
         }
@@ -128,13 +127,13 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
-    public ItemBuilder replaceLore(String regex, String replace){
-        if(!itemMeta.hasLore())
+    public ItemBuilder replaceLore(String regex, String replace) {
+        if (!itemMeta.hasLore())
             return this;
 
         List<String> loreList = new ArrayList<>();
 
-        for(String line : itemMeta.getLore()){
+        for (String line : itemMeta.getLore()) {
             loreList.add(line.replace(regex, replace));
         }
 
@@ -142,20 +141,19 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
-    public ItemBuilder replaceLoreWithLines(String regex, String... lines){
-        if(!itemMeta.hasLore())
+    public ItemBuilder replaceLoreWithLines(String regex, String... lines) {
+        if (!itemMeta.hasLore())
             return this;
 
         List<String> loreList = new ArrayList<>();
         List<String> linesToAdd = Arrays.asList(lines);
         boolean isEmpty = linesToAdd.isEmpty() || linesToAdd.stream().allMatch(String::isEmpty);
 
-        for(String line : itemMeta.getLore()){
-            if(line.contains(regex)){
-                if(!isEmpty)
+        for (String line : itemMeta.getLore()) {
+            if (line.contains(regex)) {
+                if (!isEmpty)
                     loreList.addAll(linesToAdd);
-            }
-            else{
+            } else {
                 loreList.add(line);
             }
         }
@@ -164,44 +162,43 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
-    public ItemBuilder replaceAll(String regex, String replace){
+    public ItemBuilder replaceAll(String regex, String replace) {
         replaceName(regex, replace);
         replaceLore(regex, replace);
         return this;
     }
 
-    public ItemBuilder withEnchant(Enchantment enchant, int level){
+    public ItemBuilder withEnchant(Enchantment enchant, int level) {
         itemMeta.addEnchant(enchant, level, true);
         return this;
     }
 
-    public ItemBuilder withFlags(ItemFlag... itemFlags){
+    public ItemBuilder withFlags(ItemFlag... itemFlags) {
         itemMeta.addItemFlags(itemFlags);
         return this;
     }
 
-    public ItemBuilder setUnbreakable(){
+    public ItemBuilder setUnbreakable() {
         itemMeta.spigot().setUnbreakable(true);
         return this;
     }
 
-    public ItemBuilder withPotionEffect(PotionEffect potionEffect){
-        if(itemMeta instanceof PotionMeta)
+    public ItemBuilder withPotionEffect(PotionEffect potionEffect) {
+        if (itemMeta instanceof PotionMeta)
             plugin.getNMSAlgorithms().addPotion((PotionMeta) itemMeta, potionEffect);
         return this;
     }
 
     @SuppressWarnings("deprecation")
-    public ItemBuilder withEntityType(EntityType entityType){
-        if(ItemUtils.isValidAndSpawnEgg(itemStack)) {
-            if(ServerVersion.isLegacy()) {
+    public ItemBuilder withEntityType(EntityType entityType) {
+        if (ItemUtils.isValidAndSpawnEgg(itemStack)) {
+            if (ServerVersion.isLegacy()) {
                 try {
                     ((SpawnEggMeta) itemMeta).setSpawnedType(entityType);
                 } catch (NoClassDefFoundError error) {
                     itemStack.setDurability(entityType.getTypeId());
                 }
-            }
-            else{
+            } else {
                 itemStack.setType(Material.valueOf(entityType.name() + "_SPAWN_EGG"));
             }
         }
@@ -209,45 +206,45 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
-    public ItemBuilder withCustomModel(int customModel){
+    public ItemBuilder withCustomModel(int customModel) {
         plugin.getNMSAlgorithms().setCustomModel(itemMeta, customModel);
         return this;
     }
 
-    public ItemMeta getItemMeta(){
+    public ItemMeta getItemMeta() {
         return itemMeta;
     }
 
-    public ItemStack build(SuperiorPlayer superiorPlayer){
+    public ItemStack build(SuperiorPlayer superiorPlayer) {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
-        if(itemMeta.hasDisplayName()) {
+        if (itemMeta.hasDisplayName()) {
             withName(PlaceholderHook.parse(offlinePlayer, itemMeta.getDisplayName()));
         }
 
-        if(itemMeta.hasLore()) {
+        if (itemMeta.hasLore()) {
             withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
         }
 
-        if(textureValue.equals("%superior_player_texture%"))
+        if (textureValue.equals("%superior_player_texture%"))
             textureValue = superiorPlayer.getTextureValue();
 
         return build();
     }
 
-    public ItemStack build(){
+    public ItemStack build() {
         itemStack.setItemMeta(itemMeta);
         return textureValue.isEmpty() ? itemStack : HeadUtils.getPlayerHead(itemStack, textureValue);
     }
 
-    public ItemBuilder clone(){
+    public ItemBuilder clone() {
         try {
             ItemBuilder itemBuilder = (ItemBuilder) super.clone();
             itemBuilder.itemStack = itemStack.clone();
             itemBuilder.itemMeta = itemMeta.clone();
             itemBuilder.textureValue = textureValue;
             return itemBuilder;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             throw new NullPointerException(ex.getMessage());
         }
     }

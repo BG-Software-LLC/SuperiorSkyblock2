@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -57,19 +57,15 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
         if (!(sender instanceof Player) && args.length == 2) {
             sender.sendMessage(ChatColor.RED + "You must specify a player to teleport.");
             return;
-        }
-
-        else if(args.length == 3){
+        } else if (args.length == 3) {
             targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-            if(targetPlayer != null && !targetPlayer.isOnline())
+            if (targetPlayer != null && !targetPlayer.isOnline())
                 targetPlayer = null;
-        }
-
-        else if(sender instanceof Player){
+        } else if (sender instanceof Player) {
             targetPlayer = plugin.getPlayers().getSuperiorPlayer((Player) sender);
         }
 
-        if(targetPlayer == null){
+        if (targetPlayer == null) {
             Locale.INVALID_PLAYER.send(sender, args[2]);
             return;
         }

@@ -24,7 +24,7 @@ public class SUpgrade implements Upgrade {
     private SUpgradeLevel[] upgradeLevels = new SUpgradeLevel[0];
     private int slot = -1;
 
-    public SUpgrade(String name){
+    public SUpgrade(String name) {
         this.name = name;
     }
 
@@ -49,15 +49,20 @@ public class SUpgrade implements Upgrade {
     }
 
     @Override
-    public void setSlot(int slot){
+    public void setSlot(int slot) {
         this.slot = slot;
     }
 
-    public void addUpgradeLevel(int level, SUpgradeLevel upgradeLevel){
-        if(level > upgradeLevels.length)
+    public void addUpgradeLevel(int level, SUpgradeLevel upgradeLevel) {
+        if (level > upgradeLevels.length)
             upgradeLevels = Arrays.copyOf(upgradeLevels, level);
 
         upgradeLevels[level - 1] = upgradeLevel;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override
@@ -66,11 +71,6 @@ public class SUpgrade implements Upgrade {
         if (o == null || getClass() != o.getClass()) return false;
         SUpgrade upgrade = (SUpgrade) o;
         return name.equals(upgrade.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
     }
 
 }

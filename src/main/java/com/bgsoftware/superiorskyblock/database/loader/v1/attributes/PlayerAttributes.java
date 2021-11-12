@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class PlayerAttributes extends AttributesRegistry<PlayerAttributes.Field> {
 
-    public PlayerAttributes(){
+    public PlayerAttributes() {
         super(Field.class);
     }
 

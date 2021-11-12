@@ -22,17 +22,17 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Bukkit;
@@ -71,7 +71,7 @@ public final class SpawnIsland implements Island {
     private final List<IslandFlag> islandSettings;
     private Biome biome = Biome.PLAINS;
 
-    public SpawnIsland(SuperiorSkyblockPlugin plugin){
+    public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         SpawnIsland.plugin = plugin;
 
         String spawnLocation = plugin.getSettings().getSpawn().getLocation().replace(" ", "");
@@ -82,10 +82,10 @@ public final class SpawnIsland implements Island {
         islandSize = plugin.getSettings().getSpawn().getSize();
         islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
-        if(center.getWorld() == null)
+        if (center.getWorld() == null)
             SWMHook.tryWorldLoad(spawnLocation.split(",")[0]);
 
-        if(center.getWorld() == null){
+        if (center.getWorld() == null) {
             new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
             Bukkit.shutdown();
             return;
@@ -240,18 +240,18 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getCoopLimitRaw() {
-        return -1;
-    }
-
-    @Override
     public void setCoopLimit(int coopLimit) {
 
     }
 
     @Override
+    public int getCoopLimitRaw() {
+        return -1;
+    }
+
+    @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
-        if(inside)
+        if (inside)
             playersInside.add(superiorPlayer);
         else
             playersInside.remove(superiorPlayer);
@@ -285,17 +285,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void setVisitorsLocation(Location visitorsLocation) {
+
+    }
+
+    @Override
     public void setTeleportLocation(Location teleportLocation) {
 
     }
 
     @Override
     public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
-
-    }
-
-    @Override
-    public void setVisitorsLocation(Location visitorsLocation) {
 
     }
 
@@ -348,9 +348,9 @@ public final class SpawnIsland implements Island {
 
         List<Chunk> chunks = new ArrayList<>();
 
-        for(int x = minChunk.getX(); x <= maxChunk.getX(); x++){
-            for(int z = minChunk.getZ(); z <= maxChunk.getZ(); z++){
-                if(!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
+        for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
+            for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
+                if (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -372,9 +372,9 @@ public final class SpawnIsland implements Island {
 
         List<Chunk> chunks = new ArrayList<>();
 
-        for(int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++){
-            for(int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++){
-                if(world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))){
+        for (int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++) {
+            for (int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++) {
+                if (world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))) {
                     chunks.add(world.getChunkAt(chunkX, chunkZ));
                 }
             }
@@ -415,7 +415,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        if(!location.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
+        if (!location.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -435,7 +435,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        if(!chunk.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
+        if (!chunk.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
         Location min = getMinimum(), max = getMaximum();
@@ -548,13 +548,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public String getRawName() {
-        return "";
+    public void setName(String islandName) {
+
     }
 
     @Override
-    public void setName(String islandName) {
-
+    public String getRawName() {
+        return "";
     }
 
     @Override
@@ -608,13 +608,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getIslandSizeRaw() {
-        return islandSize;
+    public void setIslandSize(int islandSize) {
+
     }
 
     @Override
-    public void setIslandSize(int islandSize) {
-
+    public int getIslandSizeRaw() {
+        return islandSize;
     }
 
     @Override
@@ -678,7 +678,7 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers){
+    public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
 
     }
 
@@ -723,13 +723,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public BigDecimal getBankLimitRaw() {
-        return BigDecimal.valueOf(-1);
+    public void setBankLimit(BigDecimal bankLimit) {
+
     }
 
     @Override
-    public void setBankLimit(BigDecimal bankLimit) {
-
+    public BigDecimal getBankLimitRaw() {
+        return BigDecimal.valueOf(-1);
     }
 
     @Override
@@ -743,13 +743,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public long getNextInterest() {
-        return -1;
+    public void setLastInterestTime(long lastInterest) {
+
     }
 
     @Override
-    public void setLastInterestTime(long lastInterest) {
-
+    public long getNextInterest() {
+        return -1;
     }
 
     @Override
@@ -923,22 +923,17 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public double getCropGrowthRaw() {
-        return 1;
-    }
-
-    @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
 
     }
 
     @Override
-    public double getSpawnerRatesMultiplier() {
+    public double getCropGrowthRaw() {
         return 1;
     }
 
     @Override
-    public double getSpawnerRatesRaw() {
+    public double getSpawnerRatesMultiplier() {
         return 1;
     }
 
@@ -948,18 +943,23 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public double getMobDropsMultiplier() {
+    public double getSpawnerRatesRaw() {
         return 1;
     }
 
     @Override
-    public double getMobDropsRaw() {
+    public double getMobDropsMultiplier() {
         return 1;
     }
 
     @Override
     public void setMobDropsMultiplier(double mobDrops) {
 
+    }
+
+    @Override
+    public double getMobDropsRaw() {
+        return 1;
     }
 
     @Override
@@ -1068,13 +1068,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getTeamLimitRaw() {
-        return 0;
+    public void setTeamLimit(int teamLimit) {
+
     }
 
     @Override
-    public void setTeamLimit(int teamLimit) {
-
+    public int getTeamLimitRaw() {
+        return 0;
     }
 
     @Override
@@ -1083,13 +1083,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public int getWarpsLimitRaw() {
-        return IslandUtils.NO_LIMIT.get();
+    public void setWarpsLimit(int warpsLimit) {
+
     }
 
     @Override
-    public void setWarpsLimit(int warpsLimit) {
-
+    public int getWarpsLimitRaw() {
+        return IslandUtils.NO_LIMIT.get();
     }
 
     @Override
@@ -1193,12 +1193,12 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public IslandWarp getWarp(String name) {
+    public IslandWarp getWarp(Location location) {
         return null;
     }
 
     @Override
-    public IslandWarp getWarp(Location location) {
+    public IslandWarp getWarp(String name) {
         return null;
     }
 
@@ -1253,43 +1253,13 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
-    public void completeMission(Mission<?> mission) {
-
-    }
-
-    @Override
-    public void resetMission(Mission<?> mission) {
-
-    }
-
-    @Override
-    public boolean hasCompletedMission(Mission<?> mission) {
-        return false;
-    }
-
-    @Override
-    public boolean canCompleteMissionAgain(Mission<?> mission) {
-        return false;
-    }
-
-    @Override
-    public int getAmountMissionCompleted(Mission<?> mission) {
-        return 0;
-    }
-
-    @Override
-    public List<Mission<?>> getCompletedMissions() {
-        return new ArrayList<>();
-    }
-
-    @Override
-    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return new HashMap<>();
-    }
-
-    @Override
     public boolean hasSettingsEnabled(IslandFlag islandFlag) {
         return this.islandSettings.contains(islandFlag);
+    }
+
+    @Override
+    public Map<IslandFlag, Byte> getAllSettings() {
+        return new HashMap<>();
     }
 
     @Override
@@ -1300,11 +1270,6 @@ public final class SpawnIsland implements Island {
     @Override
     public void disableSettings(IslandFlag islandFlag) {
 
-    }
-
-    @Override
-    public Map<IslandFlag, Byte> getAllSettings() {
-        return new HashMap<>();
     }
 
     @Override
@@ -1405,6 +1370,41 @@ public final class SpawnIsland implements Island {
     @Override
     public DatabaseBridge getDatabaseBridge() {
         return EmptyDatabaseBridge.getInstance();
+    }
+
+    @Override
+    public void completeMission(Mission<?> mission) {
+
+    }
+
+    @Override
+    public void resetMission(Mission<?> mission) {
+
+    }
+
+    @Override
+    public boolean hasCompletedMission(Mission<?> mission) {
+        return false;
+    }
+
+    @Override
+    public boolean canCompleteMissionAgain(Mission<?> mission) {
+        return false;
+    }
+
+    @Override
+    public int getAmountMissionCompleted(Mission<?> mission) {
+        return 0;
+    }
+
+    @Override
+    public List<Mission<?>> getCompletedMissions() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
+        return new HashMap<>();
     }
 
     @SuppressWarnings("NullableProblems")

@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -71,10 +71,10 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Material rawMaterial = CommandArguments.getMaterial(sender, args[3]);
 
-        if(rawMaterial == null)
+        if (rawMaterial == null)
             return;
 
-        if(!rawMaterial.isSolid()){
+        if (!rawMaterial.isSolid()) {
             Locale.MATERIAL_NOT_SOLID.send(sender);
             return;
         }
@@ -82,17 +82,17 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         Key material = Key.of(args[3].toUpperCase());
         boolean percentage = args[4].endsWith("%");
 
-        if(percentage)
+        if (percentage)
             args[4] = args[4].substring(0, args[4].length() - 1);
 
         Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[4]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         int amount = arguments.getKey();
 
-        if(percentage && (amount < 0 || amount > 100)){
+        if (percentage && (amount < 0 || amount > 100)) {
             Locale.INVALID_PERCENTAGE.send(sender);
             return;
         }
@@ -100,21 +100,20 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         World.Environment environment = args.length == 5 ? plugin.getSettings().getWorlds().getDefaultWorld() :
                 CommandArguments.getEnvironment(sender, args[5]);
 
-        if(environment == null)
+        if (environment == null)
             return;
 
         Executor.data(() -> islands.forEach(island -> {
-            if(percentage){
+            if (percentage) {
                 island.setGeneratorPercentage(material, Math.max(0, Math.min(100, amount)), environment);
-            }
-            else{
+            } else {
                 island.setGeneratorAmount(material, amount, environment);
             }
         }));
 
-        if(islands.size() != 1)
+        if (islands.size() != 1)
             Locale.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
         else
             Locale.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());

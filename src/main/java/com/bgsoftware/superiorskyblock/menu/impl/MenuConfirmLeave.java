@@ -27,11 +27,33 @@ public final class MenuConfirmLeave extends SuperiorMenu {
         super("menuConfirmLeave", superiorPlayer);
     }
 
+    public static void init() {
+        MenuConfirmLeave menuConfirmLeave = new MenuConfirmLeave(null);
+
+        File file = new File(plugin.getDataFolder(), "menus/confirm-leave.yml");
+
+        if (!file.exists())
+            FileUtils.saveResource("menus/confirm-leave.yml");
+
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
+
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmLeave, "confirm-leave.yml", config);
+
+        confirmSlot = getSlots(config, "confirm", menuPatternSlots);
+        cancelSlot = getSlots(config, "cancel", menuPatternSlots);
+
+        menuConfirmLeave.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
+        new MenuConfirmLeave(superiorPlayer).open(previousMenu);
+    }
+
     @Override
     protected void onPlayerClick(InventoryClickEvent e) {
         Island island = superiorPlayer.getIsland();
 
-        if(island == null)
+        if (island == null)
             return;
 
         if (confirmSlot.contains(e.getRawSlot())) {
@@ -54,27 +76,5 @@ public final class MenuConfirmLeave extends SuperiorMenu {
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
         openInventory(superiorPlayer, previousMenu);
-    }
-
-    public static void init() {
-        MenuConfirmLeave menuConfirmLeave = new MenuConfirmLeave(null);
-
-        File file = new File(plugin.getDataFolder(), "menus/confirm-leave.yml");
-
-        if (!file.exists())
-            FileUtils.saveResource("menus/confirm-leave.yml");
-
-        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
-
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmLeave, "confirm-leave.yml", config);
-
-        confirmSlot = getSlots(config, "confirm", menuPatternSlots);
-        cancelSlot = getSlots(config, "cancel", menuPatternSlots);
-
-        menuConfirmLeave.markCompleted();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
-        new MenuConfirmLeave(superiorPlayer).open(previousMenu);
     }
 }

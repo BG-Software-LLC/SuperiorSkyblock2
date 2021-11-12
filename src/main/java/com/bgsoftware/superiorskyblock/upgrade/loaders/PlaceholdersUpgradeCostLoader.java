@@ -12,7 +12,7 @@ public final class PlaceholdersUpgradeCostLoader implements UpgradeCostLoader {
 
     @Override
     public UpgradeCost loadCost(ConfigurationSection upgradeSection) throws UpgradeCostLoadException {
-        if(!upgradeSection.contains("price"))
+        if (!upgradeSection.contains("price"))
             throw new UpgradeCostLoadException("The field 'price' is missing from the section.");
         if (!upgradeSection.contains("placeholder"))
             throw new UpgradeCostLoadException("The field 'placeholder' is missing from the section.");

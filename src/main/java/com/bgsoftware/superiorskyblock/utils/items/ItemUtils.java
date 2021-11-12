@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -32,23 +32,23 @@ public final class ItemUtils {
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
 
-    private ItemUtils(){
+    private ItemUtils() {
 
     }
 
-    public static void removeItem(ItemStack itemStack, Event event, Player player){
+    public static void removeItem(ItemStack itemStack, Event event, Player player) {
         ReflectMethod<EquipmentSlot> reflectMethod = null;
 
-        if(event instanceof BlockPlaceEvent)
+        if (event instanceof BlockPlaceEvent)
             reflectMethod = GET_HAND_BLOCK_PLACE;
-        else if(event instanceof PlayerInteractEvent)
+        else if (event instanceof PlayerInteractEvent)
             reflectMethod = GET_HAND_PLAYER_INTERACT;
 
-        if(reflectMethod != null && reflectMethod.isValid()){
+        if (reflectMethod != null && reflectMethod.isValid()) {
             EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
-            if(equipmentSlot.name().equals("OFF_HAND")){
+            if (equipmentSlot.name().equals("OFF_HAND")) {
                 ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
-                if(offHand.isSimilar(itemStack)){
+                if (offHand.isSimilar(itemStack)) {
                     offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
                     SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), offHand);
                     return;
@@ -59,17 +59,17 @@ public final class ItemUtils {
         player.getInventory().removeItem(itemStack);
     }
 
-    public static void setItem(ItemStack itemStack, Event event, Player player){
+    public static void setItem(ItemStack itemStack, Event event, Player player) {
         ReflectMethod<EquipmentSlot> reflectMethod = null;
 
-        if(event instanceof BlockPlaceEvent)
+        if (event instanceof BlockPlaceEvent)
             reflectMethod = GET_HAND_BLOCK_PLACE;
-        else if(event instanceof PlayerInteractEvent)
+        else if (event instanceof PlayerInteractEvent)
             reflectMethod = GET_HAND_PLAYER_INTERACT;
 
-        if(reflectMethod != null && reflectMethod.isValid()){
+        if (reflectMethod != null && reflectMethod.isValid()) {
             EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
-            if(equipmentSlot != null && equipmentSlot.name().equals("OFF_HAND")){
+            if (equipmentSlot != null && equipmentSlot.name().equals("OFF_HAND")) {
                 player.getInventory().setItem(40, itemStack);
                 return;
             }
@@ -79,43 +79,43 @@ public final class ItemUtils {
     }
 
     @SuppressWarnings("deprecation")
-    public static EntityType getEntityType(ItemStack itemStack){
-        if(!isValidAndSpawnEgg(itemStack))
+    public static EntityType getEntityType(ItemStack itemStack) {
+        if (!isValidAndSpawnEgg(itemStack))
             return itemStack.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND : EntityType.UNKNOWN;
 
-        if(ServerVersion.isLegacy()) {
+        if (ServerVersion.isLegacy()) {
             try {
                 SpawnEggMeta spawnEggMeta = (SpawnEggMeta) itemStack.getItemMeta();
                 return spawnEggMeta.getSpawnedType() == null ? EntityType.PIG : spawnEggMeta.getSpawnedType();
             } catch (NoClassDefFoundError error) {
                 return EntityType.fromId(itemStack.getDurability());
             }
-        }else{
+        } else {
             return EntityType.fromName(itemStack.getType().name().replace("_SPAWN_EGG", ""));
         }
     }
 
-    public static void addItem(ItemStack itemStack, PlayerInventory playerInventory, Location toDrop){
+    public static void addItem(ItemStack itemStack, PlayerInventory playerInventory, Location toDrop) {
         Map<Integer, ItemStack> additionalItems = playerInventory.addItem(itemStack);
-        for(ItemStack additionalItem : additionalItems.values())
+        for (ItemStack additionalItem : additionalItems.values())
             toDrop.getWorld().dropItemNaturally(toDrop, additionalItem);
     }
 
-    public static String serialize(ItemStack[] contents){
+    public static String serialize(ItemStack[] contents) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutput = new DataOutputStream(outputStream);
 
         CompoundTag compoundTag = new CompoundTag();
         compoundTag.setInt("Length", contents.length);
 
-        for(int i = 0; i < contents.length; i++) {
-            if(contents[i] != null && contents[i].getType() != Material.AIR)
+        for (int i = 0; i < contents.length; i++) {
+            if (contents[i] != null && contents[i].getType() != Material.AIR)
                 compoundTag.setTag(i + "", TagUtils.itemToCompound(contents[i]));
         }
 
         try {
             compoundTag.write(dataOutput);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return "";
@@ -124,13 +124,13 @@ public final class ItemUtils {
         return new BigInteger(1, outputStream.toByteArray()).toString(32);
     }
 
-    public static String serializeItem(ItemStack itemStack){
+    public static String serializeItem(ItemStack itemStack) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutput = new DataOutputStream(outputStream);
 
         try {
             TagUtils.itemToCompound(itemStack).write(dataOutput);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return "";
@@ -139,13 +139,13 @@ public final class ItemUtils {
         return new BigInteger(1, outputStream.toByteArray()).toString(32);
     }
 
-    public static ItemStack[] deserialize(String serialized){
+    public static ItemStack[] deserialize(String serialized) {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
         CompoundTag compoundTag;
 
         try {
             compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return new ItemStack[0];
@@ -153,17 +153,17 @@ public final class ItemUtils {
 
         ItemStack[] contents = new ItemStack[compoundTag.getInt("Length")];
 
-        for(int i = 0; i < contents.length; i++) {
+        for (int i = 0; i < contents.length; i++) {
             CompoundTag itemCompound = compoundTag.getCompound(i + "");
-            if(itemCompound != null)
+            if (itemCompound != null)
                 contents[i] = TagUtils.compoundToItem(itemCompound);
         }
 
         return contents;
     }
 
-    public static ItemStack deserializeItem(String serialized){
-        if(serialized.length() > 0) {
+    public static ItemStack deserializeItem(String serialized) {
+        if (serialized.length() > 0) {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
 
             try {
@@ -178,7 +178,7 @@ public final class ItemUtils {
         return null;
     }
 
-    public static boolean isValidAndSpawnEgg(ItemStack itemStack){
+    public static boolean isValidAndSpawnEgg(ItemStack itemStack) {
         return !itemStack.getType().isBlock() && itemStack.getType().name().contains(ServerVersion.isLegacy() ? "MONSTER_EGG" : "SPAWN_EGG");
     }
 

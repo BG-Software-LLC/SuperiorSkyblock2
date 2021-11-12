@@ -42,7 +42,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     private PluginCommand pluginCommand;
     private String label = null;
 
-    public CommandsHandler(SuperiorSkyblockPlugin plugin, CommandsMap playerCommandsMap, CommandsMap adminCommandsMap){
+    public CommandsHandler(SuperiorSkyblockPlugin plugin, CommandsMap playerCommandsMap, CommandsMap adminCommandsMap) {
         super(plugin);
         this.playerCommandsMap = playerCommandsMap;
         this.adminCommandsMap = adminCommandsMap;
@@ -57,7 +57,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         String[] commandSections = islandCommand.split(",");
 
-        if(commandSections.length > 1){
+        if (commandSections.length > 1) {
             pluginCommand.setAliases(Arrays.asList(Arrays.copyOfRange(commandSections, 1, commandSections.length)));
         }
 
@@ -68,7 +68,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         loadCommands();
 
-        if(this.pendingCommands != null) {
+        if (this.pendingCommands != null) {
             Set<Runnable> pendingCommands = new HashSet<>(this.pendingCommands);
             this.pendingCommands = null;
             pendingCommands.forEach(Runnable::run);
@@ -88,7 +88,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public void registerAdminCommand(SuperiorCommand superiorCommand) {
-        if(pendingCommands != null){
+        if (pendingCommands != null) {
             pendingCommands.add(() -> registerAdminCommand(superiorCommand));
             return;
         }
@@ -139,12 +139,12 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         pluginCommand.execute(sender, "", commandArguments);
     }
 
-    public String getLabel(){
+    public String getLabel() {
         return label;
     }
 
-    public void registerCommand(SuperiorCommand superiorCommand, boolean sort){
-        if(pendingCommands != null){
+    public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
+        if (pendingCommands != null) {
             pendingCommands.add(() -> registerCommand(superiorCommand, sort));
             return;
         }
@@ -153,37 +153,36 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
-    private void loadCommands(){
+    private void loadCommands() {
         File commandsFolder = new File(plugin.getDataFolder(), "commands");
 
-        if(!commandsFolder.exists()){
+        if (!commandsFolder.exists()) {
             commandsFolder.mkdirs();
             return;
         }
 
-        for(File file : commandsFolder.listFiles()){
-            if(!file.getName().endsWith(".jar"))
+        for (File file : commandsFolder.listFiles()) {
+            if (!file.getName().endsWith(".jar"))
                 continue;
 
             try {
                 //noinspection deprecation
                 Optional<Class<?>> commandClass = FileUtils.getClasses(file.toURL(), SuperiorCommand.class).stream().findFirst();
 
-                if(!commandClass.isPresent())
+                if (!commandClass.isPresent())
                     continue;
 
                 SuperiorCommand superiorCommand = createInstance(commandClass.get());
 
-                if(file.getName().toLowerCase().contains("admin")) {
+                if (file.getName().toLowerCase().contains("admin")) {
                     registerAdminCommand(superiorCommand);
                     SuperiorSkyblockPlugin.log("Successfully loaded external admin command: " + file.getName().split("\\.")[0]);
-                }
-                else {
+                } else {
                     registerCommand(superiorCommand);
                     SuperiorSkyblockPlugin.log("Successfully loaded external command: " + file.getName().split("\\.")[0]);
                 }
 
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -191,12 +190,12 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     }
 
-    private SuperiorCommand createInstance(Class<?> clazz) throws Exception{
+    private SuperiorCommand createInstance(Class<?> clazz) throws Exception {
         Preconditions.checkArgument(SuperiorCommand.class.isAssignableFrom(clazz), "Class " + clazz + " is not a SuperiorCommand.");
 
-        for(Constructor<?> constructor : clazz.getConstructors()){
-            if(constructor.getParameterCount() == 0) {
-                if(!constructor.isAccessible())
+        for (Constructor<?> constructor : clazz.getConstructors()) {
+            if (constructor.getParameterCount() == 0) {
+                if (!constructor.isAccessible())
                     constructor.setAccessible(true);
 
                 return (SuperiorCommand) constructor.newInstance();
@@ -208,7 +207,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     private class PluginCommand extends BukkitCommand {
 
-        PluginCommand(String islandCommandLabel){
+        PluginCommand(String islandCommandLabel) {
             super(islandCommandLabel);
         }
 
@@ -216,28 +215,28 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
         public boolean execute(CommandSender sender, String label, String[] args) {
             java.util.Locale locale = LocaleUtils.getLocale(sender);
 
-            if(args.length > 0){
+            if (args.length > 0) {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
-                if(command != null){
-                    if(!(sender instanceof Player) && !command.canBeExecutedByConsole()){
+                if (command != null) {
+                    if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
                         Locale.sendMessage(sender, "&cCan be executed only by players!", true);
                         return false;
                     }
 
-                    if(!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
+                    if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
                         SuperiorSkyblockPlugin.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
                         Locale.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }
 
-                    if(args.length < command.getMinArgs() || args.length > command.getMaxArgs()){
+                    if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
                         Locale.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
                         return false;
                     }
 
                     String commandLabel = command.getAliases().get(0);
 
-                    if(sender instanceof Player && plugin.getSettings().getCommandsCooldown().containsKey(commandLabel)) {
+                    if (sender instanceof Player && plugin.getSettings().getCommandsCooldown().containsKey(commandLabel)) {
                         UUID uuid = ((Player) sender).getUniqueId();
 
                         long timeToExecute = commandsCooldown.containsKey(uuid) && commandsCooldown.get(uuid).containsKey(commandLabel) ?
@@ -245,13 +244,13 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
                         long timeNow = System.currentTimeMillis();
 
-                        if(timeNow < timeToExecute){
+                        if (timeNow < timeToExecute) {
                             Locale.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
                                     StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
                             return false;
                         }
 
-                        if(!commandsCooldown.containsKey(uuid)){
+                        if (!commandsCooldown.containsKey(uuid)) {
                             commandsCooldown.put(uuid, new HashMap<>());
                         }
 
@@ -264,22 +263,19 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                 }
             }
 
-            if(sender instanceof Player){
+            if (sender instanceof Player) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-                if(superiorPlayer != null){
+                if (superiorPlayer != null) {
                     Island island = superiorPlayer.getIsland();
 
-                    if(args.length != 0){
+                    if (args.length != 0) {
                         Bukkit.dispatchCommand(sender, label + " help");
-                    }
-                    else if(island == null){
+                    } else if (island == null) {
                         Bukkit.dispatchCommand(sender, label + " create");
-                    }
-                    else if(superiorPlayer.hasToggledPanel()){
+                    } else if (superiorPlayer.hasToggledPanel()) {
                         Bukkit.dispatchCommand(sender, label + " panel");
-                    }
-                    else{
+                    } else {
                         Bukkit.dispatchCommand(sender, label + " tp");
                     }
 
@@ -295,9 +291,9 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         @Override
         public List<String> tabComplete(CommandSender sender, String label, String[] args) {
-            if(args.length > 0){
+            if (args.length > 0) {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
-                if(command != null){
+                if (command != null) {
                     return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
                             new ArrayList<>() : command.tabComplete(plugin, sender, args);
                 }
@@ -305,7 +301,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
             List<String> list = new ArrayList<>();
 
-            for(SuperiorCommand subCommand : getSubCommands()) {
+            for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
                     aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));

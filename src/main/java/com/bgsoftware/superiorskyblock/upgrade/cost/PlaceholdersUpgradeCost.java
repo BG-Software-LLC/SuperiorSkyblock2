@@ -14,7 +14,7 @@ public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
     private final String placeholder;
     private final List<String> withdrawCommands;
 
-    public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands){
+    public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands) {
         super(cost, "placeholders");
         this.placeholder = placeholder;
         this.withdrawCommands = Collections.unmodifiableList(withdrawCommands);
@@ -24,9 +24,10 @@ public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
     public boolean hasEnoughBalance(SuperiorPlayer superiorPlayer) {
         BigDecimal currentBalance = BigDecimal.ZERO;
 
-        try{
+        try {
             currentBalance = new BigDecimal(PlaceholderHook.parse(superiorPlayer, placeholder));
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
 
         return currentBalance.compareTo(cost) >= 0;
     }

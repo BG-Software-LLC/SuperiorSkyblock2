@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -63,14 +63,14 @@ public final class CmdAdminSetBankLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         BigDecimal limit = CommandArguments.getBigDecimalAmount(sender, args[3]);
 
-        if(limit == null)
+        if (limit == null)
             return;
 
         Executor.data(() -> islands.forEach(island -> island.setBankLimit(limit)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_BANK_LIMIT_ALL.send(sender);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_BANK_LIMIT_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_BANK_LIMIT.send(sender, targetPlayer.getName());

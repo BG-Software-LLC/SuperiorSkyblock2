@@ -59,7 +59,7 @@ public final class NashornEngineDownloader {
         String downloadURL = JENKINS_ARTIFACTS_ENDPOINT + engineName;
         File engineFile = new File(plugin.getDataFolder(), "modules/" + engineName);
 
-        try(InputStream inputStream = new URL(downloadURL).openStream()) {
+        try (InputStream inputStream = new URL(downloadURL).openStream()) {
             Files.copy(inputStream, Paths.get(engineFile.toURI()));
         }
 

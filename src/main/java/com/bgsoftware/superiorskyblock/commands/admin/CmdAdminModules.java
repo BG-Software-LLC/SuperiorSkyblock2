@@ -53,20 +53,18 @@ public final class CmdAdminModules implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length == 2){
+        if (args.length == 2) {
             StringBuilder modulesList = new StringBuilder();
             java.util.Locale senderLocale = LocaleUtils.getLocale(sender);
             String moduleSeparator = Locale.MODULES_LIST_SEPARATOR.getMessage(senderLocale);
 
-            for(PluginModule pluginModule : plugin.getModules().getModules()){
+            for (PluginModule pluginModule : plugin.getModules().getModules()) {
                 modulesList.append(moduleSeparator).append(Locale.MODULES_LIST_MODULE_NAME
                         .getMessage(senderLocale, pluginModule.getName(), pluginModule.getAuthor()));
             }
 
             Locale.MODULES_LIST.send(sender, plugin.getModules().getModules().size(), modulesList.substring(moduleSeparator.length()));
-        }
-
-        else {
+        } else {
             PluginModule pluginModule = plugin.getModules().getModule(args[2]);
 
             if (args.length == 3) {
@@ -76,9 +74,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
                 }
 
                 Locale.MODULE_INFO.send(sender, pluginModule.getName(), pluginModule.getAuthor(), "");
-            }
-
-            else {
+            } else {
                 String command = args[3].toLowerCase();
 
                 switch (command) {

@@ -11,11 +11,11 @@ public final class SQLHelper {
 
     private static SQLSession globalSession;
 
-    private SQLHelper(){
+    private SQLHelper() {
 
     }
 
-    public static void waitForConnection(){
+    public static void waitForConnection() {
         globalSession.waitForConnection();
     }
 
@@ -23,44 +23,44 @@ public final class SQLHelper {
         return globalSession.getMutex();
     }
 
-    public static boolean createConnection(SuperiorSkyblockPlugin plugin){
+    public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
         globalSession = new SQLSession(plugin, true);
         return globalSession.createConnection();
     }
 
-    public static void executeUpdate(String statement){
+    public static void executeUpdate(String statement) {
         globalSession.executeUpdate(statement);
     }
 
-    public static void executeUpdate(String statement, Consumer<SQLException> onFailure){
+    public static void executeUpdate(String statement, Consumer<SQLException> onFailure) {
         globalSession.executeUpdate(statement, onFailure);
     }
 
-    public static boolean doesConditionExist(String statement){
+    public static boolean doesConditionExist(String statement) {
         return globalSession.doesConditionExist(statement);
     }
 
-    public static void executeQuery(String statement, QueryConsumer<ResultSet> callback){
+    public static void executeQuery(String statement, QueryConsumer<ResultSet> callback) {
         globalSession.executeQuery(statement, callback::accept);
     }
 
-    public static void close(){
+    public static void close() {
         globalSession.close();
     }
 
-    public static void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
+    public static void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure) {
         globalSession.buildStatement(query, consumer::accept, failure);
     }
 
-    public static void setAutoCommit(boolean autoCommit){
+    public static void setAutoCommit(boolean autoCommit) {
         globalSession.setAutoCommit(autoCommit);
     }
 
-    public static void commit() throws SQLException{
+    public static void commit() throws SQLException {
         globalSession.commit();
     }
 
-    public interface QueryConsumer<T>{
+    public interface QueryConsumer<T> {
 
         void accept(T value) throws SQLException;
 

@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -85,7 +85,7 @@ public final class CmdAdminSetLeader implements IAdminPlayerCommand {
             return;
         }
 
-        if(island.transferIsland(newLeader)) {
+        if (island.transferIsland(newLeader)) {
             Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
             IslandUtils.sendMessage(island, Locale.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
         }

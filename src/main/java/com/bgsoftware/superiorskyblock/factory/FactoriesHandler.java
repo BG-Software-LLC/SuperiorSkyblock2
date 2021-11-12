@@ -14,11 +14,11 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseBridge;
-import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
@@ -60,7 +60,7 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public Island createIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName){
+    public Island createIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
         SIsland island = new SIsland(superiorPlayer, uuid, location, islandName, schemName);
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
@@ -75,39 +75,39 @@ public final class FactoriesHandler implements FactoriesManager {
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
 
-    public IslandBank createIslandBank(Island island){
+    public IslandBank createIslandBank(Island island) {
         SIslandBank islandBank = new SIslandBank(island);
         return banksFactory == null ? islandBank : banksFactory.createIslandBank(island, islandBank);
     }
 
-    public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island){
+    public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
         return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
     }
 
-    public boolean hasCustomDatabaseBridge(){
+    public boolean hasCustomDatabaseBridge() {
         return databaseBridgeFactory != null;
     }
 
-    public DatabaseBridge createDatabaseBridge(Island island){
+    public DatabaseBridge createDatabaseBridge(Island island) {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
 
-    public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer){
+    public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer) {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }
 
-    public DatabaseBridge createDatabaseBridge(GridManager gridManager){
+    public DatabaseBridge createDatabaseBridge(GridManager gridManager) {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
     }
 
-    public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager){
+    public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager) {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);

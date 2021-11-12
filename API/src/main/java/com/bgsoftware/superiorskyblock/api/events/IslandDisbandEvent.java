@@ -14,10 +14,11 @@ public class IslandDisbandEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor for the event.
+     *
      * @param superiorPlayer The player who proceed the operation.
-     * @param island The island that is being disbanded.
+     * @param island         The island that is being disbanded.
      */
-    public IslandDisbandEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandDisbandEvent(SuperiorPlayer superiorPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }

@@ -28,62 +28,25 @@ public final class MenuIslandRate extends SuperiorMenu {
 
     private final Island island;
 
-    private MenuIslandRate(SuperiorPlayer superiorPlayer, Island island){
+    private MenuIslandRate(SuperiorPlayer superiorPlayer, Island island) {
         super("menuIslandRate", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        Rating rating = Rating.UNKNOWN;
-
-        if(zeroStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.ZERO_STARS;
-        else if(oneStarSlot.contains(e.getRawSlot()))
-            rating = Rating.ONE_STAR;
-        else if(twoStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.TWO_STARS;
-        else if(threeStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.THREE_STARS;
-        else if(fourStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.FOUR_STARS;
-        else if(fiveStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.FIVE_STARS;
-
-        if(rating == Rating.UNKNOWN)
-            return;
-
-        island.setRating(superiorPlayer, rating);
-
-        Locale.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
-
-        IslandUtils.sendMessage(island, Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
-
-        Executor.sync(() -> {
-            previousMove = false;
-            e.getWhoClicked().closeInventory();
-        }, 1L);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    public static void init(){
+    public static void init() {
         MenuIslandRate menuIslandRate = new MenuIslandRate(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/island-rate.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/island-rate.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 SuperiorSkyblockPlugin.debug(ex);
                 ex.printStackTrace();
             }
@@ -101,14 +64,14 @@ public final class MenuIslandRate extends SuperiorMenu {
         menuIslandRate.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
         new MenuIslandRate(superiorPlayer, island).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -126,7 +89,7 @@ public final class MenuIslandRate extends SuperiorMenu {
 
         int charCounter = 0;
 
-        if(cfg.contains("rate-gui.fill-items")) {
+        if (cfg.contains("rate-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("rate-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -155,6 +118,43 @@ public final class MenuIslandRate extends SuperiorMenu {
         newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    public void onPlayerClick(InventoryClickEvent e) {
+        Rating rating = Rating.UNKNOWN;
+
+        if (zeroStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.ZERO_STARS;
+        else if (oneStarSlot.contains(e.getRawSlot()))
+            rating = Rating.ONE_STAR;
+        else if (twoStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.TWO_STARS;
+        else if (threeStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.THREE_STARS;
+        else if (fourStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.FOUR_STARS;
+        else if (fiveStarsSlot.contains(e.getRawSlot()))
+            rating = Rating.FIVE_STARS;
+
+        if (rating == Rating.UNKNOWN)
+            return;
+
+        island.setRating(superiorPlayer, rating);
+
+        Locale.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
+
+        IslandUtils.sendMessage(island, Locale.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
+
+        Executor.sync(() -> {
+            previousMove = false;
+            e.getWhoClicked().closeInventory();
+        }, 1L);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

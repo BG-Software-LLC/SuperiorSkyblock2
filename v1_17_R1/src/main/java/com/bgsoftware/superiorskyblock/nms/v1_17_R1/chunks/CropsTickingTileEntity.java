@@ -34,6 +34,16 @@ public final class CropsTickingTileEntity extends TileEntity {
 
     private int currentTick = 0;
 
+    private CropsTickingTileEntity(Island island, Chunk chunk, BlockPosition blockPosition) {
+        super(TileEntityTypes.v, blockPosition, chunk.getWorld().getType(blockPosition));
+        this.island = new WeakReference<>(island);
+        this.chunk = new WeakReference<>(chunk);
+        this.chunkX = chunk.getPos().b;
+        this.chunkZ = chunk.getPos().c;
+        setWorld(chunk.getWorld());
+        chunk.getWorld().a(new CropsTickingTileEntityTicker(this));
+    }
+
     public static void create(Island island, Chunk chunk) {
         long chunkPair = chunk.getPos().pair();
         if (!tickingChunks.containsKey(chunkPair)) {
@@ -44,16 +54,6 @@ public final class CropsTickingTileEntity extends TileEntity {
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
         return tickingChunks.remove(chunkCoords.pair());
-    }
-
-    private CropsTickingTileEntity(Island island, Chunk chunk, BlockPosition blockPosition) {
-        super(TileEntityTypes.v, blockPosition, chunk.getWorld().getType(blockPosition));
-        this.island = new WeakReference<>(island);
-        this.chunk = new WeakReference<>(chunk);
-        this.chunkX = chunk.getPos().b;
-        this.chunkZ = chunk.getPos().c;
-        setWorld(chunk.getWorld());
-        chunk.getWorld().a(new CropsTickingTileEntityTicker(this));
     }
 
     public void remove() {

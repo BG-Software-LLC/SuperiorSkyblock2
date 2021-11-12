@@ -11,16 +11,16 @@ public final class EnchantsUtils {
 
     private static Enchantment glowEnchant;
 
-    private EnchantsUtils(){
+    private EnchantsUtils() {
 
     }
 
-    public static void registerGlowEnchantment(){
+    public static void registerGlowEnchantment() {
         glowEnchant = plugin.getNMSAlgorithms().getGlowEnchant();
         ACCEPTING_NEW.set(null, true);
-        try{
+        try {
             Enchantment.registerEnchantment(glowEnchant);
-        }catch(Exception error){
+        } catch (Exception error) {
             SuperiorSkyblockPlugin.debug(error);
         }
     }

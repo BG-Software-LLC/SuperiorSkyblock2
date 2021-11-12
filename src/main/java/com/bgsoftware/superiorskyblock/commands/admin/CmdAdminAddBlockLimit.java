@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -60,6 +60,11 @@ public final class CmdAdminAddBlockLimit implements IAdminIslandCommand {
     }
 
     @Override
+    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
+        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : new ArrayList<>();
+    }
+
+    @Override
     public boolean supportMultipleIslands() {
         return true;
     }
@@ -70,24 +75,19 @@ public final class CmdAdminAddBlockLimit implements IAdminIslandCommand {
 
         Pair<Integer, Boolean> arguments = CommandArguments.getLimit(sender, args[4]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         int limit = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, island.getBlockLimit(key) + limit)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.getGlobalKey()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.getGlobalKey()), islands.get(0).getName());
         else
             Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.getGlobalKey()), targetPlayer.getName());
-    }
-
-    @Override
-    public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : new ArrayList<>();
     }
 
 }

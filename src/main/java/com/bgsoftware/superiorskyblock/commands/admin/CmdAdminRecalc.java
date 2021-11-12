@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -55,12 +55,10 @@ public final class CmdAdminRecalc implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(args.length == 2){
+        if (args.length == 2) {
             Locale.RECALC_ALL_ISLANDS.send(sender);
             plugin.getGrid().calcAllIslands(() -> Locale.RECALC_ALL_ISLANDS_DONE.send(sender));
-        }
-
-        else {
+        } else {
             SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
@@ -74,7 +72,7 @@ public final class CmdAdminRecalc implements ISuperiorCommand {
                 return;
             }
 
-            if(island.isBeingRecalculated()){
+            if (island.isBeingRecalculated()) {
                 Locale.RECALC_ALREADY_RUNNING_OTHER.send(sender);
                 return;
             }

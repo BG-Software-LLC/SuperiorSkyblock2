@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import org.bukkit.command.CommandSender;
 
@@ -57,14 +57,14 @@ public final class CmdAdminDemote implements IAdminPlayerCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Island island = targetPlayer.getIsland();
 
-        if(island == null){
+        if (island == null) {
             Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
         PlayerRole currentRole = targetPlayer.getPlayerRole();
 
-        if(currentRole.isLastRole()){
+        if (currentRole.isLastRole()) {
             Locale.DEMOTE_LEADER.send(sender);
             return;
         }
@@ -75,9 +75,9 @@ public final class CmdAdminDemote implements IAdminPlayerCommand {
         do {
             previousRole = previousRole.getPreviousRole();
             roleLimit = previousRole == null ? -1 : island.getRoleLimit(previousRole);
-        }while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
+        } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
 
-        if(previousRole == null){
+        if (previousRole == null) {
             Locale.LAST_ROLE_DEMOTE.send(sender);
             return;
         }

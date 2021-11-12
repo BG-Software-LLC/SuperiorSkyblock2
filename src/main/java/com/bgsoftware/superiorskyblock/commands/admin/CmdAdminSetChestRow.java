@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -67,28 +67,28 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Pair<Integer, Boolean> pageArguments = CommandArguments.getPage(sender, args[3]);
 
-        if(!pageArguments.getValue())
+        if (!pageArguments.getValue())
             return;
 
         int page = pageArguments.getKey();
 
         Pair<Integer, Boolean> rowsArguments = CommandArguments.getRows(sender, args[4]);
 
-        if(!rowsArguments.getValue())
+        if (!rowsArguments.getValue())
             return;
 
         int rows = rowsArguments.getKey();
 
-        if(rows < 1 || rows > 6){
+        if (rows < 1 || rows > 6) {
             Locale.INVALID_ROWS.send(sender, args[4]);
             return;
         }
 
         Executor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_CHEST_SIZE_NAME.send(sender, page, rows, islands.get(0).getName());
         else
             Locale.CHANGED_CHEST_SIZE.send(sender, page, rows, targetPlayer.getName());
@@ -99,8 +99,8 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
         return args.length == 4 && island != null ?
                 CommandTabCompletes.getCustomComplete(args[3], IntStream.range(1, island.getChestSize() + 1)) :
                 args.length == 5 && island != null ?
-                CommandTabCompletes.getCustomComplete(args[4], IntStream.range(1, 7)) :
-                new ArrayList<>();
+                        CommandTabCompletes.getCustomComplete(args[4], IntStream.range(1, 7)) :
+                        new ArrayList<>();
     }
 
 }

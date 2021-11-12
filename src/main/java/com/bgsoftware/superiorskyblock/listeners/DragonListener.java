@@ -11,12 +11,12 @@ public final class DragonListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public DragonListener(SuperiorSkyblockPlugin plugin){
+    public DragonListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEnderDragonChangePhase(EnderDragonChangePhaseEvent e){
+    public void onEnderDragonChangePhase(EnderDragonChangePhaseEvent e) {
         Executor.sync(() -> plugin.getNMSDragonFight().setDragonPhase(e.getEntity(), e.getNewPhase()), 1L);
     }
 

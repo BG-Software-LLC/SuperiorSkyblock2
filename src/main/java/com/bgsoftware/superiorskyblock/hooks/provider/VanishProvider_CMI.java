@@ -17,10 +17,10 @@ public final class VanishProvider_CMI implements VanishProvider, Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public VanishProvider_CMI(SuperiorSkyblockPlugin plugin){
+    public VanishProvider_CMI(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
 
-        if(!alreadyEnabled){
+        if (!alreadyEnabled) {
             alreadyEnabled = true;
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
@@ -34,12 +34,12 @@ public final class VanishProvider_CMI implements VanishProvider, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerVanish(CMIPlayerVanishEvent e){
+    public void onPlayerVanish(CMIPlayerVanishEvent e) {
         PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerUnvanish(CMIPlayerUnVanishEvent e){
+    public void onPlayerUnvanish(CMIPlayerUnVanishEvent e) {
         PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
     }
 

@@ -16,23 +16,24 @@ public class IslandCreateEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor for the event.
-     * @param superiorPlayer The player who created the island.
-     * @param island The island object that was created.
      *
+     * @param superiorPlayer The player who created the island.
+     * @param island         The island object that was created.
      * @deprecated See IslandCreateEvent(SuperiorPlayer, Island, String)
      */
     @Deprecated
-    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island) {
         this(superiorPlayer, island, "");
     }
 
     /**
      * The constructor for the event.
+     *
      * @param superiorPlayer The player who created the island.
-     * @param island The island object that was created.
-     * @param schematic The schematic that was used.
+     * @param island         The island object that was created.
+     * @param schematic      The schematic that was used.
      */
-    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic){
+    public IslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schematic) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.schematic = schematic;

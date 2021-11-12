@@ -16,14 +16,14 @@ public final class SkinsRestorerHook {
     private static SuperiorSkyblockPlugin plugin;
     private static ISkinsRestorer skinsRestorer = null;
 
-    public static void setSkinTexture(SuperiorPlayer superiorPlayer){
-        if(Bukkit.isPrimaryThread()){
+    public static void setSkinTexture(SuperiorPlayer superiorPlayer) {
+        if (Bukkit.isPrimaryThread()) {
             Executor.async(() -> setSkinTexture(superiorPlayer));
             return;
         }
 
         Property property = skinsRestorer.getSkin(superiorPlayer);
-        if(property != null)
+        if (property != null)
             Executor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
@@ -31,12 +31,12 @@ public final class SkinsRestorerHook {
         return skinsRestorer != null;
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin){
+    public static void register(SuperiorSkyblockPlugin plugin) {
         SkinsRestorerHook.plugin = plugin;
-        try{
+        try {
             Class.forName("net.skinsrestorer.bukkit.SkinsRestorer");
             skinsRestorer = new SkinsRestorerNew();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             skinsRestorer = new SkinsRestorerOld();
         }
     }
@@ -54,7 +54,7 @@ public final class SkinsRestorerHook {
             try {
                 SkinStorage skinStorage = SkinsRestorer.getInstance().getSkinStorage();
                 return (Property) skinStorage.getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
-            }catch (SkinRequestException | NullPointerException ex){
+            } catch (SkinRequestException | NullPointerException ex) {
                 SuperiorSkyblockPlugin.debug(ex);
                 return null;
             }
@@ -70,7 +70,7 @@ public final class SkinsRestorerHook {
         public Property getSkin(SuperiorPlayer superiorPlayer) {
             try {
                 return (Property) SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
-            }catch(Throwable ex){
+            } catch (Throwable ex) {
                 return (Property) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
             }
         }

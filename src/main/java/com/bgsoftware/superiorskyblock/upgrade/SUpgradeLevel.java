@@ -4,14 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
@@ -52,7 +51,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          UpgradeValue<Integer> borderSize, KeyMap<Integer> blockLimits,
                          KeyMap<Integer> entityLimits, KeyMap<Integer>[] generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, UpgradeValue<BigDecimal> bankLimit,
-                         Map<Integer, Integer> roleLimits){
+                         Map<Integer, Integer> roleLimits) {
         this.level = level;
         this.cost = cost;
         this.commands = commands;
@@ -119,26 +118,14 @@ public class SUpgradeLevel implements UpgradeLevel {
         return cropGrowth.get();
     }
 
-    public UpgradeValue<Double> getCropGrowthUpgradeValue(){
-        return cropGrowth;
-    }
-
     @Override
     public double getSpawnerRates() {
         return spawnerRates.get();
     }
 
-    public UpgradeValue<Double> getSpawnerRatesUpgradeValue(){
-        return spawnerRates;
-    }
-
     @Override
     public double getMobDrops() {
         return mobDrops.get();
-    }
-
-    public UpgradeValue<Double> getMobDropsUpgradeValue(){
-        return mobDrops;
     }
 
     @Override
@@ -158,13 +145,6 @@ public class SUpgradeLevel implements UpgradeLevel {
         return Collections.unmodifiableMap(blockLimits);
     }
 
-    public Map<Key, UpgradeValue<Integer>> getBlockLimitsUpgradeValue(){
-        return blockLimits.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> new UpgradeValue<>(entry.getValue(), true))
-        );
-    }
-
     @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
@@ -182,20 +162,9 @@ public class SUpgradeLevel implements UpgradeLevel {
         return Collections.unmodifiableMap(entityLimits);
     }
 
-    public Map<Key, UpgradeValue<Integer>> getEntityLimitsUpgradeValue(){
-        return entityLimits.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> new UpgradeValue<>(entry.getValue(), true))
-        );
-    }
-
     @Override
     public int getTeamLimit() {
         return teamLimit.get();
-    }
-
-    public UpgradeValue<Integer> getTeamLimitUpgradeValue(){
-        return teamLimit;
     }
 
     @Override
@@ -203,26 +172,14 @@ public class SUpgradeLevel implements UpgradeLevel {
         return warpsLimit.get();
     }
 
-    public UpgradeValue<Integer> getWarpsLimitUpgradeValue(){
-        return warpsLimit;
-    }
-
     @Override
     public int getCoopLimit() {
         return coopLimit.get();
     }
 
-    public UpgradeValue<Integer> getCoopLimitUpgradeValue(){
-        return coopLimit;
-    }
-
     @Override
     public int getBorderSize() {
         return borderSize.get();
-    }
-
-    public UpgradeValue<Integer> getBorderSizeUpgradeValue(){
-        return borderSize;
     }
 
     @Override
@@ -242,21 +199,6 @@ public class SUpgradeLevel implements UpgradeLevel {
                 Map.Entry::getValue));
     }
 
-    public Map<Key, UpgradeValue<Integer>>[] getGeneratorUpgradeValue(){
-        Map<Key, UpgradeValue<Integer>>[] generatorRates = new Map[this.generatorRates.length];
-
-        for(int i = 0; i < generatorRates.length; ++i) {
-            if(this.generatorRates[i] != null) {
-                generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> new UpgradeValue<>(entry.getValue(), true))
-                );
-            }
-        }
-
-        return generatorRates;
-    }
-
     @Override
     public int getPotionEffect(PotionEffectType potionEffectType) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
@@ -268,20 +210,9 @@ public class SUpgradeLevel implements UpgradeLevel {
         return Collections.unmodifiableMap(islandEffects);
     }
 
-    public Map<PotionEffectType, UpgradeValue<Integer>> getPotionEffectsUpgradeValue(){
-        return islandEffects.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> new UpgradeValue<>(entry.getValue(), true))
-        );
-    }
-
     @Override
     public BigDecimal getBankLimit() {
         return bankLimit.get();
-    }
-
-    public UpgradeValue<BigDecimal> getBankLimitUpgradeValue(){
-        return bankLimit;
     }
 
     @Override
@@ -300,7 +231,75 @@ public class SUpgradeLevel implements UpgradeLevel {
                 ));
     }
 
-    public Map<PlayerRole, UpgradeValue<Integer>> getRoleLimitsUpgradeValue(){
+    public UpgradeValue<Double> getCropGrowthUpgradeValue() {
+        return cropGrowth;
+    }
+
+    public UpgradeValue<Double> getSpawnerRatesUpgradeValue() {
+        return spawnerRates;
+    }
+
+    public UpgradeValue<Double> getMobDropsUpgradeValue() {
+        return mobDrops;
+    }
+
+    public Map<Key, UpgradeValue<Integer>> getBlockLimitsUpgradeValue() {
+        return blockLimits.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
+    }
+
+    public Map<Key, UpgradeValue<Integer>> getEntityLimitsUpgradeValue() {
+        return entityLimits.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
+    }
+
+    public UpgradeValue<Integer> getTeamLimitUpgradeValue() {
+        return teamLimit;
+    }
+
+    public UpgradeValue<Integer> getWarpsLimitUpgradeValue() {
+        return warpsLimit;
+    }
+
+    public UpgradeValue<Integer> getCoopLimitUpgradeValue() {
+        return coopLimit;
+    }
+
+    public UpgradeValue<Integer> getBorderSizeUpgradeValue() {
+        return borderSize;
+    }
+
+    public Map<Key, UpgradeValue<Integer>>[] getGeneratorUpgradeValue() {
+        Map<Key, UpgradeValue<Integer>>[] generatorRates = new Map[this.generatorRates.length];
+
+        for (int i = 0; i < generatorRates.length; ++i) {
+            if (this.generatorRates[i] != null) {
+                generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new UpgradeValue<>(entry.getValue(), true))
+                );
+            }
+        }
+
+        return generatorRates;
+    }
+
+    public Map<PotionEffectType, UpgradeValue<Integer>> getPotionEffectsUpgradeValue() {
+        return islandEffects.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> new UpgradeValue<>(entry.getValue(), true))
+        );
+    }
+
+    public UpgradeValue<BigDecimal> getBankLimitUpgradeValue() {
+        return bankLimit;
+    }
+
+    public Map<PlayerRole, UpgradeValue<Integer>> getRoleLimitsUpgradeValue() {
         return roleLimits.entrySet().stream()
                 .filter(entry -> SPlayerRole.fromId(entry.getKey()) != null)
                 .collect(Collectors.toMap(
@@ -309,7 +308,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 ));
     }
 
-    public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
+    public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
         this.itemData = new ItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
     }
 
@@ -317,13 +316,13 @@ public class SUpgradeLevel implements UpgradeLevel {
         return itemData;
     }
 
-    public static class ItemData{
+    public static class ItemData {
 
         public ItemBuilder hasNextLevel, noNextLevel;
         public SoundWrapper hasNextLevelSound, noNextLevelSound;
         public List<String> hasNextLevelCommands, noNextLevelCommands;
 
-        public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands){
+        public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.hasNextLevelSound = hasNextLevelSound;

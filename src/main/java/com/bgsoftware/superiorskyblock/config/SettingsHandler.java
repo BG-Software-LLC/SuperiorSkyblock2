@@ -52,7 +52,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
 
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
@@ -62,7 +62,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
                     "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
         }
@@ -516,7 +516,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             plugin.saveResource("config.yml", false);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
@@ -529,17 +529,17 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
 
         try {
             plugin.setSettings(new SettingsHandler(plugin));
-        }catch (HandlerLoadException ex){
+        } catch (HandlerLoadException ex) {
             HandlerLoadException.handle(ex);
         }
     }
 
-    private void convertData(YamlConfiguration cfg){
-        if(cfg.contains("default-hoppers-limit")){
+    private void convertData(YamlConfiguration cfg) {
+        if (cfg.contains("default-hoppers-limit")) {
             cfg.set("default-limits", Collections.singletonList("HOPPER:" + cfg.getInt("default-hoppers-limit")));
             cfg.set("default-hoppers-limit", null);
         }
-        if(cfg.contains("default-permissions")){
+        if (cfg.contains("default-permissions")) {
             cfg.set("island-roles.guest.name", "Guest");
             cfg.set("island-roles.guest.permissions", cfg.getStringList("default-permissions.guest"));
             cfg.set("island-roles.ladder.member.name", "Member");
@@ -555,74 +555,74 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
             cfg.set("island-roles.ladder.leader.weight", 3);
             cfg.set("island-roles.ladder.leader.permissions", cfg.getStringList("default-permissions.leader"));
         }
-        if(cfg.contains("spawn-location"))
+        if (cfg.contains("spawn-location"))
             cfg.set("spawn.location", cfg.getString("spawn-location"));
-        if(cfg.contains("spawn-protection"))
+        if (cfg.contains("spawn-protection"))
             cfg.set("spawn.protection", cfg.getBoolean("spawn-protection"));
-        if(cfg.getBoolean("spawn-pvp", false))
+        if (cfg.getBoolean("spawn-pvp", false))
             cfg.set("spawn.settings", Collections.singletonList("PVP"));
-        if(cfg.contains("island-world"))
+        if (cfg.contains("island-world"))
             cfg.set("worlds.normal-world", cfg.getString("island-world"));
-        if(cfg.contains("welcome-sign-line"))
+        if (cfg.contains("welcome-sign-line"))
             cfg.set("visitors-sign.line", cfg.getString("welcome-sign-line"));
-        if(cfg.contains("island-roles.ladder")){
-            for(String name : cfg.getConfigurationSection("island-roles.ladder").getKeys(false)){
-                if(!cfg.contains("island-roles.ladder." + name + ".id"))
+        if (cfg.contains("island-roles.ladder")) {
+            for (String name : cfg.getConfigurationSection("island-roles.ladder").getKeys(false)) {
+                if (!cfg.contains("island-roles.ladder." + name + ".id"))
                     cfg.set("island-roles.ladder." + name + ".id", cfg.getInt("island-roles.ladder." + name + ".weight"));
             }
         }
-        if(cfg.contains("default-island-size"))
+        if (cfg.contains("default-island-size"))
             cfg.set("default-values.island-size", cfg.getInt("default-island-size"));
-        if(cfg.contains("default-limits"))
+        if (cfg.contains("default-limits"))
             cfg.set("default-values.block-limits", cfg.getStringList("default-limits"));
-        if(cfg.contains("default-entity-limits"))
+        if (cfg.contains("default-entity-limits"))
             cfg.set("default-values.entity-limits", cfg.getStringList("default-entity-limits"));
-        if(cfg.contains("default-warps-limit"))
+        if (cfg.contains("default-warps-limit"))
             cfg.set("default-values.warps-limit", cfg.getInt("default-warps-limit"));
-        if(cfg.contains("default-team-limit"))
+        if (cfg.contains("default-team-limit"))
             cfg.set("default-values.team-limit", cfg.getInt("default-team-limit"));
-        if(cfg.contains("default-crop-growth"))
+        if (cfg.contains("default-crop-growth"))
             cfg.set("default-values.crop-growth", cfg.getInt("default-crop-growth"));
-        if(cfg.contains("default-spawner-rates"))
+        if (cfg.contains("default-spawner-rates"))
             cfg.set("default-values.spawner-rates", cfg.getInt("default-spawner-rates"));
-        if(cfg.contains("default-mob-drops"))
+        if (cfg.contains("default-mob-drops"))
             cfg.set("default-values.mob-drops", cfg.getInt("default-mob-drops"));
-        if(cfg.contains("default-island-height"))
+        if (cfg.contains("default-island-height"))
             cfg.set("islands-height", cfg.getInt("default-island-height"));
-        if(cfg.contains("starter-chest")){
+        if (cfg.contains("starter-chest")) {
             cfg.set("default-containers.enabled", cfg.getBoolean("starter-chest.enabled"));
             cfg.set("default-containers.containers.chest", cfg.getConfigurationSection("starter-chest.contents"));
         }
-        if(cfg.contains("default-generator"))
+        if (cfg.contains("default-generator"))
             cfg.set("default-values.generator", cfg.getStringList("default-generator"));
-        if(cfg.isBoolean("void-teleport")){
+        if (cfg.isBoolean("void-teleport")) {
             boolean voidTeleport = cfg.getBoolean("void-teleport");
             cfg.set("void-teleport.members", voidTeleport);
             cfg.set("void-teleport.visitors", voidTeleport);
         }
-        if(cfg.isBoolean("sync-worth"))
+        if (cfg.isBoolean("sync-worth"))
             cfg.set("sync-worth", cfg.getBoolean("sync-worth") ? "BUY" : "NONE");
-        if(!cfg.contains("worlds.nether")){
+        if (!cfg.contains("worlds.nether")) {
             cfg.set("worlds.nether.enabled", cfg.getBoolean("worlds.nether-world"));
             cfg.set("worlds.nether.unlock", cfg.getBoolean("worlds.nether-unlock"));
         }
-        if(!cfg.contains("worlds.end")){
+        if (!cfg.contains("worlds.end")) {
             cfg.set("worlds.end.enabled", cfg.getBoolean("worlds.end-world"));
             cfg.set("worlds.end.unlock", cfg.getBoolean("worlds.end-unlock"));
         }
-        if(cfg.contains("worlds.normal-world")){
+        if (cfg.contains("worlds.normal-world")) {
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
         }
     }
 
-    private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg){
-        if(!cfg.contains("interactables"))
+    private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {
+        if (!cfg.contains("interactables"))
             return;
 
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             plugin.saveResource("interactables.yml", false);
 
         CommentedConfiguration commentedConfig = CommentedConfiguration.loadConfiguration(file);
@@ -631,7 +631,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
 
         try {
             commentedConfig.save(file);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
         }

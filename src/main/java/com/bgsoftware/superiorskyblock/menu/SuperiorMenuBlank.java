@@ -14,21 +14,11 @@ import java.util.Arrays;
 
 public final class SuperiorMenuBlank extends SuperiorMenu {
 
-    private SuperiorMenuBlank(SuperiorPlayer superiorPlayer){
+    private SuperiorMenuBlank(SuperiorPlayer superiorPlayer) {
         super("menuBlank", superiorPlayer);
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e) {
-
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        open(previousMenu);
-    }
-
-    public static void init(){
+    public static void init() {
         SuperiorMenuBlank superiorMenuBlank = new SuperiorMenuBlank(null);
 
         superiorMenuBlank.resetData();
@@ -39,17 +29,28 @@ public final class SuperiorMenuBlank extends SuperiorMenu {
         superiorMenuBlank.setBackButton(-1);
 
         superiorMenuBlank.addFillItem(13, new ItemBuilder(Material.BEDROCK).withName("&cUnloaded Menu")
-        .withLore(Arrays.asList("&7There was an issue with loading the menu.", "&7Contact administrator to fix the issue.")));
+                .withLore(Arrays.asList("&7There was an issue with loading the menu.", "&7Contact administrator to fix the issue.")));
 
         try {
             superiorMenuBlank.addSound(13, new SoundWrapper(Sound.valueOf("BLOCK_ANVIL_PLACE"), 0.2f, 0.2f));
-        }catch(Throwable ignored){}
+        } catch (Throwable ignored) {
+        }
 
         superiorMenuBlank.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
         new SuperiorMenuBlank(superiorPlayer).open(previousMenu);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        open(previousMenu);
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent e) {
+
     }
 
 }

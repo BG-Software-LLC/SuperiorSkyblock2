@@ -26,8 +26,8 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
     private static ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = null;
     private static boolean registered = false;
 
-    public SpawnersProvider_RoseStacker(){
-        if(!registered) {
+    public SpawnersProvider_RoseStacker() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
 
@@ -43,7 +43,7 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
 
         int blockCount = -1;
 
-        if(Bukkit.isPrimaryThread()){
+        if (Bukkit.isPrimaryThread()) {
             StackedSpawner stackedSpawner = RoseStackerAPI.getInstance().getStackedSpawner(location.getBlock());
             blockCount = stackedSpawner == null ? 1 : stackedSpawner.getStackSize();
         }
@@ -65,20 +65,20 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerStack(SpawnerStackEvent e){
+        public void onSpawnerStack(SpawnerStackEvent e) {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
-            if(island != null) {
+            if (island != null) {
                 Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
                 island.handleBlockPlace(spawnerKey, e.getIncreaseAmount());
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerUnstack(SpawnerUnstackEvent e){
+        public void onSpawnerUnstack(SpawnerUnstackEvent e) {
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
-            if(island != null) {
+            if (island != null) {
                 Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
                 island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
             }

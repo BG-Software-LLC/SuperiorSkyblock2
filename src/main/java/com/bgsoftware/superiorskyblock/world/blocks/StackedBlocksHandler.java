@@ -33,6 +33,13 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         this.stackedBlocksContainer = stackedBlocksContainer;
     }
 
+    private static Map<Location, Integer> convertStackedBlocksMap(Map<Location, StackedBlock> stackedBlocks) {
+        return stackedBlocks.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                value -> value.getValue().getAmount()
+        ));
+    }
+
     @Override
     public void loadData() {
         initializeDatabaseBridge();
@@ -124,7 +131,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         StackedBlock oldStackedBlock = this.stackedBlocksContainer.removeStackedBlock(location);
 
-        if(oldStackedBlock != null) {
+        if (oldStackedBlock != null) {
             oldStackedBlock.removeHologram();
             StackedBlocksDatabaseBridge.deleteStackedBlock(this, oldStackedBlock);
         }
@@ -145,7 +152,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
         Map<Location, StackedBlock> chunkStackedBlocks = this.stackedBlocksContainer.removeStackedBlocks(chunkPosition);
 
-        if(!chunkStackedBlocks.isEmpty()) {
+        if (!chunkStackedBlocks.isEmpty()) {
             try {
                 databaseBridge.batchOperations(true);
                 chunkStackedBlocks.values().forEach(stackedBlock -> {
@@ -172,10 +179,6 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
         Map<Location, StackedBlock> chunkStackedBlocks = this.stackedBlocksContainer.getStackedBlocks(chunkPosition);
         return Collections.unmodifiableMap(convertStackedBlocksMap(chunkStackedBlocks));
-    }
-
-    public Collection<StackedBlock> getRealStackedBlocks(ChunkPosition chunkPosition) {
-        return Collections.unmodifiableCollection(this.stackedBlocksContainer.getStackedBlocks(chunkPosition).values());
     }
 
     @Override
@@ -231,6 +234,10 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         return databaseBridge;
     }
 
+    public Collection<StackedBlock> getRealStackedBlocks(ChunkPosition chunkPosition) {
+        return Collections.unmodifiableCollection(this.stackedBlocksContainer.getStackedBlocks(chunkPosition).values());
+    }
+
     public void saveStackedBlocks() {
         Map<Location, StackedBlock> stackedBlocks = this.stackedBlocksContainer.getStackedBlocks();
 
@@ -270,13 +277,6 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     private void initializeDatabaseBridge() {
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         databaseBridge.startSavingData();
-    }
-
-    private static Map<Location, Integer> convertStackedBlocksMap(Map<Location, StackedBlock> stackedBlocks) {
-        return stackedBlocks.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                value -> value.getValue().getAmount()
-        ));
     }
 
 }

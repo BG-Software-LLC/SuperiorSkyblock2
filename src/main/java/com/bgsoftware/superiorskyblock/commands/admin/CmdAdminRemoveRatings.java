@@ -59,17 +59,16 @@ public final class CmdAdminRemoveRatings implements IAdminIslandCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Executor.data(() -> {
-            if(targetPlayer != null) {
+            if (targetPlayer != null) {
                 plugin.getGrid().getIslands().forEach(island -> island.setRating(targetPlayer, Rating.UNKNOWN));
-            }
-            else{
+            } else {
                 islands.forEach(Island::removeRatings);
             }
         });
 
-        if(targetPlayer != null)
+        if (targetPlayer != null)
             Locale.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
-        else if(islands.size() == 1)
+        else if (islands.size() == 1)
             Locale.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());
         else
             Locale.RATE_REMOVE_ALL_ISLANDS.send(sender);

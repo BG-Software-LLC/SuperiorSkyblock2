@@ -104,6 +104,7 @@ public interface SuperiorSkyblock {
 
     /**
      * Set the script engine of the plugin.
+     *
      * @param scriptEngine The script engine to set.
      *                     When null, the default java script engine will be set instead.
      */
@@ -116,6 +117,7 @@ public interface SuperiorSkyblock {
 
     /**
      * Set a new world events-manager for the plugin.
+     *
      * @param worldEventsManager The new events-manager to set.
      *                           If null, the default events-manager will be set.
      */

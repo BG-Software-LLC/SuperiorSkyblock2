@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -59,28 +59,26 @@ public final class CmdTeamChat implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        if(args.length == 1){
-            if(superiorPlayer.hasTeamChatEnabled()){
+        if (args.length == 1) {
+            if (superiorPlayer.hasTeamChatEnabled()) {
                 Locale.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
-            }else{
+            } else {
                 Locale.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
             }
             superiorPlayer.toggleTeamChat();
-        }
-
-        else{
+        } else {
             String message = CommandArguments.buildLongString(args, 1, true);
             IslandUtils.sendMessage(island, Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
                     superiorPlayer.getName(), message);
             Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
-            for(Player _onlinePlayer : Bukkit.getOnlinePlayers()){
+            for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
-                if(onlinePlayer.hasAdminSpyEnabled())
+                if (onlinePlayer.hasAdminSpyEnabled())
                     Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
             }
         }

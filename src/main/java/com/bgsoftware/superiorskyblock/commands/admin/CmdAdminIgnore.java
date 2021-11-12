@@ -58,7 +58,7 @@ public final class CmdAdminIgnore implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         island.setIgnored(true);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             Locale.IGNORED_ISLAND_NAME.send(sender, island.getName());
         else
             Locale.IGNORED_ISLAND.send(sender, targetPlayer.getName());

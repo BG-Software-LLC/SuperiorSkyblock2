@@ -53,9 +53,12 @@ public final class EndTag extends Tag<Object> {
         super(null, CLASS);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) {
-
+    public static EndTag fromStream(DataInputStream is, int depth) throws IOException {
+        if (depth == 0) {
+            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+        } else {
+            return new EndTag();
+        }
     }
 
     @Override
@@ -63,12 +66,9 @@ public final class EndTag extends Tag<Object> {
         return "TAG_End";
     }
 
-    public static EndTag fromStream(DataInputStream is, int depth) throws IOException{
-        if (depth == 0) {
-            throw new IOException("TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
-        } else {
-            return new EndTag();
-        }
+    @Override
+    protected void writeData(DataOutputStream os) {
+
     }
 
 }

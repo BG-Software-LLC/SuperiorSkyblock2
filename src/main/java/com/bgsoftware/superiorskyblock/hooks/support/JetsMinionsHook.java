@@ -13,21 +13,21 @@ public final class JetsMinionsHook implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    private JetsMinionsHook(SuperiorSkyblockPlugin plugin){
+    private JetsMinionsHook(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
+    public static void register(SuperiorSkyblockPlugin plugin) {
+        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), plugin);
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onMinionBreak(MinerBlockBreakEvent e){
+    public void onMinionBreak(MinerBlockBreakEvent e) {
         SuperiorSkyblockPlugin.debug("Action: Jets Minion Break, Block: " + e.getBlock().getLocation() + ", Type: " + e.getBlock().getType());
-        if(StackedBlocksLogic.tryUnstack(null, e.getBlock(), plugin))
+        if (StackedBlocksLogic.tryUnstack(null, e.getBlock(), plugin))
             e.setCancelled(true);
         else
             BlocksLogic.handleBreak(e.getBlock());
-    }
-
-    public static void register(SuperiorSkyblockPlugin plugin){
-        Bukkit.getPluginManager().registerEvents(new JetsMinionsHook(plugin), plugin);
     }
 
 }

@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -57,23 +57,23 @@ public final class CmdPanel implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        if(args.length > 1){
-            if(args[1].equalsIgnoreCase("members")){
+        if (args.length > 1) {
+            if (args[1].equalsIgnoreCase("members")) {
                 plugin.getMenus().openMembers(superiorPlayer, null, island);
                 return;
-            }else if(args[1].equalsIgnoreCase("visitors")){
+            } else if (args[1].equalsIgnoreCase("visitors")) {
                 plugin.getMenus().openVisitors(superiorPlayer, null, island);
                 return;
-            }else if(args[1].equalsIgnoreCase("toggle")){
-                if(superiorPlayer.hasToggledPanel()){
+            } else if (args[1].equalsIgnoreCase("toggle")) {
+                if (superiorPlayer.hasToggledPanel()) {
                     superiorPlayer.setToggledPanel(false);
                     Locale.PANEL_TOGGLE_OFF.send(superiorPlayer);
-                }else{
+                } else {
                     superiorPlayer.setToggledPanel(true);
                     Locale.PANEL_TOGGLE_ON.send(superiorPlayer);
                 }

@@ -26,9 +26,72 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     private final String subKey;
     private boolean apiKey = false;
 
-    private Key(String globalKey, String subKey){
+    private Key(String globalKey, String subKey) {
         this.globalKey = globalKey;
         this.subKey = subKey;
+    }
+
+    public static Key of(EntityType entityType) {
+        return of(entityType.name());
+    }
+
+    public static Key of(Entity entity) {
+        return of(EntityUtils.getLimitEntityType(entity), entity);
+    }
+
+    public static Key of(Block block) {
+        return of(block.getState());
+    }
+
+    public static Key of(BlockState blockState) {
+        if (blockState instanceof CreatureSpawner) {
+            CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
+            return of(Materials.SPAWNER.toBukkitType() + "", creatureSpawner.getSpawnedType() + "", blockState.getLocation());
+        }
+
+        //noinspection deprecation
+        Key rawBlockKey = of(blockState.getType(), blockState.getRawData());
+
+
+        return of(rawBlockKey.getGlobalKey(), rawBlockKey.getSubKey(), blockState.getLocation());
+    }
+
+    public static Key of(ItemStack itemStack) {
+        return of(Materials.SPAWNER.toBukkitType() == itemStack.getType() ? plugin.getProviders().getSpawnerKey(itemStack) :
+                of(itemStack.getType(), itemStack.getDurability()), itemStack);
+    }
+
+    public static Key of(Material material, short data) {
+        return of(of(material + "", data + ""), new ItemStack(material, 1, data));
+    }
+
+    public static Key of(String globalKey, String subKey) {
+        return new Key(LEGACY_PATTERN.matcher(globalKey).replaceAll(""), subKey);
+    }
+
+    public static Key of(String key) {
+        String[] sections = KEY_SPLITTER_PATTERN.split(key);
+        return new Key(sections[0], sections.length == 2 ? sections[1] : "");
+    }
+
+    public static Key of(Material material, short data, Location location) {
+        return of(material + "", data + "", location);
+    }
+
+    public static Key of(String globalKey, String subKey, Location location) {
+        return of(Key.of(globalKey, subKey), location);
+    }
+
+    public static Key of(Key key, Location location) {
+        return plugin.getBlockValues().convertKey(key, location);
+    }
+
+    public static Key of(Key key, ItemStack itemStack) {
+        return plugin.getBlockValues().convertKey(key, itemStack);
+    }
+
+    public static Key of(Key key, Entity entity) {
+        return plugin.getBlockValues().convertKey(key, entity);
     }
 
     @Override
@@ -56,77 +119,14 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     @Override
-    public String toString() {
-        return subKey.isEmpty() ? globalKey : globalKey + ":" + subKey;
-    }
-
-    @Override
     @SuppressWarnings("all")
     public boolean equals(Object obj) {
         return obj instanceof Key && toString().equals(obj.toString());
     }
 
-    public static Key of(EntityType entityType){
-        return of(entityType.name());
-    }
-
-    public static Key of(Entity entity){
-        return of(EntityUtils.getLimitEntityType(entity), entity);
-    }
-
-    public static Key of(Block block){
-        return of(block.getState());
-    }
-
-    public static Key of(BlockState blockState){
-        if(blockState instanceof CreatureSpawner){
-            CreatureSpawner creatureSpawner = (CreatureSpawner) blockState;
-            return of(Materials.SPAWNER.toBukkitType() + "", creatureSpawner.getSpawnedType() + "", blockState.getLocation());
-        }
-
-        //noinspection deprecation
-        Key rawBlockKey = of(blockState.getType(), blockState.getRawData());
-
-
-        return of(rawBlockKey.getGlobalKey(), rawBlockKey.getSubKey(), blockState.getLocation());
-    }
-
-    public static Key of(ItemStack itemStack){
-        return of(Materials.SPAWNER.toBukkitType() == itemStack.getType() ? plugin.getProviders().getSpawnerKey(itemStack) :
-                of(itemStack.getType(), itemStack.getDurability()), itemStack);
-    }
-
-    public static Key of(Material material, short data){
-        return of(of(material + "", data + ""), new ItemStack(material, 1, data));
-    }
-
-    public static Key of(String globalKey, String subKey){
-        return new Key(LEGACY_PATTERN.matcher(globalKey).replaceAll(""), subKey);
-    }
-
-    public static Key of(String key){
-        String[] sections = KEY_SPLITTER_PATTERN.split(key);
-        return new Key(sections[0], sections.length == 2 ? sections[1] : "");
-    }
-
-    public static Key of(Material material, short data, Location location){
-        return of(material + "", data + "", location);
-    }
-
-    public static Key of(String globalKey, String subKey, Location location){
-        return of(Key.of(globalKey, subKey), location);
-    }
-
-    public static Key of(Key key, Location location){
-        return plugin.getBlockValues().convertKey(key, location);
-    }
-
-    public static Key of(Key key, ItemStack itemStack){
-        return plugin.getBlockValues().convertKey(key, itemStack);
-    }
-
-    public static Key of(Key key, Entity entity){
-        return plugin.getBlockValues().convertKey(key, entity);
+    @Override
+    public String toString() {
+        return subKey.isEmpty() ? globalKey : globalKey + ":" + subKey;
     }
 
 }

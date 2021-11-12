@@ -29,7 +29,7 @@ public final class StackedBlocksDatabaseBridge {
         stackedBlocks.getDatabaseBridge().deleteObject("stacked_blocks", null);
     }
 
-    private static DatabaseFilter createFilter(Pair<String, Object>... others){
+    private static DatabaseFilter createFilter(Pair<String, Object>... others) {
         return new DatabaseFilter(Arrays.asList(others));
     }
 

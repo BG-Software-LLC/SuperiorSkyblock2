@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -63,7 +63,7 @@ public final class CmdAdminMsgAll implements IAdminIslandCommand {
 
         islands.forEach(island -> island.sendMessage(message));
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             Locale.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());

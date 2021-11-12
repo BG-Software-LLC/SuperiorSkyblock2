@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import org.bukkit.Bukkit;
@@ -146,8 +146,9 @@ public final class ProtectionListener implements Listener {
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
         else if (blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
-        else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) requiredPrivilege = IslandPrivileges.BREAK;
-        else if(blockType == Material.PUMPKIN) requiredPrivilege = IslandPrivileges.BREAK;
+        else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1)
+            requiredPrivilege = IslandPrivileges.BREAK;
+        else if (blockType == Material.PUMPKIN) requiredPrivilege = IslandPrivileges.BREAK;
         else requiredPrivilege = IslandPrivileges.INTERACT;
 
         if (!island.hasPermission(superiorPlayer, requiredPrivilege)) {
@@ -714,6 +715,16 @@ public final class ProtectionListener implements Listener {
         }
     }
 
+    private static final class PaperAttemptPickupListener implements Listener {
+
+        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+        public void onPlayerItemPickup(PlayerAttemptPickupItemEvent e) {
+            if (!ProtectionLogic.handlePlayerPickupItem(e.getPlayer(), e.getItem()))
+                e.setCancelled(true);
+        }
+
+    }
+
     private class PlayerArrowPickup implements Listener {
 
         @EventHandler
@@ -725,16 +736,6 @@ public final class ProtectionListener implements Listener {
                 e.setCancelled(true);
                 Locale.sendProtectionMessage(superiorPlayer);
             }
-        }
-
-    }
-
-    private static final class PaperAttemptPickupListener implements Listener {
-
-        @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-        public void onPlayerItemPickup(PlayerAttemptPickupItemEvent e) {
-            if (!ProtectionLogic.handlePlayerPickupItem(e.getPlayer(), e.getItem()))
-                e.setCancelled(true);
         }
 
     }

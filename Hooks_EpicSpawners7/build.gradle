@@ -4,7 +4,7 @@ repositories {
     String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
     String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
 
-    if(mavenUsername != null && mavenPassword != null) {
+    if (mavenUsername != null && mavenPassword != null) {
         maven {
             url 'https://repo.bg-software.com/repository/private-libs/'
             credentials {

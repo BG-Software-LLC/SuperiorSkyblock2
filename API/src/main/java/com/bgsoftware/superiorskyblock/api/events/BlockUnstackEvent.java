@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.events;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.BlockEvent;
 
@@ -17,11 +16,15 @@ public class BlockUnstackEvent extends BlockEvent implements Cancellable {
     private final int originalCount, newCount;
     private boolean cancelled = false;
 
-    public BlockUnstackEvent(Block block, Player player, int originalCount, int newCount){
+    public BlockUnstackEvent(Block block, Player player, int originalCount, int newCount) {
         super(block);
         this.player = player;
         this.originalCount = originalCount;
         this.newCount = newCount;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     @Nullable
@@ -29,15 +32,15 @@ public class BlockUnstackEvent extends BlockEvent implements Cancellable {
         return player;
     }
 
-    public int getOriginalCount(){
+    public int getOriginalCount() {
         return originalCount;
     }
 
-    public int getNewCount(){
+    public int getNewCount() {
         return newCount;
     }
 
-    public int getDecreaseAmount(){
+    public int getDecreaseAmount() {
         return originalCount - newCount;
     }
 
@@ -53,10 +56,6 @@ public class BlockUnstackEvent extends BlockEvent implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

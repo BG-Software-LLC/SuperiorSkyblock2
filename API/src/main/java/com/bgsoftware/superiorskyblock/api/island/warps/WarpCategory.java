@@ -22,6 +22,7 @@ public interface WarpCategory {
     /**
      * Set a new name to the category.
      * Do not call this method - use Island#renameCategory instead!
+     *
      * @param name The new name to set.
      */
     void setName(String name);
@@ -38,6 +39,7 @@ public interface WarpCategory {
 
     /**
      * Set the slot of the category.
+     *
      * @param slot The slot to set.
      */
     void setSlot(int slot);
@@ -49,12 +51,14 @@ public interface WarpCategory {
 
     /**
      * Get the icon of the category after all placeholders are parsed.
+     *
      * @param superiorPlayer The player to parse the placeholders for
      */
     ItemStack getIcon(@Nullable SuperiorPlayer superiorPlayer);
 
     /**
      * Set the icon of the category.
+     *
      * @param icon The icon to set. If null, default icon will be set.
      */
     void setIcon(@Nullable ItemStack icon);

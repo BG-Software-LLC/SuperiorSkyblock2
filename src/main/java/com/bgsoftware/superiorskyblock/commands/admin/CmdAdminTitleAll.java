@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -68,24 +68,24 @@ public final class CmdAdminTitleAll implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Pair<Integer, Boolean> fadeIn = CommandArguments.getInterval(sender, args[3]);
 
-        if(!fadeIn.getValue())
+        if (!fadeIn.getValue())
             return;
 
         Pair<Integer, Boolean> duration = CommandArguments.getInterval(sender, args[4]);
 
-        if(!duration.getValue())
+        if (!duration.getValue())
             return;
 
         Pair<Integer, Boolean> fadeOut = CommandArguments.getInterval(sender, args[5]);
 
-        if(!fadeOut.getValue())
+        if (!fadeOut.getValue())
             return;
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
 
         String title = parsedArguments.get("title"), subtitle = parsedArguments.get("subtitle");
 
-        if(title == null && subtitle == null){
+        if (title == null && subtitle == null) {
             Locale.INVALID_TITLE.send(sender);
             return;
         }
@@ -93,7 +93,7 @@ public final class CmdAdminTitleAll implements IAdminIslandCommand {
         islands.forEach(island -> island.sendTitle(title == null ? null : StringUtils.translateColors(title),
                 subtitle == null ? null : StringUtils.translateColors(subtitle), fadeIn.getKey(), duration.getKey(), fadeOut.getKey()));
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             Locale.GLOBAL_TITLE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
             Locale.GLOBAL_TITLE_SENT.send(sender, targetPlayer.getName());

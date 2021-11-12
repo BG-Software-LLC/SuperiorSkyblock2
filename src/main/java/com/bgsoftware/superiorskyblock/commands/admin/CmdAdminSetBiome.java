@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 
@@ -65,14 +65,14 @@ public final class CmdAdminSetBiome implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Biome biome = CommandArguments.getBiome(sender, args[3]);
 
-        if(biome == null)
+        if (biome == null)
             return;
 
         islands.forEach(island -> island.setBiome(biome));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_BIOME_ALL.send(sender, StringUtils.format(biome.name()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_BIOME_NAME.send(sender, StringUtils.format(biome.name()), islands.get(0).getName());
         else
             Locale.CHANGED_BIOME_OTHER.send(sender, StringUtils.format(biome.name()), targetPlayer.getName());

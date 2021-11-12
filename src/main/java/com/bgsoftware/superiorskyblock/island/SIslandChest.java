@@ -20,17 +20,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class SIslandChest implements IslandChest {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
     private final AtomicBoolean updateFlag = new AtomicBoolean(false);
-    private int contentsUpdateCounter = 0;
-
     private final Island island;
     private final int index;
+    private Inventory inventory = Bukkit.createInventory(this, 9, plugin.getSettings().getIslandChests().getChestTitle());
+    private int contentsUpdateCounter = 0;
 
-    public SIslandChest(Island island, int index){
+    public SIslandChest(Island island, int index) {
         this.island = island;
         this.index = index;
+    }
+
+    public static SIslandChest createChest(Island island, int index, ItemStack[] contents) {
+        SIslandChest islandChest = new SIslandChest(island, index);
+        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
+        islandChest.inventory.setContents(contents);
+        return islandChest;
     }
 
     @Override
@@ -59,10 +64,10 @@ public final class SIslandChest implements IslandChest {
                 inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
                 toUpdate.forEach(humanEntity -> {
-                    if(humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
+                    if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
                         humanEntity.openInventory(inventory);
                 });
-            }finally {
+            } finally {
                 updateFlag.set(false);
             }
         });
@@ -84,25 +89,17 @@ public final class SIslandChest implements IslandChest {
         return inventory;
     }
 
-    public boolean isUpdating(){
+    public boolean isUpdating() {
         return updateFlag.get();
     }
 
-    public void updateContents(){
-        if(++contentsUpdateCounter >= 50){
+    public void updateContents() {
+        if (++contentsUpdateCounter >= 50) {
             contentsUpdateCounter = 0;
             IslandsDatabaseBridge.saveIslandChest(island, this);
-        }
-        else{
+        } else {
             IslandsDatabaseBridge.markIslandChestsToBeSaved(island, this);
         }
-    }
-
-    public static SIslandChest createChest(Island island, int index, ItemStack[] contents){
-        SIslandChest islandChest = new SIslandChest(island, index);
-        islandChest.inventory = Bukkit.createInventory(islandChest, contents.length, plugin.getSettings().getIslandChests().getChestTitle());
-        islandChest.inventory.setContents(contents);
-        return islandChest;
     }
 
 }

@@ -11,25 +11,25 @@ public final class SWMHook {
 
     private static Plugin slimeWorldPlugin = null;
 
-    public static void tryWorldLoad(String worldName){
-        if(slimeWorldPlugin == null)
+    public static void tryWorldLoad(String worldName) {
+        if (slimeWorldPlugin == null)
             return;
 
         SlimePlugin slimePlugin = (SlimePlugin) slimeWorldPlugin;
 
         WorldData worldData = ConfigManager.getWorldConfig().getWorlds().get(worldName);
 
-        if(worldData == null)
+        if (worldData == null)
             return;
 
         try {
             slimePlugin.getLoader(worldData.getDataSource()).loadWorld(worldName, false);
-        }catch (Exception error){
+        } catch (Exception error) {
             SuperiorSkyblockPlugin.debug(error);
         }
     }
 
-    public static void register(){
+    public static void register() {
         slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
     }
 

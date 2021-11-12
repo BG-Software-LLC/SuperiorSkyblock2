@@ -7,10 +7,10 @@ import org.bukkit.inventory.meta.BlockStateMeta;
 
 public interface SpawnersProviderItemMetaSpawnerType extends SpawnersProvider_AutoDetect {
 
-    default String getSpawnerType(ItemStack itemStack){
+    default String getSpawnerType(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
 
-        if(itemStack.getItemMeta() instanceof BlockStateMeta){
+        if (itemStack.getItemMeta() instanceof BlockStateMeta) {
             CreatureSpawner creatureSpawner = (CreatureSpawner) ((BlockStateMeta) itemStack.getItemMeta()).getBlockState();
             return creatureSpawner.getSpawnedType().name();
         }

@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.base.Preconditions;
 import com.songoda.ultimatestacker.UltimateStacker;
@@ -23,8 +23,8 @@ public final class SpawnersProvider_UltimateStacker implements SpawnersProviderI
 
     private final UltimateStacker instance = UltimateStacker.getInstance();
 
-    public SpawnersProvider_UltimateStacker(){
-        if(!registered) {
+    public SpawnersProvider_UltimateStacker() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using UltimateStacker as a spawners provider.");
@@ -49,29 +49,27 @@ public final class SpawnersProvider_UltimateStacker implements SpawnersProviderI
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.HIGHEST)
-        public void onSpawnerStack(SpawnerPlaceEvent e){
+        public void onSpawnerStack(SpawnerPlaceEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
-            if(island == null)
+            if (island == null)
                 return;
 
             Key blockKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType().name());
             int increaseAmount = e.getAmount();
 
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+            if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-            }
-
-            else{
+            } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerUnstack(SpawnerBreakEvent e){
+        public void onSpawnerUnstack(SpawnerBreakEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
-            if(island != null)
+            if (island != null)
                 island.handleBlockBreak(e.getBlock(), e.getAmount());
         }
 

@@ -10,7 +10,8 @@ public interface StackedBlocksProvider {
 
     /**
      * Get all stacked blocks in a chunk.
-     * @param world The world of the chunk.
+     *
+     * @param world  The world of the chunk.
      * @param chunkX The x-coords of the chunk.
      * @param chunkZ The z-coords of the chunk.
      * @return Collection of pairs representing the stacked blocks.

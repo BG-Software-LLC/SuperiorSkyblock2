@@ -7,12 +7,12 @@ import org.bukkit.enchantments.EnchantmentTarget;
 @SuppressWarnings("NullableProblems")
 public final class GlowEnchantment extends Enchantment {
 
-    public static GlowEnchantment createEnchantment(){
-        return new GlowEnchantment(NamespacedKey.minecraft("superior_glowing_enchant"));
+    private GlowEnchantment(NamespacedKey namespacedKey) {
+        super(namespacedKey);
     }
 
-    private GlowEnchantment(NamespacedKey namespacedKey){
-        super(namespacedKey);
+    public static GlowEnchantment createEnchantment() {
+        return new GlowEnchantment(NamespacedKey.minecraft("superior_glowing_enchant"));
     }
 
     @Override
@@ -35,6 +35,14 @@ public final class GlowEnchantment extends Enchantment {
         return null;
     }
 
+    public boolean isTreasure() {
+        return false;
+    }
+
+    public boolean isCursed() {
+        return false;
+    }
+
     @Override
     public boolean conflictsWith(Enchantment enchantment) {
         return false;
@@ -43,14 +51,6 @@ public final class GlowEnchantment extends Enchantment {
     @Override
     public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
         return true;
-    }
-
-    public boolean isTreasure() {
-        return false;
-    }
-
-    public boolean isCursed() {
-        return false;
     }
 
 }

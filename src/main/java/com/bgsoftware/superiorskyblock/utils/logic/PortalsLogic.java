@@ -68,7 +68,7 @@ public final class PortalsLogic {
                     plugin.getSchematics().getDefaultSchematic(destinationEnvironment) :
                     islandSchematic + "_" + destinationEnvironmentName);
 
-            if(schematic == null){
+            if (schematic == null) {
                 Locale.sendSchematicMessage(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
                         destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
                         "The format for " + destinationEnvironmentName + " schematic is \"" +

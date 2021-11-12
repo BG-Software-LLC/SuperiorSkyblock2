@@ -34,10 +34,6 @@ package com.bgsoftware.superiorskyblock.tag;
 
 public final class NBTTags {
 
-    private NBTTags() {
-
-    }
-
     public static final int TYPE_END = 0;
     public static final int TYPE_BYTE = 1;
     public static final int TYPE_SHORT = 2;
@@ -50,5 +46,8 @@ public final class NBTTags {
     public static final int TYPE_LIST = 9;
     public static final int TYPE_COMPOUND = 10;
     public static final int TYPE_INT_ARRAY = 11;
+    private NBTTags() {
+
+    }
 
 }

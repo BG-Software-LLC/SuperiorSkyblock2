@@ -12,18 +12,18 @@ public final class ChangeSkinHook implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    ChangeSkinHook(SuperiorSkyblockPlugin plugin){
+    ChangeSkinHook(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
-    @EventHandler
-    public void onPlayerChangeSkin(PlayerChangeSkinEvent e){
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        superiorPlayer.setTextureValue(e.getSkinModel().getEncodedValue());
+    public static void register(SuperiorSkyblockPlugin plugin) {
+        Bukkit.getPluginManager().registerEvents(new ChangeSkinHook(plugin), plugin);
     }
 
-    public static void register(SuperiorSkyblockPlugin plugin){
-        Bukkit.getPluginManager().registerEvents(new ChangeSkinHook(plugin), plugin);
+    @EventHandler
+    public void onPlayerChangeSkin(PlayerChangeSkinEvent e) {
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
+        superiorPlayer.setTextureValue(e.getSkinModel().getEncodedValue());
     }
 
 }

@@ -18,23 +18,15 @@ import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_CMI;
 import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.support.ChangeSkinHook;
-import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Vault;
-import com.bgsoftware.superiorskyblock.hooks.support.JetsMinionsHook;
-import com.bgsoftware.superiorskyblock.hooks.support.LeaderHeadsHook;
+import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_LuckPerms;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider;
+import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_ShopGUIPlus;
-import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
-import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.hooks.support.SlimefunHook;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
@@ -55,9 +47,17 @@ import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_SuperVanish;
 import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.support.ChangeSkinHook;
+import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
+import com.bgsoftware.superiorskyblock.hooks.support.JetsMinionsHook;
+import com.bgsoftware.superiorskyblock.hooks.support.LeaderHeadsHook;
+import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
+import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
+import com.bgsoftware.superiorskyblock.hooks.support.SlimefunHook;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -80,7 +80,7 @@ import java.util.function.Consumer;
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
     private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
-
+    private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
@@ -91,15 +91,31 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private AsyncProvider asyncProvider = new AsyncProvider_Default();
     private WorldsProvider worldsProvider;
     private MenusProvider menusProvider;
-
-    private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
-
     private boolean listenToSpawnerChanges = true;
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
         this.menusProvider = new MenusProvider_Default(plugin);
+    }
+
+    private static void runSafe(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
+        }
+    }
+
+    private static boolean hasPaperAsyncSupport() {
+        try {
+            //noinspection JavaReflectionMemberAccess
+            World.class.getMethod("getChunkAtAsync", int.class, int.class);
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
     }
 
     @Override
@@ -118,14 +134,19 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
+    public SpawnersProvider getSpawnersProvider() {
+        return this.spawnersProvider;
+    }
+
+    @Override
     public void setSpawnersProvider(SpawnersProvider spawnersProvider) {
         Preconditions.checkNotNull(spawnersProvider, "spawnersProvider parameter cannot be null.");
         this.spawnersProvider = spawnersProvider;
     }
 
     @Override
-    public SpawnersProvider getSpawnersProvider() {
-        return this.spawnersProvider;
+    public StackedBlocksProvider getStackedBlocksProvider() {
+        return this.stackedBlocksProvider;
     }
 
     @Override
@@ -135,8 +156,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
-    public StackedBlocksProvider getStackedBlocksProvider() {
-        return this.stackedBlocksProvider;
+    public EconomyProvider getEconomyProvider() {
+        return this.economyProvider;
     }
 
     @Override
@@ -146,8 +167,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
-    public EconomyProvider getEconomyProvider() {
-        return this.economyProvider;
+    public WorldsProvider getWorldsProvider() {
+        return this.worldsProvider;
     }
 
     @Override
@@ -157,19 +178,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
-    public WorldsProvider getWorldsProvider() {
-        return this.worldsProvider;
+    public EconomyProvider getBankEconomyProvider() {
+        return this.bankEconomyProvider;
     }
 
     @Override
     public void setBankEconomyProvider(EconomyProvider bankEconomyProvider) {
         Preconditions.checkNotNull(bankEconomyProvider, "bankEconomyProvider parameter cannot be null.");
         this.bankEconomyProvider = bankEconomyProvider;
-    }
-
-    @Override
-    public EconomyProvider getBankEconomyProvider() {
-        return this.bankEconomyProvider;
     }
 
     @Override
@@ -184,14 +200,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
-    public void setMenusProvider(MenusProvider menusProvider) {
-        Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
-        this.menusProvider = menusProvider;
+    public MenusProvider getMenusProvider() {
+        return this.menusProvider;
     }
 
     @Override
-    public MenusProvider getMenusProvider() {
-        return this.menusProvider;
+    public void setMenusProvider(MenusProvider menusProvider) {
+        Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
+        this.menusProvider = menusProvider;
     }
 
     public Pair<Integer, String> getSpawner(Location location) {
@@ -211,21 +227,21 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 stackedBlocksProvider instanceof StackedBlocksSnapshotProvider;
     }
 
-    public void takeSnapshots(Chunk chunk){
-        if(spawnersProvider instanceof SpawnersSnapshotProvider){
+    public void takeSnapshots(Chunk chunk) {
+        if (spawnersProvider instanceof SpawnersSnapshotProvider) {
             ((SpawnersSnapshotProvider) spawnersProvider).takeSnapshot(chunk);
         }
-        if(stackedBlocksProvider instanceof StackedBlocksSnapshotProvider){
+        if (stackedBlocksProvider instanceof StackedBlocksSnapshotProvider) {
             ((StackedBlocksSnapshotProvider) stackedBlocksProvider).takeSnapshot(chunk);
         }
     }
 
-    public void releaseSnapshots(ChunkPosition chunkPosition){
-        if(spawnersProvider instanceof SpawnersSnapshotProvider){
+    public void releaseSnapshots(ChunkPosition chunkPosition) {
+        if (spawnersProvider instanceof SpawnersSnapshotProvider) {
             ((SpawnersSnapshotProvider) spawnersProvider).releaseSnapshot(
                     chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
         }
-        if(stackedBlocksProvider instanceof StackedBlocksSnapshotProvider){
+        if (stackedBlocksProvider instanceof StackedBlocksSnapshotProvider) {
             ((StackedBlocksSnapshotProvider) stackedBlocksProvider).releaseSnapshot(
                     chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
         }
@@ -505,7 +521,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
     }
 
-    private void registerAsyncProvider(){
+    private void registerAsyncProvider() {
         if (hasPaperAsyncSupport()) {
             try {
                 asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
@@ -520,7 +536,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
     }
 
-    private void registerEconomyProviders(){
+    private void registerEconomyProviders() {
         if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
             boolean alreadyCheckedForVault = false;
             if (economyProvider instanceof EconomyProvider_Default && EconomyProvider_Vault.isCompatible()) {
@@ -530,25 +546,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             if (bankEconomyProvider instanceof EconomyProvider_Default && (alreadyCheckedForVault || EconomyProvider_Vault.isCompatible())) {
                 setBankEconomyProvider(economyProvider);
             }
-        }
-    }
-
-    private static void runSafe(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
-        }
-    }
-
-    private static boolean hasPaperAsyncSupport() {
-        try {
-            //noinspection JavaReflectionMemberAccess
-            World.class.getMethod("getChunkAtAsync", int.class, int.class);
-            return true;
-        } catch (Throwable ex) {
-            return false;
         }
     }
 

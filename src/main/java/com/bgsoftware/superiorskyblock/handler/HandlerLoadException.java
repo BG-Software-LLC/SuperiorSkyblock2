@@ -17,19 +17,31 @@ public class HandlerLoadException extends Exception {
 
     private final ErrorLevel errorLevel;
 
-    public HandlerLoadException(String message, ErrorLevel errorLevel){
+    public HandlerLoadException(String message, ErrorLevel errorLevel) {
         super(message == null ? "" : message);
         this.errorLevel = errorLevel;
     }
 
-    public HandlerLoadException(Throwable cause, ErrorLevel errorLevel){
+    public HandlerLoadException(Throwable cause, ErrorLevel errorLevel) {
         super(cause);
         this.errorLevel = errorLevel;
     }
 
-    public HandlerLoadException(Throwable cause, String message, ErrorLevel errorLevel){
+    public HandlerLoadException(Throwable cause, String message, ErrorLevel errorLevel) {
         super(message, cause);
         this.errorLevel = errorLevel;
+    }
+
+    public static boolean handle(HandlerLoadException ex) {
+        SuperiorSkyblockPlugin.debug(ex);
+        ex.printStackTrace();
+
+        if (ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN) {
+            Bukkit.shutdown();
+            return false;
+        }
+
+        return true;
     }
 
     public ErrorLevel getErrorLevel() {
@@ -38,7 +50,7 @@ public class HandlerLoadException extends Exception {
 
     @Override
     public void printStackTrace() {
-        if(getErrorLevel() == ErrorLevel.CONTINUE){
+        if (getErrorLevel() == ErrorLevel.CONTINUE) {
             super.printStackTrace();
             return;
         }
@@ -62,12 +74,12 @@ public class HandlerLoadException extends Exception {
 
         int linesCounter = 0;
 
-        for(String stackTraceLine : stackTrace.toString().split("\n")) {
-            if(linesCounter > messageLines.size()) {
-                if(!messageLines.contains(stackTraceLine)) {
+        for (String stackTraceLine : stackTrace.toString().split("\n")) {
+            if (linesCounter > messageLines.size()) {
+                if (!messageLines.contains(stackTraceLine)) {
                     sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + stackTraceLine);
                 }
-            }else {
+            } else {
                 linesCounter++;
             }
         }
@@ -76,19 +88,7 @@ public class HandlerLoadException extends Exception {
         sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
     }
 
-    public static boolean handle(HandlerLoadException ex){
-        SuperiorSkyblockPlugin.debug(ex);
-        ex.printStackTrace();
-
-        if(ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN){
-            Bukkit.shutdown();
-            return false;
-        }
-
-        return true;
-    }
-
-    public enum ErrorLevel{
+    public enum ErrorLevel {
 
         SERVER_SHUTDOWN,
         CONTINUE

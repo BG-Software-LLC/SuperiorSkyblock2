@@ -8,18 +8,18 @@ import java.util.List;
 
 public final class MenuConverter {
 
-    private MenuConverter(){
+    private MenuConverter() {
 
     }
 
-    public static int convertFillItems(ConfigurationSection fillItemsSection, int charCounter, char[] patternChars, ConfigurationSection itemsSection,  ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
-        for (String itemFill : fillItemsSection.getKeys(false)){
+    public static int convertFillItems(ConfigurationSection fillItemsSection, int charCounter, char[] patternChars, ConfigurationSection itemsSection, ConfigurationSection commandsSection, ConfigurationSection soundsSection) {
+        for (String itemFill : fillItemsSection.getKeys(false)) {
             ConfigurationSection section = fillItemsSection.getConfigurationSection(itemFill);
             String[] slots = section.getString("slots").split(",");
             section.set("slots", null);
 
             char itemChar = SuperiorMenu.itemChars[charCounter++];
-            for(String slot : slots){
+            for (String slot : slots) {
                 patternChars[Integer.parseInt(slot)] = itemChar;
             }
 
@@ -29,8 +29,8 @@ public final class MenuConverter {
         return charCounter;
     }
 
-    public static void convertItem(ConfigurationSection section, char[] patternChars, char itemChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
-        if(section.contains("slot")) {
+    public static void convertItem(ConfigurationSection section, char[] patternChars, char itemChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection, ConfigurationSection soundsSection) {
+        if (section.contains("slot")) {
             patternChars[section.getInt("slot")] = itemChar;
             section.set("slot", null);
         }
@@ -44,7 +44,7 @@ public final class MenuConverter {
         itemsSection.set(itemChar + "", section);
     }
 
-    public static void convertItemAccess(ConfigurationSection section, char[] patternChars, char itemChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
+    public static void convertItemAccess(ConfigurationSection section, char[] patternChars, char itemChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection, ConfigurationSection soundsSection) {
         patternChars[section.getInt("slot")] = itemChar;
         section.set("slot", null);
 
@@ -65,23 +65,23 @@ public final class MenuConverter {
         itemsSection.set(itemChar + "", section);
     }
 
-    public static void convertPagedButtons(ConfigurationSection section, ConfigurationSection newMenu, char[] patternChars, char slotsChar, char previousChar, char currentChar, char nextChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
+    public static void convertPagedButtons(ConfigurationSection section, ConfigurationSection newMenu, char[] patternChars, char slotsChar, char previousChar, char currentChar, char nextChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection, ConfigurationSection soundsSection) {
         convertPagedButtons(section, null, newMenu, patternChars, slotsChar, previousChar, currentChar, nextChar, itemsSection, commandsSection, soundsSection);
     }
 
-    public static void convertPagedButtons(ConfigurationSection section, ConfigurationSection itemSection, ConfigurationSection newMenu, char[] patternChars, char slotsChar, char previousChar, char currentChar, char nextChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection,  ConfigurationSection soundsSection){
+    public static void convertPagedButtons(ConfigurationSection section, ConfigurationSection itemSection, ConfigurationSection newMenu, char[] patternChars, char slotsChar, char previousChar, char currentChar, char nextChar, ConfigurationSection itemsSection, ConfigurationSection commandsSection, ConfigurationSection soundsSection) {
         String slots = itemSection != null ? itemSection.getString("slots") : section.getString("slots");
 
-        if(slots != null) {
+        if (slots != null) {
             for (String slot : slots.split(","))
                 patternChars[Integer.parseInt(slot)] = slotsChar;
-            if(itemSection != null)
+            if (itemSection != null)
                 itemSection.set("slots", null);
             else
                 section.set("slots", null);
         }
 
-        if(itemSection != null){
+        if (itemSection != null) {
             MenuConverter.convertItem(itemSection, patternChars, slotsChar, itemsSection, commandsSection, soundsSection);
         }
 
@@ -98,16 +98,16 @@ public final class MenuConverter {
         newMenu.set("next-page", nextChar + "");
     }
 
-    public static List<String> buildPattern(int size, char[] patternChars, char replaceChar){
+    public static List<String> buildPattern(int size, char[] patternChars, char replaceChar) {
         int charCount = 0, lineLength = patternChars.length == 5 ? 5 : 9;
 
         List<String> pattern = new ArrayList<>(size);
         StringBuilder line = new StringBuilder();
 
-        for(char ch : patternChars){
+        for (char ch : patternChars) {
             charCount++;
             line.append(" ").append(ch);
-            if(charCount == lineLength){
+            if (charCount == lineLength) {
                 charCount = 0;
                 pattern.add(line.substring(1).replace('\n', replaceChar));
                 line = new StringBuilder();

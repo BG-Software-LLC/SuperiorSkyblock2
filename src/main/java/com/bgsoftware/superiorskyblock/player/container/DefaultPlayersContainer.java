@@ -20,11 +20,11 @@ public final class DefaultPlayersContainer implements PlayersContainer {
     public SuperiorPlayer getSuperiorPlayer(String name) {
         SuperiorPlayer superiorPlayer = this.playersByNames.get(name.toLowerCase());
 
-        if(superiorPlayer == null) {
+        if (superiorPlayer == null) {
             superiorPlayer = players.values().stream()
                     .filter(player -> player.getName().equalsIgnoreCase(name))
                     .findFirst().orElse(null);
-            if(superiorPlayer != null)
+            if (superiorPlayer != null)
                 this.playersByNames.put(name.toLowerCase(), superiorPlayer);
         }
 
@@ -46,7 +46,7 @@ public final class DefaultPlayersContainer implements PlayersContainer {
     public void addPlayer(SuperiorPlayer superiorPlayer) {
         this.players.put(superiorPlayer.getUniqueId(), superiorPlayer);
         String playerName = superiorPlayer.getName();
-        if(!playerName.equals("null"))
+        if (!playerName.equals("null"))
             this.playersByNames.put(playerName.toLowerCase(), superiorPlayer);
     }
 

@@ -16,11 +16,16 @@ public abstract class IslandEvent extends Event {
 
     /**
      * The constructor for the event.
+     *
      * @param island The island object that was involved in the event.
      */
-    public IslandEvent(Island island){
+    public IslandEvent(Island island) {
         super(!Bukkit.isPrimaryThread());
         this.island = island;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
@@ -32,10 +37,6 @@ public abstract class IslandEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

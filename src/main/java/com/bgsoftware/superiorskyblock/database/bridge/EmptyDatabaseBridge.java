@@ -12,12 +12,12 @@ public final class EmptyDatabaseBridge implements DatabaseBridge {
 
     private static final EmptyDatabaseBridge instance = new EmptyDatabaseBridge();
 
-    public static EmptyDatabaseBridge getInstance() {
-        return instance;
+    private EmptyDatabaseBridge() {
+
     }
 
-    private EmptyDatabaseBridge(){
-
+    public static EmptyDatabaseBridge getInstance() {
+        return instance;
     }
 
     @Override

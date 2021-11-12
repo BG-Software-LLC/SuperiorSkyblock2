@@ -9,6 +9,7 @@ public interface RolesManager {
 
     /**
      * Get a player role by it's weight.
+     *
      * @param weight The weight to check.
      * @return The player role with that weight.
      */
@@ -17,6 +18,7 @@ public interface RolesManager {
 
     /**
      * Get a player role by it's id.
+     *
      * @param id The id to check.
      * @return The player role with that weight.
      */
@@ -25,6 +27,7 @@ public interface RolesManager {
 
     /**
      * Get a player role by it's name.
+     *
      * @param name The name to check.
      * @return The player role with that name.
      * If there's no role with that name, IllegalArgumentException will be thrown.

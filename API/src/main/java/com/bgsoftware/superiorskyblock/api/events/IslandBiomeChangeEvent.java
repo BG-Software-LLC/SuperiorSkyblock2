@@ -5,8 +5,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.block.Biome;
 import org.bukkit.event.Cancellable;
 
-import java.util.List;
-
 /**
  * IslandCreateEvent is called when a new island is created.
  */
@@ -18,11 +16,12 @@ public class IslandBiomeChangeEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor for the event.
+     *
      * @param superiorPlayer The player who changed the biome of the island.
-     * @param island The island object that was changed.
-     * @param biome The name of the new biome.
+     * @param island         The island object that was changed.
+     * @param biome          The name of the new biome.
      */
-    public IslandBiomeChangeEvent(SuperiorPlayer superiorPlayer, Island island, Biome biome){
+    public IslandBiomeChangeEvent(SuperiorPlayer superiorPlayer, Island island, Biome biome) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.biome = biome;

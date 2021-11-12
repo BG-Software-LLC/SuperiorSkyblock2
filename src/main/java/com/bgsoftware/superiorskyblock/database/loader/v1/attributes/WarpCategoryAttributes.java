@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class WarpCategoryAttributes extends AttributesRegistry<WarpCategoryAttributes.Field> {
 
-    public WarpCategoryAttributes(){
+    public WarpCategoryAttributes() {
         super(Field.class);
     }
 

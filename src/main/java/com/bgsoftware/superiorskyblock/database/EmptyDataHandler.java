@@ -7,12 +7,12 @@ public final class EmptyDataHandler implements IslandDataHandler, PlayerDataHand
 
     private static final EmptyDataHandler instance = new EmptyDataHandler();
 
-    public static EmptyDataHandler getInstance() {
-        return instance;
+    private EmptyDataHandler() {
+
     }
 
-    private EmptyDataHandler(){
-
+    public static EmptyDataHandler getInstance() {
+        return instance;
     }
 
     @Override

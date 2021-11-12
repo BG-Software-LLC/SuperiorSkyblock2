@@ -6,10 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -68,19 +68,19 @@ public final class CmdAdminSetPermission implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         IslandPrivilege islandPrivilege = CommandArguments.getIslandPrivilege(sender, args[3]);
 
-        if(islandPrivilege == null)
+        if (islandPrivilege == null)
             return;
 
         PlayerRole playerRole = CommandArguments.getPlayerRole(sender, args[4]);
 
-        if(playerRole == null)
+        if (playerRole == null)
             return;
 
         Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPrivilege, true)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPrivilege.getName()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPrivilege.getName()), islands.get(0).getName());
         else
             Locale.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPrivilege.getName()), targetPlayer.getName());

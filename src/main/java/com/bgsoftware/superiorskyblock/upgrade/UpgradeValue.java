@@ -14,20 +14,20 @@ public class UpgradeValue<T> {
     private final boolean upgradeValue;
     private final T value;
 
-    public UpgradeValue(T value, Predicate<T> shouldBeSync){
+    public UpgradeValue(T value, Predicate<T> shouldBeSync) {
         this(value, shouldBeSync.test(value));
     }
 
-    public UpgradeValue(T value, boolean upgradeValue){
+    public UpgradeValue(T value, boolean upgradeValue) {
         this.upgradeValue = upgradeValue;
         this.value = value;
     }
 
-    public T get(){
+    public T get() {
         return value;
     }
 
-    public boolean isSynced(){
+    public boolean isSynced() {
         return upgradeValue;
     }
 

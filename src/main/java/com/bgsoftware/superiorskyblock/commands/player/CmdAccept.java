@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -60,31 +60,30 @@ public final class CmdAccept implements ISuperiorCommand {
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
         Island island;
 
-        if(targetPlayer == null){
-            if((island = plugin.getGrid().getIsland(args[1])) == null || !island.isInvited(superiorPlayer)){
+        if (targetPlayer == null) {
+            if ((island = plugin.getGrid().getIsland(args[1])) == null || !island.isInvited(superiorPlayer)) {
                 Locale.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
-        }
-        else{
-            if((island = plugin.getGrid().getIsland(targetPlayer)) == null || !island.isInvited(superiorPlayer)) {
+        } else {
+            if ((island = plugin.getGrid().getIsland(targetPlayer)) == null || !island.isInvited(superiorPlayer)) {
                 Locale.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
         }
 
-        if(superiorPlayer.getIsland() != null){
+        if (superiorPlayer.getIsland() != null) {
             Locale.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
-        if(island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()){
+        if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
             Locale.JOIN_FULL_ISLAND.send(superiorPlayer);
             island.revokeInvite(superiorPlayer);
             return;
         }
 
-        if(!EventsCaller.callIslandJoinEvent(superiorPlayer, island))
+        if (!EventsCaller.callIslandJoinEvent(superiorPlayer, island))
             return;
 
         IslandUtils.sendMessage(island, Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
@@ -92,14 +91,14 @@ public final class CmdAccept implements ISuperiorCommand {
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             Locale.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
             Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
-        if(plugin.getSettings().isTeleportOnJoin())
+        if (plugin.getSettings().isTeleportOnJoin())
             superiorPlayer.teleport(island);
-        if(plugin.getSettings().isClearOnJoin())
+        if (plugin.getSettings().isClearOnJoin())
             plugin.getNMSPlayers().clearInventory(superiorPlayer.asPlayer());
     }
 

@@ -32,7 +32,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
     @Override
     public void clearInventory(OfflinePlayer offlinePlayer) {
-        if(offlinePlayer.isOnline() || offlinePlayer instanceof Player){
+        if (offlinePlayer.isOnline() || offlinePlayer instanceof Player) {
             Player player = offlinePlayer instanceof Player ? (Player) offlinePlayer : offlinePlayer.getPlayer();
             assert player != null;
             player.getInventory().clear();

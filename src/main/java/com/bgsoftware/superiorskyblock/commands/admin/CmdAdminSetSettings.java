@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -67,21 +67,21 @@ public final class CmdAdminSetSettings implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         IslandFlag islandFlag = CommandArguments.getIslandFlag(sender, args[3]);
 
-        if(islandFlag == null)
+        if (islandFlag == null)
             return;
 
         boolean value = args[4].equalsIgnoreCase("true");
 
         Executor.data(() -> islands.forEach(island -> {
-            if(value)
+            if (value)
                 island.enableSettings(islandFlag);
             else
                 island.disableSettings(islandFlag);
         }));
 
-        if(islands.size() != 1)
+        if (islands.size() != 1)
             Locale.SETTINGS_UPDATED_ALL.send(sender, StringUtils.format(islandFlag.getName()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.SETTINGS_UPDATED_NAME.send(sender, StringUtils.format(islandFlag.getName()), islands.get(0).getName());
         else
             Locale.SETTINGS_UPDATED.send(sender, StringUtils.format(islandFlag.getName()), targetPlayer.getName());
@@ -90,7 +90,7 @@ public final class CmdAdminSetSettings implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getIslandFlags(args[3]) :
-                args.length == 5 ?  CommandTabCompletes.getCustomComplete(args[4], "true", "false") : new ArrayList<>();
+                args.length == 5 ? CommandTabCompletes.getCustomComplete(args[4], "true", "false") : new ArrayList<>();
     }
 
 }

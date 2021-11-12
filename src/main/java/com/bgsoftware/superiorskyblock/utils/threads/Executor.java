@@ -57,10 +57,9 @@ public final class Executor {
         if (shutdown)
             return;
 
-        if(syncDatabaseCalls) {
+        if (syncDatabaseCalls) {
             runnable.run();
-        }
-        else {
+        } else {
             databaseExecutor.execute(runnable);
         }
     }

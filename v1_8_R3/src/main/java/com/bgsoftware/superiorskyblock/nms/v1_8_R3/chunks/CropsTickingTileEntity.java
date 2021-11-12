@@ -30,6 +30,16 @@ public final class CropsTickingTileEntity extends TileEntity implements IUpdateP
 
     private int currentTick = 0;
 
+    private CropsTickingTileEntity(Island island, Chunk chunk) {
+        this.island = new WeakReference<>(island);
+        this.chunk = new WeakReference<>(chunk);
+        this.chunkX = chunk.locX;
+        this.chunkZ = chunk.locZ;
+        a(chunk.getWorld());
+        a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
+        world.tileEntityList.add(this);
+    }
+
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
         return tickingChunks.remove(ChunkCoordIntPair.a(chunkCoords.x, chunkCoords.z));
     }
@@ -39,16 +49,6 @@ public final class CropsTickingTileEntity extends TileEntity implements IUpdateP
         if (!tickingChunks.containsKey(chunkKey)) {
             tickingChunks.put(chunkKey, new CropsTickingTileEntity(island, chunk));
         }
-    }
-
-    private CropsTickingTileEntity(Island island, Chunk chunk) {
-        this.island = new WeakReference<>(island);
-        this.chunk = new WeakReference<>(chunk);
-        this.chunkX = chunk.locX;
-        this.chunkZ = chunk.locZ;
-        a(chunk.getWorld());
-        a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-        world.tileEntityList.add(this);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class GridAttributes extends AttributesRegistry<GridAttributes.Field> {
 
-    public GridAttributes(){
+    public GridAttributes() {
         super(Field.class);
     }
 

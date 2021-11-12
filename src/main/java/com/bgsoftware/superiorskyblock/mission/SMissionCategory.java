@@ -12,7 +12,7 @@ public final class SMissionCategory implements MissionCategory {
     private final int slot;
     private final List<Mission<?>> missions;
 
-    public SMissionCategory(String name, int slot, List<Mission<?>> missions){
+    public SMissionCategory(String name, int slot, List<Mission<?>> missions) {
         this.name = name;
         this.slot = slot;
         this.missions = missions;

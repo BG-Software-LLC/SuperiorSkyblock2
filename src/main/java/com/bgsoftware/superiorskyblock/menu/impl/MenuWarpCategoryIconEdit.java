@@ -31,27 +31,52 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
     private String itemName = null;
     private List<String> itemLore = null;
 
-    private MenuWarpCategoryIconEdit(SuperiorPlayer superiorPlayer, WarpCategory warpCategory){
+    private MenuWarpCategoryIconEdit(SuperiorPlayer superiorPlayer, WarpCategory warpCategory) {
         super("menuWarpCategoryIconEdit", superiorPlayer);
         this.warpCategory = warpCategory;
         this.itemStack = warpCategory == null ? null : warpCategory.getRawIcon();
-        if(itemStack != null){
+        if (itemStack != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemName = itemMeta.getDisplayName();
             itemLore = itemMeta.getLore();
         }
     }
 
+    public static void init() {
+        MenuWarpCategoryIconEdit menuWarpCategoryIconEdit = new MenuWarpCategoryIconEdit(null, null);
+
+        File file = new File(plugin.getDataFolder(), "menus/warp-category-icon-edit.yml");
+
+        if (!file.exists())
+            FileUtils.saveResource("menus/warp-category-icon-edit.yml");
+
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
+
+        typeSlots = getSlots(cfg, "icon-type", menuPatternSlots);
+        renameSlots = getSlots(cfg, "icon-rename", menuPatternSlots);
+        loreSlots = getSlots(cfg, "icon-relore", menuPatternSlots);
+        confirmSlots = getSlots(cfg, "icon-confirm", menuPatternSlots);
+        iconSlots = getSlots(cfg, "icon-slots", menuPatternSlots);
+
+        menuWarpCategoryIconEdit.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, WarpCategory warpCategory) {
+        new MenuWarpCategoryIconEdit(superiorPlayer, warpCategory).open(previousMenu);
+    }
+
     @Override
     protected void onPlayerClick(InventoryClickEvent e) {
-        if(typeSlots.contains(e.getRawSlot())){
+        if (typeSlots.contains(e.getRawSlot())) {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
             Locale.WARP_CATEGORY_ICON_NEW_TYPE.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
-                if(!message.equalsIgnoreCase("-cancel")) {
+                if (!message.equalsIgnoreCase("-cancel")) {
                     String[] sections = message.split(":");
                     Material material;
 
@@ -86,15 +111,14 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
                 return true;
             });
-        }
-        else if(renameSlots.contains(e.getRawSlot())){
+        } else if (renameSlots.contains(e.getRawSlot())) {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
             Locale.WARP_CATEGORY_ICON_NEW_NAME.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
-                if(!message.equalsIgnoreCase("-cancel")) {
+                if (!message.equalsIgnoreCase("-cancel")) {
                     itemName = message;
                 }
 
@@ -103,15 +127,14 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
                 return true;
             });
-        }
-        else if(loreSlots.contains(e.getRawSlot())){
+        } else if (loreSlots.contains(e.getRawSlot())) {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
             Locale.WARP_CATEGORY_ICON_NEW_LORE.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
-                if(!message.equalsIgnoreCase("-cancel")) {
+                if (!message.equalsIgnoreCase("-cancel")) {
                     itemLore = Arrays.asList(message.split("\\\\n"));
                 }
 
@@ -120,14 +143,18 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
                 return true;
             });
-        }
-        else if(confirmSlots.contains(e.getRawSlot())){
+        } else if (confirmSlots.contains(e.getRawSlot())) {
             e.getWhoClicked().closeInventory();
 
             Locale.WARP_CATEGORY_ICON_UPDATED.send(e.getWhoClicked());
 
             warpCategory.setIcon(new ItemBuilder(itemStack).withName(itemName).withLore(itemLore).build());
         }
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, warpCategory);
     }
 
     @Override
@@ -138,36 +165,6 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
                 .withName(itemName).withLore(itemLore).build()));
 
         return inventory;
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, warpCategory);
-    }
-
-    public static void init(){
-        MenuWarpCategoryIconEdit menuWarpCategoryIconEdit = new MenuWarpCategoryIconEdit(null, null);
-
-        File file = new File(plugin.getDataFolder(), "menus/warp-category-icon-edit.yml");
-
-        if(!file.exists())
-            FileUtils.saveResource("menus/warp-category-icon-edit.yml");
-
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
-
-        typeSlots = getSlots(cfg, "icon-type", menuPatternSlots);
-        renameSlots = getSlots(cfg, "icon-rename", menuPatternSlots);
-        loreSlots = getSlots(cfg, "icon-relore", menuPatternSlots);
-        confirmSlots = getSlots(cfg, "icon-confirm", menuPatternSlots);
-        iconSlots = getSlots(cfg, "icon-slots", menuPatternSlots);
-
-        menuWarpCategoryIconEdit.markCompleted();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, WarpCategory warpCategory){
-        new MenuWarpCategoryIconEdit(superiorPlayer, warpCategory).open(previousMenu);
     }
 
 }

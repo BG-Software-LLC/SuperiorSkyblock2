@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -60,17 +60,17 @@ public final class CmdRate implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
-        if(island.isSpawn()){
+        if (island.isSpawn()) {
             Locale.INVALID_ISLAND_LOCATION.send(sender);
             return;
         }
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if(!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())){
+        if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())) {
             Locale.RATE_OWN_ISLAND.send(superiorPlayer);
             return;
         }

@@ -10,15 +10,14 @@ import javax.script.ScriptException;
 public final class NashornEngine implements IScriptEngine {
 
     private static final NashornEngine instance = new NashornEngine();
+    private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+
+    private NashornEngine() {
+
+    }
 
     public static NashornEngine getInstance() {
         return instance;
-    }
-
-    private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-
-    private NashornEngine(){
-
     }
 
     @Override

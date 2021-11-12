@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
@@ -25,9 +26,8 @@ import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.listeners.UpgradesListener;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -45,8 +45,33 @@ public final class UpgradesModule extends BuiltinModule {
 
     private boolean enabled = false;
 
-    public UpgradesModule(){
+    public UpgradesModule() {
         super("upgrades");
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
+
+        File upgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
+
+        if (upgradesFile.exists()) {
+            CommentedConfiguration config = CommentedConfiguration.loadConfiguration(upgradesFile);
+            super.config.set("upgrades", config.get("upgrades"));
+
+            File moduleConfigFile = new File(getDataFolder(), "config.yml");
+
+            try {
+                super.config.save(moduleConfigFile);
+                config.save(upgradesFile);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
+            }
+
+            upgradesFile.delete();
+        }
     }
 
     @Override
@@ -59,17 +84,17 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new Listener[] {new UpgradesListener(plugin)};
+        return !enabled ? null : new Listener[]{new UpgradesListener(plugin)};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[] {new CmdRankup(), new CmdUpgrade()};
+        return !enabled ? null : new SuperiorCommand[]{new CmdRankup(), new CmdUpgrade()};
     }
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[] {
+        return !enabled ? null : new SuperiorCommand[]{
                 new CmdAdminAddCropGrowth(), new CmdAdminAddEffect(), new CmdAdminAddMobDrops(),
                 new CmdAdminAddSpawnerRates(), new CmdAdminRankup(), new CmdAdminSetCropGrowth(),
                 new CmdAdminSetEffect(), new CmdAdminSetMobDrops(), new CmdAdminSetSpawnerRates(),
@@ -86,27 +111,27 @@ public final class UpgradesModule extends BuiltinModule {
     protected void updateConfig(SuperiorSkyblockPlugin plugin) {
         enabled = config.getBoolean("enabled");
 
-        if(enabled){
+        if (enabled) {
             ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
-            for(String upgradeName : upgrades.getKeys(false)){
+            for (String upgradeName : upgrades.getKeys(false)) {
                 SUpgrade upgrade = new SUpgrade(upgradeName);
-                for(String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)){
+                for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
                     ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);
                     int level = Integer.parseInt(_level);
 
                     String priceType = levelSection.getString("price-type", "money");
                     UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
-                    if(costLoader == null){
+                    if (costLoader == null) {
                         SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
                         continue;
                     }
 
                     UpgradeCost upgradeCost;
 
-                    try{
+                    try {
                         upgradeCost = costLoader.loadCost(levelSection);
-                    }catch (UpgradeCostLoadException ex){
+                    } catch (UpgradeCostLoadException ex) {
                         SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + ex.getMessage() + ". Skipping...");
                         SuperiorSkyblockPlugin.debug(ex);
                         continue;
@@ -115,7 +140,7 @@ public final class UpgradesModule extends BuiltinModule {
                     List<String> commands = levelSection.getStringList("commands");
                     String permission = levelSection.getString("permission", "");
                     Set<Pair<String, String>> requirements = new HashSet<>();
-                    for(String line : levelSection.getStringList("required-checks")){
+                    for (String line : levelSection.getStringList("required-checks")) {
                         String[] sections = line.split(";");
                         requirements.add(new Pair<>(sections[0], StringUtils.translateColors(sections[1])));
                     }
@@ -128,48 +153,48 @@ public final class UpgradesModule extends BuiltinModule {
                     UpgradeValue<Integer> borderSize = new UpgradeValue<>(levelSection.getInt("border-size", -1), true);
                     UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
                     KeyMap<Integer> blockLimits = new KeyMap<>();
-                    if(levelSection.contains("block-limits")){
-                        for(String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
+                    if (levelSection.contains("block-limits")) {
+                        for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
                             blockLimits.put(block, levelSection.getInt("block-limits." + block));
                             plugin.getBlockValues().addCustomBlockKey(Key.of(block));
                         }
                     }
                     KeyMap<Integer> entityLimits = new KeyMap<>();
-                    if(levelSection.contains("entity-limits")){
-                        for(String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
+                    if (levelSection.contains("entity-limits")) {
+                        for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                             entityLimits.put(entity.toUpperCase(), levelSection.getInt("entity-limits." + entity));
                     }
                     KeyMap<Integer>[] generatorRates = new KeyMap[World.Environment.values().length];
-                    if(levelSection.contains("generator-rates")){
-                        for(String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
-                            try{
+                    if (levelSection.contains("generator-rates")) {
+                        for (String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
+                            try {
                                 int index = World.Environment.valueOf(blockOrEnv.toUpperCase()).ordinal();
-                                for(String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
-                                    if(generatorRates[index] == null)
+                                for (String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
+                                    if (generatorRates[index] == null)
                                         generatorRates[index] = new KeyMap<>();
                                     generatorRates[index].put(block, levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                                 }
-                            }catch (Exception ex) {
-                                if(generatorRates[0] == null)
+                            } catch (Exception ex) {
+                                if (generatorRates[0] == null)
                                     generatorRates[0] = new KeyMap<>();
                                 generatorRates[0].put(blockOrEnv, levelSection.getInt("generator-rates." + blockOrEnv));
                             }
                         }
                     }
                     Map<PotionEffectType, Integer> islandEffects = new HashMap<>();
-                    if(levelSection.contains("island-effects")){
-                        for(String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
+                    if (levelSection.contains("island-effects")) {
+                        for (String effect : levelSection.getConfigurationSection("island-effects").getKeys(false)) {
                             PotionEffectType potionEffectType = PotionEffectType.getByName(effect);
-                            if(potionEffectType != null)
+                            if (potionEffectType != null)
                                 islandEffects.put(potionEffectType, levelSection.getInt("island-effects." + effect) - 1);
                         }
                     }
                     Map<Integer, Integer> rolesLimits = new HashMap<>();
-                    if(levelSection.contains("role-limits")){
-                        for(String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
+                    if (levelSection.contains("role-limits")) {
+                        for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                             try {
                                 rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
-                            }catch (NumberFormatException error){
+                            } catch (NumberFormatException error) {
                                 SuperiorSkyblockPlugin.debug(error);
                             }
                         }
@@ -185,34 +210,9 @@ public final class UpgradesModule extends BuiltinModule {
 
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        super.onPluginInit(plugin);
-
-        File upgradesFile = new File(plugin.getDataFolder(), "upgrades.yml");
-
-        if(upgradesFile.exists()) {
-            CommentedConfiguration config = CommentedConfiguration.loadConfiguration(upgradesFile);
-            super.config.set("upgrades", config.get("upgrades"));
-
-            File moduleConfigFile = new File(getDataFolder(), "config.yml");
-
-            try{
-                super.config.save(moduleConfigFile);
-                config.save(upgradesFile);
-            }catch (Exception ex){
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-
-            upgradesFile.delete();
-        }
-    }
-
     @Override
     protected String[] getIgnoredSections() {
-        return new String[] { "upgrades" };
+        return new String[]{"upgrades"};
     }
 
 }

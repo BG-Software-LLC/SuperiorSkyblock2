@@ -9,7 +9,7 @@ public abstract class UpgradeCostAbstract implements UpgradeCost {
     protected final BigDecimal cost;
     protected final String id;
 
-    protected UpgradeCostAbstract(BigDecimal cost, String id){
+    protected UpgradeCostAbstract(BigDecimal cost, String id) {
         this.cost = cost;
         this.id = id;
     }

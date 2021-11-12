@@ -7,12 +7,14 @@ public interface IslandsFactory {
 
     /**
      * Create a new island.
+     *
      * @param original The original island that was created.
      */
     Island createIsland(Island original);
 
     /**
      * Create a calculation algorithm for an island.
+     *
      * @param island The island to set the algorithm to.
      */
     IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island);

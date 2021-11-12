@@ -10,26 +10,25 @@ import java.util.function.Function;
 public final class PlayerChat {
 
     private static final Map<UUID, PlayerChat> playerChatListeners = new HashMap<>();
-
-    public static PlayerChat getChatListener(Player player){
-        return playerChatListeners.get(player.getUniqueId());
-    }
-
-    public static void listen(Player player, Function<String, Boolean> onChat){
-        playerChatListeners.put(player.getUniqueId(), new PlayerChat(onChat));
-    }
-
-    public static void remove(Player player){
-        playerChatListeners.remove(player.getUniqueId());
-    }
-
     private final Function<String, Boolean> chatConsumer;
 
-    private PlayerChat(Function<String, Boolean> chatConsumer){
+    private PlayerChat(Function<String, Boolean> chatConsumer) {
         this.chatConsumer = chatConsumer;
     }
 
-    public boolean supply(String message){
+    public static PlayerChat getChatListener(Player player) {
+        return playerChatListeners.get(player.getUniqueId());
+    }
+
+    public static void listen(Player player, Function<String, Boolean> onChat) {
+        playerChatListeners.put(player.getUniqueId(), new PlayerChat(onChat));
+    }
+
+    public static void remove(Player player) {
+        playerChatListeners.remove(player.getUniqueId());
+    }
+
+    public boolean supply(String message) {
         return chatConsumer.apply(message);
     }
 

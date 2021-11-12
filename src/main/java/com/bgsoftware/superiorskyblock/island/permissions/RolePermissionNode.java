@@ -13,17 +13,17 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     private final SPlayerRole playerRole;
     private final RolePermissionNode previousNode;
 
-    public RolePermissionNode(PlayerRole playerRole, PermissionNodeAbstract previousNode){
+    public RolePermissionNode(PlayerRole playerRole, PermissionNodeAbstract previousNode) {
         this(playerRole, previousNode, "");
     }
 
-    public RolePermissionNode(PlayerRole playerRole, PermissionNodeAbstract previousNode, String permissions){
+    public RolePermissionNode(PlayerRole playerRole, PermissionNodeAbstract previousNode, String permissions) {
         this.playerRole = (SPlayerRole) playerRole;
         this.previousNode = (RolePermissionNode) previousNode;
         Executor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
-    private RolePermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode){
+    private RolePermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode) {
         super(privileges);
 
         this.playerRole = playerRole;
@@ -36,21 +36,17 @@ public class RolePermissionNode extends PermissionNodeAbstract {
 
         PrivilegeStatus status = getStatus(islandPrivilege);
 
-        if(status != PrivilegeStatus.DEFAULT){
+        if (status != PrivilegeStatus.DEFAULT) {
             return status == PrivilegeStatus.ENABLED;
         }
 
         status = previousNode == null ? PrivilegeStatus.DEFAULT : previousNode.getStatus(islandPrivilege);
 
-        if(status != PrivilegeStatus.DEFAULT){
+        if (status != PrivilegeStatus.DEFAULT) {
             return status == PrivilegeStatus.ENABLED;
         }
 
         return playerRole != null && playerRole.getDefaultPermissions().hasPermission(islandPrivilege);
-    }
-
-    public PrivilegeStatus getStatus(IslandPrivilege permission){
-        return privileges.getOrDefault(permission, PrivilegeStatus.DEFAULT);
     }
 
     @Override
@@ -59,11 +55,31 @@ public class RolePermissionNode extends PermissionNodeAbstract {
         setPermission(islandPrivilege, value, true);
     }
 
-    public void setPermission(IslandPrivilege permission, boolean value, boolean keepDisable) {
-        if(!value && !keepDisable){
-            privileges.remove(permission);
+    @Override
+    public PermissionNodeAbstract clone() {
+        return new RolePermissionNode(privileges, playerRole, previousNode);
+    }
+
+    @Override
+    protected boolean isDefault(IslandPrivilege islandPrivilege) {
+        if (playerRole != null) {
+            return playerRole.getDefaultPermissions().isDefault(islandPrivilege);
         }
-        else {
+
+        if (previousNode != null && previousNode.isDefault(islandPrivilege))
+            return true;
+
+        return privileges.containsKey(islandPrivilege);
+    }
+
+    public PrivilegeStatus getStatus(IslandPrivilege permission) {
+        return privileges.getOrDefault(permission, PrivilegeStatus.DEFAULT);
+    }
+
+    public void setPermission(IslandPrivilege permission, boolean value, boolean keepDisable) {
+        if (!value && !keepDisable) {
+            privileges.remove(permission);
+        } else {
             super.setPermission(permission, value);
         }
 
@@ -72,28 +88,11 @@ public class RolePermissionNode extends PermissionNodeAbstract {
     }
 
     @Override
-    protected boolean isDefault(IslandPrivilege islandPrivilege) {
-        if(playerRole != null){
-            return playerRole.getDefaultPermissions().isDefault(islandPrivilege);
-        }
-
-        if(previousNode != null && previousNode.isDefault(islandPrivilege))
-            return true;
-
-        return privileges.containsKey(islandPrivilege);
-    }
-
-    @Override
-    public PermissionNodeAbstract clone() {
-        return new RolePermissionNode(privileges, playerRole, previousNode);
-    }
-
-    @Override
     public String toString() {
         return "RolePermissionNode" + privileges;
     }
 
-    public static class EmptyRolePermissionNode extends RolePermissionNode{
+    public static class EmptyRolePermissionNode extends RolePermissionNode {
 
         public static final EmptyRolePermissionNode INSTANCE;
 
@@ -101,7 +100,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
             INSTANCE = new EmptyRolePermissionNode();
         }
 
-        EmptyRolePermissionNode(){
+        EmptyRolePermissionNode() {
             super(null, null);
         }
 

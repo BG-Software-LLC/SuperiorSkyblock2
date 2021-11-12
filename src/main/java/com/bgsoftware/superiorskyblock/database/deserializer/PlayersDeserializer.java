@@ -30,11 +30,11 @@ public final class PlayersDeserializer {
         });
     }
 
-    public static void deserializePlayerSettings(SuperiorPlayer superiorPlayer, Consumer<Map<String, Object>> playerSettingsConsumer){
+    public static void deserializePlayerSettings(SuperiorPlayer superiorPlayer, Consumer<Map<String, Object>> playerSettingsConsumer) {
         loadObject(superiorPlayer, "players_settings", playerSettingsConsumer);
     }
 
-    private static void loadObject(SuperiorPlayer superiorPlayer, String table, Consumer<Map<String, Object>> resultConsumer){
+    private static void loadObject(SuperiorPlayer superiorPlayer, String table, Consumer<Map<String, Object>> resultConsumer) {
         superiorPlayer.getDatabaseBridge().loadObject(table,
                 new DatabaseFilter(Collections.singletonList(new Pair<>("player", superiorPlayer.getUniqueId().toString()))),
                 resultConsumer);

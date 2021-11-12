@@ -406,8 +406,8 @@ public interface MenusManager {
     /**
      * Open the missions-menu of a specific category.
      *
-     * @param targetPlayer The player to open the menu for.
-     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetPlayer    The player to open the menu for.
+     * @param previousMenu    The previous menu that was opened, if exists.
      * @param missionCategory The category to get missions from.
      */
     void openMissionsCategory(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, MissionCategory missionCategory);
@@ -485,7 +485,7 @@ public interface MenusManager {
     /**
      * Refresh the permissions-menu of a player for a specific island.
      *
-     * @param island The island to refresh the menus for.
+     * @param island            The island to refresh the menus for.
      * @param permissiblePlayer The player to change permissions.
      */
     void refreshPermissions(Island island, SuperiorPlayer permissiblePlayer);
@@ -493,7 +493,7 @@ public interface MenusManager {
     /**
      * Refresh the permissions-menu of an island role for a specific island.
      *
-     * @param island The island to refresh the menus for.
+     * @param island          The island to refresh the menus for.
      * @param permissibleRole The island role to change permissions for.
      */
     void refreshPermissions(Island island, PlayerRole permissibleRole);

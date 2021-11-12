@@ -16,16 +16,9 @@ public enum Rating {
     FIVE_STARS;
 
     /**
-     * Get the integer value of the rating.
-     */
-    public int getValue(){
-        return ordinal() - 1;
-    }
-
-    /**
      * Get a string of all the rating names.
      */
-    public static String getValuesString(){
+    public static String getValuesString() {
         StringBuilder stringBuilder = new StringBuilder();
         Arrays.stream(values()).forEach(rating -> stringBuilder.append(", ").append(rating.toString().toLowerCase()));
         return stringBuilder.toString().substring(2);
@@ -34,8 +27,15 @@ public enum Rating {
     /**
      * Get a rating by it's value.
      */
-    public static Rating valueOf(int value){
+    public static Rating valueOf(int value) {
         return values()[value + 1];
+    }
+
+    /**
+     * Get the integer value of the rating.
+     */
+    public int getValue() {
+        return ordinal() - 1;
     }
 
 }

@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
@@ -66,16 +66,15 @@ public final class CmdBan implements IPermissibleCommand {
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             return;
 
-        if(!IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer))
+        if (!IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer))
             return;
 
-        if(plugin.getSettings().isBanConfirm()){
+        if (plugin.getSettings().isBanConfirm()) {
             plugin.getMenus().openConfirmBan(superiorPlayer, null, island, targetPlayer);
-        }
-        else {
+        } else {
             IslandUtils.handleBanPlayer(superiorPlayer, island, targetPlayer);
         }
     }
@@ -83,8 +82,8 @@ public final class CmdBan implements IPermissibleCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return args.length != 2 ? new ArrayList<>() : CommandTabCompletes.getOnlinePlayers(plugin, args[1], true,
-            onlinePlayer-> !island.isBanned(onlinePlayer) && (!island.isMember(onlinePlayer) ||
-                    onlinePlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())));
+                onlinePlayer -> !island.isBanned(onlinePlayer) && (!island.isMember(onlinePlayer) ||
+                        onlinePlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())));
     }
 
 }

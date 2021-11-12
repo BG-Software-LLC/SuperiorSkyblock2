@@ -13,12 +13,13 @@ public class IslandChunkResetEvent extends IslandEvent {
 
     /**
      * The constructor of the event.
+     *
      * @param island The island that the chunk was reset in.
-     * @param world The world of the chunk.
+     * @param world  The world of the chunk.
      * @param chunkX The x-coords of the chunk.
      * @param chunkZ The z-coords of the chunk.
      */
-    public IslandChunkResetEvent(Island island, World world, int chunkX, int chunkZ){
+    public IslandChunkResetEvent(Island island, World world, int chunkX, int chunkZ) {
         super(island);
         this.world = world;
         this.chunkX = chunkX;

@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -64,10 +64,10 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         World.Environment environment = CommandArguments.getEnvironment(sender, args[3]);
 
-        if(environment == null)
+        if (environment == null)
             return;
 
-        if(environment == plugin.getSettings().getWorlds().getDefaultWorld()){
+        if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
             Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
@@ -75,7 +75,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
         boolean enable = Boolean.parseBoolean(args[4]);
 
         islands.forEach(island -> {
-            switch (environment){
+            switch (environment) {
                 case NORMAL:
                     island.setNormalEnabled(enable);
                     break;
@@ -93,14 +93,14 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        if(args.length == 5)
+        if (args.length == 5)
             return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
 
-        if(args.length != 4)
+        if (args.length != 4)
             return new ArrayList<>();
 
         List<String> environments = new ArrayList<>();
-        for(World.Environment environment : World.Environment.values()){
+        for (World.Environment environment : World.Environment.values()) {
             environments.add(environment.name().toLowerCase());
         }
 

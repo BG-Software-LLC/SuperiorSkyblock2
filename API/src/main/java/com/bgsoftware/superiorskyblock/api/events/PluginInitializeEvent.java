@@ -17,8 +17,12 @@ public class PluginInitializeEvent extends Event {
      * The constructor for the event.
      * You cannot use handlers in this time, as none of them is set up.
      */
-    public PluginInitializeEvent(SuperiorSkyblock plugin){
+    public PluginInitializeEvent(SuperiorSkyblock plugin) {
         this.plugin = plugin;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     public SuperiorSkyblock getPlugin() {
@@ -27,10 +31,6 @@ public class PluginInitializeEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

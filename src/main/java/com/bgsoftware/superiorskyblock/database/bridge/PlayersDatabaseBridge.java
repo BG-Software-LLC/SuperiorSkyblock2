@@ -14,22 +14,22 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public final class PlayersDatabaseBridge {
 
-    private PlayersDatabaseBridge(){
+    private PlayersDatabaseBridge() {
     }
 
-    public static void saveTextureValue(SuperiorPlayer superiorPlayer){
+    public static void saveTextureValue(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().updateObject("players",
                 createFilter("uuid", superiorPlayer),
                 new Pair<>("last_used_skin", superiorPlayer.getTextureValue()));
     }
 
-    public static void savePlayerName(SuperiorPlayer superiorPlayer){
+    public static void savePlayerName(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().updateObject("players",
                 createFilter("uuid", superiorPlayer),
                 new Pair<>("last_used_name", superiorPlayer.getName()));
     }
 
-    public static void saveUserLocale(SuperiorPlayer superiorPlayer){
+    public static void saveUserLocale(SuperiorPlayer superiorPlayer) {
         Locale userLocale = superiorPlayer.getUserLocale();
         superiorPlayer.getDatabaseBridge().updateObject("players_settings",
                 createFilter("player", superiorPlayer),
@@ -85,7 +85,7 @@ public final class PlayersDatabaseBridge {
         );
     }
 
-    public static void insertPlayer(SuperiorPlayer superiorPlayer){
+    public static void insertPlayer(SuperiorPlayer superiorPlayer) {
         Locale userLocale = superiorPlayer.getUserLocale();
 
         superiorPlayer.getDatabaseBridge().insertObject("players",
@@ -106,7 +106,7 @@ public final class PlayersDatabaseBridge {
         );
     }
 
-    public static void updatePlayer(SuperiorPlayer superiorPlayer){
+    public static void updatePlayer(SuperiorPlayer superiorPlayer) {
         Locale userLocale = superiorPlayer.getUserLocale();
         superiorPlayer.getDatabaseBridge().updateObject("players",
                 createFilter("uuid", superiorPlayer),
@@ -128,21 +128,21 @@ public final class PlayersDatabaseBridge {
         superiorPlayer.getDatabaseBridge().deleteObject("players_missions",
                 createFilter("player", superiorPlayer));
 
-        for(Map.Entry<Mission<?>, Integer> missionEntry : superiorPlayer.getCompletedMissionsWithAmounts().entrySet()){
+        for (Map.Entry<Mission<?>, Integer> missionEntry : superiorPlayer.getCompletedMissionsWithAmounts().entrySet()) {
             saveMission(superiorPlayer, missionEntry.getKey(), missionEntry.getValue());
         }
     }
 
-    public static void deletePlayer(SuperiorPlayer superiorPlayer){
+    public static void deletePlayer(SuperiorPlayer superiorPlayer) {
         superiorPlayer.getDatabaseBridge().deleteObject("players", createFilter("uuid", superiorPlayer));
         superiorPlayer.getDatabaseBridge().deleteObject("players_settings", createFilter("player", superiorPlayer));
         superiorPlayer.getDatabaseBridge().deleteObject("players_missions", createFilter("player", superiorPlayer));
     }
 
-    private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others){
+    private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
         List<Pair<String, Object>> filters = new ArrayList<>();
         filters.add(new Pair<>(id, superiorPlayer.getUniqueId().toString()));
-        if(others != null)
+        if (others != null)
             filters.addAll(Arrays.asList(others));
         return new DatabaseFilter(filters);
     }

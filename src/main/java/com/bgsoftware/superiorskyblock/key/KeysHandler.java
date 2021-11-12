@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 public final class KeysHandler extends AbstractHandler implements KeysManager {
 
-    public KeysHandler(SuperiorSkyblockPlugin plugin){
+    public KeysHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
     }
 

@@ -107,13 +107,13 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
-    public void refreshCounts(Island island) {
-        plugin.getProviders().getMenusProvider().refreshCounts(island);
+    public void openIslandCountsMenu(SuperiorPlayer superiorPlayer, Island island) {
+        openCounts(superiorPlayer, null, island);
     }
 
     @Override
-    public void openIslandCountsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        openCounts(superiorPlayer, null, island);
+    public void refreshCounts(Island island) {
+        plugin.getProviders().getMenusProvider().refreshCounts(island);
     }
 
     @Override
@@ -392,13 +392,13 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
-    public void openIslandVisitorsMenu(SuperiorPlayer superiorPlayer, Island island) {
-        openVisitors(superiorPlayer, null, island);
+    public void refreshVisitors(Island island) {
+        plugin.getProviders().getMenusProvider().refreshVisitors(island);
     }
 
     @Override
-    public void refreshVisitors(Island island) {
-        plugin.getProviders().getMenusProvider().refreshVisitors(island);
+    public void openIslandVisitorsMenu(SuperiorPlayer superiorPlayer, Island island) {
+        openVisitors(superiorPlayer, null, island);
     }
 
     @Override
@@ -407,13 +407,13 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
     }
 
     @Override
-    public void destroyWarpCategories(Island island) {
-        plugin.getProviders().getMenusProvider().destroyWarpCategories(island);
+    public void refreshWarpCategories(Island island) {
+        plugin.getProviders().getMenusProvider().refreshWarpCategories(island);
     }
 
     @Override
-    public void refreshWarpCategories(Island island) {
-        plugin.getProviders().getMenusProvider().refreshWarpCategories(island);
+    public void destroyWarpCategories(Island island) {
+        plugin.getProviders().getMenusProvider().destroyWarpCategories(island);
     }
 
     @Override

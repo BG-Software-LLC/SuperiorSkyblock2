@@ -14,13 +14,15 @@ public interface StackedBlocksSnapshotProvider extends StackedBlocksProvider {
 
     /**
      * Take a snapshot of a chunk.
+     *
      * @param chunk The chunk to take a snapshot of.
      */
     void takeSnapshot(Chunk chunk);
 
     /**
      * Release a snapshot of a chunk.
-     * @param world The world of the chunk.
+     *
+     * @param world  The world of the chunk.
      * @param chunkX The x-coords of the chunk.
      * @param chunkZ The z-coords of the chunk.
      */

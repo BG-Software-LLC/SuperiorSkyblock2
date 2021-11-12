@@ -60,9 +60,9 @@ public final class CmdAdminSyncUpgrades implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         islands.forEach(Island::syncUpgrades);
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.SYNC_UPGRADES_ALL.send(sender);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.SYNC_UPGRADES_NAME.send(sender, islands.get(0).getName());
         else
             Locale.SYNC_UPGRADES.send(sender, targetPlayer.getName());

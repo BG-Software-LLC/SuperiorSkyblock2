@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -58,12 +58,12 @@ public final class CmdLeave implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        if(superiorPlayer.getPlayerRole().getNextRole() == null){
+        if (superiorPlayer.getPlayerRole().getNextRole() == null) {
             Locale.LEAVE_ISLAND_AS_LEADER.send(superiorPlayer);
             return;
         }
@@ -73,7 +73,7 @@ public final class CmdLeave implements ISuperiorCommand {
             return;
         }
 
-        if(!EventsCaller.callIslandQuitEvent(superiorPlayer, island))
+        if (!EventsCaller.callIslandQuitEvent(superiorPlayer, island))
             return;
 
         island.kickMember(superiorPlayer);

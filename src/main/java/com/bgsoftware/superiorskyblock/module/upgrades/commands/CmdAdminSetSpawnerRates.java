@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -63,16 +63,16 @@ public final class CmdAdminSetSpawnerRates implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Pair<Double, Boolean> arguments = CommandArguments.getMultiplier(sender, args[3]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         double multiplier = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(multiplier)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_SPAWNER_RATES_ALL.send(sender);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());

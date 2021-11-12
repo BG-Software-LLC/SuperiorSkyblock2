@@ -29,11 +29,6 @@ public final class GlowEnchantmentFactory {
         }
 
         @Override
-        public String getName() {
-            return "SuperiorSkyblockGlow";
-        }
-
-        @Override
         public int getMaxLevel() {
             return 1;
         }
@@ -49,13 +44,13 @@ public final class GlowEnchantmentFactory {
         }
 
         @Override
-        public boolean conflictsWith(Enchantment enchantment) {
-            return false;
+        public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
+            return true;
         }
 
         @Override
-        public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
-            return true;
+        public String getName() {
+            return "SuperiorSkyblockGlow";
         }
 
         public boolean isTreasure() {
@@ -63,6 +58,11 @@ public final class GlowEnchantmentFactory {
         }
 
         public boolean isCursed() {
+            return false;
+        }
+
+        @Override
+        public boolean conflictsWith(Enchantment enchantment) {
             return false;
         }
 

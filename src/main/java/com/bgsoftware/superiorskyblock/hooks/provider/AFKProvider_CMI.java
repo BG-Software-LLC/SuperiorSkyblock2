@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 public final class AFKProvider_CMI implements AFKProvider {
 
-    public AFKProvider_CMI(){
+    public AFKProvider_CMI() {
         SuperiorSkyblockPlugin.log("Hooked into CMI for support of afk status of players.");
     }
 

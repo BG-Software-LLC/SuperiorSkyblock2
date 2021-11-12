@@ -13,22 +13,21 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
 
     @Override
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(!supportMultiplePlayers()){
+        if (!supportMultiplePlayers()) {
             SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
-            if(targetPlayer != null) {
+            if (targetPlayer != null) {
                 Island playerIsland = targetPlayer.getIsland();
 
-                if(requireIsland() && playerIsland == null){
+                if (requireIsland() && playerIsland == null) {
                     Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
                     return;
                 }
 
                 execute(plugin, sender, targetPlayer, args);
             }
-        }
-        else{
+        } else {
             List<SuperiorPlayer> players = CommandArguments.getMultiplePlayers(plugin, sender, args[2]);
-            if(!players.isEmpty())
+            if (!players.isEmpty())
                 execute(plugin, sender, players, args);
         }
     }
@@ -37,18 +36,16 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         List<String> tabVariables = new ArrayList<>();
 
-        if(args.length == 3) {
-            if(supportMultiplePlayers() && "*".contains(args[2]))
+        if (args.length == 3) {
+            if (supportMultiplePlayers() && "*".contains(args[2]))
                 tabVariables.add("*");
             tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[2], false));
-        }
-        else if(args.length > 3){
-            if(supportMultiplePlayers()) {
+        } else if (args.length > 3) {
+            if (supportMultiplePlayers()) {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
-            }
-            else{
+            } else {
                 SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-                if(targetPlayer != null) {
+                if (targetPlayer != null) {
                     tabVariables = adminTabComplete(plugin, sender, targetPlayer, args);
                 }
             }
@@ -59,19 +56,19 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
 
     boolean supportMultiplePlayers();
 
-    default boolean requireIsland(){
+    default boolean requireIsland() {
         return false;
     }
 
-    default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args){
+    default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
 
     }
 
-    default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, List<SuperiorPlayer> targetPlayers, String[] args){
+    default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, List<SuperiorPlayer> targetPlayers, String[] args) {
 
     }
 
-    default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args){
+    default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         return new ArrayList<>();
     }
 

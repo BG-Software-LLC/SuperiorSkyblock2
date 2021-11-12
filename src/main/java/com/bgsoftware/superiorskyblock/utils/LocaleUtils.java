@@ -17,19 +17,19 @@ public final class LocaleUtils {
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
     private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
 
-    private LocaleUtils(){
+    private LocaleUtils() {
 
     }
 
-    public static Locale getLocale(CommandSender sender){
+    public static Locale getLocale(CommandSender sender) {
         return sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender).getUserLocale() : com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
     }
 
-    public static Locale getLocale(SuperiorPlayer superiorPlayer){
+    public static Locale getLocale(SuperiorPlayer superiorPlayer) {
         return superiorPlayer.getUserLocale();
     }
 
-    public static java.util.Locale getLocale(String str) throws IllegalArgumentException{
+    public static java.util.Locale getLocale(String str) throws IllegalArgumentException {
         str = str.replace("_", "-");
 
         Preconditions.checkArgument(LOCALE_PATTERN.matcher(str).matches(), "String " + str + " is not a valid language.");
@@ -39,11 +39,11 @@ public final class LocaleUtils {
         return new java.util.Locale(numberFormatSections[0], numberFormatSections[1]);
     }
 
-    public static boolean isRightToLeft(Locale locale){
+    public static boolean isRightToLeft(Locale locale) {
         return RTL_LOCALE_PATTERN.matcher(locale.getLanguage()).matches();
     }
 
-    public static Locale getDefault(){
+    public static Locale getDefault() {
         return com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
     }
 

@@ -20,12 +20,13 @@ public class IslandLeaveEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who left the island's area.
-     * @param island The island that the player left.
-     * @param leaveCause The cause of leaving the island.
-     * @param toLocation The location the player will be at after leaving.
+     * @param island         The island that the player left.
+     * @param leaveCause     The cause of leaving the island.
+     * @param toLocation     The location the player will be at after leaving.
      */
-    public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause, Location toLocation){
+    public IslandLeaveEvent(SuperiorPlayer superiorPlayer, Island island, LeaveCause leaveCause, Location toLocation) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.leaveCause = leaveCause;
@@ -68,7 +69,7 @@ public class IslandLeaveEvent extends IslandEvent implements Cancellable {
     /**
      * Used to determine the cause of leaving.
      */
-    public enum LeaveCause{
+    public enum LeaveCause {
 
         PLAYER_MOVE,
         PLAYER_TELEPORT,

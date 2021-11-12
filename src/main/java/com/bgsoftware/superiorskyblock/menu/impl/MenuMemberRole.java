@@ -8,9 +8,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -30,54 +30,26 @@ public final class MenuMemberRole extends SuperiorMenu {
 
     private final SuperiorPlayer targetPlayer;
 
-    private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer){
+    private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
         super("menuMemberRole", superiorPlayer);
         this.targetPlayer = targetPlayer;
         updateTargetPlayer(targetPlayer);
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        if(!roleSlots.containsKey(e.getRawSlot()))
-            return;
-
-        PlayerRole playerRole = roleSlots.get(e.getRawSlot());
-
-        if(playerRole.isLastRole()){
-            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "transfer",
-                    targetPlayer.getName());
-        }
-
-        else{
-            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "setrole",
-                    targetPlayer.getName() + " " + playerRole);
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetPlayer);
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return buildInventory(title -> PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName())));
-    }
-
-    public static void init(){
+    public static void init() {
         MenuMemberRole menuMemberRole = new MenuMemberRole(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/member-role.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/member-role.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -100,17 +72,16 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         roleSlots.clear();
 
-        for(int row = 0; row < pattern.size(); row++){
+        for (int row = 0; row < pattern.size(); row++) {
             String patternLine = pattern.get(row);
             int slot = row * 9;
 
-            for(int i = 0; i < patternLine.length(); i++){
+            for (int i = 0; i < patternLine.length(); i++) {
                 char ch = patternLine.charAt(i);
-                if(ch != ' '){
-                    if(backButtonChar == ch){
+                if (ch != ' ') {
+                    if (backButtonChar == ch) {
                         backButton = slot;
-                    }
-                    else if (cfg.contains("items." + ch + ".role")){
+                    } else if (cfg.contains("items." + ch + ".role")) {
                         roleSlots.put(slot, SPlayerRole.of(cfg.getString("items." + ch + ".role")));
                     }
 
@@ -129,24 +100,24 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         menuMemberRole.setBackButton(backButton);
 
-        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
+        if (plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         menuMemberRole.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SuperiorPlayer targetPlayer){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SuperiorPlayer targetPlayer) {
         new MenuMemberRole(superiorPlayer, targetPlayer).open(previousMenu);
     }
 
-    public static void destroyMenus(SuperiorPlayer targetPlayer){
+    public static void destroyMenus(SuperiorPlayer targetPlayer) {
         destroyMenus(MenuMemberRole.class, menuMemberRole -> menuMemberRole.targetPlayer.equals(targetPlayer));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -165,13 +136,13 @@ public final class MenuMemberRole extends SuperiorMenu {
 
         int charCounter = 0;
 
-        if(cfg.contains("roles-panel.fill-items")) {
+        if (cfg.contains("roles-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("roles-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if(cfg.contains("roles-panel.roles")) {
-            for (String roleName : cfg.getConfigurationSection("roles-panel.roles").getKeys(false)){
+        if (cfg.contains("roles-panel.roles")) {
+            for (String roleName : cfg.getConfigurationSection("roles-panel.roles").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("roles-panel.roles." + roleName);
                 char itemChar = itemChars[charCounter++];
                 section.set("role", StringUtils.format(roleName));
@@ -182,6 +153,32 @@ public final class MenuMemberRole extends SuperiorMenu {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    public Inventory getInventory() {
+        return buildInventory(title -> PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName())));
+    }
+
+    @Override
+    public void onPlayerClick(InventoryClickEvent e) {
+        if (!roleSlots.containsKey(e.getRawSlot()))
+            return;
+
+        PlayerRole playerRole = roleSlots.get(e.getRawSlot());
+
+        if (playerRole.isLastRole()) {
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "transfer",
+                    targetPlayer.getName());
+        } else {
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "setrole",
+                    targetPlayer.getName() + " " + playerRole);
+        }
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, targetPlayer);
     }
 
 }

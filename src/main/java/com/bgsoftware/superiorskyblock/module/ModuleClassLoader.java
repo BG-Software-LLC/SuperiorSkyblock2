@@ -26,11 +26,27 @@ public final class ModuleClassLoader extends URLClassLoader {
     private final URL url;
 
     public ModuleClassLoader(File file) throws IOException {
-        super(new URL[] { file.toURI().toURL() }, PluginModule.class.getClassLoader());
+        super(new URL[]{file.toURI().toURL()}, PluginModule.class.getClassLoader());
 
         this.jar = new JarFile(file);
         this.manifest = jar.getManifest();
         this.url = file.toURI().toURL();
+    }
+
+    @Nullable
+    @Override
+    public URL getResource(String name) {
+        URL url = findResource(name);
+        return url == null ? super.getResource(name) : url;
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            super.close();
+        } finally {
+            jar.close();
+        }
     }
 
     @Override
@@ -83,22 +99,6 @@ public final class ModuleClassLoader extends URLClassLoader {
         }
 
         return result;
-    }
-
-    @Nullable
-    @Override
-    public URL getResource(String name) {
-        URL url = findResource(name);
-        return url == null ? super.getResource(name) : url;
-    }
-
-    @Override
-    public void close() throws IOException {
-        try {
-            super.close();
-        } finally {
-            jar.close();
-        }
     }
 
 }

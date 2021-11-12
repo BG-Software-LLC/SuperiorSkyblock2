@@ -18,23 +18,28 @@ public class PreIslandCreateEvent extends Event implements Cancellable {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who created the island.
-     * @param islandName The name that was given to the island.
+     * @param islandName     The name that was given to the island.
      */
-    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName){
+    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName) {
         this.superiorPlayer = superiorPlayer;
         this.islandName = islandName;
     }
 
     /**
      * The constructor of the event.
-     * @param superiorPlayer The player who created the island.
      *
+     * @param superiorPlayer The player who created the island.
      * @deprecated See PreIslandCreateEvent(SuperiorPlayer, String)
      */
     @Deprecated
-    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer){
+    public PreIslandCreateEvent(SuperiorPlayer superiorPlayer) {
         this(superiorPlayer, "");
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
@@ -63,10 +68,6 @@ public class PreIslandCreateEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

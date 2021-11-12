@@ -2,10 +2,9 @@ package com.bgsoftware.superiorskyblock.world.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Location;
 
 public final class StackedBlock {
@@ -63,7 +62,7 @@ public final class StackedBlock {
             }
 
             // Must be checked in order to fix issue #632
-            if(!currentBlockKey.equals(blockKey)) {
+            if (!currentBlockKey.equals(blockKey)) {
                 removeHologram();
                 return;
             }

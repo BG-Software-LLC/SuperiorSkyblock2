@@ -3,13 +3,9 @@ package com.bgsoftware.superiorskyblock.schematic;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
@@ -18,6 +14,10 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.google.common.collect.Maps;
@@ -71,7 +71,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     private Set<ChunkPosition> loadedChunks = null;
 
-    public SuperiorSchematic(String name, CompoundTag compoundTag){
+    public SuperiorSchematic(String name, CompoundTag compoundTag) {
         super(name);
         this.compoundTag = compoundTag;
 
@@ -91,41 +91,38 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             for (SchematicBlock[] _blocksSection : blocksSection)
                 Arrays.fill(_blocksSection, SchematicBlock.AIR);
 
-        if(compoundTag.getValue().containsKey("blocks")) {
-            for(Tag<?> tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()){
+        if (compoundTag.getValue().containsKey("blocks")) {
+            for (Tag<?> tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()) {
                 Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
                 SchematicPosition schematicPosition = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue());
                 int x = schematicPosition.getX(), y = schematicPosition.getY(), z = schematicPosition.getZ();
                 int combinedId;
 
-                if(compoundValue.containsKey("combinedId")){
+                if (compoundValue.containsKey("combinedId")) {
                     combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
-                }
-                else if(compoundValue.containsKey("id") && compoundValue.containsKey("data")){
+                } else if (compoundValue.containsKey("id") && compoundValue.containsKey("data")) {
                     int id = ((IntTag) compoundValue.get("id")).getValue();
                     int data = ((IntTag) compoundValue.get("data")).getValue();
                     combinedId = id + (data << 12);
-                }
-                else if(compoundValue.containsKey("type")){
+                } else if (compoundValue.containsKey("type")) {
                     Material type;
 
-                    try{
+                    try {
                         type = Material.valueOf(((StringTag) compoundValue.get("type")).getValue());
-                    }catch (Exception ignored){
+                    } catch (Exception ignored) {
                         continue;
                     }
 
                     int data = ((IntTag) compoundValue.getOrDefault("data", new IntTag(0))).getValue();
 
                     combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
-                }
-                else{
+                } else {
                     SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + x + ", " + y + ", " + z + " - skipping...");
                     continue;
                 }
 
-                byte skyLightLevel = ((ByteTag) compoundValue.getOrDefault("skyLightLevel", new ByteTag((byte)0))).getValue();
-                byte blockLightLevel = ((ByteTag) compoundValue.getOrDefault("blockLightLevel", new ByteTag((byte)0))).getValue();
+                byte skyLightLevel = ((ByteTag) compoundValue.getOrDefault("skyLightLevel", new ByteTag((byte) 0))).getValue();
+                byte blockLightLevel = ((ByteTag) compoundValue.getOrDefault("blockLightLevel", new ByteTag((byte) 0))).getValue();
 
                 parseOldTileEntity((CompoundTag) tag);
 
@@ -139,18 +136,151 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
         List<Tag<?>> entitiesList = new ArrayList<>();
 
-        if(compoundTag.getValue().containsKey("entities"))
+        if (compoundTag.getValue().containsKey("entities"))
             entitiesList = ((ListTag) compoundTag.getValue().get("entities")).getValue();
 
         entities = new SchematicEntity[entitiesList.size()];
 
-        for(int i = 0; i < entitiesList.size(); i++){
+        for (int i = 0; i < entitiesList.size(); i++) {
             Map<String, Tag<?>> compoundValue = ((CompoundTag) entitiesList.get(i)).getValue();
             EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
             CompoundTag entityTag = (CompoundTag) compoundValue.get("NBT");
             Location offset = LocationUtils.getLocation(((StringTag) compoundValue.get("offset")).getValue());
             entities[i] = SchematicEntity.of(entityType, entityTag, offset);
         }
+    }
+
+    private static int parseTag(Tag<?> tag) {
+        if (tag instanceof ByteTag)
+            return ((ByteTag) tag).getValue();
+        else
+            return ((IntTag) tag).getValue();
+    }
+
+    private static void parseOldTileEntity(CompoundTag compoundTag) {
+        CompoundTag tileEntity = new CompoundTag();
+
+        {
+            String baseColor = compoundTag.getString("baseColor");
+            if (baseColor != null)
+                //noinspection deprecation
+                tileEntity.setInt("Base", DyeColor.valueOf(baseColor).getDyeData());
+        }
+
+        {
+            CompoundTag patterns = compoundTag.getCompound("patterns");
+            if (patterns != null) {
+                ListTag patternsList = new ListTag(CompoundTag.class, new ArrayList<>());
+
+                for (Tag<?> tag : patterns) {
+                    if (tag instanceof CompoundTag) {
+                        CompoundTag oldPatternTag = (CompoundTag) tag;
+                        CompoundTag patternTag = new CompoundTag();
+                        patternTag.setInt("Color", oldPatternTag.getInt("color"));
+                        patternTag.setString("Pattern", oldPatternTag.getString("type"));
+                        patternsList.addTag(patternTag);
+                    }
+                }
+
+                tileEntity.setTag("Patterns", patternsList);
+            }
+        }
+
+        {
+            CompoundTag contents = compoundTag.getCompound("contents");
+            if (contents != null) {
+                ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
+                for (Map.Entry<String, Tag<?>> item : contents.entrySet()) {
+                    if (item.getValue() instanceof CompoundTag) {
+                        try {
+                            ItemStack itemStack = TagUtils.compoundToItem((CompoundTag) item.getValue());
+                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
+                            itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
+                            items.addTag(itemCompound);
+                        } catch (Exception error) {
+                            SuperiorSkyblockPlugin.debug(error);
+                        }
+                    }
+                }
+
+                tileEntity.setTag("Items", items);
+
+                String inventoryType = compoundTag.getString("inventoryType");
+                tileEntity.setString("inventoryType", inventoryType != null ? inventoryType : "CHEST");
+            }
+        }
+
+        {
+            String flower = compoundTag.getString("flower");
+            if (flower != null) {
+                try {
+                    String[] flowerSections = flower.split(":");
+                    tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
+                    tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
+                }
+            }
+        }
+
+        {
+            String skullType = compoundTag.getString("skullType");
+            if (skullType != null) {
+                tileEntity.setByte("SkullType", (byte) (SkullType.valueOf(skullType).ordinal() - 1));
+            }
+        }
+
+        {
+            String rotation = compoundTag.getString("rotation");
+            if (rotation != null) {
+                tileEntity.setByte("Rot", rotationToByte.getOrDefault(BlockFace.valueOf(rotation), (byte) 0));
+            }
+        }
+
+        {
+            String owner = compoundTag.getString("owner");
+            if (owner != null) {
+                tileEntity.setString("Name", owner);
+            }
+        }
+
+        {
+            String signLine0 = compoundTag.getString("signLine0");
+            if (signLine0 != null) {
+                tileEntity.setString("Text1", plugin.getNMSAlgorithms().parseSignLine(signLine0));
+            }
+        }
+
+        {
+            String signLine1 = compoundTag.getString("signLine1");
+            if (signLine1 != null) {
+                tileEntity.setString("Text2", plugin.getNMSAlgorithms().parseSignLine(signLine1));
+            }
+        }
+
+        {
+            String signLine2 = compoundTag.getString("signLine2");
+            if (signLine2 != null) {
+                tileEntity.setString("Text3", plugin.getNMSAlgorithms().parseSignLine(signLine2));
+            }
+        }
+
+        {
+            String signLine3 = compoundTag.getString("signLine3");
+            if (signLine3 != null) {
+                tileEntity.setString("Text4", plugin.getNMSAlgorithms().parseSignLine(signLine3));
+            }
+        }
+
+        {
+            String spawnedType = compoundTag.getString("spawnedType");
+            if (spawnedType != null) {
+                tileEntity.setString("EntityId", spawnedType);
+            }
+        }
+
+        if (tileEntity.size() != 0)
+            compoundTag.setTag("tileEntity", tileEntity);
     }
 
     @Override
@@ -160,7 +290,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        if(!Bukkit.isPrimaryThread()){
+        if (!Bukkit.isPrimaryThread()) {
             Executor.sync(() -> pasteSchematic(island, location, callback, onFailure));
             return;
         }
@@ -195,13 +325,13 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     callback.run();
                     loadedChunks = null;
 
-                }catch(Throwable ex) {
-                    if(onFailure != null)
+                } catch (Throwable ex) {
+                    if (onFailure != null)
                         onFailure.accept(ex);
                 }
             });
-        }catch (Throwable ex){
-            if(onFailure != null)
+        } catch (Throwable ex) {
+            if (onFailure != null)
                 onFailure.accept(ex);
         }
     }
@@ -213,7 +343,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         return location;
     }
 
-    public CompoundTag getTag(){
+    public CompoundTag getTag() {
         return compoundTag;
     }
 
@@ -221,142 +351,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         return loadedChunks;
     }
 
-    private void readBlock(SchematicBlock block){
+    private void readBlock(SchematicBlock block) {
         Key key = plugin.getNMSAlgorithms().getBlockKey(block.getCombinedId());
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
-    }
-
-    private static int parseTag(Tag<?> tag){
-        if(tag instanceof ByteTag)
-            return ((ByteTag) tag).getValue();
-        else
-            return ((IntTag) tag).getValue();
-    }
-
-    private static void parseOldTileEntity(CompoundTag compoundTag){
-        CompoundTag tileEntity = new CompoundTag();
-
-        {
-            String baseColor = compoundTag.getString("baseColor");
-            if(baseColor != null)
-                //noinspection deprecation
-                tileEntity.setInt("Base", DyeColor.valueOf(baseColor).getDyeData());
-        }
-
-        {
-            CompoundTag patterns = compoundTag.getCompound("patterns");
-            if(patterns != null) {
-                ListTag patternsList = new ListTag(CompoundTag.class, new ArrayList<>());
-
-                for(Tag<?> tag : patterns){
-                    if(tag instanceof CompoundTag){
-                        CompoundTag oldPatternTag = (CompoundTag) tag;
-                        CompoundTag patternTag = new CompoundTag();
-                        patternTag.setInt("Color", oldPatternTag.getInt("color"));
-                        patternTag.setString("Pattern", oldPatternTag.getString("type"));
-                        patternsList.addTag(patternTag);
-                    }
-                }
-
-                tileEntity.setTag("Patterns", patternsList);
-            }
-        }
-
-        {
-            CompoundTag contents = compoundTag.getCompound("contents");
-            if(contents != null){
-                ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
-                for(Map.Entry<String, Tag<?>> item : contents.entrySet()){
-                    if(item.getValue() instanceof CompoundTag) {
-                        try {
-                            ItemStack itemStack = TagUtils.compoundToItem((CompoundTag) item.getValue());
-                            CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
-                            itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
-                            items.addTag(itemCompound);
-                        } catch (Exception error) {
-                            SuperiorSkyblockPlugin.debug(error);
-                        }
-                    }
-                }
-
-                tileEntity.setTag("Items", items);
-
-                String inventoryType = compoundTag.getString("inventoryType");
-                tileEntity.setString("inventoryType", inventoryType != null ? inventoryType : "CHEST");
-            }
-        }
-
-        {
-            String flower = compoundTag.getString("flower");
-            if(flower != null){
-                try {
-                    String[] flowerSections = flower.split(":");
-                    tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
-                    tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
-                }catch (Exception error){
-                    SuperiorSkyblockPlugin.debug(error);
-                }
-            }
-        }
-
-        {
-            String skullType = compoundTag.getString("skullType");
-            if(skullType != null){
-                tileEntity.setByte("SkullType", (byte) (SkullType.valueOf(skullType).ordinal() - 1));
-            }
-        }
-
-        {
-            String rotation = compoundTag.getString("rotation");
-            if(rotation != null){
-                tileEntity.setByte("Rot", rotationToByte.getOrDefault(BlockFace.valueOf(rotation), (byte) 0));
-            }
-        }
-
-        {
-            String owner = compoundTag.getString("owner");
-            if(owner != null){
-                tileEntity.setString("Name", owner);
-            }
-        }
-
-        {
-            String signLine0 = compoundTag.getString("signLine0");
-            if(signLine0 != null){
-                tileEntity.setString("Text1", plugin.getNMSAlgorithms().parseSignLine(signLine0));
-            }
-        }
-
-        {
-            String signLine1 = compoundTag.getString("signLine1");
-            if(signLine1 != null){
-                tileEntity.setString("Text2", plugin.getNMSAlgorithms().parseSignLine(signLine1));
-            }
-        }
-
-        {
-            String signLine2 = compoundTag.getString("signLine2");
-            if(signLine2 != null){
-                tileEntity.setString("Text3", plugin.getNMSAlgorithms().parseSignLine(signLine2));
-            }
-        }
-
-        {
-            String signLine3 = compoundTag.getString("signLine3");
-            if(signLine3 != null){
-                tileEntity.setString("Text4", plugin.getNMSAlgorithms().parseSignLine(signLine3));
-            }
-        }
-
-        {
-            String spawnedType = compoundTag.getString("spawnedType");
-            if(spawnedType != null){
-                tileEntity.setString("EntityId", spawnedType);
-            }
-        }
-
-        if(tileEntity.size() != 0)
-            compoundTag.setTag("tileEntity", tileEntity);
     }
 
 }

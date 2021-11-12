@@ -21,12 +21,14 @@ public interface SuperiorCommand {
 
     /**
      * Get the usage of the sub command.
+     *
      * @param locale The locale of the player.
      */
     String getUsage(Locale locale);
 
     /**
      * Get the description of the sub command.
+     *
      * @param locale The locale of the player.
      */
     String getDescription(Locale locale);
@@ -57,17 +59,19 @@ public interface SuperiorCommand {
 
     /**
      * The method to be executed when the command is running.
+     *
      * @param plugin The instance of the plugin.
      * @param sender The sender who ran the command.
-     * @param args The arguments of the command.
+     * @param args   The arguments of the command.
      */
     void execute(SuperiorSkyblock plugin, CommandSender sender, String[] args);
 
     /**
      * Get the tab-complete arguments of the command.
+     *
      * @param plugin The instance of the plugin.
      * @param sender The sender who ran the command.
-     * @param args The arguments of the command.
+     * @param args   The arguments of the command.
      */
     List<String> tabComplete(SuperiorSkyblock plugin, CommandSender sender, String[] args);
 

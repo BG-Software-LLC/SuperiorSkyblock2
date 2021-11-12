@@ -14,11 +14,12 @@ public class IslandCoopPlayerEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor of the event.
+     *
      * @param island The island that the leadership of it is transferred.
      * @param player The player who cooped the target.
      * @param target The player that will be cooped.
      */
-    public IslandCoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target){
+    public IslandCoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target) {
         super(island);
         this.player = player;
         this.target = target;

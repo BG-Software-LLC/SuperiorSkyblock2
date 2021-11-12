@@ -16,10 +16,10 @@ public final class VanishProvider_SuperVanish implements VanishProvider, Listene
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin){
+    public VanishProvider_SuperVanish(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
 
-        if(!alreadyEnabled){
+        if (!alreadyEnabled) {
             alreadyEnabled = true;
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
@@ -33,11 +33,10 @@ public final class VanishProvider_SuperVanish implements VanishProvider, Listene
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerVanish(PlayerVanishStateChangeEvent e){
-        if(e.isVanishing()) {
+    public void onPlayerVanish(PlayerVanishStateChangeEvent e) {
+        if (e.isVanishing()) {
             PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
-        }
-        else{
+        } else {
             PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getUUID()));
         }
     }

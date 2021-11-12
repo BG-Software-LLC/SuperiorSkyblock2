@@ -13,14 +13,14 @@ public final class WildStackerSnapshotsContainer {
 
     private static final Map<ChunkPosition, StackedSnapshot> cachedSnapshots = new ConcurrentHashMap<>();
 
-    private WildStackerSnapshotsContainer(){
+    private WildStackerSnapshotsContainer() {
 
     }
 
-    public static void takeSnapshot(Chunk chunk){
+    public static void takeSnapshot(Chunk chunk) {
         ChunkPosition chunkPosition = ChunkPosition.of(chunk);
 
-        if(cachedSnapshots.containsKey(chunkPosition))
+        if (cachedSnapshots.containsKey(chunkPosition))
             return;
 
         try {
@@ -36,7 +36,7 @@ public final class WildStackerSnapshotsContainer {
             if (stackedSnapshot != null) {
                 cachedSnapshots.put(chunkPosition, stackedSnapshot);
             }
-        }catch(Throwable error){
+        } catch (Throwable error) {
             SuperiorSkyblockPlugin.debug(error);
         }
     }
@@ -45,10 +45,10 @@ public final class WildStackerSnapshotsContainer {
         cachedSnapshots.remove(chunkPosition);
     }
 
-    public static StackedSnapshot getSnapshot(ChunkPosition chunkPosition){
+    public static StackedSnapshot getSnapshot(ChunkPosition chunkPosition) {
         StackedSnapshot stackedSnapshot = cachedSnapshots.get(chunkPosition);
 
-        if(stackedSnapshot == null){
+        if (stackedSnapshot == null) {
             throw new RuntimeException("Chunk " + chunkPosition + " is not cached.");
         }
 

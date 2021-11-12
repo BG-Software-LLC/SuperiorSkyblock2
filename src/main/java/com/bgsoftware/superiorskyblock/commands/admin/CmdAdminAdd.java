@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
@@ -65,15 +65,15 @@ public final class CmdAdminAdd implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[3]);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             return;
 
-        if(targetPlayer.getIsland() != null){
+        if (targetPlayer.getIsland() != null) {
             Locale.PLAYER_ALREADY_IN_ISLAND.send(sender);
             return;
         }
 
-        if(!EventsCaller.callIslandJoinEvent(targetPlayer, island))
+        if (!EventsCaller.callIslandJoinEvent(targetPlayer, island))
             return;
 
         IslandUtils.sendMessage(island, Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName());
@@ -81,18 +81,17 @@ public final class CmdAdminAdd implements IAdminIslandCommand {
         island.revokeInvite(targetPlayer);
         island.addMember(targetPlayer, SPlayerRole.defaultRole());
 
-        if(superiorPlayer == null) {
+        if (superiorPlayer == null) {
             Locale.JOINED_ISLAND_NAME.send(targetPlayer, island.getName());
             Locale.ADMIN_ADD_PLAYER_NAME.send(sender, targetPlayer.getName(), island.getName());
-        }
-        else {
+        } else {
             Locale.JOINED_ISLAND.send(targetPlayer, superiorPlayer.getName());
             Locale.ADMIN_ADD_PLAYER.send(sender, targetPlayer.getName(), superiorPlayer.getName());
         }
 
-        if(plugin.getSettings().isTeleportOnJoin() && targetPlayer.isOnline())
+        if (plugin.getSettings().isTeleportOnJoin() && targetPlayer.isOnline())
             targetPlayer.teleport(island);
-        if(plugin.getSettings().isClearOnJoin())
+        if (plugin.getSettings().isClearOnJoin())
             plugin.getNMSPlayers().clearInventory(targetPlayer.asOfflinePlayer());
     }
 

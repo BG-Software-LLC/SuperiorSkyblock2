@@ -40,7 +40,7 @@ repositories {
     String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
     String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
 
-    if(mavenUsername != null && mavenPassword != null) {
+    if (mavenUsername != null && mavenPassword != null) {
         maven {
             url 'https://repo.bg-software.com/repository/private-libs/'
             credentials {
@@ -109,7 +109,7 @@ jar {
 }
 
 processResources {
-    outputs.upToDateWhen {false}
+    outputs.upToDateWhen { false }
     String versionNumber = System.getenv("BUILD_NUMBER") == null ? version : version + "." + System.getenv("BUILD_NUMBER")
     eachFile { details ->
         if (details.name.contentEquals('plugin.yml')) {
@@ -125,10 +125,9 @@ shadowJar {
 
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
 
-    if(System.getenv("BUILD_NUMBER") == null){
+    if (System.getenv("BUILD_NUMBER") == null) {
         archiveName = rootProject.name + "-" + version + ".jar"
-    }
-    else{
+    } else {
         archiveName = rootProject.name + "-" + version + "-b" + System.getenv("BUILD_NUMBER") + ".jar"
     }
 

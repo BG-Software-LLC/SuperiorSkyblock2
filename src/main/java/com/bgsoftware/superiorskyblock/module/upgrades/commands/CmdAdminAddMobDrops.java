@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -63,16 +63,16 @@ public final class CmdAdminAddMobDrops implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Pair<Double, Boolean> arguments = CommandArguments.getMultiplier(sender, args[3]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         double multiplier = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(island.getMobDropsMultiplier() + multiplier)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_MOB_DROPS_ALL.send(sender);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_MOB_DROPS_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_MOB_DROPS.send(sender, targetPlayer.getName());

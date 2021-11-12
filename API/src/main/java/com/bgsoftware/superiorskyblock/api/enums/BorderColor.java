@@ -9,10 +9,10 @@ public enum BorderColor {
     GREEN,
     BLUE;
 
-    public static BorderColor safeValue(String name, BorderColor def){
-        try{
+    public static BorderColor safeValue(String name, BorderColor def) {
+        try {
             return BorderColor.valueOf(name);
-        }catch(IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             return def;
         }
     }

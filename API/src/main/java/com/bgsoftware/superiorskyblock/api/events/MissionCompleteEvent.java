@@ -26,19 +26,24 @@ public class MissionCompleteEvent extends Event implements Cancellable {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who completed the mission.
-     * @param mission The mission that was completed.
-     * @param islandMission Flag that determines whether or not the mission is an island mission.
-     * @param itemRewards The list of items that will be given as a reward.
+     * @param mission        The mission that was completed.
+     * @param islandMission  Flag that determines whether or not the mission is an island mission.
+     * @param itemRewards    The list of items that will be given as a reward.
      * @param commandRewards The list of commands that will be ran as a reward.
      */
-    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards){
+    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards) {
         super(true);
         this.superiorPlayer = superiorPlayer;
         this.mission = mission;
         this.islandMission = islandMission;
         this.itemRewards = itemRewards;
         this.commandRewards = commandRewards;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
@@ -88,10 +93,6 @@ public class MissionCompleteEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

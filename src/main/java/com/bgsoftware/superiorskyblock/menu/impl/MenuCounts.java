@@ -157,18 +157,49 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
     private final Island island;
 
-    private MenuCounts(SuperiorPlayer superiorPlayer, Island island){
+    private MenuCounts(SuperiorPlayer superiorPlayer, Island island) {
         super("menuCounts", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
+    public static void init() {
+        MenuCounts menuCounts = new MenuCounts(null, null);
+
+        File file = new File(plugin.getDataFolder(), "menus/counts.yml");
+
+        if (!file.exists())
+            FileUtils.saveResource("menus/counts.yml");
+
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
+
+        menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuCounts.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuCounts.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuCounts.setSlots(getSlots(cfg, "slots", menuPatternSlots));
+
+        menuCounts.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
+        new MenuCounts(superiorPlayer, island).open(previousMenu);
+    }
+
+    public static void refreshMenus(Island island) {
+        refreshMenus(MenuCounts.class, superiorMenu -> superiorMenu.island.equals(island));
+    }
+
+    private static Material getSafeMaterial(String value) {
+        try {
+            return Material.valueOf(value);
+        } catch (Exception ex) {
+            return Material.BEDROCK;
+        }
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+    public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
     }
 
     @Override
@@ -187,7 +218,8 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
                     Material.valueOf(itemType);
                     String subKey = item.length == 2 ? item[1] : "";
                     blockKey = Key.of(item[0], subKey);
-                }catch(Throwable ignored){}
+                } catch (Throwable ignored) {
+                }
             }
 
             Material blockMaterial;
@@ -196,10 +228,11 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
             try {
                 blockMaterial = Material.valueOf(blockKey.getGlobalKey());
-                if(!blockKey.getSubKey().isEmpty()) {
+                if (!blockKey.getSubKey().isEmpty()) {
                     try {
                         damage = Byte.parseByte(blockKey.getSubKey());
-                    }catch(Throwable ignored){}
+                    } catch (Throwable ignored) {
+                    }
                 }
             } catch (Exception ex) {
                 blockMaterial = Material.BEDROCK;
@@ -234,7 +267,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
             itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());
 
             return itemStack;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of block: " + block.getKey());
             SuperiorSkyblockPlugin.debug(ex);
             throw ex;
@@ -251,40 +284,9 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
         }).map(Pair::new).collect(Collectors.toList());
     }
 
-    public static void init(){
-        MenuCounts menuCounts = new MenuCounts(null, null);
-
-        File file = new File(plugin.getDataFolder(), "menus/counts.yml");
-
-        if(!file.exists())
-            FileUtils.saveResource("menus/counts.yml");
-
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
-
-        menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuCounts.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuCounts.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuCounts.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuCounts.markCompleted();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
-        new MenuCounts(superiorPlayer, island).open(previousMenu);
-    }
-
-    public static void refreshMenus(Island island){
-        refreshMenus(MenuCounts.class, superiorMenu -> superiorMenu.island.equals(island));
-    }
-
-    private static Material getSafeMaterial(String value){
-        try{
-            return Material.valueOf(value);
-        }catch(Exception ex){
-            return Material.BEDROCK;
-        }
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

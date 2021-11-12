@@ -22,7 +22,7 @@ public final class MissionData {
     private final ItemBuilder notCompleted, canComplete, completed;
     private final int resetAmount;
 
-    MissionData(Mission<?> mission, ConfigurationSection section){
+    MissionData(Mission<?> mission, ConfigurationSection section) {
         this.index = currentIndex++;
         this.mission = mission;
         this.islandMission = section.getBoolean("island", false);
@@ -31,8 +31,8 @@ public final class MissionData {
         this.leaveReset = section.getBoolean("leave-reset", false);
         this.resetAmount = section.getInt("reset-amount", 1);
 
-        if(section.contains("rewards.items")){
-            for(String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
+        if (section.contains("rewards.items")) {
+            for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
                 ItemStack itemStack = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key)).build();
                 itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
                 this.itemRewards.add(itemStack);

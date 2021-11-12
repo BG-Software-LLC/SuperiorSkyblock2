@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_15_R1;
 
-import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.hologram.Hologram;
+import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import net.minecraft.server.v1_15_R1.AxisAlignedBB;
 import net.minecraft.server.v1_15_R1.DamageSource;
 import net.minecraft.server.v1_15_R1.EntityArmorStand;
@@ -63,16 +63,6 @@ public final class NMSHologramsImpl implements NMSHolograms {
         }
 
         @Override
-        public void tick() {
-            // Disable normal ticking for this entity.
-
-            // Workaround to force EntityTrackerEntry to send a teleport packet immediately after spawning this entity.
-            if (this.onGround) {
-                this.onGround = false;
-            }
-        }
-
-        @Override
         public void inactiveTick() {
             // Disable normal ticking for this entity.
 
@@ -83,8 +73,67 @@ public final class NMSHologramsImpl implements NMSHolograms {
         }
 
         @Override
+        public void setSlot(EnumItemSlot enumitemslot, ItemStack itemstack) {
+            // Prevent stand being equipped
+        }
+
+        @Override
+        public boolean a_(int i, ItemStack item) {
+            // Prevent stand being equipped
+            return false;
+        }
+
+        @Override
         public void b(NBTTagCompound nbttagcompound) {
             // Do not save NBT.
+        }
+
+        @Override
+        public void a(NBTTagCompound nbttagcompound) {
+            // Do not load NBT.
+        }
+
+        @Override
+        public boolean isCollidable() {
+            return false;
+        }
+
+        @Override
+        public EnumInteractionResult a(EntityHuman human, Vec3D vec3d, EnumHand enumhand) {
+            // Prevent stand being equipped
+            return EnumInteractionResult.PASS;
+        }
+
+        @Override
+        public void tick() {
+            // Disable normal ticking for this entity.
+
+            // Workaround to force EntityTrackerEntry to send a teleport packet immediately after spawning this entity.
+            if (this.onGround) {
+                this.onGround = false;
+            }
+        }
+
+        public void forceSetBoundingBox(AxisAlignedBB boundingBox) {
+            super.a(boundingBox);
+        }
+
+        @Override
+        public CraftEntity getBukkitEntity() {
+            if (bukkitEntity == null) {
+                bukkitEntity = new CraftArmorStand(super.world.getServer(), this);
+            }
+            return bukkitEntity;
+        }
+
+        @Override
+        public void die() {
+            // Prevent being killed.
+        }
+
+        @Override
+        public void a(SoundEffect soundeffect, float f, float f1) {
+            // Remove sounds.
         }
 
         @Override
@@ -111,11 +160,6 @@ public final class NMSHologramsImpl implements NMSHolograms {
         }
 
         @Override
-        public void a(NBTTagCompound nbttagcompound) {
-            // Do not load NBT.
-        }
-
-        @Override
         public boolean isInvulnerable(DamageSource source) {
             /*
              * The field Entity.invulnerable is private.
@@ -123,11 +167,6 @@ public final class NMSHologramsImpl implements NMSHolograms {
              * on chunk unload, we prefer to override isInvulnerable().
              */
             return true;
-        }
-
-        @Override
-        public boolean isCollidable() {
-            return false;
         }
 
         @Override
@@ -141,47 +180,8 @@ public final class NMSHologramsImpl implements NMSHolograms {
         }
 
         @Override
-        public EnumInteractionResult a(EntityHuman human, Vec3D vec3d, EnumHand enumhand) {
-            // Prevent stand being equipped
-            return EnumInteractionResult.PASS;
-        }
-
-        @Override
-        public boolean a_(int i, ItemStack item) {
-            // Prevent stand being equipped
-            return false;
-        }
-
-        @Override
-        public void setSlot(EnumItemSlot enumitemslot, ItemStack itemstack) {
-            // Prevent stand being equipped
-        }
-
-        @Override
         public void a(AxisAlignedBB boundingBox) {
             // Do not change it!
-        }
-
-        public void forceSetBoundingBox(AxisAlignedBB boundingBox) {
-            super.a(boundingBox);
-        }
-
-        @Override
-        public void a(SoundEffect soundeffect, float f, float f1) {
-            // Remove sounds.
-        }
-
-        @Override
-        public void die() {
-            // Prevent being killed.
-        }
-
-        @Override
-        public CraftEntity getBukkitEntity() {
-            if (bukkitEntity == null) {
-                bukkitEntity = new CraftArmorStand(super.world.getServer(), this);
-            }
-            return bukkitEntity;
         }
 
     }

@@ -9,7 +9,7 @@ public final class NMSCachedBlock implements ICachedBlock {
 
     private final BlockData blockData;
 
-    public NMSCachedBlock(Block block){
+    public NMSCachedBlock(Block block) {
         this.blockData = block.getBlockData();
     }
 

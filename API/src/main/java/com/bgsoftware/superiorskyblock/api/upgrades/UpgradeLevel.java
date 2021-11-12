@@ -21,6 +21,7 @@ public interface UpgradeLevel {
 
     /**
      * Get the price required to upgrade to the next level.
+     *
      * @deprecated See getCost()
      */
     @Deprecated
@@ -43,9 +44,10 @@ public interface UpgradeLevel {
 
     /**
      * Check all the custom requirements of the upgrade.
+     *
      * @param superiorPlayer The player to check the requirements on.
      * @return The error message for the failed requirements.
-     *         If all the requirements were passed, an empty string will be returned.
+     * If all the requirements were passed, an empty string will be returned.
      */
     String checkRequirements(SuperiorPlayer superiorPlayer);
 
@@ -66,12 +68,14 @@ public interface UpgradeLevel {
 
     /**
      * Get the limit of a block for this level.
+     *
      * @param key The block to check.
      */
     int getBlockLimit(Key key);
 
     /**
      * Get the exact limit of a block for this level.
+     *
      * @param key The block to check.
      */
     int getExactBlockLimit(Key key);
@@ -83,12 +87,14 @@ public interface UpgradeLevel {
 
     /**
      * Get the limit of an entity for this level.
+     *
      * @param entityType The entity's type to check.
      */
     int getEntityLimit(EntityType entityType);
 
     /**
      * Get the limit of an entity for this level.
+     *
      * @param key The key of the entity to check.
      */
     int getEntityLimit(Key key);
@@ -120,19 +126,22 @@ public interface UpgradeLevel {
 
     /**
      * Get the generator rate of a block for this level in a specific world.
-     * @param key The block to check.
+     *
+     * @param key         The block to check.
      * @param environment The world environment
      */
     int getGeneratorAmount(Key key, World.Environment environment);
 
     /**
      * Get all the generator rates for this level in a specific world.
+     *
      * @param environment The world environment
      */
     Map<String, Integer> getGeneratorAmounts(World.Environment environment);
 
     /**
      * Get the potion effect for this level.
+     *
      * @param potionEffectType The potion effect to check.
      */
     int getPotionEffect(PotionEffectType potionEffectType);
@@ -149,6 +158,7 @@ public interface UpgradeLevel {
 
     /**
      * Get a limit of a role for this level.
+     *
      * @param playerRole The role to check.
      */
     int getRoleLimit(PlayerRole playerRole);

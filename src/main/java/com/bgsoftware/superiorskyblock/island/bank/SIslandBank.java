@@ -45,7 +45,7 @@ public final class SIslandBank implements IslandBank {
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
 
-    public SIslandBank(Island island){
+    public SIslandBank(Island island) {
         this.island = island;
     }
 
@@ -67,13 +67,11 @@ public final class SIslandBank implements IslandBank {
         BankTransaction bankTransaction;
         String failureReason;
 
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.DEPOSIT_MONEY)){
+        if (!island.hasPermission(superiorPlayer, IslandPrivileges.DEPOSIT_MONEY)) {
             failureReason = "No permission";
-        }
-        else if(amount.compareTo(BigDecimal.ZERO) <= 0){
+        } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
-        }
-        else {
+        } else {
             SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + amount);
 
             EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
@@ -82,7 +80,7 @@ public final class SIslandBank implements IslandBank {
 
             if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";
-            } else if(island.getBankLimit().compareTo(BigDecimal.valueOf(-1)) > 0 &&
+            } else if (island.getBankLimit().compareTo(BigDecimal.valueOf(-1)) > 0 &&
                     this.balance.get().add(amount).compareTo(island.getBankLimit()) > 0) {
                 failureReason = "Exceed bank limit";
             } else {
@@ -94,7 +92,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = transactions.readAndGet(SortedSet::size) + 1;
 
-        if(failureReason == null || failureReason.isEmpty()){
+        if (failureReason == null || failureReason.isEmpty()) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
             increaseBalance(amount);
 
@@ -104,8 +102,7 @@ public final class SIslandBank implements IslandBank {
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
-        }
-        else{
+        } else {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
         }
 
@@ -143,16 +140,13 @@ public final class SIslandBank implements IslandBank {
         BankTransaction bankTransaction;
         String failureReason;
 
-        if(!island.hasPermission(superiorPlayer, IslandPrivileges.WITHDRAW_MONEY)){
+        if (!island.hasPermission(superiorPlayer, IslandPrivileges.WITHDRAW_MONEY)) {
             failureReason = "No permission";
-        }
-        else if(this.balance.get().compareTo(BigDecimal.ZERO) <= 0){
+        } else if (this.balance.get().compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Bank is empty";
-        }
-        else if(amount.compareTo(BigDecimal.ZERO) <= 0){
+        } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
-        }
-        else {
+        } else {
             SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
 
             EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
@@ -173,7 +167,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = transactions.readAndGet(SortedSet::size) + 1;
 
-        if(failureReason == null || failureReason.isEmpty()){
+        if (failureReason == null || failureReason.isEmpty()) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
             decreaseBalance(withdrawAmount);
 
@@ -183,8 +177,7 @@ public final class SIslandBank implements IslandBank {
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
-        }
-        else{
+        } else {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
         }
 
@@ -228,18 +221,18 @@ public final class SIslandBank implements IslandBank {
     }
 
     @Override
-    public void loadTransaction(BankTransaction bankTransaction){
+    public void loadTransaction(BankTransaction bankTransaction) {
         addTransaction(bankTransaction, false);
     }
 
-    private List<BankTransaction> getTransactions(UUID uuid){
+    private List<BankTransaction> getTransactions(UUID uuid) {
         SyncedObject<List<BankTransaction>> transactions = this.transactionsByPlayers.get(uuid);
         return transactions == null ? Collections.unmodifiableList(new ArrayList<>()) :
                 transactions.readAndGet(Collections::unmodifiableList);
     }
 
-    private void addTransaction(BankTransaction bankTransaction, boolean save){
-        if(!BuiltinModules.BANK.bankLogs)
+    private void addTransaction(BankTransaction bankTransaction, boolean save) {
+        if (!BuiltinModules.BANK.bankLogs)
             return;
 
         UUID senderUUID = bankTransaction.getPlayer();
@@ -248,16 +241,16 @@ public final class SIslandBank implements IslandBank {
         transactionsByPlayers.computeIfAbsent(senderUUID != null ? senderUUID : CONSOLE_UUID, p -> SyncedObject.of(new ArrayList<>()))
                 .write(transactions -> transactions.add(bankTransaction));
 
-        if(save){
+        if (save) {
             IslandsDatabaseBridge.saveBankTransaction(island, bankTransaction);
         }
     }
 
-    private void decreaseBalance(BigDecimal amount){
+    private void decreaseBalance(BigDecimal amount) {
         increaseBalance(amount.negate());
     }
 
-    private void increaseBalance(BigDecimal amount){
+    private void increaseBalance(BigDecimal amount) {
         this.balance.updateAndGet(bigDecimal -> bigDecimal.add(amount).setScale(2, RoundingMode.HALF_DOWN));
         IslandsDatabaseBridge.saveBankBalance(island);
     }

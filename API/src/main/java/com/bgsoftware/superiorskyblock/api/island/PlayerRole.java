@@ -21,12 +21,14 @@ public interface PlayerRole {
 
     /**
      * Check whether or not the role is higher than another role.
+     *
      * @param role The role to check.
      */
     boolean isHigherThan(PlayerRole role);
 
     /**
      * Check whether or not the role is less than another role.
+     *
      * @param role The role to check.
      */
     boolean isLessThan(PlayerRole role);

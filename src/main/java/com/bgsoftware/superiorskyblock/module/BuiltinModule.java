@@ -14,7 +14,7 @@ public abstract class BuiltinModule extends PluginModule {
 
     protected CommentedConfiguration config = null;
 
-    public BuiltinModule(String moduleName){
+    public BuiltinModule(String moduleName) {
         super(moduleName, "Ome_R");
     }
 
@@ -61,7 +61,7 @@ public abstract class BuiltinModule extends PluginModule {
             config.syncWithConfig(configFile,
                     FileUtils.getResource("modules/" + getName() + "/config.yml"),
                     getIgnoredSections());
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
         }
@@ -69,10 +69,10 @@ public abstract class BuiltinModule extends PluginModule {
         updateConfig(plugin);
     }
 
-    public File createConfig(){
+    public File createConfig() {
         File configFile = new File(getDataFolder(), "config.yml");
 
-        if(!configFile.exists())
+        if (!configFile.exists())
             FileUtils.saveResource("modules/" + getName() + "/config.yml");
 
         return configFile;
@@ -92,7 +92,7 @@ public abstract class BuiltinModule extends PluginModule {
 
     protected abstract void updateConfig(SuperiorSkyblockPlugin plugin);
 
-    protected String[] getIgnoredSections(){
+    protected String[] getIgnoredSections() {
         return new String[0];
     }
 

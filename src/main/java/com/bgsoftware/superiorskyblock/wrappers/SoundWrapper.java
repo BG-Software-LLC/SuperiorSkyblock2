@@ -9,17 +9,17 @@ public final class SoundWrapper {
     private Sound sound;
     private float volume, pitch;
 
-    public SoundWrapper(Sound sound, float volume, float pitch){
+    public SoundWrapper(Sound sound, float volume, float pitch) {
         this.sound = sound;
         this.volume = volume;
         this.pitch = pitch;
     }
 
-    public void playSound(HumanEntity humanEntity){
+    public void playSound(HumanEntity humanEntity) {
         playSound((Player) humanEntity);
     }
 
-    public void playSound(Player player){
+    public void playSound(Player player) {
         player.playSound(player.getLocation(), sound, volume, pitch);
     }
 

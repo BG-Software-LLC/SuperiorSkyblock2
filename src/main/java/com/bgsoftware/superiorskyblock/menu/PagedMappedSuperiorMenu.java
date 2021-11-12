@@ -13,7 +13,7 @@ public abstract class PagedMappedSuperiorMenu<K, V> extends PagedSuperiorMenu<K>
 
     private Map<K, V> objects;
 
-    public PagedMappedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer){
+    public PagedMappedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer) {
         super(identifier, superiorPlayer);
     }
 
@@ -32,7 +32,7 @@ public abstract class PagedMappedSuperiorMenu<K, V> extends PagedSuperiorMenu<K>
         this.objects = requestMappedObjects();
         return new ArrayList<>(objects.keySet());
     }
-    
+
     protected abstract void onPlayerClick(InventoryClickEvent event, K clickedObjectKey, V clickedObjectValue);
 
     protected abstract ItemStack getObjectItem(ItemStack clickedItem, K itemKey, V itemValue);

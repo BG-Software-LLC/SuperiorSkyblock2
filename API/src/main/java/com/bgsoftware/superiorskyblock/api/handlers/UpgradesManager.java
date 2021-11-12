@@ -11,6 +11,7 @@ public interface UpgradesManager {
 
     /**
      * Get an upgrade by it's name.
+     *
      * @param upgradeName The name of the upgrade.
      */
     @Nullable
@@ -18,6 +19,7 @@ public interface UpgradesManager {
 
     /**
      * Get an upgrade by it's menu slot.
+     *
      * @param slot The slot of the upgrade.
      */
     @Nullable
@@ -25,6 +27,7 @@ public interface UpgradesManager {
 
     /**
      * Add a new upgrade.
+     *
      * @param upgrade The upgrade to add.
      */
     void addUpgrade(Upgrade upgrade);
@@ -36,6 +39,7 @@ public interface UpgradesManager {
 
     /**
      * Check whether or not an upgrade with the provided name exists or not.
+     *
      * @param upgradeName The name to check.
      */
     boolean isUpgrade(String upgradeName);
@@ -47,7 +51,8 @@ public interface UpgradesManager {
 
     /**
      * Register custom upgrade cost loader
-     * @param id The id of the loader.
+     *
+     * @param id         The id of the loader.
      * @param costLoader the loader you're registering
      */
     void registerUpgradeCostLoader(String id, UpgradeCostLoader costLoader);

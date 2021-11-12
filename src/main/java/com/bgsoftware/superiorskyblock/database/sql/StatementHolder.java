@@ -20,7 +20,7 @@ public final class StatementHolder {
     private String query;
     private int currentIndex = 1;
 
-    public StatementHolder(String statement){
+    public StatementHolder(String statement) {
         setQuery(statement);
     }
 
@@ -28,22 +28,22 @@ public final class StatementHolder {
         this.query = query.replace("{prefix}", prefix);
     }
 
-    public void addBatch(){
+    public void addBatch() {
         batches.add(new HashMap<>(values));
         values.clear();
         currentIndex = 1;
     }
 
-    public StatementHolder setObject(Object value){
+    public StatementHolder setObject(Object value) {
         values.put(currentIndex++, value);
         return this;
     }
 
-    public void executeBatch(boolean async){
-        if(query == null || query.isEmpty() || batches.isEmpty())
+    public void executeBatch(boolean async) {
+        if (query == null || query.isEmpty() || batches.isEmpty())
             return;
 
-        if(async && !Executor.isDataThread()){
+        if (async && !Executor.isDataThread()) {
             Executor.data(() -> executeBatch(false));
             return;
         }
@@ -69,7 +69,8 @@ public final class StatementHolder {
                     preparedStatement.executeBatch();
                     try {
                         SQLHelper.commit();
-                    }catch(Throwable ignored){}
+                    } catch (Throwable ignored) {
+                    }
 
                     SQLHelper.setAutoCommit(true);
                 }, ex -> {
@@ -83,7 +84,7 @@ public final class StatementHolder {
     }
 
     public void execute(boolean async) {
-        if(async && !Executor.isDataThread()){
+        if (async && !Executor.isDataThread()) {
             Executor.data(() -> execute(false));
             return;
         }
@@ -111,11 +112,11 @@ public final class StatementHolder {
         }
     }
 
-    private static class StringHolder{
+    private static class StringHolder {
 
         private String value;
 
-        StringHolder(String value){
+        StringHolder(String value) {
             this.value = value;
         }
 

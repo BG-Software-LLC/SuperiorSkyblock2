@@ -39,7 +39,7 @@ public final class IslandsDatabaseBridge {
 
     private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
 
-    private IslandsDatabaseBridge(){
+    private IslandsDatabaseBridge() {
     }
 
     public static void addMember(Island island, SuperiorPlayer superiorPlayer, long addTime) {
@@ -86,12 +86,11 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveTeleportLocation(Island island, World.Environment environment, Location location) {
-        if(location == null){
+        if (location == null) {
             island.getDatabaseBridge().deleteObject("islands_homes",
                     createFilter("island", island, new Pair<>("environment", environment.name()))
             );
-        }
-        else {
+        } else {
             island.getDatabaseBridge().insertObject("islands_homes",
                     new Pair<>("island", island.getUniqueId().toString()),
                     new Pair<>("environment", environment.name()),
@@ -108,7 +107,7 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void removeVisitorLocation(Island island, World.Environment environment){
+    public static void removeVisitorLocation(Island island, World.Environment environment) {
         island.getDatabaseBridge().deleteObject("islands_visitor_homes",
                 createFilter("island", island, new Pair<>("environment", environment.name()))
         );
@@ -122,7 +121,7 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void savePlayerPermission(Island island, SuperiorPlayer superiorPlayer, IslandPrivilege privilege,
-                                            boolean status){
+                                            boolean status) {
         island.getDatabaseBridge().insertObject("islands_player_permissions",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("player", superiorPlayer.getUniqueId().toString()),
@@ -131,13 +130,13 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void clearPlayerPermission(Island island, SuperiorPlayer superiorPlayer){
+    public static void clearPlayerPermission(Island island, SuperiorPlayer superiorPlayer) {
         island.getDatabaseBridge().deleteObject("islands_player_permissions",
                 createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString()))
         );
     }
 
-    public static void saveRolePermission(Island island, PlayerRole playerRole, IslandPrivilege privilege){
+    public static void saveRolePermission(Island island, PlayerRole playerRole, IslandPrivilege privilege) {
         island.getDatabaseBridge().insertObject("islands_role_permissions",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("role", playerRole.getId()),
@@ -145,13 +144,13 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void removeRolePermission(Island island, PlayerRole playerRole){
+    public static void removeRolePermission(Island island, PlayerRole playerRole) {
         island.getDatabaseBridge().deleteObject("islands_role_permissions",
                 createFilter("island", island, new Pair<>("role", playerRole.getId()))
         );
     }
 
-    public static void clearRolePermissions(Island island){
+    public static void clearRolePermissions(Island island) {
         island.getDatabaseBridge().deleteObject("islands_role_permissions",
                 createFilter("island", island));
     }
@@ -549,7 +548,7 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void insertIsland(Island island){
+    public static void insertIsland(Island island) {
         island.getDatabaseBridge().insertObject("islands",
                 new Pair<>("uuid", island.getUniqueId().toString()),
                 new Pair<>("owner", island.getOwner().getUniqueId().toString()),
@@ -590,7 +589,7 @@ public final class IslandsDatabaseBridge {
         );
     }
 
-    public static void deleteIsland(Island island){
+    public static void deleteIsland(Island island) {
         island.getDatabaseBridge().deleteObject("islands", createFilter("uuid", island));
         island.getDatabaseBridge().deleteObject("islands_banks", createFilter("island", island));
         island.getDatabaseBridge().deleteObject("islands_bans", createFilter("island", island));
@@ -624,24 +623,24 @@ public final class IslandsDatabaseBridge {
     public static void markBlockCountsToBeSaved(Island island) {
         Set<Object> varsForBlockCounts = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(island.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
                 .computeIfAbsent(FutureSave.BLOCK_COUNTS, e -> new HashSet<>());
-        if(varsForBlockCounts.isEmpty())
+        if (varsForBlockCounts.isEmpty())
             varsForBlockCounts.add(new Object());
     }
 
-    public static boolean isModified(Island island){
+    public static boolean isModified(Island island) {
         return SAVE_METHODS_TO_BE_EXECUTED.containsKey(island.getUniqueId());
     }
 
-    public static void executeFutureSaves(Island island){
+    public static void executeFutureSaves(Island island) {
         Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(island.getUniqueId());
-        if(futureSaves != null){
-            for(Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()){
-                switch (futureSaveEntry.getKey()){
+        if (futureSaves != null) {
+            for (Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()) {
+                switch (futureSaveEntry.getKey()) {
                     case BLOCK_COUNTS:
                         saveBlockCounts(island);
                         break;
                     case ISLAND_CHESTS:
-                        for(Object islandChest : futureSaveEntry.getValue())
+                        for (Object islandChest : futureSaveEntry.getValue())
                             saveIslandChest(island, (IslandChest) islandChest);
                         break;
                 }
@@ -649,10 +648,10 @@ public final class IslandsDatabaseBridge {
         }
     }
 
-    private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others){
+    private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others) {
         List<Pair<String, Object>> filters = new ArrayList<>();
         filters.add(new Pair<>(id, island.getUniqueId().toString()));
-        if(others != null)
+        if (others != null)
             filters.addAll(Arrays.asList(others));
         return new DatabaseFilter(filters);
     }

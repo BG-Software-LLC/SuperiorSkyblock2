@@ -33,86 +33,25 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
     private final Island island;
 
-    private MenuSettings(SuperiorPlayer superiorPlayer, Island island){
+    private MenuSettings(SuperiorPlayer superiorPlayer, Island island) {
         super("menuSettings", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, IslandFlag islandFlag) {
-        String settingsName = islandFlag.getName().toLowerCase();
-
-        if(!containsData(settingsName + "-settings-enabled"))
-            return;
-
-        String permission = (String) getData(settingsName + "-permission");
-        SoundWrapper noAccessSound = (SoundWrapper) getData(settingsName + "-no-access-sound");
-        if(!permission.isEmpty() && !superiorPlayer.hasPermission(permission)){
-            if(noAccessSound != null)
-                noAccessSound.playSound(event.getWhoClicked());
-            return;
-        }
-
-        if(island.hasSettingsEnabled(islandFlag)){
-            island.disableSettings(islandFlag);
-        }
-        else{
-            island.enableSettings(islandFlag);
-        }
-
-        Locale.UPDATED_SETTINGS.send(superiorPlayer, StringUtils.format(settingsName));
-
-        SoundWrapper soundWrapper = (SoundWrapper) getData(settingsName + "-sound");
-        if (soundWrapper != null)
-            soundWrapper.playSound(event.getWhoClicked());
-        //noinspection unchecked
-        List<String> commands = (List<String>) getData(settingsName + "-commands");
-        if (commands != null)
-            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
-
-        previousMove = false;
-        open(previousMenu);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, IslandFlag islandFlag) {
-        try {
-            String settingsName = islandFlag.getName().toLowerCase();
-            return (containsData(settingsName + "-settings-enabled") ?
-                    (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
-                    new ItemBuilder(Material.AIR)
-            ).clone().build(superiorPlayer);
-        }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected List<IslandFlag> requestObjects() {
-        return islandSettings;
-    }
-
-    public static void init(){
+    public static void init() {
         MenuSettings menuSettings = new MenuSettings(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/settings.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/settings.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -125,10 +64,10 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         islandSettings = new ArrayList<>();
         int position = 0;
 
-        for(String key : settingsSection.getKeys(false)){
+        for (String key : settingsSection.getKeys(false)) {
             try {
                 updateSettings(IslandFlag.getByName(key.toLowerCase()), cfg, position++);
-            }catch (Exception error){
+            } catch (Exception error) {
                 SuperiorSkyblockPlugin.debug(error);
             }
         }
@@ -141,21 +80,21 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         menuSettings.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
         new MenuSettings(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(Island island){
+    public static void refreshMenus(Island island) {
         SuperiorMenu.refreshMenus(MenuSettings.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    public static void updateSettings(IslandFlag islandFlag){
+    public static void updateSettings(IslandFlag islandFlag) {
         File file = new File(plugin.getDataFolder(), "menus/settings.yml");
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         int position = 0;
 
-        for(String key : cfg.getConfigurationSection("settings").getKeys(false)){
-            if(islandFlag.getName().equalsIgnoreCase(key))
+        for (String key : cfg.getConfigurationSection("settings").getKeys(false)) {
+            if (islandFlag.getName().equalsIgnoreCase(key))
                 break;
 
             position++;
@@ -164,8 +103,8 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         updateSettings(islandFlag, cfg, position);
     }
 
-    public static void updateSettings(IslandFlag islandFlag, YamlConfiguration cfg, int position){
-        if(!islandSettings.contains(islandFlag)) {
+    public static void updateSettings(IslandFlag islandFlag, YamlConfiguration cfg, int position) {
+        if (!islandSettings.contains(islandFlag)) {
             String settings = islandFlag.getName().toLowerCase();
             if (cfg.contains("settings." + settings)) {
                 ConfigurationSection section = cfg.getConfigurationSection("settings." + settings);
@@ -176,7 +115,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
                 menuSettings.addData(settings + "-no-access-sound", FileUtils.getSound(section.getConfigurationSection("no-access-sound")));
                 menuSettings.addData(settings + "-settings-enabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-enabled")));
                 menuSettings.addData(settings + "-settings-disabled", FileUtils.getItemStack("settings.yml", section.getConfigurationSection("settings-disabled")));
-                if(position >= 0)
+                if (position >= 0)
                     islandSettings.add(position, islandFlag);
                 else
                     islandSettings.add(islandFlag);
@@ -184,10 +123,10 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         }
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/settings-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -206,7 +145,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
         int charCounter = 0;
 
-        if(cfg.contains("settings-gui.fill-items")) {
+        if (cfg.contains("settings-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("settings-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -224,6 +163,66 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent event, IslandFlag islandFlag) {
+        String settingsName = islandFlag.getName().toLowerCase();
+
+        if (!containsData(settingsName + "-settings-enabled"))
+            return;
+
+        String permission = (String) getData(settingsName + "-permission");
+        SoundWrapper noAccessSound = (SoundWrapper) getData(settingsName + "-no-access-sound");
+        if (!permission.isEmpty() && !superiorPlayer.hasPermission(permission)) {
+            if (noAccessSound != null)
+                noAccessSound.playSound(event.getWhoClicked());
+            return;
+        }
+
+        if (island.hasSettingsEnabled(islandFlag)) {
+            island.disableSettings(islandFlag);
+        } else {
+            island.enableSettings(islandFlag);
+        }
+
+        Locale.UPDATED_SETTINGS.send(superiorPlayer, StringUtils.format(settingsName));
+
+        SoundWrapper soundWrapper = (SoundWrapper) getData(settingsName + "-sound");
+        if (soundWrapper != null)
+            soundWrapper.playSound(event.getWhoClicked());
+        //noinspection unchecked
+        List<String> commands = (List<String>) getData(settingsName + "-commands");
+        if (commands != null)
+            commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+
+        previousMove = false;
+        open(previousMenu);
+    }
+
+    @Override
+    protected ItemStack getObjectItem(ItemStack clickedItem, IslandFlag islandFlag) {
+        try {
+            String settingsName = islandFlag.getName().toLowerCase();
+            return (containsData(settingsName + "-settings-enabled") ?
+                    (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
+                    new ItemBuilder(Material.AIR)
+            ).clone().build(superiorPlayer);
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
+            SuperiorSkyblockPlugin.debug(ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    protected List<IslandFlag> requestObjects() {
+        return islandSettings;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

@@ -4,8 +4,12 @@ public final class DefaultUpgrade extends SUpgrade {
 
     private static final DefaultUpgrade INSTANCE = new DefaultUpgrade();
 
-    private DefaultUpgrade(){
+    private DefaultUpgrade() {
         super("DEFAULT");
+    }
+
+    public static DefaultUpgrade getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -21,9 +25,5 @@ public final class DefaultUpgrade extends SUpgrade {
     @Override
     public void addUpgradeLevel(int level, SUpgradeLevel upgradeLevel) {
         // Not supported for the default upgrade.
-    }
-
-    public static DefaultUpgrade getInstance() {
-        return INSTANCE;
     }
 }

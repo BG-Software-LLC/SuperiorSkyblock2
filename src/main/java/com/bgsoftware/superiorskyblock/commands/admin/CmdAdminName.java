@@ -62,7 +62,7 @@ public final class CmdAdminName implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         String islandName = args[3];
 
-        if(!StringUtils.isValidName(sender, island, islandName))
+        if (!StringUtils.isValidName(sender, island, islandName))
             return;
 
         String oldName = island.getName();
@@ -71,10 +71,10 @@ public final class CmdAdminName implements IAdminIslandCommand {
         String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
                 StringUtils.translateColors(islandName) : islandName;
 
-        for(Player player : Bukkit.getOnlinePlayers())
+        for (Player player : Bukkit.getOnlinePlayers())
             Locale.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             Locale.CHANGED_NAME_OTHER_NAME.send(sender, oldName, coloredName);
         else
             Locale.CHANGED_NAME_OTHER.send(sender, targetPlayer.getName(), coloredName);

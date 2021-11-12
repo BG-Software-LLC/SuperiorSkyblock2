@@ -34,70 +34,6 @@ public final class MissionsModule extends BuiltinModule {
         super("missions");
     }
 
-    @Override
-    public void onEnable(SuperiorSkyblockPlugin plugin) {
-        if (!enabled)
-            return;
-
-        List<Mission<?>> missionsToLoad = new ArrayList<>();
-
-        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
-
-        if (categoriesSection != null) {
-            for (String categoryName : categoriesSection.getKeys(false)) {
-                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
-
-                if (categorySection == null)
-                    continue;
-
-                List<Mission<?>> categoryMissions = new ArrayList<>();
-
-                if (!canLoadCategory(plugin, categoryName, categoryMissions))
-                    continue;
-
-                int slot = categorySection.getInt("slot");
-
-                String formattedCategoryName = categorySection.getString("name", categoryName);
-
-                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
-
-                missionsToLoad.addAll(categoryMissions);
-            }
-        }
-
-        if (!missionsToLoad.isEmpty()) {
-            // Should be running in 1-tick delay so players and their islands will be loaded
-            // before loading data of missions, as they depend on this data.
-            Executor.sync(() -> plugin.getMissions().loadMissionsData(missionsToLoad), 1L);
-        }
-    }
-
-    @Override
-    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
-        return null;
-    }
-
-    @Override
-    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[]{new CmdMission(), new CmdMissions()};
-    }
-
-    @Override
-    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[]{new CmdAdminMission()};
-    }
-
-    @Override
-    public void onDisable(SuperiorSkyblockPlugin plugin) {
-        if (enabled)
-            plugin.getMissions().saveMissionsData();
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return enabled && isInitialized();
-    }
-
     private void generateDefaultFiles() {
         FileUtils.copyResource("modules/missions/BlocksMissions");
         FileUtils.copyResource("modules/missions/BrewingMissions");
@@ -156,6 +92,70 @@ public final class MissionsModule extends BuiltinModule {
         }
 
         updateConfig(plugin);
+    }
+
+    @Override
+    public void onEnable(SuperiorSkyblockPlugin plugin) {
+        if (!enabled)
+            return;
+
+        List<Mission<?>> missionsToLoad = new ArrayList<>();
+
+        ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
+
+        if (categoriesSection != null) {
+            for (String categoryName : categoriesSection.getKeys(false)) {
+                ConfigurationSection categorySection = categoriesSection.getConfigurationSection(categoryName);
+
+                if (categorySection == null)
+                    continue;
+
+                List<Mission<?>> categoryMissions = new ArrayList<>();
+
+                if (!canLoadCategory(plugin, categoryName, categoryMissions))
+                    continue;
+
+                int slot = categorySection.getInt("slot");
+
+                String formattedCategoryName = categorySection.getString("name", categoryName);
+
+                plugin.getMissions().loadMissionCategory(new SMissionCategory(formattedCategoryName, slot, categoryMissions));
+
+                missionsToLoad.addAll(categoryMissions);
+            }
+        }
+
+        if (!missionsToLoad.isEmpty()) {
+            // Should be running in 1-tick delay so players and their islands will be loaded
+            // before loading data of missions, as they depend on this data.
+            Executor.sync(() -> plugin.getMissions().loadMissionsData(missionsToLoad), 1L);
+        }
+    }
+
+    @Override
+    public void onDisable(SuperiorSkyblockPlugin plugin) {
+        if (enabled)
+            plugin.getMissions().saveMissionsData();
+    }
+
+    @Override
+    public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
+        return null;
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
+        return !enabled ? null : new SuperiorCommand[]{new CmdMission(), new CmdMissions()};
+    }
+
+    @Override
+    public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
+        return !enabled ? null : new SuperiorCommand[]{new CmdAdminMission()};
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled && isInitialized();
     }
 
     @Override

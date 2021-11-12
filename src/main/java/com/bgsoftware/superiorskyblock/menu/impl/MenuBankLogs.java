@@ -44,80 +44,6 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         this.island = island;
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e, BankTransaction transaction) {
-        boolean reopenMenu = false;
-
-        if (transaction == null) {
-            if (timeSortSlots.contains(e.getRawSlot())) {
-                sorting = Comparator.comparingLong(BankTransaction::getTime);
-                reopenMenu = true;
-            } else if (moneySortSlots.contains(e.getRawSlot())) {
-                sorting = (o1, o2) -> o2.getAmount().compareTo(o1.getAmount());
-                reopenMenu = true;
-            }
-        } else if (e.getClick().name().contains("RIGHT")) {
-            filteredPlayer = transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer();
-            reopenMenu = true;
-        }
-
-        if (reopenMenu) {
-            previousMove = false;
-            open(previousMenu);
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, BankTransaction transaction) {
-        try {
-            return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", transaction.getPosition() + "")
-                    .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
-                    .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
-                            Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
-                    .replaceAll("{3}", transaction.getDate())
-                    .replaceAll("{4}", transaction.getAmount() + "")
-                    .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
-                    .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), superiorPlayer.getUserLocale()))
-                    .asSkullOf(superiorPlayer).build(superiorPlayer);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        return super.buildInventory(title -> title.replace("{0}", getFilteredPlayerName(filteredPlayer)));
-    }
-
-    @Override
-    protected List<BankTransaction> requestObjects() {
-        List<BankTransaction> transactions = getTransactions();
-
-        if (sorting == null) {
-            return transactions;
-        }
-
-        return transactions.stream().sorted(sorting).collect(Collectors.toList());
-    }
-
-    private List<BankTransaction> getTransactions() {
-        if (filteredPlayer == null) {
-            return island.getIslandBank().getAllTransactions();
-        } else if (filteredPlayer.equals(CONSOLE_UUID)) {
-            return island.getIslandBank().getConsoleTransactions();
-        } else {
-            return island.getIslandBank().getTransactions(plugin.getPlayers().getSuperiorPlayer(filteredPlayer));
-        }
-    }
-
     private static String getFilteredPlayerName(UUID filteredPlayer) {
         if (filteredPlayer == null) {
             return "";
@@ -205,6 +131,80 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
+    }
+
+    @Override
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        return super.buildInventory(title -> title.replace("{0}", getFilteredPlayerName(filteredPlayer)));
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent e, BankTransaction transaction) {
+        boolean reopenMenu = false;
+
+        if (transaction == null) {
+            if (timeSortSlots.contains(e.getRawSlot())) {
+                sorting = Comparator.comparingLong(BankTransaction::getTime);
+                reopenMenu = true;
+            } else if (moneySortSlots.contains(e.getRawSlot())) {
+                sorting = (o1, o2) -> o2.getAmount().compareTo(o1.getAmount());
+                reopenMenu = true;
+            }
+        } else if (e.getClick().name().contains("RIGHT")) {
+            filteredPlayer = transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer();
+            reopenMenu = true;
+        }
+
+        if (reopenMenu) {
+            previousMove = false;
+            open(previousMenu);
+        }
+    }
+
+    @Override
+    protected ItemStack getObjectItem(ItemStack clickedItem, BankTransaction transaction) {
+        try {
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", transaction.getPosition() + "")
+                    .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
+                    .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
+                            Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
+                    .replaceAll("{3}", transaction.getDate())
+                    .replaceAll("{4}", transaction.getAmount() + "")
+                    .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
+                    .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), superiorPlayer.getUserLocale()))
+                    .asSkullOf(superiorPlayer).build(superiorPlayer);
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            SuperiorSkyblockPlugin.debug(ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    protected List<BankTransaction> requestObjects() {
+        List<BankTransaction> transactions = getTransactions();
+
+        if (sorting == null) {
+            return transactions;
+        }
+
+        return transactions.stream().sorted(sorting).collect(Collectors.toList());
+    }
+
+    private List<BankTransaction> getTransactions() {
+        if (filteredPlayer == null) {
+            return island.getIslandBank().getAllTransactions();
+        } else if (filteredPlayer.equals(CONSOLE_UUID)) {
+            return island.getIslandBank().getConsoleTransactions();
+        } else {
+            return island.getIslandBank().getTransactions(plugin.getPlayers().getSuperiorPlayer(filteredPlayer));
+        }
     }
 
 }

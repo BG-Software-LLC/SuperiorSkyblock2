@@ -53,26 +53,26 @@ public final class LongTag extends Tag<Long> {
         super(value, CLASS, long.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeLong(value);
-    }
-
-    public static LongTag fromNBT(Object tag){
+    public static LongTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to LongTag!");
 
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);
             return new LongTag(value);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
 
-    public static LongTag fromStream(DataInputStream is) throws IOException{
+    public static LongTag fromStream(DataInputStream is) throws IOException {
         return new LongTag(is.readLong());
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeLong(value);
     }
 
 }

@@ -26,52 +26,17 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
     private final Island island;
 
-    private MenuIslandChest(SuperiorPlayer superiorPlayer, Island island){
+    private MenuIslandChest(SuperiorPlayer superiorPlayer, Island island) {
         super("menuIslandChest", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, IslandChest islandChest) {
-        previousMove = false;
-        islandChest.openChest(superiorPlayer);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, IslandChest islandChest) {
-        try {
-            return validPage.clone()
-                    .replaceAll("{0}", (islandChest.getIndex() + 1) + "")
-                    .replaceAll("{1}", (islandChest.getRows() * 9) + "")
-                    .build(superiorPlayer);
-        }catch (Exception ex){
-            ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
-            return getNullItem();
-        }
-    }
-
-    @Override
-    protected ItemStack getNullItem() {
-        return invalidPage.clone().build();
-    }
-
-    @Override
-    protected List<IslandChest> requestObjects() {
-        return Arrays.asList(island.getChest());
-    }
-
-    public static void init(){
+    public static void init() {
         MenuIslandChest menuIslandChest = new MenuIslandChest(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/island-chest.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/island-chest.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
@@ -115,18 +80,52 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
         menuIslandChest.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
         MenuIslandChest menuIslandChest = new MenuIslandChest(superiorPlayer, island);
-        if(plugin.getSettings().isSkipOneItemMenus() && island.getChest().length == 1){
+        if (plugin.getSettings().isSkipOneItemMenus() && island.getChest().length == 1) {
             menuIslandChest.onPlayerClick(null, island.getChest()[0]);
-        }
-        else {
+        } else {
             menuIslandChest.open(previousMenu);
         }
     }
 
-    public static void refreshMenus(Island island){
+    public static void refreshMenus(Island island) {
         SuperiorMenu.refreshMenus(MenuIslandChest.class, superiorMenu -> superiorMenu.island.equals(island));
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent event, IslandChest islandChest) {
+        previousMove = false;
+        islandChest.openChest(superiorPlayer);
+    }
+
+    @Override
+    protected ItemStack getObjectItem(ItemStack clickedItem, IslandChest islandChest) {
+        try {
+            return validPage.clone()
+                    .replaceAll("{0}", (islandChest.getIndex() + 1) + "")
+                    .replaceAll("{1}", (islandChest.getRows() * 9) + "")
+                    .build(superiorPlayer);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
+            return getNullItem();
+        }
+    }
+
+    @Override
+    protected ItemStack getNullItem() {
+        return invalidPage.clone().build();
+    }
+
+    @Override
+    protected List<IslandChest> requestObjects() {
+        return Arrays.asList(island.getChest());
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

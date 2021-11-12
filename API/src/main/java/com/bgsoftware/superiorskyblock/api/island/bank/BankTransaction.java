@@ -38,7 +38,7 @@ public interface BankTransaction {
     /**
      * Get the reason for failure of the transaction.
      * If succeed, an empty string will be returned.
-     *
+     * <p>
      * Some fail reasons, such as "Not enough money", will not be logged.
      */
     String getFailureReason();

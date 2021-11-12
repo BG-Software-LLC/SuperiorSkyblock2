@@ -15,11 +15,10 @@ import java.util.List;
 public final class RolesHandler extends AbstractHandler implements RolesManager {
 
     private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
+    private final RolesContainer rolesContainer;
     private int lastRole = Integer.MIN_VALUE;
 
-    private final RolesContainer rolesContainer;
-
-    public RolesHandler(SuperiorSkyblockPlugin plugin, RolesContainer rolesContainer){
+    public RolesHandler(SuperiorSkyblockPlugin plugin, RolesContainer rolesContainer) {
         super(plugin);
         this.rolesContainer = rolesContainer;
     }
@@ -30,7 +29,7 @@ public final class RolesHandler extends AbstractHandler implements RolesManager 
         loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX, null);
         loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX, (SPlayerRole) getGuestRole());
         SPlayerRole previousRole = (SPlayerRole) getCoopRole();
-        for(String roleSection : rolesSection.getConfigurationSection("ladder").getKeys(false))
+        for (String roleSection : rolesSection.getConfigurationSection("ladder").getKeys(false))
             previousRole = (SPlayerRole) getPlayerRole(loadRole(rolesSection.getConfigurationSection("ladder." + roleSection), 0, previousRole));
     }
 
@@ -73,11 +72,11 @@ public final class RolesHandler extends AbstractHandler implements RolesManager 
     }
 
     @Override
-    public List<PlayerRole> getRoles(){
+    public List<PlayerRole> getRoles() {
         return this.rolesContainer.getRoles();
     }
 
-    private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole){
+    private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole) {
         int weight = section.getInt("weight", type);
         int id = section.getInt("id", weight);
         String name = section.getString("name");
@@ -86,7 +85,7 @@ public final class RolesHandler extends AbstractHandler implements RolesManager 
 
         this.rolesContainer.addPlayerRole(playerRole);
 
-        if(weight > lastRole)
+        if (weight > lastRole)
             lastRole = weight;
 
         return weight;

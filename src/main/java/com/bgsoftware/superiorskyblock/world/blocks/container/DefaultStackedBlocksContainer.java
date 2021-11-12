@@ -33,7 +33,7 @@ public final class DefaultStackedBlocksContainer implements StackedBlocksContain
         ChunkPosition chunkPosition = ChunkPosition.of(location);
         Map<Location, StackedBlock> chunkStackedBlocks = this.stackedBlocks.get(chunkPosition);
         StackedBlock removedStackedBlock = chunkStackedBlocks == null ? null : chunkStackedBlocks.remove(location);
-        if(chunkStackedBlocks != null && chunkStackedBlocks.isEmpty())
+        if (chunkStackedBlocks != null && chunkStackedBlocks.isEmpty())
             this.stackedBlocks.remove(chunkPosition);
         return removedStackedBlock;
     }

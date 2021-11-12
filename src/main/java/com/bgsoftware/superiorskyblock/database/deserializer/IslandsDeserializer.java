@@ -3,7 +3,11 @@ package com.bgsoftware.superiorskyblock.database.deserializer;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.island.*;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
+import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -12,15 +16,18 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -28,7 +35,12 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class IslandsDeserializer {
@@ -69,7 +81,7 @@ public final class IslandsDeserializer {
         }));
     }
 
-    public static void deserializePlayerPermissions(Island island, Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions){
+    public static void deserializePlayerPermissions(Island island, Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions) {
         loadObject(island, "islands_player_permissions", playerPermissionRow -> {
             UUID playerUUID = UUID.fromString((String) playerPermissionRow.get("player"));
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
@@ -78,7 +90,7 @@ public final class IslandsDeserializer {
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) playerPermissionRow.get("permission"));
                 playerPermissions.computeIfAbsent(superiorPlayer, s -> new PlayerPermissionNode(superiorPlayer, island))
                         .loadPrivilege(islandPrivilege, getAsByte(playerPermissionRow.get("status")));
-            }catch (Exception error) {
+            } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
                 error.printStackTrace();
                 SuperiorSkyblockPlugin.debug(error);
@@ -86,13 +98,13 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeRolePermissions(Island island, Map<IslandPrivilege, PlayerRole> rolePermissions){
+    public static void deserializeRolePermissions(Island island, Map<IslandPrivilege, PlayerRole> rolePermissions) {
         loadObject(island, "islands_role_permissions", rolePermissionRow -> {
             try {
                 PlayerRole playerRole = SPlayerRole.fromId((int) rolePermissionRow.get("role"));
                 IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) rolePermissionRow.get("permission"));
                 rolePermissions.put(islandPrivilege, playerRole);
-            }catch (Exception error) {
+            } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading role permissions:");
                 error.printStackTrace();
                 SuperiorSkyblockPlugin.debug(error);
@@ -108,14 +120,14 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeWarps(Island island){
+    public static void deserializeWarps(Island island) {
         loadObject(island, "islands_warps", islandWarpRow -> {
             String name = IslandUtils.getWarpName((String) islandWarpRow.get("name"));
 
-            if(name.isEmpty())
+            if (name.isEmpty())
                 return;
 
-            if(!IslandUtils.isWarpNameLengthValid(name))
+            if (!IslandUtils.isWarpNameLengthValid(name))
                 name = name.substring(0, IslandUtils.getMaxWarpNameLength());
 
             WarpCategory warpCategory = null;
@@ -134,7 +146,7 @@ public final class IslandsDeserializer {
     }
 
     public static void deserializeBlockCounts(String blocks, Island island) {
-        if(blocks == null || blocks.isEmpty())
+        if (blocks == null || blocks.isEmpty())
             return;
 
         JsonArray blockCountsArray = gson.fromJson(blocks, JsonArray.class);
@@ -203,7 +215,7 @@ public final class IslandsDeserializer {
                 Key blockKey = Key.of((String) generatorsRow.get("block"));
                 int rate = (int) generatorsRow.get("rate");
                 (cobbleGenerator[environment] = new KeyMap<>()).put(blockKey, new UpgradeValue<>(rate, n -> n < 0));
-            }catch (Exception error) {
+            } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading generators:");
                 error.printStackTrace();
                 SuperiorSkyblockPlugin.debug(error);
@@ -242,7 +254,7 @@ public final class IslandsDeserializer {
             int index = (int) islandChestRow.get("index");
             String contents = (String) islandChestRow.get("contents");
 
-            while (index > islandChestList.size()){
+            while (index > islandChestList.size()) {
                 IslandChest newIslandChest = new SIslandChest(island, islandChestList.size());
                 newIslandChest.setRows(plugin.getSettings().getIslandChests().getDefaultSize());
                 islandChestList.add(newIslandChest);
@@ -254,7 +266,7 @@ public final class IslandsDeserializer {
         islandChestsSync.set(islandChestList.toArray(new IslandChest[0]));
     }
 
-    public static void deserializeRoleLimits(Island island, Map<PlayerRole, UpgradeValue<Integer>> roleLimits){
+    public static void deserializeRoleLimits(Island island, Map<PlayerRole, UpgradeValue<Integer>> roleLimits) {
         loadObject(island, "islands_role_limits", roleLimitRaw -> {
             PlayerRole playerRole = SPlayerRole.fromId((int) roleLimitRaw.get("role"));
             if (playerRole != null) {
@@ -264,7 +276,7 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeWarpCategories(Island island){
+    public static void deserializeWarpCategories(Island island) {
         loadObject(island, "islands_warp_categories", warpCategoryRow -> {
             String name = StringUtils.stripColors((String) warpCategoryRow.get("name"));
 
@@ -286,48 +298,45 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeIslandBank(Island island){
+    public static void deserializeIslandBank(Island island) {
         loadObject(island, "islands_banks", islandBankRow -> {
             BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
             long lastInterestTime = getAsLong(islandBankRow.get("last_interest_time"));
-            if(lastInterestTime > (System.currentTimeMillis() / 1000))
+            if (lastInterestTime > (System.currentTimeMillis() / 1000))
                 lastInterestTime /= 1000;
             island.getIslandBank().setBalance(balance);
             island.setLastInterestTime(lastInterestTime);
         });
     }
 
-    public static void deserializeIslandSettings(Island island, Consumer<Map<String, Object>> islandSettingsConsumer){
+    public static void deserializeIslandSettings(Island island, Consumer<Map<String, Object>> islandSettingsConsumer) {
         loadObject(island, "islands_settings", islandSettingsConsumer);
     }
 
-    private static void loadObject(Island island, String table, Consumer<Map<String, Object>> resultConsumer){
+    private static void loadObject(Island island, String table, Consumer<Map<String, Object>> resultConsumer) {
         island.getDatabaseBridge().loadObject(table,
                 new DatabaseFilter(Collections.singletonList(new Pair<>("island", island.getUniqueId().toString()))),
                 resultConsumer);
     }
 
-    private static long getAsLong(Object value){
-        if(value instanceof Long) {
+    private static long getAsLong(Object value) {
+        if (value instanceof Long) {
             return (long) value;
-        }
-        else if(value instanceof Integer) {
+        } else if (value instanceof Integer) {
             return (int) value;
-        }  else {
+        } else {
             throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to long.");
         }
     }
 
-    private static byte getAsByte(Object value){
-        if(value instanceof Byte) {
+    private static byte getAsByte(Object value) {
+        if (value instanceof Byte) {
             return (byte) value;
-        }
-        else if(value instanceof Boolean) {
+        } else if (value instanceof Boolean) {
             return (Boolean) value ? (byte) 1 : 0;
-        }
-        else if(value instanceof Integer) {
+        } else if (value instanceof Integer) {
             return (byte) (int) value;
-        }  else {
+        } else {
             throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to byte.");
         }
     }

@@ -11,13 +11,13 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class PricesProvider_ShopGUIPlus implements PricesProvider{
+public final class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
     private static final KeyMap<Double> cachedPrices = new KeyMap<>();
 
-    public PricesProvider_ShopGUIPlus(){
+    public PricesProvider_ShopGUIPlus() {
         SuperiorSkyblockPlugin.log("Using ShopGUIPlus as a prices provider.");
     }
 
@@ -25,7 +25,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider{
     public BigDecimal getPrice(Key key) {
         double price = cachedPrices.getOrDefault(key, 0D);
 
-        if(price == 0) {
+        if (price == 0) {
             Map<String, Shop> shops = new HashMap<>(shopPlugin.getShopManager().shops);
             for (Shop shop : shops.values()) {
                 for (ShopItem shopItem : shop.getShopItems()) {

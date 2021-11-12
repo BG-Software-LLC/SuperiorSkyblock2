@@ -56,14 +56,13 @@ public final class CmdFly implements ISuperiorCommand {
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
         Player player = (Player) sender;
 
-        if(superiorPlayer.hasIslandFlyEnabled()){
+        if (superiorPlayer.hasIslandFlyEnabled()) {
             player.setAllowFlight(false);
             player.setFlying(false);
 
             Locale.TOGGLED_FLY_OFF.send(superiorPlayer);
-        }
-        else{
-            if(island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
+        } else {
+            if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }

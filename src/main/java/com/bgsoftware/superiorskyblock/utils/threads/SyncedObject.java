@@ -11,18 +11,22 @@ public final class SyncedObject<T> {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private T value;
 
-    SyncedObject(T value){
+    SyncedObject(T value) {
         this.value = value;
     }
 
-    public T get(){
-        if(value instanceof Map)
+    public static <T> SyncedObject<T> of(T value) {
+        return new SyncedObject<>(value);
+    }
+
+    public T get() {
+        if (value instanceof Map)
             throw new UnsupportedOperationException("Cannot get raw maps from synced objects.");
 
-        if(value instanceof Collection)
+        if (value instanceof Collection)
             throw new UnsupportedOperationException("Cannot get raw collections from synced objects.");
 
-        try{
+        try {
             lock.readLock().lock();
             return value;
         } finally {
@@ -30,8 +34,8 @@ public final class SyncedObject<T> {
         }
     }
 
-    public void set(T value){
-        try{
+    public void set(T value) {
+        try {
             lock.writeLock().lock();
             this.value = value;
         } finally {
@@ -39,8 +43,8 @@ public final class SyncedObject<T> {
         }
     }
 
-    public void set(Function<T, T> function){
-        try{
+    public void set(Function<T, T> function) {
+        try {
             lock.writeLock().lock();
             this.value = function.apply(value);
         } finally {
@@ -48,8 +52,8 @@ public final class SyncedObject<T> {
         }
     }
 
-    public void read(Consumer<T> consumer){
-        try{
+    public void read(Consumer<T> consumer) {
+        try {
             lock.readLock().lock();
             consumer.accept(value);
         } finally {
@@ -57,8 +61,8 @@ public final class SyncedObject<T> {
         }
     }
 
-    public <R> R readAndGet(Function<T, R> function){
-        try{
+    public <R> R readAndGet(Function<T, R> function) {
+        try {
             lock.readLock().lock();
             return function.apply(value);
         } finally {
@@ -66,8 +70,8 @@ public final class SyncedObject<T> {
         }
     }
 
-    public void write(Consumer<T> consumer){
-        try{
+    public void write(Consumer<T> consumer) {
+        try {
             lock.writeLock().lock();
             consumer.accept(value);
         } finally {
@@ -75,17 +79,13 @@ public final class SyncedObject<T> {
         }
     }
 
-    public <R> R writeAndGet(Function<T, R> function){
-        try{
+    public <R> R writeAndGet(Function<T, R> function) {
+        try {
             lock.writeLock().lock();
             return function.apply(value);
         } finally {
             lock.writeLock().unlock();
         }
-    }
-
-    public static <T> SyncedObject<T> of(T value){
-        return new SyncedObject<>(value);
     }
 
 }

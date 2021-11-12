@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -67,11 +67,11 @@ public final class CmdAdminAddBonus implements IAdminIslandCommand {
 
         BigDecimal bonus = CommandArguments.getBigDecimalAmount(sender, args[4]);
 
-        if(bonus == null)
+        if (bonus == null)
             return;
 
         Executor.data(() -> islands.forEach(island -> {
-            if(isWorthBonus)
+            if (isWorthBonus)
                 island.setBonusWorth(island.getBonusWorth().add(bonus));
             else
                 island.setBonusLevel(island.getBonusLevel().add(bonus));

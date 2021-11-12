@@ -14,11 +14,12 @@ public class IslandInviteEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor for the event.
+     *
      * @param superiorPlayer The player who sent the invite request.
-     * @param targetPlayer The player who received the invite request.
-     * @param island The island that the player was invited into.
+     * @param targetPlayer   The player who received the invite request.
+     * @param island         The island that the player was invited into.
      */
-    public IslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
+    public IslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.targetPlayer = targetPlayer;

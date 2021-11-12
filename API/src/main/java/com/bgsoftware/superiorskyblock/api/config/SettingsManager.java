@@ -1087,5 +1087,4 @@ public interface SettingsManager {
     }
 
 
-
 }

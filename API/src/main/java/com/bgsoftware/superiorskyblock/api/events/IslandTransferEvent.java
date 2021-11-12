@@ -14,11 +14,12 @@ public class IslandTransferEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor of the event.
-     * @param island The island that the leadership of it is transferred.
+     *
+     * @param island   The island that the leadership of it is transferred.
      * @param oldOwner The old owner of the island.
      * @param newOwner The new owner of the island.
      */
-    public IslandTransferEvent(Island island, SuperiorPlayer oldOwner, SuperiorPlayer newOwner){
+    public IslandTransferEvent(Island island, SuperiorPlayer oldOwner, SuperiorPlayer newOwner) {
         super(island);
         this.oldOwner = oldOwner;
         this.newOwner = newOwner;

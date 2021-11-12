@@ -17,8 +17,6 @@ import java.io.File;
 
 public final class BankModule extends BuiltinModule {
 
-    private boolean enabled = true;
-
     public double bankWorthRate = 1000;
     public double disbandRefund = 0;
     public boolean bankLogs = true;
@@ -26,9 +24,44 @@ public final class BankModule extends BuiltinModule {
     public int bankInterestInterval = 86400;
     public int bankInterestPercentage = 10;
     public int bankInterestRecentActive = 86400;
+    private boolean enabled = true;
 
-    public BankModule(){
+    public BankModule() {
         super("bank");
+    }
+
+    @Override
+    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
+        super.onPluginInit(plugin);
+
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
+
+        boolean updatedConfig = false;
+
+        if (syncValues("bank-worth-rate", config))
+            updatedConfig = true;
+
+        if (syncValues("disband-refund", config))
+            updatedConfig = true;
+
+        if (syncValues("bank-logs", config))
+            updatedConfig = true;
+
+        if (syncValues("bank-interest", config))
+            updatedConfig = true;
+
+        if (updatedConfig) {
+            File moduleConfigFile = new File(getDataFolder(), "config.yml");
+
+            try {
+                super.config.save(moduleConfigFile);
+                config.save(configFile);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
+            }
+        }
     }
 
     @Override
@@ -48,7 +81,7 @@ public final class BankModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorCommands(SuperiorSkyblockPlugin plugin) {
-        return !enabled ? null : new SuperiorCommand[] {new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
+        return !enabled ? null : new SuperiorCommand[]{new CmdBalance(), new CmdBank(), new CmdDeposit(), new CmdWithdraw()};
     }
 
     @Override
@@ -74,42 +107,8 @@ public final class BankModule extends BuiltinModule {
         bankInterestRecentActive = config.getInt("bank-interest.recent-active", 86400);
     }
 
-    @Override
-    protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        super.onPluginInit(plugin);
-
-        File configFile = new File(plugin.getDataFolder(), "config.yml");
-        CommentedConfiguration config = CommentedConfiguration.loadConfiguration(configFile);
-
-        boolean updatedConfig = false;
-
-        if(syncValues("bank-worth-rate", config))
-            updatedConfig = true;
-
-        if(syncValues("disband-refund", config))
-            updatedConfig = true;
-
-        if(syncValues("bank-logs", config))
-            updatedConfig = true;
-
-        if(syncValues("bank-interest", config))
-            updatedConfig = true;
-
-        if(updatedConfig) {
-            File moduleConfigFile = new File(getDataFolder(), "config.yml");
-
-            try {
-                super.config.save(moduleConfigFile);
-                config.save(configFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
-    }
-
-    private boolean syncValues(String section, YamlConfiguration config){
-        if(config.contains(section)){
+    private boolean syncValues(String section, YamlConfiguration config) {
+        if (config.contains(section)) {
             super.config.set(section, config.get(section));
             config.set(section, null);
             return true;

@@ -12,11 +12,12 @@ public class IslandBanEvent extends IslandEvent {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who banned the other player.
-     * @param targetPlayer The player that was banned.
-     * @param island The island that the player was banned from.
+     * @param targetPlayer   The player that was banned.
+     * @param island         The island that the player was banned from.
      */
-    public IslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
+    public IslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.targetPlayer = targetPlayer;

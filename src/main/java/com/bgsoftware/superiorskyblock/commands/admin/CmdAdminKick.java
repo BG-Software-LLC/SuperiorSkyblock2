@@ -58,12 +58,12 @@ public final class CmdAdminKick implements IAdminPlayerCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         Island targetIsland = targetPlayer.getIsland();
 
-        if(targetIsland == null){
+        if (targetIsland == null) {
             Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
-        if(targetIsland.getOwner() == targetPlayer){
+        if (targetIsland.getOwner() == targetPlayer) {
             Locale.KICK_ISLAND_LEADER.send(sender);
             return;
         }

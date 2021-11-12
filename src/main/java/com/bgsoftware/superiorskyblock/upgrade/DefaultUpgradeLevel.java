@@ -15,7 +15,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final DefaultUpgradeLevel INSTANCE = new DefaultUpgradeLevel();
 
-    private DefaultUpgradeLevel(){
+    private DefaultUpgradeLevel() {
         super(-1, EmptyUpgradeCost.getInstance(), new ArrayList<>(), "", new HashSet<>(),
                 newSyncedDoubleValue(v -> plugin.getSettings().getDefaultValues().getCropGrowth()),
                 newSyncedDoubleValue(v -> plugin.getSettings().getDefaultValues().getSpawnerRates()),
@@ -33,11 +33,11 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
         );
     }
 
-    public static DefaultUpgradeLevel getInstance(){
+    public static DefaultUpgradeLevel getInstance() {
         return INSTANCE;
     }
 
-    private static UpgradeValue<Double> newSyncedDoubleValue(Function<Object, Double> function){
+    private static UpgradeValue<Double> newSyncedDoubleValue(Function<Object, Double> function) {
         return new UpgradeValue<Double>(0D, true) {
 
             @Override
@@ -47,7 +47,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
         };
     }
 
-    private static UpgradeValue<Integer> newSyncedIntegerValue(Function<Object, Integer> function){
+    private static UpgradeValue<Integer> newSyncedIntegerValue(Function<Object, Integer> function) {
         return new UpgradeValue<Integer>(0, true) {
 
             @Override
@@ -57,7 +57,7 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
         };
     }
 
-    private static UpgradeValue<BigDecimal> newSyncedBigDecimalValue(Function<Object, BigDecimal> function){
+    private static UpgradeValue<BigDecimal> newSyncedBigDecimalValue(Function<Object, BigDecimal> function) {
         return new UpgradeValue<BigDecimal>(BigDecimal.ZERO, true) {
 
             @Override

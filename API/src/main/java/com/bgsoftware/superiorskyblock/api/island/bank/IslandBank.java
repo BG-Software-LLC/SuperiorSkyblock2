@@ -22,24 +22,27 @@ public interface IslandBank {
 
     /**
      * Deposit money into the bank.
+     *
      * @param superiorPlayer The player that deposited the money.
-     * @param amount The amount to deposit.
+     * @param amount         The amount to deposit.
      * @return The transaction details.
      */
     BankTransaction depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount);
 
     /**
      * Deposit money into the bank, without taking money from any player.
+     *
      * @param commandSender The player that deposited the money.
-     * @param amount The amount to deposit.
+     * @param amount        The amount to deposit.
      * @return The transaction details.
      */
     BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount);
 
     /**
      * Withdraw money from the bank.
-     * @param superiorPlayer The player that withdrawn the money.
-     * @param amount The amount to withdraw.
+     *
+     * @param superiorPlayer    The player that withdrawn the money.
+     * @param amount            The amount to withdraw.
      * @param commandsToExecute Commands to execute instead of using the default economy provider.
      *                          The commands can use {0} as player's name placeholder, and {1} for the amount.
      * @return The transaction details.
@@ -48,8 +51,9 @@ public interface IslandBank {
 
     /**
      * Withdraw money from the bank, without giving it to any player.
+     *
      * @param commandSender The player that withdrawn the money.
-     * @param amount The amount to withdraw.
+     * @param amount        The amount to withdraw.
      * @return The transaction details.
      */
     BankTransaction withdrawAdminMoney(CommandSender commandSender, BigDecimal amount);
@@ -72,6 +76,7 @@ public interface IslandBank {
     /**
      * Load a transaction log.
      * Used to load transactions from the database.
+     *
      * @param bankTransaction The transaction object to load.
      */
     void loadTransaction(BankTransaction bankTransaction);

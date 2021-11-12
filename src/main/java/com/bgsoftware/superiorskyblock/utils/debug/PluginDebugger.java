@@ -72,7 +72,7 @@ public final class PluginDebugger {
     }
 
     private void writeDebugMessages() {
-        if(!debuggedMessage.get())
+        if (!debuggedMessage.get())
             return;
 
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(PluginDebugger.this.debugFile, "rw")) {

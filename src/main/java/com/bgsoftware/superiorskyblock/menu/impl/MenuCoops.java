@@ -21,18 +21,41 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
 
     private final Island island;
 
-    private MenuCoops(SuperiorPlayer superiorPlayer, Island island){
+    private MenuCoops(SuperiorPlayer superiorPlayer, Island island) {
         super("menuCoops", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
+    public static void init() {
+        MenuCoops menuCoops = new MenuCoops(null, null);
+
+        File file = new File(plugin.getDataFolder(), "menus/coops.yml");
+
+        if (!file.exists())
+            FileUtils.saveResource("menus/coops.yml");
+
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
+
+        menuCoops.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuCoops.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuCoops.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuCoops.setSlots(getSlots(cfg, "slots", menuPatternSlots));
+
+        menuCoops.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
+        new MenuCoops(superiorPlayer, island).open(previousMenu);
+    }
+
+    public static void refreshMenus(Island island) {
+        SuperiorMenu.refreshMenus(MenuCoops.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
     @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
     }
 
     @Override
@@ -42,7 +65,7 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
                     .replaceAll("{0}", superiorPlayer.getName())
                     .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
                     .asSkullOf(superiorPlayer).build(superiorPlayer);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
             SuperiorSkyblockPlugin.debug(ex);
             throw ex;
@@ -62,32 +85,9 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
         );
     }
 
-    public static void init(){
-        MenuCoops menuCoops = new MenuCoops(null, null);
-
-        File file = new File(plugin.getDataFolder(), "menus/coops.yml");
-
-        if(!file.exists())
-            FileUtils.saveResource("menus/coops.yml");
-
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
-
-        menuCoops.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuCoops.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuCoops.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuCoops.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuCoops.markCompleted();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
-        new MenuCoops(superiorPlayer, island).open(previousMenu);
-    }
-
-    public static void refreshMenus(Island island){
-        SuperiorMenu.refreshMenus(MenuCoops.class, superiorMenu -> superiorMenu.island.equals(island));
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

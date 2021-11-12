@@ -9,7 +9,7 @@ public final class ModuleData {
     private final SuperiorCommand[] commands;
     private final SuperiorCommand[] adminCommands;
 
-    public ModuleData(Listener[] listeners, SuperiorCommand[] commands, SuperiorCommand[] adminCommands){
+    public ModuleData(Listener[] listeners, SuperiorCommand[] commands, SuperiorCommand[] adminCommands) {
         this.listeners = listeners;
         this.commands = commands;
         this.adminCommands = adminCommands;

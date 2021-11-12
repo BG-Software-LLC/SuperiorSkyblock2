@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -70,16 +70,16 @@ public final class CmdAdminSetBlockLimit implements IAdminIslandCommand {
 
         Pair<Integer, Boolean> arguments = CommandArguments.getLimit(sender, args[4]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         int limit = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, limit)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.getGlobalKey()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.getGlobalKey()), islands.get(0).getName());
         else
             Locale.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.getGlobalKey()), targetPlayer.getName());

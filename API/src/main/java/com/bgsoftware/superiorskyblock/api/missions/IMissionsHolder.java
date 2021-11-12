@@ -7,30 +7,35 @@ public interface IMissionsHolder {
 
     /**
      * Complete a mission.
+     *
      * @param mission The mission to complete.
      */
     void completeMission(Mission<?> mission);
 
     /**
      * Reset a mission.
+     *
      * @param mission The mission to reset.
      */
     void resetMission(Mission<?> mission);
 
     /**
      * Check whether the island has completed the mission before.
+     *
      * @param mission The mission to check.
      */
     boolean hasCompletedMission(Mission<?> mission);
 
     /**
      * Check whether the island can complete a mission again.
+     *
      * @param mission The mission to check.
      */
     boolean canCompleteMissionAgain(Mission<?> mission);
 
     /**
      * Get the amount of times mission was completed.
+     *
      * @param mission The mission to check.
      */
     int getAmountMissionCompleted(Mission<?> mission);

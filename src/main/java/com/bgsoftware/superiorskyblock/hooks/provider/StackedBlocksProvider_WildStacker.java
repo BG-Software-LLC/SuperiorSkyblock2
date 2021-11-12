@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.hooks.support.WildStackerSnapshotsContainer;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -34,8 +34,8 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
     private static boolean registered = false;
 
-    public StackedBlocksProvider_WildStacker(){
-        if(!registered) {
+    public StackedBlocksProvider_WildStacker() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
 
@@ -63,14 +63,14 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
     @Override
     public Collection<Pair<Key, Integer>> getBlocks(World world, int chunkX, int chunkZ) {
-        StackedSnapshot stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot( ChunkPosition.of(world, chunkX, chunkZ));
+        StackedSnapshot stackedSnapshot = WildStackerSnapshotsContainer.getSnapshot(ChunkPosition.of(world, chunkX, chunkZ));
 
         try {
             return stackedSnapshot.getAllBarrelsItems().values().stream()
                     .filter(entry -> entry.getValue() != null)
                     .map(entry -> new Pair<>(Key.of(entry.getValue()), entry.getKey()))
                     .collect(Collectors.toSet());
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             return stackedSnapshot.getAllBarrels().values().stream()
                     .map(entry -> new Pair<>(Key.of(entry.getValue(), (short) 0), entry.getKey()))
                     .collect(Collectors.toSet());
@@ -93,67 +93,61 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelPlace(BarrelPlaceEvent e){
+        public void onBarrelPlace(BarrelPlaceEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
 
-            if(island == null)
+            if (island == null)
                 return;
 
             com.bgsoftware.superiorskyblock.key.Key blockKey = com.bgsoftware.superiorskyblock.key.Key.of(e.getBarrel().getBarrelItem(1));
             int increaseAmount = e.getBarrel().getStackAmount();
 
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+            if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-            }
-
-            else{
+            } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelStack(BarrelStackEvent e){
+        public void onBarrelStack(BarrelStackEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
 
-            if(island == null)
+            if (island == null)
                 return;
 
             com.bgsoftware.superiorskyblock.key.Key blockKey = com.bgsoftware.superiorskyblock.key.Key.of(e.getTarget().getBarrelItem(1));
             int increaseAmount = e.getTarget().getStackAmount();
 
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+            if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-            }
-
-            else{
+            } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelUnstack(BarrelUnstackEvent e){
+        public void onBarrelUnstack(BarrelUnstackEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
-            if(island != null)
+            if (island != null)
                 island.handleBlockBreak(com.bgsoftware.superiorskyblock.key.Key.of(e.getBarrel().getBarrelItem(1)), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onBarrelPlace(BarrelPlaceInventoryEvent e){
+        public void onBarrelPlace(BarrelPlaceInventoryEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBarrel().getLocation());
 
-            if(island == null)
+            if (island == null)
                 return;
 
             com.bgsoftware.superiorskyblock.key.Key blockKey = com.bgsoftware.superiorskyblock.key.Key.of(e.getBarrel().getBarrelItem(1));
             int increaseAmount = e.getIncreaseAmount();
 
-            if(island.hasReachedBlockLimit(blockKey, increaseAmount)){
+            if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
                 Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
-            }
-
-            else{
+            } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
         }

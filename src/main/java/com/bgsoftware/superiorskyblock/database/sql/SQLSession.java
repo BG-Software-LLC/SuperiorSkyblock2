@@ -25,18 +25,18 @@ public final class SQLSession {
 
     private HikariDataSource dataSource;
 
-    public SQLSession(SuperiorSkyblockPlugin plugin, boolean logging){
+    public SQLSession(SuperiorSkyblockPlugin plugin, boolean logging) {
         this.plugin = plugin;
         this.logging = logging;
         this.usesMySQL = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL");
     }
 
-    private void log(String message){
-        if(logging)
+    private void log(String message) {
+        if (logging)
             SuperiorSkyblockPlugin.log(message);
     }
 
-    public boolean createConnection(){
+    public boolean createConnection() {
         try {
             log("Trying to connect to " + plugin.getSettings().getDatabase().getType() + " database...");
 
@@ -66,8 +66,8 @@ public final class SQLSession {
                 config.setConnectionTimeout(10000);
                 config.setIdleTimeout(plugin.getSettings().getDatabase().getWaitTimeout());
                 config.setMaxLifetime(plugin.getSettings().getDatabase().getMaxLifetime());
-                config.addDataSourceProperty("characterEncoding","utf8");
-                config.addDataSourceProperty("useUnicode","true");
+                config.addDataSourceProperty("characterEncoding", "utf8");
+                config.addDataSourceProperty("useUnicode", "true");
 
                 dataSource = new HikariDataSource(config);
 
@@ -85,21 +85,21 @@ public final class SQLSession {
             ready.complete(null);
 
             return true;
-        }catch(Exception error){
+        } catch (Exception error) {
             SuperiorSkyblockPlugin.debug(error);
         }
 
         return false;
     }
 
-    public boolean isUsingMySQL(){
+    public boolean isUsingMySQL() {
         return usesMySQL;
     }
 
-    public void waitForConnection(){
+    public void waitForConnection() {
         try {
             ready.get();
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
         }
@@ -109,24 +109,24 @@ public final class SQLSession {
         return mutex;
     }
 
-    public void executeUpdate(String statement){
+    public void executeUpdate(String statement) {
         executeUpdate(statement, error -> {
             SuperiorSkyblockPlugin.log("&cAn errror occurred while running statement: " + statement);
             error.printStackTrace();
         });
     }
 
-    public void executeUpdate(String statement, Consumer<SQLException> onFailure){
+    public void executeUpdate(String statement, Consumer<SQLException> onFailure) {
         String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
-        try{
+        try {
             conn = dataSource.getConnection();
             preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)
                     .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)")
                     .replace("UNIQUE_TEXT", "VARCHAR(30)"));
             preparedStatement.executeUpdate();
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             onFailure.accept(ex);
         } finally {
             close(preparedStatement);
@@ -134,7 +134,7 @@ public final class SQLSession {
         }
     }
 
-    public boolean doesConditionExist(String statement){
+    public boolean doesConditionExist(String statement) {
         AtomicBoolean result = new AtomicBoolean(false);
         executeQuery(statement, resultSet -> result.set(resultSet.next()));
         return result.get();
@@ -149,21 +149,21 @@ public final class SQLSession {
         return result.get();
     }
 
-    public void executeQuery(String statement, QueryConsumer<ResultSet> callback){
+    public void executeQuery(String statement, QueryConsumer<ResultSet> callback) {
         executeQuery(statement, callback, SQLException::printStackTrace);
     }
 
-    public void executeQuery(String statement, QueryConsumer<ResultSet> callback, Consumer<SQLException> onFailure){
+    public void executeQuery(String statement, QueryConsumer<ResultSet> callback, Consumer<SQLException> onFailure) {
         String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        try{
+        try {
             conn = dataSource.getConnection();
             preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix));
             resultSet = preparedStatement.executeQuery();
             callback.accept(resultSet);
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             onFailure.accept(ex);
         } finally {
             close(resultSet);
@@ -172,19 +172,19 @@ public final class SQLSession {
         }
     }
 
-    public void close(){
+    public void close() {
         dataSource.close();
     }
 
-    public void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure){
+    public void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure) {
         String prefix = usesMySQL ? plugin.getSettings().getDatabase().getPrefix() : "";
         Connection conn = null;
         PreparedStatement preparedStatement = null;
-        try{
+        try {
             conn = dataSource.getConnection();
             preparedStatement = conn.prepareStatement(query.replace("{prefix}", prefix));
             consumer.accept(preparedStatement);
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             failure.accept(ex);
         } finally {
             close(preparedStatement);
@@ -192,21 +192,22 @@ public final class SQLSession {
         }
     }
 
-    private void close(AutoCloseable closeable){
-        if(closeable != null){
+    private void close(AutoCloseable closeable) {
+        if (closeable != null) {
             try {
-                if(!(closeable instanceof Connection) || usesMySQL)
+                if (!(closeable instanceof Connection) || usesMySQL)
                     closeable.close();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
-    public void setAutoCommit(boolean autoCommit){
+    public void setAutoCommit(boolean autoCommit) {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(autoCommit);
-        }catch(SQLException ex){
+        } catch (SQLException ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
         } finally {
@@ -214,7 +215,7 @@ public final class SQLSession {
         }
     }
 
-    public void commit() throws SQLException{
+    public void commit() throws SQLException {
         Connection conn = null;
         try {
             conn = dataSource.getConnection();
@@ -224,7 +225,7 @@ public final class SQLSession {
         }
     }
 
-    public interface QueryConsumer<T>{
+    public interface QueryConsumer<T> {
 
         void accept(T value) throws SQLException;
 
@@ -234,12 +235,12 @@ public final class SQLSession {
 
         private final Connection conn;
 
-        HikariDataSourceSQLiteWrapper(HikariConfig config) throws SQLException{
+        HikariDataSourceSQLiteWrapper(HikariConfig config) throws SQLException {
             conn = DriverManager.getConnection(config.getJdbcUrl());
         }
 
         @Override
-        public Connection getConnection(){
+        public Connection getConnection() {
             return conn;
         }
 
@@ -247,7 +248,8 @@ public final class SQLSession {
         public void close() {
             try {
                 conn.close();
-            }catch(SQLException ignored){}
+            } catch (SQLException ignored) {
+            }
         }
     }
 

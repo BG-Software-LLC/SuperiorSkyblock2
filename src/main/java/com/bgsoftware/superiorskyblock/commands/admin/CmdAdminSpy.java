@@ -51,11 +51,9 @@ public final class CmdAdminSpy implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if(superiorPlayer.hasAdminSpyEnabled()){
+        if (superiorPlayer.hasAdminSpyEnabled()) {
             Locale.TOGGLED_SPY_OFF.send(superiorPlayer);
-        }
-
-        else{
+        } else {
             Locale.TOGGLED_SPY_ON.send(superiorPlayer);
         }
 

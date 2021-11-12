@@ -4,13 +4,13 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import net.minecraft.server.v1_8_R3.BiomeBase;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -49,10 +49,9 @@ import java.util.List;
 
 public final class NMSWorldImpl implements NMSWorld {
 
-    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeBase[].class, "biome");
+    private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
     @SuppressWarnings("deprecation")

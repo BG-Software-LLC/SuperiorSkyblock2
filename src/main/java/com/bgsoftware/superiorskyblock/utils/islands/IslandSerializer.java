@@ -16,11 +16,11 @@ public final class IslandSerializer {
 
     private static final Gson gson = new GsonBuilder().create();
 
-    private IslandSerializer(){
+    private IslandSerializer() {
 
     }
 
-    public static String serializeBlockCounts(Map<Key, BigInteger> blockCounts){
+    public static String serializeBlockCounts(Map<Key, BigInteger> blockCounts) {
         JsonArray blockCountsArray = new JsonArray();
         blockCounts.forEach((key, amount) -> {
             JsonObject blockCountObject = new JsonObject();
@@ -31,15 +31,14 @@ public final class IslandSerializer {
         return gson.toJson(blockCountsArray);
     }
 
-    public static String serializeDirtyChunks(Set<ChunkPosition> dirtyChunks){
+    public static String serializeDirtyChunks(Set<ChunkPosition> dirtyChunks) {
         JsonObject dirtyChunksObject = new JsonObject();
         dirtyChunks.forEach(chunkPosition -> {
             JsonArray dirtyChunksArray;
 
-            if(dirtyChunksObject.has(chunkPosition.getWorldName())){
+            if (dirtyChunksObject.has(chunkPosition.getWorldName())) {
                 dirtyChunksArray = dirtyChunksObject.getAsJsonArray(chunkPosition.getWorldName());
-            }
-            else{
+            } else {
                 dirtyChunksArray = new JsonArray();
                 dirtyChunksObject.add(chunkPosition.getWorldName(), dirtyChunksArray);
             }

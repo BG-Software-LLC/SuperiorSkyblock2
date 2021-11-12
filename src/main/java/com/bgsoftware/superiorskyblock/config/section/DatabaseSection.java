@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.config.section;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 

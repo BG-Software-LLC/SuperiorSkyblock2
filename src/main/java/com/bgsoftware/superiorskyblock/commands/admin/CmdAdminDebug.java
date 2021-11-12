@@ -53,19 +53,19 @@ public final class CmdAdminDebug implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if(plugin.isDebugMode() && args.length == 2){
+        if (plugin.isDebugMode() && args.length == 2) {
             Locale.DEBUG_MODE_DISABLED.send(sender);
             plugin.toggleDebugMode();
             plugin.setDebugFilter("");
             return;
         }
 
-        if(!plugin.isDebugMode()){
+        if (!plugin.isDebugMode()) {
             Locale.DEBUG_MODE_ENABLED.send(sender);
             plugin.toggleDebugMode();
         }
 
-        if(args.length > 2){
+        if (args.length > 2) {
             StringBuilder debugFilter = new StringBuilder();
             for (int i = 2; i < args.length; i++)
                 debugFilter.append(" ").append(args[i]);

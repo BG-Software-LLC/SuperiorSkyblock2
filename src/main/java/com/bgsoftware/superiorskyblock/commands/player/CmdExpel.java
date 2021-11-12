@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -69,31 +69,31 @@ public final class CmdExpel implements IPermissibleCommand {
         CommandSender sender = superiorPlayer == null ? Bukkit.getConsoleSender() : superiorPlayer.asPlayer();
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[1]);
 
-        if(targetPlayer == null || sender == null)
+        if (targetPlayer == null || sender == null)
             return;
 
         Player target = targetPlayer.asPlayer();
 
-        if(target == null){
+        if (target == null) {
             Locale.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
 
         Island targetIsland = plugin.getGrid().getIslandAt(target.getLocation());
 
-        if(targetIsland == null){
+        if (targetIsland == null) {
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
             return;
         }
 
         // Checking requirements for players
-        if(superiorPlayer != null){
-            if(!targetIsland.equals(playerIsland)){
+        if (superiorPlayer != null) {
+            if (!targetIsland.equals(playerIsland)) {
                 Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
 
-            if(targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)){
+            if (targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)) {
                 Locale.PLAYER_EXPEL_BYPASS.send(sender);
                 return;
             }

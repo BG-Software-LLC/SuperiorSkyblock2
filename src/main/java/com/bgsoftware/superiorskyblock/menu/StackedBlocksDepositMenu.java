@@ -20,7 +20,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
     private final Inventory inventory;
     private final Location stackedBlock;
 
-    public StackedBlocksDepositMenu(Location stackedBlock){
+    public StackedBlocksDepositMenu(Location stackedBlock) {
         this.inventory = Bukkit.createInventory(this, 36, plugin.getSettings().getStackedBlocks().getDepositMenu().getTitle());
         this.stackedBlock = stackedBlock;
     }
@@ -30,10 +30,10 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
         return inventory;
     }
 
-    public void onInteract(InventoryClickEvent e){
+    public void onInteract(InventoryClickEvent e) {
         ItemStack itemToDeposit = null;
 
-        switch (e.getAction()){
+        switch (e.getAction()) {
             case HOTBAR_SWAP:
                 itemToDeposit = e.getView().getBottomInventory().getItem(e.getHotbarButton());
                 break;
@@ -47,30 +47,29 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
                 break;
         }
 
-        if(itemToDeposit == null || itemToDeposit.getType() == Material.AIR)
+        if (itemToDeposit == null || itemToDeposit.getType() == Material.AIR)
             return;
 
-        if(!StackedBlocksLogic.canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock(), null))
+        if (!StackedBlocksLogic.canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock(), null))
             e.setCancelled(true);
     }
 
-    public void onClose(InventoryCloseEvent e){
+    public void onClose(InventoryCloseEvent e) {
         int depositAmount = 0;
         ItemStack blockItem = null;
 
-        for(ItemStack itemStack : e.getInventory().getContents()){
-            if(itemStack != null && itemStack.getType() != Material.AIR) {
-                if(StackedBlocksLogic.canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock(), null)){
+        for (ItemStack itemStack : e.getInventory().getContents()) {
+            if (itemStack != null && itemStack.getType() != Material.AIR) {
+                if (StackedBlocksLogic.canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock(), null)) {
                     depositAmount += itemStack.getAmount();
                     blockItem = itemStack;
-                }
-                else{
+                } else {
                     stackedBlock.getWorld().dropItemNaturally(stackedBlock, itemStack);
                 }
             }
         }
 
-        if(depositAmount > 0){
+        if (depositAmount > 0) {
             int DEPOSIT_AMOUNT = depositAmount;
             ItemStack BLOCK_ITEM = blockItem;
             boolean success = StackedBlocksLogic.tryStack(plugin, (Player) e.getPlayer(), depositAmount, stackedBlock, amount -> {

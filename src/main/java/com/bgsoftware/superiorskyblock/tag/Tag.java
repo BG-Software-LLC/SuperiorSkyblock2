@@ -46,7 +46,6 @@ import java.io.IOException;
  * Represents a single NBT tag.
  *
  * @author Graham Edgecombe
- *
  */
 public abstract class Tag<E> {
 
@@ -62,73 +61,41 @@ public abstract class Tag<E> {
         this.CONSTRUCTOR = new ReflectConstructor<>(clazz, parameterTypes);
     }
 
-    public E getValue(){
-        return value;
-    }
-
-    @Override
-    public String toString() {
-        return NBTUtils.getTypeName(this.getClass()) + ": " + value;
-    }
-
-    public void write(DataOutputStream os) throws IOException{
-        int type = NBTUtils.getTypeCode(this.getClass());
-
-        os.writeByte(type);
-
-        if (type == NBTTags.TYPE_END) {
-            throw new IOException("Named TAG_End not permitted.");
-        }
-
-        writeData(os);
-    }
-
-    protected abstract void writeData(DataOutputStream outputStream) throws IOException;
-
-    public Object toNBT(){
-        if(A.isValid()){
-            return A.invoke(null, value);
-        }
-        else{
-            return CONSTRUCTOR.newInstance(value);
-        }
-    }
-
-    public static Tag<?> fromNBT(Object tag){
-        if(tag.getClass().equals(ByteArrayTag.CLASS))
+    public static Tag<?> fromNBT(Object tag) {
+        if (tag.getClass().equals(ByteArrayTag.CLASS))
             return ByteArrayTag.fromNBT(tag);
-        else if(tag.getClass().equals(ByteTag.CLASS))
+        else if (tag.getClass().equals(ByteTag.CLASS))
             return ByteTag.fromNBT(tag);
-        else if(tag.getClass().equals(CompoundTag.CLASS))
+        else if (tag.getClass().equals(CompoundTag.CLASS))
             return CompoundTag.fromNBT(tag);
-        else if(tag.getClass().equals(DoubleTag.CLASS))
+        else if (tag.getClass().equals(DoubleTag.CLASS))
             return DoubleTag.fromNBT(tag);
-        else if(tag.getClass().equals(EndTag.CLASS))
+        else if (tag.getClass().equals(EndTag.CLASS))
             return new EndTag();
-        else if(tag.getClass().equals(FloatTag.CLASS))
+        else if (tag.getClass().equals(FloatTag.CLASS))
             return FloatTag.fromNBT(tag);
-        else if(tag.getClass().equals(IntArrayTag.CLASS))
+        else if (tag.getClass().equals(IntArrayTag.CLASS))
             return IntArrayTag.fromNBT(tag);
-        else if(tag.getClass().equals(IntTag.CLASS))
+        else if (tag.getClass().equals(IntTag.CLASS))
             return IntTag.fromNBT(tag);
-        else if(tag.getClass().equals(ListTag.CLASS))
+        else if (tag.getClass().equals(ListTag.CLASS))
             return ListTag.fromNBT(tag);
-        else if(tag.getClass().equals(LongTag.CLASS))
+        else if (tag.getClass().equals(LongTag.CLASS))
             return LongTag.fromNBT(tag);
-        else if(tag.getClass().equals(ShortTag.CLASS))
+        else if (tag.getClass().equals(ShortTag.CLASS))
             return ShortTag.fromNBT(tag);
-        else if(tag.getClass().equals(StringTag.CLASS))
+        else if (tag.getClass().equals(StringTag.CLASS))
             return StringTag.fromNBT(tag);
 
         throw new IllegalArgumentException("Cannot convert " + tag.getClass() + " to Tag!");
     }
 
-    public static Tag<?> fromStream(DataInputStream is, int depth) throws IOException{
+    public static Tag<?> fromStream(DataInputStream is, int depth) throws IOException {
         int type = is.readByte() & 0xFF;
         return fromStream(is, depth, type);
     }
 
-    protected static Tag<?> fromStream(DataInputStream is, int depth, int type) throws IOException{
+    protected static Tag<?> fromStream(DataInputStream is, int depth, int type) throws IOException {
         switch (type) {
             case NBTTags.TYPE_END:
                 return EndTag.fromStream(is, depth);
@@ -159,19 +126,49 @@ public abstract class Tag<E> {
         throw new IllegalArgumentException("Invalid tag: " + type);
     }
 
-    protected static Class<?> getNNTClass(String nbtType){
-        try{
-            if(ServerVersion.isAtLeast(ServerVersion.v1_17)) {
+    protected static Class<?> getNNTClass(String nbtType) {
+        try {
+            if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
                 return Class.forName("net.minecraft.nbt." + nbtType);
-            }
-            else {
+            } else {
                 String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
                 return Class.forName("net.minecraft.server." + version + "." + nbtType);
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
+        }
+    }
+
+    public E getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return NBTUtils.getTypeName(this.getClass()) + ": " + value;
+    }
+
+    public void write(DataOutputStream os) throws IOException {
+        int type = NBTUtils.getTypeCode(this.getClass());
+
+        os.writeByte(type);
+
+        if (type == NBTTags.TYPE_END) {
+            throw new IOException("Named TAG_End not permitted.");
+        }
+
+        writeData(os);
+    }
+
+    protected abstract void writeData(DataOutputStream outputStream) throws IOException;
+
+    public Object toNBT() {
+        if (A.isValid()) {
+            return A.invoke(null, value);
+        } else {
+            return CONSTRUCTOR.newInstance(value);
         }
     }
 

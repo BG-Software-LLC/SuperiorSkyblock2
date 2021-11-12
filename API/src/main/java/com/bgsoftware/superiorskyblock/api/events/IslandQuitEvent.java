@@ -14,10 +14,11 @@ public class IslandQuitEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who left their island.
-     * @param island The island that the player left.
+     * @param island         The island that the player left.
      */
-    public IslandQuitEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandQuitEvent(SuperiorPlayer superiorPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }

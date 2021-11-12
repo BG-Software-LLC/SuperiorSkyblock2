@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class IslandAttributes extends AttributesRegistry<IslandAttributes.Field> {
 
-    public IslandAttributes(){
+    public IslandAttributes() {
         super(Field.class);
     }
 

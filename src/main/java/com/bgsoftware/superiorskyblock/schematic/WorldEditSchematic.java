@@ -4,10 +4,10 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -40,10 +40,18 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
     private final com.boydti.fawe.object.schematic.Schematic schematic;
 
-    public WorldEditSchematic(String name, com.boydti.fawe.object.schematic.Schematic schematic){
+    public WorldEditSchematic(String name, com.boydti.fawe.object.schematic.Schematic schematic) {
         super(name);
         this.schematic = schematic;
         readBlocks();
+    }
+
+    private static Class<?> getClass(String classPath) {
+        try {
+            return Class.forName(classPath);
+        } catch (Throwable ex) {
+            return null;
+        }
     }
 
     @Override
@@ -59,7 +67,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
 
-            if(editSession == null){
+            if (editSession == null) {
                 com.sk89q.worldedit.Vector point = new com.sk89q.worldedit.Vector(location.getBlockX(), location.getBlockY(), location.getBlockZ());
                 editSession = schematic.paste(new BukkitWorld(location.getWorld()), point, true, true, null);
             }
@@ -71,13 +79,13 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
                     EventsCaller.callIslandSchematicPasteEvent(island, name, location);
 
                     callback.run();
-                }catch(Throwable ex){
-                    if(onFailure != null)
+                } catch (Throwable ex) {
+                    if (onFailure != null)
                         onFailure.accept(ex);
                 }
             });
-        }catch(Throwable ex){
-            if(onFailure != null)
+        } catch (Throwable ex) {
+            if (onFailure != null)
                 onFailure.accept(ex);
         }
     }
@@ -104,7 +112,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
                     readBlock(block);
                 }
             }, false);
-        }catch(Throwable ex){
+        } catch (Throwable ex) {
             clipboard.IMP.forEach(new FaweClipboard.BlockReader() {
                 @Override
                 public void run(int x, int y, int z, BlockState block) {
@@ -114,15 +122,14 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
         }
     }
 
-    private void readBlock(Object baseBlock){
+    private void readBlock(Object baseBlock) {
         Key key;
 
-        if(ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()){
+        if (ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
             Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
             int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
             key = Key.of(material, (byte) data);
-        }
-        else{
+        } else {
             int id = GET_ID.invoke(baseBlock);
             int data = GET_DATA.invoke(baseBlock);
             //noinspection deprecation
@@ -132,24 +139,16 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);
     }
 
-    private static abstract class BlockReader extends FaweClipboard.BlockReader{
+    private static abstract class BlockReader extends FaweClipboard.BlockReader {
 
-        public void run(int x, int y, int z, BaseBlock block){
-
-        }
-
-        public void run(int x, int y, int z, BlockState block){
+        public void run(int x, int y, int z, BaseBlock block) {
 
         }
 
-    }
+        public void run(int x, int y, int z, BlockState block) {
 
-    private static Class<?> getClass(String classPath){
-        try{
-            return Class.forName(classPath);
-        }catch (Throwable ex){
-            return null;
         }
+
     }
 
 }

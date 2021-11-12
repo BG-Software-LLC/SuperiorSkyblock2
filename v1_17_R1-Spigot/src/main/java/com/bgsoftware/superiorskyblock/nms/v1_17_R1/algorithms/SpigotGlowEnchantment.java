@@ -30,6 +30,14 @@ public class SpigotGlowEnchantment extends Enchantment {
         return null;
     }
 
+    public boolean isTreasure() {
+        return false;
+    }
+
+    public boolean isCursed() {
+        return false;
+    }
+
     @Override
     public boolean conflictsWith(Enchantment enchantment) {
         return false;
@@ -38,14 +46,6 @@ public class SpigotGlowEnchantment extends Enchantment {
     @Override
     public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
         return true;
-    }
-
-    public boolean isTreasure() {
-        return false;
-    }
-
-    public boolean isCursed() {
-        return false;
     }
 
 }

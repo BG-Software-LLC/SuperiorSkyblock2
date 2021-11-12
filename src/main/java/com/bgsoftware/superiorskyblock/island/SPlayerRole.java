@@ -17,7 +17,7 @@ public final class SPlayerRole implements PlayerRole {
     private final int id, weight;
     private final RolePermissionNode defaultPermissions;
 
-    public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole){
+    public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole) {
         this.name = name;
         this.id = id;
         this.weight = weight;
@@ -28,6 +28,40 @@ public final class SPlayerRole implements PlayerRole {
         this.defaultPermissions = new RolePermissionNode(null,
                 previousRole == null ? RolePermissionNode.EmptyRolePermissionNode.INSTANCE : previousRole.defaultPermissions,
                 permissions.length() == 0 ? "" : permissions.substring(1));
+    }
+
+    public static PlayerRole defaultRole() {
+        return plugin.getRoles().getDefaultRole();
+    }
+
+    public static PlayerRole lastRole() {
+        return plugin.getRoles().getLastRole();
+    }
+
+    public static PlayerRole guestRole() {
+        return plugin.getRoles().getGuestRole();
+    }
+
+    public static PlayerRole coopRole() {
+        return plugin.getRoles().getCoopRole();
+    }
+
+    public static PlayerRole of(int weight) {
+        return plugin.getRoles().getPlayerRole(weight);
+    }
+
+    public static PlayerRole fromId(int id) {
+        return plugin.getRoles().getPlayerRoleFromId(id);
+    }
+
+    public static PlayerRole of(String name) {
+        return plugin.getRoles().getPlayerRole(name);
+    }
+
+    public static String getValuesString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase()));
+        return stringBuilder.substring(2);
     }
 
     @Override
@@ -83,11 +117,6 @@ public final class SPlayerRole implements PlayerRole {
     }
 
     @Override
-    public String toString() {
-        return name;
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(id);
     }
@@ -100,42 +129,13 @@ public final class SPlayerRole implements PlayerRole {
         return id == that.id;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public RolePermissionNode getDefaultPermissions() {
         return defaultPermissions;
-    }
-
-    public static PlayerRole defaultRole(){
-        return plugin.getRoles().getDefaultRole();
-    }
-
-    public static PlayerRole lastRole(){
-        return plugin.getRoles().getLastRole();
-    }
-
-    public static PlayerRole guestRole(){
-        return plugin.getRoles().getGuestRole();
-    }
-
-    public static PlayerRole coopRole(){
-        return plugin.getRoles().getCoopRole();
-    }
-
-    public static PlayerRole of(int weight){
-        return plugin.getRoles().getPlayerRole(weight);
-    }
-
-    public static PlayerRole fromId(int id){
-        return plugin.getRoles().getPlayerRoleFromId(id);
-    }
-
-    public static PlayerRole of(String name){
-        return plugin.getRoles().getPlayerRole(name);
-    }
-
-    public static String getValuesString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase()));
-        return stringBuilder.substring(2);
     }
 
 }

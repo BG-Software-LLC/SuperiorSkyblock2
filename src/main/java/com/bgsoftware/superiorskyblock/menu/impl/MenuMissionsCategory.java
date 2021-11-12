@@ -37,37 +37,53 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
 
         this.missionCategory = missionCategory;
 
-        if(superiorPlayer != null) {
+        if (superiorPlayer != null) {
             this.missions = missionCategory.getMissions().stream()
                     .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
-            if(sortByCompletion && superiorPlayer.getIsland() != null)
+            if (sortByCompletion && superiorPlayer.getIsland() != null)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
         }
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, Mission<?> mission) {
-        Island island = superiorPlayer.getIsland();
+    public static void init() {
+        MenuMissionsCategory menuMissionsCategory = new MenuMissionsCategory(null, null);
 
-        if(island == null)
-            return;
+        File file = new File(plugin.getDataFolder(), "menus/missions-category.yml");
 
-        boolean completed = !island.canCompleteMissionAgain(mission);
-        boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
+        if (!file.exists())
+            FileUtils.saveResource("menus/missions-category.yml");
 
-        SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
-        if(sound != null)
-            sound.playSound(event.getWhoClicked());
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)){
-            plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {
-               if(result){
-                   previousMove = false;
-                   openInventory(superiorPlayer, previousMenu, missionCategory);
-               }
-            });
-        }
+        sortByCompletion = cfg.getBoolean("sort-by-completion", false);
+        removeCompleted = cfg.getBoolean("remove-completed", false);
+
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
+
+        char slotsChar = cfg.getString("slots", " ").charAt(0);
+
+        if (cfg.contains("sounds." + slotsChar + ".completed"))
+            menuMissionsCategory.addData("sound-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".completed")));
+        if (cfg.contains("sounds." + slotsChar + ".not-completed"))
+            menuMissionsCategory.addData("sound-not-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".not-completed")));
+        if (cfg.contains("sounds." + slotsChar + ".can-complete"))
+            menuMissionsCategory.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
+
+        menuMissionsCategory.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuMissionsCategory.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuMissionsCategory.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuMissionsCategory.setSlots(getSlots(cfg, "slots", menuPatternSlots));
+
+        menuMissionsCategory.markCompleted();
+    }
+
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, MissionCategory missionCategory) {
+        new MenuMissionsCategory(superiorPlayer, missionCategory).open(previousMenu);
+    }
+
+    public static void refreshMenus(MissionCategory missionCategory) {
+        refreshMenus(MenuMissionsCategory.class, superiorMenu -> missionCategory.equals(superiorMenu.missionCategory));
     }
 
     @Override
@@ -78,6 +94,30 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
     @Override
     protected Inventory buildInventory(Function<String, String> titleReplacer) {
         return super.buildInventory(title -> title.replace("{0}", missionCategory.getName()));
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent event, Mission<?> mission) {
+        Island island = superiorPlayer.getIsland();
+
+        if (island == null)
+            return;
+
+        boolean completed = !island.canCompleteMissionAgain(mission);
+        boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
+
+        SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
+        if (sound != null)
+            sound.playSound(event.getWhoClicked());
+
+        if (canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)) {
+            plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {
+                if (result) {
+                    previousMove = false;
+                    openInventory(superiorPlayer, previousMenu, missionCategory);
+                }
+            });
+        }
     }
 
     @Override
@@ -113,7 +153,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
             mission.formatItem(superiorPlayer, itemStack);
 
             return itemStack;
-        }catch(Exception ex){
+        } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of mission: " + mission.getName());
             SuperiorSkyblockPlugin.debug(ex);
             throw ex;
@@ -125,55 +165,15 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
         return missions;
     }
 
-    private int getPercentage(double progress){
+    private int getPercentage(double progress) {
         progress = Math.min(1.0, progress);
         return Math.round((float) progress * 100);
     }
 
-    private int getCompletionStatus(Mission<?> mission){
+    private int getCompletionStatus(Mission<?> mission) {
         return superiorPlayer.getIsland() == null ? 0 :
                 !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
-                plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
-    }
-
-    public static void init(){
-        MenuMissionsCategory menuMissionsCategory = new MenuMissionsCategory(null, null);
-
-        File file = new File(plugin.getDataFolder(), "menus/missions-category.yml");
-
-        if(!file.exists())
-            FileUtils.saveResource("menus/missions-category.yml");
-
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-
-        sortByCompletion = cfg.getBoolean("sort-by-completion", false);
-        removeCompleted = cfg.getBoolean("remove-completed", false);
-
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
-
-        char slotsChar = cfg.getString("slots", " ").charAt(0);
-
-        if(cfg.contains("sounds." + slotsChar + ".completed"))
-            menuMissionsCategory.addData("sound-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".completed")));
-        if(cfg.contains("sounds." + slotsChar + ".not-completed"))
-            menuMissionsCategory.addData("sound-not-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".not-completed")));
-        if(cfg.contains("sounds." + slotsChar + ".can-complete"))
-            menuMissionsCategory.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
-
-        menuMissionsCategory.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuMissionsCategory.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuMissionsCategory.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuMissionsCategory.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuMissionsCategory.markCompleted();
-    }
-
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, MissionCategory missionCategory){
-        new MenuMissionsCategory(superiorPlayer, missionCategory).open(previousMenu);
-    }
-
-    public static void refreshMenus(MissionCategory missionCategory){
-        refreshMenus(MenuMissionsCategory.class, superiorMenu -> missionCategory.equals(superiorMenu.missionCategory));
+                        plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
     }
 
 }

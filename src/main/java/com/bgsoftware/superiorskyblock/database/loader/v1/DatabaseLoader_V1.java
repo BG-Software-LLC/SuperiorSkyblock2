@@ -51,11 +51,38 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
     private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
     private final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
-    private GridAttributes gridAttributes;
-
     private final IDeserializer deserializer = new MultipleDeserializer(
             new JsonDeserializer(this), new RawDeserializer(this, plugin)
     );
+    private GridAttributes gridAttributes;
+
+    public static void register(DataHandler dataHandler) {
+        if (isDatabaseOldFormat())
+            dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
+    }
+
+    private static boolean isDatabaseOldFormat() {
+        sqlSession = new SQLSession(plugin, false);
+
+        if (!sqlSession.isUsingMySQL()) {
+            databaseFile = new File(plugin.getDataFolder(), "database.db");
+
+            if (!databaseFile.exists())
+                return false;
+        }
+
+        if (!sqlSession.createConnection()) {
+            sqlSession.close();
+            return false;
+        }
+
+        if (!sqlSession.doesTableExist("stackedBlocks")) {
+            sqlSession.close();
+            return false;
+        }
+
+        return true;
+    }
 
     @Override
     public void loadData() {
@@ -104,15 +131,15 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         AtomicBoolean failedBackup = new AtomicBoolean(true);
 
-        if(!sqlSession.isUsingMySQL()) {
+        if (!sqlSession.isUsingMySQL()) {
             sqlSession.close();
             if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackup.set(false);
             }
         }
 
-        if(failedBackup.get()) {
-            if(!sqlSession.isUsingMySQL()) {
+        if (failedBackup.get()) {
+            if (!sqlSession.isUsingMySQL()) {
                 sqlSession = new SQLSession(plugin, false);
                 sqlSession.createConnection();
             }
@@ -126,7 +153,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> failedBackup.set(true));
         }
 
-        if(sqlSession.isUsingMySQL())
+        if (sqlSession.isUsingMySQL())
             sqlSession.close();
 
         if (failedBackup.get()) {
@@ -145,35 +172,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         saveGrid();
     }
 
-    public static void register(DataHandler dataHandler) {
-        if (isDatabaseOldFormat())
-            dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
-    }
-
-    private static boolean isDatabaseOldFormat() {
-        sqlSession = new SQLSession(plugin, false);
-
-        if (!sqlSession.isUsingMySQL()) {
-            databaseFile = new File(plugin.getDataFolder(), "database.db");
-
-            if (!databaseFile.exists())
-                return false;
-        }
-
-        if (!sqlSession.createConnection()) {
-            sqlSession.close();
-            return false;
-        }
-
-        if (!sqlSession.doesTableExist("stackedBlocks")) {
-            sqlSession.close();
-            return false;
-        }
-
-        return true;
-    }
-
-    private void savePlayers(){
+    private void savePlayers() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting players...");
 
         StatementHolder playersQuery = new StatementHolder("REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
@@ -189,7 +188,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         playersSettingsQuery.executeBatch(false);
     }
 
-    private void saveIslands(){
+    private void saveIslands() {
         long currentTime = System.currentTimeMillis();
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting islands...");
@@ -250,7 +249,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         islandsWarpsQuery.executeBatch(false);
     }
 
-    private void saveStackedBlocks(){
+    private void saveStackedBlocks() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting stacked blocks...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
@@ -266,7 +265,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         insertQuery.executeBatch(false);
     }
 
-    private void saveBankTransactions(){
+    private void saveBankTransactions() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting bank transactions...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
@@ -286,8 +285,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         insertQuery.executeBatch(false);
     }
 
-    private void saveGrid(){
-        if(gridAttributes == null)
+    private void saveGrid() {
+        if (gridAttributes == null)
             return;
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting grid data...");

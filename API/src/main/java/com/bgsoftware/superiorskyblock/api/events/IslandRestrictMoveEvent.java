@@ -16,12 +16,17 @@ public class IslandRestrictMoveEvent extends Event {
 
     /**
      * The constructor for the event.
+     *
      * @param superiorPlayer The player which was restricted.
      * @param restrictReason The reason for the restriction.
      */
-    public IslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, RestrictReason restrictReason){
+    public IslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, RestrictReason restrictReason) {
         this.superiorPlayer = superiorPlayer;
         this.restrictReason = restrictReason;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
     /**
@@ -43,11 +48,7 @@ public class IslandRestrictMoveEvent extends Event {
         return handlers;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
-    }
-
-    public enum RestrictReason{
+    public enum RestrictReason {
 
         LEAVE_ISLAND_TO_OUTSIDE,
         LEAVE_PROTECTED_EVENT_CANCELLED,

@@ -23,6 +23,7 @@ public interface IslandChest extends InventoryHolder {
 
     /**
      * Set the amount of rows for this chest.
+     *
      * @param rows The new amount of rows.
      */
     void setRows(int rows);

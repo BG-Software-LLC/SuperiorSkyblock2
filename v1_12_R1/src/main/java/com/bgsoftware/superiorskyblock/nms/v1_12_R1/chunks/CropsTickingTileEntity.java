@@ -30,6 +30,16 @@ public final class CropsTickingTileEntity extends TileEntity implements ITickabl
 
     private int currentTick = 0;
 
+    private CropsTickingTileEntity(Island island, Chunk chunk) {
+        this.island = new WeakReference<>(island);
+        this.chunk = new WeakReference<>(chunk);
+        this.chunkX = chunk.locX;
+        this.chunkZ = chunk.locZ;
+        a(chunk.getWorld());
+        setPosition(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
+        world.tileEntityListTick.add(this);
+    }
+
     public static void create(Island island, Chunk chunk) {
         long chunkKey = ChunkCoordIntPair.a(chunk.locX, chunk.locZ);
         if (!tickingChunks.containsKey(chunkKey)) {
@@ -39,16 +49,6 @@ public final class CropsTickingTileEntity extends TileEntity implements ITickabl
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
         return tickingChunks.remove(ChunkCoordIntPair.a(chunkCoords.x, chunkCoords.z));
-    }
-
-    private CropsTickingTileEntity(Island island, Chunk chunk) {
-        this.island = new WeakReference<>(island);
-        this.chunk = new WeakReference<>(chunk);
-        this.chunkX = chunk.locX;
-        this.chunkZ = chunk.locZ;
-        a(chunk.getWorld());
-        setPosition(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-        world.tileEntityListTick.add(this);
     }
 
     @Override

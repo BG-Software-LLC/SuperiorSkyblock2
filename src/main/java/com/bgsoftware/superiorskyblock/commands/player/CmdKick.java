@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
@@ -66,16 +66,15 @@ public final class CmdKick implements IPermissibleCommand {
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             return;
 
-        if(!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer))
+        if (!IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer))
             return;
 
-        if(plugin.getSettings().isKickConfirm()) {
+        if (plugin.getSettings().isKickConfirm()) {
             plugin.getMenus().openConfirmKick(superiorPlayer, null, island, targetPlayer);
-        }
-        else {
+        } else {
             IslandUtils.handleKickPlayer(superiorPlayer, island, targetPlayer);
         }
     }

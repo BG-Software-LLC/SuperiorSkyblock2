@@ -17,12 +17,13 @@ public class IslandUncoopPlayerEvent extends IslandEvent implements Cancellable 
 
     /**
      * The constructor of the event.
-     * @param island The island that the leadership of it is transferred.
-     * @param player The player who cooped the target, if exists.
-     * @param target The player that will no longer be coop.
+     *
+     * @param island       The island that the leadership of it is transferred.
+     * @param player       The player who cooped the target, if exists.
+     * @param target       The player that will no longer be coop.
      * @param uncoopReason The reason for the action.
      */
-    public IslandUncoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target, UncoopReason uncoopReason){
+    public IslandUncoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target, UncoopReason uncoopReason) {
         super(island);
         this.player = player;
         this.target = target;
@@ -61,7 +62,7 @@ public class IslandUncoopPlayerEvent extends IslandEvent implements Cancellable 
         this.cancelled = cancelled;
     }
 
-    public enum UncoopReason{
+    public enum UncoopReason {
 
         PLAYER,
         SERVER_LEAVE

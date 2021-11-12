@@ -16,31 +16,30 @@ public enum Materials {
     NETHER_PORTAL("PORTAL"),
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
 
-    Materials(String bukkitType){
+    private final String bukkitType;
+    private final short bukkitData;
+
+    Materials(String bukkitType) {
         this(bukkitType, 0);
     }
-
-    Materials(String bukkitType, int bukkitData){
+    Materials(String bukkitType, int bukkitData) {
         this.bukkitType = bukkitType;
         this.bukkitData = (short) bukkitData;
     }
 
-    private final String bukkitType;
-    private final short bukkitData;
-
-    public Material toBukkitType(){
+    public Material toBukkitType() {
         try {
             return Material.valueOf(ServerVersion.isLegacy() ? bukkitType : name());
-        }catch(Exception ex){
+        } catch (Exception ex) {
             throw new IllegalArgumentException("Couldn't cast " + name() + " into a bukkit enum. Contact Ome_R!");
         }
     }
 
-    public ItemStack toBukkitItem(){
+    public ItemStack toBukkitItem() {
         return toBukkitItem(1);
     }
 
-    public ItemStack toBukkitItem(int amount){
+    public ItemStack toBukkitItem(int amount) {
         return ServerVersion.isLegacy() ? new ItemStack(toBukkitType(), amount, bukkitData) : new ItemStack(toBukkitType(), amount);
     }
 

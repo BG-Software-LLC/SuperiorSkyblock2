@@ -5,13 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import org.bukkit.Bukkit;
@@ -71,7 +71,7 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Upgrade upgrade = CommandArguments.getUpgrade(plugin, sender, args[3]);
 
-        if(upgrade == null)
+        if (upgrade == null)
             return;
 
         islands.forEach(island -> {
@@ -80,7 +80,7 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
             EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(
                     null, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
 
-            if(!event.isCancelled()){
+            if (!event.isCancelled()) {
                 SuperiorPlayer owner = island.getOwner();
                 for (String command : event.getResult().getKey()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(owner, command
@@ -91,9 +91,9 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
             }
         });
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
         else
             Locale.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());

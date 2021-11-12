@@ -52,26 +52,26 @@ public final class IntTag extends Tag<Integer> {
         super(value, CLASS, int.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value);
-    }
-
-    public static IntTag fromNBT(Object tag){
+    public static IntTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to IntTag!");
 
         try {
             int value = plugin.getNMSTags().getNBTIntValue(tag);
             return new IntTag(value);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
 
-    public static IntTag fromStream(DataInputStream is) throws IOException{
+    public static IntTag fromStream(DataInputStream is) throws IOException {
         return new IntTag(is.readInt());
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value);
     }
 
 }

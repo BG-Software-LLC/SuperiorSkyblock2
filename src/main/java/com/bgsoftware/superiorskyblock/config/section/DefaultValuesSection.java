@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
-import org.bukkit.World;
 
 import java.math.BigDecimal;
 import java.util.Map;

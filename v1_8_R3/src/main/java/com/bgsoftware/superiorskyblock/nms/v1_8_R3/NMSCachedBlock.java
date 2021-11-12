@@ -11,7 +11,7 @@ public final class NMSCachedBlock implements ICachedBlock {
     private final Material blockType;
     private final byte blockData;
 
-    public NMSCachedBlock(Block block){
+    public NMSCachedBlock(Block block) {
         this.blockType = block.getType();
         this.blockData = block.getData();
     }

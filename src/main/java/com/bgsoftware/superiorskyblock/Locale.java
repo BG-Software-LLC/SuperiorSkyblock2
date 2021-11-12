@@ -702,52 +702,23 @@ public enum Locale {
     WITHDRAW_ERROR,
     WORLD_NOT_UNLOCKED;
 
-    private final String defaultMessage;
-    private final Map<java.util.Locale, MessageContainer> messages = new HashMap<>();
-
-    Locale(){
-        this(null);
-    }
-
-    Locale(String defaultMessage){
-        this.defaultMessage = defaultMessage;
-    }
-
-    public boolean isEmpty(java.util.Locale locale){
-        MessageContainer messageContainer = messages.get(locale);
-        return messageContainer == null || messageContainer.getMessage().isEmpty();
-    }
-
-    public String getMessage(java.util.Locale locale, Object... objects){
-        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects);
-    }
-
-    public void send(SuperiorPlayer superiorPlayer, Object... objects){
-        superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
-    }
-
-    public void send(CommandSender sender, Object... objects){
-        send(sender, LocaleUtils.getLocale(sender), objects);
-    }
-
-    public void send(CommandSender sender, java.util.Locale locale, Object... objects){
-        MessageContainer messageContainer = messages.get(locale);
-        if(messageContainer != null)
-            messageContainer.sendMessage(sender, objects);
-    }
-
-    private void setMessage(java.util.Locale locale, MessageContainer messageContainer){
-        messages.put(locale, messageContainer);
-    }
-
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Set<UUID> noInteractMessages = new HashSet<>();
     private static final Set<UUID> noSchematicMessages = new HashSet<>();
-
     private static Set<java.util.Locale> locales = new HashSet<>();
     private static java.util.Locale defaultLocale = null;
+    private final String defaultMessage;
+    private final Map<java.util.Locale, MessageContainer> messages = new HashMap<>();
 
-    public static void reload(){
+    Locale() {
+        this(null);
+    }
+
+    Locale(String defaultMessage) {
+        this.defaultMessage = defaultMessage;
+    }
+
+    public static void reload() {
         SuperiorSkyblockPlugin.log("Loading messages started...");
         long startTime = System.currentTimeMillis();
 
@@ -756,7 +727,7 @@ public enum Locale {
 
         File langFolder = new File(plugin.getDataFolder(), "lang");
 
-        if(!langFolder.exists()){
+        if (!langFolder.exists()) {
             plugin.saveResource("lang/en-US.yml", false);
             plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);
@@ -770,13 +741,13 @@ public enum Locale {
         int messagesAmount = 0;
         boolean countMessages = true;
 
-        for(File langFile : Objects.requireNonNull(langFolder.listFiles())){
+        for (File langFile : Objects.requireNonNull(langFolder.listFiles())) {
             String fileName = langFile.getName().split("\\.")[0];
             java.util.Locale fileLocale;
 
-            try{
+            try {
                 fileLocale = LocaleUtils.getLocale(fileName);
-            }catch(IllegalArgumentException ex){
+            } catch (IllegalArgumentException ex) {
                 SuperiorSkyblockPlugin.log("&cThe language \"" + fileName + "\" is invalid. Please correct the file name.");
                 SuperiorSkyblockPlugin.debug(ex);
                 continue;
@@ -784,7 +755,7 @@ public enum Locale {
 
             locales.add(fileLocale);
 
-            if(plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName))
+            if (plugin.getSettings().getDefaultLanguage().equalsIgnoreCase(fileName))
                 defaultLocale = fileLocale;
 
             CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(langFile);
@@ -792,27 +763,26 @@ public enum Locale {
 
             try {
                 cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 SuperiorSkyblockPlugin.debug(ex);
                 ex.printStackTrace();
             }
 
-            for(Locale locale : values()){
-                if(cfg.isConfigurationSection(locale.name())){
+            for (Locale locale : values()) {
+                if (cfg.isConfigurationSection(locale.name())) {
                     locale.setMessage(fileLocale, new ComplexMessage(locale.name(), cfg.getConfigurationSection(locale.name())));
-                }
-                else {
+                } else {
                     locale.setMessage(fileLocale, new RawMessage(locale.name(), StringUtils.translateColors(cfg.getString(locale.name(), ""))));
                 }
 
-                if(countMessages)
+                if (countMessages)
                     messagesAmount++;
             }
 
             countMessages = false;
         }
 
-        if(defaultLocale == null)
+        if (defaultLocale == null)
             //noinspection OptionalGetWithoutIsPresent
             defaultLocale = locales.stream().findFirst().get();
 
@@ -820,54 +790,54 @@ public enum Locale {
         SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
-    public static void sendMessage(SuperiorPlayer superiorPlayer, String message, boolean translateColors){
+    public static void sendMessage(SuperiorPlayer superiorPlayer, String message, boolean translateColors) {
         superiorPlayer.runIfOnline(player -> sendMessage(player, message, translateColors));
     }
 
-    public static void sendMessage(CommandSender sender, String message, boolean translateColors){
+    public static void sendMessage(CommandSender sender, String message, boolean translateColors) {
         sender.sendMessage(translateColors ? StringUtils.translateColors(message) : message);
     }
 
-    public static void sendProtectionMessage(SuperiorPlayer superiorPlayer){
+    public static void sendProtectionMessage(SuperiorPlayer superiorPlayer) {
         superiorPlayer.runIfOnline(player -> sendProtectionMessage(player, superiorPlayer.getUserLocale()));
     }
 
-    public static void sendProtectionMessage(Player player){
+    public static void sendProtectionMessage(Player player) {
         sendProtectionMessage(player, LocaleUtils.getLocale(player));
     }
 
-    public static void sendProtectionMessage(Player player, java.util.Locale locale){
-        if(!noInteractMessages.contains(player.getUniqueId())){
+    public static void sendProtectionMessage(Player player, java.util.Locale locale) {
+        if (!noInteractMessages.contains(player.getUniqueId())) {
             noInteractMessages.add(player.getUniqueId());
             ISLAND_PROTECTED.send(player, locale);
             Executor.sync(() -> noInteractMessages.remove(player.getUniqueId()), plugin.getSettings().getProtectedMessageDelay());
         }
     }
 
-    public static void sendSchematicMessage(SuperiorPlayer superiorPlayer, String message){
-        if(!noSchematicMessages.contains(superiorPlayer.getUniqueId())){
+    public static void sendSchematicMessage(SuperiorPlayer superiorPlayer, String message) {
+        if (!noSchematicMessages.contains(superiorPlayer.getUniqueId())) {
             noSchematicMessages.add(superiorPlayer.getUniqueId());
-            Locale.sendMessage(superiorPlayer, message,  false);
+            Locale.sendMessage(superiorPlayer, message, false);
             Executor.sync(() -> noSchematicMessages.remove(superiorPlayer.getUniqueId()), 60L);
         }
     }
 
-    public static boolean isValidLocale(java.util.Locale locale){
+    public static boolean isValidLocale(java.util.Locale locale) {
         return locales.contains(locale);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static void convertOldFile(){
+    private static void convertOldFile() {
         File file = new File(plugin.getDataFolder(), "lang.yml");
-        if(file.exists()){
+        if (file.exists()) {
             File dest = new File(plugin.getDataFolder(), "lang/en-US.yml");
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
     }
 
-    private static String replaceArgs(String msg, Object... objects){
-        if(msg == null)
+    private static String replaceArgs(String msg, Object... objects) {
+        if (msg == null)
             return null;
 
         for (int i = 0; i < objects.length; i++) {
@@ -879,15 +849,42 @@ public enum Locale {
         return msg;
     }
 
-    public static java.util.Locale getDefaultLocale(){
+    public static java.util.Locale getDefaultLocale() {
         return defaultLocale;
     }
 
-    private static abstract class MessageContainer{
+    public boolean isEmpty(java.util.Locale locale) {
+        MessageContainer messageContainer = messages.get(locale);
+        return messageContainer == null || messageContainer.getMessage().isEmpty();
+    }
+
+    public String getMessage(java.util.Locale locale, Object... objects) {
+        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects);
+    }
+
+    public void send(SuperiorPlayer superiorPlayer, Object... objects) {
+        superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
+    }
+
+    public void send(CommandSender sender, Object... objects) {
+        send(sender, LocaleUtils.getLocale(sender), objects);
+    }
+
+    public void send(CommandSender sender, java.util.Locale locale, Object... objects) {
+        MessageContainer messageContainer = messages.get(locale);
+        if (messageContainer != null)
+            messageContainer.sendMessage(sender, objects);
+    }
+
+    private void setMessage(java.util.Locale locale, MessageContainer messageContainer) {
+        messages.put(locale, messageContainer);
+    }
+
+    private static abstract class MessageContainer {
 
         protected final String name;
 
-        MessageContainer(String name){
+        MessageContainer(String name) {
             this.name = name;
         }
 
@@ -897,11 +894,11 @@ public enum Locale {
 
     }
 
-    private static final class RawMessage extends MessageContainer{
+    private static final class RawMessage extends MessageContainer {
 
         private final String message;
 
-        RawMessage(String name, String message){
+        RawMessage(String name, String message) {
             super(name);
             this.message = message;
         }
@@ -913,18 +910,18 @@ public enum Locale {
 
         @Override
         void sendMessage(CommandSender sender, Object... objects) {
-            if(message != null && !message.isEmpty())
+            if (message != null && !message.isEmpty())
                 sender.sendMessage(replaceArgs(message, objects));
         }
     }
 
-    private static final class ComplexMessage extends MessageContainer{
+    private static final class ComplexMessage extends MessageContainer {
 
         private final TextComponent[] textComponents;
         private final String rawMessage, actionBarMessage, titleMessage, subtitleMessage;
         private final int fadeIn, duration, fadeOut;
 
-        ComplexMessage(String name, ConfigurationSection section){
+        ComplexMessage(String name, ConfigurationSection section) {
             super(name);
 
             List<TextComponent> textComponents = new ArrayList<>();
@@ -932,20 +929,16 @@ public enum Locale {
             String actionBarMessage = "", titleMessage = null, subtitleMessage = null;
             int fadeIn = -1, fadeOut = -1, duration = -1;
 
-            for(String key : section.getKeys(false)){
-                if(key.equals("action-bar")){
+            for (String key : section.getKeys(false)) {
+                if (key.equals("action-bar")) {
                     actionBarMessage = StringUtils.translateColors(section.getString(key + ".text"));
-                }
-
-                else if(key.equals("title")){
+                } else if (key.equals("title")) {
                     titleMessage = StringUtils.translateColors(section.getString(key + ".title"));
                     subtitleMessage = StringUtils.translateColors(section.getString(key + ".sub-title"));
                     fadeIn = section.getInt(key + ".fade-in");
                     duration = section.getInt(key + ".duration");
                     fadeOut = section.getInt(key + ".fade-out");
-                }
-
-                else {
+                } else {
                     String message = StringUtils.translateColors(section.getString(key + ".text"));
                     stringBuilder.append(message);
 
@@ -974,6 +967,23 @@ public enum Locale {
             this.fadeOut = fadeOut;
         }
 
+        private static BaseComponent[] replaceArgs(BaseComponent[] textComponents, Object... objects) {
+            BaseComponent[] duplicate = new BaseComponent[textComponents.length];
+
+            for (int i = 0; i < textComponents.length; i++) {
+                duplicate[i] = textComponents[i].duplicate();
+                if (duplicate[i] instanceof TextComponent) {
+                    TextComponent textComponent = (TextComponent) duplicate[i];
+                    textComponent.setText(Locale.replaceArgs(textComponent.getText(), objects));
+                }
+                HoverEvent hoverEvent = duplicate[i].getHoverEvent();
+                if (hoverEvent != null)
+                    duplicate[i].setHoverEvent(new HoverEvent(hoverEvent.getAction(), replaceArgs(hoverEvent.getValue(), objects)));
+            }
+
+            return duplicate;
+        }
+
         @Override
         public String getMessage() {
             return rawMessage;
@@ -981,38 +991,20 @@ public enum Locale {
 
         @Override
         void sendMessage(CommandSender sender, Object... objects) {
-            if(!(sender instanceof Player)){
+            if (!(sender instanceof Player)) {
                 sender.sendMessage(rawMessage);
-            }
-            else {
+            } else {
                 BaseComponent[] duplicate = replaceArgs(textComponents, objects);
-                
-                if(duplicate.length > 0)
+
+                if (duplicate.length > 0)
                     ((Player) sender).spigot().sendMessage(duplicate);
 
-                if(actionBarMessage != null)
+                if (actionBarMessage != null)
                     plugin.getNMSPlayers().sendActionBar((Player) sender, Locale.replaceArgs(actionBarMessage, objects));
 
                 plugin.getNMSPlayers().sendTitle((Player) sender, Locale.replaceArgs(titleMessage, objects),
                         Locale.replaceArgs(subtitleMessage, objects), fadeIn, duration, fadeOut);
             }
-        }
-
-        private static BaseComponent[] replaceArgs(BaseComponent[] textComponents, Object... objects){
-            BaseComponent[] duplicate = new BaseComponent[textComponents.length];
-
-            for(int i = 0; i < textComponents.length; i++){
-                duplicate[i] = textComponents[i].duplicate();
-                if(duplicate[i] instanceof TextComponent) {
-                    TextComponent textComponent = (TextComponent) duplicate[i];
-                    textComponent.setText(Locale.replaceArgs(textComponent.getText(), objects));
-                }
-                HoverEvent hoverEvent = duplicate[i].getHoverEvent();
-                if(hoverEvent != null)
-                    duplicate[i].setHoverEvent(new HoverEvent(hoverEvent.getAction(), replaceArgs(hoverEvent.getValue(), objects)));
-            }
-
-            return duplicate;
         }
 
     }

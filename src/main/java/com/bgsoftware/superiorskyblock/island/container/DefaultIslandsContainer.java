@@ -28,7 +28,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     private final SuperiorSkyblockPlugin plugin;
 
-    public DefaultIslandsContainer(SuperiorSkyblockPlugin plugin){
+    public DefaultIslandsContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         SortingType.values().forEach(sortingType -> addSortingType(sortingType, false));
     }
@@ -38,7 +38,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
         Location islandLocation = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
         this.islandsByPositions.put(IslandPosition.of(islandLocation), island);
 
-        if(plugin.getProviders().hasCustomWorldsSupport()){
+        if (plugin.getProviders().hasCustomWorldsSupport()) {
             runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
                     location -> this.islandsByPositions.put(IslandPosition.of(location), island));
             runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
@@ -59,7 +59,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
         islandsByUUID.remove(island.getUniqueId());
         islandsByPositions.remove(IslandPosition.of(islandLocation));
 
-        if(plugin.getProviders().hasCustomWorldsSupport()){
+        if (plugin.getProviders().hasCustomWorldsSupport()) {
             runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
                     location -> islandsByPositions.remove(IslandPosition.of(location)));
             runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
@@ -105,7 +105,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
     }
 
     @Override
-    public void transferIsland(UUID oldOwner, UUID newOwner){
+    public void transferIsland(UUID oldOwner, UUID newOwner) {
         Island island = sortedIslands.get(oldOwner);
         sortedIslands.remove(oldOwner);
         sortedIslands.put(newOwner, island);
@@ -131,12 +131,13 @@ public final class DefaultIslandsContainer implements IslandsContainer {
         this.sortedIslands.registerSortingType(sortingType, sort, ISLANDS_PREDICATE);
     }
 
-    private void runWithCustomWorld(Location islandLocation, Island island, World.Environment environment, Consumer<Location> onSuccess){
-        try{
+    private void runWithCustomWorld(Location islandLocation, Island island, World.Environment environment, Consumer<Location> onSuccess) {
+        try {
             Location location = island.getCenter(environment);
-            if(!location.getWorld().equals(islandLocation.getWorld()))
+            if (!location.getWorld().equals(islandLocation.getWorld()))
                 onSuccess.accept(location);
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
 }

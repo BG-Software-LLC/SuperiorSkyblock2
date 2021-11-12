@@ -19,17 +19,17 @@ public interface IPermissibleCommand extends ISuperiorCommand {
         Island island = null;
         SuperiorPlayer superiorPlayer = null;
 
-        if(!canBeExecutedByConsole() || sender instanceof Player){
+        if (!canBeExecutedByConsole() || sender instanceof Player) {
             Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
 
             island = arguments.getKey();
 
-            if(island == null)
+            if (island == null)
                 return;
 
             superiorPlayer = arguments.getValue();
 
-            if(!superiorPlayer.hasPermission(getPrivilege())){
+            if (!superiorPlayer.hasPermission(getPrivilege())) {
                 getPermissionLackMessage().send(superiorPlayer, island.getRequiredPlayerRole(getPrivilege()));
                 return;
             }
@@ -43,7 +43,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
         Island island = null;
         SuperiorPlayer superiorPlayer = null;
 
-        if(!canBeExecutedByConsole() || sender instanceof Player){
+        if (!canBeExecutedByConsole() || sender instanceof Player) {
             superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
             island = superiorPlayer.getIsland();
         }
@@ -58,7 +58,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
 
     void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args);
 
-    default List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args){
+    default List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return new ArrayList<>();
     }
 

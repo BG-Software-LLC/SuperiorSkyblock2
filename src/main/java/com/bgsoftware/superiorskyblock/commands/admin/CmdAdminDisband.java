@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -7,8 +9,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.Locale;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
@@ -62,15 +62,15 @@ public final class CmdAdminDisband implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if(EventsCaller.callIslandDisbandEvent(targetPlayer, island)){
+        if (EventsCaller.callIslandDisbandEvent(targetPlayer, island)) {
             IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
 
-            if(targetPlayer == null)
+            if (targetPlayer == null)
                 Locale.DISBANDED_ISLAND_OTHER_NAME.send(sender, island.getName());
             else
                 Locale.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
 
-            if(BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
+            if (BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
                 Locale.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
                         .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }

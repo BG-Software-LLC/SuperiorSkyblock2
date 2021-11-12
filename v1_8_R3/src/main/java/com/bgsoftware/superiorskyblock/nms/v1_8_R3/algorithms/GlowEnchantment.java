@@ -5,7 +5,11 @@ import org.bukkit.enchantments.EnchantmentTarget;
 
 public final class GlowEnchantment extends Enchantment {
 
-    public static GlowEnchantment createEnchantment(){
+    private GlowEnchantment(int id) {
+        super(id);
+    }
+
+    public static GlowEnchantment createEnchantment() {
         int id = 100;
 
         //noinspection deprecation, StatementWithEmptyBody
@@ -13,10 +17,6 @@ public final class GlowEnchantment extends Enchantment {
         }
 
         return new GlowEnchantment(id);
-    }
-
-    private GlowEnchantment(int id){
-        super(id);
     }
 
     @Override

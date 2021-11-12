@@ -14,26 +14,30 @@ public class BlockStackEvent extends BlockEvent implements Cancellable {
     private final int originalCount, newCount;
     private boolean cancelled = false;
 
-    public BlockStackEvent(Block block, Player player, int originalCount, int newCount){
+    public BlockStackEvent(Block block, Player player, int originalCount, int newCount) {
         super(block);
         this.player = player;
         this.originalCount = originalCount;
         this.newCount = newCount;
     }
 
+    public static HandlerList getHandlerList() {
+        return handlers;
+    }
+
     public Player getPlayer() {
         return player;
     }
 
-    public int getOriginalCount(){
+    public int getOriginalCount() {
         return originalCount;
     }
 
-    public int getNewCount(){
+    public int getNewCount() {
         return newCount;
     }
 
-    public int getIncreaseAmount(){
+    public int getIncreaseAmount() {
         return newCount - originalCount;
     }
 
@@ -49,10 +53,6 @@ public class BlockStackEvent extends BlockEvent implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList() {
         return handlers;
     }
 

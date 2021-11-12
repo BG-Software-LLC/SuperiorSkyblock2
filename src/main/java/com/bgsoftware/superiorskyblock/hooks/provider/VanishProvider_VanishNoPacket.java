@@ -18,11 +18,11 @@ public final class VanishProvider_VanishNoPacket implements VanishProvider, List
     private final SuperiorSkyblockPlugin plugin;
     private final VanishPlugin instance;
 
-    public VanishProvider_VanishNoPacket(SuperiorSkyblockPlugin plugin){
+    public VanishProvider_VanishNoPacket(SuperiorSkyblockPlugin plugin) {
         instance = JavaPlugin.getPlugin(VanishPlugin.class);
         this.plugin = plugin;
 
-        if(!alreadyEnabled){
+        if (!alreadyEnabled) {
             alreadyEnabled = true;
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
@@ -36,11 +36,10 @@ public final class VanishProvider_VanishNoPacket implements VanishProvider, List
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerVanish(VanishStatusChangeEvent e){
-        if(e.isVanishing()) {
+    public void onPlayerVanish(VanishStatusChangeEvent e) {
+        if (e.isVanishing()) {
             PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
-        }
-        else{
+        } else {
             PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         }
     }

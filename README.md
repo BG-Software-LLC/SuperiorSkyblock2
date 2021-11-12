@@ -17,6 +17,7 @@ You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/
 You must add yourself all the private jars or purchase access to our private repository.
 
 ##### Private Jars:
+
 - AdvancedSpawners by GC [[link]](https://advancedplugins.net/item/2)
 - CMI by Zrips [[link]](https://www.spigotmc.org/resources/3742/)
 - EpicSpawners by Songoda [[link]](https://songoda.com/marketplace/product/13)
@@ -26,9 +27,13 @@ You must add yourself all the private jars or purchase access to our private rep
 
 ## API
 
-The plugin is packed with a rich API for interacting with islands, players and more. When hooking into the plugin, it's highly recommended to only use the API and not the compiled plugin, as the API methods are not only commented, but also will not get removed or changed unless they are marked as deprecated. This means that when using the API, you won't have to do any additional changes to your code between updates.
+The plugin is packed with a rich API for interacting with islands, players and more. When hooking into the plugin, it's
+highly recommended to only use the API and not the compiled plugin, as the API methods are not only commented, but also
+will not get removed or changed unless they are marked as deprecated. This means that when using the API, you won't have
+to do any additional changes to your code between updates.
 
 ##### Maven
+
 ```
 <repositories>
     <repository>
@@ -47,6 +52,7 @@ The plugin is packed with a rich API for interacting with islands, players and m
 ```
 
 ##### Gradle
+
 ```
 repositories {
     maven { url 'https://repo.bg-software.com/repository/api/' }
@@ -59,9 +65,9 @@ dependencies {
 
 ## Updates
 
-This plugin is provided "as is", which means no updates or new features are guaranteed. We will do our best to keep 
+This plugin is provided "as is", which means no updates or new features are guaranteed. We will do our best to keep
 updating and pushing new updates, and you are more than welcome to contribute your time as well and make pull requests
-for bug fixes. 
+for bug fixes.
 
 ## License
 

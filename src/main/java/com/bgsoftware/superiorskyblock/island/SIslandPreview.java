@@ -19,7 +19,7 @@ public final class SIslandPreview implements IslandPreview {
     private final String schematic;
     private final String islandName;
 
-    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, String schematic, String islandName){
+    public SIslandPreview(SuperiorPlayer superiorPlayer, Location previewLocation, String schematic, String islandName) {
         this.superiorPlayer = superiorPlayer;
         this.previewLocation = previewLocation;
         this.schematic = schematic;
@@ -29,11 +29,10 @@ public final class SIslandPreview implements IslandPreview {
         Preconditions.checkNotNull(player, "Cannot start island preview to an offline player.");
 
         PlayerChat.listen(player, message -> {
-            if(message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CONFIRM_TEXT.getMessage(superiorPlayer.getUserLocale()))){
+            if (message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CONFIRM_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
                 handleConfirm();
                 return true;
-            }
-            else if(message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale()))){
+            } else if (message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
                 handleCancel();
                 return true;
             }

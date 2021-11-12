@@ -22,6 +22,7 @@ public interface IslandWarp {
     /**
      * Set the name of the warp.
      * Do not call this method - use Island#renameWarp instead!
+     *
      * @param name The new name to set.
      */
     void setName(String name);
@@ -33,6 +34,7 @@ public interface IslandWarp {
 
     /**
      * Set the location of the warp.
+     *
      * @param location The new location to set.
      */
     void setLocation(Location location);
@@ -44,6 +46,7 @@ public interface IslandWarp {
 
     /**
      * Set the private flag of the island warp.
+     *
      * @param privateFlag The flag to set.
      */
     void setPrivateFlag(boolean privateFlag);
@@ -58,6 +61,7 @@ public interface IslandWarp {
     /**
      * Get the icon of the warp after all placeholders are parsed.
      * May be null if the warp has no special icon.
+     *
      * @param superiorPlayer The player to parse the placeholders for
      */
     @Nullable
@@ -66,6 +70,7 @@ public interface IslandWarp {
     /**
      * Set the icon of the warp.
      * May be null if the warp should have no special icon.
+     *
      * @param icon The icon to set.
      */
     void setIcon(@Nullable ItemStack icon);

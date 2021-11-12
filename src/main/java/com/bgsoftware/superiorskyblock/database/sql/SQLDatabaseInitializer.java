@@ -12,17 +12,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class SQLDatabaseInitializer {
 
     private static final SQLDatabaseInitializer instance = new SQLDatabaseInitializer();
-
-    public static SQLDatabaseInitializer getInstance() {
-        return instance;
-    }
+    private DatabaseType database = DatabaseType.SQLite;
+    private SuperiorSkyblockPlugin plugin;
 
     private SQLDatabaseInitializer() {
 
     }
 
-    private DatabaseType database = DatabaseType.SQLite;
-    private SuperiorSkyblockPlugin plugin;
+    public static SQLDatabaseInitializer getInstance() {
+        return instance;
+    }
 
     public void init(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
@@ -47,66 +46,86 @@ public final class SQLDatabaseInitializer {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
     }
 
-    public void createIndexes(){
+    public void createIndexes() {
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_bans_index ON " +
-                "{prefix}islands_bans (island,player);", ignoreError -> {});
+                "{prefix}islands_bans (island,player);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX block_limits_index ON " +
-                "{prefix}islands_block_limits (island,block);", ignoreError -> {});
+                "{prefix}islands_block_limits (island,block);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_chests_index ON " +
-                "{prefix}islands_chests (island,`index`);", ignoreError -> {});
+                "{prefix}islands_chests (island,`index`);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_effects_index ON " +
-                "{prefix}islands_effects (island,effect_type);", ignoreError -> {});
+                "{prefix}islands_effects (island,effect_type);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX entity_limits_index ON " +
-                "{prefix}islands_entity_limits (island,entity);", ignoreError -> {});
+                "{prefix}islands_entity_limits (island,entity);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_flags_index ON " +
-                "{prefix}islands_flags (island,name);", ignoreError -> {});
+                "{prefix}islands_flags (island,name);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_generators_index ON " +
-                "{prefix}islands_generators (island,environment,block);", ignoreError -> {});
+                "{prefix}islands_generators (island,environment,block);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_homes_index ON " +
-                "{prefix}islands_homes (island,environment);", ignoreError -> {});
+                "{prefix}islands_homes (island,environment);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_members_index ON " +
-                "{prefix}islands_members (island,player);", ignoreError -> {});
+                "{prefix}islands_members (island,player);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_missions_index ON " +
-                "{prefix}islands_missions (island,name);", ignoreError -> {});
+                "{prefix}islands_missions (island,name);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX player_permissions_index ON " +
-                "{prefix}islands_player_permissions (island,player,permission);", ignoreError -> {});
+                "{prefix}islands_player_permissions (island,player,permission);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_ratings_index ON " +
-                "{prefix}islands_ratings (island,player);", ignoreError -> {});
+                "{prefix}islands_ratings (island,player);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX role_limits_index ON " +
-                "{prefix}islands_role_limits (island,role);", ignoreError -> {});
+                "{prefix}islands_role_limits (island,role);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX role_permissions_index ON " +
-                "{prefix}islands_role_permissions (island,permission);", ignoreError -> {});
+                "{prefix}islands_role_permissions (island,permission);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_upgrades_index ON " +
-                "{prefix}islands_upgrades (island,upgrade);", ignoreError -> {});
+                "{prefix}islands_upgrades (island,upgrade);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX visitor_homes_index ON " +
-                "{prefix}islands_visitor_homes (island,environment);", ignoreError -> {});
+                "{prefix}islands_visitor_homes (island,environment);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_visitors_index ON " +
-                "{prefix}islands_visitors (island,player);", ignoreError -> {});
+                "{prefix}islands_visitors (island,player);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX warp_categories_index ON " +
-                "{prefix}islands_warp_categories (island,name);", ignoreError -> {});
+                "{prefix}islands_warp_categories (island,name);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX islands_warps_index ON " +
-                "{prefix}islands_warps (island,name);", ignoreError -> {});
+                "{prefix}islands_warps (island,name);", ignoreError -> {
+        });
 
         SQLHelper.executeUpdate("CREATE UNIQUE INDEX players_missions_index ON " +
-                "{prefix}players_missions (player,name);", ignoreError -> {});
+                "{prefix}players_missions (player,name);", ignoreError -> {
+        });
     }
 
     public void close() {

@@ -827,7 +827,7 @@ WARP_ICON_NEW_LORE: |
 WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
 WARP_ICON_UPDATED: '&e&lKhu Vực | &7Thành công cập nhập biểu tượng danh mục.'
-WARP_ILLEGAL_NAME:  '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
+WARP_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
 WARP_LOCATION_UPDATE: '&e&lKhu Vực | &7Đã cập nhật thành công vị trí của khu vực vào vị trí của bạn.'
 WARP_PUBLIC_UPDATE: '&e&lKhu Vực | &7Thành công mở khu vực cho công chúng.'
 WARP_PRIVATE_UPDATE: '&e&lKhu Vực | &7Thành công đóng khu vực đối với công chúng.'

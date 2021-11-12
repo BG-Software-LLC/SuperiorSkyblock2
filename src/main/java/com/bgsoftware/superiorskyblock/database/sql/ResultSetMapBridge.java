@@ -32,7 +32,7 @@ public final class ResultSetMapBridge implements Map<String, Object> {
         try {
             get(key);
             return true;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             return false;
         }
     }

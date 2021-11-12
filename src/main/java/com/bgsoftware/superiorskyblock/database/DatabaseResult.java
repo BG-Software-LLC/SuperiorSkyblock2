@@ -7,80 +7,72 @@ public final class DatabaseResult {
 
     private final Map<String, Object> resultSet;
 
-    public DatabaseResult(Map<String, Object> resultSet){
+    public DatabaseResult(Map<String, Object> resultSet) {
         this.resultSet = resultSet;
     }
 
-    public String getString(String key){
+    public String getString(String key) {
         return getObject(key, String.class, null);
     }
 
-    public long getLong(String key){
+    public long getLong(String key) {
         Object value = getObject(key, 0L);
 
-        if(value instanceof Long) {
+        if (value instanceof Long) {
             return (long) value;
-        }
-        else if(value instanceof Integer) {
+        } else if (value instanceof Integer) {
             return (int) value;
-        }
-        else {
+        } else {
             return 0L;
         }
     }
 
-    public int getInt(String key){
+    public int getInt(String key) {
         return getObject(key, Integer.class, 0);
     }
 
-    public double getDouble(String key){
+    public double getDouble(String key) {
         Object value = getObject(key, 0D);
 
-        if(value instanceof Double){
+        if (value instanceof Double) {
             return (double) value;
-        }
-        else if(value instanceof Long) {
+        } else if (value instanceof Long) {
             return (double) (long) value;
-        }
-        else if(value instanceof Integer) {
+        } else if (value instanceof Integer) {
             return (double) (int) value;
-        }
-        else if(value instanceof BigDecimal) {
+        } else if (value instanceof BigDecimal) {
             return ((BigDecimal) value).doubleValue();
-        }
-        else {
+        } else {
             return 0L;
         }
     }
 
-    public boolean getBoolean(String key){
+    public boolean getBoolean(String key) {
         Object value = getObject(key, false);
 
-        if(value instanceof Integer) {
+        if (value instanceof Integer) {
             return (int) value == 1;
-        }
-        else if(value instanceof Boolean) {
+        } else if (value instanceof Boolean) {
             return (boolean) value;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    public BigDecimal getBigDecimal(String key){
+    public BigDecimal getBigDecimal(String key) {
         String value = getString(key);
-        try{
+        try {
             return new BigDecimal(value);
-        }catch (NumberFormatException | NullPointerException ex){
+        } catch (NumberFormatException | NullPointerException ex) {
             return BigDecimal.ZERO;
         }
     }
 
-    private Object getObject(String key, Object def){
+    private Object getObject(String key, Object def) {
         return resultSet.getOrDefault(key, def);
     }
 
-    private <T> T getObject(String key, Class<T> clazz, T def){
+    private <T> T getObject(String key, Class<T> clazz, T def) {
         Object value = resultSet.get(key);
         return value == null || !value.getClass().isAssignableFrom(clazz) ? def : clazz.cast(value);
     }

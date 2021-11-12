@@ -58,31 +58,31 @@ public final class StringTag extends Tag<String> {
         super(value, CLASS, String.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
-        os.writeShort(bytes.length);
-        os.write(bytes);
-    }
-
-    public static StringTag fromNBT(Object tag){
+    public static StringTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to StringTag!");
 
         try {
             String value = plugin.getNMSTags().getNBTStringValue(tag);
             return new StringTag(value);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
 
-    public static StringTag fromStream(DataInputStream is) throws IOException{
+    public static StringTag fromStream(DataInputStream is) throws IOException {
         int length = is.readShort();
         byte[] bytes = new byte[length];
         is.readFully(bytes);
         return new StringTag(new String(bytes, StandardCharsets.UTF_8));
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+        os.writeShort(bytes.length);
+        os.write(bytes);
     }
 
 }

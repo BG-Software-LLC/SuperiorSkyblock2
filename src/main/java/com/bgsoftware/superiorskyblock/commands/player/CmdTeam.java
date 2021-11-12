@@ -1,18 +1,18 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -68,14 +68,14 @@ public final class CmdTeam implements ISuperiorCommand {
         Island island = (args.length == 1 ? CommandArguments.getSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1])).getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         Executor.async(() -> {
             java.util.Locale locale = LocaleUtils.getLocale(sender);
             StringBuilder infoMessage = new StringBuilder();
 
-            if(!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty(locale)) {
+            if (!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty(locale)) {
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(locale, island.getOwner().getName(),
                         island.getIslandMembers(true).size(), island.getTeamLimit())).append("\n");
             }
@@ -83,7 +83,7 @@ public final class CmdTeam implements ISuperiorCommand {
             List<SuperiorPlayer> members = island.getIslandMembers(true);
             members.sort(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
 
-            if(!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)){
+            if (!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)) {
                 Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
                 plugin.getRoles().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
@@ -106,7 +106,7 @@ public final class CmdTeam implements ISuperiorCommand {
                         .forEach(playerRole -> infoMessage.append(rolesStrings.get(playerRole)));
             }
 
-            if(!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
+            if (!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
                 infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage(locale));
 
             Locale.sendMessage(sender, infoMessage.toString(), false);

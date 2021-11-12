@@ -82,7 +82,7 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
                 if (tileBlock.isTileEntity()) {
                     BlockPosition worldTilePosition = new BlockPosition((chunkX << 4) + tileX, tileY, (chunkZ << 4) + tileZ);
                     TileEntity tile = ((ITileEntity) tileBlock.getBlock()).createTile(worldTilePosition, tileBlock);
-                    if(tile != null)
+                    if (tile != null)
                         chunk.setTileEntity(tile);
                 }
             }
@@ -99,16 +99,16 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
         }
 
         @Override
+        public Biome getBiome(int x, int y, int z) {
+            return CraftBlock.biomeBaseToBiome((IRegistry<BiomeBase>) this.biome.e, this.biome.getBiome(x >> 2, y >> 2, z >> 2));
+        }
+
+        @Override
         public void setBiome(int x, int z, Biome biome) {
             BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry<BiomeBase>) this.biome.e, biome);
             for (int y = worldServer.getMinBuildHeight(); y < worldServer.getMaxBuildHeight(); y += 4) {
                 this.biome.setBiome(x >> 2, y >> 2, z >> 2, biomeBase);
             }
-        }
-
-        @Override
-        public Biome getBiome(int x, int y, int z) {
-            return CraftBlock.biomeBaseToBiome((IRegistry<BiomeBase>) this.biome.e, this.biome.getBiome(x >> 2, y >> 2, z >> 2));
         }
 
         @Override

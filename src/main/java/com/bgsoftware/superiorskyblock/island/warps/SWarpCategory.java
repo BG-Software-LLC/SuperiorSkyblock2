@@ -27,7 +27,7 @@ public final class SWarpCategory implements WarpCategory {
     private int slot = 0;
     private ItemStack icon = DEFAULT_WARP_ICON.clone();
 
-    public SWarpCategory(Island island, String name){
+    public SWarpCategory(Island island, String name) {
         this.island = island;
         this.name = name;
     }
@@ -48,7 +48,7 @@ public final class SWarpCategory implements WarpCategory {
         SuperiorSkyblockPlugin.debug("Action: Update Warp-Category Name, Island: " + getOwnerName() + ", Category: " + this.name + ", New Name: " + name);
         String oldName = this.name;
         this.name = name;
-        for(IslandWarp islandWarp : islandWarps)
+        for (IslandWarp islandWarp : islandWarps)
             IslandsDatabaseBridge.updateWarpCategory(island, islandWarp, oldName);
         IslandsDatabaseBridge.updateWarpCategoryName(island, this, oldName);
     }
@@ -89,7 +89,7 @@ public final class SWarpCategory implements WarpCategory {
         IslandsDatabaseBridge.updateWarpCategoryIcon(island, this);
     }
 
-    private String getOwnerName(){
+    private String getOwnerName() {
         SuperiorPlayer superiorPlayer = island.getOwner();
         return superiorPlayer == null ? "None" : superiorPlayer.getName();
     }

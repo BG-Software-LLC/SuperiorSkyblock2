@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.schematic.data;
 
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
 import org.bukkit.Location;
 
 public final class SchematicBlock {
@@ -21,6 +21,10 @@ public final class SchematicBlock {
         this.tileEntity = tileEntity;
     }
 
+    public static SchematicBlock of(int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity) {
+        return new SchematicBlock(combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
+    }
+
     public int getCombinedId() {
         return combinedId;
     }
@@ -31,10 +35,6 @@ public final class SchematicBlock {
 
     public void applyBlock(BlockChangeTask blockChangeTask, Location location) {
         blockChangeTask.setBlock(location, combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
-    }
-
-    public static SchematicBlock of(int combinedId, byte skyLightLevel, byte blockLightLevel, CompoundTag statesTag, CompoundTag tileEntity) {
-        return new SchematicBlock(combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity);
     }
 
 }

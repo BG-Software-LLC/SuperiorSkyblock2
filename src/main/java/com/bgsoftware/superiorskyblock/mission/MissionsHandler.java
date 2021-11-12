@@ -9,13 +9,13 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
@@ -109,6 +109,21 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     @Override
+    public boolean canComplete(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        return canCompleteNoProgress(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0;
+    }
+
+    @Override
+    public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission<?> mission) {
+        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        return canCompleteAgain(superiorPlayer, mission) && hasAllRequiredMissions(superiorPlayer, mission) &&
+                canPassAllChecks(superiorPlayer, mission);
+    }
+
+    @Override
     public boolean canCompleteAgain(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
@@ -130,21 +145,6 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
 
         return false;
-    }
-
-    @Override
-    public boolean canComplete(SuperiorPlayer superiorPlayer, Mission<?> mission) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return canCompleteNoProgress(superiorPlayer, mission) && mission.getProgress(superiorPlayer) >= 1.0;
-    }
-
-    @Override
-    public boolean canCompleteNoProgress(SuperiorPlayer superiorPlayer, Mission<?> mission) {
-        Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return canCompleteAgain(superiorPlayer, mission) && hasAllRequiredMissions(superiorPlayer, mission) &&
-                canPassAllChecks(superiorPlayer, mission);
     }
 
     @Override
@@ -334,12 +334,37 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         loadMissionsData(getAllMissions());
     }
 
-    public void loadMissionCategory(MissionCategory missionCategory){
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void loadMissionsData(List<Mission<?>> missionsList) {
+        Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
+
+        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
+
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
+            }
+        }
+
+        YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
+
+        for (Mission<?> mission : missionsList) {
+            if (data.contains(mission.getName()))
+                mission.loadProgress(data.getConfigurationSection(mission.getName()));
+        }
+    }
+
+    public void loadMissionCategory(MissionCategory missionCategory) {
         this.missionsContainer.addMissionCategory(missionCategory);
     }
 
-    public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted){
-        if(mission.isOnlyShowIfRequiredCompleted()) {
+    public boolean canDisplayMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean removeCompleted) {
+        if (mission.isOnlyShowIfRequiredCompleted()) {
             if (!hasAllRequiredMissions(superiorPlayer, mission))
                 return false;
 
@@ -347,8 +372,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 return false;
         }
 
-        if(removeCompleted){
-            if(mission.getIslandMission() ? superiorPlayer.getIsland() != null &&
+        if (removeCompleted) {
+            if (mission.getIslandMission() ? superiorPlayer.getIsland() != null &&
                     !superiorPlayer.getIsland().canCompleteMissionAgain(mission) :
                     !superiorPlayer.canCompleteMissionAgain(mission))
                 return false;
@@ -396,31 +421,6 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
 
         return newMission;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void loadMissionsData(List<Mission<?>> missionsList) {
-        Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
-
-        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
-
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
-
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
-
-        for (Mission<?> mission : missionsList) {
-            if (data.contains(mission.getName()))
-                mission.loadProgress(data.getConfigurationSection(mission.getName()));
-        }
     }
 
     public Optional<MissionData> getMissionData(Mission<?> mission) {

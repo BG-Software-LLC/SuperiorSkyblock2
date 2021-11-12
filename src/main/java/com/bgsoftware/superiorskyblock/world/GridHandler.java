@@ -210,16 +210,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         }
     }
 
-    public UUID generateIslandUUID() {
-        UUID uuid;
-
-        do {
-            uuid = UUID.randomUUID();
-        } while (getIslandByUUID(uuid) != null || getIsland(uuid) != null);
-
-        return uuid;
-    }
-
     @Override
     public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
@@ -317,6 +307,19 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
+    public Island getIsland(int index, SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        return this.islandsContainer.getIslandAtPosition(index, sortingType);
+    }
+
+    @Override
+    public int getIslandPosition(Island island, SortingType sortingType) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        return this.islandsContainer.getIslandPosition(island, sortingType);
+    }
+
+    @Override
     public Island getIsland(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         return this.islandsContainer.getIslandByOwner(uuid);
@@ -333,19 +336,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         String inputName = StringUtils.stripColors(islandName);
         return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
-    }
-
-    @Override
-    public Island getIsland(int index, SortingType sortingType) {
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        return this.islandsContainer.getIslandAtPosition(index, sortingType);
-    }
-
-    @Override
-    public int getIslandPosition(Island island, SortingType sortingType) {
-        Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        return this.islandsContainer.getIslandPosition(island, sortingType);
     }
 
     @Override
@@ -386,6 +376,37 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
+    public void transferIsland(UUID oldOwner, UUID newOwner) {
+        Preconditions.checkNotNull(oldOwner, "oldOwner parameter cannot be null.");
+        Preconditions.checkNotNull(newOwner, "newOwner parameter cannot be null.");
+        this.islandsContainer.transferIsland(oldOwner, newOwner);
+    }
+
+    @Override
+    public int getSize() {
+        return this.islandsContainer.getIslandsAmount();
+    }
+
+    @Override
+    public void sortIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        sortIslands(sortingType, null);
+    }
+
+    @Override
+    public void sortIslands(SortingType sortingType, Runnable onFinish) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+
+        SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
+
+        this.islandsContainer.sortIslands(sortingType, () -> {
+            plugin.getMenus().refreshTopIslands(sortingType);
+            if (onFinish != null)
+                onFinish.run();
+        });
+    }
+
+    @Override
     public SpawnIsland getSpawnIsland() {
         if (spawnIsland == null)
             updateSpawn();
@@ -415,37 +436,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public List<World> getRegisteredWorlds() {
         return customWorlds.stream().map(Bukkit::getWorld).collect(Collectors.toList());
-    }
-
-    @Override
-    public void transferIsland(UUID oldOwner, UUID newOwner) {
-        Preconditions.checkNotNull(oldOwner, "oldOwner parameter cannot be null.");
-        Preconditions.checkNotNull(newOwner, "newOwner parameter cannot be null.");
-        this.islandsContainer.transferIsland(oldOwner, newOwner);
-    }
-
-    @Override
-    public int getSize() {
-        return this.islandsContainer.getIslandsAmount();
-    }
-
-    @Override
-    public void sortIslands(SortingType sortingType) {
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        sortIslands(sortingType, null);
-    }
-
-    @Override
-    public void sortIslands(SortingType sortingType, Runnable onFinish) {
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-
-        SuperiorSkyblockPlugin.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
-
-        this.islandsContainer.sortIslands(sortingType, () -> {
-            plugin.getMenus().refreshTopIslands(sortingType);
-            if (onFinish != null)
-                onFinish.run();
-        });
     }
 
     @Override
@@ -584,6 +574,16 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public DatabaseBridge getDatabaseBridge() {
         return databaseBridge;
+    }
+
+    public UUID generateIslandUUID() {
+        UUID uuid;
+
+        do {
+            uuid = UUID.randomUUID();
+        } while (getIslandByUUID(uuid) != null || getIsland(uuid) != null);
+
+        return uuid;
     }
 
     public void disablePlugin() {

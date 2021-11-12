@@ -6,7 +6,7 @@ public abstract class AbstractHandler {
 
     protected final SuperiorSkyblockPlugin plugin;
 
-    protected AbstractHandler(SuperiorSkyblockPlugin plugin){
+    protected AbstractHandler(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 

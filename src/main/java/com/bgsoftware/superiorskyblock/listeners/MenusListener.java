@@ -23,7 +23,7 @@ public final class MenusListener implements Listener {
     private final Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
     private final SuperiorSkyblockPlugin plugin;
 
-    public MenusListener(SuperiorSkyblockPlugin plugin){
+    public MenusListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -33,16 +33,16 @@ public final class MenusListener implements Listener {
      */
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onInventoryClickMonitor(InventoryClickEvent e){
-        if(e.getCurrentItem() != null && e.isCancelled() && e.getClickedInventory().getHolder() instanceof SuperiorMenu) {
+    public void onInventoryClickMonitor(InventoryClickEvent e) {
+        if (e.getCurrentItem() != null && e.isCancelled() && e.getClickedInventory().getHolder() instanceof SuperiorMenu) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
             Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onInventoryCloseMonitor(InventoryCloseEvent e){
-        if(latestClickedItem.containsKey(e.getPlayer().getUniqueId())){
+    public void onInventoryCloseMonitor(InventoryCloseEvent e) {
+        if (latestClickedItem.containsKey(e.getPlayer().getUniqueId())) {
             ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
             Executor.sync(() -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
@@ -52,35 +52,33 @@ public final class MenusListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onMenuClick(InventoryClickEvent e){
-        if(!(e.getWhoClicked() instanceof Player) || e.getView().getTopInventory() == null ||
+    public void onMenuClick(InventoryClickEvent e) {
+        if (!(e.getWhoClicked() instanceof Player) || e.getView().getTopInventory() == null ||
                 e.getClickedInventory() == null)
             return;
 
         InventoryHolder inventoryHolder = e.getView().getTopInventory().getHolder();
 
-        if(inventoryHolder instanceof SuperiorMenu) {
+        if (inventoryHolder instanceof SuperiorMenu) {
             e.setCancelled(true);
 
             if (e.getClickedInventory().equals(e.getView().getTopInventory()))
                 ((SuperiorMenu) inventoryHolder).onClick(e);
-        }
-        else if(inventoryHolder instanceof StackedBlocksDepositMenu){
+        } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e);
         }
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onMenuClose(InventoryCloseEvent e){
+    public void onMenuClose(InventoryCloseEvent e) {
         InventoryHolder inventoryHolder = e.getInventory() == null ? null : e.getInventory().getHolder();
 
-        if(!(e.getPlayer() instanceof Player))
+        if (!(e.getPlayer() instanceof Player))
             return;
 
-        if(inventoryHolder instanceof SuperiorMenu) {
+        if (inventoryHolder instanceof SuperiorMenu) {
             ((SuperiorMenu) inventoryHolder).closeInventory(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
-        }
-        else if(inventoryHolder instanceof StackedBlocksDepositMenu){
+        } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
         }
     }

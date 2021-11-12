@@ -24,12 +24,12 @@ public final class MultipleDeserializer implements IDeserializer {
 
     private final List<IDeserializer> deserializers;
 
-    public MultipleDeserializer(IDeserializer... deserializers){
+    public MultipleDeserializer(IDeserializer... deserializers) {
         this.deserializers = Arrays.asList(deserializers);
     }
 
-    private <T> T runDeserializers(Function<IDeserializer, T> function){
-        for(IDeserializer deserializer : deserializers){
+    private <T> T runDeserializers(Function<IDeserializer, T> function) {
+        for (IDeserializer deserializer : deserializers) {
             try {
                 return function.apply(deserializer);
             } catch (Exception error) {

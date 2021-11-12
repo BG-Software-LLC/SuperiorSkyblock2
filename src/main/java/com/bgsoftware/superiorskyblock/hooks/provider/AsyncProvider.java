@@ -11,12 +11,12 @@ public interface AsyncProvider {
 
     void loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> chunkResult);
 
-    default void teleport(Entity entity, Location location){
-        teleport(entity, location, r -> {});
+    default void teleport(Entity entity, Location location) {
+        teleport(entity, location, r -> {
+        });
     }
 
     void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult);
-
 
 
 }

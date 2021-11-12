@@ -24,55 +24,25 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
 
     private final Island island;
 
-    private MenuMembers(SuperiorPlayer superiorPlayer, Island island){
+    private MenuMembers(SuperiorPlayer superiorPlayer, Island island) {
         super("menuMembers", superiorPlayer);
         this.island = island;
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
-        previousMove = false;
-        plugin.getMenus().openMemberManage(superiorPlayer, this, targetPlayer);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
-        try {
-            return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", superiorPlayer.getName())
-                    .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
-                    .asSkullOf(superiorPlayer).build(superiorPlayer);
-        }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected List<SuperiorPlayer> requestObjects() {
-        return island.getIslandMembers(true);
-    }
-
-    public static void init(){
+    public static void init() {
         MenuMembers menuMembers = new MenuMembers(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/members.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/members.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -88,18 +58,18 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
         menuMembers.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
         new MenuMembers(superiorPlayer, island).open(previousMenu);
     }
 
-    public static void refreshMenus(Island island){
+    public static void refreshMenus(Island island) {
         SuperiorMenu.refreshMenus(MenuMembers.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -118,7 +88,7 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
 
         int charCounter = 0;
 
-        if(cfg.contains("members-panel.fill-items")) {
+        if (cfg.contains("members-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("members-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -133,6 +103,36 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
+        previousMove = false;
+        plugin.getMenus().openMemberManage(superiorPlayer, this, targetPlayer);
+    }
+
+    @Override
+    protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
+        try {
+            return new ItemBuilder(clickedItem)
+                    .replaceAll("{0}", superiorPlayer.getName())
+                    .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
+                    .asSkullOf(superiorPlayer).build(superiorPlayer);
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            SuperiorSkyblockPlugin.debug(ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    protected List<SuperiorPlayer> requestObjects() {
+        return island.getIslandMembers(true);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

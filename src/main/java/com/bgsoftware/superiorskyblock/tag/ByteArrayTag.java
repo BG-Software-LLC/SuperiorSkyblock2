@@ -59,10 +59,24 @@ public final class ByteArrayTag extends Tag<byte[]> {
         super(value, CLASS, byte[].class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeInt(value.length);
-        os.write(value);
+    public static ByteArrayTag fromNBT(Object tag) {
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
+
+        try {
+            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
+            return new ByteArrayTag(value);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
+            return null;
+        }
+    }
+
+    public static ByteArrayTag fromStream(DataInputStream is) throws IOException {
+        int length = is.readInt();
+        byte[] bytes = new byte[length];
+        is.readFully(bytes);
+        return new ByteArrayTag(bytes);
     }
 
     @Override
@@ -78,24 +92,10 @@ public final class ByteArrayTag extends Tag<byte[]> {
         return "TAG_Byte_Array: " + hex;
     }
 
-    public static ByteArrayTag fromNBT(Object tag){
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteArrayTag!");
-
-        try {
-            byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
-            return new ByteArrayTag(value);
-        }catch(Exception ex){
-            ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
-            return null;
-        }
-    }
-
-    public static ByteArrayTag fromStream(DataInputStream is) throws IOException{
-        int length = is.readInt();
-        byte[] bytes = new byte[length];
-        is.readFully(bytes);
-        return new ByteArrayTag(bytes);
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeInt(value.length);
+        os.write(value);
     }
 
 }

@@ -17,13 +17,20 @@ public final class LeaderHeadsHook {
 
     private static SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private LeaderHeadsHook(){
+    private LeaderHeadsHook() {
 
     }
 
-    private final static class WorthDataController extends SuperiorDataController{
+    public static void register() {
+        new WorthDataController();
+        new LevelDataController();
+        new RatingDataController();
+        new PlayersDataController();
+    }
 
-        WorthDataController(){
+    private final static class WorthDataController extends SuperiorDataController {
+
+        WorthDataController() {
             super("worth-islands", "topislandsworth", SortingTypes.BY_WORTH);
         }
 
@@ -33,9 +40,9 @@ public final class LeaderHeadsHook {
         }
     }
 
-    private final static class LevelDataController extends SuperiorDataController{
+    private final static class LevelDataController extends SuperiorDataController {
 
-        LevelDataController(){
+        LevelDataController() {
             super("level-islands", "topislandslevel", SortingTypes.BY_LEVEL);
         }
 
@@ -45,9 +52,9 @@ public final class LeaderHeadsHook {
         }
     }
 
-    private final static class RatingDataController extends SuperiorDataController{
+    private final static class RatingDataController extends SuperiorDataController {
 
-        RatingDataController(){
+        RatingDataController() {
             super("rating-islands", "topislandsrating", SortingTypes.BY_RATING);
         }
 
@@ -57,9 +64,9 @@ public final class LeaderHeadsHook {
         }
     }
 
-    private final static class PlayersDataController extends SuperiorDataController{
+    private final static class PlayersDataController extends SuperiorDataController {
 
-        PlayersDataController(){
+        PlayersDataController() {
             super("players-islands", "topislandsplayers", SortingTypes.BY_PLAYERS);
         }
 
@@ -69,11 +76,11 @@ public final class LeaderHeadsHook {
         }
     }
 
-    private static abstract class SuperiorDataController extends DataCollector{
+    private static abstract class SuperiorDataController extends DataCollector {
 
         private SortingType sortingType;
 
-        SuperiorDataController(String name, String command, SortingType sortingType){
+        SuperiorDataController(String name, String command, SortingType sortingType) {
             super(
                     name,
                     "SuperiorSkyblock2",
@@ -89,7 +96,7 @@ public final class LeaderHeadsHook {
 
         @Override
         public List<Map.Entry<?, Double>> requestAll() {
-            return plugin.getGrid().getIslands(sortingType).stream().map(island -> new Map.Entry<UUID, Double>(){
+            return plugin.getGrid().getIslands(sortingType).stream().map(island -> new Map.Entry<UUID, Double>() {
                 @Override
                 public UUID getKey() {
                     return island.getOwner().getUniqueId();
@@ -109,13 +116,6 @@ public final class LeaderHeadsHook {
 
         public abstract Double getValue(Island island);
 
-    }
-
-    public static void register(){
-        new WorthDataController();
-        new LevelDataController();
-        new RatingDataController();
-        new PlayersDataController();
     }
 
 }

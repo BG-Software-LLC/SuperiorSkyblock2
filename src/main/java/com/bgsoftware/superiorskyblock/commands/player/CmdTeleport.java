@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
-import com.bgsoftware.superiorskyblock.Locale;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public final class CmdTeleport implements ISuperiorCommand {
 
     @Override
-    public List<String> getAliases(){
+    public List<String> getAliases() {
         return Arrays.asList("tp", "teleport", "go", "home");
     }
 
@@ -59,18 +59,17 @@ public final class CmdTeleport implements ISuperiorCommand {
 
         Island island = arguments.getKey();
 
-        if(island == null)
+        if (island == null)
             return;
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        if(plugin.getSettings().getHomeWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
+        if (plugin.getSettings().getHomeWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() && !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
                     plugin.getSettings().getHomeWarmup(), TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
                     teleportToIsland(superiorPlayer, island), plugin.getSettings().getHomeWarmup() / 50));
-        }
-        else {
+        } else {
             teleportToIsland(superiorPlayer, island);
         }
     }
@@ -80,10 +79,10 @@ public final class CmdTeleport implements ISuperiorCommand {
         return new ArrayList<>();
     }
 
-    private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island){
+    private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island) {
         superiorPlayer.setTeleportTask(null);
         superiorPlayer.teleport(island, result -> {
-            if(result)
+            if (result)
                 Locale.TELEPORTED_SUCCESS.send(superiorPlayer);
             else
                 Locale.TELEPORTED_FAILED.send(superiorPlayer);

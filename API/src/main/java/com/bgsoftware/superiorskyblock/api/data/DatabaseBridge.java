@@ -10,7 +10,8 @@ public interface DatabaseBridge {
 
     /**
      * Load all the objects from the database.
-     * @param table: The table to load the objects from.
+     *
+     * @param table:         The table to load the objects from.
      * @param resultConsumer Consumer that receives each object from the database.
      */
     void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer);
@@ -28,30 +29,34 @@ public interface DatabaseBridge {
 
     /**
      * Update the object in the database.
-     * @param table The name of the table in the database.
-     * @param filter The filter of the column.
+     *
+     * @param table   The name of the table in the database.
+     * @param filter  The filter of the column.
      * @param columns All columns to be saved with their values.
      */
     void updateObject(String table, @Nullable DatabaseFilter filter, Pair<String, Object>... columns);
 
     /**
      * Insert the object in the database.
-     * @param table The name of the table in the database.
+     *
+     * @param table   The name of the table in the database.
      * @param columns All columns to be saved with their values.
      */
     void insertObject(String table, Pair<String, Object>... columns);
 
     /**
      * Delete the object from the database.
-     * @param table The name of the table in the database.
+     *
+     * @param table  The name of the table in the database.
      * @param filter The filter of the column.
      */
     void deleteObject(String table, @Nullable DatabaseFilter filter);
 
     /**
      * Load data from the database for this object.
-     * @param table The table to get the data from.
-     * @param filter The filter of the column.
+     *
+     * @param table          The table to get the data from.
+     * @param filter         The filter of the column.
      * @param resultConsumer Consumer that receives data for each row.
      */
     void loadObject(String table, @Nullable DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer);

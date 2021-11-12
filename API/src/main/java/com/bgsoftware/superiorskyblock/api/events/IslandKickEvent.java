@@ -12,11 +12,12 @@ public class IslandKickEvent extends IslandEvent {
 
     /**
      * The constructor of the event.
+     *
      * @param superiorPlayer The player who kicked the other player. If null, it means console kicked the player.
-     * @param targetPlayer The player that was kicked.
-     * @param island The island that the player was kicked from.
+     * @param targetPlayer   The player that was kicked.
+     * @param island         The island that the player was kicked from.
      */
-    public IslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island){
+    public IslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
         this.targetPlayer = targetPlayer;

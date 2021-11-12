@@ -19,26 +19,26 @@ public final class PaperListener implements Listener {
     private final List<Location> alreadySpongeAbosrbCalled = new ArrayList<>();
     private final SuperiorSkyblockPlugin plugin;
 
-    public PaperListener(SuperiorSkyblockPlugin plugin){
+    public PaperListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-    public void onSpongeAbsorb(SpongeAbsorbEvent e){
-        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
+    public void onSpongeAbsorb(SpongeAbsorbEvent e) {
+        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onSpongeAbsorbMonitor(SpongeAbsorbEvent e){
+    public void onSpongeAbsorbMonitor(SpongeAbsorbEvent e) {
         Location location = e.getBlock().getLocation();
 
-        if(alreadySpongeAbosrbCalled.contains(location))
+        if (alreadySpongeAbosrbCalled.contains(location))
             return;
 
         Island island = plugin.getGrid().getIslandAt(location);
 
-        if(island == null)
+        if (island == null)
             return;
 
         island.handleBlockBreak(e.getBlock(), 1);

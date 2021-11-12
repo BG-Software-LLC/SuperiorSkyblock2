@@ -23,9 +23,12 @@ public final class IslandsGenerator extends ChunkGenerator {
         this.defaultWorldEnvironment = defaultWorldEnvironment;
     }
 
-    @Override
-    public Location getFixedSpawnLocation(World world, Random random) {
-        return new Location(world, 0, 100, 0);
+    private static Biome getNetherBiome() {
+        try {
+            return Biome.valueOf("NETHER_WASTES");
+        } catch (Throwable ex) {
+            return null;
+        }
     }
 
     public byte[][] generateBlockSections(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomes) {
@@ -73,20 +76,17 @@ public final class IslandsGenerator extends ChunkGenerator {
         return new ArrayList<>();
     }
 
+    @Override
+    public Location getFixedSpawnLocation(World world, Random random) {
+        return new Location(world, 0, 100, 0);
+    }
+
     @SuppressWarnings("SameParameterValue")
     private void setBlock(byte[][] blocks, int x, int y, int z, int blockId) {
         if (blocks[y >> 4] == null)
             blocks[y >> 4] = new byte[4096];
 
         blocks[y >> 4][((y & 0xF) << 8) | (z << 4) | x] = (byte) blockId;
-    }
-
-    private static Biome getNetherBiome() {
-        try {
-            return Biome.valueOf("NETHER_WASTES");
-        } catch (Throwable ex) {
-            return null;
-        }
     }
 
 }

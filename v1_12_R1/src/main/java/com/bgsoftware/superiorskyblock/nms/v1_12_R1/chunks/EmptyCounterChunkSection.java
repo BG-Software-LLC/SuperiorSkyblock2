@@ -28,6 +28,10 @@ public final class EmptyCounterChunkSection extends ChunkSection {
         SKY_LIGHT.set(this, chunkSection.getSkyLightArray());
     }
 
+    public static EmptyCounterChunkSection of(ChunkSection chunkSection) {
+        return chunkSection == null ? null : new EmptyCounterChunkSection(chunkSection);
+    }
+
     @Override
     public void setType(int i, int j, int k, IBlockData iblockdata) {
         Block currentBlock = getType(i, j, k).getBlock(), placedBlock = iblockdata.getBlock();
@@ -49,6 +53,16 @@ public final class EmptyCounterChunkSection extends ChunkSection {
         super.setType(i, j, k, iblockdata);
     }
 
+    @Override
+    public boolean a() {
+        return nonEmptyBlockCount == 0;
+    }
+
+    @Override
+    public boolean shouldTick() {
+        return tickingBlockCount > 0;
+    }
+
     public void recalcBlockCounts() {
         nonEmptyBlockCount = 0;
         tickingBlockCount = 0;
@@ -66,20 +80,6 @@ public final class EmptyCounterChunkSection extends ChunkSection {
                 }
             }
         }
-    }
-
-    @Override
-    public boolean shouldTick() {
-        return tickingBlockCount > 0;
-    }
-
-    @Override
-    public boolean a() {
-        return nonEmptyBlockCount == 0;
-    }
-
-    public static EmptyCounterChunkSection of(ChunkSection chunkSection) {
-        return chunkSection == null ? null : new EmptyCounterChunkSection(chunkSection);
     }
 
 }

@@ -9,7 +9,7 @@ public final class DatabaseFilter {
 
     private final Collection<Pair<String, Object>> filters;
 
-    public DatabaseFilter(Collection<Pair<String, Object>> filters){
+    public DatabaseFilter(Collection<Pair<String, Object>> filters) {
         this.filters = Collections.unmodifiableCollection(filters);
     }
 

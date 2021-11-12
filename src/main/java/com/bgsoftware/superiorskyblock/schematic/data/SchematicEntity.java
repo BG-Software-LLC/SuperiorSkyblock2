@@ -20,17 +20,17 @@ public final class SchematicEntity {
         this.offset = offset;
     }
 
-    public void spawnEntity(Location min) {
-        Location location = parseLocation(this.offset, min.getWorld()).add(min);
-        plugin.getNMSTags().spawnEntity(entityType, location, entityTag);
-    }
-
     public static SchematicEntity of(EntityType entityType, CompoundTag entityTag, Location offset) {
         return new SchematicEntity(entityType, entityTag, offset);
     }
 
     private static Location parseLocation(Location location, World world) {
         return new Location(world, location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+
+    public void spawnEntity(Location min) {
+        Location location = parseLocation(this.offset, min.getWorld()).add(min);
+        plugin.getNMSTags().spawnEntity(entityType, location, entityTag);
     }
 
 }

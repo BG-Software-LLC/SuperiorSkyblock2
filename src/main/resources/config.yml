@@ -90,12 +90,12 @@ default-values:
   # You can find a list of materials here: https://bg-software.com/materials/
   generator:
     normal:
-    - COBBLESTONE:95
-    - COAL_ORE:5
+      - COBBLESTONE:95
+      - COAL_ORE:5
 
   # A list of default role limits for new islands.
   # Example: '1:5' will set the limit of the role with the id 1 (Moderator by default) to 5.
-  role-limits: []
+  role-limits: [ ]
 
 # Set the islands height generation for islands.
 islands-height: 100
@@ -115,15 +115,15 @@ stacked-blocks:
   custom-name: '&ex{0} {1}'
 
   # A list of worlds that blocks cannot stack in.
-  disabled-worlds: []
+  disabled-worlds: [ ]
 
   # A list of whitelisted blocks that will get stacked when players have stack mode toggled on.
   whitelisted:
-  - 'DIAMOND_BLOCK'
+    - 'DIAMOND_BLOCK'
 
   # Set limits to stacked blocks.
   limits:
-  - 'EXAMPLE_BLOCK:5'
+    - 'EXAMPLE_BLOCK:5'
 
   # Should blocks get added directly into the player's inventory?
   auto-collect: false
@@ -154,41 +154,41 @@ island-roles:
     # A custom name for the role.
     name: 'Guest'
     # A list of default permissions for guests.
-    permissions: []
+    permissions: [ ]
 
   # This role is given to players that are co-op.
   coop:
     name: 'Coop'
     permissions:
-    - ANIMAL_BREED
-    - ANIMAL_DAMAGE
-    - BREAK
-    - BUILD
-    - CLOSE_BYPASS
-    - CROPS_GROWTH
-    - DROP_ITEMS
-    - ENDER_PEARL
-    - EXPEL_BYPASS
-    - FARM_TRAMPING
-    - FERTILIZE
-    - FISH
-    - HORSE_INTERACT
-    - INTERACT
-    - ITEM_FRAME
-    - LEASH
-    - MINECART_DAMAGE
-    - MINECART_ENTER
-    - MINECART_OPEN
-    - MINECART_PLACE
-    - MONSTER_DAMAGE
-    - NAME_ENTITY
-    - PAINTING
-    - PICKUP_DROPS
-    - PICKUP_FISH
-    - SIGN_INTERACT
-    - TURTLE_EGG_TRAMPING
-    - USE
-    - VILLAGER_TRADING
+      - ANIMAL_BREED
+      - ANIMAL_DAMAGE
+      - BREAK
+      - BUILD
+      - CLOSE_BYPASS
+      - CROPS_GROWTH
+      - DROP_ITEMS
+      - ENDER_PEARL
+      - EXPEL_BYPASS
+      - FARM_TRAMPING
+      - FERTILIZE
+      - FISH
+      - HORSE_INTERACT
+      - INTERACT
+      - ITEM_FRAME
+      - LEASH
+      - MINECART_DAMAGE
+      - MINECART_ENTER
+      - MINECART_OPEN
+      - MINECART_PLACE
+      - MONSTER_DAMAGE
+      - NAME_ENTITY
+      - PAINTING
+      - PICKUP_DROPS
+      - PICKUP_FISH
+      - SIGN_INTERACT
+      - TURTLE_EGG_TRAMPING
+      - USE
+      - VILLAGER_TRADING
 
   # The roles ladder for island members.
   # All the island member roles go here.
@@ -203,64 +203,64 @@ island-roles:
       name: 'Member'
       weight: 0
       permissions:
-      - ANIMAL_SPAWN
-      - CHEST_ACCESS
-      - DEPOSIT_MONEY
-      - FLY
-      - ISLAND_CHEST
-      - MONSTER_SPAWN
-      - RANKUP
-      - SPAWNER_BREAK
+        - ANIMAL_SPAWN
+        - CHEST_ACCESS
+        - DEPOSIT_MONEY
+        - FLY
+        - ISLAND_CHEST
+        - MONSTER_SPAWN
+        - RANKUP
+        - SPAWNER_BREAK
     mod:
       id: 1
       name: 'Moderator'
       weight: 1
       permissions:
-      - BAN_MEMBER
-      - CLOSE_ISLAND
-      - DELETE_WARP
-      - EXPEL_PLAYERS
-      - INVITE_MEMBER
-      - KICK_MEMBER
-      - OPEN_ISLAND
-      - RATINGS_SHOW
-      - SET_WARP
-      - VALUABLE_BREAK
-      - WITHDRAW_MONEY
+        - BAN_MEMBER
+        - CLOSE_ISLAND
+        - DELETE_WARP
+        - EXPEL_PLAYERS
+        - INVITE_MEMBER
+        - KICK_MEMBER
+        - OPEN_ISLAND
+        - RATINGS_SHOW
+        - SET_WARP
+        - VALUABLE_BREAK
+        - WITHDRAW_MONEY
     admin:
       id: 2
       name: 'Admin'
       weight: 2
       permissions:
-      - COOP_MEMBER
-      - DEMOTE_MEMBERS
-      - DISCORD_SHOW
-      - PAYPAL_SHOW
-      - PROMOTE_MEMBERS
-      - SET_BIOME
-      - SET_DISCORD
-      - SET_HOME
-      - SET_PAYPAL
-      - SET_PERMISSION
-      - SET_ROLE
-      - SET_SETTINGS
-      - UNCOOP_MEMBER
+        - COOP_MEMBER
+        - DEMOTE_MEMBERS
+        - DISCORD_SHOW
+        - PAYPAL_SHOW
+        - PROMOTE_MEMBERS
+        - SET_BIOME
+        - SET_DISCORD
+        - SET_HOME
+        - SET_PAYPAL
+        - SET_PERMISSION
+        - SET_ROLE
+        - SET_SETTINGS
+        - UNCOOP_MEMBER
     leader:
       id: 3
       name: 'Leader'
       weight: 3
       permissions:
-      - ALL
+        - ALL
 
 # Set the line to create the warp sign.
 sign-warp-line: '[IslandWarp]'
 
 # Set the lines of the island warp.
 sign-warp:
-- '&a[Island Warp]'
-- ''
-- ''
-- ''
+  - '&a[Island Warp]'
+  - ''
+  - ''
+  - ''
 
 # All settings related to the visitors sign.
 visitors-sign:
@@ -335,7 +335,7 @@ spawn:
     - WATER_FLOW
 
   # A list of permissions for the spawn island.
-  permissions: []
+  permissions: [ ]
 
   # Should a world border be displayed in the spawn?
   world-border: false
@@ -370,9 +370,9 @@ island-top-include-leader: true
 # Please use the <placeholder>:<default> format.
 # You can find a list of placeholders here: https://bg-software.com/superiorskyblock/#placeholders
 default-placeholders:
-- 'superior_island_leader:N/A'
-- 'superior_island_level:0'
-- 'superior_island_worth:0'
+  - 'superior_island_leader:N/A'
+  - 'superior_island_level:0'
+  - 'superior_island_worth:0'
 
 # Should a confirm gui be displayed when /is ban is executed.
 ban-confirm: true
@@ -410,9 +410,9 @@ island-names:
 
   # A list of names that will be blacklisted.
   filtered-names:
-  - fuck
-  - duck
-  - hypixel
+    - fuck
+    - duck
+    - hypixel
 
   # Should names have color support enabled?
   color-support: true
@@ -438,17 +438,17 @@ rate-own-island: false
 # A list of default settings for new islands.
 # You can find a list of settings here: https://bg-software.com/superiorskyblock/docs/island-settings/
 default-settings:
-- 'CREEPER_EXPLOSION'
-- 'NATURAL_ANIMALS_SPAWN'
-- 'NATURAL_MONSTER_SPAWN'
-- 'SPAWNER_ANIMALS_SPAWN'
-- 'SPAWNER_MONSTER_SPAWN'
-- 'WATER_FLOW'
-- 'LAVA_FLOW'
-- 'CROPS_GROWTH'
-- 'TREE_GROWTH'
-- 'FIRE_SPREAD'
-- 'EGG_LAY'
+  - 'CREEPER_EXPLOSION'
+  - 'NATURAL_ANIMALS_SPAWN'
+  - 'NATURAL_MONSTER_SPAWN'
+  - 'SPAWNER_ANIMALS_SPAWN'
+  - 'SPAWNER_MONSTER_SPAWN'
+  - 'WATER_FLOW'
+  - 'LAVA_FLOW'
+  - 'CROPS_GROWTH'
+  - 'TREE_GROWTH'
+  - 'FIRE_SPREAD'
+  - 'EGG_LAY'
 
 # Should redstone be disabled on islands that none of the members are online?
 # This should increase performance on the server.
@@ -500,7 +500,7 @@ teleport-on-pvp-enable: true
 immune-to-pvp-when-teleport: true
 
 # A list of commands that cannot be executed by visitors.
-blocked-visitors-commands: []
+blocked-visitors-commands: [ ]
 
 # Set items for containers inside island schematics.
 default-containers:
@@ -550,7 +550,7 @@ default-containers:
 # {player} - The island-owner's name
 # {island} - The island's name if exists. if not, the owner's name will be pasted.
 # You can disable this feature by setting the section to 'default-signs: []'
-default-signs: []
+default-signs: [ ]
 
 # A list of commands that will be executed when an event is called.
 # You can find a list of events here:
@@ -558,7 +558,7 @@ default-signs: []
 # A list of placeholders (Not all of them work for all the events):
 # %island% %player% %schematic% %enter-cause% %target% %leave-cause% %old-owner% %new-owner% %worth% %level%
 event-commands:
-  IslandCreateEvent: []
+  IslandCreateEvent: [ ]
 
 # A delay before getting teleported to a warp (in milliseconds).
 # Players cannot move in that time, or the teleportation will be cancelled.
@@ -577,7 +577,7 @@ lights-update: false
 
 # A list of worlds that PvP will be enabled between island members.
 pvp-worlds:
-- 'PvP'
+  - 'PvP'
 
 # Stop players from leaving their island by walking through the border.
 stop-leaving: false
@@ -588,28 +588,28 @@ values-menu: true
 # A list of crops that will be affected by the crop growth multiplier.
 # You can find a list of materials here: https://bg-software.com/materials/
 crops-to-grow:
-- 'CACTUS'
-- 'SUGAR_CANE_BLOCK'
-- 'SUGAR_CANE'
-- 'MELON_STEM'
-- 'ATTACHED_MELON_STEM'
-- 'RED_MUSHROOM'
-- 'BROWN_MUSHROOM'
-- 'PUMPKIN_STEM'
-- 'ATTACHED_PUMPKIN_STEM'
-- 'VINE'
-- 'COCOA'
-- 'SAPLING'
-- 'DARK_OAK_SAPLING'
-- 'JUNGLE_SAPLING'
-- 'OAK_SAPLING'
-- 'ACACIA_SAPLING'
-- 'BIRCH_SAPLING'
-- 'SPRUCE_SAPLING'
-- 'CROPS'
-- 'WHEAT'
-- 'CARROT'
-- 'POTATO'
+  - 'CACTUS'
+  - 'SUGAR_CANE_BLOCK'
+  - 'SUGAR_CANE'
+  - 'MELON_STEM'
+  - 'ATTACHED_MELON_STEM'
+  - 'RED_MUSHROOM'
+  - 'BROWN_MUSHROOM'
+  - 'PUMPKIN_STEM'
+  - 'ATTACHED_PUMPKIN_STEM'
+  - 'VINE'
+  - 'COCOA'
+  - 'SAPLING'
+  - 'DARK_OAK_SAPLING'
+  - 'JUNGLE_SAPLING'
+  - 'OAK_SAPLING'
+  - 'ACACIA_SAPLING'
+  - 'BIRCH_SAPLING'
+  - 'SPRUCE_SAPLING'
+  - 'CROPS'
+  - 'WHEAT'
+  - 'CARROT'
+  - 'POTATO'
 
 # How frequency should the crops task run? (in ticks)
 # You can disable this feature by setting it to 0.
@@ -661,7 +661,7 @@ negative-level: true
 # A list of events that will not be fired. This can increase performance.
 # You can find a list of events here:
 # https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events
-disabled-events: []
+disabled-events: [ ]
 
 # Should there be a schematic-name argument in the create command?
 # When enabled, people will be able to skip the create menu and create islands directly with the command.
@@ -680,12 +680,12 @@ island-chests:
 # Custom aliases for plugin's commands.
 command-aliases:
   example-command:
-  - 'Aliase1'
-  - 'Aliase2'
+    - 'Aliase1'
+    - 'Aliase2'
 
 # A list of valuable blocks.
 # These blocks require the "VALUABLE_BREAK" permission in order to break them.
-valuable-blocks: []
+valuable-blocks: [ ]
 
 # Set preview locations for schematics.
 # You can disable this feature by setting the section to 'preview-islands: {}'

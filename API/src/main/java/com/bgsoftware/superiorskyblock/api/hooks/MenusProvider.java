@@ -287,8 +287,8 @@ public interface MenusProvider {
     /**
      * Open the missions-menu of a specific category.
      *
-     * @param targetPlayer The player to open the menu for.
-     * @param previousMenu The previous menu that was opened, if exists.
+     * @param targetPlayer    The player to open the menu for.
+     * @param previousMenu    The previous menu that was opened, if exists.
      * @param missionCategory The category to get missions from.
      */
     void openMissionsCategory(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, MissionCategory missionCategory);

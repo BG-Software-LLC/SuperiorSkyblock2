@@ -9,12 +9,12 @@ public final class EmptyUpgradeCost extends UpgradeCostAbstract {
 
     private static final EmptyUpgradeCost instance = new EmptyUpgradeCost();
 
-    public static EmptyUpgradeCost getInstance() {
-        return instance;
+    private EmptyUpgradeCost() {
+        super(BigDecimal.ZERO, "Null");
     }
 
-    private EmptyUpgradeCost(){
-        super(BigDecimal.ZERO, "Null");
+    public static EmptyUpgradeCost getInstance() {
+        return instance;
     }
 
     @Override

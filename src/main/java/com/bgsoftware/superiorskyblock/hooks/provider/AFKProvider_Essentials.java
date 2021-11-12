@@ -11,7 +11,7 @@ public final class AFKProvider_Essentials implements AFKProvider {
 
     private final Essentials instance;
 
-    public AFKProvider_Essentials(){
+    public AFKProvider_Essentials() {
         instance = JavaPlugin.getPlugin(Essentials.class);
         SuperiorSkyblockPlugin.log("Hooked into Essentials for support of afk status of players.");
     }

@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -62,7 +62,7 @@ public final class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Pair<Integer, Boolean> arguments = CommandArguments.getLimit(sender, args[3]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         int limit = arguments.getKey();
@@ -74,9 +74,9 @@ public final class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
         Executor.data(() -> islands.forEach(island -> island.setWarpsLimit(island.getWarpsLimit() + limit)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_WARPS_LIMIT_ALL.send(sender);
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_WARPS_LIMIT_NAME.send(sender, islands.get(0).getName());
         else
             Locale.CHANGED_WARPS_LIMIT.send(sender, targetPlayer.getName());

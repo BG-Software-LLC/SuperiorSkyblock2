@@ -16,39 +16,44 @@ public interface WorldsProvider {
 
     /**
      * Get the world of an island by the environment.
+     *
      * @param environment The world environment.
-     * @param island The island to check.
+     * @param island      The island to check.
      */
     World getIslandsWorld(Island island, World.Environment environment);
 
     /**
      * Checks if the given world is an islands world.
+     *
      * @param world The world to check.
      */
     boolean isIslandsWorld(World world);
 
     /**
      * Get the location for a new island that is created.
+     *
      * @param previousLocation The location of the previous island that was created.
-     * @param islandsHeight The default islands height.
-     * @param maxIslandSize The default maximum island size.
-     * @param islandOwner The owner of the island.
-     * @param islandUUID The UUID of the island.
+     * @param islandsHeight    The default islands height.
+     * @param maxIslandSize    The default maximum island size.
+     * @param islandOwner      The owner of the island.
+     * @param islandUUID       The UUID of the island.
      */
     Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID);
 
     /**
      * Callback upon finishing of creation of islands.
+     *
      * @param islandLocation The location of the new island.
-     * @param islandOwner The owner of the island.
-     * @param islandUUID The UUID of the island.
+     * @param islandOwner    The owner of the island.
+     * @param islandUUID     The UUID of the island.
      */
     void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID);
 
     /**
      * Prepare teleportation of an entity to an island.
-     * @param island The target island.
-     * @param location The location that the entity will be teleported to.
+     *
+     * @param island         The target island.
+     * @param location       The location that the entity will be teleported to.
      * @param finishCallback Callback function after the preparation is finished.
      */
     void prepareTeleport(Island island, Location location, Runnable finishCallback);

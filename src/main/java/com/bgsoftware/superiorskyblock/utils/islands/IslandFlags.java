@@ -4,10 +4,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 
 public final class IslandFlags {
 
-    private IslandFlags(){
-
-    }
-
     public static IslandFlag ALWAYS_DAY = IslandFlag.getByName("ALWAYS_DAY");
     public static IslandFlag ALWAYS_MIDDLE_DAY = IslandFlag.getByName("ALWAYS_MIDDLE_DAY");
     public static IslandFlag ALWAYS_NIGHT = IslandFlag.getByName("ALWAYS_NIGHT");
@@ -30,5 +26,8 @@ public final class IslandFlags {
     public static IslandFlag TREE_GROWTH = IslandFlag.getByName("TREE_GROWTH");
     public static IslandFlag WATER_FLOW = IslandFlag.getByName("WATER_FLOW");
     public static IslandFlag WITHER_EXPLOSION = IslandFlag.getByName("WITHER_EXPLOSION");
+    private IslandFlags() {
+
+    }
 
 }

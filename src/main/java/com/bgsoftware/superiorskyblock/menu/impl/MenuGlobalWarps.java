@@ -28,61 +28,24 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
     public static boolean visitorWarps;
 
-    private MenuGlobalWarps(SuperiorPlayer superiorPlayer){
+    private MenuGlobalWarps(SuperiorPlayer superiorPlayer) {
         super("menuGlobalWarps", superiorPlayer);
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, Island island) {
-        if(visitorWarps){
-            previousMove = false;
-            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "visit", island.getOwner().getName());
-        }
-        else{
-            plugin.getMenus().openWarpCategories(superiorPlayer, this, island);
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
-        try {
-            return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
-                    .replaceAll("{0}", island.getOwner().getName())
-                    .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                    .replaceAll("{2}", island.getIslandWarps().size() + "").build(island.getOwner());
-        }catch(Exception ex){
-            SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected List<Island> requestObjects() {
-        return getFilteredIslands(superiorPlayer)
-                .sorted(SortingComparators.WORTH_COMPARATOR)
-                .collect(Collectors.toList());
-    }
-
-    public static void init(){
+    public static void init() {
         MenuGlobalWarps menuGlobalWarps = new MenuGlobalWarps(null);
 
         File file = new File(plugin.getDataFolder(), "menus/global-warps.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/global-warps.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -98,11 +61,11 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
         List<Integer> slots = new ArrayList<>();
 
-        if(cfg.contains("warps"))
+        if (cfg.contains("warps"))
             slots.addAll(getSlots(cfg, "warps", menuPatternSlots));
-        if(cfg.contains("slots"))
+        if (cfg.contains("slots"))
             slots.addAll(getSlots(cfg, "slots", menuPatternSlots));
-        if(slots.isEmpty())
+        if (slots.isEmpty())
             slots.add(-1);
 
         menuGlobalWarps.setSlots(slots);
@@ -110,30 +73,30 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
         menuGlobalWarps.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
         new MenuGlobalWarps(superiorPlayer).open(previousMenu);
     }
 
-    public static void refreshMenus(){
+    public static void refreshMenus() {
         SuperiorMenu.refreshMenus(MenuGlobalWarps.class, superiorMenu -> true);
     }
 
-    private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer){
+    private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer) {
         return plugin.getGrid().getIslands().stream()
                 .filter(island -> {
-                    if(visitorWarps)
+                    if (visitorWarps)
                         return island.getVisitorsLocation() != null;
-                    else if(island.equals(superiorPlayer.getIsland()))
+                    else if (island.equals(superiorPlayer.getIsland()))
                         return !island.getIslandWarps().isEmpty();
                     else
                         return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
                 });
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/warps-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -152,7 +115,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
 
         int charCounter = 0;
 
-        if(cfg.contains("global-gui.fill-items")) {
+        if (cfg.contains("global-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("global-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -172,6 +135,42 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    protected void onPlayerClick(InventoryClickEvent event, Island island) {
+        if (visitorWarps) {
+            previousMove = false;
+            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "visit", island.getOwner().getName());
+        } else {
+            plugin.getMenus().openWarpCategories(superiorPlayer, this, island);
+        }
+    }
+
+    @Override
+    protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
+        try {
+            return new ItemBuilder(clickedItem).asSkullOf(island.getOwner())
+                    .replaceAll("{0}", island.getOwner().getName())
+                    .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
+                    .replaceAll("{2}", island.getIslandWarps().size() + "").build(island.getOwner());
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
+            SuperiorSkyblockPlugin.debug(ex);
+            throw ex;
+        }
+    }
+
+    @Override
+    protected List<Island> requestObjects() {
+        return getFilteredIslands(superiorPlayer)
+                .sorted(SortingComparators.WORTH_COMPARATOR)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu);
     }
 
 }

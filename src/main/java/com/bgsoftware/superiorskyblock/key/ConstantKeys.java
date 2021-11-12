@@ -4,10 +4,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 
 public final class ConstantKeys {
 
-    private ConstantKeys(){
-
-    }
-
     public static final Key HOPPER = Key.of("HOPPER");
     public static final Key WATER = Key.of("WATER");
     public static final Key LAVA = Key.of("LAVA");
@@ -25,5 +21,8 @@ public final class ConstantKeys {
     public static final Key END_PORTAL_FRAME_WITH_EYE = Key.of(Materials.END_PORTAL_FRAME.toBukkitType(), (short) 7);
     public static final Key END_PORTAL_FRAME = Key.of(Materials.END_PORTAL_FRAME.toBukkitType().name());
     public static final Key WET_SPONGE = Key.of("WET_SPONGE");
+    private ConstantKeys() {
+
+    }
 
 }

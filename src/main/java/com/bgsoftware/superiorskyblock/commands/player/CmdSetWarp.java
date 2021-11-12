@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -9,7 +10,6 @@ import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import com.bgsoftware.superiorskyblock.Locale;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +33,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
         StringBuilder usage = new StringBuilder("setwarp <")
                 .append(Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale)).append(">");
 
-        if(plugin.getSettings().isWarpCategories())
+        if (plugin.getSettings().isWarpCategories())
             usage.append(" [").append(Locale.COMMAND_ARGUMENT_WARP_CATEGORY.getMessage(locale)).append("]");
 
         return usage.toString();
@@ -71,43 +71,43 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        if(island.getIslandWarps().size() >= island.getWarpsLimit()) {
+        if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
             Locale.NO_MORE_WARPS.send(superiorPlayer);
             return;
         }
 
         String warpName = IslandUtils.getWarpName(args[1]);
 
-        if(warpName.isEmpty()){
+        if (warpName.isEmpty()) {
             Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
             return;
         }
 
-        if(!IslandUtils.isWarpNameLengthValid(warpName)) {
+        if (!IslandUtils.isWarpNameLengthValid(warpName)) {
             Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
             return;
         }
 
-        if(island.getWarp(warpName) != null){
+        if (island.getWarp(warpName) != null) {
             Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
             return;
         }
 
-        if(!island.isInsideRange(superiorPlayer.getLocation())){
+        if (!island.isInsideRange(superiorPlayer.getLocation())) {
             Locale.SET_WARP_OUTSIDE.send(superiorPlayer);
             return;
         }
 
         String categoryName = null;
 
-        if(args.length == 3){
+        if (args.length == 3) {
             categoryName = IslandUtils.getWarpName(args[2]);
-            if(categoryName.isEmpty()){
+            if (categoryName.isEmpty()) {
                 Locale.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
                 return;
             }
 
-            if(!IslandUtils.isWarpNameLengthValid(categoryName)) {
+            if (!IslandUtils.isWarpNameLengthValid(categoryName)) {
                 Locale.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
                 return;
             }

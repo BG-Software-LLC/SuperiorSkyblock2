@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
@@ -68,21 +68,21 @@ public final class CmdAdminAddEffect implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         PotionEffectType potionEffectType = CommandArguments.getPotionEffect(sender, args[3]);
 
-        if(potionEffectType == null)
+        if (potionEffectType == null)
             return;
 
         Pair<Integer, Boolean> arguments = CommandArguments.getLevel(sender, args[4]);
 
-        if(!arguments.getValue())
+        if (!arguments.getValue())
             return;
 
         int level = arguments.getKey();
 
         Executor.data(() -> islands.forEach(island -> island.setPotionEffect(potionEffectType, island.getPotionEffectLevel(potionEffectType) + level)));
 
-        if(islands.size() > 1)
+        if (islands.size() > 1)
             Locale.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, StringUtils.format(potionEffectType.getName()));
-        else if(targetPlayer == null)
+        else if (targetPlayer == null)
             Locale.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, StringUtils.format(potionEffectType.getName()), islands.get(0).getName());
         else
             Locale.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, StringUtils.format(potionEffectType.getName()), targetPlayer.getName());

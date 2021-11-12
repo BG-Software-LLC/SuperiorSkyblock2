@@ -14,10 +14,11 @@ public class IslandJoinEvent extends IslandEvent implements Cancellable {
 
     /**
      * The constructor to the event.
+     *
      * @param superiorPlayer The player who joined the island as a new member.
-     * @param island The island that the player joined into.
+     * @param island         The island that the player joined into.
      */
-    public IslandJoinEvent(SuperiorPlayer superiorPlayer, Island island){
+    public IslandJoinEvent(SuperiorPlayer superiorPlayer, Island island) {
         super(island);
         this.superiorPlayer = superiorPlayer;
     }

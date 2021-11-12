@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -68,22 +68,22 @@ public final class CmdUncoop implements IPermissibleCommand {
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             return;
 
-        if(!island.isCoop(targetPlayer)){
+        if (!island.isCoop(targetPlayer)) {
             Locale.PLAYER_NOT_COOP.send(superiorPlayer);
             return;
         }
 
-        if(!EventsCaller.callIslandUncoopPlayerEvent(island, superiorPlayer, targetPlayer, IslandUncoopPlayerEvent.UncoopReason.PLAYER))
+        if (!EventsCaller.callIslandUncoopPlayerEvent(island, superiorPlayer, targetPlayer, IslandUncoopPlayerEvent.UncoopReason.PLAYER))
             return;
 
         island.removeCoop(targetPlayer);
 
         IslandUtils.sendMessage(island, Locale.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
-        if(island.getName().isEmpty())
+        if (island.getName().isEmpty())
             Locale.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
         else
             Locale.LEFT_ISLAND_COOP_NAME.send(targetPlayer, island.getName());

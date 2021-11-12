@@ -6,10 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -93,14 +93,6 @@ public final class CmdWarp implements ISuperiorCommand {
 
     }
 
-    private void warpPlayer(IslandWarp warp, SuperiorPlayer superiorPlayer, Island island) {
-        if (!warp.getIsland().isMember(superiorPlayer) && warp.hasPrivateFlag()) {
-            Locale.INVALID_WARP.send(superiorPlayer, warp.getName());
-        } else {
-            MenuWarps.simulateClick(superiorPlayer, island, warp.getName());
-        }
-    }
-
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         List<String> tabCompletes = args.length < 2 ? new ArrayList<>() :
@@ -122,7 +114,7 @@ public final class CmdWarp implements ISuperiorCommand {
                 if (!tabCompletes.isEmpty()) {
                     SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
                     Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[1]) : targetPlayer.getIsland();
-                    if(island != null) {
+                    if (island != null) {
                         tabCompletes = CommandTabCompletes.getIslandWarps(island, args[2]);
                     }
                 }
@@ -134,6 +126,14 @@ public final class CmdWarp implements ISuperiorCommand {
         }
 
         return tabCompletes;
+    }
+
+    private void warpPlayer(IslandWarp warp, SuperiorPlayer superiorPlayer, Island island) {
+        if (!warp.getIsland().isMember(superiorPlayer) && warp.hasPrivateFlag()) {
+            Locale.INVALID_WARP.send(superiorPlayer, warp.getName());
+        } else {
+            MenuWarps.simulateClick(superiorPlayer, island, warp.getName());
+        }
     }
 
 }

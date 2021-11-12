@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,11 +12,11 @@ public final class TagUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private TagUtils(){
+    private TagUtils() {
 
     }
 
-    public static CompoundTag itemToCompound(ItemStack itemStack){
+    public static CompoundTag itemToCompound(ItemStack itemStack) {
         Map<String, Tag<?>> compoundValues = new HashMap<>();
 
         compoundValues.put("type", new StringTag(itemStack.getType().name()));

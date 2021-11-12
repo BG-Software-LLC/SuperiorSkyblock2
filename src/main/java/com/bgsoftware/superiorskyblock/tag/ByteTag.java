@@ -57,26 +57,26 @@ public final class ByteTag extends Tag<Byte> {
         super(value, CLASS, byte.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeByte(value);
-    }
-
-    public static ByteTag fromNBT(Object tag){
+    public static ByteTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to ByteTag!");
 
         try {
             byte value = plugin.getNMSTags().getNBTByteValue(tag);
             return new ByteTag(value);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
 
-    public static ByteTag fromStream(DataInputStream is) throws IOException{
+    public static ByteTag fromStream(DataInputStream is) throws IOException {
         return new ByteTag(is.readByte());
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeByte(value);
     }
 
 }

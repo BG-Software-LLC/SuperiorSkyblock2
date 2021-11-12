@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
@@ -50,7 +51,6 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
-import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,6 +62,16 @@ public final class MenusProvider_Default implements MenusProvider {
 
     public MenusProvider_Default(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    private static void handleExceptions(Runnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception ex) {
+            HandlerLoadException handlerError = new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
+            handlerError.printStackTrace();
+            SuperiorSkyblockPlugin.debug(handlerError);
+        }
     }
 
     @Override
@@ -548,16 +558,6 @@ public final class MenusProvider_Default implements MenusProvider {
     public void destroyWarps(WarpCategory warpCategory) {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         MenuWarps.destroyMenus(warpCategory);
-    }
-
-    private static void handleExceptions(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (Exception ex) {
-            HandlerLoadException handlerError = new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
-            handlerError.printStackTrace();
-            SuperiorSkyblockPlugin.debug(handlerError);
-        }
     }
 
 }

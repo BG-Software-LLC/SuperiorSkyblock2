@@ -20,8 +20,8 @@ public final class SpawnersProvider_MergedSpawner implements SpawnersProvider_Au
 
     private static boolean registered = false;
 
-    public SpawnersProvider_MergedSpawner(){
-        if(!registered) {
+    public SpawnersProvider_MergedSpawner() {
+        if (!registered) {
             Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
             registered = true;
             SuperiorSkyblockPlugin.log("Using MergedSpawner as a spawners provider.");
@@ -33,7 +33,7 @@ public final class SpawnersProvider_MergedSpawner implements SpawnersProvider_Au
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         int blockCount = -1;
 
-        if(Bukkit.isPrimaryThread()){
+        if (Bukkit.isPrimaryThread()) {
             MergedSpawnerAPI spawnerAPI = MergedSpawnerAPI.getInstance();
             blockCount = spawnerAPI.getCountFor(location.getBlock());
         }
@@ -53,18 +53,18 @@ public final class SpawnersProvider_MergedSpawner implements SpawnersProvider_Au
         private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerStack(MergedSpawnerPlaceEvent e){
+        public void onSpawnerStack(MergedSpawnerPlaceEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             int increaseAmount = e.getNewCount() - e.getOldCount();
-            if(island != null)
+            if (island != null)
                 island.handleBlockPlace(e.getBlock(), increaseAmount);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-        public void onSpawnerUnstack(MergedSpawnerBreakEvent e){
+        public void onSpawnerUnstack(MergedSpawnerBreakEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             int decreaseAmount = e.getOldCount() - e.getNewCount();
-            if(island != null)
+            if (island != null)
                 island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType() + ""), decreaseAmount);
         }
 

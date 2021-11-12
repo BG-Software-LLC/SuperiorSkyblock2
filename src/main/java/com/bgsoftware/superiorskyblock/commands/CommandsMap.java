@@ -31,17 +31,17 @@ public abstract class CommandsMap {
         String label = aliases.get(0).toLowerCase();
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, new ArrayList<>()));
 
-        if(subCommands.containsKey(label)){
+        if (subCommands.containsKey(label)) {
             subCommands.remove(label);
             aliasesToCommand.values().removeIf(sC -> sC.getAliases().get(0).equals(aliases.get(0)));
         }
         subCommands.put(label, superiorCommand);
 
-        for(int i = 1; i < aliases.size(); i++){
+        for (int i = 1; i < aliases.size(); i++) {
             aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
         }
 
-        if(sort){
+        if (sort) {
             List<SuperiorCommand> superiorCommands = new ArrayList<>(subCommands.values());
             superiorCommands.sort(Comparator.comparing(o -> o.getAliases().get(0)));
             subCommands.clear();
@@ -61,7 +61,7 @@ public abstract class CommandsMap {
     }
 
     @Nullable
-    public SuperiorCommand getCommand(String label){
+    public SuperiorCommand getCommand(String label) {
         label = label.toLowerCase();
         return subCommands.getOrDefault(label, aliasesToCommand.get(label));
     }

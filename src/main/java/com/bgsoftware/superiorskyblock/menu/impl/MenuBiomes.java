@@ -7,13 +7,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -35,106 +35,25 @@ public final class MenuBiomes extends SuperiorMenu {
 
     private final Island targetIsland;
 
-    private MenuBiomes(SuperiorPlayer superiorPlayer, Island targetIsland){
+    private MenuBiomes(SuperiorPlayer superiorPlayer, Island targetIsland) {
         super("menuBiomes", superiorPlayer);
         this.targetIsland = targetIsland;
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        for(Biome biome : Biome.values()){
-            String biomeName = biome.name().toLowerCase();
-            if(containsData(biomeName + "-slot")) {
-                int slot = (int) getData(biomeName + "-slot");
-                String permission = (String) getData(biomeName + "-permission");
-
-                if(slot == e.getRawSlot()){
-                    if (superiorPlayer.hasPermission(permission)) {
-                        EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(superiorPlayer, targetIsland, biome);
-                        if(!event.isCancelled()){
-                            SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
-                            if(soundWrapper != null)
-                                soundWrapper.playSound(e.getWhoClicked());
-                            //noinspection unchecked
-                            List<String> commands = (List<String>) getData(biomeName + "-has-access-item-commands");
-                            if (commands != null)
-                                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                        command.replace("%player%", superiorPlayer.getName())));
-
-                            targetIsland.setBiome(event.getResult());
-                            Locale.CHANGED_BIOME.send(superiorPlayer, event.getResult().name().toLowerCase());
-
-                            Executor.sync(() -> {
-                                previousMove = false;
-                                e.getWhoClicked().closeInventory();
-                            }, 1L);
-
-                            break;
-                        }
-                    }
-
-                    SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-no-access-item-sound");
-                    if(soundWrapper != null)
-                        soundWrapper.playSound(e.getWhoClicked());
-                    //noinspection unchecked
-                    List<String> commands = (List<String>) getData(biomeName + "-no-access-item-commands");
-                    if(commands != null)
-                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
-
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inv = super.buildInventory(titleReplacer);
-        Island island = superiorPlayer.getIsland();
-
-        if(island != null) {
-            for (Biome biome : Biome.values()) {
-                String biomeName = biome.name().toLowerCase();
-                if (containsData(biomeName + "-has-access-item")) {
-                    ItemBuilder biomeItem = (ItemBuilder) getData(biomeName + "-has-access-item");
-                    String permission = (String) getData(biomeName + "-permission");
-                    int slot = (int) getData(biomeName + "-slot");
-
-                    if (!superiorPlayer.hasPermission(permission))
-                        biomeItem = (ItemBuilder) getData(biomeName + "-no-access-item");
-
-                    biomeItem = biomeItem.clone();
-
-                    if (currentBiomeGlow && island.getBiome() == biome)
-                        biomeItem.withEnchant(EnchantsUtils.getGlowEnchant(), 1);
-
-                    inv.setItem(slot, biomeItem.build(superiorPlayer));
-                }
-            }
-        }
-
-       return inv;
-    }
-
-    public static void init(){
+    public static void init() {
         MenuBiomes menuBiomes = new MenuBiomes(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/biomes.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/biomes.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -157,18 +76,18 @@ public final class MenuBiomes extends SuperiorMenu {
         int backButton = -1;
         char backButtonChar = cfg.getString("back", " ").charAt(0);
 
-        for(int row = 0; row < pattern.size(); row++){
+        for (int row = 0; row < pattern.size(); row++) {
             String patternLine = pattern.get(row);
             int slot = row * 9;
 
-            for(int i = 0; i < patternLine.length(); i++){
+            for (int i = 0; i < patternLine.length(); i++) {
                 char ch = patternLine.charAt(i);
-                if(ch != ' '){
-                    if(backButtonChar == ch){
+                if (ch != ' ') {
+                    if (backButtonChar == ch) {
                         backButton = slot;
                     }
 
-                    if(cfg.contains("items." + ch + ".biome")){
+                    if (cfg.contains("items." + ch + ".biome")) {
                         ConfigurationSection itemSection = cfg.getConfigurationSection("items." + ch);
                         ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + ch);
                         ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + ch);
@@ -180,17 +99,15 @@ public final class MenuBiomes extends SuperiorMenu {
                         menuBiomes.addData(biome + "-has-access-item", FileUtils.getItemStack("biomes.yml", itemSection.getConfigurationSection("access")));
                         menuBiomes.addData(biome + "-no-access-item", FileUtils.getItemStack("biomes.yml", itemSection.getConfigurationSection("no-access")));
 
-                        if(soundSection != null) {
+                        if (soundSection != null) {
                             menuBiomes.addData(biome + "-has-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("access")));
                             menuBiomes.addData(biome + "-no-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("no-access")));
                         }
-                        if(commandSection != null) {
+                        if (commandSection != null) {
                             menuBiomes.addData(biome + "-has-access-item-commands", commandSection.getStringList("access"));
                             menuBiomes.addData(biome + "-no-access-item-commands", commandSection.getStringList("no-access"));
                         }
-                    }
-
-                    else{
+                    } else {
                         menuBiomes.addFillItem(slot, FileUtils.getItemStack("biomes.yml", cfg.getConfigurationSection("items." + ch)));
                         menuBiomes.addCommands(slot, cfg.getStringList("commands." + ch));
                         menuBiomes.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
@@ -207,20 +124,20 @@ public final class MenuBiomes extends SuperiorMenu {
 
         menuBiomes.setBackButton(backButton);
 
-        if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
+        if (plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         menuBiomes.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
         new MenuBiomes(superiorPlayer, targetIsland).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/biomes-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -239,13 +156,13 @@ public final class MenuBiomes extends SuperiorMenu {
 
         int charCounter = 0;
 
-        if(cfg.contains("biomes-gui.fill-items")) {
+        if (cfg.contains("biomes-gui.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("biomes-gui.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        if(cfg.contains("biomes-gui.biomes")) {
-            for (String biomeName : cfg.getConfigurationSection("biomes-gui.biomes").getKeys(false)){
+        if (cfg.contains("biomes-gui.biomes")) {
+            for (String biomeName : cfg.getConfigurationSection("biomes-gui.biomes").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes." + biomeName);
                 char itemChar = itemChars[charCounter++];
                 section.set("biome", biomeName.toUpperCase());
@@ -256,6 +173,87 @@ public final class MenuBiomes extends SuperiorMenu {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    public void onPlayerClick(InventoryClickEvent e) {
+        for (Biome biome : Biome.values()) {
+            String biomeName = biome.name().toLowerCase();
+            if (containsData(biomeName + "-slot")) {
+                int slot = (int) getData(biomeName + "-slot");
+                String permission = (String) getData(biomeName + "-permission");
+
+                if (slot == e.getRawSlot()) {
+                    if (superiorPlayer.hasPermission(permission)) {
+                        EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(superiorPlayer, targetIsland, biome);
+                        if (!event.isCancelled()) {
+                            SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-has-access-item-sound");
+                            if (soundWrapper != null)
+                                soundWrapper.playSound(e.getWhoClicked());
+                            //noinspection unchecked
+                            List<String> commands = (List<String>) getData(biomeName + "-has-access-item-commands");
+                            if (commands != null)
+                                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                        command.replace("%player%", superiorPlayer.getName())));
+
+                            targetIsland.setBiome(event.getResult());
+                            Locale.CHANGED_BIOME.send(superiorPlayer, event.getResult().name().toLowerCase());
+
+                            Executor.sync(() -> {
+                                previousMove = false;
+                                e.getWhoClicked().closeInventory();
+                            }, 1L);
+
+                            break;
+                        }
+                    }
+
+                    SoundWrapper soundWrapper = (SoundWrapper) getData(biomeName + "-no-access-item-sound");
+                    if (soundWrapper != null)
+                        soundWrapper.playSound(e.getWhoClicked());
+                    //noinspection unchecked
+                    List<String> commands = (List<String>) getData(biomeName + "-no-access-item-commands");
+                    if (commands != null)
+                        commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", superiorPlayer.getName())));
+
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, targetIsland);
+    }
+
+    @Override
+    protected Inventory buildInventory(Function<String, String> titleReplacer) {
+        Inventory inv = super.buildInventory(titleReplacer);
+        Island island = superiorPlayer.getIsland();
+
+        if (island != null) {
+            for (Biome biome : Biome.values()) {
+                String biomeName = biome.name().toLowerCase();
+                if (containsData(biomeName + "-has-access-item")) {
+                    ItemBuilder biomeItem = (ItemBuilder) getData(biomeName + "-has-access-item");
+                    String permission = (String) getData(biomeName + "-permission");
+                    int slot = (int) getData(biomeName + "-slot");
+
+                    if (!superiorPlayer.hasPermission(permission))
+                        biomeItem = (ItemBuilder) getData(biomeName + "-no-access-item");
+
+                    biomeItem = biomeItem.clone();
+
+                    if (currentBiomeGlow && island.getBiome() == biome)
+                        biomeItem.withEnchant(EnchantsUtils.getGlowEnchant(), 1);
+
+                    inv.setItem(slot, biomeItem.build(superiorPlayer));
+                }
+            }
+        }
+
+        return inv;
     }
 
 }

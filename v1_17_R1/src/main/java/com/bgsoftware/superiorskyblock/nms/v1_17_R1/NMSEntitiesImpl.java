@@ -38,10 +38,9 @@ public final class NMSEntitiesImpl implements NMSEntities {
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
         EntityAnimal entityAnimal = ((CraftAnimals) animals).getHandle();
-        if(ANIMAL_BREED_ITEM.isValid()){
+        if (ANIMAL_BREED_ITEM.isValid()) {
             return ANIMAL_BREED_ITEM.invoke(entityAnimal, CraftItemStack.asNMSCopy(itemStack));
-        }
-        else {
+        } else {
             return entityAnimal.isBreedItem(CraftItemStack.asNMSCopy(itemStack));
         }
     }

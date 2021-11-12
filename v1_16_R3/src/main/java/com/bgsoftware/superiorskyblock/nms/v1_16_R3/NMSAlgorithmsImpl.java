@@ -33,6 +33,11 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
+    public void registerCommand(BukkitCommand command) {
+        ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);
+    }
+
+    @Override
     public String parseSignLine(String original) {
         return IChatBaseComponent.ChatSerializer.a(CraftChatMessage.fromString(original)[0]);
     }
@@ -66,11 +71,6 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Key getMinecartBlock(Minecart minecart) {
         return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
-    }
-
-    @Override
-    public void registerCommand(BukkitCommand command) {
-        ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);
     }
 
     @Override

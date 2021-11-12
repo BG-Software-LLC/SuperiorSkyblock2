@@ -58,26 +58,26 @@ public final class FloatTag extends Tag<Float> {
         super(value, CLASS, float.class);
     }
 
-    @Override
-    protected void writeData(DataOutputStream os) throws IOException {
-        os.writeFloat(value);
-    }
-
-    public static FloatTag fromNBT(Object tag){
+    public static FloatTag fromNBT(Object tag) {
         Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to FloatTag!");
 
         try {
             float value = plugin.getNMSTags().getNBTFloatValue(tag);
             return new FloatTag(value);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
 
-    public static FloatTag fromStream(DataInputStream is) throws IOException{
+    public static FloatTag fromStream(DataInputStream is) throws IOException {
         return new FloatTag(is.readFloat());
+    }
+
+    @Override
+    protected void writeData(DataOutputStream os) throws IOException {
+        os.writeFloat(value);
     }
 
 }

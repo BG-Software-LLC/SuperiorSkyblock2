@@ -25,50 +25,25 @@ public final class MenuControlPanel extends SuperiorMenu {
 
     private final Island targetIsland;
 
-    private MenuControlPanel(SuperiorPlayer superiorPlayer, Island targetIsland){
+    private MenuControlPanel(SuperiorPlayer superiorPlayer, Island targetIsland) {
         super("menuControlPanel", superiorPlayer);
         this.targetIsland = targetIsland;
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        if(membersSlot.contains(e.getRawSlot())){
-            plugin.getMenus().openMembers(superiorPlayer, this, targetIsland);
-        }
-        else if (settingsSlot.contains(e.getRawSlot())) {
-            if(superiorPlayer.hasPermission("superior.island.settings")) {
-                if(!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)){
-                    Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
-                    return;
-                }
-
-                plugin.getMenus().openSettings(superiorPlayer, this, targetIsland);
-            }
-        }
-        else if (visitorsSlot.contains(e.getRawSlot())) {
-            plugin.getMenus().openVisitors(superiorPlayer, this, targetIsland);
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
-    }
-
-    public static void init(){
+    public static void init() {
         MenuControlPanel menuControlPanel = new MenuControlPanel(null, null);
 
         File file = new File(plugin.getDataFolder(), "menus/control-panel.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             FileUtils.saveResource("menus/control-panel.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if(convertOldGUI(cfg)){
+        if (convertOldGUI(cfg)) {
             try {
                 cfg.save(file);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
             }
@@ -83,14 +58,14 @@ public final class MenuControlPanel extends SuperiorMenu {
         menuControlPanel.markCompleted();
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland){
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
         new MenuControlPanel(superiorPlayer, targetIsland).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu){
+    private static boolean convertOldGUI(YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
-        if(!oldFile.exists())
+        if (!oldFile.exists())
             return false;
 
         //We want to reset the items of newMenu.
@@ -109,7 +84,7 @@ public final class MenuControlPanel extends SuperiorMenu {
 
         int charCounter = 0;
 
-        if(cfg.contains("main-panel.fill-items")) {
+        if (cfg.contains("main-panel.fill-items")) {
             charCounter = MenuConverter.convertFillItems(cfg.getConfigurationSection("main-panel.fill-items"),
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
@@ -130,6 +105,29 @@ public final class MenuControlPanel extends SuperiorMenu {
         newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
 
         return true;
+    }
+
+    @Override
+    public void onPlayerClick(InventoryClickEvent e) {
+        if (membersSlot.contains(e.getRawSlot())) {
+            plugin.getMenus().openMembers(superiorPlayer, this, targetIsland);
+        } else if (settingsSlot.contains(e.getRawSlot())) {
+            if (superiorPlayer.hasPermission("superior.island.settings")) {
+                if (!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)) {
+                    Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
+                    return;
+                }
+
+                plugin.getMenus().openSettings(superiorPlayer, this, targetIsland);
+            }
+        } else if (visitorsSlot.contains(e.getRawSlot())) {
+            plugin.getMenus().openVisitors(superiorPlayer, this, targetIsland);
+        }
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, targetIsland);
     }
 
 }

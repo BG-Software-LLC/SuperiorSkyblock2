@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
@@ -51,7 +51,7 @@ public final class CmdAdminSchematic implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if(args.length == 2) {
+        if (args.length == 2) {
             if (superiorPlayer.hasSchematicModeEnabled()) {
                 Locale.TOGGLED_SCHEMATIC_OFF.send(superiorPlayer);
             } else {
@@ -59,10 +59,8 @@ public final class CmdAdminSchematic implements ISuperiorCommand {
             }
 
             superiorPlayer.toggleSchematicMode();
-        }
-
-        else{
-            if(superiorPlayer.getSchematicPos1() == null || superiorPlayer.getSchematicPos2() == null){
+        } else {
+            if (superiorPlayer.getSchematicPos1() == null || superiorPlayer.getSchematicPos2() == null) {
                 Locale.SCHEMATIC_NOT_READY.send(superiorPlayer);
                 return;
             }

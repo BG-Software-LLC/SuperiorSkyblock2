@@ -15,30 +15,29 @@ public final class CoreProtectHook {
     private static SuperiorSkyblockPlugin plugin;
     private static Plugin coreProtect;
 
-    public static void register(SuperiorSkyblockPlugin plugin){
+    public static void register(SuperiorSkyblockPlugin plugin) {
         CoreProtectHook.plugin = plugin;
         coreProtect = Bukkit.getPluginManager().getPlugin("CoreProtect");
     }
 
     public static void recordBlockChange(OfflinePlayer offlinePlayer, Block block, boolean place) {
-        if(coreProtect == null)
+        if (coreProtect == null)
             return;
 
-        if(!Bukkit.isPrimaryThread()){
+        if (!Bukkit.isPrimaryThread()) {
             Executor.sync(() -> recordBlockChange(offlinePlayer, block, place));
             return;
         }
 
         CoreProtectAPI coreProtectAPI = ((CoreProtect) coreProtect).getAPI();
 
-        if(coreProtectAPI.APIVersion() == 5) {
-            if(!place)
+        if (coreProtectAPI.APIVersion() == 5) {
+            if (!place)
                 coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
             else
                 coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
-        }
-        else if(coreProtectAPI.APIVersion() == 6) {
-            if(!place)
+        } else if (coreProtectAPI.APIVersion() == 6) {
+            if (!place)
                 coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(),
                         (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
             else

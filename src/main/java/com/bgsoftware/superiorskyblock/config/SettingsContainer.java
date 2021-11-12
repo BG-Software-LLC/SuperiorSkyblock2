@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -197,10 +197,10 @@ public final class SettingsContainer {
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
         defaultBlockLimits = new KeyMap<>();
-        for(String line : config.getStringList("default-values.block-limits")){
+        for (String line : config.getStringList("default-values.block-limits")) {
             String[] sections = line.split(":");
 
-            if(sections.length < 2){
+            if (sections.length < 2) {
                 SuperiorSkyblockPlugin.log("&cCouldn't parse block limit '" + line + "', skipping...");
                 continue;
             }
@@ -213,10 +213,10 @@ public final class SettingsContainer {
             plugin.getBlockValues().addCustomBlockKey(key);
         }
         defaultEntityLimits = new KeyMap<>();
-        for(String line : config.getStringList("default-values.entity-limits")){
+        for (String line : config.getStringList("default-values.entity-limits")) {
             String[] sections = line.split(":");
 
-            if(sections.length < 2){
+            if (sections.length < 2) {
                 SuperiorSkyblockPlugin.log("&cCouldn't parse entity limit '" + line + "', skipping...");
                 continue;
             }
@@ -234,11 +234,12 @@ public final class SettingsContainer {
         defaultMobDrops = config.getDouble("default-values.mob-drops", 1D);
         defaultBankLimit = new BigDecimal(config.getString("default-values.bank-limit", "-1"));
         defaultRoleLimits = new HashMap<>();
-        for(String line : config.getStringList("default-values.role-limits")){
+        for (String line : config.getStringList("default-values.role-limits")) {
             String[] sections = line.split(":");
             try {
                 defaultRoleLimits.put(Integer.parseInt(sections[0]), Integer.parseInt(sections[1]));
-            }catch (NumberFormatException ignored){}
+            } catch (NumberFormatException ignored) {
+            }
         }
         islandsHeight = config.getInt("islands-height", 100);
         worldBordersEnabled = config.getBoolean("world-borders", true);
@@ -254,7 +255,7 @@ public final class SettingsContainer {
                     stackedBlocksLimits.put(Key.of(sections[0], ""), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
                     stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 SuperiorSkyblockPlugin.debug(ex);
             }
         });
@@ -267,7 +268,7 @@ public final class SettingsContainer {
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
         signWarp = StringUtils.translateColors(config.getStringList("sign-warp"));
-        while(signWarp.size() < 4)
+        while (signWarp.size() < 4)
             signWarp.add("");
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = StringUtils.translateColors(config.getString("visitors-sign.active", "&a[Welcome]"));
@@ -288,19 +289,16 @@ public final class SettingsContainer {
         endSchematicOffset = config.getBoolean("worlds.end.schematic-offset", true);
         endDragonFight = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         String defaultWorldEnvironment = config.getString("worlds.default-world");
-        if(defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled){
+        if (defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled) {
             this.defaultWorldEnvironment = World.Environment.NORMAL;
             this.defaultWorldName = this.islandWorldName;
-        }
-        else if(defaultWorldEnvironment.equalsIgnoreCase("nether") && netherWorldEnabled){
+        } else if (defaultWorldEnvironment.equalsIgnoreCase("nether") && netherWorldEnabled) {
             this.defaultWorldEnvironment = World.Environment.NETHER;
             this.defaultWorldName = this.netherWorldName;
-        }
-        else if(defaultWorldEnvironment.equalsIgnoreCase("the_end") && endWorldEnabled){
+        } else if (defaultWorldEnvironment.equalsIgnoreCase("the_end") && endWorldEnabled) {
             this.defaultWorldEnvironment = World.Environment.THE_END;
             this.defaultWorldName = this.endWorldName;
-        }
-        else{
+        } else {
             throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
         worldsDifficulty = config.getString("worlds.difficulty", "EASY");
@@ -342,24 +340,23 @@ public final class SettingsContainer {
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         defaultSettings = config.getStringList("default-settings");
         defaultGenerator = new KeyMap[World.Environment.values().length];
-        if(config.isConfigurationSection("default-values.generator")){
-            for(String env : config.getConfigurationSection("default-values.generator").getKeys(false)){
-                try{
+        if (config.isConfigurationSection("default-values.generator")) {
+            for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
+                try {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase());
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     SuperiorSkyblockPlugin.debug(ex);
                 }
             }
-        }
-        else {
+        } else {
             loadGenerator(config.getStringList("default-values.generator"), 0);
         }
         disableRedstoneOffline = config.getBoolean("disable-redstone-offline", true);
         disableRedstoneAFK = config.getBoolean("afk-integrations.disable-redstone", false);
         disableSpawningAFK = config.getBoolean("afk-integrations.disable-spawning", true);
         commandsCooldown = new HashMap<>();
-        for(String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)){
+        for (String subCommand : config.getConfigurationSection("commands-cooldown").getKeys(false)) {
             int cooldown = config.getInt("commands-cooldown." + subCommand + ".cooldown");
             String permission = config.getString("commands-cooldown." + subCommand + ".bypass-permission");
             commandsCooldown.put(subCommand, new Pair<>(cooldown, permission));
@@ -375,7 +372,7 @@ public final class SettingsContainer {
         blockedVisitorsCommands = config.getStringList("blocked-visitors-commands");
         defaultContainersEnabled = config.getBoolean("default-containers.enabled", false);
         defaultContainersContents = new HashMap<>();
-        if(config.contains("default-containers.containers")) {
+        if (config.contains("default-containers.containers")) {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
@@ -406,7 +403,7 @@ public final class SettingsContainer {
         }
         defaultSignLines = config.getStringList("default-signs");
         eventCommands = new HashMap<>();
-        if(config.contains("event-commands")) {
+        if (config.contains("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
                 eventCommands.put(eventName.toLowerCase(), config.getStringList("event-commands." + eventName));
             }
@@ -439,15 +436,15 @@ public final class SettingsContainer {
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = config.getInt("island-chests.default-size", 3);
         commandAliases = new HashMap<>();
-        if(config.isConfigurationSection("command-aliases")){
-            for(String label : config.getConfigurationSection("command-aliases").getKeys(false)){
+        if (config.isConfigurationSection("command-aliases")) {
+            for (String label : config.getConfigurationSection("command-aliases").getKeys(false)) {
                 commandAliases.put(label.toLowerCase(), config.getStringList("command-aliases." + label));
             }
         }
         valuableBlocks = new KeySet(config.getStringList("valuable-blocks"));
         islandPreviewLocations = new HashMap<>();
-        if(config.isConfigurationSection("preview-islands")){
-            for(String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
+        if (config.isConfigurationSection("preview-islands")) {
+            for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
                 islandPreviewLocations.put(schematic.toLowerCase(), LocationUtils.getLocation(config.getString("preview-islands." + schematic)));
         }
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
@@ -460,10 +457,10 @@ public final class SettingsContainer {
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
     }
 
-    private List<String> loadInteractables(SuperiorSkyblockPlugin plugin){
+    private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {
         File file = new File(plugin.getDataFolder(), "interactables.yml");
 
-        if(!file.exists())
+        if (!file.exists())
             plugin.saveResource("interactables.yml", false);
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
@@ -471,9 +468,9 @@ public final class SettingsContainer {
         return cfg.getStringList("interactables");
     }
 
-    private void loadGenerator(List<String> lines, int index){
+    private void loadGenerator(List<String> lines, int index) {
         defaultGenerator[index] = new KeyMap<>();
-        for(String line : lines){
+        for (String line : lines) {
             String[] sections = line.split(":");
             String globalKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];

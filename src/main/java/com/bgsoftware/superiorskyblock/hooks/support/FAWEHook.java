@@ -14,7 +14,7 @@ public final class FAWEHook {
         return new WorldEditSchematic(name, FaweAPI.load(file));
     }
 
-    public static boolean isEnabled(){
+    public static boolean isEnabled() {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 

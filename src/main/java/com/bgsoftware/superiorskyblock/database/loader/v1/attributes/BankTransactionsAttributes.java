@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.database.loader.v1.attributes;
 
 public final class BankTransactionsAttributes extends AttributesRegistry<BankTransactionsAttributes.Field> {
 
-    public BankTransactionsAttributes(){
+    public BankTransactionsAttributes() {
         super(Field.class);
     }
 

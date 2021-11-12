@@ -8,17 +8,16 @@ import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 
 public final class BuiltinModules {
 
-    private BuiltinModules(){
-
-    }
-
     public static final GeneratorsModule GENERATORS = new GeneratorsModule();
     public static final MissionsModule MISSIONS = new MissionsModule();
     public static final BankModule BANK = new BankModule();
     public static final UpgradesModule UPGRADES = new UpgradesModule();
+    private BuiltinModules() {
 
-    public static PluginModule getBuiltinModule(String name){
-        switch (name.toLowerCase()){
+    }
+
+    public static PluginModule getBuiltinModule(String name) {
+        switch (name.toLowerCase()) {
             case "generators":
                 return GENERATORS;
             case "missions":

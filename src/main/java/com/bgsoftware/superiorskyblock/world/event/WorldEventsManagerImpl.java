@@ -18,6 +18,11 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
         this.plugin = plugin;
     }
 
+    private static boolean isHologram(ArmorStand armorStand) {
+        return !armorStand.hasGravity() && armorStand.isSmall() && !armorStand.isVisible() &&
+                armorStand.isCustomNameVisible() && armorStand.isMarker() && armorStand.getCustomName() != null;
+    }
+
     @Override
     public void loadChunk(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
@@ -68,11 +73,6 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
 
         if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
             ChunksTracker.markDirty(island, chunk, true);
-    }
-
-    private static boolean isHologram(ArmorStand armorStand) {
-        return !armorStand.hasGravity() && armorStand.isSmall() && !armorStand.isVisible() &&
-                armorStand.isCustomNameVisible() && armorStand.isMarker() && armorStand.getCustomName() != null;
     }
 
 }

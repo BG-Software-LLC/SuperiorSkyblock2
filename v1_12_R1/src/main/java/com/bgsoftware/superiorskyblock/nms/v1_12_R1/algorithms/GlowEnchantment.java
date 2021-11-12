@@ -5,7 +5,11 @@ import org.bukkit.enchantments.EnchantmentTarget;
 
 public final class GlowEnchantment extends Enchantment {
 
-    public static GlowEnchantment createEnchantment(){
+    private GlowEnchantment(int id) {
+        super(id);
+    }
+
+    public static GlowEnchantment createEnchantment() {
         int id = 100;
 
         //noinspection deprecation, StatementWithEmptyBody
@@ -13,10 +17,6 @@ public final class GlowEnchantment extends Enchantment {
         }
 
         return new GlowEnchantment(id);
-    }
-
-    private GlowEnchantment(int id){
-        super(id);
     }
 
     @Override
@@ -39,6 +39,14 @@ public final class GlowEnchantment extends Enchantment {
         return null;
     }
 
+    public boolean isTreasure() {
+        return false;
+    }
+
+    public boolean isCursed() {
+        return false;
+    }
+
     @Override
     public boolean conflictsWith(Enchantment enchantment) {
         return false;
@@ -47,14 +55,6 @@ public final class GlowEnchantment extends Enchantment {
     @Override
     public boolean canEnchantItem(org.bukkit.inventory.ItemStack itemStack) {
         return true;
-    }
-
-    public boolean isTreasure() {
-        return false;
-    }
-
-    public boolean isCursed() {
-        return false;
     }
 
 }

@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 
 import java.util.ArrayList;
@@ -66,22 +66,22 @@ public final class CmdPromote implements IPermissibleCommand {
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, superiorPlayer, args[1]);
 
-        if(targetPlayer == null)
+        if (targetPlayer == null)
             return;
 
-        if(!island.isMember(targetPlayer)){
+        if (!island.isMember(targetPlayer)) {
             Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return;
         }
 
         PlayerRole playerRole = targetPlayer.getPlayerRole();
 
-        if(playerRole.isLastRole()){
+        if (playerRole.isLastRole()) {
             Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
-        if(!playerRole.isLessThan(superiorPlayer.getPlayerRole())){
+        if (!playerRole.isLessThan(superiorPlayer.getPlayerRole())) {
             Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
@@ -89,18 +89,18 @@ public final class CmdPromote implements IPermissibleCommand {
         PlayerRole nextRole = playerRole;
         int roleLimit;
 
-        do{
+        do {
             nextRole = nextRole.getNextRole();
             roleLimit = nextRole == null ? -1 : island.getRoleLimit(nextRole);
-        }while (nextRole != null && !nextRole.isLastRole() && !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
+        } while (nextRole != null && !nextRole.isLastRole() && !nextRole.isHigherThan(superiorPlayer.getPlayerRole()) &&
                 roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
 
-        if(nextRole == null || nextRole.isLastRole()){
+        if (nextRole == null || nextRole.isLastRole()) {
             Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
-        if(nextRole.isHigherThan(superiorPlayer.getPlayerRole())){
+        if (nextRole.isHigherThan(superiorPlayer.getPlayerRole())) {
             Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }

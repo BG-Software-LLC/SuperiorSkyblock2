@@ -17,7 +17,7 @@ public final class PermissionsProvider_LuckPerms implements PermissionsProvider 
             luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
             SuperiorSkyblockPlugin.log("Using LuckPerms as a permissions provider.");
             return true;
-        }catch (Throwable ex){
+        } catch (Throwable ex) {
             SuperiorSkyblockPlugin.log("&cYou are using an outdated version of LuckPerms. " +
                     "It's recommended to update for a more optimized experience (v5.1+).");
             return false;
