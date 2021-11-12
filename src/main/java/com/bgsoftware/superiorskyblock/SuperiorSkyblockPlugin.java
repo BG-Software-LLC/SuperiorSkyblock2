@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -100,6 +101,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static SuperiorSkyblockPlugin plugin;
 
     private final Updater updater = new Updater(this, "superiorskyblock2");
+    private final PluginDebugger pluginDebugger = new PluginDebugger(new File(getDataFolder(), ".session_logs"));
 
     private final DataHandler dataHandler = new DataHandler(this);
 
@@ -785,6 +787,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public static void debug(String message){
+        plugin.pluginDebugger.debug(message);
         if(plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
             plugin.getLogger().info("[DEBUG] " + message);
     }
