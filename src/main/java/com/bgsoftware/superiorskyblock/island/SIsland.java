@@ -2525,25 +2525,39 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(warp, "warp parameter cannot be null.");
 
+        IslandWarp islandWarp = getWarp(warp);
+
+        if(islandWarp == null) {
+            Locale.INVALID_WARP.send(superiorPlayer, warp);
+            return;
+        }
+
         if(plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
                     plugin.getSettings().getWarpsWarmup(), TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
-                    warpPlayerWithoutWarmup(superiorPlayer, warp), plugin.getSettings().getWarpsWarmup() / 50));
+                    warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
         }
         else {
-            warpPlayerWithoutWarmup(superiorPlayer, warp);
+            warpPlayerWithoutWarmup(superiorPlayer, islandWarp);
         }
     }
 
-    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, String warp){
-        Location location = warpsByName.get(warp.toLowerCase()).getLocation();
+    private void warpPlayerWithoutWarmup(SuperiorPlayer superiorPlayer, IslandWarp islandWarp){
+        Location location = islandWarp.getLocation();
         superiorPlayer.setTeleportTask(null);
+
+        // Warp doesn't exist anymore.
+        if(getWarp(islandWarp.getName()) == null) {
+            Locale.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
+            deleteWarp(islandWarp.getName());
+            return;
+        }
 
         if(!isInsideRange(location)){
             Locale.UNSAFE_WARP.send(superiorPlayer);
-            deleteWarp(warp);
+            deleteWarp(islandWarp.getName());
             return;
         }
 
@@ -2557,7 +2571,7 @@ public final class SIsland implements Island {
                 Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if(superiorPlayer.isShownAsOnline()) {
                     IslandUtils.sendMessage(this, Locale.TELEPORTED_TO_WARP_ANNOUNCEMENT,
-                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), warp);
+                            Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
                 }
             }
         });
