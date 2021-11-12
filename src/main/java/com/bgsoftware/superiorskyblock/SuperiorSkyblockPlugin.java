@@ -785,6 +785,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public static void log(String message){
+        plugin.pluginDebugger.debug(ChatColor.stripColor(message));
         message = StringUtils.translateColors(message);
         if(message.contains(ChatColor.COLOR_CHAR + ""))
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
