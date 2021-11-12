@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -14,7 +15,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Callum Jay Seabrook (BomBardyGamer)
@@ -66,10 +66,10 @@ public final class MenuConfirmLeave extends SuperiorMenu {
 
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmLeave, "confirm-leave.yml", config);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmLeave, "confirm-leave.yml", config);
 
-        confirmSlot = getSlots(config, "confirm", charSlots);
-        cancelSlot = getSlots(config, "cancel", charSlots);
+        confirmSlot = getSlots(config, "confirm", menuPatternSlots);
+        cancelSlot = getSlots(config, "cancel", menuPatternSlots);
 
         menuConfirmLeave.markCompleted();
     }

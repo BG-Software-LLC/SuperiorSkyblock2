@@ -10,10 +10,11 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -24,7 +25,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -145,15 +145,15 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMembers, "bank-logs.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMembers, "bank-logs.yml", cfg);
 
-        menuMembers.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuMembers.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuMembers.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuMembers.setSlots(getSlots(cfg, "slots", charSlots));
+        menuMembers.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuMembers.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuMembers.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuMembers.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
-        timeSortSlots = getSlots(cfg, "time-sort", charSlots);
-        moneySortSlots = getSlots(cfg, "money-sort", charSlots);
+        timeSortSlots = getSlots(cfg, "time-sort", menuPatternSlots);
+        moneySortSlots = getSlots(cfg, "money-sort", menuPatternSlots);
 
         menuMembers.markCompleted();
     }

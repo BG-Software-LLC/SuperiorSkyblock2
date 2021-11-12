@@ -6,13 +6,14 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -259,12 +260,12 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
 
-        menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuCounts.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuCounts.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuCounts.setSlots(getSlots(cfg, "slots", charSlots));
+        menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuCounts.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuCounts.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuCounts.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuCounts.markCompleted();
     }

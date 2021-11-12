@@ -6,9 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,7 +17,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
@@ -72,11 +72,11 @@ public final class MenuControlPanel extends SuperiorMenu {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
 
-        membersSlot = getSlots(cfg, "members", charSlots);
-        settingsSlot = getSlots(cfg, "settings", charSlots);
-        visitorsSlot = getSlots(cfg, "visitors", charSlots);
+        membersSlot = getSlots(cfg, "members", menuPatternSlots);
+        settingsSlot = getSlots(cfg, "settings", menuPatternSlots);
+        visitorsSlot = getSlots(cfg, "visitors", menuPatternSlots);
 
         menuControlPanel.markCompleted();
     }

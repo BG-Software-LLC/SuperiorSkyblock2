@@ -12,10 +12,11 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -29,7 +30,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
@@ -234,7 +234,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
 
@@ -250,10 +250,10 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             }
         }
 
-        menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuPermissions.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuPermissions.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuPermissions.setSlots(getSlots(cfg, "slots", charSlots));
+        menuPermissions.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuPermissions.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuPermissions.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuPermissions.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuPermissions.markCompleted();
     }

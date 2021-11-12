@@ -6,10 +6,11 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,7 +23,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuBorderColor extends SuperiorMenu {
@@ -104,16 +104,16 @@ public final class MenuBorderColor extends SuperiorMenu {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
 
-        greenColorSlot = getSlots(cfg, "green-color", charSlots);
-        redColorSlot = getSlots(cfg, "red-color", charSlots);
-        blueColorSlot = getSlots(cfg, "blue-color", charSlots);
+        greenColorSlot = getSlots(cfg, "green-color", menuPatternSlots);
+        redColorSlot = getSlots(cfg, "red-color", menuPatternSlots);
+        blueColorSlot = getSlots(cfg, "blue-color", menuPatternSlots);
 
         toggleBorderSlot = new ArrayList<>();
         for(String itemChar : cfg.getConfigurationSection("items").getKeys(false)){
             if(cfg.contains("items." + itemChar + ".enable-border")){
-                List<Integer> slots = charSlots.get(itemChar.toCharArray()[0]);
+                List<Integer> slots = menuPatternSlots.getSlots(itemChar);
                 toggleBorderSlot.addAll(slots);
 
                 ItemBuilder enableBorder = FileUtils.getItemStack("border-color.yml",

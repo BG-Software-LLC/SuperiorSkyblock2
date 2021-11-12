@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -478,20 +479,9 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
     }
 
-    protected static List<Integer> getSlots(ConfigurationSection section, String key, Map<Character, List<Integer>> charSlots) {
-        if(!section.contains(key))
-            return new ArrayList<>();
-
-        List<Character> chars = new ArrayList<>();
-
-        for(char ch : section.getString(key).toCharArray())
-            chars.add(ch);
-
-        List<Integer> slots = new ArrayList<>();
-
-        chars.stream().filter(charSlots::containsKey).forEach(ch -> slots.addAll(charSlots.get(ch)));
-
-        return slots.isEmpty() ? Collections.singletonList(-1) : slots;
+    protected static List<Integer> getSlots(ConfigurationSection section, String key, MenuPatternSlots menuPatternSlots) {
+        return !section.contains(key) ? Collections.singletonList(-1) :
+                menuPatternSlots.getSlots(section.getString(key), -1);
     }
 
 }

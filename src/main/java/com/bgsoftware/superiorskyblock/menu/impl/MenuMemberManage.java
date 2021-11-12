@@ -6,9 +6,10 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.Inventory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuMemberManage extends SuperiorMenu {
 
@@ -95,11 +95,11 @@ public final class MenuMemberManage extends SuperiorMenu {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
 
-        rolesSlot = getSlots(cfg, "roles", charSlots);
-        banSlot = getSlots(cfg, "ban", charSlots);
-        kickSlot = getSlots(cfg, "kick", charSlots);
+        rolesSlot = getSlots(cfg, "roles", menuPatternSlots);
+        banSlot = getSlots(cfg, "ban", menuPatternSlots);
+        kickSlot = getSlots(cfg, "kick", menuPatternSlots);
 
         menuMemberManage.markCompleted();
     }

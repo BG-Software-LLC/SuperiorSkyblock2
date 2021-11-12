@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -19,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
@@ -155,13 +155,13 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
 
-        typeSlots = getSlots(cfg, "icon-type", charSlots);
-        renameSlots = getSlots(cfg, "icon-rename", charSlots);
-        loreSlots = getSlots(cfg, "icon-relore", charSlots);
-        confirmSlots = getSlots(cfg, "icon-confirm", charSlots);
-        iconSlots = getSlots(cfg, "icon-slots", charSlots);
+        typeSlots = getSlots(cfg, "icon-type", menuPatternSlots);
+        renameSlots = getSlots(cfg, "icon-rename", menuPatternSlots);
+        loreSlots = getSlots(cfg, "icon-relore", menuPatternSlots);
+        confirmSlots = getSlots(cfg, "icon-confirm", menuPatternSlots);
+        iconSlots = getSlots(cfg, "icon-slots", menuPatternSlots);
 
         menuWarpCategoryIconEdit.markCompleted();
     }

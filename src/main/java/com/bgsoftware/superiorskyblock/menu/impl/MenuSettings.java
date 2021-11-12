@@ -9,10 +9,11 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -25,7 +26,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
 
@@ -116,7 +116,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
 
         ConfigurationSection settingsSection = cfg.getConfigurationSection("settings");
 
@@ -129,10 +129,10 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             }catch (Exception ignored){}
         }
 
-        menuSettings.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuSettings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuSettings.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuSettings.setSlots(getSlots(cfg, "slots", charSlots));
+        menuSettings.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuSettings.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuSettings.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuSettings.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuSettings.markCompleted();
     }

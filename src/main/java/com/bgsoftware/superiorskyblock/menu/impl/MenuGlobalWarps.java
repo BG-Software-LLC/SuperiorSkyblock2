@@ -7,10 +7,11 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,20 +86,20 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        menuGlobalWarps.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuGlobalWarps.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuGlobalWarps.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuGlobalWarps.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuGlobalWarps.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuGlobalWarps.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
 
         List<Integer> slots = new ArrayList<>();
 
         if(cfg.contains("warps"))
-            slots.addAll(getSlots(cfg, "warps", charSlots));
+            slots.addAll(getSlots(cfg, "warps", menuPatternSlots));
         if(cfg.contains("slots"))
-            slots.addAll(getSlots(cfg, "slots", charSlots));
+            slots.addAll(getSlots(cfg, "slots", menuPatternSlots));
         if(slots.isEmpty())
             slots.add(-1);
 

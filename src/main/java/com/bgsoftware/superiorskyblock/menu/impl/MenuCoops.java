@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -15,7 +16,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
 
@@ -71,12 +71,12 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCoops, "coops.yml", cfg);
 
-        menuCoops.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuCoops.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuCoops.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuCoops.setSlots(getSlots(cfg, "slots", charSlots));
+        menuCoops.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuCoops.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuCoops.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuCoops.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuCoops.markCompleted();
     }

@@ -7,9 +7,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -19,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
@@ -87,14 +87,14 @@ public final class MenuIslandRate extends SuperiorMenu {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
 
-        zeroStarsSlot = getSlots(cfg, "zero-stars", charSlots);
-        oneStarSlot = getSlots(cfg, "one-star", charSlots);
-        twoStarsSlot = getSlots(cfg, "two-stars", charSlots);
-        threeStarsSlot = getSlots(cfg, "three-stars", charSlots);
-        fourStarsSlot = getSlots(cfg, "four-stars", charSlots);
-        fiveStarsSlot = getSlots(cfg, "five-stars", charSlots);
+        zeroStarsSlot = getSlots(cfg, "zero-stars", menuPatternSlots);
+        oneStarSlot = getSlots(cfg, "one-star", menuPatternSlots);
+        twoStarsSlot = getSlots(cfg, "two-stars", menuPatternSlots);
+        threeStarsSlot = getSlots(cfg, "three-stars", menuPatternSlots);
+        fourStarsSlot = getSlots(cfg, "four-stars", menuPatternSlots);
+        fiveStarsSlot = getSlots(cfg, "five-stars", menuPatternSlots);
 
         menuIslandRate.markCompleted();
     }

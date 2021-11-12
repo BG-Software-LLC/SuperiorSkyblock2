@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -20,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -148,7 +148,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
         sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         removeCompleted = cfg.getBoolean("remove-completed", false);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 
@@ -159,10 +159,10 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
         if(cfg.contains("sounds." + slotsChar + ".can-complete"))
             menuMissionsCategory.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
 
-        menuMissionsCategory.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuMissionsCategory.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuMissionsCategory.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuMissionsCategory.setSlots(getSlots(cfg, "slots", charSlots));
+        menuMissionsCategory.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuMissionsCategory.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuMissionsCategory.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuMissionsCategory.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuMissionsCategory.markCompleted();
     }

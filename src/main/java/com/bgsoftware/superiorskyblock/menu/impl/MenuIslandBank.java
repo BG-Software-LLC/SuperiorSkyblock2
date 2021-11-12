@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
@@ -19,7 +20,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuIslandBank extends SuperiorMenu {
 
@@ -126,15 +126,15 @@ public final class MenuIslandBank extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandBank, "island-bank.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandBank, "island-bank.yml", cfg);
 
-        logsSlot = getSlots(cfg, "logs", charSlots);
+        logsSlot = getSlots(cfg, "logs", menuPatternSlots);
 
         for(String itemChar : cfg.getConfigurationSection("items").getKeys(false)){
             if(cfg.contains("items." + itemChar + ".bank-action")){
-                List<Integer> slots = charSlots.get(itemChar.toCharArray()[0]);
+                List<Integer> slots = menuPatternSlots.getSlots(itemChar);
 
-                if(slots == null){
+                if(slots.isEmpty()){
                     SuperiorSkyblockPlugin.log("&cThe item '" + itemChar.toCharArray()[0] + "' in island bank has no slots, skipping...");
                     continue;
                 }

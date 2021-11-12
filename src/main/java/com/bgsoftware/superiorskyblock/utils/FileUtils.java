@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -134,8 +135,8 @@ public final class FileUtils {
         return itemBuilder;
     }
 
-    public static Map<Character, List<Integer>> loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
-        Map<Character, List<Integer>> charSlots = new HashMap<>();
+    public static MenuPatternSlots loadGUI(SuperiorMenu menu, String fileName, YamlConfiguration cfg){
+        MenuPatternSlots menuPatternSlots = new MenuPatternSlots();
 
         menu.resetData();
 
@@ -169,27 +170,20 @@ public final class FileUtils {
                         menu.addSound(slot, sound);
                     }
 
-                    if(!charSlots.containsKey(ch))
-                        charSlots.put(ch, new ArrayList<>());
-
-                    charSlots.get(ch).add(slot);
+                    menuPatternSlots.addSlot(ch, slot);
 
                     slot++;
                 }
             }
         }
 
-        int backButton = charSlots.getOrDefault(
-                cfg.getString("back", " ").charAt(0),
-                Collections.singletonList(-1)
-        ).get(0);
-
+        int backButton = menuPatternSlots.getSlots(cfg.getString("back", " ")).get(0);
         menu.setBackButton(backButton);
 
         if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] Menu doesn't have a back button, it's impossible to close it.");
 
-        return charSlots;
+        return menuPatternSlots;
     }
 
     public static String fromLocation(Location location){

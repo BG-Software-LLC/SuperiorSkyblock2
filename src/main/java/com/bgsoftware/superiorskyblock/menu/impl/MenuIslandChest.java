@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
@@ -74,16 +74,16 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandChest, "island-chest.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandChest, "island-chest.yml", cfg);
 
-        menuIslandChest.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuIslandChest.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuIslandChest.setNextSlot(getSlots(cfg, "next-page", charSlots));
+        menuIslandChest.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuIslandChest.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuIslandChest.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
 
         {
             char slotChar = cfg.getString("slots", "").toCharArray()[0];
 
-            List<Integer> slots = charSlots.get(slotChar);
+            List<Integer> slots = menuPatternSlots.getSlots(slotChar);
             menuIslandChest.setSlots(slots);
 
             ConfigurationSection validPageSection = cfg.getConfigurationSection("items." + slotChar + ".valid-page");

@@ -6,9 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
 
@@ -90,14 +90,14 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
 
-        uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", charSlots);
+        uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", menuPatternSlots);
 
-        menuVisitors.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuVisitors.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuVisitors.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuVisitors.setSlots(getSlots(cfg, "slots", charSlots));
+        menuVisitors.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuVisitors.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuVisitors.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuVisitors.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuVisitors.markCompleted();
     }

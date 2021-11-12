@@ -6,12 +6,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
 
@@ -84,10 +84,10 @@ public final class MenuConfirmDisband extends SuperiorMenu {
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
 
-        confirmSlot = getSlots(cfg, "confirm", charSlots);
-        cancelSlot = getSlots(cfg, "cancel", charSlots);
+        confirmSlot = getSlots(cfg, "confirm", menuPatternSlots);
+        cancelSlot = getSlots(cfg, "cancel", menuPatternSlots);
 
         menuConfirmDisband.markCompleted();
     }

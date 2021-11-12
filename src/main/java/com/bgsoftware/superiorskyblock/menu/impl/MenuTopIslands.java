@@ -10,11 +10,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -29,10 +30,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -270,7 +269,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         int backButton = -1;
         char backButtonChar = cfg.getString("back", " ").charAt(0);
 
-        Map<Character, List<Integer>> charSlots = new HashMap<>();
+        MenuPatternSlots menuPatternSlots = new MenuPatternSlots();
 
         for(int row = 0; row < pattern.size(); row++){
             String patternLine = pattern.get(row);
@@ -300,10 +299,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                         menuTopIslands.addData(sortingType, slots);
                     }
 
-                    if(!charSlots.containsKey(ch))
-                        charSlots.put(ch, new ArrayList<>());
-
-                    charSlots.get(ch).add(slot);
+                    menuPatternSlots.addSlot(ch, slot);
 
                     slot++;
                 }
@@ -316,27 +312,27 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             SuperiorSkyblockPlugin.log("&c[top-islands.yml] Menu doesn't have a back button, it's impossible to close it.");
 
         if(cfg.contains("worth-sort")) {
-            List<Integer> worthSortSlots = getSlots(cfg, "worth-sort", charSlots);
+            List<Integer> worthSortSlots = getSlots(cfg, "worth-sort", menuPatternSlots);
             worthSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "WORTH"));
             menuTopIslands.addData("WORTH", worthSortSlots);
         }
         if(cfg.contains("level-sort")) {
-            List<Integer> levelSortSlots = getSlots(cfg, "level-sort", charSlots);
+            List<Integer> levelSortSlots = getSlots(cfg, "level-sort", menuPatternSlots);
             levelSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "LEVEL"));
             menuTopIslands.addData("LEVEL", levelSortSlots);
         }
         if(cfg.contains("rating-sort")) {
-            List<Integer> ratingSortSlots = getSlots(cfg, "rating-sort", charSlots);
+            List<Integer> ratingSortSlots = getSlots(cfg, "rating-sort", menuPatternSlots);
             ratingSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "RATING"));
             menuTopIslands.addData("RATING", ratingSortSlots);
         }
         if(cfg.contains("players-sort")) {
-            List<Integer> playerSortSlots = getSlots(cfg, "players-sort", charSlots);
+            List<Integer> playerSortSlots = getSlots(cfg, "players-sort", menuPatternSlots);
             playerSortSlots.forEach(slot ->  menuTopIslands.addData(slot + "", "PLAYERS"));
             menuTopIslands.addData("PLAYERS", playerSortSlots);
         }
 
-        playerIslandSlot = getSlots(cfg, "player-island", charSlots);
+        playerIslandSlot = getSlots(cfg, "player-island", menuPatternSlots);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 
@@ -347,10 +343,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));
         menuTopIslands.addData("no-island-commands", cfg.getStringList("commands." + slotsChar + ".no-island"));
 
-        menuTopIslands.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuTopIslands.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuTopIslands.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuTopIslands.setSlots(getSlots(cfg, "slots", charSlots));
+        menuTopIslands.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuTopIslands.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuTopIslands.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuTopIslands.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuTopIslands.markCompleted();
     }

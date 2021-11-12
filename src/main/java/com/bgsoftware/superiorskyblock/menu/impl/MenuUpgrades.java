@@ -9,10 +9,11 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.apache.commons.lang.math.NumberUtils;
@@ -25,7 +26,6 @@ import org.bukkit.inventory.Inventory;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuUpgrades extends SuperiorMenu {
@@ -100,7 +100,7 @@ public final class MenuUpgrades extends SuperiorMenu {
         }
 
         Executor.sync(() -> {
-            Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
+            MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
 
             if(cfg.contains("upgrades")){
                 ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");
@@ -112,7 +112,7 @@ public final class MenuUpgrades extends SuperiorMenu {
                         continue;
                     }
 
-                    int slot = getSlots(upgradeSection, "item", charSlots).get(0);
+                    int slot = getSlots(upgradeSection, "item", menuPatternSlots).get(0);
                     upgrade.setSlot(slot);
 
                     for(String level : upgradeSection.getKeys(false)) {

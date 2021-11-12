@@ -8,10 +8,11 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedMappedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -79,12 +79,12 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
             }
         }
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
 
-        menuIslandRatings.setPreviousSlot(getSlots(cfg, "previous-page", charSlots));
-        menuIslandRatings.setCurrentSlot(getSlots(cfg, "current-page", charSlots));
-        menuIslandRatings.setNextSlot(getSlots(cfg, "next-page", charSlots));
-        menuIslandRatings.setSlots(getSlots(cfg, "slots", charSlots));
+        menuIslandRatings.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
+        menuIslandRatings.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
+        menuIslandRatings.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
+        menuIslandRatings.setSlots(getSlots(cfg, "slots", menuPatternSlots));
 
         menuIslandRatings.markCompleted();
     }

@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMissions;
 import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
@@ -22,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 public final class MissionsModule extends BuiltinModule {
 
@@ -173,12 +173,12 @@ public final class MissionsModule extends BuiltinModule {
 
         ConfigurationSection categoriesSection = config.createSection("categories");
         YamlConfiguration missionsMenuConfig = loadMissionsMenuFile(plugin);
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
 
         categoriesSection.set("islands.name", "Islands");
-        categoriesSection.set("islands.slot", charSlots.get(missionsMenuConfig.getString("player-missions").charAt(0)).get(0));
+        categoriesSection.set("islands.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("player-missions", "")));
         categoriesSection.set("players.name", "Players");
-        categoriesSection.set("players.slot", charSlots.get(missionsMenuConfig.getString("island-missions").charAt(0)).get(0));
+        categoriesSection.set("players.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", "")));
 
         File islandsCategoryFile = new File(getDataFolder(), "categories/islands");
         File playersCategoryFile = new File(getDataFolder(), "categories/players");

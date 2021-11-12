@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -19,7 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 public final class MenuWarpCategoryManage extends SuperiorMenu {
@@ -156,11 +156,11 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        Map<Character, List<Integer>> charSlots = FileUtils.loadGUI(menuWarpCategoryManage, "warp-category-manage.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpCategoryManage, "warp-category-manage.yml", cfg);
 
-        renameSlots = getSlots(cfg, "category-rename", charSlots);
-        iconSlots = getSlots(cfg, "category-icon", charSlots);
-        warpsSlots = getSlots(cfg, "category-warps", charSlots);
+        renameSlots = getSlots(cfg, "category-rename", menuPatternSlots);
+        iconSlots = getSlots(cfg, "category-icon", menuPatternSlots);
+        warpsSlots = getSlots(cfg, "category-warps", menuPatternSlots);
 
         if(cfg.isConfigurationSection("success-update-sound"))
             successUpdateSound = FileUtils.getSound(cfg.getConfigurationSection("success-update-sound"));
