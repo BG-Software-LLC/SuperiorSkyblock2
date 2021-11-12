@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class PluginDebugger {
 
     private static final long TIMER_WRITE_DELAY = TimeUnit.SECONDS.toMillis(1);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("H:m:s");
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private final File debugFile;
     private final AtomicBoolean debuggedMessage = new AtomicBoolean(false);
