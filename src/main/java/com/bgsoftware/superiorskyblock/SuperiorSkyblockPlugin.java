@@ -346,6 +346,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Executor.close();
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
 
+            pluginDebugger.cancel();
             dataHandler.closeConnection();
         }
     }

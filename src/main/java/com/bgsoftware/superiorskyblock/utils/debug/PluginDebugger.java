@@ -62,26 +62,30 @@ public final class PluginDebugger {
         return timer;
     }
 
+    private void writeDebugMessages() {
+        if(!debuggedMessage.get())
+            return;
+
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(PluginDebugger.this.debugFile, "rw")) {
+            randomAccessFile.seek(randomAccessFile.length());
+
+            byte[] debugLines;
+            synchronized (PluginDebugger.this) {
+                debugLines = PluginDebugger.this.debugLines.toString().getBytes(StandardCharsets.UTF_8);
+                PluginDebugger.this.debugLines = new StringBuilder();
+            }
+
+            randomAccessFile.write(debugLines);
+            debuggedMessage.set(false);
+        } catch (IOException ignored) {
+        }
+    }
+
     private class WriteDebugMessages extends TimerTask {
 
         @Override
         public void run() {
-            if(!debuggedMessage.get())
-                return;
-
-            try (RandomAccessFile randomAccessFile = new RandomAccessFile(PluginDebugger.this.debugFile, "rw")) {
-                randomAccessFile.seek(randomAccessFile.length());
-
-                byte[] debugLines;
-                synchronized (PluginDebugger.this) {
-                    debugLines = PluginDebugger.this.debugLines.toString().getBytes(StandardCharsets.UTF_8);
-                    PluginDebugger.this.debugLines = new StringBuilder();
-                }
-
-                randomAccessFile.write(debugLines);
-                debuggedMessage.set(false);
-            } catch (IOException ignored) {
-            }
+            writeDebugMessages();
         }
     }
 
