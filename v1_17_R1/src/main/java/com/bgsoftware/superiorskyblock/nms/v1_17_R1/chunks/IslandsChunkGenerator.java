@@ -60,7 +60,8 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
             }
         }
 
-        Preconditions.checkArgument(data instanceof CraftChunkData, "Plugins must use createChunkData(World) rather than implementing ChunkData: %s", data);
+        Preconditions.checkArgument(data instanceof CraftChunkData || data.getClass().getName().equals("OldCraftChunkData"),
+                "Plugins must use createChunkData(World) rather than implementing ChunkData: %s", data);
 
         ChunkSection[] chunkDataSections = CHUNK_DATA_SECTIONS.get(data);
         ChunkSection[] chunkSections = chunk.getSections();
