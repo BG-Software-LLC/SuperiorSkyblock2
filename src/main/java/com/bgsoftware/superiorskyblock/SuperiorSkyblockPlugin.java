@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsCont
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -436,6 +437,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     private boolean checkScriptEngine(){
+        return testScriptEngine() || (NashornEngineDownloader.downloadEngine(this) && testScriptEngine());
+    }
+
+    private boolean testScriptEngine() {
         try{
             scriptEngine.eval("1+1");
             return true;
