@@ -1311,45 +1311,46 @@ public final class SIsland implements Island {
 
     @Override
     public void setBiome(Biome biome){
-        Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
         setBiome(biome, true);
     }
 
     public void setBiome(Biome biome, boolean updateBlocks){
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
-
-        if(updateBlocks) {
-            List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
-
-            {
-                World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, false, false);
-                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
-            }
-
-            if (plugin.getProviders().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
-                World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-                Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
-                        ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
-                plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
-            }
-
-            if (plugin.getProviders().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
-                World endWorld = getCenter(World.Environment.THE_END).getWorld();
-                Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
-                plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
-            }
-
-            for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-                List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, registeredWorld, false, false);
-                plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
-            }
-        }
 
         this.biome = biome;
+
+        if(!updateBlocks)
+            return;
+
+        SuperiorSkyblockPlugin.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
+
+        List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
+
+        {
+            World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, false, false);
+            plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+        }
+
+        if (plugin.getProviders().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
+            World netherWorld = getCenter(World.Environment.NETHER).getWorld();
+            Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
+                    ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
+            plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
+        }
+
+        if (plugin.getProviders().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
+            World endWorld = getCenter(World.Environment.THE_END).getWorld();
+            Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
+            plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
+        }
+
+        for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, registeredWorld, false, false);
+            plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
+        }
     }
 
     @Override
