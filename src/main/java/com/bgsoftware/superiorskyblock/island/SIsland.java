@@ -103,6 +103,10 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
+    private static final int NORMAL_GENERATED_SCHEMATIC_BIT_MASK = 0x8;
+    private static final int NETHER_GENERATED_SCHEMATIC_BIT_MASK = 0x4;
+    private static final int THE_END_GENERATED_SCHEMATIC_BIT_MASK = 0x3;
+
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static int blocksUpdateCounter = 0;
@@ -3014,8 +3018,18 @@ public final class SIsland implements Island {
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
-        return (generatedSchematics.get() & n) == n;
+        int generatedSchematics = this.generatedSchematics.get();
+
+        switch (environment) {
+            case NORMAL:
+                return (generatedSchematics & NORMAL_GENERATED_SCHEMATIC_BIT_MASK) != 0;
+            case NETHER:
+                return (generatedSchematics & NETHER_GENERATED_SCHEMATIC_BIT_MASK) != 0;
+            case THE_END:
+                return (generatedSchematics & THE_END_GENERATED_SCHEMATIC_BIT_MASK) != 0;
+        }
+
+        return false;
     }
 
     @Override
@@ -3029,15 +3043,15 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Set Schematic, Island: " + owner.getName() + ", Environment: " + environment);
 
+        int generateBitChange = environment == World.Environment.NORMAL ? NORMAL_GENERATED_SCHEMATIC_BIT_MASK :
+                environment == World.Environment.NETHER ? NETHER_GENERATED_SCHEMATIC_BIT_MASK :
+                        environment == World.Environment.THE_END ? THE_END_GENERATED_SCHEMATIC_BIT_MASK : 0;
+
+        if(generateBitChange == 0)
+            return;
+
         this.generatedSchematics.updateAndGet(generatedSchematics -> {
-            if(generated) {
-                int n = environment == World.Environment.NORMAL ? 8 : environment == World.Environment.NETHER ? 4 : 3;
-                return generatedSchematics | n;
-            }
-            else {
-                int n = environment == World.Environment.NORMAL ? 7 : environment == World.Environment.NETHER ? 11 : 14;
-                return generatedSchematics & n;
-            }
+            return generated ? generatedSchematics | generateBitChange : generatedSchematics & ~generateBitChange;
         });
 
         IslandsDatabaseBridge.saveGeneratedSchematics(this);
