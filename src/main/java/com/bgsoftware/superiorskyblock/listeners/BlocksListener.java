@@ -432,6 +432,12 @@ public final class BlocksListener implements Listener {
             e.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBlockChangeState(BlockFormEvent e){
+        if(plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
+            e.setCancelled(true);
+    }
+
     /*
      *  Island Warps
      */
