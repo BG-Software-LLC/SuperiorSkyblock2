@@ -20,6 +20,8 @@ import org.bukkit.event.Listener;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -155,6 +157,72 @@ public final class MissionsModule extends BuiltinModule {
         updateConfig(plugin);
     }
 
+    @Override
+    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
+        enabled = config.getBoolean("enabled");
+    }
+
+    @Override
+    protected String[] getIgnoredSections() {
+        return new String[]{"categories"};
+    }
+
+    private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {
+        File categoryFolder = new File(getDataFolder(), "categories/" + categoryName);
+
+        if (!categoryFolder.exists()) {
+            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " doesn't exist, skipping...");
+            return false;
+        }
+
+        if (!categoryFolder.isDirectory()) {
+            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " is not valid, skipping...");
+            return false;
+        }
+
+        File[] missionFiles = categoryFolder.listFiles(file ->
+                file.isFile() && file.getName().endsWith(".yml"));
+
+        if (missionFiles == null || missionFiles.length == 0) {
+            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
+            return false;
+        }
+
+        for (File missionFile : missionFiles) {
+            String missionName = missionFile.getName().replace(".yml", "");
+
+            YamlConfiguration missionConfigFile = new YamlConfiguration();
+
+            try {
+                missionConfigFile.load(missionFile);
+            } catch (InvalidConfigurationException ex) {
+                SuperiorSkyblockPlugin.log("&cError occurred while parsing mission file " + missionFile.getName() + ":");
+                ex.printStackTrace();
+                continue;
+            } catch (IOException ex) {
+                SuperiorSkyblockPlugin.log("&cError occurred while opening mission file " + missionFile.getName() + ":");
+                ex.printStackTrace();
+                continue;
+            }
+
+            ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
+
+            Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
+            if (mission != null)
+                categoryMissions.add(mission);
+        }
+
+        if (categoryMissions.isEmpty()) {
+            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
+            return false;
+        }
+
+        // Sort missions by their names.
+        categoryMissions.sort(Comparator.comparing(Mission::getName));
+
+        return true;
+    }
+
     private YamlConfiguration loadMissionsMenuFile(SuperiorSkyblockPlugin plugin) {
         File missionsMenuFile = new File(plugin.getDataFolder(), "menus/missions.yml");
 
@@ -227,6 +295,8 @@ public final class MissionsModule extends BuiltinModule {
         } catch (Exception error) {
             error.printStackTrace();
         }
+
+        copyOldMissionsMenuFile(plugin);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -265,70 +335,24 @@ public final class MissionsModule extends BuiltinModule {
         }
     }
 
-    @Override
-    protected void updateConfig(SuperiorSkyblockPlugin plugin) {
-        enabled = config.getBoolean("enabled");
-    }
+    private void copyOldMissionsMenuFile(SuperiorSkyblockPlugin plugin) {
+        File oldMissionsMenuFile = new File(plugin.getDataFolder(), "menus/island-missions.yml");
+        File newMissionsCategoryMenuFile = new File(plugin.getDataFolder(), "menus/missions-category.yml");
 
-    @Override
-    protected String[] getIgnoredSections() {
-        return new String[]{"categories"};
-    }
-
-    private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {
-        File categoryFolder = new File(getDataFolder(), "categories/" + categoryName);
-
-        if (!categoryFolder.exists()) {
-            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " doesn't exist, skipping...");
-            return false;
+        try {
+            Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
+        } catch (IOException error) {
+            SuperiorSkyblockPlugin.log("&cError occurred while copying old missions-menu to the new format, skipping...");
+            return;
         }
 
-        if (!categoryFolder.isDirectory()) {
-            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " is not valid, skipping...");
-            return false;
+        YamlConfiguration newMissionsCategoryMenuConfig = YamlConfiguration.loadConfiguration(newMissionsCategoryMenuFile);
+        newMissionsCategoryMenuConfig.set("title", "&l{0} Missions");
+
+        try {
+            newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
+        } catch (IOException ignored) {
         }
-
-        File[] missionFiles = categoryFolder.listFiles(file ->
-                file.isFile() && file.getName().endsWith(".yml"));
-
-        if (missionFiles == null || missionFiles.length == 0) {
-            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
-            return false;
-        }
-
-        for (File missionFile : missionFiles) {
-            String missionName = missionFile.getName().replace(".yml", "");
-
-            YamlConfiguration missionConfigFile = new YamlConfiguration();
-
-            try {
-                missionConfigFile.load(missionFile);
-            } catch (InvalidConfigurationException ex) {
-                SuperiorSkyblockPlugin.log("&cError occurred while parsing mission file " + missionFile.getName() + ":");
-                ex.printStackTrace();
-                continue;
-            } catch (IOException ex) {
-                SuperiorSkyblockPlugin.log("&cError occurred while opening mission file " + missionFile.getName() + ":");
-                ex.printStackTrace();
-                continue;
-            }
-
-            ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
-
-            Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
-            if (mission != null)
-                categoryMissions.add(mission);
-        }
-
-        if (categoryMissions.isEmpty()) {
-            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
-            return false;
-        }
-
-        // Sort missions by their names.
-        categoryMissions.sort(Comparator.comparing(Mission::getName));
-
-        return true;
     }
 
 }
