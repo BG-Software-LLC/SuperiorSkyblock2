@@ -29,6 +29,7 @@ public final class PluginDebugger {
             debugFile.delete();
 
         try {
+            debugFile.getParentFile().mkdirs();
             debugFile.createNewFile();
         } catch (IOException error) {
             SuperiorSkyblockPlugin.log("&cError occurred while creating debug file. Disabling debugs...");
