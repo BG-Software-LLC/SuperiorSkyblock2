@@ -20,6 +20,7 @@ import org.bukkit.event.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -316,6 +317,9 @@ public final class MissionsModule extends BuiltinModule {
             SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
             return false;
         }
+
+        // Sort missions by their names.
+        categoryMissions.sort(Comparator.comparing(Mission::getName));
 
         return true;
     }
