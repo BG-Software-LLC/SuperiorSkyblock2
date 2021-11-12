@@ -98,6 +98,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
                     .build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of warp: " + islandWarp.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -124,6 +125,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), MENU_IGNORED_SECTIONS);
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         if(convertOldGUI(cfg)){
@@ -131,6 +133,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

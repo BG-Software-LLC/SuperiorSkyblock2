@@ -61,6 +61,7 @@ public final class GeneratorsModule extends BuiltinModule {
                 config.save(configFile);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

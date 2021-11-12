@@ -89,6 +89,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             ).clone().build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -113,6 +114,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 
@@ -126,7 +128,9 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
         for(String key : settingsSection.getKeys(false)){
             try {
                 updateSettings(IslandFlag.getByName(key.toLowerCase()), cfg, position++);
-            }catch (Exception ignored){}
+            }catch (Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         menuSettings.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));

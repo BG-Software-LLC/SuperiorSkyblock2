@@ -296,6 +296,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                 SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
             }
 
+            SuperiorSkyblockPlugin.debug(ex);
             ex.printStackTrace();
             return;
         }
@@ -461,7 +462,9 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                     SuperiorMenu superiorMenu = (SuperiorMenu) inventoryHolder;
                     callback.accept(player, superiorMenu);
                 }
-            }catch(Exception ignored){}
+            }catch(Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
     }
 

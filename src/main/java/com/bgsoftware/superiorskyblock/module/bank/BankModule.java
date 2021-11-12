@@ -103,6 +103,7 @@ public final class BankModule extends BuiltinModule {
                 config.save(configFile);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
     }

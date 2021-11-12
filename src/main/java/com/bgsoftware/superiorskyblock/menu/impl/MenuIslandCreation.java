@@ -158,6 +158,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
             try {
                 cfg.save(file);
             }catch (Exception ex){
+                SuperiorSkyblockPlugin.debug(ex);
                 ex.printStackTrace();
             }
         }

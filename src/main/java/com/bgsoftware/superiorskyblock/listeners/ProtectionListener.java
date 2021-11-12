@@ -479,6 +479,7 @@ public final class ProtectionListener implements Listener {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 

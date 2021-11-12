@@ -64,6 +64,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
                     "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         this.container = new SettingsContainer(plugin, cfg);
@@ -632,6 +633,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
             commentedConfig.save(file);
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
 

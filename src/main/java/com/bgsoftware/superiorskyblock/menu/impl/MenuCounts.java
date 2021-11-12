@@ -236,6 +236,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
             return itemStack;
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of block: " + block.getKey());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }

@@ -73,7 +73,9 @@ public final class StringUtils {
             for (Island island : plugin.getGrid().getIslands()) {
                 island.updateDatesFormatter();
             }
-        }catch (Exception ignored){}
+        }catch (Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
     }
 
     public static String format(String type){

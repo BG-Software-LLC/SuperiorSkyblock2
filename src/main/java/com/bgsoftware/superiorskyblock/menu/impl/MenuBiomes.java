@@ -136,6 +136,7 @@ public final class MenuBiomes extends SuperiorMenu {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

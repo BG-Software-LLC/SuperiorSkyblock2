@@ -89,6 +89,7 @@ public final class NMSUtils {
                             chunkLoader.a(worldServer, loadedChunk);
                         } catch (Exception ex) {
                             ex.printStackTrace();
+                            SuperiorSkyblockPlugin.debug(ex);
                         }
                     }
                 }
@@ -97,6 +98,7 @@ public final class NMSUtils {
                     onFinish.run();
             } catch (Exception ex) {
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         });
     }

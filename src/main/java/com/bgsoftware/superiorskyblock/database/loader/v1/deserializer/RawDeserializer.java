@@ -65,7 +65,8 @@ public final class RawDeserializer implements IDeserializer {
                 String[] locationSection = worldSection.split("=");
                 String environment = locationSection[0].toUpperCase();
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
-            } catch (Exception ignored) {
+            } catch (Exception error) {
+                SuperiorSkyblockPlugin.debug(error);
             }
         }
 
@@ -83,7 +84,9 @@ public final class RawDeserializer implements IDeserializer {
                     PlayerAttributes playerAttributes = databaseLoader.getPlayerAttributes(uuid);
                     if(playerAttributes != null)
                         playerAttributesList.add(playerAttributes);
-                } catch (Exception ignored) {}
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
 
@@ -112,7 +115,9 @@ public final class RawDeserializer implements IDeserializer {
                     playerPermissions.put(UUID.fromString(sections[0]), new PlayerPermissionNode(null,
                             null, sections.length == 1 ? "" : sections[1]));
                 }
-            }catch(Exception ignored){}
+            }catch(Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         return playerPermissions;
@@ -147,10 +152,14 @@ public final class RawDeserializer implements IDeserializer {
                             if (permissionSections.length == 2 && permissionSections[1].equals("1")) {
                                 rolePermissions.put(islandPrivilege, playerRole);
                             }
-                        }catch(Exception ignored){}
+                        }catch(Exception error){
+                            SuperiorSkyblockPlugin.debug(error);
+                        }
                     }
                 }
-            }catch(Exception ignored){}
+            }catch(Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         return rolePermissions;
@@ -165,7 +174,8 @@ public final class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = entry.split("=");
                     upgradesMap.put(sections[0], Integer.parseInt(sections[1]));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -210,7 +220,9 @@ public final class RawDeserializer implements IDeserializer {
                         .setValue(IslandWarpAttributes.Field.LOCATION, sections[1])
                         .setValue(IslandWarpAttributes.Field.PRIVATE_STATUS, privateFlag)
                         .setValue(IslandWarpAttributes.Field.ICON, sections[3]));
-            }catch(Exception ignored){}
+            }catch(Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         return warpAttributes;
@@ -225,7 +237,8 @@ public final class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = limit.split("=");
                     blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -242,7 +255,8 @@ public final class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = entry.split("=");
                     ratingsMap.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -264,7 +278,8 @@ public final class RawDeserializer implements IDeserializer {
                         if (!plugin.getSettings().getDefaultSettings().contains(setting))
                             islandSettings.put(IslandFlag.getByName(setting), (byte) 1);
                     }
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -286,7 +301,9 @@ public final class RawDeserializer implements IDeserializer {
                 try{
                     World.Environment environment = World.Environment.valueOf(sections[0]);
                     deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = new KeyMap<>());
-                }catch (Exception ignored){}
+                }catch (Exception error){
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
         else {
@@ -301,7 +318,8 @@ public final class RawDeserializer implements IDeserializer {
             try {
                 String[] sections = limit.split("=");
                 cobbleGenerator.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
-            } catch (Exception ignored) {
+            } catch (Exception error) {
+                SuperiorSkyblockPlugin.debug(error);
             }
         }
     }
@@ -316,7 +334,8 @@ public final class RawDeserializer implements IDeserializer {
                     String[] visitorSections = visitor.split(";");
                     long lastTimeJoined = visitorSections.length == 2 ? Long.parseLong(visitorSections[1]) : System.currentTimeMillis();
                     visitors.add(new Pair<>(UUID.fromString(visitorSections[0]), lastTimeJoined));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -333,7 +352,8 @@ public final class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = limit.split("=");
                     entityLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -386,7 +406,8 @@ public final class RawDeserializer implements IDeserializer {
                     PlayerRole playerRole = SPlayerRole.fromId(Integer.parseInt(sections[0]));
                     if (playerRole != null)
                         roleLimits.put(playerRole, Integer.parseInt(sections[1]));
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }
@@ -412,7 +433,9 @@ public final class RawDeserializer implements IDeserializer {
                         .setValue(WarpCategoryAttributes.Field.NAME, name)
                         .setValue(WarpCategoryAttributes.Field.SLOT, slot)
                         .setValue(WarpCategoryAttributes.Field.ICON, icon));
-            }catch(Exception ignored){}
+            }catch(Exception error){
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         return warpCategoryAttributes;

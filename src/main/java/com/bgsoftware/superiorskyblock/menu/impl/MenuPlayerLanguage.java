@@ -60,6 +60,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
                         else throw new IllegalArgumentException();
                     }catch(IllegalArgumentException ex){
                         SuperiorSkyblockPlugin.log("&c[player-language.yml] The language " + language + " is not valid.");
+                        SuperiorSkyblockPlugin.debug(ex);
                     }
                 }
             }

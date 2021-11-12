@@ -93,6 +93,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
                             } catch (Exception ex) {
                                 Locale.MODULE_LOADED_FAILURE.send(sender, args[2]);
                                 ex.printStackTrace();
+                                SuperiorSkyblockPlugin.debug(ex);
                             }
                         } else {
                             if (pluginModule.isInitialized()) {

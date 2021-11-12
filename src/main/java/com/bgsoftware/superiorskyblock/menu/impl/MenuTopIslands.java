@@ -138,6 +138,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
             return itemBuilder.build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of the island of: " + (islandOwner == null ? "null" : islandOwner.getName()));
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -249,6 +250,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

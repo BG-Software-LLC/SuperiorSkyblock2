@@ -115,6 +115,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
             return itemStack;
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of mission: " + mission.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }

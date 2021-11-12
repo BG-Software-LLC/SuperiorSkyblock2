@@ -387,6 +387,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                             chunkSnapshot = chunkToLoad.get();
                         } catch (Exception ex) {
                             SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
+                            SuperiorSkyblockPlugin.debug(ex);
                             continue;
                         }
 

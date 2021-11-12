@@ -52,7 +52,8 @@ public final class BlockStatesMapper {
                             field.getName(), (IBlockState<?>) value);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception error) {
+            SuperiorSkyblockPlugin.debug(error);
         }
     }
 

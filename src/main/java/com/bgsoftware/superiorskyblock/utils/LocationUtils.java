@@ -32,6 +32,7 @@ public final class LocationUtils {
             return new SmartLocation(sections[0], x, y, z, yaw, pitch);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Error while parsing location: " + location);
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }

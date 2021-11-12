@@ -95,6 +95,7 @@ public final class SIslandWarp implements IslandWarp {
             return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
         }catch (Exception ex){
             setIcon(null);
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }

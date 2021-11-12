@@ -778,6 +778,7 @@ public enum Locale {
                 fileLocale = LocaleUtils.getLocale(fileName);
             }catch(IllegalArgumentException ex){
                 SuperiorSkyblockPlugin.log("&cThe language \"" + fileName + "\" is invalid. Please correct the file name.");
+                SuperiorSkyblockPlugin.debug(ex);
                 continue;
             }
 
@@ -792,6 +793,7 @@ public enum Locale {
             try {
                 cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
             }catch (Exception ex){
+                SuperiorSkyblockPlugin.debug(ex);
                 ex.printStackTrace();
             }
 

@@ -77,6 +77,7 @@ public class HandlerLoadException extends Exception {
     }
 
     public static boolean handle(HandlerLoadException ex){
+        SuperiorSkyblockPlugin.debug(ex);
         ex.printStackTrace();
 
         if(ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN){

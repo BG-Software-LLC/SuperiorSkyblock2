@@ -170,6 +170,7 @@ public abstract class Tag<E> {
             }
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }

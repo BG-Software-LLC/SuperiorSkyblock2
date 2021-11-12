@@ -26,6 +26,7 @@ public final class BlockLevelsContainer extends BlockValuesContainer {
                 setBlockValue(Key.of(key), new BigDecimal(value));
             }catch (Exception ex){
                 SuperiorSkyblockPlugin.log("&cInvalid level value: " + value);
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
     }

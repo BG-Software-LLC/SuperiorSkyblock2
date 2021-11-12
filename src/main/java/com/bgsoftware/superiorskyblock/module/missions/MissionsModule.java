@@ -152,6 +152,7 @@ public final class MissionsModule extends BuiltinModule {
             config.syncWithConfig(file, FileUtils.getResource("modules/missions/config.yml"), getIgnoredSections());
         } catch (Exception ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         updateConfig(plugin);
@@ -198,10 +199,12 @@ public final class MissionsModule extends BuiltinModule {
             } catch (InvalidConfigurationException ex) {
                 SuperiorSkyblockPlugin.log("&cError occurred while parsing mission file " + missionFile.getName() + ":");
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
                 continue;
             } catch (IOException ex) {
                 SuperiorSkyblockPlugin.log("&cError occurred while opening mission file " + missionFile.getName() + ":");
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
                 continue;
             }
 
@@ -275,6 +278,7 @@ public final class MissionsModule extends BuiltinModule {
                 missionFile.createNewFile();
             } catch (IOException error) {
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
                 continue;
             }
 
@@ -285,6 +289,7 @@ public final class MissionsModule extends BuiltinModule {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
             }
         }
 
@@ -294,6 +299,7 @@ public final class MissionsModule extends BuiltinModule {
             config.save(file);
         } catch (Exception error) {
             error.printStackTrace();
+            SuperiorSkyblockPlugin.debug(error);
         }
 
         copyOldMissionsMenuFile(plugin);
@@ -313,6 +319,7 @@ public final class MissionsModule extends BuiltinModule {
                     config.save(file);
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
 
                 oldMissionsFile.delete();
@@ -343,6 +350,7 @@ public final class MissionsModule extends BuiltinModule {
             Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
             SuperiorSkyblockPlugin.log("&cError occurred while copying old missions-menu to the new format, skipping...");
+            SuperiorSkyblockPlugin.debug(error);
             return;
         }
 
@@ -351,7 +359,8 @@ public final class MissionsModule extends BuiltinModule {
 
         try {
             newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
-        } catch (IOException ignored) {
+        } catch (IOException error) {
+            SuperiorSkyblockPlugin.debug(error);
         }
     }
 

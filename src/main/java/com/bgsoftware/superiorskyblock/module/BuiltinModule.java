@@ -63,6 +63,7 @@ public abstract class BuiltinModule extends PluginModule {
                     getIgnoredSections());
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         updateConfig(plugin);

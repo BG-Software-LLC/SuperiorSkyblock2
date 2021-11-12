@@ -108,6 +108,7 @@ public final class UpgradesModule extends BuiltinModule {
                         upgradeCost = costLoader.loadCost(levelSection);
                     }catch (UpgradeCostLoadException ex){
                         SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + ex.getMessage() + ". Skipping...");
+                        SuperiorSkyblockPlugin.debug(ex);
                         continue;
                     }
 
@@ -168,7 +169,9 @@ public final class UpgradesModule extends BuiltinModule {
                         for(String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                             try {
                                 rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
-                            }catch (NumberFormatException ignored){}
+                            }catch (NumberFormatException error){
+                                SuperiorSkyblockPlugin.debug(error);
+                            }
                         }
                     }
                     upgrade.addUpgradeLevel(level, new SUpgradeLevel(level, upgradeCost, commands, permission, requirements,
@@ -200,6 +203,7 @@ public final class UpgradesModule extends BuiltinModule {
                 config.save(upgradesFile);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
 
             upgradesFile.delete();

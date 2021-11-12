@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -30,6 +31,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 }catch (Exception ex){
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             }
         });
@@ -140,6 +142,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 }catch (Exception ex){
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             }
         });

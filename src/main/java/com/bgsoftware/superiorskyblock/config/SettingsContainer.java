@@ -254,7 +254,9 @@ public final class SettingsContainer {
                     stackedBlocksLimits.put(Key.of(sections[0], ""), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
                     stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
-            }catch(Exception ignored){}
+            }catch(Exception ex){
+                SuperiorSkyblockPlugin.debug(ex);
+            }
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
@@ -345,7 +347,9 @@ public final class SettingsContainer {
                 try{
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase());
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
-                }catch (Exception ignored){}
+                }catch (Exception ex){
+                    SuperiorSkyblockPlugin.debug(ex);
+                }
             }
         }
         else {
@@ -390,10 +394,13 @@ public final class SettingsContainer {
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);
-                        } catch (Exception ignored) {}
+                        } catch (Exception ex) {
+                            SuperiorSkyblockPlugin.debug(ex);
+                        }
                     }
                 } catch (IllegalArgumentException ex) {
                     SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             }
         }

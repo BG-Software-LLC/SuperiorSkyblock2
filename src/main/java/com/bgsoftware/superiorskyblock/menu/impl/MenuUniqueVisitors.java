@@ -60,6 +60,7 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
                     .asSkullOf(pair.getKey()).build(pair.getKey());
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + pair.getKey().getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }

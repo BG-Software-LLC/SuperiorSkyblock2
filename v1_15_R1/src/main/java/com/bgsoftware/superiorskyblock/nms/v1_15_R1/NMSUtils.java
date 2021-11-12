@@ -117,6 +117,7 @@ public final class NMSUtils {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             });
         }).runSync(v -> {
@@ -178,7 +179,8 @@ public final class NMSUtils {
                             blockData = blockData.set(blockState, Enum.valueOf(blockState.b(), data));
                         }
                     }
-                } catch (Exception ignored) {
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.database.loader.v1.deserializer;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -31,7 +32,9 @@ public final class MultipleDeserializer implements IDeserializer {
         for(IDeserializer deserializer : deserializers){
             try {
                 return function.apply(deserializer);
-            } catch (Exception ignored) {}
+            } catch (Exception error) {
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         throw new RuntimeException("No valid deserializer found.");

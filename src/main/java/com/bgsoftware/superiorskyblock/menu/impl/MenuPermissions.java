@@ -197,6 +197,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             return permissionItem.build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of permission: " + islandPermission.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -220,6 +221,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), additionalMenuSections("permissions"));
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         if(convertOldGUI(cfg)){
@@ -227,6 +229,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 
@@ -246,7 +249,9 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                 try {
                     String permission = key.toLowerCase();
                     updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
-                }catch (Exception ignored){}
+                }catch (Exception error){
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
 

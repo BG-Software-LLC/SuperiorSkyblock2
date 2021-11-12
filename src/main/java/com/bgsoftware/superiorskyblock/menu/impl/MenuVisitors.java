@@ -63,6 +63,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
                     .asSkullOf(superiorPlayer).build(superiorPlayer);
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -87,6 +88,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

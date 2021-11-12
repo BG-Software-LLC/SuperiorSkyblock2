@@ -87,6 +87,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
                     .asSkullOf(superiorPlayer).build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -142,6 +143,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

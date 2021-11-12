@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.permissions;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.google.common.base.Preconditions;
@@ -33,7 +34,9 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                         if(!checkDefaults || !isDefault(islandPrivilege))
                             privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
                     }
-                }catch(Exception ignored){}
+                }catch(Exception error){
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
     }

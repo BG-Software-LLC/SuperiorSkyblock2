@@ -55,6 +55,7 @@ public final class SkinsRestorerHook {
                 SkinStorage skinStorage = SkinsRestorer.getInstance().getSkinStorage();
                 return (Property) skinStorage.getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
             }catch (SkinRequestException | NullPointerException ex){
+                SuperiorSkyblockPlugin.debug(ex);
                 return null;
             }
         }

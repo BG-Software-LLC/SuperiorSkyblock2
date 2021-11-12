@@ -79,6 +79,7 @@ public final class MenuMemberRole extends SuperiorMenu {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

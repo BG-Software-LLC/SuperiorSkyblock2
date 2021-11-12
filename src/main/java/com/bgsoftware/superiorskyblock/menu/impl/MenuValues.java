@@ -102,6 +102,7 @@ public final class MenuValues extends SuperiorMenu {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

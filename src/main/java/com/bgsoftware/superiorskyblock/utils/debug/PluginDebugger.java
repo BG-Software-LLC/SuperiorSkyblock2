@@ -4,7 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -48,6 +50,12 @@ public final class PluginDebugger {
                 this.debugLines.append(formattedMessage).append(System.lineSeparator());
             }
         }
+    }
+
+    public void debug(Throwable error) {
+        StringWriter stringWriter = new StringWriter();
+        error.printStackTrace(new PrintWriter(new StringWriter()));
+        debug(stringWriter.toString());
     }
 
     public void cancel() {

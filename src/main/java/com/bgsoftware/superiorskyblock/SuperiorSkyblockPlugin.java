@@ -241,8 +241,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             try{
                 providersHandler.prepareWorlds();
             }catch (RuntimeException ex){
+                HandlerLoadException handlerError = new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 shouldEnable = false;
-                new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+                handlerError.printStackTrace();
+                debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -263,9 +265,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 safeEventsRegister(new ProtectionListener(this));
                 safeEventsRegister(new SettingsListener(this));
             }catch (RuntimeException ex){
+                HandlerLoadException handlerError = new HandlerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
+                        HandlerLoadException.ErrorLevel.CONTINUE);
                 shouldEnable = false;
-                new HandlerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
-                        HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                handlerError.printStackTrace();
+                debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -305,6 +309,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }catch (Throwable ex){
             shouldEnable = false;
             ex.printStackTrace();
+            debug(ex);
             Bukkit.shutdown();
         }
     }
@@ -342,6 +347,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             });
         }catch(Exception ex){
             ex.printStackTrace();
+            debug(ex);
         }finally {
             CalcTask.cancelTask();
             Executor.close();
@@ -371,6 +377,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             return true;
         } catch (Exception ex) {
             log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
+            debug(ex);
             return false;
         }
     }
@@ -427,6 +434,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             } catch (Exception ex) {
                 log("An error occurred while loading the generator:");
                 ex.printStackTrace();
+                debug(ex);
             }
         }
     }
@@ -797,6 +805,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         plugin.pluginDebugger.debug(message);
         if(plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
             plugin.getLogger().info("[DEBUG] " + message);
+    }
+
+    public static void debug(Throwable error){
+        plugin.pluginDebugger.debug(error);
     }
 
     public static SuperiorSkyblockPlugin getPlugin(){

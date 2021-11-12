@@ -32,6 +32,7 @@ public final class BlockWorthValuesContainer extends BlockValuesContainer {
                 setBlockValue(Key.of(key), new BigDecimal(value));
             }catch (Exception ex){
                 SuperiorSkyblockPlugin.log("&cInvalid worth value: " + value);
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
     }

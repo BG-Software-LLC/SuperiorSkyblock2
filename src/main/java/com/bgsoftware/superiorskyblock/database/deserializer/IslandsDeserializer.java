@@ -81,6 +81,7 @@ public final class IslandsDeserializer {
             }catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
             }
         });
     }
@@ -94,6 +95,7 @@ public final class IslandsDeserializer {
             }catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading role permissions:");
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
             }
         });
     }
@@ -189,6 +191,7 @@ public final class IslandsDeserializer {
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading island flags:");
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
             }
         });
     }
@@ -203,6 +206,7 @@ public final class IslandsDeserializer {
             }catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading generators:");
                 error.printStackTrace();
+                SuperiorSkyblockPlugin.debug(error);
             }
         });
     }

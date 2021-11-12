@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
@@ -116,6 +117,7 @@ public final class ItemUtils {
             compoundTag.write(dataOutput);
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return "";
         }
 
@@ -130,6 +132,7 @@ public final class ItemUtils {
             TagUtils.itemToCompound(itemStack).write(dataOutput);
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return "";
         }
 
@@ -144,6 +147,7 @@ public final class ItemUtils {
             compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return new ItemStack[0];
         }
 
@@ -167,6 +171,7 @@ public final class ItemUtils {
                 return TagUtils.compoundToItem(compoundTag);
             } catch (Exception ex) {
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

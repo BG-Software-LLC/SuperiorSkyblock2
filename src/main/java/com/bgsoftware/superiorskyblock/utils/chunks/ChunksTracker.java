@@ -90,7 +90,9 @@ public final class ChunksTracker {
                     try {
                         markDirty(island, ChunkPosition.of(worldName, Integer.parseInt(chunkPositionSections[0]),
                                 Integer.parseInt(chunkPositionSections[1])), false);
-                    }catch(Exception ignored){}
+                    }catch(Exception error){
+                        SuperiorSkyblockPlugin.debug(error);
+                    }
                 });
             });
         }catch (JsonSyntaxException ex){
@@ -119,7 +121,9 @@ public final class ChunksTracker {
                     markDirty(island, chunkPosition, false);
                 }
             }
-        }catch(Exception ignored){}
+        }catch(Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
     }
 
     private static void deserializeOldV1(Island island, String serialized){

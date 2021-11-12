@@ -369,6 +369,7 @@ public final class NMSChunksImpl implements NMSChunks {
                 entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);
             } catch (Exception ex2) {
                 ex2.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex2);
             }
         }
 

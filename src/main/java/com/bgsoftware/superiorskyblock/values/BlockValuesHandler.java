@@ -233,6 +233,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return new BigDecimal(obj.toString());
         }catch(ScriptException ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return value;
         }
     }

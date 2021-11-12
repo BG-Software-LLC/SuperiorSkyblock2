@@ -80,6 +80,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             try {
                 world = island.getCenter(environment).getWorld();
             }catch (NullPointerException ex){
+                SuperiorSkyblockPlugin.debug(ex);
                 return;
             }
 

@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 
@@ -153,6 +154,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             return nbtTagCompound;
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
@@ -189,6 +191,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             return new CompoundTag(map);
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }

@@ -90,7 +90,9 @@ public final class BlockData {
                     ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
                     if(items != null)
                         clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
-                }catch (Exception ignored){}
+                }catch (Exception error){
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
     }

@@ -112,6 +112,7 @@ public final class Executor {
             shutdownAndAwaitTermination();
         } catch (Exception ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 

@@ -36,6 +36,7 @@ public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<
         } else try {
             allTasks.get(plugin.getSettings().getRecalcTaskTimeout(), TimeUnit.SECONDS);
         } catch (Throwable error) {
+            SuperiorSkyblockPlugin.debug(error);
             onFailure.accept(error);
         }
     }

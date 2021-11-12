@@ -117,6 +117,7 @@ public final class NMSUtils {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             });
         }).runSync(v -> {

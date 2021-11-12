@@ -402,6 +402,7 @@ public final class SQLDatabaseInitializer {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             }, Throwable::printStackTrace);
         } else {
@@ -415,6 +416,7 @@ public final class SQLDatabaseInitializer {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(ex);
                 }
             }, Throwable::printStackTrace);
         }

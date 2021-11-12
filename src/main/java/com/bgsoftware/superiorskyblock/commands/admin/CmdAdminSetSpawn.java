@@ -64,6 +64,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
             plugin.getGrid().updateSpawn();
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         Locale.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);

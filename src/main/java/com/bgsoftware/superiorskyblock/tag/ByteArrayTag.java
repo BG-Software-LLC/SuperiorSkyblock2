@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -85,6 +86,7 @@ public final class ByteArrayTag extends Tag<byte[]> {
             return new ByteArrayTag(value);
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }

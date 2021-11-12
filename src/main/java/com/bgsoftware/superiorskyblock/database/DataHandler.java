@@ -96,6 +96,7 @@ public final class DataHandler extends AbstractHandler {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
         } catch (Exception ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 
@@ -157,6 +158,7 @@ public final class DataHandler extends AbstractHandler {
                 } catch (Exception error) {
                     SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
                     error.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             });
 

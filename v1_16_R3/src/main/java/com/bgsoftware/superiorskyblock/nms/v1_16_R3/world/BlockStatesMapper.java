@@ -61,6 +61,7 @@ public final class BlockStatesMapper {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
     }

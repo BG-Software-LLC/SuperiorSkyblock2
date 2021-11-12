@@ -54,6 +54,7 @@ public final class FileUtils {
             data = (short) section.getInt("data");
         }catch(IllegalArgumentException ex){
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
 
@@ -73,6 +74,7 @@ public final class FileUtils {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
                     SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
+                    SuperiorSkyblockPlugin.debug(ex);
                     continue;
                 }
 
@@ -125,6 +127,7 @@ public final class FileUtils {
                 itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase()));
             }catch (IllegalArgumentException ex){
                 SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + entity + " into an entity type, skipping...");
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 
@@ -241,6 +244,7 @@ public final class FileUtils {
             }
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 
@@ -262,6 +266,7 @@ public final class FileUtils {
             return plugin.getResource(resourcePath);
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }
@@ -271,7 +276,9 @@ public final class FileUtils {
 
         try{
             sound = Sound.valueOf(section.getString("type"));
-        }catch(Exception ignored){}
+        }catch(Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
 
         if(sound == null)
             return null;
@@ -342,6 +349,7 @@ public final class FileUtils {
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
     }

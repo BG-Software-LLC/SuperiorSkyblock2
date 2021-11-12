@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -126,6 +127,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
             return new ListTag(size == 0 ? EndTag.class : list.get(0).getClass(), list);
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             return null;
         }
     }

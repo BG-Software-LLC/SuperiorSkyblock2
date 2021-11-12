@@ -273,7 +273,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                             CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
-                        } catch (Exception ignored) {
+                        } catch (Exception error) {
+                            SuperiorSkyblockPlugin.debug(error);
                         }
                     }
                 }
@@ -292,7 +293,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     String[] flowerSections = flower.split(":");
                     tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
                     tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
-                }catch (Exception ignored){}
+                }catch (Exception error){
+                    SuperiorSkyblockPlugin.debug(error);
+                }
             }
         }
 

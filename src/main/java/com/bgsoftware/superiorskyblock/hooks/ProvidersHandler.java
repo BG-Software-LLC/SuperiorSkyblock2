@@ -515,6 +515,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("Detected PaperSpigot but failed to load async chunk-loading support...");
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
     }
@@ -537,6 +538,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             runnable.run();
         } catch (Throwable ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 

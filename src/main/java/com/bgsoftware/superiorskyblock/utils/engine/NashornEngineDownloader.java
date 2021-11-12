@@ -35,6 +35,7 @@ public final class NashornEngineDownloader {
             return true;
         } catch (Exception error) {
             SuperiorSkyblockPlugin.log("&cFailed to download the nashorn engine.");
+            SuperiorSkyblockPlugin.debug(error);
             return false;
         }
     }

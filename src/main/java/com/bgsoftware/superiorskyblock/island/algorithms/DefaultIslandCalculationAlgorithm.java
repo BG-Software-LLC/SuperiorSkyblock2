@@ -123,7 +123,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
-                } catch (Throwable ignored) {
+                } catch (Throwable error) {
+                    SuperiorSkyblockPlugin.debug(error);
                 }
             }
             spawnersToCheck.clear();

@@ -204,6 +204,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
                 plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
                 Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
             });
         }
@@ -618,6 +619,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
             Bukkit.shutdown();
         }
     }

@@ -39,6 +39,7 @@ public final class HeadUtils {
             cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         for(String entityType : cfg.getConfigurationSection("").getKeys(false))

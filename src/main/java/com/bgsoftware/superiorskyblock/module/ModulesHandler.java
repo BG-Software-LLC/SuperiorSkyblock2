@@ -126,6 +126,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             SuperiorSkyblockPlugin.log("&cAn error occurred while enabling the module " + pluginModule.getName() + ":");
             ex.printStackTrace();
             SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+            SuperiorSkyblockPlugin.debug(ex);
 
             // Calling onDisable so the plugin can unregister its data if needed
             pluginModule.onDisable(plugin);
@@ -148,7 +149,10 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
                         registerModule(file);
                     } catch (Exception ex) {
                         SuperiorSkyblockPlugin.log("Couldn't register module " + file.getName() + ": ");
-                        new HandlerLoadException(ex, "Couldn't register module " + file.getName() + ".", HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+                        HandlerLoadException handlerError = new HandlerLoadException(ex, "Couldn't register module " + file.getName() + ".",
+                                HandlerLoadException.ErrorLevel.CONTINUE);
+                        handlerError.printStackTrace();
+                        SuperiorSkyblockPlugin.debug(handlerError);
                     }
                 }
             }

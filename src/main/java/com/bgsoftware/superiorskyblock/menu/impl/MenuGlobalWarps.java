@@ -57,6 +57,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
                     .replaceAll("{2}", island.getIslandWarps().size() + "").build(island.getOwner());
         }catch(Exception ex){
             SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
+            SuperiorSkyblockPlugin.debug(ex);
             throw ex;
         }
     }
@@ -83,6 +84,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

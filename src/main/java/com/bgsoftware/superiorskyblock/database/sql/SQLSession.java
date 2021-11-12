@@ -85,7 +85,9 @@ public final class SQLSession {
             ready.complete(null);
 
             return true;
-        }catch(Exception ignored){}
+        }catch(Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
 
         return false;
     }
@@ -99,6 +101,7 @@ public final class SQLSession {
             ready.get();
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 
@@ -205,6 +208,7 @@ public final class SQLSession {
             conn.setAutoCommit(autoCommit);
         }catch(SQLException ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         } finally {
             close(conn);
         }

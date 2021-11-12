@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.SettingsHandler;
@@ -86,7 +87,9 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
                     player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
                 }
             }
-        }catch(Exception ignored){}
+        }catch(Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
     }
 
     @Override
@@ -261,6 +264,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
             plugin.setSettings(new SettingsHandler(plugin));
         }catch (Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 
@@ -269,6 +273,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
             config.load(new File(plugin.getDataFolder(), "config.yml"));
         }catch(Exception ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 

@@ -554,7 +554,9 @@ public final class MenusProvider_Default implements MenusProvider {
         try {
             runnable.run();
         } catch (Exception ex) {
-            new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE).printStackTrace();
+            HandlerLoadException handlerError = new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
+            handlerError.printStackTrace();
+            SuperiorSkyblockPlugin.debug(handlerError);
         }
     }
 

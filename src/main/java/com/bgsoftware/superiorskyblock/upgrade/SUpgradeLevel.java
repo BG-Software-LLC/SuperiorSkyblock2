@@ -106,7 +106,9 @@ public class SUpgradeLevel implements UpgradeLevel {
             try {
                 if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
                     return requirement.getValue();
-            } catch (ScriptException ignored) {}
+            } catch (ScriptException error) {
+                SuperiorSkyblockPlugin.debug(error);
+            }
         }
 
         return "";

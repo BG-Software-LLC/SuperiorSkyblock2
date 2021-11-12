@@ -20,7 +20,9 @@ public final class EnchantsUtils {
         ACCEPTING_NEW.set(null, true);
         try{
             Enchantment.registerEnchantment(glowEnchant);
-        }catch(Exception ignored){}
+        }catch(Exception error){
+            SuperiorSkyblockPlugin.debug(error);
+        }
     }
 
     public static Enchantment getGlowEnchant() {

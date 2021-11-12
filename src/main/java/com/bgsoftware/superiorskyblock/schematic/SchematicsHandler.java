@@ -242,11 +242,13 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
                     schematic = new SuperiorSchematic(schemName, compoundTag);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
                 SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid.");
+                ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }catch(IOException ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
 
         return schematic;
@@ -267,6 +269,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             }
         }catch(IOException ex){
             ex.printStackTrace();
+            SuperiorSkyblockPlugin.debug(ex);
         }
     }
 

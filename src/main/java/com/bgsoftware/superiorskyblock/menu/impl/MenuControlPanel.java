@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -69,6 +70,7 @@ public final class MenuControlPanel extends SuperiorMenu {
                 cfg.save(file);
             }catch (Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 

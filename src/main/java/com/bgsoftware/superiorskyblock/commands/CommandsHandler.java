@@ -185,6 +185,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
             }catch(Exception ex){
                 ex.printStackTrace();
+                SuperiorSkyblockPlugin.debug(ex);
             }
         }
 
