@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu.file;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +28,9 @@ public final class MenuPatternSlots {
     }
 
     public List<Integer> getSlots(String str, Integer... defaultSlots) {
-        for(char ch : str.toCharArray()) {
+        for (char ch : str.toCharArray()) {
             List<Integer> slots = getSlots(ch);
-            if(!slots.isEmpty())
+            if (!slots.isEmpty())
                 return slots;
         }
 
@@ -39,19 +38,21 @@ public final class MenuPatternSlots {
     }
 
     public int getSlot(char character, int defaultSlot) {
-        return getSlots(character, defaultSlot).get(0);
+        List<Integer> slots = getSlots(character);
+        return slots.isEmpty() ? defaultSlot : slots.get(0);
     }
 
     public int getSlot(char character) {
-        return getSlots(character).get(0);
+        return getSlot(character, -1);
     }
 
     public int getSlot(String str, int defaultSlot) {
-        return getSlots(str, defaultSlot).get(0);
+        List<Integer> slots = getSlots(str);
+        return slots.isEmpty() ? defaultSlot : slots.get(0);
     }
 
     public int getSlot(String str) {
-        return getSlots(str).get(0);
+        return getSlot(str, -1);
     }
 
 }

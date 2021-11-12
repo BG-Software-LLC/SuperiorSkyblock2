@@ -177,7 +177,7 @@ public final class FileUtils {
             }
         }
 
-        int backButton = menuPatternSlots.getSlots(cfg.getString("back", " ")).get(0);
+        int backButton = menuPatternSlots.getSlot(cfg.getString("back", ""));
         menu.setBackButton(backButton);
 
         if(plugin.getSettings().isOnlyBackButton() && backButton == -1)
