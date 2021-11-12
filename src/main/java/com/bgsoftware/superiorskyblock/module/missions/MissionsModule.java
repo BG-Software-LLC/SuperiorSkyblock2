@@ -176,9 +176,9 @@ public final class MissionsModule extends BuiltinModule {
         MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
 
         categoriesSection.set("islands.name", "Islands");
-        categoriesSection.set("islands.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("player-missions", "")));
+        categoriesSection.set("islands.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", "")));
         categoriesSection.set("players.name", "Players");
-        categoriesSection.set("players.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", "")));
+        categoriesSection.set("players.slot", menuPatternSlots.getSlot(missionsMenuConfig.getString("player-missions", "")));
 
         File islandsCategoryFile = new File(getDataFolder(), "categories/islands");
         File playersCategoryFile = new File(getDataFolder(), "categories/players");
