@@ -72,6 +72,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -480,7 +481,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
             }
 
-            this.k.getPlayers().stream()
+            new HashSet<>(this.k.getPlayers()).stream()
                     .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer))
                     .forEach(this.k::removePlayer);
         }
