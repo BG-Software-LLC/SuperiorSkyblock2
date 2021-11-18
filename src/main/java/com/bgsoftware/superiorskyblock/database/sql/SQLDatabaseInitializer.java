@@ -358,10 +358,17 @@ public final class SQLDatabaseInitializer {
 
     private void createStackedBlocksTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stacked_blocks (" +
-                "location VARCHAR(30) PRIMARY KEY, " +
+                "location VARCHAR(255) PRIMARY KEY, " +
                 "block_type TEXT, " +
                 "amount INTEGER" +
                 ");");
+        // Before v1.8.1.363, location column of stacked_blocks was limited to 30 chars.
+        // In order to make sure all tables keep the large number, we modify the column to 255-chars long
+        // each time the plugin attempts to create the table.
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/730
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}stacked_blocks MODIFY COLUMN location VARCHAR(255)",
+                error -> {
+                });
     }
 
     private boolean containsGrid() {
