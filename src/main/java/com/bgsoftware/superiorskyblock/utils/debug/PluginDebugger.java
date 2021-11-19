@@ -54,7 +54,7 @@ public final class PluginDebugger {
 
     public void debug(Throwable error) {
         StringWriter stringWriter = new StringWriter();
-        error.printStackTrace(new PrintWriter(new StringWriter()));
+        error.printStackTrace(new PrintWriter(stringWriter));
         debug(stringWriter.toString());
     }
 
