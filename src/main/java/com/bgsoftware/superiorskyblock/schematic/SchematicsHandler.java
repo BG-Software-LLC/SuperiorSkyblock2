@@ -4,10 +4,13 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
+import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.hooks.support.FAWEHook;
 import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.schematic.parser.DefaultSchematicParser;
+import com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
 import com.bgsoftware.superiorskyblock.tag.IntTag;
@@ -20,6 +23,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -70,18 +74,21 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             FileUtils.saveResource("schematics/normal_the_end.schematic");
         }
 
+        loadDefaultSchematicParsers();
+
         //noinspection ConstantConditions
         for (File schemFile : schematicsFolder.listFiles()) {
             String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
             Schematic schematic = loadFromFile(schemName, schemFile);
             if (schematic != null) {
                 this.schematicsContainer.addSchematic(schematic);
-                SuperiorSkyblockPlugin.log("Successfully loaded schematic " + schemFile.getName() + " (" +
-                        (schematic instanceof WorldEditSchematic ? "WorldEdit" : "SuperiorSkyblock") + ")");
-            } else {
-                SuperiorSkyblockPlugin.log("Couldn't load schematic " + schemFile.getName() + ".");
             }
         }
+    }
+
+    private void loadDefaultSchematicParsers() {
+        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
+            this.schematicsContainer.addSchematicParser(FAWESchematicParser.getInstance());
     }
 
     @Override
@@ -93,6 +100,17 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
     @Override
     public List<String> getSchematics() {
         return this.schematicsContainer.getSchematicNames();
+    }
+
+    @Override
+    public void registerSchematicParser(SchematicParser schematicParser) {
+        Preconditions.checkNotNull(schematicParser, "schematicParser parameter cannot be null.");
+        this.schematicsContainer.addSchematicParser(schematicParser);
+    }
+
+    @Override
+    public List<SchematicParser> getSchematicParsers() {
+        return this.schematicsContainer.getSchematicParsers();
     }
 
     @Override
@@ -222,31 +240,32 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     private Schematic loadFromFile(String schemName, File file) {
         Schematic schematic = null;
+        SchematicParser usedParser = null;
 
-        try {
-            if (!file.exists()) {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            }
-
-            try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-                CompoundTag compoundTag = (CompoundTag) Tag.fromStream(reader, 0);
-                if (compoundTag.getValue().containsKey("version") && !compoundTag.getValue().get("version").getValue().equals(ServerVersion.getBukkitVersion()))
-                    SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " was created in a different version, may cause issues.");
-                if (compoundTag.getValue().isEmpty()) {
-                    if (FAWEHook.isEnabled())
-                        schematic = FAWEHook.loadSchematic(schemName, file);
-                } else {
-                    schematic = new SuperiorSchematic(schemName, compoundTag);
+        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+            for (SchematicParser schematicParser : this.schematicsContainer.getSchematicParsers()) {
+                try {
+                    schematic = schematicParser.parseSchematic(reader, schemName);
+                    usedParser = schematicParser;
+                    break;
+                } catch (SchematicParseException ignored) {
                 }
-            } catch (Exception ex) {
-                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is invalid.");
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
             }
-        } catch (IOException ex) {
+
+            try {
+                schematic = DefaultSchematicParser.getInstance().parseSchematic(reader, schemName);
+                usedParser = DefaultSchematicParser.getInstance();
+            } catch (SchematicParseException error) {
+                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is not a valid schematic, ignoring...");
+            }
+        } catch (Exception ex) {
+            SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
             ex.printStackTrace();
             SuperiorSkyblockPlugin.debug(ex);
+        }
+
+        if (schematic != null && usedParser != null) {
+            SuperiorSkyblockPlugin.log("Successfully loaded schematic " + file.getName() + " (" + usedParser.getClass().getSimpleName() + ")");
         }
 
         return schematic;

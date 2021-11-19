@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.schematic.container;
 
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.Map;
 public final class DefaultSchematicsContainer implements SchematicsContainer {
 
     private final Map<String, Schematic> schematicMap = new HashMap<>();
+    private final List<SchematicParser> schematicParsers = new ArrayList<>();
 
     @Nullable
     @Override
@@ -27,6 +29,16 @@ public final class DefaultSchematicsContainer implements SchematicsContainer {
     @Override
     public List<String> getSchematicNames() {
         return Collections.unmodifiableList(new ArrayList<>(this.schematicMap.keySet()));
+    }
+
+    @Override
+    public void addSchematicParser(SchematicParser schematicParser) {
+        this.schematicParsers.add(schematicParser);
+    }
+
+    @Override
+    public List<SchematicParser> getSchematicParsers() {
+        return Collections.unmodifiableList(this.schematicParsers);
     }
 
 }
