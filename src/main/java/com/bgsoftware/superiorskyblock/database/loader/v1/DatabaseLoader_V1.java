@@ -72,7 +72,6 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
 
         if (!sqlSession.createConnection()) {
-            sqlSession.close();
             return false;
         }
 
