@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseExcept
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
 import com.bgsoftware.superiorskyblock.schematic.parser.DefaultSchematicParser;
 import com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser;
@@ -60,6 +61,10 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
     @Override
     public void loadData() {
+        throw new UnsupportedOperationException("Not supported for SchematicsHandler.");
+    }
+
+    public void loadDataWithException() throws HandlerLoadException {
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
         if (!schematicsFolder.exists()) {
@@ -84,6 +89,11 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             if (schematic != null) {
                 this.schematicsContainer.addSchematic(schematic);
             }
+        }
+
+        if (this.schematicsContainer.getSchematicNames().isEmpty()) {
+            throw new HandlerLoadException("&cThere were no valid schematics.",
+                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
     }
 

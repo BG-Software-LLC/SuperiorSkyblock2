@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -49,11 +50,15 @@ public final class CmdAdminReload implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Executor.async(() -> {
-            Locale.RELOAD_PROCCESS_REQUEST.send(sender);
+        Locale.RELOAD_PROCCESS_REQUEST.send(sender);
+
+        try {
             plugin.reloadPlugin(false);
-            Locale.RELOAD_COMPLETED.send(sender);
-        });
+        } catch (HandlerLoadException error) {
+            SuperiorSkyblockPlugin.debug(error);
+        }
+
+        Locale.RELOAD_COMPLETED.send(sender);
     }
 
     @Override

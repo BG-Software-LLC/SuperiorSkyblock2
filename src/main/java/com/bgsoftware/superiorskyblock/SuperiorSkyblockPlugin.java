@@ -275,7 +275,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
-            if (!reloadPlugin(true)) {
+            try {
+                reloadPlugin(true);
+            } catch (HandlerLoadException error) {
+                HandlerLoadException.handle(error);
                 shouldEnable = false;
                 return;
             }
@@ -452,31 +455,25 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         }
     }
 
-    public boolean reloadPlugin(boolean loadGrid) {
+    public void reloadPlugin(boolean loadGrid) throws HandlerLoadException {
         HeadUtils.readTextures(this);
 
         if (!loadGrid) {
-            try {
-                settingsHandler = new SettingsHandler(this);
-            } catch (HandlerLoadException ex) {
-                if (!HandlerLoadException.handle(ex))
-                    return false;
-            }
+            settingsHandler = new SettingsHandler(this);
         } else {
             commandsHandler.loadData();
             modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
 
         if (!checkScriptEngine()) {
-            HandlerLoadException.handle(new HandlerLoadException(
+            throw new HandlerLoadException(
                     "It seems like the script engine of the plugin is corrupted.\n" +
                             "This may occur by one of the following reasons:\n" +
                             "1. You have a module/plugin that sets a custom script that doesn't work well.\n" +
                             "2. You're using Java 16 without installing an external module engine.\n" +
                             "If that's the case, check out the following link:\n" +
                             "https://github.com/BG-Software-LLC/SuperiorSkyblock2-NashornEngine",
-                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN));
-            return false;
+                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
         blockValuesHandler.loadData();
@@ -493,21 +490,15 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.syncUpgrades();
         }
 
-        schematicsHandler.loadData();
+        schematicsHandler.loadDataWithException();
         providersHandler.loadData();
         menusHandler.loadData();
 
         if (loadGrid) {
-            try {
-                dataHandler.loadDataWithException();
-                stackedBlocksHandler.loadData();
-            } catch (HandlerLoadException ex) {
-                if (!HandlerLoadException.handle(ex))
-                    return false;
-            }
+            dataHandler.loadDataWithException();
+            stackedBlocksHandler.loadData();
         } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
-
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }
 
@@ -522,8 +513,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
 
         CalcTask.startTask();
-
-        return true;
     }
 
     @Override
