@@ -40,7 +40,11 @@ public final class SlimefunHook {
             Class.forName("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule");
             new Slimefun4RelocationsProtectionModule().register();
         } catch (ClassNotFoundException ex) {
-            new Slimefun4ProtectionModule().register();
+            try {
+                new Slimefun4ProtectionModule().register();
+            } catch (Throwable ignored) {
+                // Slimefun is too old and doesn't support ProtectionModule.
+            }
         }
     }
 
