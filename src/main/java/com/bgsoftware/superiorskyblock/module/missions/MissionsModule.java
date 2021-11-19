@@ -24,7 +24,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class MissionsModule extends BuiltinModule {
 
@@ -189,6 +191,8 @@ public final class MissionsModule extends BuiltinModule {
             return false;
         }
 
+        Map<Mission<?>, Integer> missionWeights = new HashMap<>();
+
         for (File missionFile : missionFiles) {
             String missionName = missionFile.getName().replace(".yml", "");
 
@@ -211,8 +215,11 @@ public final class MissionsModule extends BuiltinModule {
             ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
             Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
-            if (mission != null)
+
+            if (mission != null) {
                 categoryMissions.add(mission);
+                missionWeights.put(mission, missionSection.getInt("weight", 0));
+            }
         }
 
         if (categoryMissions.isEmpty()) {
@@ -220,8 +227,8 @@ public final class MissionsModule extends BuiltinModule {
             return false;
         }
 
-        // Sort missions by their names.
-        categoryMissions.sort(Comparator.comparing(Mission::getName));
+        // Sort missions by their names and weights.
+        categoryMissions.sort(new MissionsComparator(missionWeights));
 
         return true;
     }
@@ -361,6 +368,22 @@ public final class MissionsModule extends BuiltinModule {
             newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
         } catch (IOException error) {
             SuperiorSkyblockPlugin.debug(error);
+        }
+    }
+
+    private static class MissionsComparator implements Comparator<Mission<?>> {
+
+        private final Map<Mission<?>, Integer> missionWeights;
+
+        public MissionsComparator(Map<Mission<?>, Integer> missionWeights){
+            this.missionWeights = missionWeights;
+        }
+
+        @Override
+        public int compare(Mission<?> o1, Mission<?> o2) {
+            int firstWeight = this.missionWeights.getOrDefault(o1, 0);
+            int secondWeight = this.missionWeights.getOrDefault(o2, 0);
+            return firstWeight == secondWeight ? o1.getName().compareTo(o2.getName()) : Integer.compare(firstWeight, secondWeight);
         }
     }
 
