@@ -34,6 +34,8 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                         if (!checkDefaults || !isDefault(islandPrivilege))
                             privileges.put(islandPrivilege, PrivilegeStatus.ENABLED);
                     }
+                } catch (NullPointerException ignored) {
+                    // Ignored - invalid privilege.
                 } catch (Exception error) {
                     SuperiorSkyblockPlugin.debug(error);
                 }

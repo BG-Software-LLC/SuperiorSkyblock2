@@ -266,10 +266,18 @@ public final class FileUtils {
     }
 
     public static SoundWrapper getSound(ConfigurationSection section) {
+        if (section == null)
+            return null;
+
+        String soundType = section.getString("type");
+
+        if (soundType == null)
+            return null;
+
         Sound sound = null;
 
         try {
-            sound = Sound.valueOf(section.getString("type"));
+            sound = Sound.valueOf(soundType);
         } catch (Exception error) {
             SuperiorSkyblockPlugin.debug(error);
         }
@@ -277,7 +285,8 @@ public final class FileUtils {
         if (sound == null)
             return null;
 
-        return new SoundWrapper(sound, (float) section.getDouble("volume"), (float) section.getDouble("pitch"));
+        return new SoundWrapper(sound, (float) section.getDouble("volume", 1),
+                (float) section.getDouble("pitch", 1));
     }
 
     public static List<Class<?>> getClasses(URL jar, Class<?> clazz) {
