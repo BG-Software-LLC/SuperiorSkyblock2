@@ -40,6 +40,7 @@ import org.bukkit.event.block.LeavesDecayEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -96,6 +97,19 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreakMonitor(BlockBreakEvent e) {
         BlocksLogic.handleBreak(e.getBlock());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onEntityBlockDeath(EntityDeathEvent e) {
+        if (!(e.getEntity() instanceof FallingBlock))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
+
+        if (island != null) {
+            Key blockKey = plugin.getNMSAlgorithms().getFallingBlockType((FallingBlock) e.getEntity());
+            island.handleBlockBreak(blockKey, 1);
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

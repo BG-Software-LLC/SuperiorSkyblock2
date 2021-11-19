@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
@@ -28,6 +29,8 @@ public interface NMSAlgorithms {
     Key getBlockKey(int combinedId);
 
     Key getMinecartBlock(Minecart minecart);
+
+    Key getFallingBlockType(FallingBlock fallingBlock);
 
     void setCustomModel(ItemMeta itemMeta, int customModel);
 

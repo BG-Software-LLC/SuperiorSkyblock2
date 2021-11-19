@@ -19,6 +19,7 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
@@ -71,6 +72,12 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
         MaterialData materialData = minecart.getDisplayBlock();
         //noinspection deprecation
         return Key.of(materialData.getItemType(), materialData.getData());
+    }
+
+    @Override
+    public Key getFallingBlockType(FallingBlock fallingBlock) {
+        //noinspection deprecation
+        return Key.of(fallingBlock.getMaterial(), fallingBlock.getBlockData());
     }
 
     @Override
