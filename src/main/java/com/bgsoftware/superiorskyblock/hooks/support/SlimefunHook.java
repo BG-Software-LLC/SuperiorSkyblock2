@@ -35,7 +35,6 @@ public final class SlimefunHook {
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SlimefunHook.plugin = plugin;
-        plugin.getServer().getPluginManager().registerEvents(new Slimefun4Listener(), plugin);
         try {
             Class.forName("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule");
             new Slimefun4RelocationsProtectionModule().register();
@@ -44,8 +43,11 @@ public final class SlimefunHook {
                 new Slimefun4ProtectionModule().register();
             } catch (Throwable ignored) {
                 // Slimefun is too old and doesn't support ProtectionModule.
+                // We don't want to register the listener if that's the case.
+                return;
             }
         }
+        plugin.getServer().getPluginManager().registerEvents(new Slimefun4Listener(), plugin);
     }
 
     private static boolean checkPermission(OfflinePlayer offlinePlayer, Location location, String protectableAction) {
