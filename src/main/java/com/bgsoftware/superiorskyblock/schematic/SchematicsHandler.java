@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -238,30 +239,39 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         return "";
     }
 
+    private Schematic parseSchematic(File file, String schemName, SchematicParser schematicParser,
+                                     Consumer<SchematicParseException> onSchematicParseError) {
+        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+            return schematicParser.parseSchematic(reader, schemName);
+        } catch (SchematicParseException error) {
+            onSchematicParseError.accept(error);
+        } catch (Exception error) {
+            SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
+            error.printStackTrace();
+            SuperiorSkyblockPlugin.debug(error);
+        }
+
+        return null;
+    }
+
     private Schematic loadFromFile(String schemName, File file) {
         Schematic schematic = null;
         SchematicParser usedParser = null;
 
-        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
-            for (SchematicParser schematicParser : this.schematicsContainer.getSchematicParsers()) {
-                try {
-                    schematic = schematicParser.parseSchematic(reader, schemName);
-                    usedParser = schematicParser;
-                    break;
-                } catch (SchematicParseException ignored) {
-                }
+        for (SchematicParser schematicParser : this.schematicsContainer.getSchematicParsers()) {
+            schematic = parseSchematic(file, schemName, schematicParser, error -> {
+            });
+            if (schematic != null) {
+                usedParser = schematicParser;
+                break;
             }
+        }
 
-            try {
-                schematic = DefaultSchematicParser.getInstance().parseSchematic(reader, schemName);
+        if (schematic == null) {
+            schematic = parseSchematic(file, schemName, DefaultSchematicParser.getInstance(), error ->
+                    SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is not a valid schematic, ignoring..."));
+            if (schematic != null)
                 usedParser = DefaultSchematicParser.getInstance();
-            } catch (SchematicParseException error) {
-                SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is not a valid schematic, ignoring...");
-            }
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
-            ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
         }
 
         if (schematic != null && usedParser != null) {
