@@ -387,9 +387,11 @@ public final class UpgradesListener implements Listener {
 
         island.hasReachedEntityLimit(Key.of(e.getVehicle())).whenComplete((result, ex) -> {
             if (result && e.getVehicle().isValid() && !e.getVehicle().isDead()) {
-                e.getVehicle().remove();
-                if (placedVehicle != null)
-                    Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
+                Executor.sync(() -> {
+                    e.getVehicle().remove();
+                    if (placedVehicle != null)
+                        Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
+                });
             }
         });
     }
