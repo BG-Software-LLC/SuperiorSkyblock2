@@ -43,6 +43,8 @@ import java.util.Set;
 
 public final class UpgradesModule extends BuiltinModule {
 
+    private static final int MAX_UPGRADES_NAME_LENGTH = 255;
+
     private boolean enabled = false;
 
     public UpgradesModule() {
@@ -114,6 +116,9 @@ public final class UpgradesModule extends BuiltinModule {
         if (enabled) {
             ConfigurationSection upgrades = config.getConfigurationSection("upgrades");
             for (String upgradeName : upgrades.getKeys(false)) {
+                if (upgradeName.length() > MAX_UPGRADES_NAME_LENGTH)
+                    upgradeName = upgradeName.substring(0, MAX_UPGRADES_NAME_LENGTH);
+
                 SUpgrade upgrade = new SUpgrade(upgradeName);
                 for (String _level : upgrades.getConfigurationSection(upgradeName).getKeys(false)) {
                     ConfigurationSection levelSection = upgrades.getConfigurationSection(upgradeName + "." + _level);

@@ -30,6 +30,8 @@ import java.util.Map;
 
 public final class MissionsModule extends BuiltinModule {
 
+    private static final int MAX_MISSIONS_NAME_LENGTH = 255;
+
     private boolean enabled = true;
 
     public MissionsModule() {
@@ -195,6 +197,9 @@ public final class MissionsModule extends BuiltinModule {
 
         for (File missionFile : missionFiles) {
             String missionName = missionFile.getName().replace(".yml", "");
+
+            if (missionName.length() > MAX_MISSIONS_NAME_LENGTH)
+                missionName = missionName.substring(0, MAX_MISSIONS_NAME_LENGTH);
 
             YamlConfiguration missionConfigFile = new YamlConfiguration();
 
@@ -375,7 +380,7 @@ public final class MissionsModule extends BuiltinModule {
 
         private final Map<Mission<?>, Integer> missionWeights;
 
-        public MissionsComparator(Map<Mission<?>, Integer> missionWeights){
+        public MissionsComparator(Map<Mission<?>, Integer> missionWeights) {
             this.missionWeights = missionWeights;
         }
 

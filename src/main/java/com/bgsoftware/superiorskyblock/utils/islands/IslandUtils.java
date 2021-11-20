@@ -243,11 +243,11 @@ public final class IslandUtils {
     }
 
     public static boolean isWarpNameLengthValid(String warpName) {
-        return warpName.length() <= 32;
+        return warpName.length() <= getMaxWarpNameLength();
     }
 
     public static int getMaxWarpNameLength() {
-        return 32;
+        return 255;
     }
 
 }
