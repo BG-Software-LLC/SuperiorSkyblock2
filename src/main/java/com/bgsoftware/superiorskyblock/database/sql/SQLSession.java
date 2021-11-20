@@ -123,7 +123,9 @@ public final class SQLSession {
         try {
             conn = dataSource.getConnection();
             preparedStatement = conn.prepareStatement(statement.replace("{prefix}", prefix)
-                    .replace("BIG_DECIMAL", "TEXT").replace("UUID", "VARCHAR(36)")
+                    .replace("BIG_DECIMAL", "TEXT")
+                    .replace("UUID", "VARCHAR(36)")
+                    .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                     .replace("UNIQUE_TEXT", "VARCHAR(30)"));
             preparedStatement.executeUpdate();
         } catch (SQLException ex) {

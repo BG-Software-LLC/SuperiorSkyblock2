@@ -234,9 +234,13 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_missions (" +
                 "island UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name LONG_UNIQUE_TEXT, " +
                 "finish_count INTEGER" +
                 ");");
+
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}islands_missions MODIFY COLUMN name LONG_UNIQUE_TEXT",
+                error -> {
+                });
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_player_permissions (" +
                 "island UUID, " +
@@ -278,9 +282,13 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_upgrades (" +
                 "island UUID, " +
-                "upgrade UNIQUE_TEXT, " +
+                "upgrade LONG_UNIQUE_TEXT, " +
                 "level INTEGER" +
                 ");");
+
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}islands_upgrades MODIFY COLUMN upgrade LONG_UNIQUE_TEXT",
+                error -> {
+                });
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_visitor_homes (" +
                 "island UUID, " +
@@ -296,19 +304,27 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warp_categories (" +
                 "island UUID, " +
-                "name VARCHAR(255), " +
+                "name LONG_UNIQUE_TEXT, " +
                 "slot INTEGER, " +
                 "icon TEXT" +
                 ");");
 
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}islands_warp_categories MODIFY COLUMN name LONG_UNIQUE_TEXT",
+                error -> {
+                });
+
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}islands_warps (" +
                 "island UUID, " +
-                "name VARCHAR(255), " +
+                "name LONG_UNIQUE_TEXT, " +
                 "category TEXT, " +
                 "location TEXT, " +
                 "private BOOLEAN, " +
                 "icon TEXT" +
                 ");");
+
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}islands_warps MODIFY COLUMN name LONG_UNIQUE_TEXT",
+                error -> {
+                });
     }
 
     private void createPlayersTable() {
@@ -322,9 +338,13 @@ public final class SQLDatabaseInitializer {
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_missions (" +
                 "player UUID, " +
-                "name UNIQUE_TEXT, " +
+                "name LONG_UNIQUE_TEXT, " +
                 "finish_count INTEGER" +
                 ");");
+
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}players_missions MODIFY COLUMN name LONG_UNIQUE_TEXT",
+                error -> {
+                });
 
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}players_settings (" +
                 "player UUID PRIMARY KEY, " +
@@ -358,7 +378,7 @@ public final class SQLDatabaseInitializer {
 
     private void createStackedBlocksTable() {
         SQLHelper.executeUpdate("CREATE TABLE IF NOT EXISTS {prefix}stacked_blocks (" +
-                "location VARCHAR(255) PRIMARY KEY, " +
+                "location LONG_UNIQUE_TEXT PRIMARY KEY, " +
                 "block_type TEXT, " +
                 "amount INTEGER" +
                 ");");
@@ -366,7 +386,7 @@ public final class SQLDatabaseInitializer {
         // In order to make sure all tables keep the large number, we modify the column to 255-chars long
         // each time the plugin attempts to create the table.
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/730
-        SQLHelper.executeUpdate("ALTER TABLE {prefix}stacked_blocks MODIFY COLUMN location VARCHAR(255)",
+        SQLHelper.executeUpdate("ALTER TABLE {prefix}stacked_blocks MODIFY COLUMN location LONG_UNIQUE_TEXT",
                 error -> {
                 });
     }
