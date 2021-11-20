@@ -81,7 +81,6 @@ public final class CmdTeam implements ISuperiorCommand {
             }
 
             List<SuperiorPlayer> members = island.getIslandMembers(true);
-            members.sort(SortingComparators.ISLAND_MEMBERS_COMPARATOR);
 
             if (!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)) {
                 Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();

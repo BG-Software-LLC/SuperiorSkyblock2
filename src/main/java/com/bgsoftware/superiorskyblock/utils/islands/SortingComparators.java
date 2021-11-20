@@ -10,10 +10,6 @@ import java.util.Comparator;
 public final class SortingComparators {
 
     public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
-    public final static Comparator<SuperiorPlayer> ISLAND_MEMBERS_COMPARATOR = (o1, o2) -> {
-        int compare = Integer.compare(o2.getPlayerRole().getWeight(), o1.getPlayerRole().getWeight());
-        return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(o1, o2) : compare;
-    };
     public final static Comparator<Pair<SuperiorPlayer, Long>> PAIRED_PLAYERS_NAMES_COMPARATOR =
             Comparator.comparing(o -> o.getKey().getName());
     public final static Comparator<BankTransaction> BANK_TRANSACTIONS_COMPARATOR =
