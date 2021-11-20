@@ -98,8 +98,13 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
     }
 
     private void loadDefaultSchematicParsers() {
-        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit"))
-            this.schematicsContainer.addSchematicParser(FAWESchematicParser.getInstance());
+        if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
+            try {
+                Class.forName("com.boydti.fawe.object.schematic.Schematic");
+                this.schematicsContainer.addSchematicParser(FAWESchematicParser.getInstance());
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
     }
 
     @Override
