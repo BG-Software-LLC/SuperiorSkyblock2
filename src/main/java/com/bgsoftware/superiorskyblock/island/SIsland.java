@@ -445,7 +445,14 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Kick Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        members.write(members -> members.remove(superiorPlayer));
+        boolean succeed = members.writeAndGet(members -> members.remove(superiorPlayer));
+
+        if (!succeed) {
+            // If the remove method failed, we iterate through all the members and remove the member manually.
+            // Should fix issues if members are not in the correct order.
+            // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
+            members.write(members -> members.removeIf(superiorPlayer::equals));
+        }
 
         superiorPlayer.setIsland(null);
 
