@@ -7,9 +7,9 @@ java {
 }
 
 dependencies {
-    //compileOnly "org.spigotmc:v1_18_R1:pre8"
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\versions\\v1_18_R1.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\spigot-api-1.18-pre8-R0.1-SNAPSHOT.jar')
+    compileOnly "org.spigotmc:v1_18_R1:pre8"
     compileOnly project(":API")
     compileOnly parent
 }
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
