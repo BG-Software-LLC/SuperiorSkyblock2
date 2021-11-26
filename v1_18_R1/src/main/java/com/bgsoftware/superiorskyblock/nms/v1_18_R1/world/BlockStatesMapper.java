@@ -7,6 +7,8 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.getName;
+
 public final class BlockStatesMapper {
 
     private static final Map<String, IBlockState<?>> nameToBlockState = new HashMap<>();

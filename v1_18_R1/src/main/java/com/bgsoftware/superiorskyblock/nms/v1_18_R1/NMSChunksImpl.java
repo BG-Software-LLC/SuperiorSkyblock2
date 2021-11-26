@@ -134,8 +134,7 @@ public final class NMSChunksImpl implements NMSChunks {
         if (!(worldServer.generator instanceof IslandsGenerator)) {
             IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
             ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
-            //noinspection ConstantConditions
-            chunkGenerator.buildBase(null, protoChunk);
+            chunkGenerator.a(null, null, protoChunk);
 
             ChunkSection[] chunkSections = getSections(protoChunk);
             System.arraycopy(chunkSections, 0, getSections(chunk), 0, chunkSections.length);

@@ -14,12 +14,14 @@ import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
-import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+
+import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 
 public final class CropsTickingTileEntity extends TileEntity {
 
@@ -35,25 +37,25 @@ public final class CropsTickingTileEntity extends TileEntity {
     private int currentTick = 0;
 
     private CropsTickingTileEntity(Island island, Chunk chunk, BlockPosition blockPosition) {
-        super(TileEntityTypes.v, blockPosition, chunk.getWorld().getType(blockPosition));
+        super(TileEntityTypes.v, blockPosition, getType(getWorld(chunk), blockPosition));
         this.island = new WeakReference<>(island);
         this.chunk = new WeakReference<>(chunk);
-        this.chunkX = chunk.getPos().b;
-        this.chunkZ = chunk.getPos().c;
-        setWorld(chunk.getWorld());
-        chunk.getWorld().a(new CropsTickingTileEntityTicker(this));
+        this.chunkX = getPos(chunk).c;
+        this.chunkZ = getPos(chunk).d;
+        a(getWorld(chunk));
+        getWorld(chunk).a(new CropsTickingTileEntityTicker(this));
     }
 
     public static void create(Island island, Chunk chunk) {
-        long chunkPair = chunk.getPos().pair();
+        long chunkPair = pair(getPos(chunk));
         if (!tickingChunks.containsKey(chunkPair)) {
-            BlockPosition blockPosition = new BlockPosition(chunk.getPos().b << 4, 1, chunk.getPos().c << 4);
+            BlockPosition blockPosition = new BlockPosition(getPos(chunk).c << 4, 1, getPos(chunk).d << 4);
             tickingChunks.put(chunkPair, new CropsTickingTileEntity(island, chunk, blockPosition));
         }
     }
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
-        return tickingChunks.remove(chunkCoords.pair());
+        return tickingChunks.remove(pair(chunkCoords));
     }
 
     public void remove() {
@@ -66,7 +68,7 @@ public final class CropsTickingTileEntity extends TileEntity {
 
         Chunk chunk = this.chunk.get();
         Island island = this.island.get();
-        World world = this.getWorld();
+        World world = this.k();
 
         if (chunk == null || island == null || world == null) {
             remove();
@@ -75,24 +77,24 @@ public final class CropsTickingTileEntity extends TileEntity {
 
         currentTick = 0;
 
-        int worldRandomTick = world.getGameRules().getInt(GameRules.n);
+        int worldRandomTick = getGameRules(world).c(GameRules.n);
         double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
         int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
 
         if (chunkRandomTickSpeed > 0) {
-            for (ChunkSection chunkSection : chunk.getSections()) {
-                if (chunkSection != Chunk.a && chunkSection.d()) {
+            for (ChunkSection chunkSection : getSections(chunk)) {
+                if (chunkSection != null && chunkSection.d()) {
                     for (int i = 0; i < chunkRandomTickSpeed; i++) {
                         random = random * 3 + 1013904223;
                         int factor = random >> 2;
                         int x = factor & 15;
                         int z = factor >> 8 & 15;
                         int y = factor >> 16 & 15;
-                        IBlockData blockData = chunkSection.getType(x, y, z);
-                        Block block = blockData.getBlock();
-                        if (block.isTicking(blockData) && plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
-                            BlockPosition blockPosition = new BlockPosition(x + (chunkX << 4), y + chunkSection.getYPosition(), z + (chunkZ << 4));
+                        IBlockData blockData = getType(chunkSection, x, y, z);
+                        Block block = getBlock(blockData);
+                        if (isTicking(block, blockData) && plugin.getSettings().getCropsToGrow().contains(CraftMagicNumbers.getMaterial(block).name())) {
+                            BlockPosition blockPosition = new BlockPosition(x + (chunkX << 4), y + getYPosition(chunkSection), z + (chunkZ << 4));
                             blockData.b((WorldServer) world, blockPosition, ThreadLocalRandom.current());
                         }
                     }
@@ -111,19 +113,17 @@ public final class CropsTickingTileEntity extends TileEntity {
 
         @Override
         public boolean b() {
-            return cropsTickingTileEntity.isRemoved();
+            return isRemoved(cropsTickingTileEntity);
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public BlockPosition c() {
-            return cropsTickingTileEntity.getPosition();
+            return getPosition(cropsTickingTileEntity);
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public String d() {
-            return TileEntityTypes.a(cropsTickingTileEntity.getTileType()) + "";
+            return TileEntityTypes.a(getTileType(cropsTickingTileEntity)) + "";
         }
 
     }

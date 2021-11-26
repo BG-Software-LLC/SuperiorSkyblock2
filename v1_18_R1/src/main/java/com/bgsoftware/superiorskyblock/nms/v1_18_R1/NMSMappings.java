@@ -42,14 +42,17 @@ import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GeneratorAccess;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.MobSpawnerAbstract;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ITileEntity;
 import net.minecraft.world.level.block.SoundEffectType;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityMobSpawner;
+import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.pattern.ShapeDetectorBlock;
 import net.minecraft.world.level.block.state.properties.IBlockState;
@@ -669,6 +672,34 @@ public final class NMSMappings {
     public static void playSound(World world, EntityHuman player, BlockPosition pos, SoundEffect sound,
                                  SoundCategory category, float volume, float pitch) {
         world.a(player, pos, sound, category, volume, pitch);
+    }
+
+    public static GameRules getGameRules(World world) {
+        return world.X();
+    }
+
+    public static boolean isTicking(Block block, IBlockData blockData) {
+        return block.e_(blockData);
+    }
+
+    public static TileEntityTypes<?> getTileType(TileEntity tileEntity) {
+        return tileEntity.u();
+    }
+
+    public static boolean isRemoved(TileEntity tileEntity) {
+        return tileEntity.r();
+    }
+
+    public static boolean isTileEntity(IBlockData blockData) {
+        return blockData.m();
+    }
+
+    public static TileEntity createTile(ITileEntity tileEntity, BlockPosition blockPosition, IBlockData blockData) {
+        return tileEntity.a(blockPosition, blockData);
+    }
+
+    public static void setTileEntity(IChunkAccess chunkAccess, TileEntity tileEntity) {
+        chunkAccess.a(tileEntity);
     }
 
 }
