@@ -166,13 +166,13 @@ public final class NMSChunksImpl implements NMSChunks {
             for (int i = 0; i < chunkSections.length; ++i) {
                 ChunkSection currentSection = chunkSections[i];
                 if (currentSection != null) {
-                    DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.i();
-                    chunkSections[i] = new ChunkSection(currentSection.g() >> 4, dataPaletteBlock,
+                    DataPaletteBlock<IBlockData> dataPaletteBlock = getBlocks(currentSection);
+                    chunkSections[i] = new ChunkSection(getYPosition(currentSection) >> 4, dataPaletteBlock,
                             new DataPaletteBlock<>(biomesRegistry, biomeBase, DataPaletteBlock.e.e));
                 }
             }
 
-            markDirty(chunk);
+            setNeedsSaving(chunk, true);
 
             PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.c, chunkCoords.d);
             //PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk);

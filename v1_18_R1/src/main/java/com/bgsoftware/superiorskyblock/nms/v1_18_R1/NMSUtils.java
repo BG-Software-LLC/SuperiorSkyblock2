@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -111,7 +112,8 @@ public final class NMSUtils {
                         chunkCompound = saveChunk(worldServer, protoChunk);
                     } else {
                         chunkCompound = getChunkData(playerChunkMap, worldServer.getTypeKey(),
-                                Suppliers.ofInstance(getWorldPersistentData(worldServer)), chunkCompound, chunkCoords, worldServer);
+                                Suppliers.ofInstance(getWorldPersistentData(worldServer)), chunkCompound,
+                                chunkCoords, worldServer);
                     }
 
                     if (hasKeyOfType(chunkCompound, "Level", 10)) {
@@ -212,7 +214,6 @@ public final class NMSUtils {
             chunk.g.get(HeightMap.Type.d).a(blockX, blockY, blockZ, blockData);
             chunk.g.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
 
-            markDirty(chunk);
             setNeedsSaving(chunk, true);
         }
 

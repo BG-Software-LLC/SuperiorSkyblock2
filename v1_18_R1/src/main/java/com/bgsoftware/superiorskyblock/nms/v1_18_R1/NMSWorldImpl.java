@@ -178,8 +178,8 @@ public final class NMSWorldImpl implements NMSWorld {
         for (int i = 0; i < chunkSections.length; ++i) {
             ChunkSection currentSection = chunkSections[i];
             if (currentSection != null) {
-                DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.i();
-                chunkSections[i] = new ChunkSection(currentSection.g() >> 4, dataPaletteBlock,
+                DataPaletteBlock<IBlockData> dataPaletteBlock = getBlocks(currentSection);
+                chunkSections[i] = new ChunkSection(getYPosition(currentSection) >> 4, dataPaletteBlock,
                         new DataPaletteBlock<>(chunk.biomeRegistry, biomeBase, DataPaletteBlock.e.e));
             }
         }
@@ -289,7 +289,7 @@ public final class NMSWorldImpl implements NMSWorld {
         if (tileEntity == null)
             return null;
 
-        NBTTagCompound tileEntityCompound = save(tileEntity, new NBTTagCompound());
+        NBTTagCompound tileEntityCompound = save(tileEntity);
 
         remove(tileEntityCompound, "x");
         remove(tileEntityCompound, "y");

@@ -68,7 +68,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
         Player player = superiorPlayer.asPlayer();
         if (player != null) {
             EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            Optional<Property> optional = getProperties(getProfile(entityPlayer)).get("textures").stream().findFirst();
+            Optional<Property> optional = getProfile(entityPlayer).getProperties().get("textures").stream().findFirst();
             optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
         }
     }
