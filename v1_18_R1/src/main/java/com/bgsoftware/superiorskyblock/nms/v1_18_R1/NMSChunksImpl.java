@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -22,6 +23,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
+import net.minecraft.util.DataBits;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.EnumSkyBlock;
@@ -166,7 +168,7 @@ public final class NMSChunksImpl implements NMSChunks {
                 if (currentSection != null) {
                     DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.i();
                     chunkSections[i] = new ChunkSection(currentSection.g() >> 4, dataPaletteBlock,
-                            new DataPaletteBlock<>(biomesRegistry, biomesRegistry.d(Biomes.b), DataPaletteBlock.e.e));
+                            new DataPaletteBlock<>(biomesRegistry, biomeBase, DataPaletteBlock.e.e));
                 }
             }
 

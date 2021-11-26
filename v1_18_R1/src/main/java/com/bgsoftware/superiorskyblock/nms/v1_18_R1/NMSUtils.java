@@ -10,7 +10,9 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.google.common.base.Suppliers;
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.IRegistry;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.Packet;
@@ -60,12 +62,14 @@ public final class NMSUtils {
         chunksCoords.forEach(chunkCoords -> {
             IChunkAccess chunkAccess;
 
-            try {
-                //chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.b, chunkCoords.c);
-                // TODO: Paper
-            } catch (Throwable ex) {
-                chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.c, chunkCoords.d);
-            }
+//            try {
+//                //chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.b, chunkCoords.c);
+//                // TODO: Paper
+//            } catch (Throwable ex) {
+//
+//            }
+
+            chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.c, chunkCoords.d);
 
             if (chunkAccess instanceof Chunk) {
                 loadedChunks.add((Chunk) chunkAccess);
@@ -127,12 +131,11 @@ public final class NMSUtils {
     }
 
     public static ProtoChunk createProtoChunk(ChunkCoordIntPair chunkCoords, WorldServer worldServer) {
-        try {
-            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer, worldServer);
-        } catch (Throwable ex) {
-            //noinspection deprecation
-            return new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer);
-        }
+        return new ProtoChunk(chunkCoords,
+                ChunkConverter.a,
+                worldServer,
+                getCustomRegistry(worldServer).d(IRegistry.aR),
+                null);
     }
 
     public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
@@ -147,11 +150,7 @@ public final class NMSUtils {
         }
 
         if (playerChunk != null) {
-            try {
-                playerChunk.a(packet, false);
-            } catch (Throwable ex) {
-                SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
-            }
+            SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
         }
     }
 
@@ -199,14 +198,7 @@ public final class NMSUtils {
 
             if (chunkSection == null) {
                 int yOffset = SectionPosition.a(getY(blockPosition));
-                try {
-                    // Paper's constructor for ChunkSection for more optimized chunk sections.
-                    chunkSection = getSections(chunk)[indexY] = new ChunkSection(yOffset, chunk, getWorld(chunk), true);
-                } catch (Throwable ex) {
-                    // Spigot's constructor for ChunkSection
-                    // noinspection deprecation
-                    chunkSection = getSections(chunk)[indexY] = new ChunkSection(yOffset);
-                }
+                chunkSection = new ChunkSection(yOffset, chunk.biomeRegistry);
             }
 
             int blockX = getX(blockPosition) & 15;

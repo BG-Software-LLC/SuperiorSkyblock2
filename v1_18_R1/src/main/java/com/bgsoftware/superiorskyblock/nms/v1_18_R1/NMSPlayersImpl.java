@@ -24,7 +24,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 
@@ -56,6 +55,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
         //Setting the entity to the spawn location
         Location spawnLocation = plugin.getGrid().getSpawnIsland().getCenter(org.bukkit.World.Environment.NORMAL);
+        assert spawnLocation.getWorld() != null;
         entity.t = ((CraftWorld) spawnLocation.getWorld()).getHandle();
         setPositionRotation(entity, spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(),
                 spawnLocation.getYaw(), spawnLocation.getPitch());
@@ -68,7 +68,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
         Player player = superiorPlayer.asPlayer();
         if (player != null) {
             EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-            Optional<Property> optional = getProfile(entityPlayer).getProperties().get("textures").stream().findFirst();
+            Optional<Property> optional = getProperties(getProfile(entityPlayer)).get("textures").stream().findFirst();
             optional.ifPresent(property -> setSkinTexture(superiorPlayer, property));
         }
     }

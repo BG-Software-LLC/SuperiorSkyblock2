@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.core.BaseBlockPosition;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
@@ -23,6 +25,8 @@ import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.sounds.SoundCategory;
+import net.minecraft.sounds.SoundEffect;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
@@ -33,16 +37,21 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManage
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
 import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.GeneratorAccess;
+import net.minecraft.world.level.MobSpawnerAbstract;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundEffectType;
 import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.entity.TileEntityMobSpawner;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.pattern.ShapeDetectorBlock;
 import net.minecraft.world.level.block.state.properties.IBlockState;
+import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -50,6 +59,7 @@ import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.level.dimension.WorldDimension;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.levelgen.GeneratorSettings;
@@ -481,6 +491,11 @@ public final class NMSMappings {
 
     }
 
+
+    public static PropertyMap getProperties(GameProfile gameProfile) {
+
+    }
+
     public static UUID getThrower(EntityItem entityItem) {
 
     }
@@ -525,7 +540,7 @@ public final class NMSMappings {
 
     }
 
-    public static NBTTagCompound getChunkData(PlayerChunkMap playerChunkMap, ResourceKey<DimensionManager> resourcekey,
+    public static NBTTagCompound getChunkData(PlayerChunkMap playerChunkMap, ResourceKey<WorldDimension> resourcekey,
                                               Supplier<WorldPersistentData> supplier, NBTTagCompound nbttagcompound,
                                               ChunkCoordIntPair pos, GeneratorAccess generatoraccess) throws IOException {
 
@@ -612,6 +627,67 @@ public final class NMSMappings {
     }
 
     public static String getName(IBlockState<?> blockState) {
+
+    }
+
+    public static MobSpawnerAbstract getSpawner(TileEntityMobSpawner tileEntityMobSpawner) {
+
+    }
+
+    public static WorldBorder getWorldBorder(WorldServer worldServer) {
+
+    }
+
+    public static void setSize(WorldBorder worldBorder, double size) {
+
+    }
+
+    public static void setCenter(WorldBorder worldBorder, double x, double z) {
+
+    }
+
+    public static void transitionSizeBetween(WorldBorder worldBorder, double startSize, double endSize, long time) {
+
+    }
+
+    public static double getSize(WorldBorder worldBorder) {
+
+    }
+
+    public static Chunk getChunkAtWorldCoords(WorldServer worldServer, BlockPosition blockPosition) {
+
+    }
+
+    public static Map<IBlockState<?>, Comparable<?>> getStateMap(IBlockData blockData) {
+
+    }
+
+    public static NBTTagCompound save(TileEntity tileEntity, NBTTagCompound nbtTagCompound) {
+
+    }
+
+    public static void remove(NBTTagCompound nbtTagCompound, String key) {
+
+    }
+
+    public static SoundEffectType getStepSound(IBlockData blockData) {
+
+    }
+
+    public static SoundEffect getPlaceSound(SoundEffectType soundEffectType) {
+
+    }
+
+    public static float getVolume(SoundEffectType soundEffectType) {
+
+    }
+
+    public static float getPitch(SoundEffectType soundEffectType) {
+
+    }
+
+    public static void playSound(WorldServer worldServer, EntityHuman player, BlockPosition pos, SoundEffect sound,
+                                 SoundCategory category, float volume, float pitch) {
 
     }
 
