@@ -146,4 +146,19 @@ public final class NMSTagsImpl implements NMSTags {
         return nbtTagList;
     }
 
+    @Override
+    public Object getNBTCompoundTag(Object object, String key) {
+        return ((NBTTagCompound) object).c(key);
+    }
+
+    @Override
+    public void setNBTCompoundTagValue(Object object, String key, Object value) {
+        ((NBTTagCompound) object).a(key, (NBTBase) value);
+    }
+
+    @Override
+    public int getNBTTagListSize(Object object) {
+        return ((NBTTagList) object).size();
+    }
+
 }

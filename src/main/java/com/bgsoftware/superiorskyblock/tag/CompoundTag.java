@@ -32,7 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
@@ -54,10 +53,6 @@ import java.util.Set;
 public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagCompound");
-
-    private static final ReflectMethod<Void> SET = new ReflectMethod<>(CLASS,
-            "set", String.class, getNNTClass("NBTBase"));
-    private static final ReflectMethod<Object> GET = new ReflectMethod<>(CLASS, "get", String.class);
 
     public CompoundTag() {
         this(new HashMap<>());
@@ -86,7 +81,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
 
             for (String key : keySet) {
-                map.put(key, Tag.fromNBT(GET.invoke(tag, key)));
+                map.put(key, Tag.fromNBT(plugin.getNMSTags().getNBTCompoundTag(tag, key)));
             }
 
             return new CompoundTag(map);
@@ -199,7 +194,7 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             Object nbtTagCompound = CONSTRUCTOR.newInstance();
 
             for (Map.Entry<String, Tag<?>> entry : value.entrySet()) {
-                SET.invoke(nbtTagCompound, entry.getKey(), entry.getValue().toNBT());
+                plugin.getNMSTags().setNBTCompoundTagValue(nbtTagCompound, entry.getKey(), entry.getValue().toNBT());
             }
 
             return nbtTagCompound;

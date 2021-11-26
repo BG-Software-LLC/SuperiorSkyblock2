@@ -7,7 +7,9 @@ java {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:v1_18_R1:pre8"
+    //compileOnly "org.spigotmc:v1_18_R1:pre8"
+    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\spigot-api-1.18-pre8-R0.1-SNAPSHOT.jar')
+
     compileOnly project(":API")
     compileOnly parent
 }

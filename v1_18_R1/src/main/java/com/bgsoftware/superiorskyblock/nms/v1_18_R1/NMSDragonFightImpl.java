@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.IslandsChunkGenerator;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.advancements.CriterionTriggers;
 import net.minecraft.core.BaseBlockPosition;
 import net.minecraft.core.BlockPosition;
@@ -36,7 +38,6 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.ChunkCoordIntPair;
-import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityEnderPortal;
@@ -54,11 +55,13 @@ import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 import net.minecraft.world.level.levelgen.feature.configurations.WorldGenFeatureConfiguration;
 import net.minecraft.world.level.pathfinder.PathEntity;
 import net.minecraft.world.level.pathfinder.PathPoint;
+import net.minecraft.world.level.storage.Convertable;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEnderDragon;
@@ -159,9 +162,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         private final BlockPosition islandBlockPosition;
 
-        IslandEntityEnderDragon(World world, BlockPosition islandBlockPosition) {
-            super(null, world);
+        IslandEntityEnderDragon(WorldServer world, BlockPosition islandBlockPosition, IslandEnderDragonBattle islandEnderDragonBattle) {
+            super(null, getDragonBattleInjection(islandEnderDragonBattle));
             this.islandBlockPosition = islandBlockPosition;
+            a(world);
         }
 
         @Override
@@ -192,6 +196,21 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
             return vec3d;
         }
+
+        private static WorldServer getDragonBattleInjection(IslandEnderDragonBattle islandEnderDragonBattle) {
+            WorldServer worldServer = islandEnderDragonBattle.l;
+            return new WorldServer(worldServer.n(), worldServer.n().az, worldServer.convertable, worldServer.N,
+                    worldServer.aa(), worldServer.q_(), worldServer.n().L.create(11), new IslandsChunkGenerator(worldServer),
+                    worldServer.N.A().g(), j, ImmutableList.of(), true, World.Environment.NORMAL,
+                    worldServer.generator, worldServer.getWorld().getBiomeProvider()) {
+
+                @Override
+                public EnderDragonBattle F() {
+                    return islandEnderDragonBattle;
+                }
+            };
+        }
+
     }
 
     private static final class IslandEnderDragonBattle extends EnderDragonBattle {
@@ -487,7 +506,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         }
 
         private EntityEnderDragon spawnEnderDragon() {
-            EntityEnderDragon entityEnderDragon = new IslandEntityEnderDragon(this.l, islandBlockPosition);
+            EntityEnderDragon entityEnderDragon = new IslandEntityEnderDragon(this.l, islandBlockPosition, this);
             setControllerPhase(getDragonControllerManager(entityEnderDragon), DragonControllerPhase.a);
             setPositionRotation(entityEnderDragon, getX(islandBlockPosition), 128, getZ(islandBlockPosition),
                     this.l.w.nextFloat() * 360.0F, 0.0F);

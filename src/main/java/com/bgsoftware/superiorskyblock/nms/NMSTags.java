@@ -45,4 +45,10 @@ public interface NMSTags {
 
     Object parseList(ListTag listTag);
 
+    Object getNBTCompoundTag(Object object, String key);
+
+    void setNBTCompoundTagValue(Object object, String key, Object value);
+
+    int getNBTTagListSize(Object object);
+
 }

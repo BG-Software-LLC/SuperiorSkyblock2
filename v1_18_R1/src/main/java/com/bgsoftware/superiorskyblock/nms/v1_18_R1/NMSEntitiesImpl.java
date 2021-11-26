@@ -17,7 +17,7 @@ import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.isBreedIt
 public final class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
-            Entity.class, int.class, "ah");
+            Entity.class, int.class, "aS");
 
     @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {

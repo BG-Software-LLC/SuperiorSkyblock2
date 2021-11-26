@@ -90,6 +90,10 @@ import java.util.function.Supplier;
 
 public final class NMSMappings {
 
+    private NMSMappings() {
+
+    }
+
     public static IBlockData getType(ChunkSection chunkSection, int x, int y, int z) {
         return chunkSection.a(x, y, z);
     }

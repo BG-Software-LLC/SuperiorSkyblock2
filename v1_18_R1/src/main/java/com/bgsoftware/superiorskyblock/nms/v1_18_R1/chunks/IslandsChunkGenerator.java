@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.server.level.RegionLimitedWorldAccess;
@@ -19,16 +18,10 @@ import org.bukkit.craftbukkit.v1_18_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
-import java.util.Set;
 
 import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 
 public final class IslandsChunkGenerator extends CustomChunkGenerator {
-
-    private static final ReflectField<ChunkSection[]> CHUNK_DATA_SECTIONS = new ReflectField<>(
-            CraftChunkData.class, ChunkSection[].class, "sections");
-    private static final ReflectField<Set<BlockPosition>> CHUNK_DATA_TILES = new ReflectField<>(
-            CraftChunkData.class, Set.class, "tiles");
 
     private final Random random = new Random();
     private final WorldServer worldServer;
@@ -62,7 +55,11 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
         Preconditions.checkArgument(data instanceof CraftChunkData || data.getClass().getName().equals("OldCraftChunkData"),
                 "Plugins must use createChunkData(World) rather than implementing ChunkData: %s", data);
 
-        ChunkSection[] chunkDataSections = CHUNK_DATA_SECTIONS.get(data);
+        assert data instanceof CraftChunkData;
+
+        IChunkAccess chunkAccess = ((CraftChunkData) data).getHandle();
+
+        ChunkSection[] chunkDataSections = getSections(chunkAccess);
         ChunkSection[] chunkSections = getSections(chunk);
         int chunkSectionsLength = Math.min(chunkSections.length, chunkDataSections.length);
 
@@ -71,18 +68,14 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
                 chunkSections[i] = chunkDataSections[i];
         }
 
-        Set<BlockPosition> tiles = CHUNK_DATA_TILES.get(data);
-        if (tiles != null) {
-            for (BlockPosition tilePosition : tiles) {
-                int tileX = getX(tilePosition), tileY = getY(tilePosition), tileZ = getZ(tilePosition);
-                assert data instanceof CraftChunkData;
-                IBlockData tileBlock = ((CraftChunkData) data).getTypeId(tileX, tileY, tileZ);
-                if (isTileEntity(tileBlock)) {
-                    BlockPosition worldTilePosition = new BlockPosition((chunkX << 4) + tileX, tileY, (chunkZ << 4) + tileZ);
-                    TileEntity tile = createTile(((ITileEntity) getBlock(tileBlock)), worldTilePosition, tileBlock);
-                    if (tile != null)
-                        setTileEntity(chunk, tile);
-                }
+        for (BlockPosition tilePosition : getTileEntities(chunkAccess).keySet()) {
+            int tileX = getX(tilePosition), tileY = getY(tilePosition), tileZ = getZ(tilePosition);
+            IBlockData tileBlock = ((CraftChunkData) data).getTypeId(tileX, tileY, tileZ);
+            if (isTileEntity(tileBlock)) {
+                BlockPosition worldTilePosition = new BlockPosition((chunkX << 4) + tileX, tileY, (chunkZ << 4) + tileZ);
+                TileEntity tile = createTile(((ITileEntity) getBlock(tileBlock)), worldTilePosition, tileBlock);
+                if (tile != null)
+                    setTileEntity(chunk, tile);
             }
         }
     }

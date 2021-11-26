@@ -45,8 +45,6 @@ public final class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
-            PlayerChunkMap.class, Map.class, "visibleChunks", "l");
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, "a", Packet.class, boolean.class);
 
@@ -143,14 +141,7 @@ public final class NMSUtils {
     public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = getChunkProvider(worldServer).a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        PlayerChunk playerChunk;
-
-        try {
-            playerChunk = getVisibleChunk(playerChunkMap, pair(chunkCoordIntPair));
-        } catch (Throwable ex) {
-            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(pair(chunkCoordIntPair));
-        }
-
+        PlayerChunk playerChunk = getVisibleChunk(playerChunkMap, pair(chunkCoordIntPair));
         if (playerChunk != null) {
             SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
         }
