@@ -208,8 +208,6 @@ public final class NMSChunksImpl implements NMSChunks {
             for (int i = 0; i < chunkSections.length; ++i)
                 chunkSections[i] = new ChunkSection(i, biomesRegistry);
 
-            Arrays.fill(getSections(chunk), null);
-
             removeEntities(chunk);
 
             WorldServer chunkWorld = getWorld(chunk);
