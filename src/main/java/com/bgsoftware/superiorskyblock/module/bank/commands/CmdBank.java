@@ -27,12 +27,12 @@ public final class CmdBank implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "bank";
+        return "bank [logs]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_BANK.getMessage(locale) + "[logs]";
+        return Locale.COMMAND_DESCRIPTION_BANK.getMessage(locale);
     }
 
     @Override
