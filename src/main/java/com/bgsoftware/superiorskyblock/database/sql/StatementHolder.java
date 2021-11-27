@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public final class StatementHolder {
 
@@ -40,7 +41,7 @@ public final class StatementHolder {
     }
 
     public void executeBatch(boolean async) {
-        if (query == null || query.isEmpty() || batches.isEmpty())
+        if (query == null || !SQLHelper.isReady() || query.isEmpty() || batches.isEmpty())
             return;
 
         if (async && !Executor.isDataThread()) {
@@ -53,7 +54,12 @@ public final class StatementHolder {
         try {
             StringHolder errorQuery = new StringHolder(query);
 
-            synchronized (SQLHelper.getMutex()) {
+            Optional<Object> mutex = SQLHelper.getMutex();
+
+            if(!mutex.isPresent())
+                return;
+
+            synchronized (mutex.get()) {
                 SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
@@ -84,6 +90,9 @@ public final class StatementHolder {
     }
 
     public void execute(boolean async) {
+        if (!SQLHelper.isReady())
+            return;
+
         if (async && !Executor.isDataThread()) {
             Executor.data(() -> execute(false));
             return;
@@ -94,7 +103,12 @@ public final class StatementHolder {
         try {
             StringHolder errorQuery = new StringHolder(query);
 
-            synchronized (SQLHelper.getMutex()) {
+            Optional<Object> mutex = SQLHelper.getMutex();
+
+            if(!mutex.isPresent())
+                return;
+
+            synchronized (mutex.get()) {
                 SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
