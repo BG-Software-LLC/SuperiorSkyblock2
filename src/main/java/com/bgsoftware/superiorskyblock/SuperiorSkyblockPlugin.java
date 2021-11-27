@@ -84,6 +84,7 @@ import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.DefaultIslandsPurger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -195,6 +196,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         ChunksProvider.stop();
         Executor.syncDatabaseCalls();
+        unloadIslandWorlds();
 
         try {
             dataHandler.saveDatabase(false);
@@ -513,6 +515,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
 
         CalcTask.startTask();
+    }
+
+    private void unloadIslandWorlds() {
+        for (World world : Bukkit.getWorlds()) {
+            if(providersHandler.isIslandsWorld(world))
+                Bukkit.unloadWorld(world, false);
+        }
     }
 
     @Override
