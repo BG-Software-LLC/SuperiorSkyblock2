@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -99,6 +100,8 @@ public final class NMSUtils {
         PlayerChunkMap playerChunkMap = getChunkProvider(worldServer).a;
 
         Executor.createTask().runAsync(v -> {
+            List<Pair<ChunkCoordIntPair, NBTTagCompound>> chunkCompounds = new ArrayList<>();
+
             chunks.forEach(chunkCoords -> {
                 try {
                     NBTTagCompound chunkCompound = read(playerChunkMap, chunkCoords);
@@ -114,14 +117,20 @@ public final class NMSUtils {
 
                     UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkCompound, chunkCoords);
                     chunkConsumer.accept(unloadedChunkCompound);
+
                     if (saveChunks)
-                        playerChunkMap.a(chunkCoords, chunkCompound);
+                        chunkCompounds.add(new Pair<>(chunkCoords, chunkCompound));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     SuperiorSkyblockPlugin.debug(ex);
                 }
             });
-        }).runSync(v -> {
+
+            return chunkCompounds;
+        }).runSync(chunkCompounds -> {
+            chunkCompounds.forEach(chunkCompoundPair ->
+                    playerChunkMap.a(chunkCompoundPair.getKey(), chunkCompoundPair.getValue()));
+
             if (onFinish != null)
                 onFinish.run();
         });
