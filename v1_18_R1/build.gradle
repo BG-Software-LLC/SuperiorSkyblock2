@@ -7,19 +7,7 @@ java {
 }
 
 dependencies {
-    //compileOnly "org.spigotmc:v1_18_R1:pre8"
-
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\spigot-api-1.18-pre8-R0.1-SNAPSHOT.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\guava-31.0.1-jre.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\authlib-3.2.38.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\bungeecord-chat-1.16-R0.4.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\fastutil-8.5.6.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\datafixerupper-4.0.26.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\brigadier-1.0.18.jar')
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\libraries\\gson-2.8.8.jar')
-
-    compileOnly files('D:\\My Servers\\Testing 1.16\\bundler\\versions\\v1_18_R1.jar')
-
+    compileOnly "org.spigotmc:v1_18_R1:rc3"
     compileOnly project(":v1_18_R1-Spigot")
     compileOnly project(":API")
     compileOnly parent
