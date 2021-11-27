@@ -22,6 +22,7 @@ import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
 import net.minecraft.server.level.LightEngineThreaded;
 import net.minecraft.server.level.WorldServer;
@@ -175,12 +176,13 @@ public final class NMSChunksImpl implements NMSChunks {
             setNeedsSaving(chunk, true);
 
             PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.c, chunkCoords.d);
-            //PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk);
-            // TODO
+            ClientboundLevelChunkWithLightPacket mapChunkPacket = new ClientboundLevelChunkWithLightPacket(chunk,
+                    getLightEngine(worldServer), null, null, true);
 
             playersToUpdate.forEach(player -> {
                 PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
                 sendPacket(playerConnection, unloadChunkPacket);
+                sendPacket(playerConnection, mapChunkPacket);
             });
         }, unloadedChunkCompound -> {
             Codec<DataPaletteBlock<BiomeBase>> codec = DataPaletteBlock.a(biomesRegistry, biomesRegistry.i(),
@@ -228,8 +230,8 @@ public final class NMSChunksImpl implements NMSChunks {
 
             removeBlocks(chunk);
 
-            //NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.c, chunkCoords.d, new PacketPlayOutMapChunk(chunk));
-            // TODO
+            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.c, chunkCoords.d,
+                    new ClientboundLevelChunkWithLightPacket(chunk, getLightEngine(worldServer), null, null, true));
         }, unloadedChunkCompound -> {
             Codec<DataPaletteBlock<IBlockData>> blocksCodec = DataPaletteBlock.a(Block.p, IBlockData.b,
                     DataPaletteBlock.e.d, Blocks.a.n());
@@ -389,9 +391,10 @@ public final class NMSChunksImpl implements NMSChunks {
     @Override
     public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        WorldServer worldServer = getWorld(chunk);
         ChunkCoordIntPair chunkCoords = getPos(chunk);
-        //NMSUtils.sendPacketToRelevantPlayers(getWorld(chunk), chunkCoords.c, chunkCoords.d, packetPlayOutMapChunk);
-        // TODO
+        NMSUtils.sendPacketToRelevantPlayers(getWorld(chunk), chunkCoords.c, chunkCoords.d,
+                new ClientboundLevelChunkWithLightPacket(chunk, getLightEngine(worldServer), null, null, true));
     }
 
     @Override
