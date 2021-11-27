@@ -47,6 +47,7 @@ import net.minecraft.world.level.GeneratorAccess;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.MobSpawnerAbstract;
 import net.minecraft.world.level.World;
+import net.minecraft.world.level.biome.BiomeBase;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ITileEntity;
 import net.minecraft.world.level.block.SoundEffectType;
@@ -225,10 +226,13 @@ public final class NMSMappings {
         return chunkSection.i();
     }
 
+    public static DataPaletteBlock<BiomeBase> getBiomes(ChunkSection chunkSection) {
+        return chunkSection.j();
+    }
+
     public static NBTTagCompound getCompound(NBTTagList nbtTagList, int index) {
         return nbtTagList.a(index);
     }
-
 
     public static NBTTagList getList(NBTTagCompound nbtTagCompound, String key, int type) {
         return nbtTagCompound.c(key, type);
@@ -704,6 +708,14 @@ public final class NMSMappings {
 
     public static void setTileEntity(IChunkAccess chunkAccess, TileEntity tileEntity) {
         chunkAccess.a(tileEntity);
+    }
+
+    public static boolean isEmpty(NBTTagCompound nbtTagCompound) {
+        return nbtTagCompound.f();
+    }
+
+    public static int getSectionsAmount(WorldServer worldServer) {
+        return worldServer.ah();
     }
 
 }

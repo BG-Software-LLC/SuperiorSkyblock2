@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.world.BlockStatesMapper;
@@ -15,6 +14,7 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.server.level.PlayerChunkMap;
@@ -35,8 +35,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
@@ -54,7 +52,7 @@ public final class NMSUtils {
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
-                                         BiConsumer<ChunkCoordIntPair, NBTTagCompound> unloadedChunkConsumer) {
+                                         Consumer<UnloadedChunkCompound> unloadedChunkConsumer) {
         List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
         List<Chunk> loadedChunks = new ArrayList<>();
 
@@ -96,7 +94,7 @@ public final class NMSUtils {
     public static void runActionOnUnloadedChunks(WorldServer worldServer,
                                                  Collection<ChunkCoordIntPair> chunks,
                                                  boolean saveChunks,
-                                                 BiConsumer<ChunkCoordIntPair, NBTTagCompound> chunkConsumer,
+                                                 Consumer<UnloadedChunkCompound> chunkConsumer,
                                                  Runnable onFinish) {
         PlayerChunkMap playerChunkMap = getChunkProvider(worldServer).a;
 
@@ -114,11 +112,10 @@ public final class NMSUtils {
                                 chunkCoords, worldServer);
                     }
 
-                    if (hasKeyOfType(chunkCompound, "Level", 10)) {
-                        chunkConsumer.accept(chunkCoords, getCompound(chunkCompound, "Level"));
-                        if (saveChunks)
-                            playerChunkMap.a(chunkCoords, chunkCompound);
-                    }
+                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkCompound, chunkCoords);
+                    chunkConsumer.accept(unloadedChunkCompound);
+                    if (saveChunks)
+                        playerChunkMap.a(chunkCoords, chunkCompound);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     SuperiorSkyblockPlugin.debug(ex);
@@ -219,6 +216,46 @@ public final class NMSUtils {
                     load(worldTileEntity, tileEntityCompound);
             }
         }
+    }
+
+    public static final class UnloadedChunkCompound {
+
+        private final NBTTagCompound chunkCompound;
+        private final ChunkCoordIntPair chunkCoords;
+
+        public UnloadedChunkCompound(NBTTagCompound chunkCompound, ChunkCoordIntPair chunkCoords) {
+            this.chunkCompound = chunkCompound;
+            this.chunkCoords = chunkCoords;
+        }
+
+        public NBTTagList getSections() {
+            return getList(chunkCompound, "sections", 10);
+        }
+
+        public NBTTagList getEntities() {
+            return getList(chunkCompound, "entities", 10);
+        }
+
+        public NBTTagList getBlockEntities() {
+            return getList(chunkCompound, "block_entities", 10);
+        }
+
+        public void setSections(NBTTagList sectionsList) {
+            set(chunkCompound, "sections", sectionsList);
+        }
+
+        public void setEntities(NBTTagList entitiesList) {
+            set(chunkCompound, "entities", entitiesList);
+        }
+
+        public void setBlockEntities(NBTTagList blockEntitiesList) {
+            set(chunkCompound, "block_entities", blockEntitiesList);
+        }
+
+        public ChunkCoordIntPair getChunkCoords() {
+            return chunkCoords;
+        }
+
     }
 
 }
