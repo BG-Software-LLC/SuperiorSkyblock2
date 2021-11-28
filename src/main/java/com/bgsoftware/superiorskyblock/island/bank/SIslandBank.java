@@ -116,16 +116,19 @@ public final class SIslandBank implements IslandBank {
         SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
+        boolean isConsole = !(commandSender instanceof Player);
 
         int position = transactions.readAndGet(SortedSet::size) + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
         increaseBalance(amount);
 
-        addTransaction(bankTransaction, true);
+        if (!isConsole) {
+            addTransaction(bankTransaction, true);
 
-        plugin.getMenus().refreshBankLogs(island);
-        plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
+        }
 
         return bankTransaction;
     }
