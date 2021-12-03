@@ -157,13 +157,6 @@ public final class ProtectionListener implements Listener {
             return;
         }
 
-        if (plugin.getSettings().getValuableBlocks().contains(Key.of(blockState)) &&
-                !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
-            e.setCancelled(true);
-            Locale.sendProtectionMessage(e.getPlayer());
-            return;
-        }
-
         if (!island.isInsideRange(clickedBlock.getLocation())) {
             e.setCancelled(true);
             Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
