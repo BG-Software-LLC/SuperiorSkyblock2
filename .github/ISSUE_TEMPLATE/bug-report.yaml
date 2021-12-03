@@ -36,17 +36,6 @@ body:
       placeholder: |
         [Insert plugin version and if it is a dev build.]
 
-  - id: session_logs
-    type: textarea
-    validations:
-      required: true
-    attributes:
-      label: 'Session Logs'
-      description: |
-        Upload your .session_logs file to pastebin (located inside the plugin's folder).
-      placeholder: |
-        [Upload your .session_logs file]
-
   - id: description
     type: textarea
     validations:
