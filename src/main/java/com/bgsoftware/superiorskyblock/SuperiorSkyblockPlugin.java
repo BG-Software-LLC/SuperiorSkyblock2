@@ -84,6 +84,7 @@ import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.DefaultIslandsPurger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -103,7 +104,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
     private static SuperiorSkyblockPlugin plugin;
     private final Updater updater = new Updater(this, "superiorskyblock2");
-    private final PluginDebugger pluginDebugger = new PluginDebugger(new File(getDataFolder(), ".session_logs"));
+    //private final PluginDebugger pluginDebugger = new PluginDebugger(new File(getDataFolder(), ".session_logs"));
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this,
@@ -150,7 +151,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private String listenerRegisterFailure = "";
 
     public static void log(String message) {
-        plugin.pluginDebugger.debug(ChatColor.stripColor(message));
+        //plugin.pluginDebugger.debug(ChatColor.stripColor(message));
         message = StringUtils.translateColors(message);
         if (message.contains(ChatColor.COLOR_CHAR + ""))
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
@@ -159,13 +160,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     public static void debug(String message) {
-        plugin.pluginDebugger.debug(message);
+        //plugin.pluginDebugger.debug(message);
         if (plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
             plugin.getLogger().info("[DEBUG] " + message);
     }
 
     public static void debug(Throwable error) {
-        plugin.pluginDebugger.debug(error);
+        //plugin.pluginDebugger.debug(error);
     }
 
     public static SuperiorSkyblockPlugin getPlugin() {
@@ -195,6 +196,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         ChunksProvider.stop();
         Executor.syncDatabaseCalls();
+        unloadIslandWorlds();
 
         try {
             dataHandler.saveDatabase(false);
@@ -227,7 +229,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Executor.close();
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
 
-            pluginDebugger.cancel();
+            //pluginDebugger.cancel();
             dataHandler.closeConnection();
         }
     }
@@ -513,6 +515,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         });
 
         CalcTask.startTask();
+    }
+
+    private void unloadIslandWorlds() {
+        for (World world : Bukkit.getWorlds()) {
+            if(providersHandler.isIslandsWorld(world))
+                Bukkit.unloadWorld(world, false);
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
             this.missions = missionCategory.getMissions().stream()
                     .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
-            if (sortByCompletion && superiorPlayer.getIsland() != null)
+            if (sortByCompletion)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
         }
     }
@@ -171,8 +171,9 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
     }
 
     private int getCompletionStatus(Mission<?> mission) {
-        return superiorPlayer.getIsland() == null ? 0 :
-                !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
+        IMissionsHolder missionsHolder = mission.getIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
+        return missionsHolder == null ? 0 :
+                !missionsHolder.canCompleteMissionAgain(mission) ? 2 :
                         plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
     }
 
