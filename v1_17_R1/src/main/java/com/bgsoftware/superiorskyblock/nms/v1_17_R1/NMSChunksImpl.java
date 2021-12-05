@@ -30,6 +30,7 @@ import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
 import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.biome.BiomeBase;
@@ -137,7 +138,9 @@ public final class NMSChunksImpl implements NMSChunks {
         }
 
         while (chunkEntities.hasNext()) {
-            chunkEntities.next().setRemoved(Entity.RemovalReason.b);
+            Entity entity = chunkEntities.next();
+            if(!(entity instanceof EntityHuman))
+                entity.setRemoved(Entity.RemovalReason.b);
         }
     }
 
