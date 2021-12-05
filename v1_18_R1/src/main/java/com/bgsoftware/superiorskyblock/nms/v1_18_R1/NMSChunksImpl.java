@@ -339,7 +339,7 @@ public final class NMSChunksImpl implements NMSChunks {
             for (int i = 0; i < sectionsList.size(); ++i) {
                 NBTTagCompound sectionCompound = getCompound(sectionsList, i);
                 byte yPosition = getByte(sectionCompound, "Y");
-                int sectionIndex = getSectionIndex(worldServer, yPosition);
+                int sectionIndex = getSectionIndexFromSectionY(worldServer, yPosition);
 
                 if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
                     DataPaletteBlock<IBlockData> blocksDataPalette;

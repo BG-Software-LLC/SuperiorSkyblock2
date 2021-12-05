@@ -597,6 +597,10 @@ public final class NMSMappings {
         return levelHeightAccessor.e(y);
     }
 
+    public static int getSectionIndexFromSectionY(LevelHeightAccessor levelHeightAccessor, int y) {
+        return levelHeightAccessor.f(y);
+    }
+
     public static void setType(ChunkSection chunkSection, int x, int y, int z, IBlockData state, boolean lock) {
         chunkSection.a(x, y, z, state, lock);
     }
