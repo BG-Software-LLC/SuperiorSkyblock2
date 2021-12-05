@@ -29,6 +29,7 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.biome.BiomeBase;
@@ -127,7 +128,8 @@ public final class NMSChunksImpl implements NMSChunks {
         });
 
         for (Entity worldEntity : worldEntities) {
-            setRemoved(worldEntity, Entity.RemovalReason.b);
+            if(!(worldEntity instanceof EntityHuman))
+                setRemoved(worldEntity, Entity.RemovalReason.b);
         }
     }
 
