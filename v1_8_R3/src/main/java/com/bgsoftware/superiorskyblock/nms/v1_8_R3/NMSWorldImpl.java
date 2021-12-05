@@ -292,4 +292,9 @@ public final class NMSWorldImpl implements NMSWorld {
                 stepSound.getPlaceSound(), (stepSound.getVolume1() + 1.0F) / 2.0F, stepSound.getVolume2() * 0.8F);
     }
 
+    @Override
+    public int getMinHeight(World world) {
+        return 0;
+    }
+
 }

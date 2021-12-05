@@ -330,4 +330,9 @@ public final class NMSWorldImpl implements NMSWorld {
         world.playSound(null, blockPosition, soundeffecttype.e(), SoundCategory.BLOCKS, (soundeffecttype.a() + 1.0F) / 2.0F, soundeffecttype.b() * 0.8F);
     }
 
+    @Override
+    public int getMinHeight(World world) {
+        return 0;
+    }
+
 }

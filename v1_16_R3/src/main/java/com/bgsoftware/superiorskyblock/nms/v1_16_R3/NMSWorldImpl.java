@@ -351,4 +351,9 @@ public final class NMSWorldImpl implements NMSWorld {
                 SoundCategory.BLOCKS, (volume + 1.0F) / 2.0F, pitch * 0.8F);
     }
 
+    @Override
+    public int getMinHeight(World world) {
+        return world.getMinHeight();
+    }
+
 }

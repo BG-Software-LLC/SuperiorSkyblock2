@@ -10,6 +10,7 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -57,5 +58,7 @@ public interface NMSWorld {
     void playBreakAnimation(Block block);
 
     void playPlaceSound(Location location);
+
+    int getMinHeight(World world);
 
 }

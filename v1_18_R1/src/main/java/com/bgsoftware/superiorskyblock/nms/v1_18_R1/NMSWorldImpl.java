@@ -392,4 +392,9 @@ public final class NMSWorldImpl implements NMSWorld {
                 SoundCategory.e, (getVolume(soundEffectType) + 1.0F) / 2.0F, getPitch(soundEffectType) * 0.8F);
     }
 
+    @Override
+    public int getMinHeight(World world) {
+        return world.getMinHeight();
+    }
+
 }

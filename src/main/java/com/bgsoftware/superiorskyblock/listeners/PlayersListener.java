@@ -403,7 +403,7 @@ public final class PlayersListener implements Listener {
     public void onPlayerFall(PlayerMoveEvent e) {
         Location from = e.getFrom(), to = e.getTo();
 
-        if (from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
+        if (from.getBlockY() == to.getBlockY() || to.getBlockY() > plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5)
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
