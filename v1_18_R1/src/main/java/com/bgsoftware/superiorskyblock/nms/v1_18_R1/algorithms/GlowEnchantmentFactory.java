@@ -5,13 +5,11 @@ import org.bukkit.enchantments.Enchantment;
 public final class GlowEnchantmentFactory {
 
     public static Enchantment createEnchantment() {
-//        try {
-//            //return new PaperGlowEnchantment("superior_glowing_enchant");
-//        } catch (Throwable error) {
-//            return new SpigotGlowEnchantment("superior_glowing_enchant");
-//        }
-        // TODO: Paper
-        return new SpigotGlowEnchantment("superior_glowing_enchant");
+        try {
+            return new PaperGlowEnchantment("superior_glowing_enchant");
+        } catch (Throwable error) {
+            return new SpigotGlowEnchantment("superior_glowing_enchant");
+        }
     }
 
 }

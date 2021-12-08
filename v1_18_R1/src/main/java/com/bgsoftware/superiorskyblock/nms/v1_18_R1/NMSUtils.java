@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.HeightMap;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +48,8 @@ public final class NMSUtils {
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, "a", Packet.class, boolean.class);
+    private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
+            PlayerChunkMap.class, Map.class, "n");
 
     private NMSUtils() {
 
@@ -60,14 +64,11 @@ public final class NMSUtils {
         chunksCoords.forEach(chunkCoords -> {
             IChunkAccess chunkAccess;
 
-//            try {
-//                //chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.b, chunkCoords.c);
-//                // TODO: Paper
-//            } catch (Throwable ex) {
-//
-//            }
-
-            chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.c, chunkCoords.d);
+            try {
+                chunkAccess = worldServer.getChunkIfLoadedImmediately(chunkCoords.c, chunkCoords.d);
+            } catch (Throwable ex) {
+                chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.c, chunkCoords.d);
+            }
 
             if (chunkAccess instanceof Chunk) {
                 loadedChunks.add((Chunk) chunkAccess);
@@ -128,8 +129,14 @@ public final class NMSUtils {
 
             return chunkCompounds;
         }).runSync(chunkCompounds -> {
-            chunkCompounds.forEach(chunkCompoundPair ->
-                    playerChunkMap.a(chunkCompoundPair.getKey(), chunkCompoundPair.getValue()));
+            chunkCompounds.forEach(chunkCompoundPair -> {
+                try {
+                    playerChunkMap.a(chunkCompoundPair.getKey(), chunkCompoundPair.getValue());
+                } catch (IOException error) {
+                    error.printStackTrace();
+                    SuperiorSkyblockPlugin.debug(error);
+                }
+            });
 
             if (onFinish != null)
                 onFinish.run();
@@ -147,7 +154,14 @@ public final class NMSUtils {
     public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {
         PlayerChunkMap playerChunkMap = getChunkProvider(worldServer).a;
         ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-        PlayerChunk playerChunk = getVisibleChunk(playerChunkMap, pair(chunkCoordIntPair));
+        PlayerChunk playerChunk;
+
+        try {
+            playerChunk = playerChunkMap.b(pair(chunkCoordIntPair));
+        } catch (Throwable ex) {
+            playerChunk = VISIBLE_CHUNKS.get(playerChunkMap).get(pair(chunkCoordIntPair));
+        }
+
         if (playerChunk != null) {
             SEND_PACKETS_TO_RELEVANT_PLAYERS.invoke(playerChunk, packet, false);
         }

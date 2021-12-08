@@ -6,8 +6,12 @@ java {
     }
 }
 
+repositories {
+    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
+}
+
 dependencies {
-    compileOnly "org.spigotmc:v1_18_R1:rc3"
+    compileOnly "org.spigotmc:v1_18_R1-Paper:b60"
     compileOnly project(":v1_18_R1-Spigot")
     compileOnly project(":API")
     compileOnly parent
