@@ -520,7 +520,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private void unloadIslandWorlds() {
         for (World world : Bukkit.getWorlds()) {
             if(providersHandler.isIslandsWorld(world))
-                Bukkit.unloadWorld(world, false);
+                Bukkit.unloadWorld(world, true);
         }
     }
 
