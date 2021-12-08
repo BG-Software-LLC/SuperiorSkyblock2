@@ -3485,17 +3485,19 @@ public final class SIsland implements Island {
     }
 
     private void loadIslandWarp(IslandWarp islandWarp) {
-        IslandWarp oldWarp = warpsByName.put(islandWarp.getName().toLowerCase(), islandWarp);
+        islandWarp.getCategory().getWarps().add(islandWarp);
 
-        if (oldWarp != null)
-            deleteWarp(oldWarp.getName());
+        String warpName = islandWarp.getName().toLowerCase();
+
+        if (warpsByName.containsKey(warpName))
+            deleteWarp(warpName);
+
+        warpsByName.put(warpName, islandWarp);
 
         Location location = islandWarp.getLocation();
 
         warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
                 location.getBlockY(), location.getBlockZ()), islandWarp);
-
-        islandWarp.getCategory().getWarps().add(islandWarp);
     }
 
 }
