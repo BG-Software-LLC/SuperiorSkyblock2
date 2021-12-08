@@ -59,7 +59,7 @@ public final class CmdWarp implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Pair<Island, SuperiorPlayer> arguments = args.length == 1 ? CommandArguments.getSenderIsland(plugin, sender) :
+        Pair<Island, SuperiorPlayer> arguments = args.length == 2 ? CommandArguments.getSenderIsland(plugin, sender) :
                 CommandArguments.getIsland(plugin, sender, args[1]);
 
         Island island = arguments.getKey();
