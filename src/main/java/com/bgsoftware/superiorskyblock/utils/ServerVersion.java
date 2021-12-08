@@ -16,7 +16,9 @@ public enum ServerVersion {
     v1_15(115),
     v1_16(116),
     v1_17(117),
-    v1_18(118);
+    v1_18(118),
+
+    UNKONWN(-1);
 
     private static final ServerVersion currentVersion;
     private static final String bukkitVersion;
@@ -26,8 +28,7 @@ public enum ServerVersion {
         bukkitVersion = Bukkit.getBukkitVersion().split("-")[0];
         String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
         String[] sections = version.split("_");
-        ;
-        currentVersion = ServerVersion.valueOf(sections[0] + "_" + sections[1]);
+        currentVersion = ServerVersion.getSafe(sections[0] + "_" + sections[1]);
         legacy = isLessThan(ServerVersion.v1_13);
     }
 
@@ -37,17 +38,24 @@ public enum ServerVersion {
         this.code = code;
     }
 
+    public static ServerVersion getSafe(String value) {
+        try {
+            return valueOf(value);
+        } catch (IllegalArgumentException error) {
+            return UNKONWN;
+        }
+    }
 
     public static boolean isAtLeast(ServerVersion serverVersion) {
-        return currentVersion.code >= serverVersion.code;
+        return isValidVersion(serverVersion) && currentVersion.code >= serverVersion.code;
     }
 
     public static boolean isLessThan(ServerVersion serverVersion) {
-        return currentVersion.code < serverVersion.code;
+        return isValidVersion(serverVersion) && currentVersion.code < serverVersion.code;
     }
 
     public static boolean isEquals(ServerVersion serverVersion) {
-        return currentVersion.code == serverVersion.code;
+        return isValidVersion(serverVersion) && currentVersion.code == serverVersion.code;
     }
 
     public static boolean isLegacy() {
@@ -68,6 +76,10 @@ public enum ServerVersion {
         }
 
         return versions;
+    }
+
+    private static boolean isValidVersion(ServerVersion compareVersion) {
+        return currentVersion != UNKONWN && compareVersion != UNKONWN;
     }
 
 }

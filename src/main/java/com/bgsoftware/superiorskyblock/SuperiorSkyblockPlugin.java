@@ -383,7 +383,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsWorld = loadNMSClass("NMSWorldImpl", version);
             return true;
         } catch (Exception ex) {
-            log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
+            new HandlerLoadException(
+                    "The plugin doesn't support your minecraft version.\n" +
+                    "Please try a different version.",
+                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
             debug(ex);
             return false;
         }
@@ -519,8 +522,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void unloadIslandWorlds() {
         for (World world : Bukkit.getWorlds()) {
-            if(providersHandler.isIslandsWorld(world))
-                Bukkit.unloadWorld(world, false);
+            if (providersHandler.isIslandsWorld(world))
+                Bukkit.unloadWorld(world, true);
         }
     }
 
