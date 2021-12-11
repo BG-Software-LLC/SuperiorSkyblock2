@@ -189,18 +189,6 @@ public final class NMSMappings {
         return nbtTagCompound.b(key, type);
     }
 
-    public static int[] getIntArray(NBTTagCompound nbtTagCompound, String key) {
-        return nbtTagCompound.n(key);
-    }
-
-    public static <T> int getId(IRegistry<T> registry, T value) {
-        return registry.a(value);
-    }
-
-    public static void setIntArray(NBTTagCompound nbtTagCompound, String key, int[] value) {
-        nbtTagCompound.a(key, value);
-    }
-
     public static void removeTileEntity(WorldServer worldServer, BlockPosition blockPosition) {
         worldServer.m(blockPosition);
     }
@@ -541,16 +529,8 @@ public final class NMSMappings {
         return worldServer.u();
     }
 
-    public static NBTTagCompound getCompound(NBTTagCompound nbtTagCompound, String key) {
-        return nbtTagCompound.p(key);
-    }
-
     public static long pair(ChunkCoordIntPair chunkCoordIntPair) {
         return chunkCoordIntPair.a();
-    }
-
-    public static PlayerChunk getVisibleChunk(PlayerChunkMap playerChunkMap, long pair) {
-        return playerChunkMap.n.get(pair);
     }
 
     public static IBlockData getType(World world, BlockPosition blockPosition) {
