@@ -37,10 +37,11 @@ public final class VanishProvider_Essentials implements VanishProvider, Listener
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(VanishStatusChangeEvent e) {
+        Player affectedPlayer = e.getAffected() == null ? e.getController().getBase() : e.getAffected().getBase();
         if (e.getValue()) {
-            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
+            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         } else {
-            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getAffected().getBase()));
+            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         }
     }
 
