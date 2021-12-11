@@ -72,7 +72,7 @@ public final class NMSChunksImpl implements NMSChunks {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(
-            LightEngineGraph.class, 0, Long.class, Long.class, Integer.class, Boolean.class);
+            LightEngineGraph.class, 1, Long.class, Long.class, Integer.class, Boolean.class);
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Integer> blockCounts = new KeyMap<>();
