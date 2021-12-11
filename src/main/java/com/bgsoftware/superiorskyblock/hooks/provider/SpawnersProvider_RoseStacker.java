@@ -69,7 +69,8 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
+                EntityType spawnerType = e.getStack().getSpawnerTile().getSpawnedType();
+                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", spawnerType + "");
                 island.handleBlockPlace(spawnerKey, e.getIncreaseAmount());
             }
         }
@@ -79,7 +80,8 @@ public final class SpawnersProvider_RoseStacker implements SpawnersProvider_Auto
             Location location = e.getStack().getLocation();
             Island island = plugin.getGrid().getIslandAt(location);
             if (island != null) {
-                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", e.getStack().getSpawner().getSpawnedType() + "");
+                EntityType spawnerType = e.getStack().getSpawnerTile().getSpawnedType();
+                Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType() + "", spawnerType + "");
                 island.handleBlockBreak(spawnerKey, e.getDecreaseAmount());
             }
         }

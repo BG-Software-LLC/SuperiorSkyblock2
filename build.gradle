@@ -84,7 +84,7 @@ dependencies {
     compileOnly 'be.maximvdw:MVdWPlaceholderAPI:latest'
     compileOnly 'me.clip:PlaceholderAPI:latest'
     compileOnly 'skyblock.hassan:PvpingSpawners:latest'
-    compileOnly 'dev.rosewood:RoseStacker:latest'
+    compileOnly 'dev.rosewood:RoseStacker:1.4.1'
     compileOnly 'net.brcdev:ShopGUIPlus-1.20:latest'
     compileOnly 'de.candc:SilkSpawners:latest'
     compileOnly 'net.skinsrestorer:SkinsRestorer:latest'
