@@ -34,6 +34,7 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.HeightMap;
 
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,9 +48,9 @@ public final class NMSUtils {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
-            PlayerChunk.class, "a", Packet.class, boolean.class);
+            PlayerChunk.class, 0, Packet.class, boolean.class);
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
-            PlayerChunkMap.class, Map.class, "n");
+            PlayerChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 0);
 
     private NMSUtils() {
 

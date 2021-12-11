@@ -70,6 +70,7 @@ import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,11 +86,13 @@ import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 public final class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<>(
-            EntityEnderDragon.class, EnderDragonBattle.class, "cn");
+            EntityEnderDragon.class, EnderDragonBattle.class,
+            Modifier.PRIVATE | Modifier.FINAL, 0);
     private static final ReflectField<IDragonController> DRAGON_PHASE = new ReflectField<>(
-            DragonControllerManager.class, IDragonController.class, "d");
+            DragonControllerManager.class, IDragonController.class,
+            Modifier.PRIVATE, 0);
     private static final ReflectMethod<PathEntity> DRAGON_FIND_PATH = new ReflectMethod<>(
-            EntityEnderDragon.class, "a", int.class, int.class, PathPoint.class);
+            EntityEnderDragon.class, 0, int.class, int.class, PathPoint.class);
 
     static {
         DRAGON_BATTLE.removeFinal();

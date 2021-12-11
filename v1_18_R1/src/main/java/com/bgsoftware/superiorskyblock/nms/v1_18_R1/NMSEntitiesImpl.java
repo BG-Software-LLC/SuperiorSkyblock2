@@ -12,12 +12,14 @@ import org.bukkit.entity.Animals;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Modifier;
+
 import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.isBreedItem;
 
 public final class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
-            Entity.class, int.class, "aS");
+            Entity.class, int.class, Modifier.PUBLIC, 4);
 
     @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
