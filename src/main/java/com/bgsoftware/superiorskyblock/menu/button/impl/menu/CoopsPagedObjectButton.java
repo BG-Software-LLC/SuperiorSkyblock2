@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class CoopsPagedObjectButton extends PagedObjectButton<BankTransaction> {
+public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlayer> {
 
     private CoopsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                    String requiredPermission, SoundWrapper lackPermissionSound,
@@ -23,11 +23,11 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<BankTransact
     }
 
     @Override
-    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, BankTransaction transaction) {
+    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, SuperiorPlayer superiorPlayer) {
         return buttonItem
-                .replaceAll("{0}", targetPlayer.getName())
-                .replaceAll("{1}", targetPlayer.getPlayerRole() + "")
-                .asSkullOf(targetPlayer);
+                .replaceAll("{0}", superiorPlayer.getName())
+                .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
+                .asSkullOf(superiorPlayer);
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, CoopsPagedObjectButton> {
