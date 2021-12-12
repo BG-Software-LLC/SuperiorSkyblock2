@@ -36,7 +36,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
     private Comparator<BankTransaction> sorting;
 
     private MenuBankLogs(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuBankLogs", menuPattern, superiorPlayer, true);
+        super(menuPattern, superiorPlayer, true);
         this.island = island;
     }
 

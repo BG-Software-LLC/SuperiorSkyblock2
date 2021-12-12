@@ -21,7 +21,7 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
     private final Island island;
 
     private MenuCoops(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuCoops", menuPattern, superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.island = island;
     }
 

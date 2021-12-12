@@ -47,15 +47,13 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
     private int backSlot;
 
     protected final SuperiorPlayer superiorPlayer;
-    private final String identifier;
     protected SuperiorPlayer targetPlayer = null;
 
     protected ISuperiorMenu previousMenu;
     protected boolean previousMove = true, closeButton = false, nextMove = false;
     private boolean refreshing = false;
 
-    public SuperiorMenu(String identifier, @Nullable SuperiorMenuPattern menuPattern, SuperiorPlayer superiorPlayer) {
-        this.identifier = identifier;
+    public SuperiorMenu(@Nullable SuperiorMenuPattern menuPattern, SuperiorPlayer superiorPlayer) {
         this.superiorPlayer = superiorPlayer;
         this.resetData(menuPattern);
     }
@@ -114,10 +112,6 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
     protected void updateTargetPlayer(SuperiorPlayer targetPlayer) {
         this.targetPlayer = targetPlayer;
-    }
-
-    public String getIdentifier() {
-        return identifier;
     }
 
     public void resetData(SuperiorMenuPattern menuPattern) {
@@ -262,7 +256,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
+        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + getClass().getName());
 
         if (menuPattern == null) {
             if (!(this instanceof SuperiorMenuBlank))
@@ -336,7 +330,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SuperiorMenu && ((SuperiorMenu) obj).getIdentifier().equals(getIdentifier());
+        return obj instanceof SuperiorMenu && obj.getClass().equals(getClass());
     }
 
 }

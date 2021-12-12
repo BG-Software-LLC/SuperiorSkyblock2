@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,12 +20,12 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
     protected int currentPage = 1;
 
-    public PagedSuperiorMenu(String identifier, PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer) {
-        this(identifier, menuPattern, superiorPlayer, false);
+    public PagedSuperiorMenu(PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer) {
+        this(menuPattern, superiorPlayer, false);
     }
 
-    public PagedSuperiorMenu(String identifier, PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer, boolean acceptNull) {
-        super(identifier, menuPattern, superiorPlayer);
+    public PagedSuperiorMenu(PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer, boolean acceptNull) {
+        super(menuPattern, superiorPlayer);
         this.acceptNull = acceptNull;
     }
 
