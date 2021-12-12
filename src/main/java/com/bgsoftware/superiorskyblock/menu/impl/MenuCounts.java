@@ -29,6 +29,11 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts.BlockCount> {
     }
 
     @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(superiorPlayer, previousMenu, island);
+    }
+
+    @Override
     protected List<BlockCount> requestObjects() {
         return island.getBlockCountsAsBigInteger().entrySet().stream().sorted((o1, o2) -> {
             Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
@@ -36,11 +41,6 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts.BlockCount> {
             int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
             return compare != 0 ? compare : o1.getKey().compareTo(o2.getKey());
         }).map(entry -> new BlockCount(Key.of(entry.getKey().toString()), entry.getValue())).collect(Collectors.toList());
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
     }
 
     public static void init() {
