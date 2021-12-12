@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
@@ -23,7 +24,7 @@ public final class BankLogsSortButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         Preconditions.checkArgument(superiorMenu instanceof MenuBankLogs, "superiorMenu must be MenuBankLogs");
 
         MenuBankLogs menuBankLogs = (MenuBankLogs) superiorMenu;
