@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
@@ -154,12 +155,13 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         // Dummy button
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuCounts.BlockCount blockCount) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer,
+                                      MenuCounts.BlockCount blockCount) {
         Key rawKey = blockCount.getBlockKey();
         Key blockKey = plugin.getBlockValues().convertKey(rawKey);
 

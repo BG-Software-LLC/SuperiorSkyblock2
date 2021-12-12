@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
@@ -19,12 +20,13 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlay
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         // Dummy button
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer superiorPlayer) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
+                                      SuperiorPlayer targetPlayer, SuperiorPlayer superiorPlayer) {
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", superiorPlayer.getName())
                 .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")

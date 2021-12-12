@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
@@ -28,15 +29,17 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
     }
 
+
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         Preconditions.checkArgument(superiorMenu instanceof MenuBankLogs, "superiorMenu must be MenuBankLogs");
         ((MenuBankLogs) superiorMenu).setFilteredPlayer(pagedObject.getPlayer());
         superiorMenu.refreshPage();
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, BankTransaction transaction) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
+                                      SuperiorPlayer targetPlayer, BankTransaction transaction) {
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", transaction.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))

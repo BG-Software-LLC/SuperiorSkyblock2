@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
@@ -14,8 +15,6 @@ import java.util.List;
 
 public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<Island> {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private GlobalWarpsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                          String requiredPermission, SoundWrapper lackPermissionSound,
                                          ItemBuilder nullItem) {
@@ -23,7 +22,7 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<Island
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         if (MenuGlobalWarps.visitorWarps) {
             superiorMenu.setPreviousMove(false);
             plugin.getCommands().dispatchSubCommand(inventoryViewer.asPlayer(), "visit", pagedObject.getOwner().getName());
@@ -33,7 +32,8 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<Island
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, Island island) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
+                                      SuperiorPlayer targetPlayer, Island island) {
         return new ItemBuilder(buttonItem)
                 .asSkullOf(island.getOwner())
                 .replaceAll("{0}", island.getOwner().getName())
