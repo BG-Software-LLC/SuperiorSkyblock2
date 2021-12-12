@@ -18,6 +18,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
@@ -42,8 +43,11 @@ import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
+import net.minecraft.world.level.chunk.NibbleArray;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.LightEngineGraph;
+import net.minecraft.world.level.lighting.LightEngineLayerEventListener;
 import net.minecraft.world.phys.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -67,6 +71,7 @@ import java.util.stream.Collectors;
 
 import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 
+@SuppressWarnings({"ConstantConditions", "deprecation"})
 public final class NMSChunksImpl implements NMSChunks {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -404,28 +409,43 @@ public final class NMSChunksImpl implements NMSChunks {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         WorldServer world = getWorld(chunk);
 
-        if (plugin.getSettings().isLightsUpdate()) {
-            // Update lights for the blocks.
-            // We use a delayed task to avoid null nibbles
-            Executor.sync(() -> {
+        // Update lights for the blocks.
+        // We use a delayed task to avoid null nibbles
+        Executor.sync(() -> {
+            boolean canSkyLight = bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL;
+            LightEngine lightEngine = getLightEngine(world);
+            LightEngineLayerEventListener blocksLightLayer = lightEngine.a(EnumSkyBlock.b);
+            LightEngineLayerEventListener skyLightLayer = lightEngine.a(EnumSkyBlock.a);
+
+            if (plugin.getSettings().isLightsUpdate()) {
                 for (BlockData blockData : blockDataList) {
                     BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
                     if (blockData.getBlockLightLevel() > 0) {
                         try {
-                            getLightEngine(world).a(EnumSkyBlock.b).a(blockPosition, blockData.getBlockLightLevel());
+                            blocksLightLayer.a(blockPosition, blockData.getBlockLightLevel());
                         } catch (Exception ignored) {
                         }
                     }
-                    if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
+                    if (canSkyLight && blockData.getSkyLightLevel() > 0) {
                         try {
-                            SKY_LIGHT_UPDATE.invoke(getLightEngine(world).a(EnumSkyBlock.a), 9223372036854775807L,
+                            SKY_LIGHT_UPDATE.invoke(skyLightLayer, 9223372036854775807L,
                                     asLong(blockPosition), 15 - blockData.getSkyLightLevel(), true);
                         } catch (Exception ignored) {
                         }
                     }
                 }
-            }, 10L);
-        }
+            } else if (canSkyLight) {
+                int sectionsAmount = getSections(chunk).length;
+                ChunkCoordIntPair chunkCoords = getPos(chunk);
+
+                for (int i = 0; i < sectionsAmount; ++i) {
+                    byte[] skyLightArray = new byte[2048];
+                    for (int j = 0; j < skyLightArray.length; j += 2)
+                        skyLightArray[j] = 15;
+                    lightEngine.a(EnumSkyBlock.a, SectionPosition.a(chunkCoords, i), new NibbleArray(skyLightArray), true);
+                }
+            }
+        }, 10L);
     }
 
     @Override
