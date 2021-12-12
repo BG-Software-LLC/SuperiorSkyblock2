@@ -41,13 +41,13 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
                 .replaceAll("{0}", transaction.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
                 .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
-                        Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(targetPlayer.getUserLocale()))
+                        Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(inventoryViewer.getUserLocale()))
                 .replaceAll("{3}", transaction.getDate())
                 .replaceAll("{4}", transaction.getAmount() + "")
                 .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
-                .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), targetPlayer.getUserLocale()))
-                .asSkullOf(targetPlayer)
-                .build(targetPlayer);
+                .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), inventoryViewer.getUserLocale()))
+                .asSkullOf(inventoryViewer)
+                .build(inventoryViewer);
     }
 
     private static String getFilteredPlayerName(UUID filteredPlayer) {

@@ -57,7 +57,7 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
                     inventory.setItem(slot, pagedObjectButton.getNullItem().build());
                     continue;
                 } else {
-                    pagedObjectButton.updateTarget(pagedObjects.get(objectIndex), superiorPlayer);
+                    pagedObjectButton.updateViewer(pagedObjects.get(objectIndex), superiorPlayer);
                 }
             }
 

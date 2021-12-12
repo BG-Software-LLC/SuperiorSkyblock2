@@ -63,7 +63,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
         }
 
         // noinspection unchecked
-        ((PagedObjectButton<T>) menuButton).updateTarget(objects.get(objectIndex), superiorPlayer);
+        ((PagedObjectButton<T>) menuButton).updateViewer(objects.get(objectIndex), superiorPlayer);
 
         return true;
     }

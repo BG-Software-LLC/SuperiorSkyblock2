@@ -14,7 +14,7 @@ public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
     private final ItemBuilder nullItem;
 
     protected T pagedObject = null;
-    protected SuperiorPlayer targetPlayer;
+    protected SuperiorPlayer inventoryViewer;
 
     protected PagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                 String requiredPermission, SoundWrapper lackPermissionSound,
@@ -23,9 +23,9 @@ public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
         this.nullItem = nullItem == null ? new ItemBuilder(Material.AIR) : nullItem;
     }
 
-    public void updateTarget(T pagedObject, SuperiorPlayer targetPlayer) {
+    public void updateViewer(T pagedObject, SuperiorPlayer inventoryViewer) {
         this.pagedObject = pagedObject;
-        this.targetPlayer = targetPlayer;
+        this.inventoryViewer = inventoryViewer;
     }
 
     public ItemBuilder getNullItem() {

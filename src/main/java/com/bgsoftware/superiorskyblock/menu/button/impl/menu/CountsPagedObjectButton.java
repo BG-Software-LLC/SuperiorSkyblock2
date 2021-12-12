@@ -221,9 +221,9 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
                 .replaceAll("{1}", amount + "")
                 .replaceAll("{2}", StringUtils.format(worthValue.multiply(amount)))
                 .replaceAll("{3}", StringUtils.format(levelValue.multiply(amount)))
-                .replaceAll("{4}", StringUtils.fancyFormat(worthValue.multiply(amount), targetPlayer.getUserLocale()))
-                .replaceAll("{5}", StringUtils.fancyFormat(levelValue.multiply(amount), targetPlayer.getUserLocale()))
-                .build(targetPlayer);
+                .replaceAll("{4}", StringUtils.fancyFormat(worthValue.multiply(amount), inventoryViewer.getUserLocale()))
+                .replaceAll("{5}", StringUtils.fancyFormat(levelValue.multiply(amount), inventoryViewer.getUserLocale()))
+                .build(inventoryViewer);
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, CountsPagedObjectButton> {

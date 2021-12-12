@@ -26,9 +26,9 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<Island
     public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
         if (MenuGlobalWarps.visitorWarps) {
             superiorMenu.setPreviousMove(false);
-            plugin.getCommands().dispatchSubCommand(targetPlayer.asPlayer(), "visit", pagedObject.getOwner().getName());
+            plugin.getCommands().dispatchSubCommand(inventoryViewer.asPlayer(), "visit", pagedObject.getOwner().getName());
         } else {
-            plugin.getMenus().openWarpCategories(targetPlayer, superiorMenu, pagedObject);
+            plugin.getMenus().openWarpCategories(inventoryViewer, superiorMenu, pagedObject);
         }
     }
 
