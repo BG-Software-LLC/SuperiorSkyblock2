@@ -146,10 +146,10 @@ public final class FileUtils {
     @Nullable
     public static MenuPatternSlots loadGUI(SuperiorMenuPattern.AbstractBuilder<?, ?> menuPattern, String fileName,
                                            @Nullable Function<YamlConfiguration, Boolean> convertOldMenu) {
-        File file = new File(plugin.getDataFolder(), "menus/bank-logs.yml");
+        File file = new File(plugin.getDataFolder(), "menus/" + fileName);
 
         if (!file.exists())
-            FileUtils.saveResource("menus/bank-logs.yml");
+            FileUtils.saveResource("menus/" + fileName);
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
