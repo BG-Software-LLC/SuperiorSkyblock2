@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -32,12 +33,13 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<Island
     }
 
     @Override
-    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, Island island) {
-        return buttonItem
+    public ItemStack modifyButtonItem(ItemStack buttonItem, Island island) {
+        return new ItemBuilder(buttonItem)
                 .asSkullOf(island.getOwner())
                 .replaceAll("{0}", island.getOwner().getName())
                 .replaceLoreWithLines("{1}", island.getDescription().split("\n"))
-                .replaceAll("{2}", island.getIslandWarps().size() + "");
+                .replaceAll("{2}", island.getIslandWarps().size() + "")
+                .build(island.getOwner());
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, GlobalWarpsPagedObjectButton> {

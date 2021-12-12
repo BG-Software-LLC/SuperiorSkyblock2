@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -28,8 +29,8 @@ public abstract class SuperiorMenuButton {
     }
 
     @Nullable
-    public ItemBuilder getButtonItem() {
-        return buttonItem == null ? null : buttonItem.clone();
+    public ItemStack getButtonItem() {
+        return buttonItem == null ? null : buttonItem.build();
     }
 
     @Nullable

@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
@@ -158,7 +159,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
     }
 
     @Override
-    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, MenuCounts.BlockCount blockCount) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuCounts.BlockCount blockCount) {
         Key rawKey = blockCount.getBlockKey();
         Key blockKey = plugin.getBlockValues().convertKey(rawKey);
 
@@ -166,7 +167,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
 
         String convertedItem = BLOCKS_TO_ITEMS.get(blockKey.getGlobalKey());
 
-        if (convertedItem != null){
+        if (convertedItem != null) {
             String[] item = convertedItem.split(":");
             String itemType = item[0];
             try {
@@ -221,7 +222,8 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
                 .replaceAll("{2}", StringUtils.format(worthValue.multiply(amount)))
                 .replaceAll("{3}", StringUtils.format(levelValue.multiply(amount)))
                 .replaceAll("{4}", StringUtils.fancyFormat(worthValue.multiply(amount), targetPlayer.getUserLocale()))
-                .replaceAll("{5}", StringUtils.fancyFormat(levelValue.multiply(amount), targetPlayer.getUserLocale()));
+                .replaceAll("{5}", StringUtils.fancyFormat(levelValue.multiply(amount), targetPlayer.getUserLocale()))
+                .build(targetPlayer);
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, CountsPagedObjectButton> {

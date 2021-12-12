@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
@@ -23,11 +24,12 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlay
     }
 
     @Override
-    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, SuperiorPlayer superiorPlayer) {
-        return buttonItem
+    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer superiorPlayer) {
+        return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", superiorPlayer.getName())
                 .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")
-                .asSkullOf(superiorPlayer);
+                .asSkullOf(superiorPlayer)
+                .build(superiorPlayer);
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, CoopsPagedObjectButton> {

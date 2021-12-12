@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,11 +34,11 @@ public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
 
     @Nullable
     @Override
-    public ItemBuilder getButtonItem() {
+    public ItemStack getButtonItem() {
         return modifyButtonItem(super.getButtonItem(), pagedObject);
     }
 
-    public abstract ItemBuilder modifyButtonItem(ItemBuilder buttonItem, T pagedObject);
+    public abstract ItemStack modifyButtonItem(ItemStack buttonItem, T pagedObject);
 
     @SuppressWarnings("unchecked")
     public static abstract class PagedObjectBuilder<B extends AbstractBuilder<B, T>, T extends SuperiorMenuButton>

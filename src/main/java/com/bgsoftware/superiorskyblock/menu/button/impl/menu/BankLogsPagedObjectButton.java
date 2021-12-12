@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +36,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
     }
 
     @Override
-    public ItemBuilder modifyButtonItem(ItemBuilder buttonItem, BankTransaction transaction) {
-        return buttonItem
+    public ItemStack modifyButtonItem(ItemStack buttonItem, BankTransaction transaction) {
+        return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", transaction.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
                 .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
@@ -45,7 +46,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
                 .replaceAll("{4}", transaction.getAmount() + "")
                 .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
                 .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), targetPlayer.getUserLocale()))
-                .asSkullOf(targetPlayer);
+                .asSkullOf(targetPlayer)
+                .build(targetPlayer);
     }
 
     private static String getFilteredPlayerName(UUID filteredPlayer) {

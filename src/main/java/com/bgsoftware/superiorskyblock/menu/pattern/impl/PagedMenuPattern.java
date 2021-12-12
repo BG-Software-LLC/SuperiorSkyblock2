@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.pattern.impl;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -59,25 +61,33 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
                 }
             }
 
-            ItemBuilder buttonItem = button.getButtonItem();
+            ItemStack buttonItem;
+
+            try {
+                buttonItem = button.getButtonItem();
+            } catch (Exception error) {
+                SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
+                SuperiorSkyblockPlugin.debug(error);
+                return;
+            }
 
             if (buttonItem == null)
                 continue;
 
             if (button instanceof PreviousPageButton) {
-                inventory.setItem(slot, buttonItem
+                inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a"))
                         .build(superiorPlayer));
             } else if (button instanceof NextPageButton) {
-                inventory.setItem(slot, buttonItem
+                inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (pagedObjects.size() > currentPage * this.objectsPerPage ? "&a" : "&c"))
                         .build(superiorPlayer));
             } else if (button instanceof CurrentPageButton) {
-                inventory.setItem(slot, buttonItem
+                inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", currentPage + "")
                         .build(superiorPlayer));
             } else {
-                inventory.setItem(slot, buttonItem.build(targetPlayer == null ? superiorPlayer : targetPlayer));
+                inventory.setItem(slot, buttonItem);
             }
         }
     }
