@@ -35,8 +35,6 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             "items", "sounds", "commands", "back"
     };
 
-    protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private static final Pattern COMMAND_PATTERN_ARGS = Pattern.compile("\\[(.+)](.+)");
     private static final Pattern COMMAND_PATTERN = Pattern.compile("\\[(.+)]");
 
@@ -155,7 +153,14 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         open(previousMenu);
     }
 
-    public final void onClick(InventoryClickEvent clickEvent) {
+    public void closePage() {
+        superiorPlayer.runIfOnline(player -> {
+            previousMove = false;
+            player.closeInventory();
+        });
+    }
+
+    public final void onClick(SuperiorSkyblockPlugin plugin, InventoryClickEvent clickEvent) {
         if (refreshing)
             return;
 
@@ -163,41 +168,47 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
         SuperiorMenuButton menuButton = this.menuPattern.getButton(clickEvent.getRawSlot());
 
+        String requiredPermission = menuButton.getRequiredPermission();
+        if (requiredPermission != null && !superiorPlayer.hasPermission(requiredPermission)) {
+            onButtonClickLackPermission(menuButton, clickEvent);
+            return;
+        }
+
         SoundWrapper clickSound = menuButton.getClickSound();
         if (clickSound != null)
             clickSound.playSound(clickEvent.getWhoClicked());
 
-        menuButton.getCommands().forEach(command -> runCommand(command, clickEvent, Bukkit.getConsoleSender()));
-
-        String requiredPermission = menuButton.getRequiredPermission();
-        if (requiredPermission != null && !superiorPlayer.hasPermission(requiredPermission)) {
-            SoundWrapper lackPermissionSound = menuButton.getLackPermissionSound();
-            if (lackPermissionSound != null)
-                lackPermissionSound.playSound(clickEvent.getWhoClicked());
-            return;
-        }
+        menuButton.getCommands().forEach(command -> runCommand(plugin, command, clickEvent, Bukkit.getConsoleSender()));
 
         SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " +
                 (clickEvent.getCurrentItem() == null ? "AIR" : clickEvent.getCurrentItem().getType()) +
                 ", Slot: " + clickEvent.getRawSlot());
 
         if (preButtonClick(menuButton, clickEvent))
-            menuButton.onButtonClick(this, clickEvent);
+            menuButton.onButtonClick(plugin, this, clickEvent);
     }
 
     public abstract void cloneAndOpen(ISuperiorMenu previousMenu);
 
-    public abstract boolean preButtonClick(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent);
+    public boolean preButtonClick(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+        return true;
+    }
 
-    private void runCommand(String command, InventoryClickEvent e, CommandSender sender) {
+    public void onButtonClickLackPermission(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+        SoundWrapper lackPermissionSound = menuButton.getLackPermissionSound();
+        if (lackPermissionSound != null)
+            lackPermissionSound.playSound(clickEvent.getWhoClicked());
+    }
+
+    private void runCommand(SuperiorSkyblockPlugin plugin, String command, InventoryClickEvent e, CommandSender sender) {
         Matcher matcher = COMMAND_PATTERN_ARGS.matcher(command);
 
         if (matcher.matches()) {
             String subCommand = matcher.group(1), args = matcher.group(2).trim();
-            handleSubCommand(subCommand, args, e, sender);
+            handleSubCommand(plugin, subCommand, args, e, sender);
         } else if ((matcher = COMMAND_PATTERN.matcher(command)).matches()) {
             String subCommand = matcher.group(1);
-            handleSubCommand(subCommand, "", e, sender);
+            handleSubCommand(plugin, subCommand, "", e, sender);
         } else if (command.equalsIgnoreCase("close")) {
             closeButton = true;
             previousMove = false;
@@ -216,14 +227,14 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         }
     }
 
-    private void handleSubCommand(String subCommand, String args, InventoryClickEvent e, CommandSender sender) {
+    private void handleSubCommand(SuperiorSkyblockPlugin plugin, String subCommand, String args, InventoryClickEvent e, CommandSender sender) {
         switch (subCommand.toLowerCase()) {
             case "player":
-                runCommand(args, e, e.getWhoClicked());
+                runCommand(plugin, args, e, e.getWhoClicked());
                 break;
             case "admin":
                 String commandLabel = plugin.getSettings().getIslandCommand().split(",")[0];
-                runCommand(commandLabel + " admin " + args, e, sender);
+                runCommand(plugin, commandLabel + " admin " + args, e, sender);
                 break;
             case "close":
                 closeButton = true;
@@ -308,7 +319,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         });
     }
 
-    public void closeInventory(SuperiorPlayer superiorPlayer) {
+    public void closeInventory(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer) {
         Executor.sync(() -> {
             if (!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
                 open(previousMenu);

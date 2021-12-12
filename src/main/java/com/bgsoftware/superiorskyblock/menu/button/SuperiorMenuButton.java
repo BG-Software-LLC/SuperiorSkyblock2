@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -13,11 +15,11 @@ import java.util.Objects;
 
 public abstract class SuperiorMenuButton {
 
-    private final ItemBuilder buttonItem;
-    private final SoundWrapper clickSound;
-    private final List<String> commands;
-    private final String requiredPermission;
-    private final SoundWrapper lackPermissionSound;
+    protected final ItemBuilder buttonItem;
+    protected final SoundWrapper clickSound;
+    protected final List<String> commands;
+    protected final String requiredPermission;
+    protected final SoundWrapper lackPermissionSound;
 
     protected SuperiorMenuButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                  String requiredPermission, SoundWrapper lackPermissionSound) {
@@ -29,8 +31,8 @@ public abstract class SuperiorMenuButton {
     }
 
     @Nullable
-    public ItemStack getButtonItem() {
-        return buttonItem == null ? null : buttonItem.build();
+    public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
+        return buttonItem == null ? null : buttonItem.build(targetPlayer == null ? inventoryViewer : targetPlayer);
     }
 
     @Nullable
@@ -60,7 +62,8 @@ public abstract class SuperiorMenuButton {
                 .setLackPermissionsSound(this.lackPermissionSound);
     }
 
-    public abstract void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent);
+    public abstract void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu,
+                                       InventoryClickEvent clickEvent);
 
     @SuppressWarnings("unchecked")
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends SuperiorMenuButton> {

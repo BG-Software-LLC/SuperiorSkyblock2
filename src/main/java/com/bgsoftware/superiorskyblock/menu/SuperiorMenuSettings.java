@@ -295,8 +295,8 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     }
 
     @Override
-    public void closeInventory(SuperiorPlayer superiorPlayer) {
-        super.closeInventory(superiorPlayer);
+    public void closeInventory(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer) {
+        super.closeInventory(plugin, superiorPlayer);
 
         if (!activePlayers.remove(superiorPlayer.getUniqueId()) && !pageMove.remove(superiorPlayer.getUniqueId())) {
             reloadConfiguration();

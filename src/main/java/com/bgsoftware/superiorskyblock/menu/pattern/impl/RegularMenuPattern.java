@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
@@ -20,13 +21,13 @@ public final class RegularMenuPattern extends SuperiorMenuPattern {
 
     @Override
     public void setupInventory(Inventory inventory, ISuperiorMenu superiorMenu,
-                               SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer targetPlayer) {
+                               SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
         // Set all buttons in the menu
         for (int slot = 0; slot < this.buttons.length; ++slot) {
             SuperiorMenuButton button = this.buttons[slot];
-            ItemBuilder buttonItem = button.getButtonItem();
+            ItemStack buttonItem = button.getButtonItem(inventoryViewer, targetPlayer);
             if (buttonItem != null) {
-                inventory.setItem(slot, buttonItem.build(targetPlayer == null ? superiorPlayer : targetPlayer));
+                inventory.setItem(slot, buttonItem);
             }
         }
     }

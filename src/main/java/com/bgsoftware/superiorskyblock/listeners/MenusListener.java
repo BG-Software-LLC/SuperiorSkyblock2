@@ -63,7 +63,7 @@ public final class MenusListener implements Listener {
             e.setCancelled(true);
 
             if (e.getClickedInventory().equals(e.getView().getTopInventory()))
-                ((SuperiorMenu) inventoryHolder).onClick(e);
+                ((SuperiorMenu) inventoryHolder).onClick(plugin, e);
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e);
         }
@@ -77,7 +77,7 @@ public final class MenusListener implements Listener {
             return;
 
         if (inventoryHolder instanceof SuperiorMenu) {
-            ((SuperiorMenu) inventoryHolder).closeInventory(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+            ((SuperiorMenu) inventoryHolder).closeInventory(plugin, plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
         }

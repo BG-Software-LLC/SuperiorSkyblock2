@@ -34,11 +34,13 @@ public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
 
     @Nullable
     @Override
-    public ItemStack getButtonItem() {
-        return modifyButtonItem(super.getButtonItem(), pagedObject);
+    public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
+        return modifyButtonItem(super.getButtonItem(inventoryViewer, targetPlayer),
+                inventoryViewer, targetPlayer, pagedObject);
     }
 
-    public abstract ItemStack modifyButtonItem(ItemStack buttonItem, T pagedObject);
+    public abstract ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
+                                               SuperiorPlayer targetPlayer, T pagedObject);
 
     @SuppressWarnings("unchecked")
     public static abstract class PagedObjectBuilder<B extends AbstractBuilder<B, T>, T extends SuperiorMenuButton>

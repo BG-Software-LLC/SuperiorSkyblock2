@@ -64,19 +64,19 @@ public abstract class SuperiorMenuPattern {
     }
 
     public Inventory buildInventory(ISuperiorMenu menu, Function<String, String> titleReplacer,
-                                    SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer targetPlayer) {
+                                    SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
 
         String title = titleReplacer.apply(this.title);
 
-        Inventory inventory = createInventory(menu, PlaceholderHook.parse(superiorPlayer, title));
+        Inventory inventory = createInventory(menu, PlaceholderHook.parse(inventoryViewer, title));
 
-        setupInventory(inventory, menu, superiorPlayer, targetPlayer);
+        setupInventory(inventory, menu, inventoryViewer, targetPlayer);
 
         return inventory;
     }
 
     public abstract void setupInventory(Inventory inventory, ISuperiorMenu superiorMenu,
-                                        SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer targetPlayer);
+                                        SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer);
 
     private Inventory createInventory(InventoryHolder holder, String title) {
         Inventory inventory;
@@ -138,6 +138,14 @@ public abstract class SuperiorMenuPattern {
         public B setButton(int slot, SuperiorMenuButton button) {
             if (button != null && slot >= 0 && slot < this.buttons.length)
                 this.buttons[slot] = button;
+            return (B) this;
+        }
+
+        public B mapButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+            if (slot >= 0 && slot < this.buttons.length) {
+                this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
+            }
+
             return (B) this;
         }
 

@@ -37,7 +37,7 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
 
     @Override
     public void setupInventory(Inventory inventory, ISuperiorMenu superiorMenu,
-                               SuperiorPlayer superiorPlayer, @Nullable SuperiorPlayer targetPlayer) {
+                               SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
         Preconditions.checkArgument(superiorMenu instanceof PagedSuperiorMenu, "superiorMenu must be PagedSuperiorMenu.");
 
         int currentPage = ((PagedSuperiorMenu<?>) superiorMenu).getCurrentPage();
@@ -57,14 +57,14 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
                     inventory.setItem(slot, pagedObjectButton.getNullItem().build());
                     continue;
                 } else {
-                    pagedObjectButton.updateViewer(pagedObjects.get(objectIndex), superiorPlayer);
+                    pagedObjectButton.updateViewer(pagedObjects.get(objectIndex), inventoryViewer);
                 }
             }
 
             ItemStack buttonItem;
 
             try {
-                buttonItem = button.getButtonItem();
+                buttonItem = button.getButtonItem(inventoryViewer, targetPlayer);
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
                 SuperiorSkyblockPlugin.debug(error);
@@ -77,15 +77,15 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
             if (button instanceof PreviousPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a"))
-                        .build(superiorPlayer));
+                        .build(inventoryViewer));
             } else if (button instanceof NextPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (pagedObjects.size() > currentPage * this.objectsPerPage ? "&a" : "&c"))
-                        .build(superiorPlayer));
+                        .build(inventoryViewer));
             } else if (button instanceof CurrentPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", currentPage + "")
-                        .build(superiorPlayer));
+                        .build(inventoryViewer));
             } else {
                 inventory.setItem(slot, buttonItem);
             }

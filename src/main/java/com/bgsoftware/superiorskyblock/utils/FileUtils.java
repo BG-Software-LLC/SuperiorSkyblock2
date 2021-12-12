@@ -34,6 +34,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.jar.JarEntry;
@@ -146,7 +147,7 @@ public final class FileUtils {
 
     @Nullable
     public static Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(SuperiorMenuPattern.AbstractBuilder<?, ?> menuPattern, String fileName,
-                                                                          @Nullable Function<YamlConfiguration, Boolean> convertOldMenu) {
+                                                                          @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
         File file = new File(plugin.getDataFolder(), "menus/" + fileName);
 
         if (!file.exists())
@@ -154,7 +155,7 @@ public final class FileUtils {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        if (convertOldMenu != null && convertOldMenu.apply(cfg)) {
+        if (convertOldMenu != null && convertOldMenu.apply(plugin, cfg)) {
             try {
                 cfg.save(file);
             } catch (Exception ex) {
