@@ -62,7 +62,7 @@ public final class MenuBiomes extends SuperiorMenu {
         RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "bank-logs.yml", MenuBiomes::convertOldGUI);
+                "biomes.yml", MenuBiomes::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
