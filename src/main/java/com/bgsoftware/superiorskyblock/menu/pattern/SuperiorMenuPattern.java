@@ -135,9 +135,19 @@ public abstract class SuperiorMenuPattern {
             return (B) this;
         }
 
-        public B setButton(int slot, SuperiorMenuButton button) {
-            if (button != null && slot >= 0 && slot < this.buttons.length)
-                this.buttons[slot] = button;
+        public B setButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+            if (buttonBuilder != null && slot >= 0 && slot < this.buttons.length)
+                this.buttons[slot] = buttonBuilder.build();
+            return (B) this;
+        }
+
+        public B setButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+            if(buttonBuilder != null) {
+                for (int slot : slots) {
+                    if (slot >= 0 && slot < this.buttons.length)
+                        this.buttons[slot] = buttonBuilder.build();
+                }
+            }
             return (B) this;
         }
 
