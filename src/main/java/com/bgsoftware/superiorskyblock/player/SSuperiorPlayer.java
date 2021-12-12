@@ -421,13 +421,16 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                         if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
                             continue;
 
-                        int worldBuildLimit = Bukkit.getWorld(chunkSnapshot.getWorldName()).getMaxHeight();
+                        World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
+                        int worldBuildLimit = world.getMaxHeight();
+                        int worldMinLimit = plugin.getNMSWorld().getMinHeight(world);
 
                         for (int x = 0; x < 16; x++) {
                             for (int z = 0; z < 16; z++) {
                                 int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
-                                Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z),
-                                        belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y == 0 ? 0 : y - 1, z);
+                                Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
+                                Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
+                                        y == worldMinLimit ? worldMinLimit : y - 1, z);
 
                                 Material blockType, belowType;
 

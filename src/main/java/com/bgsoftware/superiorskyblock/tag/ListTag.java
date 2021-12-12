@@ -32,7 +32,6 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.base.Preconditions;
 
@@ -52,7 +51,6 @@ import java.util.List;
 public final class ListTag extends Tag<List<Tag<?>>> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagList");
-    private static final ReflectMethod<Integer> SIZE = new ReflectMethod<>(CLASS, "size", new Class[0]);
 
     /**
      * The type.
@@ -76,7 +74,7 @@ public final class ListTag extends Tag<List<Tag<?>>> {
         List<Tag<?>> list = new ArrayList<>();
 
         try {
-            int size = SIZE.invoke(tag);
+            int size = plugin.getNMSTags().getNBTTagListSize(tag);
 
             for (int i = 0; i < size; i++)
                 list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));
