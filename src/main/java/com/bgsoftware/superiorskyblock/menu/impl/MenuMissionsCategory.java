@@ -59,7 +59,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
         sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         removeCompleted = cfg.getBoolean("remove-completed", false);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuMissionsCategory, "missions-category.yml", cfg);
 
         char slotsChar = cfg.getString("slots", " ").charAt(0);
 

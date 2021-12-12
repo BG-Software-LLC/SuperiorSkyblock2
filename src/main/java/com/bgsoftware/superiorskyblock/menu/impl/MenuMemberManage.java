@@ -51,7 +51,7 @@ public final class MenuMemberManage extends SuperiorMenu {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuMemberManage, "member-manage.yml", cfg);
 
         rolesSlot = getSlots(cfg, "roles", menuPatternSlots);
         banSlot = getSlots(cfg, "ban", menuPatternSlots);

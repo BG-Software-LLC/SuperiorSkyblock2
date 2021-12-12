@@ -35,7 +35,7 @@ public final class MenuConfirmKick extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmKick, "confirm-kick.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuConfirmKick, "confirm-kick.yml", cfg);
 
         confirmSlot = getSlots(cfg, "confirm", menuPatternSlots);
         cancelSlot = getSlots(cfg, "cancel", menuPatternSlots);

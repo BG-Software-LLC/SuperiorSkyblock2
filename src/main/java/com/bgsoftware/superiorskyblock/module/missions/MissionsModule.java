@@ -256,7 +256,7 @@ public final class MissionsModule extends BuiltinModule {
 
         ConfigurationSection categoriesSection = config.createSection("categories");
         YamlConfiguration missionsMenuConfig = loadMissionsMenuFile(plugin);
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
 
         int islandsCategorySlot = menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", ""));
         if (islandsCategorySlot != -1) {

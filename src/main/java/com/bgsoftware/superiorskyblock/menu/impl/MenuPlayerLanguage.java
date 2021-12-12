@@ -30,7 +30,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuPlayerLanguage, "player-language.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuPlayerLanguage, "player-language.yml", cfg);
 
         for (char ch : menuPatternSlots.getChars()) {
             if (cfg.contains("items." + ch + ".language")) {

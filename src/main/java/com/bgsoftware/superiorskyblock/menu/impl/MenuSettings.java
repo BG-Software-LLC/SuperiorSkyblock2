@@ -57,7 +57,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuSettings, "settings.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuSettings, "settings.yml", cfg);
 
         ConfigurationSection settingsSection = cfg.getConfigurationSection("settings");
 

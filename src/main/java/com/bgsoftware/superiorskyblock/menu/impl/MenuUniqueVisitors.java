@@ -37,7 +37,7 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuUniqueVisitors, "unique-visitors.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuUniqueVisitors, "unique-visitors.yml", cfg);
 
         menuUniqueVisitors.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuUniqueVisitors.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

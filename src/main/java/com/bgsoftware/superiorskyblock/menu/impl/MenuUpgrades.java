@@ -59,7 +59,7 @@ public final class MenuUpgrades extends SuperiorMenu {
         }
 
         Executor.sync(() -> {
-            MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuUpgrades, "upgrades.yml", cfg);
+            MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuUpgrades, "upgrades.yml", cfg);
 
             if (cfg.contains("upgrades")) {
                 ConfigurationSection upgradesSection = cfg.getConfigurationSection("upgrades");

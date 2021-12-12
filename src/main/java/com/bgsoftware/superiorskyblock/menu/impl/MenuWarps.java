@@ -86,7 +86,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarps, "warps.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuWarps, "warps.yml", cfg);
 
         menuWarps.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuWarps.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

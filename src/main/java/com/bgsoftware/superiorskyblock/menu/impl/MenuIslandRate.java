@@ -52,7 +52,7 @@ public final class MenuIslandRate extends SuperiorMenu {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuIslandRate, "island-rate.yml", cfg);
 
         zeroStarsSlot = getSlots(cfg, "zero-stars", menuPatternSlots);
         oneStarSlot = getSlots(cfg, "one-star", menuPatternSlots);

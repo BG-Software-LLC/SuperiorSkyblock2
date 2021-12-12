@@ -52,7 +52,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuWarpCategoryIconEdit, "warp-category-icon-edit.yml", cfg);
 
         typeSlots = getSlots(cfg, "icon-type", menuPatternSlots);
         renameSlots = getSlots(cfg, "icon-rename", menuPatternSlots);

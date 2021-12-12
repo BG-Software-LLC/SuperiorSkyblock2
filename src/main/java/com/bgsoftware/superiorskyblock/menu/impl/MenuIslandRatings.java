@@ -51,7 +51,7 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandRatings, "island-ratings.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuIslandRatings, "island-ratings.yml", cfg);
 
         menuIslandRatings.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuIslandRatings.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

@@ -49,7 +49,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuVisitors, "visitors.yml", cfg);
 
         uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", menuPatternSlots);
 

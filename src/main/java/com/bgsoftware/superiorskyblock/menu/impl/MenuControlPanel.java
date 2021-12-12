@@ -49,7 +49,7 @@ public final class MenuControlPanel extends SuperiorMenu {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuControlPanel, "control-panel.yml", cfg);
 
         membersSlot = getSlots(cfg, "members", menuPatternSlots);
         settingsSlot = getSlots(cfg, "settings", menuPatternSlots);

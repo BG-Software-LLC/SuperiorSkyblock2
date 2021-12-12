@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
@@ -144,8 +145,8 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static MenuPatternSlots loadGUI(SuperiorMenuPattern.AbstractBuilder<?, ?> menuPattern, String fileName,
-                                           @Nullable Function<YamlConfiguration, Boolean> convertOldMenu) {
+    public static Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(SuperiorMenuPattern.AbstractBuilder<?, ?> menuPattern, String fileName,
+                                                                          @Nullable Function<YamlConfiguration, Boolean> convertOldMenu) {
         File file = new File(plugin.getDataFolder(), "menus/" + fileName);
 
         if (!file.exists())
@@ -211,7 +212,7 @@ public final class FileUtils {
             return null;
         }
 
-        return menuPatternSlots;
+        return new Pair<>(menuPatternSlots, cfg);
     }
 
     public static Location toLocation(String location) {

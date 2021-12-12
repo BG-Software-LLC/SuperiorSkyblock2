@@ -48,7 +48,7 @@ public final class MenuWarpManage extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpManage, "warp-manage.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuWarpManage, "warp-manage.yml", cfg);
 
         renameSlots = getSlots(cfg, "warp-rename", menuPatternSlots);
         iconSlots = getSlots(cfg, "warp-icon", menuPatternSlots);

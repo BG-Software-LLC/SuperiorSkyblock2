@@ -51,7 +51,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuGlobalWarps, "global-warps.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuGlobalWarps, "global-warps.yml", cfg);
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 

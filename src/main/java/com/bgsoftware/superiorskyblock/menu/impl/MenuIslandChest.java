@@ -41,7 +41,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandChest, "island-chest.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuIslandChest, "island-chest.yml", cfg);
 
         menuIslandChest.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuIslandChest.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

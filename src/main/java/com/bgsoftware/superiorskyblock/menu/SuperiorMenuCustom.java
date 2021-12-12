@@ -62,7 +62,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
             plugin.getCommands().registerCommand(new CustomMenuCommand(fileName, aliases, permission, descriptions, displayCommand));
         }
 
-        FileUtils.loadGUI(superiorMenuCustom, fileName, cfg);
+        FileUtils.loadMenu(superiorMenuCustom, fileName, cfg);
 
         superiorMenuCustom.markCompleted();
     }

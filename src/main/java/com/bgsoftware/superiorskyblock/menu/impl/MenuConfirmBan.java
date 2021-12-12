@@ -35,7 +35,7 @@ public final class MenuConfirmBan extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmBan, "confirm-ban.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuConfirmBan, "confirm-ban.yml", cfg);
 
         confirmSlot = getSlots(cfg, "confirm", menuPatternSlots);
         cancelSlot = getSlots(cfg, "cancel", menuPatternSlots);

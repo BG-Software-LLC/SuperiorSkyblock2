@@ -53,7 +53,7 @@ public final class MenuBorderColor extends SuperiorMenu {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuBorderColor, "border-color.yml", cfg);
 
         greenColorSlot = getSlots(cfg, "green-color", menuPatternSlots);
         redColorSlot = getSlots(cfg, "red-color", menuPatternSlots);

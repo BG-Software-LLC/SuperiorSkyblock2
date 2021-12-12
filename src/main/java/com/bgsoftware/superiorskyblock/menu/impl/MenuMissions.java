@@ -27,7 +27,7 @@ public final class MenuMissions extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
+        FileUtils.loadMenu(menuMissions, "missions.yml", cfg);
 
         menuMissions.markCompleted();
     }

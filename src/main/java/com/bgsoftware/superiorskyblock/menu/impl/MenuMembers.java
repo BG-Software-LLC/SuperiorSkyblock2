@@ -48,7 +48,7 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMembers, "members.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuMembers, "members.yml", cfg);
 
         menuMembers.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuMembers.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

@@ -54,7 +54,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuConfirmDisband, "confirm-disband.yml", cfg);
 
         confirmSlot = getSlots(cfg, "confirm", menuPatternSlots);
         cancelSlot = getSlots(cfg, "cancel", menuPatternSlots);

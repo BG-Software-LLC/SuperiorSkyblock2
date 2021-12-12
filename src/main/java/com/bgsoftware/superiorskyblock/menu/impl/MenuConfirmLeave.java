@@ -37,7 +37,7 @@ public final class MenuConfirmLeave extends SuperiorMenu {
 
         CommentedConfiguration config = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmLeave, "confirm-leave.yml", config);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuConfirmLeave, "confirm-leave.yml", config);
 
         confirmSlot = getSlots(config, "confirm", menuPatternSlots);
         cancelSlot = getSlots(config, "cancel", menuPatternSlots);

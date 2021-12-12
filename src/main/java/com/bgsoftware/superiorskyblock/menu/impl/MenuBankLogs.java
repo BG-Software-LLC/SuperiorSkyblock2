@@ -94,7 +94,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
 
         PagedMenuPattern.Builder<BankTransaction> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadGUI(patternBuilder,
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "bank-logs.yml", MenuBankLogs::convertOldGUI);
 
         if (menuLoadResult == null)

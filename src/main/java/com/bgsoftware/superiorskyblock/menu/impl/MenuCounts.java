@@ -172,7 +172,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuCounts, "counts.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuCounts, "counts.yml", cfg);
 
         menuCounts.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
         menuCounts.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));

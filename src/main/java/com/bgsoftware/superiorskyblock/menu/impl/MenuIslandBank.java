@@ -42,7 +42,7 @@ public final class MenuIslandBank extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandBank, "island-bank.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuIslandBank, "island-bank.yml", cfg);
 
         logsSlot = getSlots(cfg, "logs", menuPatternSlots);
 

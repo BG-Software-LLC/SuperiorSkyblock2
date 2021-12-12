@@ -42,7 +42,7 @@ public final class MenuWarpCategories extends SuperiorMenu {
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 
-        FileUtils.loadGUI(menuWarpCategories, "warp-categories.yml", cfg);
+        FileUtils.loadMenu(menuWarpCategories, "warp-categories.yml", cfg);
 
         rowsSize = menuWarpCategories.getRowsSize();
         editLore = cfg.getStringList("edit-lore");

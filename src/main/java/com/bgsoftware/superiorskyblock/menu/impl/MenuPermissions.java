@@ -77,7 +77,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuPermissions, "permissions.yml", cfg);
+        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuPermissions, "permissions.yml", cfg);
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
 
