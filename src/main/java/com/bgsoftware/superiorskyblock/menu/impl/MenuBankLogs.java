@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
@@ -90,26 +90,18 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
     }
 
     public static void init() {
-        File file = new File(plugin.getDataFolder(), "menus/bank-logs.yml");
-
-        if (!file.exists())
-            FileUtils.saveResource("menus/bank-logs.yml");
-
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
-
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
+        menuPattern = null;
 
         PagedMenuPattern.Builder<BankTransaction> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(patternBuilder, "bank-logs.yml",
-                MenuBankLogs::convertOldGUI);
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadGUI(patternBuilder,
+                "bank-logs.yml", MenuBankLogs::convertOldGUI);
+
+        if (menuLoadResult == null)
+            return;
+
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         menuPattern = patternBuilder
                 .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
