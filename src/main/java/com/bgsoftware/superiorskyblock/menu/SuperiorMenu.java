@@ -112,6 +112,10 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         this.targetPlayer = targetPlayer;
     }
 
+    public SuperiorPlayer getTargetPlayer() {
+        return targetPlayer;
+    }
+
     public void resetData(SuperiorMenuPattern menuPattern) {
         this.menuPattern = menuPattern;
         this.completed = false;
