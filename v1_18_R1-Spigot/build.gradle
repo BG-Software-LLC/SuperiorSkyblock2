@@ -1,0 +1,13 @@
+group 'v1_18_R1'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+dependencies {
+    compileOnly "org.spigotmc:v1_18_R1:rc3"
+    compileOnly project(":API")
+    compileOnly parent
+}
