@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static PagedMenuPattern<BankTransaction> menuPattern;
@@ -123,7 +126,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
         SuperiorMenu.refreshMenus(MenuBankLogs.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if (!oldFile.exists())
