@@ -47,6 +47,12 @@ public final class ItemBuilder implements Cloneable {
         itemMeta = itemStack.getItemMeta();
     }
 
+    public ItemBuilder withAmount(int amount) {
+        if(amount >= 1 && amount <= itemStack.getMaxStackSize())
+            itemStack.setAmount(amount);
+        return this;
+    }
+
     public ItemBuilder asSkullOf(SuperiorPlayer superiorPlayer) {
         if (itemStack.getType() == Materials.PLAYER_HEAD.toBukkitType())
             textureValue = superiorPlayer == null ? HeadUtils.getNullPlayerTexture() : superiorPlayer.getTextureValue();
