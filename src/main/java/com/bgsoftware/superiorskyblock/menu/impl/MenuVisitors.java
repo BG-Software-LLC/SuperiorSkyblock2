@@ -62,9 +62,9 @@ public final class MenuVisitors extends PagedSuperiorMenu<MenuVisitors, Superior
 
         menuPattern = patternBuilder
                 .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setCurrentPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setNextPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
-                .setPagedObjectSlots(getSlots(cfg, "previous-page", menuPatternSlots), new VisitorPagedObjectButton.Builder())
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots), new VisitorPagedObjectButton.Builder())
                 .mapButtons(getSlots(cfg, "unique-visitors", menuPatternSlots), new OpenUniqueVisitorsButton.Builder())
                 .build();
     }
