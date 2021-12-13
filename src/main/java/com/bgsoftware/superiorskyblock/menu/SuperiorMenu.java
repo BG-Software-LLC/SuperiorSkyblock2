@@ -138,7 +138,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
 
     @Override
     @SuppressWarnings("unchecked")
-    public Inventory getInventory() {
+    public final Inventory getInventory() {
         Preconditions.checkNotNull(this.menuPattern, "menu wasn't initialized properly.");
         return menuPattern.buildInventory((M) this, this::replaceTitle);
     }

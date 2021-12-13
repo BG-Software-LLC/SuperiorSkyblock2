@@ -4,116 +4,93 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ValuesButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class MenuValues extends SuperiorMenu {
+public final class MenuValues extends SuperiorMenu<MenuValues> {
 
-    private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static RegularMenuPattern<MenuValues> menuPattern;
+
     private final Island island;
 
     private MenuValues(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuValues", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.island = island;
         if (island != null)
             updateTargetPlayer(island.getOwner());
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, island);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return title.replace("{0}", island.getOwner().getName())
+                .replace("{1}", StringUtils.format(island.getWorth()))
+                .replace("{2}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()));
+    }
+
     public static void init() {
-        MenuValues menuValues = new MenuValues(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/values.yml");
+        RegularMenuPattern.Builder<MenuValues> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/values.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "values.yml", MenuValues::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
-
-        /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
-
-        menuValues.resetData();
-
-        menuValues.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
-        menuValues.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
-        menuValues.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
-        menuValues.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
-
-        List<String> pattern = cfg.getStringList("pattern");
-        int backButton = -1;
-        char backButtonChar = cfg.getString("back", " ").charAt(0);
-
-        menuValues.setRowsSize(pattern.size());
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         KeySet keysToUpdate = new KeySet();
 
-        for (int row = 0; row < pattern.size(); row++) {
-            String patternLine = pattern.get(row);
-            int slot = row * 9;
+        if(cfg.isConfigurationSection("items")) {
+            for(String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+                ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
 
-            for (int i = 0; i < patternLine.length(); i++) {
-                char ch = patternLine.charAt(i);
-                if (ch != ' ') {
-                    if (backButtonChar == ch) {
-                        backButton = slot;
-                    } else if (cfg.contains("items." + ch + ".block")) {
-                        Key key = Key.of(cfg.getString("items." + ch + ".block"));
-                        menuValues.addData(slot + "", key);
-                        keysToUpdate.add(key);
-                    }
+                String block = itemsSection.getString("block");
 
-                    menuValues.addFillItem(slot, FileUtils.getItemStack("values.yml", cfg.getConfigurationSection("items." + ch)));
-                    menuValues.addCommands(slot, cfg.getStringList("commands." + ch));
-                    menuValues.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
+                if(block == null)
+                    continue;
 
-                    String permission = cfg.getString("permissions." + ch + ".permission");
-                    SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
-                    menuValues.addPermission(slot, permission, noAccessSound);
+                Key blockKey = Key.of(block);
+                keysToUpdate.add(blockKey);
 
-                    slot++;
-                }
+                patternBuilder.mapButton(menuPatternSlots.getSlot(itemsSectionName), new ValuesButton.Builder(blockKey));
             }
         }
 
+        menuPattern = patternBuilder.build();
+
         plugin.getBlockValues().registerMenuValueBlocks(keysToUpdate);
-
-        menuValues.setBackButton(backButton);
-
-        if (plugin.getSettings().isOnlyBackButton() && backButton == -1)
-            SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
-
-        menuValues.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
@@ -124,7 +101,7 @@ public final class MenuValues extends SuperiorMenu {
         refreshMenus(MenuValues.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/values-gui.yml");
 
         if (!oldFile.exists())
@@ -154,7 +131,7 @@ public final class MenuValues extends SuperiorMenu {
         ConfigurationSection blockItemSection = cfg.getConfigurationSection("values-gui.block-item");
 
         for (String material : cfg.getStringList("values-gui.materials")) {
-            char itemChar = itemChars[charCounter++];
+            char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
             ConfigurationSection section = itemsSection.createSection(itemChar + "");
             String[] materialSections = material.split(":");
             String block = materialSections.length == 2 ? materialSections[0] : materialSections[0] + ":" + materialSections[1];
@@ -166,7 +143,8 @@ public final class MenuValues extends SuperiorMenu {
             patternChars[slot] = itemChar;
         }
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }
@@ -201,50 +179,6 @@ public final class MenuValues extends SuperiorMenu {
         }
 
         section.set("type", spawnerType.equals(Materials.SPAWNER.toBukkitType() + "") ? spawnerType : block);
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return buildInventory(title -> title
-                .replace("{0}", island.getOwner().getName())
-                .replace("{1}", StringUtils.format(island.getWorth()))
-                .replace("{2}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
-        );
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inventory = super.buildInventory(titleReplacer);
-
-        for (int slot = 0; slot < inventory.getSize(); slot++) {
-            if (containsData(slot + "")) {
-                Key block = (Key) getData(slot + "");
-                BigDecimal amount = new BigDecimal(block.getGlobalKey().contains("SPAWNER") ?
-                        island.getExactBlockCountAsBigInteger(block) : island.getBlockCountAsBigInteger(block));
-                if (inventory.getItem(slot) != null) {
-                    ItemStack itemStack = new ItemBuilder(inventory.getItem(slot))
-                            .replaceAll("{0}", amount + "")
-                            .replaceAll("{1}", StringUtils.format(plugin.getBlockValues().getBlockWorth(block).multiply(amount)))
-                            .replaceAll("{2}", StringUtils.format(plugin.getBlockValues().getBlockLevel(block).multiply(amount)))
-                            .replaceAll("{3}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockWorth(block).multiply(amount), superiorPlayer.getUserLocale()))
-                            .replaceAll("{4}", StringUtils.fancyFormat(plugin.getBlockValues().getBlockLevel(block).multiply(amount), superiorPlayer.getUserLocale()))
-                            .build();
-                    itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());
-                    inventory.setItem(slot, itemStack);
-                }
-            }
-        }
-
-        return inventory;
     }
 
 }
