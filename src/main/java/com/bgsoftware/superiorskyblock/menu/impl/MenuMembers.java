@@ -21,9 +21,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
+public final class MenuMembers extends PagedSuperiorMenu<MenuMembers, SuperiorPlayer> {
 
-    private static PagedMenuPattern<SuperiorPlayer> menuPattern;
+    private static PagedMenuPattern<MenuMembers, SuperiorPlayer> menuPattern;
 
     private final Island island;
 
@@ -45,7 +45,7 @@ public final class MenuMembers extends PagedSuperiorMenu<SuperiorPlayer> {
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuMembers, SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "members.yml", MenuMembers::convertOldGUI);

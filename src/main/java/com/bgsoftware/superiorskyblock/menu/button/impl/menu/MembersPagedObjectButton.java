@@ -2,18 +2,16 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMembers;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public final class MembersPagedObjectButton extends PagedObjectButton<SuperiorPlayer> {
+public final class MembersPagedObjectButton extends PagedObjectButton<MenuMembers, SuperiorPlayer> {
 
     private MembersPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound,
@@ -23,11 +21,8 @@ public final class MembersPagedObjectButton extends PagedObjectButton<SuperiorPl
 
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuMembers, "superiorMenu must be MenuMembers");
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuMembers superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
-
         superiorMenu.setPreviousMove(false);
         plugin.getMenus().openMemberManage(clickedPlayer, superiorMenu, pagedObject);
     }
@@ -42,7 +37,7 @@ public final class MembersPagedObjectButton extends PagedObjectButton<SuperiorPl
                 .build(islandMember);
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, MembersPagedObjectButton> {
+    public static class Builder extends PagedObjectBuilder<Builder, MembersPagedObjectButton, MenuMembers> {
 
         @Override
         public MembersPagedObjectButton build() {

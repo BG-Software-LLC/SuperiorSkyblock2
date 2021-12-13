@@ -22,9 +22,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public final class MenuMemberRole extends SuperiorMenu {
+public final class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuMemberRole> menuPattern;
 
     private MenuMemberRole(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
         super(menuPattern, superiorPlayer);
@@ -44,7 +44,7 @@ public final class MenuMemberRole extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuMemberRole> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "member-role.yml", MenuMemberRole::convertOldGUI);
@@ -55,30 +55,30 @@ public final class MenuMemberRole extends SuperiorMenu {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        if(cfg.isConfigurationSection("items")) {
-            for(String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+        if (cfg.isConfigurationSection("items")) {
+            for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
 
                 Object roleObject = itemsSection.get("role");
 
                 PlayerRole playerRole = null;
 
-                if(roleObject instanceof String) {
+                if (roleObject instanceof String) {
                     try {
                         playerRole = SPlayerRole.of((String) roleObject);
                     } catch (IllegalArgumentException error) {
                         SuperiorSkyblockPlugin.log("&cInvalid role name in members-role menu: " + roleObject);
                         continue;
                     }
-                } else if(roleObject instanceof Integer) {
+                } else if (roleObject instanceof Integer) {
                     playerRole = SPlayerRole.of((Integer) roleObject);
-                    if(playerRole == null) {
+                    if (playerRole == null) {
                         SuperiorSkyblockPlugin.log("&cInvalid role id in members-role menu: " + roleObject);
                         continue;
                     }
                 }
 
-                if(playerRole == null)
+                if (playerRole == null)
                     continue;
 
                 patternBuilder.mapButtons(menuPatternSlots.getSlots(itemsSectionName), new MemberRoleButton.Builder()

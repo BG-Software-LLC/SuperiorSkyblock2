@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuCoops;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlayer> {
+public final class CoopsPagedObjectButton extends PagedObjectButton<MenuCoops, SuperiorPlayer> {
 
     private CoopsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                    String requiredPermission, SoundWrapper lackPermissionSound,
@@ -20,7 +20,7 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlay
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuCoops superiorMenu, InventoryClickEvent clickEvent) {
         // Dummy button
     }
 
@@ -34,7 +34,7 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<SuperiorPlay
                 .build(superiorPlayer);
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, CoopsPagedObjectButton> {
+    public static class Builder extends PagedObjectBuilder<Builder, CoopsPagedObjectButton, MenuCoops> {
 
         @Override
         public CoopsPagedObjectButton build() {

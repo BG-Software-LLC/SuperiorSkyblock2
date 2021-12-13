@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
+public final class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTransaction> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private static PagedMenuPattern<BankTransaction> menuPattern;
+    private static PagedMenuPattern<MenuBankLogs, BankTransaction> menuPattern;
 
     private final Island island;
 
@@ -95,7 +95,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<BankTransaction> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuBankLogs, BankTransaction> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "bank-logs.yml", MenuBankLogs::convertOldGUI);

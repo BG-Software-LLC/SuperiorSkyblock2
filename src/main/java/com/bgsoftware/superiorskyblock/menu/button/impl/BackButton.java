@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl;
 
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -8,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class BackButton extends SuperiorMenuButton {
+public final class BackButton<M extends ISuperiorMenu> extends SuperiorMenuButton<M> {
 
     private BackButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                        String requiredPermission, SoundWrapper lackPermissionSound) {
@@ -16,15 +17,15 @@ public final class BackButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        // Dummy button, doesn't do anything when clicked.
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
+
     }
 
-    public static class Builder extends AbstractBuilder<Builder, BackButton> {
+    public static class Builder<M extends ISuperiorMenu> extends AbstractBuilder<Builder<M>, BackButton<M>, M> {
 
         @Override
-        public BackButton build() {
-            return new BackButton(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        public BackButton<M> build() {
+            return new BackButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         }
 
     }

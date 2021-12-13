@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
+public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenu<M> {
 
     private final boolean acceptNull;
     protected Consumer<SuperiorPlayer> onPageMove = null;
@@ -20,11 +20,11 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
     protected int currentPage = 1;
 
-    public PagedSuperiorMenu(PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer) {
+    public PagedSuperiorMenu(PagedMenuPattern<M, T> menuPattern, SuperiorPlayer superiorPlayer) {
         this(menuPattern, superiorPlayer, false);
     }
 
-    public PagedSuperiorMenu(PagedMenuPattern<T> menuPattern, SuperiorPlayer superiorPlayer, boolean acceptNull) {
+    public PagedSuperiorMenu(PagedMenuPattern<M, T> menuPattern, SuperiorPlayer superiorPlayer, boolean acceptNull) {
         super(menuPattern, superiorPlayer);
         this.acceptNull = acceptNull;
     }
@@ -50,7 +50,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
     }
 
     @Override
-    public boolean preButtonClick(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+    public boolean preButtonClick(SuperiorMenuButton<M> menuButton, InventoryClickEvent clickEvent) {
         if (!(menuButton instanceof PagedObjectButton))
             return true;
 
@@ -62,8 +62,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             return acceptNull;
         }
 
-        // noinspection unchecked
-        ((PagedObjectButton<T>) menuButton).updateViewer(objects.get(objectIndex), superiorPlayer);
+        ((PagedObjectButton<M, T>) menuButton).updateViewer(objects.get(objectIndex), superiorPlayer);
 
         return true;
     }

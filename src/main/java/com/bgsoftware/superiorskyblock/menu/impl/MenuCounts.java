@@ -18,11 +18,11 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class MenuCounts extends PagedSuperiorMenu<MenuCounts.BlockCount> {
+public final class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.BlockCount> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static PagedMenuPattern<MenuCounts.BlockCount> menuPattern;
+    private static PagedMenuPattern<MenuCounts, MenuCounts.BlockCount> menuPattern;
 
     private final Island island;
 
@@ -49,7 +49,7 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts.BlockCount> {
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<BlockCount> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuCounts, BlockCount> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "counts.yml", null);

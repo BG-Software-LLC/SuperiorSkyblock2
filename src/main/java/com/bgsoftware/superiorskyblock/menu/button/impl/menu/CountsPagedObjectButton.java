@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -23,7 +22,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.BlockCount> {
+public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts, MenuCounts.BlockCount> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
@@ -155,7 +154,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuCounts superiorMenu, InventoryClickEvent clickEvent) {
         // Dummy button
     }
 
@@ -228,7 +227,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts.
                 .build(inventoryViewer);
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, CountsPagedObjectButton> {
+    public static class Builder extends PagedObjectBuilder<Builder, CountsPagedObjectButton, MenuCounts> {
 
         @Override
         public CountsPagedObjectButton build() {

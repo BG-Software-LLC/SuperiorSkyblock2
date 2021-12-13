@@ -2,20 +2,18 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public final class BorderColorToggleButton extends SuperiorMenuButton {
+public final class BorderColorToggleButton extends SuperiorMenuButton<MenuBorderColor> {
 
     private final ItemBuilder enabledItem;
     private final ItemBuilder disabledItem;
@@ -35,15 +33,12 @@ public final class BorderColorToggleButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuBorderColor, "superiorMenu must be MenuBorderColor");
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBorderColor superiorMenu, InventoryClickEvent clickEvent) {
         plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "toggle", "border");
-
         Executor.sync(superiorMenu::closePage, 1L);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, BorderColorToggleButton> {
+    public static class Builder extends AbstractBuilder<Builder, BorderColorToggleButton, MenuBorderColor> {
 
         private ItemBuilder disabledItem;
 

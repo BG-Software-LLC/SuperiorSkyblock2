@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public final class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings.RatingInfo> {
+public final class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings, MenuIslandRatings.RatingInfo> {
 
-    private static PagedMenuPattern<RatingInfo> menuPattern;
+    private static PagedMenuPattern<MenuIslandRatings, RatingInfo> menuPattern;
 
     private final Island island;
 
@@ -54,7 +54,7 @@ public final class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<RatingInfo> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuIslandRatings, RatingInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "island-ratings.yml", MenuIslandRatings::convertOldGUI);

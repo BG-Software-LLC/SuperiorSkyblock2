@@ -19,9 +19,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public final class MenuConfirmDisband extends SuperiorMenu {
+public final class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuConfirmDisband> menuPattern;
 
     private final Island targetIsland;
 
@@ -42,7 +42,7 @@ public final class MenuConfirmDisband extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuConfirmDisband> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "confirm-disband.yml", MenuConfirmDisband::convertOldGUI);

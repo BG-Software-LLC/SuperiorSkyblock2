@@ -19,9 +19,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public final class MenuControlPanel extends SuperiorMenu {
+public final class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuControlPanel> menuPattern;
 
     private final Island targetIsland;
 
@@ -42,7 +42,7 @@ public final class MenuControlPanel extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuControlPanel> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "control-panel.yml", MenuControlPanel::convertOldGUI);

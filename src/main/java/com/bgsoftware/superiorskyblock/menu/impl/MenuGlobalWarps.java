@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
+public final class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static PagedMenuPattern<Island> menuPattern;
+    private static PagedMenuPattern<MenuGlobalWarps, Island> menuPattern;
 
     public static boolean visitorWarps;
 
@@ -52,7 +52,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<Island> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuGlobalWarps, Island> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "global-warps.yml", MenuGlobalWarps::convertOldGUI);

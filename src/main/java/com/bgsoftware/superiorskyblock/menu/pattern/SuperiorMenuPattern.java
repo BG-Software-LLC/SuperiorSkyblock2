@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class SuperiorMenuPattern {
+public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
 
     public static final char[] BUTTON_SYMBOLS = new char[]{
             '!', '@', '#', '$', '%', '^', '&', '*', '-', '_', '+', '=',
@@ -34,11 +34,11 @@ public abstract class SuperiorMenuPattern {
 
     protected final String title;
     protected final InventoryType inventoryType;
-    protected final SuperiorMenuButton[] buttons;
+    protected final SuperiorMenuButton<M>[] buttons;
     protected final SoundWrapper openingSound;
     protected final boolean isPreviousMoveAllowed;
 
-    protected SuperiorMenuPattern(String title, InventoryType inventoryType, SuperiorMenuButton[] buttons,
+    protected SuperiorMenuPattern(String title, InventoryType inventoryType, SuperiorMenuButton<M>[] buttons,
                                   SoundWrapper openingSound, boolean isPreviousMoveAllowed) {
         this.title = title;
         this.inventoryType = inventoryType;
@@ -47,7 +47,8 @@ public abstract class SuperiorMenuPattern {
         this.isPreviousMoveAllowed = isPreviousMoveAllowed;
     }
 
-    public SuperiorMenuButton getButton(int slot) {
+    @SuppressWarnings("unchecked")
+    public SuperiorMenuButton<M> getButton(int slot) {
         return slot < 0 || slot >= this.buttons.length ? DummyButton.EMPTY_BUTTON : this.buttons[slot];
     }
 
@@ -63,19 +64,19 @@ public abstract class SuperiorMenuPattern {
         return isPreviousMoveAllowed;
     }
 
-    public Inventory buildInventory(ISuperiorMenu menu, Function<String, String> titleReplacer,
+    public Inventory buildInventory(M superiorMenu, Function<String, String> titleReplacer,
                                     SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
 
         String title = titleReplacer.apply(this.title);
 
-        Inventory inventory = createInventory(menu, PlaceholderHook.parse(inventoryViewer, title));
+        Inventory inventory = createInventory(superiorMenu, PlaceholderHook.parse(inventoryViewer, title));
 
-        setupInventory(inventory, menu, inventoryViewer, targetPlayer);
+        setupInventory(inventory, superiorMenu, inventoryViewer, targetPlayer);
 
         return inventory;
     }
 
-    public abstract void setupInventory(Inventory inventory, ISuperiorMenu superiorMenu,
+    public abstract void setupInventory(Inventory inventory, M superiorMenu,
                                         SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer);
 
     private Inventory createInventory(InventoryHolder holder, String title) {
@@ -94,11 +95,11 @@ public abstract class SuperiorMenuPattern {
     }
 
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T> {
+    public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T, M>, T, M extends ISuperiorMenu> {
 
         protected String title = "";
         protected InventoryType inventoryType = InventoryType.CHEST;
-        protected SuperiorMenuButton[] buttons;
+        protected SuperiorMenuButton<M>[] buttons;
         protected SoundWrapper openingSound;
         protected boolean isPreviousMoveAllowed;
 
@@ -135,14 +136,14 @@ public abstract class SuperiorMenuPattern {
             return (B) this;
         }
 
-        public B setButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+        public B setButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
             if (buttonBuilder != null && slot >= 0 && slot < this.buttons.length)
                 this.buttons[slot] = buttonBuilder.build();
             return (B) this;
         }
 
-        public B setButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
-            if(buttonBuilder != null) {
+        public B setButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
+            if (buttonBuilder != null) {
                 for (int slot : slots) {
                     if (slot >= 0 && slot < this.buttons.length)
                         this.buttons[slot] = buttonBuilder.build();
@@ -151,7 +152,7 @@ public abstract class SuperiorMenuPattern {
             return (B) this;
         }
 
-        public B mapButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+        public B mapButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
             if (slot >= 0 && slot < this.buttons.length) {
                 this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
             }
@@ -159,7 +160,7 @@ public abstract class SuperiorMenuPattern {
             return (B) this;
         }
 
-        public B mapButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder) {
+        public B mapButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
             for (int slot : slots) {
                 if (slot >= 0 && slot < this.buttons.length) {
                     this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();

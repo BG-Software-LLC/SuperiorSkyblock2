@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBiomes;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -13,7 +12,6 @@ import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public final class BiomeButton extends SuperiorMenuButton {
+public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
 
     private final SoundWrapper accessSound;
     private final List<String> accessCommands;
@@ -52,34 +50,29 @@ public final class BiomeButton extends SuperiorMenuButton {
     public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
         ItemStack buttonItem = null;
 
-        if(requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
+        if (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
             buttonItem = super.getButtonItem(inventoryViewer, targetPlayer);
-        }
-        else if(lackPermissionItem != null) {
+        } else if (lackPermissionItem != null) {
             buttonItem = lackPermissionItem.build(targetPlayer == null ? inventoryViewer : targetPlayer);
         }
 
-        if(buttonItem == null || !MenuBiomes.currentBiomeGlow)
+        if (buttonItem == null || !MenuBiomes.currentBiomeGlow)
             return buttonItem;
 
         Island island = inventoryViewer.getIsland();
 
-        if(island == null || island.getBiome() != biome)
+        if (island == null || island.getBiome() != biome)
             return buttonItem;
 
         return new ItemBuilder(buttonItem).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build();
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuBiomes, "superiorMenu must be MenuBiomes");
-
-        MenuBiomes menuBiomes = (MenuBiomes) superiorMenu;
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBiomes superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
         EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(clickedPlayer,
-                menuBiomes.getTargetIsland(), this.biome);
+                superiorMenu.getTargetIsland(), this.biome);
 
         if (event.isCancelled()) {
             if (lackPermissionSound != null)
@@ -93,13 +86,13 @@ public final class BiomeButton extends SuperiorMenuButton {
         accessCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
 
-        menuBiomes.getTargetIsland().setBiome(event.getResult());
+        superiorMenu.getTargetIsland().setBiome(event.getResult());
         Locale.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase());
 
         Executor.sync(superiorMenu::closePage, 1L);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, BiomeButton> {
+    public static class Builder extends AbstractBuilder<Builder, BiomeButton, MenuBiomes> {
 
         private final Biome biome;
         private ItemBuilder noAccessItem = null;

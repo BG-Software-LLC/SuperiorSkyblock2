@@ -14,9 +14,9 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 
 import java.util.List;
 
-public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
+public final class MenuCoops extends PagedSuperiorMenu<MenuCoops, SuperiorPlayer> {
 
-    private static PagedMenuPattern<SuperiorPlayer> menuPattern;
+    private static PagedMenuPattern<MenuCoops, SuperiorPlayer> menuPattern;
 
     private final Island island;
 
@@ -44,7 +44,7 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
     public static void init() {
         menuPattern = null;
 
-        PagedMenuPattern.Builder<SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
+        PagedMenuPattern.Builder<MenuCoops, SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "coops.yml", null);

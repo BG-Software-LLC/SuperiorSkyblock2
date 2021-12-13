@@ -20,9 +20,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public final class MenuBorderColor extends SuperiorMenu {
+public final class MenuBorderColor extends SuperiorMenu<MenuBorderColor> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuBorderColor> menuPattern;
 
     private MenuBorderColor(SuperiorPlayer superiorPlayer) {
         super(menuPattern, superiorPlayer);
@@ -37,7 +37,7 @@ public final class MenuBorderColor extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuBorderColor> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "border-color.yml", MenuBorderColor::convertOldGUI);
@@ -48,11 +48,11 @@ public final class MenuBorderColor extends SuperiorMenu {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        if(cfg.isConfigurationSection("items")) {
+        if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
 
-                if(!itemsSection.contains("enable-border") || !itemsSection.contains("disable-border"))
+                if (!itemsSection.contains("enable-border") || !itemsSection.contains("disable-border"))
                     continue;
 
                 patternBuilder.setButtons(menuPatternSlots.getSlots(itemsSectionName),

@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class PreviousPageButton extends SuperiorMenuButton {
+public final class PreviousPageButton<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenuButton<M> {
 
     private PreviousPageButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound) {
@@ -18,22 +17,18 @@ public final class PreviousPageButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof PagedSuperiorMenu, "superiorMenu must be a PagedSuperiorMenu.");
-
-        PagedSuperiorMenu<?> pagedSuperiorMenu = (PagedSuperiorMenu<?>) superiorMenu;
-
-        int newPage = pagedSuperiorMenu.getCurrentPage() - 1;
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
+        int newPage = superiorMenu.getCurrentPage() - 1;
         if (newPage >= 1)
-            pagedSuperiorMenu.movePage(newPage);
+            superiorMenu.movePage(newPage);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, PreviousPageButton> {
+    public static class Builder<M extends PagedSuperiorMenu<M, T>, T> extends
+            AbstractBuilder<Builder<M, T>, PreviousPageButton<M, T>, M> {
 
         @Override
-        public PreviousPageButton build() {
-            return new PreviousPageButton(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        public PreviousPageButton<M, T> build() {
+            return new PreviousPageButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         }
 
     }

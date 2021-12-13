@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -13,7 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class SuperiorMenuButton {
+public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
 
     protected final ItemBuilder buttonItem;
     protected final SoundWrapper clickSound;
@@ -54,7 +55,7 @@ public abstract class SuperiorMenuButton {
         return lackPermissionSound;
     }
 
-    public <T extends AbstractBuilder<T, ?>> T applyToBuilder(AbstractBuilder<T, ?> buttonBuilder) {
+    public <T extends AbstractBuilder<T, ?, M>> T applyToBuilder(AbstractBuilder<T, ?, M> buttonBuilder) {
         return buttonBuilder.setButtonItem(this.buttonItem)
                 .setClickSound(this.clickSound)
                 .setCommands(this.commands)
@@ -62,11 +63,11 @@ public abstract class SuperiorMenuButton {
                 .setLackPermissionsSound(this.lackPermissionSound);
     }
 
-    public abstract void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu,
-                                       InventoryClickEvent clickEvent);
+    public abstract void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent);
 
     @SuppressWarnings("unchecked")
-    public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T>, T extends SuperiorMenuButton> {
+    public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T, M>,
+            T extends SuperiorMenuButton<M>, M extends ISuperiorMenu> {
 
         protected boolean touched = false;
 

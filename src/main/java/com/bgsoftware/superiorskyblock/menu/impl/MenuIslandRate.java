@@ -20,9 +20,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.util.Arrays;
 
-public final class MenuIslandRate extends SuperiorMenu {
+public final class MenuIslandRate extends SuperiorMenu<MenuIslandRate> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuIslandRate> menuPattern;
 
     private final Island island;
 
@@ -43,7 +43,7 @@ public final class MenuIslandRate extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuIslandRate> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "island-rate.yml", MenuIslandRate::convertOldGUI);

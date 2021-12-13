@@ -5,20 +5,18 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 import java.util.UUID;
 
-public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTransaction> {
+public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankLogs, BankTransaction> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
@@ -31,9 +29,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
 
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuBankLogs, "superiorMenu must be MenuBankLogs");
-        ((MenuBankLogs) superiorMenu).setFilteredPlayer(pagedObject.getPlayer());
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBankLogs superiorMenu, InventoryClickEvent clickEvent) {
+        superiorMenu.setFilteredPlayer(pagedObject.getPlayer());
         superiorMenu.refreshPage();
     }
 
@@ -63,7 +60,7 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<BankTrans
         }
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, BankLogsPagedObjectButton> {
+    public static class Builder extends PagedObjectBuilder<Builder, BankLogsPagedObjectButton, MenuBankLogs> {
 
         @Override
         public BankLogsPagedObjectButton build() {

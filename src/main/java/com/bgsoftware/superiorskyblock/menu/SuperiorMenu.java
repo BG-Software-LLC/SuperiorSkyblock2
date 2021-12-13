@@ -29,7 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class SuperiorMenu implements ISuperiorMenu {
+public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperiorMenu {
 
     protected static final String[] MENU_IGNORED_SECTIONS = new String[]{
             "items", "sounds", "commands", "back"
@@ -39,7 +39,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
     private static final Pattern COMMAND_PATTERN = Pattern.compile("\\[(.+)]");
 
     @Nullable
-    private SuperiorMenuPattern menuPattern;
+    private SuperiorMenuPattern<M> menuPattern;
 
     private boolean completed;
     private int backSlot;
@@ -51,7 +51,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
     protected boolean previousMove = true, closeButton = false, nextMove = false;
     private boolean refreshing = false;
 
-    public SuperiorMenu(@Nullable SuperiorMenuPattern menuPattern, SuperiorPlayer superiorPlayer) {
+    public SuperiorMenu(@Nullable SuperiorMenuPattern<M> menuPattern, SuperiorPlayer superiorPlayer) {
         this.superiorPlayer = superiorPlayer;
         this.resetData(menuPattern);
     }
@@ -66,35 +66,36 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         superiorPlayer.runIfOnline(player -> {
             Inventory inventory = player.getOpenInventory().getTopInventory();
             InventoryHolder inventoryHolder = inventory == null ? null : inventory.getHolder();
-            if (inventoryHolder instanceof SuperiorMenu)
-                ((SuperiorMenu) inventoryHolder).previousMove = false;
+            if (inventoryHolder instanceof ISuperiorMenu)
+                ((ISuperiorMenu) inventoryHolder).setPreviousMove(false);
 
             player.closeInventory();
         });
     }
 
-    protected static <T extends SuperiorMenu> void refreshMenus(Class<T> menuClazz, Predicate<T> predicate) {
+    protected static <T extends SuperiorMenu<?>> void refreshMenus(Class<T> menuClazz, Predicate<T> predicate) {
         runActionOnMenus(menuClazz, predicate, ((player, superiorMenu) -> {
-            superiorMenu.previousMove = false;
+            superiorMenu.setPreviousMove(false);
             superiorMenu.open(superiorMenu.previousMenu);
         }));
     }
 
-    protected static <T extends SuperiorMenu> void destroyMenus(Class<T> menuClazz) {
+    protected static <T extends ISuperiorMenu> void destroyMenus(Class<T> menuClazz) {
         destroyMenus(menuClazz, superiorMenu -> true);
     }
 
-    protected static <T extends SuperiorMenu> void destroyMenus(Class<T> menuClazz, Predicate<T> predicate) {
+    protected static <T extends ISuperiorMenu> void destroyMenus(Class<T> menuClazz, Predicate<T> predicate) {
         runActionOnMenus(menuClazz, predicate, ((player, superiorMenu) -> player.closeInventory()));
     }
 
-    private static <T extends SuperiorMenu> void runActionOnMenus(Class<T> menuClazz, Predicate<T> predicate, BiConsumer<Player, SuperiorMenu> callback) {
+    @SuppressWarnings("unchecked")
+    private static <T extends ISuperiorMenu> void runActionOnMenus(Class<T> menuClazz, Predicate<T> predicate,
+                                                                   BiConsumer<Player, T> callback) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             try {
                 InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
-                //noinspection unchecked
                 if (menuClazz.isInstance(inventoryHolder) && predicate.test((T) inventoryHolder)) {
-                    SuperiorMenu superiorMenu = (SuperiorMenu) inventoryHolder;
+                    T superiorMenu = (T) inventoryHolder;
                     callback.accept(player, superiorMenu);
                 }
             } catch (Exception error) {
@@ -116,13 +117,13 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         return targetPlayer;
     }
 
-    public void resetData(SuperiorMenuPattern menuPattern) {
+    public void resetData(SuperiorMenuPattern<M> menuPattern) {
         this.menuPattern = menuPattern;
         this.completed = false;
     }
 
     @Nullable
-    public SuperiorMenuPattern getMenuPattern() {
+    public SuperiorMenuPattern<M> getMenuPattern() {
         return this.menuPattern;
     }
 
@@ -132,9 +133,10 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Inventory getInventory() {
         Preconditions.checkNotNull(this.menuPattern, "menu wasn't initialized properly.");
-        return menuPattern.buildInventory(this, this::replaceTitle, superiorPlayer, targetPlayer);
+        return menuPattern.buildInventory((M) this, this::replaceTitle, superiorPlayer, targetPlayer);
     }
 
     protected String replaceTitle(String title) {
@@ -170,7 +172,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
 
         Preconditions.checkNotNull(this.menuPattern, "menu wasn't initialized properly.");
 
-        SuperiorMenuButton menuButton = this.menuPattern.getButton(clickEvent.getRawSlot());
+        SuperiorMenuButton<M> menuButton = this.menuPattern.getButton(clickEvent.getRawSlot());
 
         String requiredPermission = menuButton.getRequiredPermission();
         if (requiredPermission != null && !superiorPlayer.hasPermission(requiredPermission)) {
@@ -189,16 +191,17 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                 ", Slot: " + clickEvent.getRawSlot());
 
         if (preButtonClick(menuButton, clickEvent))
-            menuButton.onButtonClick(plugin, this, clickEvent);
+            // noinspection unchecked
+            menuButton.onButtonClick(plugin, (M) this, clickEvent);
     }
 
     public abstract void cloneAndOpen(ISuperiorMenu previousMenu);
 
-    public boolean preButtonClick(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+    public boolean preButtonClick(SuperiorMenuButton<M> menuButton, InventoryClickEvent clickEvent) {
         return true;
     }
 
-    public void onButtonClickLackPermission(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+    public void onButtonClickLackPermission(SuperiorMenuButton<M> menuButton, InventoryClickEvent clickEvent) {
         SoundWrapper lackPermissionSound = menuButton.getLackPermissionSound();
         if (lackPermissionSound != null)
             lackPermissionSound.playSound(clickEvent.getWhoClicked());
@@ -298,10 +301,11 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             if (!superiorPlayer.isOnline())
                 return;
 
-            SuperiorMenu currentMenu = null;
+            SuperiorMenu<M> currentMenu = null;
             InventoryHolder inventoryHolder = player.getOpenInventory().getTopInventory().getHolder();
             if (inventoryHolder instanceof SuperiorMenu) {
-                currentMenu = (SuperiorMenu) inventoryHolder;
+                // noinspection unchecked
+                currentMenu = (SuperiorMenu<M>) inventoryHolder;
                 currentMenu.nextMove = true;
             }
 

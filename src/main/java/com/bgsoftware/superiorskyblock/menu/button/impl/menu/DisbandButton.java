@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -14,14 +13,13 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DisbandButton extends SuperiorMenuButton {
+public final class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> {
 
     private final boolean disbandIsland;
 
@@ -32,13 +30,9 @@ public final class DisbandButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuConfirmDisband, "superiorMenu must be MenuConfirmDisband");
-
-        MenuConfirmDisband menuConfirmDisband = (MenuConfirmDisband) superiorMenu;
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuConfirmDisband superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
-        Island targetIsland = menuConfirmDisband.getTargetIsland();
+        Island targetIsland = superiorMenu.getTargetIsland();
 
         if (disbandIsland && EventsCaller.callIslandDisbandEvent(clickedPlayer, targetIsland)) {
             IslandUtils.sendMessage(targetIsland, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());
@@ -58,7 +52,7 @@ public final class DisbandButton extends SuperiorMenuButton {
         Executor.sync(superiorMenu::closePage, 1L);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, DisbandButton> {
+    public static class Builder extends AbstractBuilder<Builder, DisbandButton, MenuConfirmDisband> {
 
         private boolean disbandIsland;
 

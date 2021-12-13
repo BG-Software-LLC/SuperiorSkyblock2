@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.button;
 
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
+public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends SuperiorMenuButton<M> {
 
     private final ItemBuilder nullItem;
 
@@ -43,8 +44,9 @@ public abstract class PagedObjectButton<T> extends SuperiorMenuButton {
                                                SuperiorPlayer targetPlayer, T pagedObject);
 
     @SuppressWarnings("unchecked")
-    public static abstract class PagedObjectBuilder<B extends AbstractBuilder<B, T>, T extends SuperiorMenuButton>
-            extends AbstractBuilder<B, T> {
+    public static abstract class PagedObjectBuilder<B extends AbstractBuilder<B, T, M>,
+            T extends SuperiorMenuButton<M>, M extends ISuperiorMenu>
+            extends AbstractBuilder<B, T, M> {
 
         protected ItemBuilder nullItem = null;
 

@@ -13,9 +13,9 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 /**
  * @author Callum Jay Seabrook (BomBardyGamer)
  */
-public final class MenuConfirmLeave extends SuperiorMenu {
+public final class MenuConfirmLeave extends SuperiorMenu<MenuConfirmLeave> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuConfirmLeave> menuPattern;
 
     private MenuConfirmLeave(SuperiorPlayer superiorPlayer) {
         super(menuPattern, superiorPlayer);
@@ -29,7 +29,7 @@ public final class MenuConfirmLeave extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuConfirmLeave> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "confirm-leave.yml", null);

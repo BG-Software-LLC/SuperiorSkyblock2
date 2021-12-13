@@ -2,18 +2,16 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.Comparator;
 import java.util.List;
 
-public final class BankLogsSortButton extends SuperiorMenuButton {
+public final class BankLogsSortButton extends SuperiorMenuButton<MenuBankLogs> {
 
     private final SortType sortType;
 
@@ -24,26 +22,22 @@ public final class BankLogsSortButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuBankLogs, "superiorMenu must be MenuBankLogs");
-
-        MenuBankLogs menuBankLogs = (MenuBankLogs) superiorMenu;
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBankLogs superiorMenu, InventoryClickEvent clickEvent) {
         switch (sortType) {
             case TIME:
-                menuBankLogs.setSorting(Comparator.comparingLong(BankTransaction::getTime));
+                superiorMenu.setSorting(Comparator.comparingLong(BankTransaction::getTime));
                 break;
             case MONEY:
-                menuBankLogs.setSorting((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
+                superiorMenu.setSorting((o1, o2) -> o2.getAmount().compareTo(o1.getAmount()));
                 break;
             default:
                 return;
         }
 
-        menuBankLogs.refreshPage();
+        superiorMenu.refreshPage();
     }
 
-    public static class Builder extends AbstractBuilder<Builder, BankLogsSortButton> {
+    public static class Builder extends AbstractBuilder<Builder, BankLogsSortButton, MenuBankLogs> {
 
         private SortType sortType;
 

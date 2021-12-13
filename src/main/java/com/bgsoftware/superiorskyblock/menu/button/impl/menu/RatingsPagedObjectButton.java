@@ -2,19 +2,17 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIslandRatings.RatingInfo> {
+public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIslandRatings, MenuIslandRatings.RatingInfo> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -25,8 +23,8 @@ public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIsland
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuIslandRatings, "superiorMenu must be MenuIslandRatings");
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuIslandRatings superiorMenu, InventoryClickEvent clickEvent) {
+        // Dummy button
     }
 
     @Override
@@ -41,7 +39,7 @@ public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIsland
                 .build(ratingPlayer);
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, RatingsPagedObjectButton> {
+    public static class Builder extends PagedObjectBuilder<Builder, RatingsPagedObjectButton, MenuIslandRatings> {
 
         @Override
         public RatingsPagedObjectButton build() {

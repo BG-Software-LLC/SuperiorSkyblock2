@@ -1,18 +1,16 @@
 package com.bgsoftware.superiorskyblock.menu.pattern.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.CurrentPageButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.NextPageButton;
-import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.PreviousPageButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -21,11 +19,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
+public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenuPattern<M> {
 
     private final int objectsPerPage;
 
-    private PagedMenuPattern(String title, InventoryType inventoryType, SuperiorMenuButton[] buttons,
+    private PagedMenuPattern(String title, InventoryType inventoryType, SuperiorMenuButton<M>[] buttons,
                              SoundWrapper openingSound, boolean isPreviousMoveAllowed) {
         super(title, inventoryType, buttons, openingSound, isPreviousMoveAllowed);
         objectsPerPage = (int) Arrays.stream(buttons).filter(button -> button instanceof PagedObjectButton).count();
@@ -36,21 +34,17 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
     }
 
     @Override
-    public void setupInventory(Inventory inventory, ISuperiorMenu superiorMenu,
-                               SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
-        Preconditions.checkArgument(superiorMenu instanceof PagedSuperiorMenu, "superiorMenu must be PagedSuperiorMenu.");
-
-        int currentPage = ((PagedSuperiorMenu<?>) superiorMenu).getCurrentPage();
-        // noinspection unchecked
-        List<T> pagedObjects = ((PagedSuperiorMenu<T>) superiorMenu).getPagedObjects();
+    public void setupInventory(Inventory inventory, M superiorMenu, SuperiorPlayer inventoryViewer,
+                               @Nullable SuperiorPlayer targetPlayer) {
+        int currentPage = superiorMenu.getCurrentPage();
+        List<T> pagedObjects = superiorMenu.getPagedObjects();
 
         // Set all regular buttons in the menu
         for (int slot = 0; slot < this.buttons.length; ++slot) {
-            SuperiorMenuButton button = this.buttons[slot];
+            SuperiorMenuButton<M> button = this.buttons[slot];
 
             if (button instanceof PagedObjectButton) {
-                // noinspection unchecked
-                PagedObjectButton<T> pagedObjectButton = (PagedObjectButton<T>) button;
+                PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) button;
                 int objectIndex = slot + (objectsPerPage * (currentPage - 1));
 
                 if (objectIndex >= pagedObjects.size()) {
@@ -92,26 +86,27 @@ public final class PagedMenuPattern<T> extends SuperiorMenuPattern {
         }
     }
 
-    public static class Builder<T> extends AbstractBuilder<Builder<T>, PagedMenuPattern<T>> {
+    public static class Builder<M extends PagedSuperiorMenu<M, T>, T> extends
+            AbstractBuilder<Builder<M, T>, PagedMenuPattern<M, T>, M> {
 
-        public Builder<T> setPreviousPageSlots(List<Integer> slots) {
-            return mapButtons(slots, new PreviousPageButton.Builder());
+        public Builder<M, T> setPreviousPageSlots(List<Integer> slots) {
+            return mapButtons(slots, new PreviousPageButton.Builder<>());
         }
 
-        public Builder<T> setNextPageSlots(List<Integer> slots) {
-            return mapButtons(slots, new NextPageButton.Builder());
+        public Builder<M, T> setNextPageSlots(List<Integer> slots) {
+            return mapButtons(slots, new NextPageButton.Builder<>());
         }
 
-        public Builder<T> setCurrentPageSlots(List<Integer> slots) {
-            return mapButtons(slots, new CurrentPageButton.Builder());
+        public Builder<M, T> setCurrentPageSlots(List<Integer> slots) {
+            return mapButtons(slots, new CurrentPageButton.Builder<>());
         }
 
-        public Builder<T> setPagedObjectSlots(List<Integer> slots, PagedObjectButton.PagedObjectBuilder<?, ?> builder) {
+        public Builder<M, T> setPagedObjectSlots(List<Integer> slots, PagedObjectButton.PagedObjectBuilder<?, ?, M> builder) {
             return mapButtons(slots, builder);
         }
 
         @Override
-        public PagedMenuPattern<T> build() {
+        public PagedMenuPattern<M, T> build() {
             return new PagedMenuPattern<>(this.title, this.inventoryType, this.buttons,
                     this.openingSound, this.isPreviousMoveAllowed);
         }

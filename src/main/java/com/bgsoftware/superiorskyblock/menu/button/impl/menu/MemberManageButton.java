@@ -3,18 +3,16 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuMemberManage;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class MemberManageButton extends SuperiorMenuButton {
+public final class MemberManageButton extends SuperiorMenuButton<MenuMemberManage> {
 
     private final ManageAction manageAction;
 
@@ -25,9 +23,7 @@ public final class MemberManageButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuBankLogs, "superiorMenu must be MenuBankLogs");
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuMemberManage superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         SuperiorPlayer targetPlayer = superiorMenu.getTargetPlayer();
 
@@ -63,7 +59,7 @@ public final class MemberManageButton extends SuperiorMenuButton {
         }
     }
 
-    public static class Builder extends AbstractBuilder<Builder, MemberManageButton> {
+    public static class Builder extends AbstractBuilder<Builder, MemberManageButton, MenuMemberManage> {
 
         private ManageAction manageAction;
 

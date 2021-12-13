@@ -24,9 +24,9 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public final class MenuBiomes extends SuperiorMenu {
+public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuBiomes> menuPattern;
 
     public static boolean currentBiomeGlow = false;
 
@@ -47,7 +47,7 @@ public final class MenuBiomes extends SuperiorMenu {
     }
 
     @Override
-    public void onButtonClickLackPermission(SuperiorMenuButton menuButton, InventoryClickEvent clickEvent) {
+    public void onButtonClickLackPermission(SuperiorMenuButton<MenuBiomes> menuButton, InventoryClickEvent clickEvent) {
         super.onButtonClickLackPermission(menuButton, clickEvent);
         if (menuButton instanceof BiomeButton) {
             List<String> commands = ((BiomeButton) menuButton).getLackPermissionCommands();
@@ -59,7 +59,7 @@ public final class MenuBiomes extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuBiomes> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "biomes.yml", MenuBiomes::convertOldGUI);

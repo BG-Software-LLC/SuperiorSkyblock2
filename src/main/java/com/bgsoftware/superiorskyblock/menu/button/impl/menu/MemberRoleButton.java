@@ -3,17 +3,15 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMemberRole;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class MemberRoleButton extends SuperiorMenuButton {
+public final class MemberRoleButton extends SuperiorMenuButton<MenuMemberRole> {
 
     private final PlayerRole playerRole;
 
@@ -25,9 +23,7 @@ public final class MemberRoleButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuMemberRole, "superiorMenu must be MenuMemberRole");
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuMemberRole superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         SuperiorPlayer targetPlayer = superiorMenu.getTargetPlayer();
 
@@ -40,7 +36,7 @@ public final class MemberRoleButton extends SuperiorMenuButton {
         }
     }
 
-    public static class Builder extends AbstractBuilder<Builder, MemberRoleButton> {
+    public static class Builder extends AbstractBuilder<Builder, MemberRoleButton, MenuMemberRole> {
 
         private PlayerRole playerRole;
 

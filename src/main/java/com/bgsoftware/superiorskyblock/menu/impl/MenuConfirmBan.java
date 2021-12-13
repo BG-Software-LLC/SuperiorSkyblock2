@@ -11,9 +11,9 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 
-public final class MenuConfirmBan extends SuperiorMenu {
+public final class MenuConfirmBan extends SuperiorMenu<MenuConfirmBan> {
 
-    private static RegularMenuPattern menuPattern;
+    private static RegularMenuPattern<MenuConfirmBan> menuPattern;
 
     private final Island targetIsland;
 
@@ -35,7 +35,7 @@ public final class MenuConfirmBan extends SuperiorMenu {
     public static void init() {
         menuPattern = null;
 
-        RegularMenuPattern.Builder patternBuilder = new RegularMenuPattern.Builder();
+        RegularMenuPattern.Builder<MenuConfirmBan> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
                 "confirm-ban.yml", null);

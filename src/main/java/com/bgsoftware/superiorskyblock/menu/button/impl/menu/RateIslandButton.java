@@ -5,20 +5,18 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRate;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class RateIslandButton extends SuperiorMenuButton {
+public final class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
 
     private final Rating rating;
 
@@ -29,13 +27,9 @@ public final class RateIslandButton extends SuperiorMenuButton {
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenu superiorMenu, InventoryClickEvent clickEvent) {
-        Preconditions.checkArgument(superiorMenu instanceof MenuIslandRate, "superiorMenu must be MenuIslandRate");
-
-        MenuIslandRate menuIslandRate = (MenuIslandRate) superiorMenu;
-
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuIslandRate superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
-        Island island = menuIslandRate.getTargetIsland();
+        Island island = superiorMenu.getTargetIsland();
 
         island.setRating(clickedPlayer, rating);
 
@@ -47,7 +41,7 @@ public final class RateIslandButton extends SuperiorMenuButton {
         Executor.sync(superiorMenu::closePage, 1L);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, RateIslandButton> {
+    public static class Builder extends AbstractBuilder<Builder, RateIslandButton, MenuIslandRate> {
 
         private Rating rating;
 
