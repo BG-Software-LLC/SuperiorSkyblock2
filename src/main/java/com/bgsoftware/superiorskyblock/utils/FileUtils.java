@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.BackButton;
@@ -35,8 +36,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -146,8 +145,10 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(SuperiorMenuPattern.AbstractBuilder<?, ?> menuPattern, String fileName,
-                                                                          @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
+    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+            SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
+            String fileName,
+            @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
         File file = new File(plugin.getDataFolder(), "menus/" + fileName);
 
         if (!file.exists())
@@ -190,16 +191,15 @@ public final class FileUtils {
                         backButtonFound = true;
                     }
 
-                    SuperiorMenuButton.AbstractBuilder<?, ?> buttonBuilder = isBackButton ?
-                            new BackButton.Builder() : new DummyButton.Builder();
+                    SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder = isBackButton ?
+                            new BackButton.Builder<>() : new DummyButton.Builder<>();
 
                     menuPattern.setButton(slot, buttonBuilder
                             .setButtonItem(getItemStack(fileName, cfg.getConfigurationSection("items." + ch)))
                             .setCommands(cfg.getStringList("commands." + ch))
                             .setClickSound(getSound(cfg.getConfigurationSection("sounds." + ch)))
                             .setRequiredPermission(cfg.getString("permissions." + ch + ".permission"))
-                            .setLackPermissionsSound(getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound")))
-                            .build());
+                            .setLackPermissionsSound(getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"))));
 
                     menuPatternSlots.addSlot(ch, slot);
 
@@ -325,7 +325,7 @@ public final class FileUtils {
             while ((jarEntry = jis.getNextJarEntry()) != null) {
                 String name = jarEntry.getName();
 
-                if (name == null || name.isEmpty() || !name.endsWith(".class")) {
+                if (!name.endsWith(".class")) {
                     continue;
                 }
 
