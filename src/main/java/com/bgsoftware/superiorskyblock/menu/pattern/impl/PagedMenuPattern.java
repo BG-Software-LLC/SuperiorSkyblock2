@@ -48,7 +48,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
                     inventory.setItem(slot, pagedObjectButton.getNullItem().build());
                     continue;
                 } else {
-                    pagedObjectButton.updateObject(pagedObjects.get(objectIndex), superiorMenu.getInventoryViewer());
+                    pagedObjectButton.updateObject(pagedObjects.get(objectIndex));
                 }
             }
 
