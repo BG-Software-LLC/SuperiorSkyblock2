@@ -1,50 +1,72 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.UniqueVisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
-import java.io.File;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPlayer, Long>> {
+public final class MenuUniqueVisitors extends PagedSuperiorMenu<MenuUniqueVisitors, MenuUniqueVisitors.UniqueVisitorInfo> {
+
+    private static PagedMenuPattern<MenuUniqueVisitors, UniqueVisitorInfo> menuPattern;
 
     private final Island island;
 
     private MenuUniqueVisitors(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuUniqueVisitors", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.island = island;
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, island);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return title.replace("{0}", island.getUniqueVisitorsWithTimes().size() + "");
+    }
+
+    @Override
+    protected List<UniqueVisitorInfo> requestObjects() {
+        return island.getUniqueVisitorsWithTimes().stream()
+                .map(pair -> new UniqueVisitorInfo(pair.getKey(), pair.getValue()))
+                .collect(Collectors.toList());
+    }
+
     public static void init() {
-        MenuUniqueVisitors menuUniqueVisitors = new MenuUniqueVisitors(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/unique-visitors.yml");
+        PagedMenuPattern.Builder<MenuUniqueVisitors, UniqueVisitorInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/unique-visitors.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "unique-visitors.yml", null);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadMenu(menuUniqueVisitors, "unique-visitors.yml", cfg);
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        menuUniqueVisitors.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuUniqueVisitors.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuUniqueVisitors.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuUniqueVisitors.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuUniqueVisitors.markCompleted();
+        menuPattern = patternBuilder
+                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots),
+                        new UniqueVisitorPagedObjectButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
@@ -55,47 +77,24 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
         refreshMenus(MenuUniqueVisitors.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    @Override
-    public Inventory getInventory() {
-        return buildInventory(title -> title.replace("{0}", island.getUniqueVisitorsWithTimes().size() + ""));
-    }
+    public static final class UniqueVisitorInfo {
 
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
+        private final SuperiorPlayer visitor;
+        private final long visitTime;
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, Pair<SuperiorPlayer, Long> pair) {
-        if (event.getClick().name().contains("RIGHT")) {
-            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "invite", pair.getKey().getName());
-        } else if (event.getClick().name().contains("LEFT")) {
-            plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "expel", pair.getKey().getName());
+        public UniqueVisitorInfo(SuperiorPlayer visitor, long visitTime) {
+            this.visitor = visitor;
+            this.visitTime = visitTime;
         }
-    }
 
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Pair<SuperiorPlayer, Long> pair) {
-        try {
-            Island island = pair.getKey().getIsland();
-            String islandOwner = island != null ? island.getOwner().getName() : "None";
-            String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
-            return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", pair.getKey().getName())
-                    .replaceAll("{1}", islandOwner)
-                    .replaceAll("{2}", islandName)
-                    .replaceAll("{3}", StringUtils.formatDate(pair.getValue()))
-                    .asSkullOf(pair.getKey()).build(pair.getKey());
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + pair.getKey().getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
+        public SuperiorPlayer getVisitor() {
+            return visitor;
         }
-    }
 
-    @Override
-    protected List<Pair<SuperiorPlayer, Long>> requestObjects() {
-        return island.getUniqueVisitorsWithTimes();
+        public long getVisitTime() {
+            return visitTime;
+        }
+
     }
 
 }
