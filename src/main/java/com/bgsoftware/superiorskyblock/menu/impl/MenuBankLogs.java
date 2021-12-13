@@ -53,7 +53,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTran
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(inventoryViewer, previousMenu, island);
     }
 
     @Override

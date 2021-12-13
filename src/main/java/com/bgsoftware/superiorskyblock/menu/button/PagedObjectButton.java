@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.button;
 
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
@@ -15,7 +14,6 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
     private final ItemBuilder nullItem;
 
     protected T pagedObject = null;
-    protected SuperiorPlayer inventoryViewer;
 
     protected PagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                 String requiredPermission, SoundWrapper lackPermissionSound,
@@ -24,9 +22,8 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
         this.nullItem = nullItem == null ? new ItemBuilder(Material.AIR) : nullItem;
     }
 
-    public void updateViewer(T pagedObject, SuperiorPlayer inventoryViewer) {
+    public void updateObject(T pagedObject) {
         this.pagedObject = pagedObject;
-        this.inventoryViewer = inventoryViewer;
     }
 
     public ItemBuilder getNullItem() {
@@ -35,13 +32,11 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
 
     @Nullable
     @Override
-    public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
-        return modifyButtonItem(super.getButtonItem(inventoryViewer, targetPlayer),
-                inventoryViewer, targetPlayer, pagedObject);
+    public ItemStack getButtonItem(M superiorMenu) {
+        return modifyButtonItem(super.getButtonItem(superiorMenu), superiorMenu, pagedObject);
     }
 
-    public abstract ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                               SuperiorPlayer targetPlayer, T pagedObject);
+    public abstract ItemStack modifyButtonItem(ItemStack buttonItem, M superiorMenu, T pagedObject);
 
     @SuppressWarnings("unchecked")
     public static abstract class PagedObjectBuilder<B extends AbstractBuilder<B, T, M>,

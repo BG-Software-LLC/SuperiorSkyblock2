@@ -33,7 +33,7 @@ public final class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetPlayer);
+        openInventory(inventoryViewer, previousMenu, targetPlayer);
     }
 
     @Override

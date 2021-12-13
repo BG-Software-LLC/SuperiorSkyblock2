@@ -29,7 +29,7 @@ public final class MenuConfirmKick extends SuperiorMenu<MenuConfirmKick> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland, targetPlayer);
+        openInventory(inventoryViewer, previousMenu, targetIsland, targetPlayer);
     }
 
     public static void init() {

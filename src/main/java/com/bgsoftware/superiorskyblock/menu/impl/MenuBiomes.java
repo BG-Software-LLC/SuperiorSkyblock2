@@ -43,7 +43,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
+        openInventory(inventoryViewer, previousMenu, targetIsland);
     }
 
     @Override
@@ -52,7 +52,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
         if (menuButton instanceof BiomeButton) {
             List<String> commands = ((BiomeButton) menuButton).getLackPermissionCommands();
             commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                    command.replace("%player%", superiorPlayer.getName())));
+                    command.replace("%player%", inventoryViewer.getName())));
         }
     }
 

@@ -41,7 +41,7 @@ public final class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(inventoryViewer, previousMenu, island);
     }
 
     @Override

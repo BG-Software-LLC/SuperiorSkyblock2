@@ -28,8 +28,8 @@ public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIsland
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, MenuIslandRatings.RatingInfo ratingInfo) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuIslandRatings superiorMenu,
+                                      MenuIslandRatings.RatingInfo ratingInfo) {
         SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(ratingInfo.getPlayerUUID());
 
         return new ItemBuilder(buttonItem)

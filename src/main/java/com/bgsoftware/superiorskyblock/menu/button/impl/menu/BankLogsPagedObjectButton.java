@@ -35,8 +35,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankL
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, BankTransaction transaction) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuBankLogs superiorMenu, BankTransaction transaction) {
+        SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", transaction.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))

@@ -35,12 +35,13 @@ public final class MissionsPagedObjectButton extends PagedObjectButton<MenuMissi
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, Mission<?> mission) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuMissionsCategory superiorMenu, Mission<?> mission) {
         Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
 
         if (!missionDataOptional.isPresent())
             return buttonItem;
+
+        SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
 
         MissionData missionData = missionDataOptional.get();
         IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;

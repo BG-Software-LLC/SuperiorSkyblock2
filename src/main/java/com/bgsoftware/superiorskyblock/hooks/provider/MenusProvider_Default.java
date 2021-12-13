@@ -39,7 +39,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuPermissions;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerLanguage;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuSettings;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuUniqueVisitors;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuUpgrades;
@@ -105,7 +105,7 @@ public final class MenusProvider_Default implements MenusProvider {
         handleExceptions(MenuMissionsCategory::init);
         handleExceptions(MenuPermissions::init);
         handleExceptions(MenuPlayerLanguage::init);
-        handleExceptions(MenuSettings::init);
+        handleExceptions(MenuIslandFlags::init);
         handleExceptions(MenuTopIslands::init);
         handleExceptions(MenuUniqueVisitors::init);
         handleExceptions(MenuUpgrades::init);
@@ -402,19 +402,19 @@ public final class MenusProvider_Default implements MenusProvider {
     public void openSettings(SuperiorPlayer targetPlayer, @Nullable ISuperiorMenu previousMenu, Island targetIsland) {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
-        MenuSettings.openInventory(targetPlayer, previousMenu, targetIsland);
+        MenuIslandFlags.openInventory(targetPlayer, previousMenu, targetIsland);
     }
 
     @Override
     public void refreshSettings(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuSettings.refreshMenus(island);
+        MenuIslandFlags.refreshMenus(island);
     }
 
     @Override
     public void updateSettings(IslandFlag islandFlag) {
         Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
-        MenuSettings.updateSettings(islandFlag);
+        MenuIslandFlags.updateSettings(islandFlag);
     }
 
     @Override

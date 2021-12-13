@@ -27,7 +27,7 @@ public final class MenuCoops extends PagedSuperiorMenu<MenuCoops, SuperiorPlayer
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(inventoryViewer, previousMenu, island);
     }
 
     @Override

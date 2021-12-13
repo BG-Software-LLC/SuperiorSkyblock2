@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.menu.pattern;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
@@ -13,7 +12,6 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -64,20 +62,19 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
         return isPreviousMoveAllowed;
     }
 
-    public Inventory buildInventory(M superiorMenu, Function<String, String> titleReplacer,
-                                    SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer) {
+    public Inventory buildInventory(M superiorMenu, Function<String, String> titleReplacer) {
 
         String title = titleReplacer.apply(this.title);
 
-        Inventory inventory = createInventory(superiorMenu, PlaceholderHook.parse(inventoryViewer, title));
+        Inventory inventory = createInventory(superiorMenu,
+                PlaceholderHook.parse(superiorMenu.getInventoryViewer(), title));
 
-        setupInventory(inventory, superiorMenu, inventoryViewer, targetPlayer);
+        setupInventory(inventory, superiorMenu);
 
         return inventory;
     }
 
-    public abstract void setupInventory(Inventory inventory, M superiorMenu,
-                                        SuperiorPlayer inventoryViewer, @Nullable SuperiorPlayer targetPlayer);
+    public abstract void setupInventory(Inventory inventory, M superiorMenu);
 
     private Inventory createInventory(InventoryHolder holder, String title) {
         Inventory inventory;

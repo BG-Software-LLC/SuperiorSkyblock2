@@ -25,8 +25,7 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<MenuCoops, S
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, SuperiorPlayer superiorPlayer) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuCoops superiorMenu, SuperiorPlayer superiorPlayer) {
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", superiorPlayer.getName())
                 .replaceAll("{1}", superiorPlayer.getPlayerRole() + "")

@@ -34,7 +34,7 @@ public final class MenuMembers extends PagedSuperiorMenu<MenuMembers, SuperiorPl
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(inventoryViewer, previousMenu, island);
     }
 
     @Override

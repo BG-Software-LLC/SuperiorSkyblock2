@@ -29,7 +29,7 @@ public final class MenuConfirmBan extends SuperiorMenu<MenuConfirmBan> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland, targetPlayer);
+        openInventory(inventoryViewer, previousMenu, targetIsland, targetPlayer);
     }
 
     public static void init() {

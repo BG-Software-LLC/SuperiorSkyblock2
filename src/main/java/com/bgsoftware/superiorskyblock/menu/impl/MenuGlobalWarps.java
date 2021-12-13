@@ -39,14 +39,24 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Is
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
+        openInventory(inventoryViewer, previousMenu);
     }
 
     @Override
     protected List<Island> requestObjects() {
-        return getFilteredIslands(superiorPlayer)
-                .sorted(SortingComparators.WORTH_COMPARATOR)
-                .collect(Collectors.toList());
+        return getFilteredIslands().sorted(SortingComparators.WORTH_COMPARATOR).collect(Collectors.toList());
+    }
+
+    private Stream<Island> getFilteredIslands() {
+        return plugin.getGrid().getIslands().stream()
+                .filter(island -> {
+                    if (visitorWarps)
+                        return island.getVisitorsLocation() != null;
+                    else if (island.equals(inventoryViewer.getIsland()))
+                        return !island.getIslandWarps().isEmpty();
+                    else
+                        return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
+                });
     }
 
     public static void init() {
@@ -88,18 +98,6 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Is
 
     public static void refreshMenus() {
         SuperiorMenu.refreshMenus(MenuGlobalWarps.class, superiorMenu -> true);
-    }
-
-    private static Stream<Island> getFilteredIslands(SuperiorPlayer superiorPlayer) {
-        return plugin.getGrid().getIslands().stream()
-                .filter(island -> {
-                    if (visitorWarps)
-                        return island.getVisitorsLocation() != null;
-                    else if (island.equals(superiorPlayer.getIsland()))
-                        return !island.getIslandWarps().isEmpty();
-                    else
-                        return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
-                });
     }
 
     private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {

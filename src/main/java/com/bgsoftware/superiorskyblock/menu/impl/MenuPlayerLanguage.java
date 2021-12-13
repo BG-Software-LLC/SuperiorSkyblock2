@@ -24,7 +24,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
+        openInventory(inventoryViewer, previousMenu);
     }
 
     public static void init() {

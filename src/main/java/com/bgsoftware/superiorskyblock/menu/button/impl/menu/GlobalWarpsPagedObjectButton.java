@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -24,15 +23,15 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<MenuGl
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuGlobalWarps superiorMenu, InventoryClickEvent clickEvent) {
         if (MenuGlobalWarps.visitorWarps) {
             superiorMenu.setPreviousMove(false);
-            plugin.getCommands().dispatchSubCommand(inventoryViewer.asPlayer(), "visit", pagedObject.getOwner().getName());
+            plugin.getCommands().dispatchSubCommand(superiorMenu.getInventoryViewer().asPlayer(),
+                    "visit", pagedObject.getOwner().getName());
         } else {
-            plugin.getMenus().openWarpCategories(inventoryViewer, superiorMenu, pagedObject);
+            plugin.getMenus().openWarpCategories(superiorMenu.getInventoryViewer(), superiorMenu, pagedObject);
         }
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, Island island) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuGlobalWarps superiorMenu, Island island) {
         return new ItemBuilder(buttonItem)
                 .asSkullOf(island.getOwner())
                 .replaceAll("{0}", island.getOwner().getName())

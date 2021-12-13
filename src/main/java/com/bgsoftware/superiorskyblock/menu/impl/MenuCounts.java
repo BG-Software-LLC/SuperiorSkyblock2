@@ -33,7 +33,7 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.B
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
+        openInventory(inventoryViewer, previousMenu, island);
     }
 
     @Override

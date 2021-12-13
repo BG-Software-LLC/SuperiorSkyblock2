@@ -62,7 +62,7 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
             return acceptNull;
         }
 
-        ((PagedObjectButton<M, T>) menuButton).updateViewer(objects.get(objectIndex), superiorPlayer);
+        ((PagedObjectButton<M, T>) menuButton).updateObject(objects.get(objectIndex), superiorPlayer);
 
         return true;
     }

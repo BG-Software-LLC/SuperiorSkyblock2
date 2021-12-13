@@ -31,7 +31,7 @@ public final class MenuBorderColor extends SuperiorMenu<MenuBorderColor> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
+        openInventory(inventoryViewer, previousMenu);
     }
 
     public static void init() {

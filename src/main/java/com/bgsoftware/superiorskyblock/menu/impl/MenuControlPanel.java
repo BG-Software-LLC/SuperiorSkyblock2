@@ -36,7 +36,7 @@ public final class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
+        openInventory(inventoryViewer, previousMenu, targetIsland);
     }
 
     public static void init() {

@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.pattern.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
@@ -14,7 +13,6 @@ import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,8 +32,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
     }
 
     @Override
-    public void setupInventory(Inventory inventory, M superiorMenu, SuperiorPlayer inventoryViewer,
-                               @Nullable SuperiorPlayer targetPlayer) {
+    public void setupInventory(Inventory inventory, M superiorMenu) {
         int currentPage = superiorMenu.getCurrentPage();
         List<T> pagedObjects = superiorMenu.getPagedObjects();
 
@@ -51,14 +48,14 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
                     inventory.setItem(slot, pagedObjectButton.getNullItem().build());
                     continue;
                 } else {
-                    pagedObjectButton.updateViewer(pagedObjects.get(objectIndex), inventoryViewer);
+                    pagedObjectButton.updateObject(pagedObjects.get(objectIndex), superiorMenu.getInventoryViewer());
                 }
             }
 
             ItemStack buttonItem;
 
             try {
-                buttonItem = button.getButtonItem(inventoryViewer, targetPlayer);
+                buttonItem = button.getButtonItem(superiorMenu);
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
                 SuperiorSkyblockPlugin.debug(error);
@@ -71,15 +68,15 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
             if (button instanceof PreviousPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a"))
-                        .build(inventoryViewer));
+                        .build(superiorMenu.getInventoryViewer()));
             } else if (button instanceof NextPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", (pagedObjects.size() > currentPage * this.objectsPerPage ? "&a" : "&c"))
-                        .build(inventoryViewer));
+                        .build(superiorMenu.getInventoryViewer()));
             } else if (button instanceof CurrentPageButton) {
                 inventory.setItem(slot, new ItemBuilder(buttonItem)
                         .replaceAll("{0}", currentPage + "")
-                        .build(inventoryViewer));
+                        .build(superiorMenu.getInventoryViewer()));
             } else {
                 inventory.setItem(slot, buttonItem);
             }

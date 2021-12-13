@@ -28,8 +28,7 @@ public final class MembersPagedObjectButton extends PagedObjectButton<MenuMember
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer,
-                                      SuperiorPlayer targetPlayer, SuperiorPlayer islandMember) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuMembers superiorMenu, SuperiorPlayer islandMember) {
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", islandMember.getName())
                 .replaceAll("{1}", islandMember.getPlayerRole() + "")

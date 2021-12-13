@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.menu.button;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -32,8 +30,8 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
     }
 
     @Nullable
-    public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
-        return buttonItem == null ? null : buttonItem.build(targetPlayer == null ? inventoryViewer : targetPlayer);
+    public ItemStack getButtonItem(M superiorMenu) {
+        return buttonItem == null ? null : buttonItem.build(superiorMenu.getInventoryViewer());
     }
 
     @Nullable

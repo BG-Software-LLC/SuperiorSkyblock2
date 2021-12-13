@@ -159,8 +159,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer,
-                                      MenuCounts.BlockCount blockCount) {
+    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuCounts superiorMenu, MenuCounts.BlockCount blockCount) {
         Key rawKey = blockCount.getBlockKey();
         Key blockKey = plugin.getBlockValues().convertKey(rawKey);
 
@@ -213,6 +212,8 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
 
         BigDecimal worthValue = plugin.getBlockValues().getBlockWorth(rawKey);
         BigDecimal levelValue = plugin.getBlockValues().getBlockLevel(rawKey);
+
+        SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
 
         return itemBuilder
                 .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")

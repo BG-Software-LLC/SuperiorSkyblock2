@@ -47,7 +47,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCa
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, missionCategory);
+        openInventory(inventoryViewer, previousMenu, missionCategory);
     }
 
     @Override
@@ -61,10 +61,10 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCa
     }
 
     private int getCompletionStatus(Mission<?> mission) {
-        IMissionsHolder missionsHolder = mission.getIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
+        IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
         return missionsHolder == null ? 0 :
                 !missionsHolder.canCompleteMissionAgain(mission) ? 2 :
-                        plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
+                        plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
     }
 
     public static void init() {

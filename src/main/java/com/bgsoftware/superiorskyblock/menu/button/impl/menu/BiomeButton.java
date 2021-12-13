@@ -47,13 +47,15 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
 
     @Nullable
     @Override
-    public ItemStack getButtonItem(SuperiorPlayer inventoryViewer, SuperiorPlayer targetPlayer) {
+    public ItemStack getButtonItem(MenuBiomes superiorMenu) {
         ItemStack buttonItem = null;
 
+        SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
+
         if (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
-            buttonItem = super.getButtonItem(inventoryViewer, targetPlayer);
+            buttonItem = super.getButtonItem(superiorMenu);
         } else if (lackPermissionItem != null) {
-            buttonItem = lackPermissionItem.build(targetPlayer == null ? inventoryViewer : targetPlayer);
+            buttonItem = lackPermissionItem.build(inventoryViewer);
         }
 
         if (buttonItem == null || !MenuBiomes.currentBiomeGlow)

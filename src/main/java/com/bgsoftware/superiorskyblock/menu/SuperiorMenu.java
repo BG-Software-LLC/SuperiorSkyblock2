@@ -44,15 +44,15 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     private boolean completed;
     private int backSlot;
 
-    protected final SuperiorPlayer superiorPlayer;
+    protected final SuperiorPlayer inventoryViewer;
     protected SuperiorPlayer targetPlayer = null;
 
     protected ISuperiorMenu previousMenu;
     protected boolean previousMove = true, closeButton = false, nextMove = false;
     private boolean refreshing = false;
 
-    public SuperiorMenu(@Nullable SuperiorMenuPattern<M> menuPattern, SuperiorPlayer superiorPlayer) {
-        this.superiorPlayer = superiorPlayer;
+    public SuperiorMenu(@Nullable SuperiorMenuPattern<M> menuPattern, SuperiorPlayer inventoryViewer) {
+        this.inventoryViewer = inventoryViewer;
         this.resetData(menuPattern);
     }
 
@@ -117,6 +117,10 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         return targetPlayer;
     }
 
+    public SuperiorPlayer getInventoryViewer() {
+        return inventoryViewer;
+    }
+
     public void resetData(SuperiorMenuPattern<M> menuPattern) {
         this.menuPattern = menuPattern;
         this.completed = false;
@@ -136,7 +140,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     @SuppressWarnings("unchecked")
     public Inventory getInventory() {
         Preconditions.checkNotNull(this.menuPattern, "menu wasn't initialized properly.");
-        return menuPattern.buildInventory((M) this, this::replaceTitle, superiorPlayer, targetPlayer);
+        return menuPattern.buildInventory((M) this, this::replaceTitle);
     }
 
     protected String replaceTitle(String title) {
@@ -160,7 +164,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     }
 
     public void closePage() {
-        superiorPlayer.runIfOnline(player -> {
+        inventoryViewer.runIfOnline(player -> {
             previousMove = false;
             player.closeInventory();
         });
@@ -175,7 +179,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         SuperiorMenuButton<M> menuButton = this.menuPattern.getButton(clickEvent.getRawSlot());
 
         String requiredPermission = menuButton.getRequiredPermission();
-        if (requiredPermission != null && !superiorPlayer.hasPermission(requiredPermission)) {
+        if (requiredPermission != null && !inventoryViewer.hasPermission(requiredPermission)) {
             onButtonClickLackPermission(menuButton, clickEvent);
             return;
         }
@@ -186,7 +190,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
 
         menuButton.getCommands().forEach(command -> runCommand(plugin, command, clickEvent, Bukkit.getConsoleSender()));
 
-        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " +
+        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + inventoryViewer.getName() + ", Item: " +
                 (clickEvent.getCurrentItem() == null ? "AIR" : clickEvent.getCurrentItem().getType()) +
                 ", Slot: " + clickEvent.getRawSlot());
 
@@ -264,21 +268,21 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             return;
         }
 
-        Player player = superiorPlayer.asPlayer();
+        Player player = inventoryViewer.asPlayer();
 
         if (player == null)
             return;
 
         if (player.isSleeping()) {
-            Locale.OPEN_MENU_WHILE_SLEEPING.send(superiorPlayer);
+            Locale.OPEN_MENU_WHILE_SLEEPING.send(inventoryViewer);
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + getClass().getName());
+        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + inventoryViewer.getName() + ", Menu: " + getClass().getName());
 
         if (menuPattern == null) {
             if (!(this instanceof SuperiorMenuBlank))
-                SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
+                SuperiorMenuBlank.openInventory(inventoryViewer, previousMenu);
             return;
         }
 
@@ -289,7 +293,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         } catch (Exception ex) {
             if (!(this instanceof SuperiorMenuBlank)) {
                 completed = false;
-                SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
+                SuperiorMenuBlank.openInventory(inventoryViewer, previousMenu);
             }
 
             SuperiorSkyblockPlugin.debug(ex);
@@ -298,7 +302,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         }
 
         Executor.sync(() -> {
-            if (!superiorPlayer.isOnline())
+            if (!inventoryViewer.isOnline())
                 return;
 
             SuperiorMenu<M> currentMenu = null;

@@ -23,7 +23,7 @@ public final class MenuMissions extends SuperiorMenu<MenuMissions> {
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
+        openInventory(inventoryViewer, previousMenu);
     }
 
     public static void init() {
