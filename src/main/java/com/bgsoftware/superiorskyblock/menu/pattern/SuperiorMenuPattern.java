@@ -13,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -165,6 +166,10 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
             }
 
             return (B) this;
+        }
+
+        public List<SuperiorMenuButton<M>> getButtons() {
+            return Collections.unmodifiableList(Arrays.asList(this.buttons));
         }
 
         public abstract T build();
