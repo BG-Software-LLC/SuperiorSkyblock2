@@ -13,6 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -49,6 +50,10 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
     @SuppressWarnings("unchecked")
     public SuperiorMenuButton<M> getButton(int slot) {
         return slot < 0 || slot >= this.buttons.length ? DummyButton.EMPTY_BUTTON : this.buttons[slot];
+    }
+
+    public Collection<SuperiorMenuButton<M>> getButtons() {
+        return Collections.unmodifiableCollection(Arrays.asList(buttons));
     }
 
     public int getRowsSize() {
@@ -166,10 +171,6 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
             }
 
             return (B) this;
-        }
-
-        public List<SuperiorMenuButton<M>> getButtons() {
-            return Collections.unmodifiableList(Arrays.asList(this.buttons));
         }
 
         public abstract T build();
