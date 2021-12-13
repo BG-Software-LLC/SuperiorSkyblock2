@@ -1,53 +1,81 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoriesPagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
-public final class MenuWarpCategories extends SuperiorMenu {
+public final class MenuWarpCategories extends PagedSuperiorMenu<MenuWarpCategories, WarpCategory> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static PagedMenuPattern<MenuWarpCategories, WarpCategory> menuPattern;
 
     public static int rowsSize;
-    private static List<String> editLore;
+    public static List<String> editLore;
 
     private final Island island;
     private final boolean hasManagePerms;
 
     private MenuWarpCategories(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuWarpCategories", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.island = island;
         hasManagePerms = island != null && island.hasPermission(superiorPlayer, IslandPrivileges.SET_WARP);
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
+    public boolean hasManagePerms() {
+        return hasManagePerms;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, island);
+    }
+
+    @Override
+    protected List<WarpCategory> requestObjects() {
+        return new ArrayList<>(island.getWarpCategories().values());
+    }
+
     public static void init() {
-        MenuWarpCategories menuWarpCategories = new MenuWarpCategories(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/warp-categories.yml");
+        PagedMenuPattern.Builder<MenuWarpCategories, WarpCategory> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/warp-categories.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "warp-categories.yml", MenuWarpCategories::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        FileUtils.loadMenu(menuWarpCategories, "warp-categories.yml", cfg);
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        rowsSize = menuWarpCategories.getRowsSize();
         editLore = cfg.getStringList("edit-lore");
 
-        menuWarpCategories.markCompleted();
+        menuPattern = patternBuilder
+                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots),
+                        new WarpCategoriesPagedObjectButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
@@ -75,56 +103,21 @@ public final class MenuWarpCategories extends SuperiorMenu {
         return island.getWarpCategories().values().stream().findFirst().orElseGet(() -> island.createWarpCategory("Default Category"));
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e) {
-        if (e.getCurrentItem() == null || e.getCurrentItem().getType() == Material.AIR)
-            return;
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
+        if (newMenu.contains("slots") || !newMenu.contains("items"))
+            return false;
 
-        for (WarpCategory warpCategory : island.getWarpCategories().values()) {
-            if (e.getRawSlot() == warpCategory.getSlot()) {
-                if (e.getClick().name().contains("RIGHT") && hasManagePerms) {
-                    previousMove = false;
-                    plugin.getMenus().openWarpCategoryManage(superiorPlayer, this, warpCategory);
-                } else {
-                    previousMove = false;
-                    plugin.getMenus().openWarps(superiorPlayer, this, warpCategory);
-                }
-            }
-        }
-    }
+        String itemChar = newMenu.getConfigurationSection("items")
+                .getKeys(false).stream()
+                .findFirst()
+                .orElse(null);
 
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
-    }
+        if (itemChar == null)
+            return false;
 
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inventory = super.buildInventory(titleReplacer);
+        newMenu.set("slots", itemChar);
 
-        for (WarpCategory warpCategory : island.getWarpCategories().values()) {
-            boolean isMember = island.isMember(superiorPlayer);
-            long accessAmount = warpCategory.getWarps().stream().filter(
-                    islandWarp -> isMember || !islandWarp.hasPrivateFlag()
-            ).count();
-
-            if (accessAmount == 0)
-                continue;
-
-            ItemStack iconItem;
-
-            if (!hasManagePerms || editLore.isEmpty()) {
-                iconItem = warpCategory.getIcon(island.getOwner());
-            } else {
-                iconItem = new ItemBuilder(warpCategory.getIcon(null))
-                        .appendLore(editLore)
-                        .build(island.getOwner());
-            }
-
-            inventory.setItem(warpCategory.getSlot(), iconItem);
-        }
-
-        return inventory;
+        return true;
     }
 
 }
