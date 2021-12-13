@@ -1,50 +1,39 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconDisplayButton;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconDisplayButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconEditLoreButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconEditTypeButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconRenameButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconEditConfirmButton;
-import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconEditLoreButton;
-import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconEditTypeButton;
-import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconRenameButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 
-public final class MenuWarpCategoryIconEdit extends SuperiorMenu<MenuWarpCategoryIconEdit> {
+public final class MenuWarpCategoryIconEdit extends SuperiorMenuIconEdit<MenuWarpCategoryIconEdit, WarpCategory> {
 
     private static RegularMenuPattern<MenuWarpCategoryIconEdit> menuPattern;
 
-    private final WarpCategory warpCategory;
-    private final ItemBuilder itemBuilder;
-
     private MenuWarpCategoryIconEdit(SuperiorPlayer superiorPlayer, WarpCategory warpCategory) {
-        super(menuPattern, superiorPlayer);
-        this.warpCategory = warpCategory;
-        this.itemBuilder = warpCategory == null ? null : new ItemBuilder(warpCategory.getRawIcon());
-    }
-
-    public WarpCategory getWarpCategory() {
-        return warpCategory;
-    }
-
-    public ItemBuilder getItemBuilder() {
-        return itemBuilder;
+        super(menuPattern, superiorPlayer, warpCategory, warpCategory == null ? null :
+                new ItemBuilder(warpCategory.getRawIcon()));
     }
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu, warpCategory);
+        openInventory(inventoryViewer, previousMenu, iconProvider);
     }
 
     @Override
     protected String replaceTitle(String title) {
-        return title.replace("{0}", warpCategory.getName());
+        return title.replace("{0}", iconProvider.getName());
     }
 
     public static void init() {
@@ -63,15 +52,15 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu<MenuWarpCategor
 
         menuPattern = patternBuilder
                 .mapButtons(getSlots(cfg, "icon-type", menuPatternSlots),
-                        new WarpCategoryIconEditTypeButton.Builder())
+                        new IconEditTypeButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_TYPE))
                 .mapButtons(getSlots(cfg, "icon-rename", menuPatternSlots),
-                        new WarpCategoryIconRenameButton.Builder())
+                        new IconRenameButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_NAME))
                 .mapButtons(getSlots(cfg, "icon-relore", menuPatternSlots),
-                        new WarpCategoryIconEditLoreButton.Builder())
+                        new IconEditLoreButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_LORE))
                 .mapButtons(getSlots(cfg, "icon-confirm", menuPatternSlots),
                         new WarpCategoryIconEditConfirmButton.Builder())
                 .mapButtons(getSlots(cfg, "icon-slots", menuPatternSlots),
-                        new WarpCategoryIconDisplayButton.Builder())
+                        new IconDisplayButton.Builder<>())
                 .build();
     }
 

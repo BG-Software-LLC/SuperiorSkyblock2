@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -13,19 +13,21 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
 
-public final class WarpCategoryIconEditTypeButton extends SuperiorMenuButton<MenuWarpCategoryIconEdit> {
+public final class IconEditTypeButton<M extends SuperiorMenuIconEdit<M, T>, T> extends SuperiorMenuButton<M> {
 
-    private WarpCategoryIconEditTypeButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
-                                           String requiredPermission, SoundWrapper lackPermissionSound) {
+    private final Locale newTypeMessage;
+
+    private IconEditTypeButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+                               String requiredPermission, SoundWrapper lackPermissionSound, Locale newTypeMessage) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        this.newTypeMessage = newTypeMessage;
     }
 
     @Override
-    public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuWarpCategoryIconEdit superiorMenu,
-                              InventoryClickEvent clickEvent) {
+    public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
         Player player = (Player) clickEvent.getWhoClicked();
 
-        Locale.WARP_CATEGORY_ICON_NEW_TYPE.send(player);
+        newTypeMessage.send(player);
 
         superiorMenu.closePage();
 
@@ -56,7 +58,7 @@ public final class WarpCategoryIconEditTypeButton extends SuperiorMenuButton<Men
                     return true;
                 }
 
-                superiorMenu.getItemBuilder()
+                superiorMenu.getIconBuilder()
                         .withType(material).withDurablity(data);
             }
 
@@ -68,12 +70,19 @@ public final class WarpCategoryIconEditTypeButton extends SuperiorMenuButton<Men
         });
     }
 
-    public static class Builder extends AbstractBuilder<Builder, WarpCategoryIconEditTypeButton, MenuWarpCategoryIconEdit> {
+    public static class Builder<M extends SuperiorMenuIconEdit<M, T>, T> extends
+            AbstractBuilder<Builder<M, T>, IconEditTypeButton<M, T>, M> {
+
+        private final Locale newTypeMessage;
+
+        public Builder(Locale newTypeMessage) {
+            this.newTypeMessage = newTypeMessage;
+        }
 
         @Override
-        public WarpCategoryIconEditTypeButton build() {
-            return new WarpCategoryIconEditTypeButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound);
+        public IconEditTypeButton<M, T> build() {
+            return new IconEditTypeButton<>(buttonItem, clickSound, commands, requiredPermission,
+                    lackPermissionSound, newTypeMessage);
         }
 
     }

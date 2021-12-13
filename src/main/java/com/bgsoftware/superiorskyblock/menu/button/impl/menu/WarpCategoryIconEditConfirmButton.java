@@ -24,7 +24,7 @@ public final class WarpCategoryIconEditConfirmButton extends SuperiorMenuButton<
 
         Locale.WARP_CATEGORY_ICON_UPDATED.send(clickEvent.getWhoClicked());
 
-        superiorMenu.getWarpCategory().setIcon(superiorMenu.getItemBuilder().build());
+        superiorMenu.getIconProvider().setIcon(superiorMenu.getIconBuilder().build());
     }
 
     public static class Builder extends AbstractBuilder<Builder, WarpCategoryIconEditConfirmButton, MenuWarpCategoryIconEdit> {
