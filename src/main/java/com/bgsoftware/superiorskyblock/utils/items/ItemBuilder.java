@@ -47,6 +47,17 @@ public final class ItemBuilder implements Cloneable {
         itemMeta = itemStack.getItemMeta();
     }
 
+    public ItemBuilder withType(Material type) {
+        this.itemStack.setType(type);
+        return this;
+    }
+
+    public ItemBuilder withDurablity(short durability) {
+        if(durability >= 0)
+            this.itemStack.setDurability(durability);
+        return this;
+    }
+
     public ItemBuilder withAmount(int amount) {
         if(amount >= 1 && amount <= itemStack.getMaxStackSize())
             itemStack.setAmount(amount);
