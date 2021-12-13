@@ -43,7 +43,7 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
         this.currentPage = newPage;
 
         if (onPageMove != null)
-            onPageMove.accept(superiorPlayer);
+            onPageMove.accept(inventoryViewer);
 
         previousMove = false;
         open(previousMenu);
@@ -62,7 +62,7 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
             return acceptNull;
         }
 
-        ((PagedObjectButton<M, T>) menuButton).updateObject(objects.get(objectIndex), superiorPlayer);
+        ((PagedObjectButton<M, T>) menuButton).updateObject(objects.get(objectIndex));
 
         return true;
     }
