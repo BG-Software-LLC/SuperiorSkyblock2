@@ -27,6 +27,15 @@ public final class RegularMenuPattern<M extends ISuperiorMenu> extends SuperiorM
         }
     }
 
+    public Builder<M> builder() {
+        return new Builder<M>()
+                .setTitle(title)
+                .setInventoryType(inventoryType)
+                .setOpeningSound(openingSound)
+                .setPreviousMoveAllowed(isPreviousMoveAllowed)
+                .setButtons(buttons);
+    }
+
     public static final class Builder<M extends ISuperiorMenu> extends
             AbstractBuilder<Builder<M>, RegularMenuPattern<M>, M> {
 

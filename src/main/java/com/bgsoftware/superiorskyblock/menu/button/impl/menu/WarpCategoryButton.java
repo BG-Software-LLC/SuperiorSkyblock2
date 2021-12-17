@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -13,12 +13,15 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public final class WarpCategoriesPagedObjectButton extends PagedObjectButton<MenuWarpCategories, WarpCategory> {
+public final class WarpCategoryButton extends SuperiorMenuButton<MenuWarpCategories> {
 
-    private WarpCategoriesPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
-                                            String requiredPermission, SoundWrapper lackPermissionSound,
-                                            ItemBuilder nullItem, int objectIndex) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
+    private final WarpCategory warpCategory;
+
+    private WarpCategoryButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+                               String requiredPermission, SoundWrapper lackPermissionSound,
+                               WarpCategory warpCategory) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+        this.warpCategory = warpCategory;
     }
 
     @Override
@@ -27,16 +30,15 @@ public final class WarpCategoriesPagedObjectButton extends PagedObjectButton<Men
 
         if (superiorMenu.hasManagePerms() && clickEvent.getClick().name().contains("RIGHT")) {
             superiorMenu.setPreviousMove(false);
-            plugin.getMenus().openWarpCategoryManage(clickedPlayer, superiorMenu, pagedObject);
+            plugin.getMenus().openWarpCategoryManage(clickedPlayer, superiorMenu, warpCategory);
         } else {
             superiorMenu.setPreviousMove(false);
-            plugin.getMenus().openWarps(clickedPlayer, superiorMenu, pagedObject);
+            plugin.getMenus().openWarps(clickedPlayer, superiorMenu, warpCategory);
         }
     }
 
     @Override
-    public ItemStack modifyButtonItem(ItemStack buttonItem, MenuWarpCategories superiorMenu,
-                                      WarpCategory warpCategory) {
+    public ItemStack getButtonItem(MenuWarpCategories superiorMenu) {
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         Island island = superiorMenu.getTargetIsland();
 
@@ -46,7 +48,7 @@ public final class WarpCategoriesPagedObjectButton extends PagedObjectButton<Men
         ).count();
 
         if (accessAmount == 0)
-            return buttonItem;
+            return null;
 
         if (!superiorMenu.hasManagePerms() || MenuWarpCategories.editLore.isEmpty()) {
             return warpCategory.getIcon(island.getOwner());
@@ -57,12 +59,18 @@ public final class WarpCategoriesPagedObjectButton extends PagedObjectButton<Men
         }
     }
 
-    public static class Builder extends PagedObjectBuilder<Builder, WarpCategoriesPagedObjectButton, MenuWarpCategories> {
+    public static class Builder extends AbstractBuilder<Builder, WarpCategoryButton, MenuWarpCategories> {
+
+        private final WarpCategory warpCategory;
+
+        public Builder(WarpCategory warpCategory) {
+            this.warpCategory = warpCategory;
+        }
 
         @Override
-        public WarpCategoriesPagedObjectButton build() {
-            return new WarpCategoriesPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, getObjectIndex());
+        public WarpCategoryButton build() {
+            return new WarpCategoryButton(buttonItem, clickSound, commands, requiredPermission,
+                    lackPermissionSound, warpCategory);
         }
 
     }
