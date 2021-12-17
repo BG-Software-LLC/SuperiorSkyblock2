@@ -157,7 +157,12 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
 
         public B mapButton(int slot, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
             if (slot >= 0 && slot < this.buttons.length) {
-                this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
+                if(this.buttons[slot] == null) {
+                    this.buttons[slot] = buttonBuilder.build();
+                }
+                else {
+                    this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
+                }
             }
 
             return (B) this;
@@ -166,7 +171,12 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
         public B mapButtons(List<Integer> slots, SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder) {
             for (int slot : slots) {
                 if (slot >= 0 && slot < this.buttons.length) {
-                    this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
+                    if(this.buttons[slot] == null) {
+                        this.buttons[slot] = buttonBuilder.build();
+                    }
+                    else {
+                        this.buttons[slot] = this.buttons[slot].applyToBuilder(buttonBuilder).build();
+                    }
                 }
             }
 
