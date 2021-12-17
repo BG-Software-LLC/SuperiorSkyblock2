@@ -134,7 +134,7 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                         .setOffset(itemSection.getBoolean("offset", false))
                         .setAccessItem(FileUtils.getItemStack("island-creation.yml",
                                 itemSection.getConfigurationSection("access")))
-                        .setAccessItem(FileUtils.getItemStack("island-creation.yml",
+                        .setNoAccessItem(FileUtils.getItemStack("island-creation.yml",
                                 itemSection.getConfigurationSection("no-access"))));
             }
         }
