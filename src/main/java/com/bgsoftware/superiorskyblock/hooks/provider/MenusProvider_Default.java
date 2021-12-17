@@ -37,7 +37,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuMemberRole;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMissions;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMissionsCategory;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuPermissions;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandPrivileges;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerLanguage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
@@ -103,7 +103,7 @@ public final class MenusProvider_Default implements MenusProvider {
         handleExceptions(MenuMembers::init);
         handleExceptions(MenuMissions::init);
         handleExceptions(MenuMissionsCategory::init);
-        handleExceptions(MenuPermissions::init);
+        handleExceptions(MenuIslandPrivileges::init);
         handleExceptions(MenuPlayerLanguage::init);
         handleExceptions(MenuIslandFlags::init);
         handleExceptions(MenuTopIslands::init);
@@ -355,7 +355,7 @@ public final class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(permissiblePlayer, "permissiblePlayer parameter cannot be null.");
-        MenuPermissions.openInventory(targetPlayer, previousMenu, targetIsland, permissiblePlayer);
+        MenuIslandPrivileges.openInventory(targetPlayer, previousMenu, targetIsland, permissiblePlayer);
     }
 
     @Override
@@ -363,33 +363,33 @@ public final class MenusProvider_Default implements MenusProvider {
         Preconditions.checkNotNull(targetPlayer, "targetPlayer parameter cannot be null.");
         Preconditions.checkNotNull(targetIsland, "targetIsland parameter cannot be null.");
         Preconditions.checkNotNull(permissibleRole, "permissibleRole parameter cannot be null.");
-        MenuPermissions.openInventory(targetPlayer, previousMenu, targetIsland, permissibleRole);
+        MenuIslandPrivileges.openInventory(targetPlayer, previousMenu, targetIsland, permissibleRole);
     }
 
     @Override
     public void refreshPermissions(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        MenuPermissions.refreshMenus(island);
+        MenuIslandPrivileges.refreshMenus(island);
     }
 
     @Override
     public void refreshPermissions(Island island, SuperiorPlayer permissiblePlayer) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(permissiblePlayer, "permissiblePlayer parameter cannot be null.");
-        MenuPermissions.refreshMenus(island, permissiblePlayer);
+        MenuIslandPrivileges.refreshMenus(island, permissiblePlayer);
     }
 
     @Override
     public void refreshPermissions(Island island, PlayerRole permissibleRole) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(permissibleRole, "permissibleRole parameter cannot be null.");
-        MenuPermissions.refreshMenus(island, permissibleRole);
+        MenuIslandPrivileges.refreshMenus(island, permissibleRole);
     }
 
     @Override
     public void updatePermission(IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        MenuPermissions.updatePermission(islandPrivilege);
+        MenuIslandPrivileges.updatePermission(islandPrivilege);
     }
 
     @Override
