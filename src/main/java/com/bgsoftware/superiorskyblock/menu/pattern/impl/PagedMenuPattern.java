@@ -35,6 +35,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
     public void setupInventory(Inventory inventory, M superiorMenu) {
         int currentPage = superiorMenu.getCurrentPage();
         List<T> pagedObjects = superiorMenu.getPagedObjects();
+        int pagedObjectSlot = 0;
 
         // Set all regular buttons in the menu
         for (int slot = 0; slot < this.buttons.length; ++slot) {
@@ -42,7 +43,9 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
 
             if (button instanceof PagedObjectButton) {
                 PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) button;
-                int objectIndex = slot + (objectsPerPage * (currentPage - 1));
+                int objectIndex = pagedObjectSlot + (objectsPerPage * (currentPage - 1));
+
+                ++pagedObjectSlot;
 
                 if (objectIndex >= pagedObjects.size()) {
                     inventory.setItem(slot, pagedObjectButton.getNullItem().build());
