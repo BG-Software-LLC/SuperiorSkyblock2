@@ -28,6 +28,8 @@ public final class IconEditLoreButton<M extends SuperiorMenuIconEdit<M, T>, T> e
 
         newLoreMessage.send(player);
 
+        superiorMenu.closePage();
+
         PlayerChat.listen(player, message -> {
             if (!message.equalsIgnoreCase("-cancel")) {
                 superiorMenu.getIconBuilder().withLore(message.split("\\\\n"));
