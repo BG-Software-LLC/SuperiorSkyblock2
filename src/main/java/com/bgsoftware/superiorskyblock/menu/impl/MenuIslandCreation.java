@@ -138,6 +138,8 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                                 itemSection.getConfigurationSection("no-access"))));
             }
         }
+
+        menuPattern = patternBuilder.build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, String islandName) {
