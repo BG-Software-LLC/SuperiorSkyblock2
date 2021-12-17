@@ -74,7 +74,8 @@ public final class CmdWithdraw implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction, -1, amount);
+        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction,
+                null, null, amount);
     }
 
     @Override
