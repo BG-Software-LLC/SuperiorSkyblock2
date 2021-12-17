@@ -29,8 +29,8 @@ public final class DummyButton<M extends ISuperiorMenu> extends SuperiorMenuButt
         @Override
         @SuppressWarnings("unchecked")
         public DummyButton<M> build() {
-            return touched ? new DummyButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound)
-                    : EMPTY_BUTTON;
+            return !touched && EMPTY_BUTTON != null ? EMPTY_BUTTON :
+                    new DummyButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         }
 
     }
