@@ -54,7 +54,10 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
     }
 
     public <T extends AbstractBuilder<T, ?, M>> T applyToBuilder(AbstractBuilder<T, ?, M> buttonBuilder) {
-        return buttonBuilder.setButtonItem(this.buttonItem)
+        if(buttonBuilder.buttonItem == null)
+            buttonBuilder.setButtonItem(this.buttonItem);
+
+        return buttonBuilder
                 .setClickSound(this.clickSound)
                 .setCommands(this.commands)
                 .setRequiredPermission(this.requiredPermission)
