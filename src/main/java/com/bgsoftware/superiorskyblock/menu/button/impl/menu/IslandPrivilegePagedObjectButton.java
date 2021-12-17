@@ -26,8 +26,10 @@ import java.util.List;
 public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<MenuIslandPrivileges,
         MenuIslandPrivileges.IslandPrivilegeInfo> {
 
-    private IslandPrivilegePagedObjectButton(String requiredPermission, SoundWrapper lackPermissionSound) {
-        super(null, null, null, requiredPermission, lackPermissionSound, null);
+    private IslandPrivilegePagedObjectButton(String requiredPermission, SoundWrapper lackPermissionSound,
+                                             int objectIndex) {
+        super(null, null, null, requiredPermission, lackPermissionSound, null,
+                objectIndex);
     }
 
     @Override
@@ -198,7 +200,7 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
 
         @Override
         public IslandPrivilegePagedObjectButton build() {
-            return new IslandPrivilegePagedObjectButton(requiredPermission, lackPermissionSound);
+            return new IslandPrivilegePagedObjectButton(requiredPermission, lackPermissionSound, getObjectIndex());
         }
 
     }

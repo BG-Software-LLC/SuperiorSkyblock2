@@ -15,8 +15,8 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<MenuGl
 
     private GlobalWarpsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                          String requiredPermission, SoundWrapper lackPermissionSound,
-                                         ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                         ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -45,7 +45,7 @@ public final class GlobalWarpsPagedObjectButton extends PagedObjectButton<MenuGl
         @Override
         public GlobalWarpsPagedObjectButton build() {
             return new GlobalWarpsPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

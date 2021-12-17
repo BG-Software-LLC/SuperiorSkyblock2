@@ -57,15 +57,17 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
         if (!(menuButton instanceof PagedObjectButton))
             return true;
 
+        PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) menuButton;
+
         objects = requestObjects();
 
-        int objectIndex = clickEvent.getRawSlot() + (objects.size() * (currentPage - 1));
+        int objectIndex = pagedObjectButton.getObjectIndex() + (objects.size() * (currentPage - 1));
 
         if (objectIndex >= objects.size()) {
             return acceptNull;
         }
 
-        ((PagedObjectButton<M, T>) menuButton).updateObject(objects.get(objectIndex));
+        pagedObjectButton.updateObject(objects.get(objectIndex));
 
         return true;
     }

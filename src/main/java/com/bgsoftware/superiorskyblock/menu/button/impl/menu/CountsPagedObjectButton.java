@@ -149,8 +149,8 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
 
     private CountsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                     String requiredPermission, SoundWrapper lackPermissionSound,
-                                    ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                    ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -233,7 +233,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
         @Override
         public CountsPagedObjectButton build() {
             return new CountsPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

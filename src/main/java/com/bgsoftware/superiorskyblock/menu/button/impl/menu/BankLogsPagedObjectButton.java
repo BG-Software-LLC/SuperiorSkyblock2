@@ -23,8 +23,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankL
 
     private BankLogsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                       String requiredPermission, SoundWrapper lackPermissionSound,
-                                      ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                      ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
 
@@ -65,7 +65,7 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankL
         @Override
         public BankLogsPagedObjectButton build() {
             return new BankLogsPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

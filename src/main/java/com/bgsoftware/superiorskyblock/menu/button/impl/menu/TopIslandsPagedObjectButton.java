@@ -37,8 +37,9 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     private TopIslandsPagedObjectButton(String requiredPermission, SoundWrapper lackPermissionSound,
                                         ItemBuilder islandItem, SoundWrapper islandSound, List<String> islandCommands,
                                         ItemBuilder noIslandItem, SoundWrapper noIslandSound,
-                                        List<String> noIslandCommands, boolean isSelfPlayerIsland) {
-        super(null, null, null, requiredPermission, lackPermissionSound, null);
+                                        List<String> noIslandCommands, boolean isSelfPlayerIsland, int objectIndex) {
+        super(null, null, null, requiredPermission, lackPermissionSound, null,
+                objectIndex);
         this.islandItem = islandItem;
         this.islandSound = islandSound;
         this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
@@ -215,7 +216,8 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
         @Override
         public TopIslandsPagedObjectButton build() {
             return new TopIslandsPagedObjectButton(requiredPermission, lackPermissionSound, buttonItem,
-                    clickSound, commands, noIslandItem, noIslandSound, noIslandCommands, isPlayerSelfIsland);
+                    clickSound, commands, noIslandItem, noIslandSound, noIslandCommands, isPlayerSelfIsland,
+                    getObjectIndex());
         }
 
     }

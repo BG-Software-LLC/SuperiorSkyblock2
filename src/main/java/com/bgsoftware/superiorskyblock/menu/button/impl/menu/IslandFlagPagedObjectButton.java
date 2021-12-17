@@ -17,10 +17,10 @@ import java.util.List;
 
 public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIslandFlags, MenuIslandFlags.IslandFlagInfo> {
 
-    private IslandFlagPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound,
-                                        List<String> commands, String requiredPermission,
-                                        SoundWrapper lackPermissionSound, ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+    private IslandFlagPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+                                        String requiredPermission, SoundWrapper lackPermissionSound,
+                                        ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -58,7 +58,7 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         @Override
         public IslandFlagPagedObjectButton build() {
             return new IslandFlagPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

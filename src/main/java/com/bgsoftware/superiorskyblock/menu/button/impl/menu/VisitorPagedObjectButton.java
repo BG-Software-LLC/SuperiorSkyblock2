@@ -16,8 +16,8 @@ public final class VisitorPagedObjectButton extends PagedObjectButton<MenuVisito
 
     private VisitorPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound,
-                                     ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                     ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -51,7 +51,7 @@ public final class VisitorPagedObjectButton extends PagedObjectButton<MenuVisito
         @Override
         public VisitorPagedObjectButton build() {
             return new VisitorPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

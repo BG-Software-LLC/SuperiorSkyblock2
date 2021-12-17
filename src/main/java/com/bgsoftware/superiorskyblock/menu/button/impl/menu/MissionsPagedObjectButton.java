@@ -27,8 +27,8 @@ public final class MissionsPagedObjectButton extends PagedObjectButton<MenuMissi
 
     private MissionsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper completedSound, List<String> commands,
                                       String requiredPermission, SoundWrapper lackPermissionSound, ItemBuilder nullItem,
-                                      SoundWrapper notCompletedSound, SoundWrapper canCompleteSound) {
-        super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem);
+                                      SoundWrapper notCompletedSound, SoundWrapper canCompleteSound, int objectIndex) {
+        super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
         this.completedSound = completedSound;
         this.notCompletedSound = notCompletedSound;
         this.canCompleteSound = canCompleteSound;
@@ -125,7 +125,7 @@ public final class MissionsPagedObjectButton extends PagedObjectButton<MenuMissi
         @Override
         public MissionsPagedObjectButton build() {
             return new MissionsPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem, notCompletedSound, canCompleteSound);
+                    lackPermissionSound, nullItem, notCompletedSound, canCompleteSound, getObjectIndex());
         }
 
     }

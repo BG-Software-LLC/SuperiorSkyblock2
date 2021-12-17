@@ -295,10 +295,9 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
 
     private static final class SuperiorSettingsPagedObjectButton extends PagedObjectButton<SuperiorMenuSettings, ItemStack> {
 
-        private static final SuperiorSettingsPagedObjectButton INSTANCE = new SuperiorSettingsPagedObjectButton();
-
-        private SuperiorSettingsPagedObjectButton() {
-            super(null, null, null, null, null, null);
+        private SuperiorSettingsPagedObjectButton(int objectIndex) {
+            super(null, null, null, null, null,
+                    null, objectIndex);
         }
 
         @Override
@@ -342,7 +341,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
 
             @Override
             public SuperiorSettingsPagedObjectButton build() {
-                return INSTANCE;
+                return new SuperiorSettingsPagedObjectButton(getObjectIndex());
             }
 
         }

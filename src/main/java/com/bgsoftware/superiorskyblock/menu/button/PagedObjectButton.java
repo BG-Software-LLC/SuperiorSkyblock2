@@ -12,14 +12,16 @@ import java.util.List;
 public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends SuperiorMenuButton<M> {
 
     private final ItemBuilder nullItem;
+    private final int objectIndex;
 
     protected T pagedObject = null;
 
     protected PagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                 String requiredPermission, SoundWrapper lackPermissionSound,
-                                ItemBuilder nullItem) {
+                                ItemBuilder nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.nullItem = nullItem == null ? new ItemBuilder(Material.AIR) : nullItem;
+        this.objectIndex = objectIndex;
     }
 
     public void updateObject(T pagedObject) {
@@ -28,6 +30,10 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
 
     public ItemBuilder getNullItem() {
         return nullItem.clone();
+    }
+
+    public int getObjectIndex() {
+        return objectIndex;
     }
 
     @Nullable
@@ -43,11 +49,16 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
             T extends SuperiorMenuButton<M>, M extends ISuperiorMenu>
             extends AbstractBuilder<B, T, M> {
 
+        private int objectIndex = 0;
         protected ItemBuilder nullItem = null;
 
         public B setNullItem(ItemBuilder nullItem) {
             this.nullItem = nullItem;
             return (B) this;
+        }
+
+        protected int getObjectIndex() {
+            return objectIndex++;
         }
 
     }

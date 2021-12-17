@@ -19,8 +19,8 @@ public final class WarpPagedObjectButton extends PagedObjectButton<MenuWarps, Is
 
     private WarpPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                   String requiredPermission, SoundWrapper lackPermissionSound,
-                                  ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                  ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -59,7 +59,7 @@ public final class WarpPagedObjectButton extends PagedObjectButton<MenuWarps, Is
         @Override
         public WarpPagedObjectButton build() {
             return new WarpPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

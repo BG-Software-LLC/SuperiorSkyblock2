@@ -15,8 +15,8 @@ public final class MembersPagedObjectButton extends PagedObjectButton<MenuMember
 
     private MembersPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound,
-                                     ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                     ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
 
@@ -41,7 +41,7 @@ public final class MembersPagedObjectButton extends PagedObjectButton<MenuMember
         @Override
         public MembersPagedObjectButton build() {
             return new MembersPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }

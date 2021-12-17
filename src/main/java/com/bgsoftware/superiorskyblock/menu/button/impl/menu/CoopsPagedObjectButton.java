@@ -15,8 +15,8 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<MenuCoops, S
 
     private CoopsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
                                    String requiredPermission, SoundWrapper lackPermissionSound,
-                                   ItemBuilder nullItem) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem);
+                                   ItemBuilder nullItem, int objectIndex) {
+        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class CoopsPagedObjectButton extends PagedObjectButton<MenuCoops, S
         @Override
         public CoopsPagedObjectButton build() {
             return new CoopsPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
-                    lackPermissionSound, nullItem);
+                    lackPermissionSound, nullItem, getObjectIndex());
         }
 
     }
