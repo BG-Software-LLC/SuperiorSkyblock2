@@ -3,14 +3,16 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Maps;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,25 +24,37 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public final class SuperiorMenuCustom extends SuperiorMenu {
+public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
 
-    private static final Set<String> customMenus = Sets.newHashSet();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final Map<String, RegularMenuPattern<SuperiorMenuCustom>> customMenus = Maps.newHashMap();
 
     private final String fileName;
 
-    private SuperiorMenuCustom(SuperiorPlayer superiorPlayer, String fileName) {
-        super("menu-" + (fileName = fileName.split("\\.")[0].toLowerCase()), superiorPlayer);
+    private SuperiorMenuCustom(RegularMenuPattern<SuperiorMenuCustom> menuPattern, SuperiorPlayer superiorPlayer,
+                               String fileName) {
+        super(menuPattern, superiorPlayer);
         this.fileName = fileName;
-        if (superiorPlayer == null)
-            customMenus.add(fileName);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, fileName, previousMenu);
     }
 
     public static void createMenu(File file) {
         String fileName = file.getName();
 
-        SuperiorMenuCustom superiorMenuCustom = new SuperiorMenuCustom(null, fileName);
+        RegularMenuPattern.Builder<SuperiorMenuCustom> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                fileName, null);
+
+        if (menuLoadResult == null)
+            return;
+
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         if (cfg.contains("command")) {
             ConfigurationSection commandsSection = cfg.getConfigurationSection("command");
@@ -62,34 +76,25 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
             plugin.getCommands().registerCommand(new CustomMenuCommand(fileName, aliases, permission, descriptions, displayCommand));
         }
 
-        FileUtils.loadMenu(superiorMenuCustom, fileName, cfg);
-
-        superiorMenuCustom.markCompleted();
+        customMenus.put(fileName.toLowerCase(), patternBuilder.build());
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, String fileName, ISuperiorMenu previousMenu) {
-        new SuperiorMenuCustom(superiorPlayer, fileName).open(previousMenu);
+        RegularMenuPattern<SuperiorMenuCustom> menuPattern = customMenus.get(fileName.toLowerCase());
+        if(menuPattern != null)
+            new SuperiorMenuCustom(menuPattern, superiorPlayer, fileName).open(previousMenu);
     }
 
     public static boolean isValidMenu(String menuName) {
-        return customMenus.contains(menuName.toLowerCase());
+        return customMenus.containsKey(menuName.toLowerCase());
     }
 
     public static Set<String> getCustomMenus() {
-        return Collections.unmodifiableSet(customMenus);
+        return Collections.unmodifiableSet(customMenus.keySet());
     }
 
     public static void resetMenus() {
         customMenus.clear();
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, fileName, previousMenu);
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
     }
 
     private static final class CustomMenuCommand implements ISuperiorCommand {
