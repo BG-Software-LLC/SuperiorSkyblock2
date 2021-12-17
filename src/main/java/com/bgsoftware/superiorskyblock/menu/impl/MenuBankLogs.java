@@ -39,7 +39,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTran
     private Comparator<BankTransaction> sorting;
 
     private MenuBankLogs(SuperiorPlayer superiorPlayer, Island island) {
-        super(menuPattern, superiorPlayer, true);
+        super(menuPattern, superiorPlayer);
         this.island = island;
     }
 
