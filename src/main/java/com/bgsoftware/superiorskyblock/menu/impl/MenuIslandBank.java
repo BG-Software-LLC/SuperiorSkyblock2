@@ -57,38 +57,40 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
-            if (cfg.contains("items." + itemChar + ".bank-action")) {
-                List<Integer> slots = menuPatternSlots.getSlots(itemChar);
+        if(cfg.isConfigurationSection("items")) {
+            for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
+                if (cfg.contains("items." + itemChar + ".bank-action")) {
+                    List<Integer> slots = menuPatternSlots.getSlots(itemChar);
 
-                if (slots.isEmpty()) {
-                    continue;
-                }
-
-                SoundWrapper successSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
-                SoundWrapper failSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
-
-                if (cfg.isDouble("items." + itemChar + ".bank-action.withdraw")) {
-                    double withdrawPercentage = cfg.getDouble("items." + itemChar + ".bank-action.withdraw");
-                    if (withdrawPercentage <= 0) {
-                        patternBuilder.mapButtons(slots, new BankCustomWithdrawButton.Builder()
-                                .setFailSound(failSound).setSuccessSound(successSound));
-                    } else {
-                        patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawPercentage)
-                                .setFailSound(failSound).setSuccessSound(successSound));
+                    if (slots.isEmpty()) {
+                        continue;
                     }
-                } else if (cfg.isList("items." + itemChar + ".bank-action.withdraw")) {
-                    List<String> withdrawCommands = cfg.getStringList("items." + itemChar + ".bank-action.withdraw");
-                    patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawCommands)
-                            .setFailSound(failSound).setSuccessSound(successSound));
-                } else if (cfg.contains("items." + itemChar + ".bank-action.deposit")) {
-                    double depositPercentage = cfg.getDouble("items." + itemChar + ".bank-action.deposit");
-                    if (depositPercentage <= 0) {
-                        patternBuilder.mapButtons(slots, new BankCustomDepositButton.Builder()
+
+                    SoundWrapper successSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
+                    SoundWrapper failSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
+
+                    if (cfg.isDouble("items." + itemChar + ".bank-action.withdraw")) {
+                        double withdrawPercentage = cfg.getDouble("items." + itemChar + ".bank-action.withdraw");
+                        if (withdrawPercentage <= 0) {
+                            patternBuilder.mapButtons(slots, new BankCustomWithdrawButton.Builder()
+                                    .setFailSound(failSound).setSuccessSound(successSound));
+                        } else {
+                            patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawPercentage)
+                                    .setFailSound(failSound).setSuccessSound(successSound));
+                        }
+                    } else if (cfg.isList("items." + itemChar + ".bank-action.withdraw")) {
+                        List<String> withdrawCommands = cfg.getStringList("items." + itemChar + ".bank-action.withdraw");
+                        patternBuilder.mapButtons(slots, new BankWithdrawButton.Builder(withdrawCommands)
                                 .setFailSound(failSound).setSuccessSound(successSound));
-                    } else {
-                        patternBuilder.mapButtons(slots, new BankDepositButton.Builder(depositPercentage)
-                                .setFailSound(failSound).setSuccessSound(successSound));
+                    } else if (cfg.contains("items." + itemChar + ".bank-action.deposit")) {
+                        double depositPercentage = cfg.getDouble("items." + itemChar + ".bank-action.deposit");
+                        if (depositPercentage <= 0) {
+                            patternBuilder.mapButtons(slots, new BankCustomDepositButton.Builder()
+                                    .setFailSound(failSound).setSuccessSound(successSound));
+                        } else {
+                            patternBuilder.mapButtons(slots, new BankDepositButton.Builder(depositPercentage)
+                                    .setFailSound(failSound).setSuccessSound(successSound));
+                        }
                     }
                 }
             }
