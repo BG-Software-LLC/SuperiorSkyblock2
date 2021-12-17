@@ -195,32 +195,29 @@ public final class FileUtils {
         boolean backButtonFound = false;
 
         for (int row = 0; row < pattern.size() && row < 6; row++) {
-            String patternLine = pattern.get(row);
-            int slot = row * 9;
-
+            String patternLine = pattern.get(row).replace(" ", "");
             for (int i = 0; i < patternLine.length() && i < 9; i++) {
+                int slot = row * 9 + i;
+
                 char ch = patternLine.charAt(i);
-                if (ch != ' ') {
-                    boolean isBackButton = backButton.contains(ch + "");
 
-                    if (isBackButton) {
-                        backButtonFound = true;
-                    }
+                boolean isBackButton = backButton.contains(ch + "");
 
-                    SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder = isBackButton ?
-                            new BackButton.Builder<>() : new DummyButton.Builder<>();
-
-                    menuPattern.setButton(slot, buttonBuilder
-                            .setButtonItem(getItemStack(fileName, cfg.getConfigurationSection("items." + ch)))
-                            .setCommands(cfg.getStringList("commands." + ch))
-                            .setClickSound(getSound(cfg.getConfigurationSection("sounds." + ch)))
-                            .setRequiredPermission(cfg.getString("permissions." + ch + ".permission"))
-                            .setLackPermissionsSound(getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"))));
-
-                    menuPatternSlots.addSlot(ch, slot);
-
-                    slot++;
+                if (isBackButton) {
+                    backButtonFound = true;
                 }
+
+                SuperiorMenuButton.AbstractBuilder<?, ?, M> buttonBuilder = isBackButton ?
+                        new BackButton.Builder<>() : new DummyButton.Builder<>();
+
+                menuPattern.setButton(slot, buttonBuilder
+                        .setButtonItem(getItemStack(fileName, cfg.getConfigurationSection("items." + ch)))
+                        .setCommands(cfg.getStringList("commands." + ch))
+                        .setClickSound(getSound(cfg.getConfigurationSection("sounds." + ch)))
+                        .setRequiredPermission(cfg.getString("permissions." + ch + ".permission"))
+                        .setLackPermissionsSound(getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"))));
+
+                menuPatternSlots.addSlot(ch, slot);
             }
         }
 
