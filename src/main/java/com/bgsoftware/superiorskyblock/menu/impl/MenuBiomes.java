@@ -79,7 +79,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 if (!itemSection.isString("biome"))
                     continue;
 
-                String biomeName = cfg.getString("biome");
+                String biomeName = itemSection.getString("biome");
                 Biome biome;
 
                 try {
