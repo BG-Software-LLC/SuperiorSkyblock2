@@ -39,6 +39,10 @@ public final class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
         this.island = island;
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
         openInventory(inventoryViewer, previousMenu, island);
@@ -71,6 +75,8 @@ public final class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                     int slot = getSlots(upgradeSection, "item", menuPatternSlots).get(0);
                     upgrade.setSlot(slot);
 
+                    patternBuilder.mapButton(slot, new UpgradeButton.Builder(upgrade));
+
                     for (String level : upgradeSection.getKeys(false)) {
                         if (NumberUtils.isNumber(level)) {
                             if (slot == -1) {
@@ -96,8 +102,6 @@ public final class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                                 List<String> hasNextLevelCommands = upgradeSection.getStringList(level + ".has-next-level.commands");
                                 List<String> noNextLevelCommands = upgradeSection.getStringList(level + ".no-next-level.commands");
                                 upgradeLevel.setItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
-
-                                patternBuilder.mapButton(slot, new UpgradeButton.Builder(upgrade, upgradeLevel));
                             }
                         }
                     }

@@ -20,21 +20,20 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
     private static final ItemBuilder INVALID_ITEM = new ItemBuilder(Material.BEDROCK).withName("&c&lInvalid Item");
 
     private final Upgrade upgrade;
-    private final UpgradeLevel upgradeLevel;
 
-    private UpgradeButton(String requiredPermission, SoundWrapper lackPermissionSound, Upgrade upgrade,
-                          UpgradeLevel upgradeLevel) {
+    private UpgradeButton(String requiredPermission, SoundWrapper lackPermissionSound, Upgrade upgrade) {
         super(null, null, null, requiredPermission, lackPermissionSound);
         this.upgrade = upgrade;
-        this.upgradeLevel = upgradeLevel;
     }
 
     @Nullable
     @Override
     public ItemStack getButtonItem(MenuUpgrades superiorMenu) {
+        UpgradeLevel upgradeLevel = superiorMenu.getTargetIsland().getUpgradeLevel(upgrade);
+
         SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
 
-        if(itemData == null)
+        if (itemData == null)
             return null;
 
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
@@ -58,7 +57,7 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
                               InventoryClickEvent clickEvent) {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(clickEvent.getRawSlot());
 
-        if(upgrade == null)
+        if (upgrade == null)
             return;
 
         plugin.getCommands().dispatchSubCommand(clickEvent.getWhoClicked(), "rankup", upgrade.getName());
@@ -68,16 +67,14 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
     public static class Builder extends AbstractBuilder<Builder, UpgradeButton, MenuUpgrades> {
 
         private final Upgrade upgrade;
-        private final UpgradeLevel upgradeLevel;
 
-        public Builder(Upgrade upgrade, UpgradeLevel upgradeLevel) {
+        public Builder(Upgrade upgrade) {
             this.upgrade = upgrade;
-            this.upgradeLevel = upgradeLevel;
         }
 
         @Override
         public UpgradeButton build() {
-            return new UpgradeButton(requiredPermission, lackPermissionSound, upgrade, upgradeLevel);
+            return new UpgradeButton(requiredPermission, lackPermissionSound, upgrade);
         }
 
     }
