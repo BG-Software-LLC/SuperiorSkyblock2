@@ -1,7 +1,8 @@
-package com.bgsoftware.superiorskyblock.menu;
+package com.bgsoftware.superiorskyblock.menu.impl.internal;
 
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.entity.Player;

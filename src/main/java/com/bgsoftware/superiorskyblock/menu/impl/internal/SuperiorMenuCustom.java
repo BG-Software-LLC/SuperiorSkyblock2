@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.menu;
+package com.bgsoftware.superiorskyblock.menu.impl.internal;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;

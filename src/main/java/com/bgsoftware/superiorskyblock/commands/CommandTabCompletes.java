@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;

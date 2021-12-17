@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;

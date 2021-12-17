@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
