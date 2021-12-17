@@ -35,6 +35,11 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
     }
 
     @Nullable
+    public ItemStack getRawButtonItem() {
+        return buttonItem == null ? null : buttonItem.build();
+    }
+
+    @Nullable
     public SoundWrapper getClickSound() {
         return clickSound;
     }
@@ -54,7 +59,7 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
     }
 
     public <T extends AbstractBuilder<T, ?, M>> T applyToBuilder(AbstractBuilder<T, ?, M> buttonBuilder) {
-        if(buttonBuilder.buttonItem == null)
+        if (buttonBuilder.buttonItem == null)
             buttonBuilder.setButtonItem(this.buttonItem);
 
         return buttonBuilder

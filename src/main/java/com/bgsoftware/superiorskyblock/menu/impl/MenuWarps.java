@@ -112,7 +112,7 @@ public final class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
         ItemStack defaultWarpIcon = menuPattern.getButtons().stream()
                 .filter(button -> button instanceof DummyButton)
                 .findFirst().orElse(new DummyButton.Builder<MenuWarps>().build())
-                .getButtonItem(null);
+                .getRawButtonItem();
 
         SIslandWarp.DEFAULT_WARP_ICON = defaultWarpIcon == null ? new ItemBuilder(Material.AIR) :
                 new ItemBuilder(defaultWarpIcon);
