@@ -19,6 +19,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +31,7 @@ public final class ItemBuilder implements Cloneable {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private ItemStack itemStack;
+    @Nullable
     private ItemMeta itemMeta;
     private String textureValue = "";
 
@@ -53,13 +55,13 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withDurablity(short durability) {
-        if(durability >= 0)
+        if (durability >= 0)
             this.itemStack.setDurability(durability);
         return this;
     }
 
     public ItemBuilder withAmount(int amount) {
-        if(amount >= 1 && amount <= itemStack.getMaxStackSize())
+        if (amount >= 1 && amount <= itemStack.getMaxStackSize())
             itemStack.setAmount(amount);
         return this;
     }
@@ -77,25 +79,25 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withName(String name) {
-        if (name != null)
+        if (itemMeta != null && name != null)
             itemMeta.setDisplayName(StringUtils.translateColors(name));
         return this;
     }
 
     public ItemBuilder replaceName(String regex, String replace) {
-        if (itemMeta.hasDisplayName())
+        if (itemMeta != null && itemMeta.hasDisplayName())
             withName(itemMeta.getDisplayName().replace(regex, replace));
         return this;
     }
 
     public ItemBuilder withLore(List<String> lore) {
-        if (lore != null)
+        if (itemMeta != null && lore != null)
             itemMeta.setLore(StringUtils.translateColors(lore));
         return this;
     }
 
     public ItemBuilder appendLore(List<String> lore) {
-        List<String> currentLore = itemMeta.getLore() == null ? new ArrayList<>() : itemMeta.getLore();
+        List<String> currentLore = itemMeta == null || itemMeta.getLore() == null ? new ArrayList<>() : itemMeta.getLore();
         currentLore.addAll(lore);
         return withLore(currentLore);
     }
@@ -105,6 +107,9 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withLore(String firstLine, List<String> listLine) {
+        if (itemMeta == null)
+            return this;
+
         List<String> loreList = new ArrayList<>();
 
         firstLine = StringUtils.translateColors(firstLine);
@@ -125,6 +130,9 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withLore(String firstLine, ConfigurationSection configurationSection) {
+        if (itemMeta == null)
+            return this;
+
         List<String> loreList = new ArrayList<>();
 
         firstLine = StringUtils.translateColors(firstLine);
@@ -145,7 +153,7 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder replaceLore(String regex, String replace) {
-        if (!itemMeta.hasLore())
+        if (itemMeta == null || !itemMeta.hasLore())
             return this;
 
         List<String> loreList = new ArrayList<>();
@@ -159,7 +167,7 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder replaceLoreWithLines(String regex, String... lines) {
-        if (!itemMeta.hasLore())
+        if (itemMeta == null || !itemMeta.hasLore())
             return this;
 
         List<String> loreList = new ArrayList<>();
@@ -186,17 +194,20 @@ public final class ItemBuilder implements Cloneable {
     }
 
     public ItemBuilder withEnchant(Enchantment enchant, int level) {
-        itemMeta.addEnchant(enchant, level, true);
+        if (itemMeta != null)
+            itemMeta.addEnchant(enchant, level, true);
         return this;
     }
 
     public ItemBuilder withFlags(ItemFlag... itemFlags) {
-        itemMeta.addItemFlags(itemFlags);
+        if (itemMeta != null)
+            itemMeta.addItemFlags(itemFlags);
         return this;
     }
 
     public ItemBuilder setUnbreakable() {
-        itemMeta.spigot().setUnbreakable(true);
+        if (itemMeta != null)
+            itemMeta.spigot().setUnbreakable(true);
         return this;
     }
 
@@ -208,6 +219,9 @@ public final class ItemBuilder implements Cloneable {
 
     @SuppressWarnings("deprecation")
     public ItemBuilder withEntityType(EntityType entityType) {
+        if (itemMeta == null)
+            return this;
+
         if (ItemUtils.isValidAndSpawnEgg(itemStack)) {
             if (ServerVersion.isLegacy()) {
                 try {
@@ -228,6 +242,7 @@ public final class ItemBuilder implements Cloneable {
         return this;
     }
 
+    @Nullable
     public ItemMeta getItemMeta() {
         return itemMeta;
     }
@@ -235,12 +250,14 @@ public final class ItemBuilder implements Cloneable {
     public ItemStack build(SuperiorPlayer superiorPlayer) {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
-        if (itemMeta.hasDisplayName()) {
-            withName(PlaceholderHook.parse(offlinePlayer, itemMeta.getDisplayName()));
-        }
+        if (itemMeta != null) {
+            if (itemMeta.hasDisplayName()) {
+                withName(PlaceholderHook.parse(offlinePlayer, itemMeta.getDisplayName()));
+            }
 
-        if (itemMeta.hasLore()) {
-            withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
+            if (itemMeta.hasLore()) {
+                withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
+            }
         }
 
         if (textureValue.equals("%superior_player_texture%"))
@@ -258,7 +275,8 @@ public final class ItemBuilder implements Cloneable {
         try {
             ItemBuilder itemBuilder = (ItemBuilder) super.clone();
             itemBuilder.itemStack = itemStack.clone();
-            itemBuilder.itemMeta = itemMeta.clone();
+            if (itemMeta != null)
+                itemBuilder.itemMeta = itemMeta.clone();
             itemBuilder.textureValue = textureValue;
             return itemBuilder;
         } catch (Exception ex) {

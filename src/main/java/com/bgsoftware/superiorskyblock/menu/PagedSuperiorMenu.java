@@ -34,6 +34,9 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
     }
 
     public List<T> getPagedObjects() {
+        if (objects == null)
+            objects = requestObjects();
+
         return Collections.unmodifiableList(objects);
     }
 

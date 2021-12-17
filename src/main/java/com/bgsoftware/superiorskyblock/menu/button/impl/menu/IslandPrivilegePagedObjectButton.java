@@ -18,6 +18,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -170,20 +171,24 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
                 }
             }
 
-            List<String> lore = permissionItem.getItemMeta().getLore();
+            ItemMeta itemMeta = permissionItem.getItemMeta();
 
-            for (int i = 0; i < lore.size(); i++) {
-                String line = lore.get(i);
-                if (line.equals("{0}")) {
-                    lore.set(i, roleString.get(0));
-                    for (int j = 1; j < roleString.size(); j++) {
-                        lore.add(i + j, roleString.get(j));
+            if (itemMeta != null) {
+                List<String> lore = itemMeta.getLore();
+
+                for (int i = 0; i < lore.size(); i++) {
+                    String line = lore.get(i);
+                    if (line.equals("{0}")) {
+                        lore.set(i, roleString.get(0));
+                        for (int j = 1; j < roleString.size(); j++) {
+                            lore.add(i + j, roleString.get(j));
+                        }
+                        i += roleString.size();
                     }
-                    i += roleString.size();
                 }
-            }
 
-            permissionItem.withLore(lore);
+                permissionItem.withLore(lore);
+            }
         }
 
         return permissionItem;
