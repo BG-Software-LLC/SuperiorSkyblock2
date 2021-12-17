@@ -44,7 +44,7 @@ public final class MenuMemberManage extends SuperiorMenu<MenuMemberManage> {
         RegularMenuPattern.Builder<MenuMemberManage> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "member-manages.yml", MenuMemberManage::convertOldGUI);
+                "member-manage.yml", MenuMemberManage::convertOldGUI);
 
         if (menuLoadResult == null)
             return;

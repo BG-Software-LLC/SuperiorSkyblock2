@@ -67,7 +67,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
         PagedMenuPattern.Builder<MenuTopIslands, Island> patternBuilder = new PagedMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "top-islands", MenuTopIslands::convertOldGUI);
+                "top-islands.yml", MenuTopIslands::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
