@@ -99,20 +99,24 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 }
 
                 {
-                    Object bonusWorth = itemSection.get("bonus", itemSection.get("bonus-worth", null));
+                    Object bonusWorth = itemSection.get("bonus", itemSection.get("bonus-worth", 0D));
                     if (bonusWorth instanceof Double) {
                         buttonBuilder.setBonusWorth(BigDecimal.valueOf((double) bonusWorth));
                     } else if (bonusWorth instanceof String) {
                         buttonBuilder.setBonusWorth(new BigDecimal((String) bonusWorth));
+                    } else {
+                        buttonBuilder.setBonusWorth(BigDecimal.ZERO);
                     }
                 }
 
                 {
-                    Object bonusLevel = itemSection.get("bonus-level", null);
+                    Object bonusLevel = itemSection.get("bonus-level", 0D);
                     if (bonusLevel instanceof Double) {
                         buttonBuilder.setBonusLevel(BigDecimal.valueOf((double) bonusLevel));
                     } else if (bonusLevel instanceof String) {
                         buttonBuilder.setBonusLevel(new BigDecimal((String) bonusLevel));
+                    } else {
+                        buttonBuilder.setBonusLevel(BigDecimal.ZERO);
                     }
                 }
 
@@ -153,7 +157,7 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
     public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick) {
         IslandCreationButton button = getButtonForSchematic(schematic);
-        if(button != null)
+        if (button != null)
             button.clickButton(plugin, superiorPlayer.asPlayer(), rightClick, islandName, null);
     }
 
