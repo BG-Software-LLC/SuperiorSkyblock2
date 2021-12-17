@@ -123,7 +123,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
             enabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
                     itemFlagSection.getConfigurationSection("settings-enabled"));
             disabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
-                    itemFlagSection.getConfigurationSection("settings-enabled"));
+                    itemFlagSection.getConfigurationSection("settings-disabled"));
         }
 
         islandFlags.add(new IslandFlagInfo(islandFlag, enabledIslandFlagItem, disabledIslandFlagItem, position));
