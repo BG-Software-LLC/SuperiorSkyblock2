@@ -17,6 +17,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -28,8 +29,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -154,7 +157,20 @@ public final class FileUtils {
         if (!file.exists())
             FileUtils.saveResource("menus/" + fileName);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        CommentedConfiguration cfg = new CommentedConfiguration();
+
+        try {
+            cfg.load(file);
+        } catch (InvalidConfigurationException error) {
+            SuperiorSkyblockPlugin.log("&c[" + fileName + "] There is an issue with the format of the file.");
+            SuperiorSkyblockPlugin.debug(error);
+            return null;
+        } catch (IOException error) {
+            SuperiorSkyblockPlugin.log("&c[" + fileName + "] An unexpected error occurred while parsing the file:");
+            SuperiorSkyblockPlugin.debug(error);
+            error.printStackTrace();
+            return null;
+        }
 
         if (convertOldMenu != null && convertOldMenu.apply(plugin, cfg)) {
             try {
