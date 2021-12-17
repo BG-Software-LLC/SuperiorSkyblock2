@@ -68,6 +68,7 @@ public final class MenuWarpCategories extends PagedSuperiorMenu<MenuWarpCategori
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
         editLore = cfg.getStringList("edit-lore");
+        rowsSize = cfg.getStringList("pattern").size();
 
         menuPattern = patternBuilder
                 .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
