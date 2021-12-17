@@ -27,10 +27,8 @@ public final class DummyButton<M extends ISuperiorMenu> extends SuperiorMenuButt
     public static class Builder<M extends ISuperiorMenu> extends AbstractBuilder<Builder<M>, DummyButton<M>, M> {
 
         @Override
-        @SuppressWarnings("unchecked")
         public DummyButton<M> build() {
-            return !touched && EMPTY_BUTTON != null ? EMPTY_BUTTON :
-                    new DummyButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
+            return new DummyButton<>(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         }
 
     }
