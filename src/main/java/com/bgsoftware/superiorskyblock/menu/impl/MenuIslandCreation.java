@@ -1,203 +1,161 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 
-public final class MenuIslandCreation extends SuperiorMenu {
+public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static RegularMenuPattern<MenuIslandCreation> menuPattern;
 
     private final String islandName;
 
     private MenuIslandCreation(SuperiorPlayer superiorPlayer, String islandName) {
-        super("menuIslandCreation", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.islandName = islandName;
     }
 
-    private static void clickSchematic(String schematic, MenuIslandCreation menu, boolean rightClick, boolean fromInventory) {
-        // Checking for preview of islands.
-        if (rightClick) {
-            Location previewLocation = plugin.getSettings().getPreviewIslands().get(schematic);
-            if (previewLocation != null) {
-                plugin.getGrid().startIslandPreview(menu.superiorPlayer, schematic, menu.islandName);
-                return;
-            }
-        }
+    public String getIslandName() {
+        return islandName;
+    }
 
-        Player player = menu.superiorPlayer.asPlayer();
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, islandName);
+    }
 
-        if (player == null)
-            return;
+    @Override
+    public void onButtonClickLackPermission(SuperiorMenuButton<MenuIslandCreation> menuButton,
+                                            InventoryClickEvent clickEvent) {
+        super.onButtonClickLackPermission(menuButton, clickEvent);
 
-        String permission = (String) menu.getData(schematic + "-permission", "");
-        if (menu.superiorPlayer.hasPermission(permission)) {
-            BigDecimal bonusWorth = BigDecimal.valueOf((double) menu.getData(schematic + "-bonus-worth", 0D));
-            BigDecimal bonusLevel = BigDecimal.valueOf((double) menu.getData(schematic + "-bonus-level", 0D));
-            boolean offset = (boolean) menu.getData(schematic + "-offset", false);
-
-            Biome biome = Biome.valueOf((String) menu.getData(schematic + "-biome", "PLAINS"));
-
-            SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-has-access-item-sound");
-            if (sound != null)
-                sound.playSound(player);
-            //noinspection unchecked
-            List<String> commands = (List<String>) menu.getData(schematic + "-has-access-item-commands");
-            if (commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        command.replace("%player%", menu.superiorPlayer.getName())));
-
-            if (fromInventory) {
-                menu.previousMove = false;
-                player.closeInventory();
-            }
-
-            Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
-
-            World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
-            offset |= environment == World.Environment.NORMAL ? plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :
-                    environment == World.Environment.NETHER ? plugin.getSettings().getWorlds().getNether().isSchematicOffset() :
-                            plugin.getSettings().getWorlds().getEnd().isSchematicOffset();
-
-            plugin.getGrid().createIsland(menu.superiorPlayer, schematic, bonusWorth, bonusLevel, biome, menu.islandName, offset);
-        } else {
-            SoundWrapper sound = (SoundWrapper) menu.getData(schematic + "-no-access-item-sound");
-            if (sound != null)
-                sound.playSound(player);
-            //noinspection unchecked
-            List<String> commands = (List<String>) menu.getData(schematic + "-no-access-item-commands");
-            if (commands != null)
-                commands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        command.replace("%player%", menu.superiorPlayer.getName())));
+        if (menuButton instanceof IslandCreationButton) {
+            ((IslandCreationButton) menuButton).getLackPermissionCommands()
+                    .forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                            command.replace("%player%", clickEvent.getWhoClicked().getName())));
         }
     }
 
     public static void init() {
-        MenuIslandCreation menuIslandCreation = new MenuIslandCreation(null, "");
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/island-creation.yml");
+        RegularMenuPattern.Builder<MenuIslandCreation> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/island-creation.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "island-creation.yml", MenuIslandCreation::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                SuperiorSkyblockPlugin.debug(ex);
-                ex.printStackTrace();
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
+        if (cfg.isConfigurationSection("items")) {
+            for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+                ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
-        menuIslandCreation.resetData();
+                if (!itemSection.isString("schematic"))
+                    continue;
 
-        menuIslandCreation.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
-        menuIslandCreation.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
-        menuIslandCreation.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
-        menuIslandCreation.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
+                Schematic schematic = plugin.getSchematics().getSchematic(itemSection.getString("schematic"));
 
-        List<String> pattern = cfg.getStringList("pattern");
-
-        menuIslandCreation.setRowsSize(pattern.size());
-        int backButton = -1;
-        char backButtonChar = cfg.getString("back", " ").charAt(0);
-
-        for (int row = 0; row < pattern.size(); row++) {
-            String patternLine = pattern.get(row);
-            int slot = row * 9;
-
-            for (int i = 0; i < patternLine.length(); i++) {
-                char ch = patternLine.charAt(i);
-                if (ch != ' ') {
-                    if (backButtonChar == ch) {
-                        backButton = slot;
-                    } else if (cfg.contains("items." + ch + ".schematic")) {
-                        ConfigurationSection itemSection = cfg.getConfigurationSection("items." + ch);
-                        ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + ch);
-                        ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + ch);
-                        String schematic = itemSection.getString("schematic").toLowerCase();
-
-                        menuIslandCreation.addData(schematic + "-slot", slot);
-                        menuIslandCreation.addData(schematic + "-permission", itemSection.getString("required-permission", ""));
-                        menuIslandCreation.addData(schematic + "-biome", itemSection.getString("biome", "PLAINS"));
-                        menuIslandCreation.addData(schematic + "-bonus-worth", itemSection.getDouble("bonus", itemSection.getDouble("bonus-worth", 0D)));
-                        menuIslandCreation.addData(schematic + "-bonus-level", itemSection.getDouble("bonus-level", 0D));
-                        menuIslandCreation.addData(schematic + "-offset", itemSection.getBoolean("offset", false));
-                        menuIslandCreation.addData(schematic + "-has-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("access")));
-                        menuIslandCreation.addData(schematic + "-no-access-item", FileUtils.getItemStack("island-creation.yml", itemSection.getConfigurationSection("no-access")));
-
-                        if (soundSection != null) {
-                            menuIslandCreation.addData(schematic + "-has-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("access")));
-                            menuIslandCreation.addData(schematic + "-no-access-item-sound", FileUtils.getSound(soundSection.getConfigurationSection("no-access")));
-                        }
-                        if (commandSection != null) {
-                            menuIslandCreation.addData(schematic + "-has-access-item-commands", commandSection.getStringList("access"));
-                            menuIslandCreation.addData(schematic + "-no-access-item-commands", commandSection.getStringList("no-access"));
-                        }
-                    } else {
-                        menuIslandCreation.addFillItem(slot, FileUtils.getItemStack("island-creation.yml", cfg.getConfigurationSection("items." + ch)));
-                        menuIslandCreation.addCommands(slot, cfg.getStringList("commands." + ch));
-                        menuIslandCreation.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
-
-                        String permission = cfg.getString("permissions." + ch + ".permission");
-                        SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
-                        menuIslandCreation.addPermission(slot, permission, noAccessSound);
-                    }
-
-                    slot++;
+                if (schematic == null) {
+                    SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid schematic for item " + itemSectionName);
+                    continue;
                 }
+
+                IslandCreationButton.Builder buttonBuilder = new IslandCreationButton.Builder(schematic);
+
+                {
+                    String biomeName = itemSection.getString("biome", "PLAINS");
+                    try {
+                        Biome biome = Biome.valueOf(biomeName.toUpperCase());
+                        buttonBuilder.setBiome(biome);
+                    } catch (IllegalArgumentException error) {
+                        SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid biome name for item " + itemSectionName + ": " + biomeName);
+                    }
+                }
+
+                {
+                    Object bonusWorth = itemSection.get("bonus", itemSection.get("bonus-worth", null));
+                    if (bonusWorth instanceof Double) {
+                        buttonBuilder.setBonusWorth(BigDecimal.valueOf((double) bonusWorth));
+                    } else if (bonusWorth instanceof String) {
+                        buttonBuilder.setBonusWorth(new BigDecimal((String) bonusWorth));
+                    }
+                }
+
+                {
+                    Object bonusLevel = itemSection.get("bonus-level", null);
+                    if (bonusLevel instanceof Double) {
+                        buttonBuilder.setBonusLevel(BigDecimal.valueOf((double) bonusLevel));
+                    } else if (bonusLevel instanceof String) {
+                        buttonBuilder.setBonusLevel(new BigDecimal((String) bonusLevel));
+                    }
+                }
+
+                ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + itemSectionName);
+                if (soundSection != null) {
+                    buttonBuilder
+                            .setAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("access")))
+                            .setNoAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("no-access")));
+                }
+
+                ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + itemSectionName);
+                if (commandSection != null) {
+                    buttonBuilder
+                            .setAccessCommands(commandSection.getStringList("access"))
+                            .setNoAccessCommands(commandSection.getStringList("no-access"));
+                }
+
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder
+                        .setOffset(itemSection.getBoolean("offset", false))
+                        .setAccessItem(FileUtils.getItemStack("island-creation.yml",
+                                itemSection.getConfigurationSection("access")))
+                        .setAccessItem(FileUtils.getItemStack("island-creation.yml",
+                                itemSection.getConfigurationSection("no-access"))));
             }
         }
-
-        menuIslandCreation.setBackButton(backButton);
-
-        if (plugin.getSettings().isOnlyBackButton() && backButton == -1)
-            SuperiorSkyblockPlugin.log("&c[biomes.yml] Menu doesn't have a back button, it's impossible to close it.");
-
-        menuIslandCreation.markCompleted();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, String islandName) {
-        MenuIslandCreation menuIslandCreation = new MenuIslandCreation(superiorPlayer, islandName);
-        if (plugin.getSettings().isSkipOneItemMenus() && menuIslandCreation.hasOnlyOneItem()) {
-            clickSchematic(menuIslandCreation.getOnlyOneItem(), menuIslandCreation, false, false);
+        if (plugin.getSettings().isSkipOneItemMenus() && hasOnlyOneItem()) {
+            String schematicName = getOnlyOneItem();
+            simulateClick(superiorPlayer, islandName, schematicName, false);
         } else {
-            menuIslandCreation.open(previousMenu);
+            new MenuIslandCreation(superiorPlayer, islandName).open(previousMenu);
         }
     }
 
     public static void simulateClick(SuperiorPlayer superiorPlayer, String islandName, String schematic, boolean rightClick) {
-        clickSchematic(schematic, new MenuIslandCreation(superiorPlayer, islandName), rightClick, false);
+        IslandCreationButton button = getButtonForSchematic(schematic);
+        if(button != null)
+            button.clickButton(plugin, superiorPlayer.asPlayer(), rightClick, islandName, null);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/creation-gui.yml");
 
         if (!oldFile.exists())
@@ -227,62 +185,35 @@ public final class MenuIslandCreation extends SuperiorMenu {
         if (cfg.contains("creation-gui.schematics")) {
             for (String schemName : cfg.getConfigurationSection("creation-gui.schematics").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("creation-gui.schematics." + schemName);
-                char itemChar = itemChars[charCounter++];
+                char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
                 section.set("schematic", schemName);
                 MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
     }
 
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        for (String schematic : plugin.getSchematics().getSchematics()) {
-            if (containsData(schematic + "-slot")) {
-                int slot = (int) getData(schematic + "-slot");
-                if (slot == e.getRawSlot()) {
-                    clickSchematic(schematic, this, e.getClick() == ClickType.RIGHT ||
-                            e.getClick() == ClickType.SHIFT_RIGHT, true);
-                    break;
-                }
-            }
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, islandName);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inv = super.buildInventory(titleReplacer);
-
-        for (String schematic : plugin.getSchematics().getSchematics()) {
-            if (containsData(schematic + "-has-access-item")) {
-                String permission = (String) getData(schematic + "-permission");
-                String schematicItemKey = superiorPlayer.hasPermission(permission) ? schematic + "-has-access-item" : schematic + "-no-access-item";
-                ItemBuilder schematicItem = (ItemBuilder) getData(schematicItemKey);
-                int slot = (int) getData(schematic + "-slot");
-                inv.setItem(slot, schematicItem.clone().build(superiorPlayer));
-            }
-        }
-
-        return inv;
-    }
-
-    private boolean hasOnlyOneItem() {
-        return plugin.getSchematics().getSchematics().stream()
-                .filter(schematic -> containsData(schematic + "-has-access-item"))
+    private static boolean hasOnlyOneItem() {
+        return menuPattern.getButtons().stream()
+                .filter(button -> button instanceof IslandCreationButton)
                 .count() == 1;
     }
 
-    private String getOnlyOneItem() {
-        return plugin.getSchematics().getSchematics().stream()
-                .filter(schematic -> containsData(schematic + "-has-access-item"))
+    private static String getOnlyOneItem() {
+        return menuPattern.getButtons().stream()
+                .filter(button -> button instanceof IslandCreationButton)
+                .map(button -> ((IslandCreationButton) button).getSchematic().getName())
+                .findFirst().orElse(null);
+    }
+
+    private static IslandCreationButton getButtonForSchematic(String schematicName) {
+        return (IslandCreationButton) menuPattern.getButtons().stream()
+                .filter(button -> button instanceof IslandCreationButton &&
+                        ((IslandCreationButton) button).getSchematic().getName().equals(schematicName))
                 .findFirst().orElse(null);
     }
 
