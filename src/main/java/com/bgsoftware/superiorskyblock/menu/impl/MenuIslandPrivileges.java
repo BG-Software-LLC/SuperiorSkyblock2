@@ -88,15 +88,16 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
         higherRolePermission = cfg.getString("messages.higher-role-permission", "");
 
-        ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
-
         islandPrivileges.clear();
         int position = 0;
 
-        for (String key : permissionsSection.getKeys(false)) {
-            if (permissionsSection.getBoolean(key + ".display-menu", true)) {
-                String permission = key.toLowerCase();
-                updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
+        ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
+        if(permissionsSection != null) {
+            for (String key : permissionsSection.getKeys(false)) {
+                if (permissionsSection.getBoolean(key + ".display-menu", true)) {
+                    String permission = key.toLowerCase();
+                    updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
+                }
             }
         }
 
