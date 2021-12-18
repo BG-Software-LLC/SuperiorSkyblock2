@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import org.bukkit.Location;
 
 import java.util.Arrays;

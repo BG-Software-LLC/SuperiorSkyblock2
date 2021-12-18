@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
+import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -74,7 +74,7 @@ public final class ChunksTracker {
 
     public static String serialize(Island island) {
         Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.getOrDefault(island, new HashSet<>());
-        return IslandSerializer.serializeDirtyChunks(dirtyChunks);
+        return IslandsSerializer.serializeDirtyChunks(dirtyChunks);
     }
 
     public static void deserialize(GridHandler grid, Island island, String serialized) {

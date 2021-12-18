@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.islands;
+package com.bgsoftware.superiorskyblock.database.serialization;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -12,11 +12,11 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
-public final class IslandSerializer {
+public final class IslandsSerializer {
 
     private static final Gson gson = new GsonBuilder().create();
 
-    private IslandSerializer() {
+    private IslandsSerializer() {
 
     }
 

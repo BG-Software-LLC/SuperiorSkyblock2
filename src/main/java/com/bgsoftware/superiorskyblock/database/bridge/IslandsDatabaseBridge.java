@@ -17,7 +17,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandSerializer;
+import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -453,7 +453,7 @@ public final class IslandsDatabaseBridge {
     public static void saveBlockCounts(Island island) {
         island.getDatabaseBridge().updateObject("islands",
                 createFilter("uuid", island),
-                new Pair<>("block_counts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())));
+                new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger())));
     }
 
     public static void saveIslandChest(Island island, IslandChest islandChest) {
@@ -567,7 +567,7 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
                 new Pair<>("last_time_updated", island.getLastTimeUpdate()),
                 new Pair<>("dirty_chunks", ChunksTracker.serialize(island)),
-                new Pair<>("block_counts", IslandSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
+                new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
         );
 
         island.getDatabaseBridge().insertObject("islands_banks",
