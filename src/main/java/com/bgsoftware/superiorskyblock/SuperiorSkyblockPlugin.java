@@ -63,7 +63,6 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -104,7 +103,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
     private static SuperiorSkyblockPlugin plugin;
     private final Updater updater = new Updater(this, "superiorskyblock2");
-    //private final PluginDebugger pluginDebugger = new PluginDebugger(new File(getDataFolder(), ".session_logs"));
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this,
