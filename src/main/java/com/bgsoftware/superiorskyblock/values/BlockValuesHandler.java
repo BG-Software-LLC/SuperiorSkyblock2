@@ -60,11 +60,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     public BigDecimal getBlockWorth(com.bgsoftware.superiorskyblock.api.key.Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key);
-
         BigDecimal customBlockValue = customBlockWorthValues.getBlockValue(key);
         if (customBlockValue != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth");
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth, Worth: " + customBlockValue);
             return customBlockValue;
         }
 
@@ -72,23 +70,25 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             BigDecimal value = blockWorthValues.getBlockValue(key);
 
             if (value != null) {
-                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
                 return value;
             }
         }
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price");
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price, Worth: " + price);
             return price;
         }
 
         BigDecimal value = blockWorthValues.getBlockValue(key);
 
         if (value != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File");
+            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
             return value;
         }
+
+        SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: 0");
 
         return BigDecimal.ZERO;
     }
@@ -97,11 +97,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     public BigDecimal getBlockLevel(com.bgsoftware.superiorskyblock.api.key.Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key);
-
         BigDecimal customBlockLevel = customBlockLevels.getBlockValue(key);
         if (customBlockLevel != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level");
+            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level, Level: " + customBlockLevel);
             return customBlockLevel;
         }
 
@@ -110,7 +108,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         if (level == null) {
             level = convertValueToLevel(getBlockWorth(key));
             blockLevels.setBlockValue(key, level);
-            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Converted From Worth");
+            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Converted From Worth, Level: " + level);
+        }
+        else {
+            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Levels File, Level: " + level);
         }
 
         return level;
