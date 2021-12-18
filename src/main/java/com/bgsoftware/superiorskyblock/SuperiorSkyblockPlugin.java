@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -483,7 +484,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         upgradesHandler.loadData();
         rolesHandler.loadData();
 
-        Locale.reload();
+        Message.reload();
 
         if (loadGrid) {
             playersHandler.loadData();

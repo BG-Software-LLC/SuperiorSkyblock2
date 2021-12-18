@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -31,15 +31,15 @@ public final class CmdAdminDeposit implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin deposit <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_DEPOSIT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_DEPOSIT.getMessage(locale);
     }
 
     @Override
@@ -75,9 +75,9 @@ public final class CmdAdminDeposit implements IAdminIslandCommand {
         }));
 
         if (targetPlayer == null)
-            Locale.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Locale.ADMIN_DEPOSIT_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
+            Message.ADMIN_DEPOSIT_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
     }
 
 }

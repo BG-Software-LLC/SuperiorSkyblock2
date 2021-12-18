@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -73,7 +73,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_CATEGORY_ICON_NEW_TYPE.send(e.getWhoClicked());
+            Message.WARP_CATEGORY_ICON_NEW_TYPE.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if (!message.equalsIgnoreCase("-cancel")) {
@@ -85,7 +85,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
                         if (material == Material.AIR)
                             throw new IllegalArgumentException();
                     } catch (IllegalArgumentException ex) {
-                        Locale.INVALID_MATERIAL.send(e.getWhoClicked(), message);
+                        Message.INVALID_MATERIAL.send(e.getWhoClicked(), message);
                         return true;
                     }
 
@@ -98,7 +98,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
                         if (data < 0)
                             throw new IllegalArgumentException();
                     } catch (IllegalArgumentException ex) {
-                        Locale.INVALID_MATERIAL_DATA.send(e.getWhoClicked(), rawMessage);
+                        Message.INVALID_MATERIAL_DATA.send(e.getWhoClicked(), rawMessage);
                         return true;
                     }
 
@@ -115,7 +115,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_CATEGORY_ICON_NEW_NAME.send(e.getWhoClicked());
+            Message.WARP_CATEGORY_ICON_NEW_NAME.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if (!message.equalsIgnoreCase("-cancel")) {
@@ -131,7 +131,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_CATEGORY_ICON_NEW_LORE.send(e.getWhoClicked());
+            Message.WARP_CATEGORY_ICON_NEW_LORE.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if (!message.equalsIgnoreCase("-cancel")) {
@@ -146,7 +146,7 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
         } else if (confirmSlots.contains(e.getRawSlot())) {
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_CATEGORY_ICON_UPDATED.send(e.getWhoClicked());
+            Message.WARP_CATEGORY_ICON_UPDATED.send(e.getWhoClicked());
 
             warpCategory.setIcon(new ItemBuilder(itemStack).withName(itemName).withLore(itemLore).build());
         }

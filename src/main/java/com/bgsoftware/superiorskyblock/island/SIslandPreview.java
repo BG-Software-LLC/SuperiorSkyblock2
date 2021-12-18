@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -29,10 +29,10 @@ public final class SIslandPreview implements IslandPreview {
         Preconditions.checkNotNull(player, "Cannot start island preview to an offline player.");
 
         PlayerChat.listen(player, message -> {
-            if (message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CONFIRM_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
+            if (message.equalsIgnoreCase(Message.ISLAND_PREVIEW_CONFIRM_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
                 handleConfirm();
                 return true;
-            } else if (message.equalsIgnoreCase(Locale.ISLAND_PREVIEW_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
+            } else if (message.equalsIgnoreCase(Message.ISLAND_PREVIEW_CANCEL_TEXT.getMessage(superiorPlayer.getUserLocale()))) {
                 handleCancel();
                 return true;
             }
@@ -72,13 +72,13 @@ public final class SIslandPreview implements IslandPreview {
     @Override
     public void handleCancel() {
         plugin.getGrid().cancelIslandPreview(superiorPlayer);
-        Locale.ISLAND_PREVIEW_CANCEL.send(superiorPlayer);
+        Message.ISLAND_PREVIEW_CANCEL.send(superiorPlayer);
     }
 
     @Override
     public void handleEscape() {
         plugin.getGrid().cancelIslandPreview(superiorPlayer);
-        Locale.ISLAND_PREVIEW_CANCEL_DISTANCE.send(superiorPlayer);
+        Message.ISLAND_PREVIEW_CANCEL_DISTANCE.send(superiorPlayer);
     }
 
 }

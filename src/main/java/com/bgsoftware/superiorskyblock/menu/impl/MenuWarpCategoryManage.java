@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -70,25 +70,25 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_CATEGORY_RENAME.send(e.getWhoClicked());
+            Message.WARP_CATEGORY_RENAME.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if (!message.equalsIgnoreCase("-cancel")) {
                     String newName = IslandUtils.getWarpName(message);
 
                     if (warpCategory.getIsland().getWarpCategory(newName) != null) {
-                        Locale.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(e.getWhoClicked());
+                        Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(e.getWhoClicked());
                         return true;
                     }
 
                     if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                        Locale.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
+                        Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
                         return true;
                     }
 
                     warpCategory.getIsland().renameCategory(warpCategory, newName);
 
-                    Locale.WARP_CATEGORY_RENAME_SUCCESS.send(e.getWhoClicked(), newName);
+                    Message.WARP_CATEGORY_RENAME_SUCCESS.send(e.getWhoClicked(), newName);
 
                     if (successUpdateSound != null)
                         successUpdateSound.playSound(e.getWhoClicked());
@@ -107,7 +107,7 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
                 previousMove = false;
                 e.getWhoClicked().closeInventory();
 
-                Locale.WARP_CATEGORY_SLOT.send(e.getWhoClicked());
+                Message.WARP_CATEGORY_SLOT.send(e.getWhoClicked());
 
                 PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                     if (!message.equalsIgnoreCase("-cancel")) {
@@ -117,17 +117,17 @@ public final class MenuWarpCategoryManage extends SuperiorMenu {
                             if (slot < 0 || slot >= MenuWarpCategories.rowsSize * 9)
                                 throw new IllegalArgumentException();
                         } catch (IllegalArgumentException ex) {
-                            Locale.INVALID_SLOT.send(e.getWhoClicked(), message);
+                            Message.INVALID_SLOT.send(e.getWhoClicked(), message);
                             return true;
                         }
 
                         if (warpCategory.getIsland().getWarpCategory(slot) != null) {
-                            Locale.WARP_CATEGORY_SLOT_ALREADY_TAKEN.send(e.getWhoClicked());
+                            Message.WARP_CATEGORY_SLOT_ALREADY_TAKEN.send(e.getWhoClicked());
                             return true;
                         }
 
                         warpCategory.setSlot(slot);
-                        Locale.WARP_CATEGORY_SLOT_SUCCESS.send(e.getWhoClicked(), slot);
+                        Message.WARP_CATEGORY_SLOT_SUCCESS.send(e.getWhoClicked(), slot);
 
                         if (successUpdateSound != null)
                             successUpdateSound.playSound(e.getWhoClicked());

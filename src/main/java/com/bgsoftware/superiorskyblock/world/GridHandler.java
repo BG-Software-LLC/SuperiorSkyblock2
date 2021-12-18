@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.world;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
@@ -182,7 +182,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 IslandsDatabaseBridge.insertIsland(island);
 
                 superiorPlayer.runIfOnline(player -> {
-                    Locale.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
+                    Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
                     if (event.getResult()) {
                         if (updateGamemode)
                             player.setGameMode(GameMode.SURVIVAL);
@@ -205,7 +205,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
                 ex.printStackTrace();
                 SuperiorSkyblockPlugin.debug(ex);
-                Locale.CREATE_ISLAND_FAILURE.send(superiorPlayer);
+                Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
             });
         }
     }
@@ -228,7 +228,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 if (result) {
                     this.islandPreviews.startIslandPreview(new SIslandPreview(superiorPlayer, previewLocation, schemName, islandName));
                     Executor.ensureMain(() -> superiorPlayer.runIfOnline(player -> player.setGameMode(GameMode.SPECTATOR)));
-                    Locale.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
+                    Message.ISLAND_PREVIEW_START.send(superiorPlayer, schemName);
                 }
             });
         }
@@ -283,7 +283,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         island.getAllPlayersInside().forEach(superiorPlayer -> {
             SuperiorMenu.killMenu(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-            Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
+            Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
         });
 
         this.islandsContainer.removeIsland(island);

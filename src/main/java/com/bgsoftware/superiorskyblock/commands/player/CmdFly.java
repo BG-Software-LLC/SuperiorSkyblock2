@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -32,7 +32,7 @@ public final class CmdFly implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_FLY.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_FLY.getMessage(locale);
     }
 
     @Override
@@ -60,14 +60,14 @@ public final class CmdFly implements ISuperiorCommand {
             player.setAllowFlight(false);
             player.setFlying(false);
 
-            Locale.TOGGLED_FLY_OFF.send(superiorPlayer);
+            Message.TOGGLED_FLY_OFF.send(superiorPlayer);
         } else {
             if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
             }
 
-            Locale.TOGGLED_FLY_ON.send(superiorPlayer);
+            Message.TOGGLED_FLY_ON.send(superiorPlayer);
         }
 
         superiorPlayer.toggleIslandFly();

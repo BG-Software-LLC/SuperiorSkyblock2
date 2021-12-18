@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -9,9 +9,8 @@ import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -39,13 +38,13 @@ public final class CmdTeam implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "team [" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_TEAM.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_TEAM.getMessage(locale);
     }
 
     @Override
@@ -72,30 +71,30 @@ public final class CmdTeam implements ISuperiorCommand {
             return;
 
         Executor.async(() -> {
-            java.util.Locale locale = LocaleUtils.getLocale(sender);
+            java.util.Locale locale = PlayerLocales.getLocale(sender);
             StringBuilder infoMessage = new StringBuilder();
 
-            if (!Locale.ISLAND_TEAM_STATUS_HEADER.isEmpty(locale)) {
-                infoMessage.append(Locale.ISLAND_TEAM_STATUS_HEADER.getMessage(locale, island.getOwner().getName(),
+            if (!Message.ISLAND_TEAM_STATUS_HEADER.isEmpty(locale)) {
+                infoMessage.append(Message.ISLAND_TEAM_STATUS_HEADER.getMessage(locale, island.getOwner().getName(),
                         island.getIslandMembers(true).size(), island.getTeamLimit())).append("\n");
             }
 
             List<SuperiorPlayer> members = island.getIslandMembers(true);
 
-            if (!Locale.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)) {
+            if (!Message.ISLAND_TEAM_STATUS_ROLES.isEmpty(locale)) {
                 Map<PlayerRole, StringBuilder> rolesStrings = new HashMap<>();
                 plugin.getRoles().getRoles().stream().filter(PlayerRole::isRoleLadder)
                         .forEach(playerRole -> rolesStrings.put(playerRole, new StringBuilder()));
                 rolesStrings.put(SPlayerRole.lastRole(), new StringBuilder());
 
-                String onlineStatus = Locale.ISLAND_TEAM_STATUS_ONLINE.getMessage(locale),
-                        offlineStatus = Locale.ISLAND_TEAM_STATUS_OFFLINE.getMessage(locale);
+                String onlineStatus = Message.ISLAND_TEAM_STATUS_ONLINE.getMessage(locale),
+                        offlineStatus = Message.ISLAND_TEAM_STATUS_OFFLINE.getMessage(locale);
 
                 members.forEach(islandMember -> {
                     PlayerRole playerRole = islandMember.getPlayerRole();
                     long time = islandMember.getLastTimeStatus() == -1 ? -1 : ((System.currentTimeMillis() / 1000) - islandMember.getLastTimeStatus());
                     boolean onlinePlayer = islandMember.isOnline() && islandMember.isShownAsOnline();
-                    rolesStrings.get(playerRole).append(Locale.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
+                    rolesStrings.get(playerRole).append(Message.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
                             islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus,
                             StringUtils.formatTime(locale, time, TimeUnit.SECONDS))).append("\n");
                 });
@@ -105,10 +104,10 @@ public final class CmdTeam implements ISuperiorCommand {
                         .forEach(playerRole -> infoMessage.append(rolesStrings.get(playerRole)));
             }
 
-            if (!Locale.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
-                infoMessage.append(Locale.ISLAND_TEAM_STATUS_FOOTER.getMessage(locale));
+            if (!Message.ISLAND_TEAM_STATUS_FOOTER.isEmpty(locale))
+                infoMessage.append(Message.ISLAND_TEAM_STATUS_FOOTER.getMessage(locale));
 
-            Locale.sendMessage(sender, infoMessage.toString(), false);
+            Message.CUSTOM.send(sender, infoMessage.toString(), false);
         });
     }
 

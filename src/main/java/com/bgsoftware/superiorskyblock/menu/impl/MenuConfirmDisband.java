@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -111,12 +111,12 @@ public final class MenuConfirmDisband extends SuperiorMenu {
     protected void onPlayerClick(InventoryClickEvent e) {
         if (confirmSlot.contains(e.getRawSlot())) {
             if (EventsCaller.callIslandDisbandEvent(superiorPlayer, targetIsland)) {
-                IslandUtils.sendMessage(targetIsland, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
-                Locale.DISBANDED_ISLAND.send(superiorPlayer);
+                Message.DISBANDED_ISLAND.send(superiorPlayer);
 
                 if (BuiltinModules.BANK.disbandRefund > 0 && targetIsland.getOwner().isOnline()) {
-                    Locale.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
+                    Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
                             .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
                 }
 

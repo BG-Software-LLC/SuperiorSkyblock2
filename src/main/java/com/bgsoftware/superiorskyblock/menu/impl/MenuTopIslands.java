@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -315,7 +316,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                         .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
                         .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
                         .replaceName("{7}", StringUtils.format(island.getTotalRating()))
-                        .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                        .replaceName("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
                         .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
                         .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
 
@@ -331,8 +332,8 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                             } else {
                                 members.forEach(member -> {
                                     String onlineMessage = member.isOnline() ?
-                                            Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
-                                            Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
+                                            Message.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
+                                            Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
 
                                     lore.add(PlaceholderHook.parse(member, memberFormat
                                             .replace("{}", member.getName())
@@ -350,7 +351,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                                     .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
                                     .replace("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
                                     .replace("{7}", StringUtils.format(island.getTotalRating()))
-                                    .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                                    .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
                                     .replace("{9}", StringUtils.format(island.getRatingAmount()))
                                     .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                         }

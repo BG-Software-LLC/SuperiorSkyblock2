@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -157,7 +157,7 @@ public final class MenuBorderColor extends SuperiorMenu {
             superiorPlayer.setBorderColor(borderColor);
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
 
-            Locale.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
+            Message.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
                     StringUtils.format(superiorPlayer.getUserLocale(), borderColor));
         }
 

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -36,7 +36,7 @@ public final class CmdDisband implements IPermissibleCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_DISBAND.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_DISBAND.getMessage(locale);
     }
 
     @Override
@@ -60,26 +60,26 @@ public final class CmdDisband implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_DISBAND_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_DISBAND_PERMISSION;
     }
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         if (!superiorPlayer.hasDisbands() && plugin.getSettings().getDisbandCount() > 0) {
-            Locale.NO_MORE_DISBANDS.send(superiorPlayer);
+            Message.NO_MORE_DISBANDS.send(superiorPlayer);
             return;
         }
 
         if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, null, island);
         } else if (EventsCaller.callIslandDisbandEvent(superiorPlayer, island)) {
-            IslandUtils.sendMessage(island, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
-            Locale.DISBANDED_ISLAND.send(superiorPlayer);
+            Message.DISBANDED_ISLAND.send(superiorPlayer);
 
             if (BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
-                Locale.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
+                Message.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
                         .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 

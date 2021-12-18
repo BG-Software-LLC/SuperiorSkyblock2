@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -26,15 +26,15 @@ public final class CmdAdminMsgAll implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin msgall <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_MSG_ALL.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_MSG_ALL.getMessage(locale);
     }
 
     @Override
@@ -64,9 +64,9 @@ public final class CmdAdminMsgAll implements IAdminIslandCommand {
         islands.forEach(island -> island.sendMessage(message));
 
         if (targetPlayer == null)
-            Locale.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
+            Message.GLOBAL_MESSAGE_SENT_NAME.send(sender, islands.size() == 1 ? islands.get(0).getName() : "all");
         else
-            Locale.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
+            Message.GLOBAL_MESSAGE_SENT.send(sender, targetPlayer.getName());
     }
 
 }

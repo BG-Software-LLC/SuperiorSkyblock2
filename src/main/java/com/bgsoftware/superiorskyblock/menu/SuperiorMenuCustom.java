@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.google.common.collect.Sets;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -55,7 +55,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
             Map<Locale, String> descriptions = new HashMap<>();
             if (commandsSection.contains("description")) {
                 for (String locale : commandsSection.getConfigurationSection("description").getKeys(false))
-                    descriptions.put(LocaleUtils.getLocale(locale), commandsSection.getString("description." + locale));
+                    descriptions.put(PlayerLocales.getLocale(locale), commandsSection.getString("description." + locale));
             }
             boolean displayCommand = commandsSection.getBoolean("display-command", false);
 

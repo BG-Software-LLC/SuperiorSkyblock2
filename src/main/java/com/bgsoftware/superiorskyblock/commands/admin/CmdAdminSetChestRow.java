@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -31,16 +31,16 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setchestrow <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_ROWS.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_ROWS.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_CHEST_ROW.getMessage(locale);
     }
 
     @Override
@@ -80,18 +80,18 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
         int rows = rowsArguments.getKey();
 
         if (rows < 1 || rows > 6) {
-            Locale.INVALID_ROWS.send(sender, args[4]);
+            Message.INVALID_ROWS.send(sender, args[4]);
             return;
         }
 
         Executor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
 
         if (islands.size() > 1)
-            Locale.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);
+            Message.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);
         else if (targetPlayer == null)
-            Locale.CHANGED_CHEST_SIZE_NAME.send(sender, page, rows, islands.get(0).getName());
+            Message.CHANGED_CHEST_SIZE_NAME.send(sender, page, rows, islands.get(0).getName());
         else
-            Locale.CHANGED_CHEST_SIZE.send(sender, page, rows, targetPlayer.getName());
+            Message.CHANGED_CHEST_SIZE.send(sender, page, rows, targetPlayer.getName());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -33,17 +33,17 @@ public final class CmdCreate implements ISuperiorCommand {
         StringBuilder usage = new StringBuilder("create");
 
         if (plugin.getSettings().getIslandNames().isRequiredForCreation())
-            usage.append(" <").append(Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale)).append(">");
+            usage.append(" <").append(Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale)).append(">");
 
         if (plugin.getSettings().isSchematicNameArgument())
-            usage.append(" [").append(Locale.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale)).append("]");
+            usage.append(" [").append(Message.COMMAND_ARGUMENT_SCHEMATIC_NAME.getMessage(locale)).append("]");
 
         return usage.toString();
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_CREATE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_CREATE.getMessage(locale);
     }
 
     @Override
@@ -74,12 +74,12 @@ public final class CmdCreate implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (superiorPlayer.getIsland() != null) {
-            Locale.ALREADY_IN_ISLAND.send(superiorPlayer);
+            Message.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
         if (plugin.getGrid().hasActiveCreateRequest(superiorPlayer)) {
-            Locale.ISLAND_CREATE_PROCESS_FAIL.send(superiorPlayer);
+            Message.ISLAND_CREATE_PROCESS_FAIL.send(superiorPlayer);
             return;
         }
 
@@ -98,7 +98,7 @@ public final class CmdCreate implements ISuperiorCommand {
             schematicName = args[plugin.getSettings().getIslandNames().isRequiredForCreation() ? 2 : 1];
             Schematic schematic = plugin.getSchematics().getSchematic(schematicName);
             if (schematic == null || schematicName.endsWith("_nether") || schematicName.endsWith("_the_end")) {
-                Locale.INVALID_SCHEMATIC.send(sender, schematicName);
+                Message.INVALID_SCHEMATIC.send(sender, schematicName);
                 return;
             }
         }

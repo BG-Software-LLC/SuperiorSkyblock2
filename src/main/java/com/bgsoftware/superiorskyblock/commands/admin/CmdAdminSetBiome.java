@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,15 +30,15 @@ public final class CmdAdminSetBiome implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setbiome <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_BIOME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_BIOME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_BIOME.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_BIOME.getMessage(locale);
     }
 
     @Override
@@ -71,11 +71,11 @@ public final class CmdAdminSetBiome implements IAdminIslandCommand {
         islands.forEach(island -> island.setBiome(biome));
 
         if (islands.size() > 1)
-            Locale.CHANGED_BIOME_ALL.send(sender, StringUtils.format(biome.name()));
+            Message.CHANGED_BIOME_ALL.send(sender, StringUtils.format(biome.name()));
         else if (targetPlayer == null)
-            Locale.CHANGED_BIOME_NAME.send(sender, StringUtils.format(biome.name()), islands.get(0).getName());
+            Message.CHANGED_BIOME_NAME.send(sender, StringUtils.format(biome.name()), islands.get(0).getName());
         else
-            Locale.CHANGED_BIOME_OTHER.send(sender, StringUtils.format(biome.name()), targetPlayer.getName());
+            Message.CHANGED_BIOME_OTHER.send(sender, StringUtils.format(biome.name()), targetPlayer.getName());
     }
 
     @Override

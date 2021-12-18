@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -25,13 +25,13 @@ public final class CmdAdminMsg implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin msg <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_MSG.getMessage(locale);
     }
 
     @Override
@@ -57,14 +57,14 @@ public final class CmdAdminMsg implements IAdminPlayerCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         if (!targetPlayer.isOnline()) {
-            Locale.PLAYER_NOT_ONLINE.send(sender);
+            Message.PLAYER_NOT_ONLINE.send(sender);
             return;
         }
 
         String message = CommandArguments.buildLongString(args, 3, true);
 
-        Locale.sendMessage(targetPlayer, message, false);
-        Locale.MESSAGE_SENT.send(sender, targetPlayer.getName());
+        Message.CUSTOM.send(targetPlayer, message, false);
+        Message.MESSAGE_SENT.send(sender, targetPlayer.getName());
     }
 
 }

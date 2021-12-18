@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
@@ -104,7 +104,7 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
@@ -146,7 +146,7 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

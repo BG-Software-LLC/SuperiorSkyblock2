@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -31,12 +31,12 @@ public final class CmdExpel implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "expel <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "expel <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_EXPEL.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_EXPEL.getMessage(locale);
     }
 
     @Override
@@ -60,8 +60,8 @@ public final class CmdExpel implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_EXPEL_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_EXPEL_PERMISSION;
     }
 
     @Override
@@ -75,26 +75,26 @@ public final class CmdExpel implements IPermissibleCommand {
         Player target = targetPlayer.asPlayer();
 
         if (target == null) {
-            Locale.INVALID_PLAYER.send(sender, args[1]);
+            Message.INVALID_PLAYER.send(sender, args[1]);
             return;
         }
 
         Island targetIsland = plugin.getGrid().getIslandAt(target.getLocation());
 
         if (targetIsland == null) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(sender);
             return;
         }
 
         // Checking requirements for players
         if (superiorPlayer != null) {
             if (!targetIsland.equals(playerIsland)) {
-                Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
+                Message.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
 
             if (targetIsland.hasPermission(targetPlayer, IslandPrivileges.EXPEL_BYPASS)) {
-                Locale.PLAYER_EXPEL_BYPASS.send(sender);
+                Message.PLAYER_EXPEL_BYPASS.send(sender);
                 return;
             }
         }
@@ -102,8 +102,8 @@ public final class CmdExpel implements IPermissibleCommand {
         targetPlayer.teleport(plugin.getGrid().getSpawnIsland());
         target.getLocation().setDirection(plugin.getGrid().getSpawnIsland()
                 .getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getDirection());
-        Locale.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
-        Locale.GOT_EXPELLED.send(targetPlayer, sender.getName());
+        Message.EXPELLED_PLAYER.send(sender, targetPlayer.getName());
+        Message.GOT_EXPELLED.send(targetPlayer, sender.getName());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,14 +30,14 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin unlockworld <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end/normal> <true/false>";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <nether/the_end/normal> <true/false>";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD.getMessage(locale);
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return;
 
         if (environment == plugin.getSettings().getWorlds().getDefaultWorld()) {
-            Locale.INVALID_ENVIRONMENT.send(sender, args[3]);
+            Message.INVALID_ENVIRONMENT.send(sender, args[3]);
             return;
         }
 
@@ -88,7 +88,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
             }
         });
 
-        Locale.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, StringUtils.format(args[3]));
+        Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, StringUtils.format(args[3]));
     }
 
     @Override

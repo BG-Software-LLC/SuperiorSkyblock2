@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -29,14 +29,14 @@ public final class CmdAdminWithdraw implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin withdraw <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_WITHDRAW.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_WITHDRAW.getMessage(locale);
     }
 
     @Override
@@ -71,17 +71,17 @@ public final class CmdAdminWithdraw implements IAdminIslandCommand {
         }
 
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            Locale.INVALID_AMOUNT.send(sender, args[3]);
+            Message.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
 
         if (island.getIslandBank().getBalance().compareTo(BigDecimal.ZERO) == 0) {
-            Locale.ISLAND_BANK_EMPTY.send(sender);
+            Message.ISLAND_BANK_EMPTY.send(sender);
             return;
         }
 
         if (island.getIslandBank().getBalance().compareTo(amount) < 0) {
-            Locale.WITHDRAW_ALL_MONEY.send(sender, island.getIslandBank().getBalance().toString());
+            Message.WITHDRAW_ALL_MONEY.send(sender, island.getIslandBank().getBalance().toString());
             amount = island.getIslandBank().getBalance();
         }
 
@@ -90,9 +90,9 @@ public final class CmdAdminWithdraw implements IAdminIslandCommand {
         island.getIslandBank().withdrawAdminMoney(sender, amount);
 
         if (targetPlayer == null)
-            Locale.WITHDRAWN_MONEY_NAME.send(sender, StringUtils.format(amount), island.getName());
+            Message.WITHDRAWN_MONEY_NAME.send(sender, StringUtils.format(amount), island.getName());
         else
-            Locale.WITHDRAWN_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
+            Message.WITHDRAWN_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
     }
 
 }

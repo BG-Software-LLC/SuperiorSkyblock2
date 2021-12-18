@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -34,17 +34,17 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setgenerator <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_VALUE.getMessage(locale) + "> [" +
-                Locale.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_VALUE.getMessage(locale) + "> [" +
+                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_GENERATOR.getMessage(locale);
     }
 
     @Override
@@ -75,7 +75,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
             return;
 
         if (!rawMaterial.isSolid()) {
-            Locale.MATERIAL_NOT_SOLID.send(sender);
+            Message.MATERIAL_NOT_SOLID.send(sender);
             return;
         }
 
@@ -93,7 +93,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         int amount = arguments.getKey();
 
         if (percentage && (amount < 0 || amount > 100)) {
-            Locale.INVALID_PERCENTAGE.send(sender);
+            Message.INVALID_PERCENTAGE.send(sender);
             return;
         }
 
@@ -105,18 +105,18 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
 
         Executor.data(() -> islands.forEach(island -> {
             if (percentage) {
-                island.setGeneratorPercentage(material, Math.max(0, Math.min(100, amount)), environment);
+                island.setGeneratorPercentage(material, amount, environment);
             } else {
                 island.setGeneratorAmount(material, amount, environment);
             }
         }));
 
         if (islands.size() != 1)
-            Locale.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
         else if (targetPlayer == null)
-            Locale.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
         else
-            Locale.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());
+            Message.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

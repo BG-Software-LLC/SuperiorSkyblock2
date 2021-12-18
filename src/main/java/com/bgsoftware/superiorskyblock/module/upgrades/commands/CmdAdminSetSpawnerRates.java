@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -28,15 +28,15 @@ public final class CmdAdminSetSpawnerRates implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setspawnerrates <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_SPAWNER_RATES.getMessage(locale);
     }
 
     @Override
@@ -71,11 +71,11 @@ public final class CmdAdminSetSpawnerRates implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(multiplier)));
 
         if (islands.size() > 1)
-            Locale.CHANGED_SPAWNER_RATES_ALL.send(sender);
+            Message.CHANGED_SPAWNER_RATES_ALL.send(sender);
         else if (targetPlayer == null)
-            Locale.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
+            Message.CHANGED_SPAWNER_RATES_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
+            Message.CHANGED_SPAWNER_RATES.send(sender, targetPlayer.getName());
     }
 
 }

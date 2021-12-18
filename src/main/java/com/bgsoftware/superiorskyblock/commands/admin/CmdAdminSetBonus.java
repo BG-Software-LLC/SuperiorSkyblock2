@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,15 +30,15 @@ public final class CmdAdminSetBonus implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setbonus <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <worth/level> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <worth/level> <" +
+                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_BONUS.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_BONUS.getMessage(locale);
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class CmdAdminSetBonus implements IAdminIslandCommand {
                 island.setBonusLevel(bonus);
         }));
 
-        Locale.BONUS_SET_SUCCESS.send(sender, bonus.toString());
+        Message.BONUS_SET_SUCCESS.send(sender, bonus.toString());
     }
 
     @Override

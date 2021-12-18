@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -32,16 +32,16 @@ public final class CmdAdminSetPermission implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setpermission <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_PERMISSION.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_PERMISSION.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_PERMISSION.getMessage(locale);
     }
 
     @Override
@@ -79,11 +79,11 @@ public final class CmdAdminSetPermission implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPrivilege, true)));
 
         if (islands.size() > 1)
-            Locale.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPrivilege.getName()));
+            Message.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPrivilege.getName()));
         else if (targetPlayer == null)
-            Locale.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPrivilege.getName()), islands.get(0).getName());
+            Message.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPrivilege.getName()), islands.get(0).getName());
         else
-            Locale.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPrivilege.getName()), targetPlayer.getName());
+            Message.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPrivilege.getName()), targetPlayer.getName());
     }
 
     @Override

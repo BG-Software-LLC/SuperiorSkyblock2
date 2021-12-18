@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -75,7 +75,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                 player.closeInventory();
             }
 
-            Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
+            Message.ISLAND_CREATE_PROCCESS_REQUEST.send(menu.superiorPlayer);
 
             World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();
             offset |= environment == World.Environment.NORMAL ? plugin.getSettings().getWorlds().getNormal().isSchematicOffset() :

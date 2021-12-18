@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -90,7 +90,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if (island != null && island.isBeingRecalculated()) {
             e.setCancelled(true);
-            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
+            Message.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 
@@ -141,7 +141,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if (island != null && island.isBeingRecalculated()) {
             e.setCancelled(true);
-            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
+            Message.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 

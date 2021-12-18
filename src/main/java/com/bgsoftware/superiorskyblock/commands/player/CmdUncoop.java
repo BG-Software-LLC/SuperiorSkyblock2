@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -31,12 +31,12 @@ public final class CmdUncoop implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "uncoop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "uncoop <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_UNCOOP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_UNCOOP.getMessage(locale);
     }
 
     @Override
@@ -60,8 +60,8 @@ public final class CmdUncoop implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_UNCOOP_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_UNCOOP_PERMISSION;
     }
 
     @Override
@@ -72,7 +72,7 @@ public final class CmdUncoop implements IPermissibleCommand {
             return;
 
         if (!island.isCoop(targetPlayer)) {
-            Locale.PLAYER_NOT_COOP.send(superiorPlayer);
+            Message.PLAYER_NOT_COOP.send(superiorPlayer);
             return;
         }
 
@@ -81,12 +81,12 @@ public final class CmdUncoop implements IPermissibleCommand {
 
         island.removeCoop(targetPlayer);
 
-        IslandUtils.sendMessage(island, Locale.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNCOOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
-            Locale.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
+            Message.LEFT_ISLAND_COOP.send(targetPlayer, superiorPlayer.getName());
         else
-            Locale.LEFT_ISLAND_COOP_NAME.send(targetPlayer, island.getName());
+            Message.LEFT_ISLAND_COOP_NAME.send(targetPlayer, island.getName());
     }
 
     @Override

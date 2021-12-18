@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -29,12 +29,12 @@ public final class CmdDemote implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "demote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "demote <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_DEMOTE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_DEMOTE.getMessage(locale);
     }
 
     @Override
@@ -58,8 +58,8 @@ public final class CmdDemote implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_DEMOTE_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_DEMOTE_PERMISSION;
     }
 
     @Override
@@ -70,12 +70,12 @@ public final class CmdDemote implements IPermissibleCommand {
             return;
 
         if (!island.isMember(targetPlayer)) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return;
         }
 
         if (!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.DEMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.DEMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
 
@@ -88,14 +88,14 @@ public final class CmdDemote implements IPermissibleCommand {
         } while (previousRole != null && !previousRole.isFirstRole() && roleLimit >= 0 && roleLimit >= island.getIslandMembers(previousRole).size());
 
         if (previousRole == null) {
-            Locale.LAST_ROLE_DEMOTE.send(superiorPlayer);
+            Message.LAST_ROLE_DEMOTE.send(superiorPlayer);
             return;
         }
 
         targetPlayer.setPlayerRole(previousRole);
 
-        Locale.DEMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
-        Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+        Message.DEMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Message.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
     @Override

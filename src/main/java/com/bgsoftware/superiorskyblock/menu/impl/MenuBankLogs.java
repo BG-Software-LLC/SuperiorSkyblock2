@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -173,7 +173,7 @@ public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
                     .replaceAll("{0}", transaction.getPosition() + "")
                     .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
                     .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
-                            Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
+                            Message.BANK_WITHDRAW_COMPLETED : Message.BANK_DEPOSIT_COMPLETED).getMessage(superiorPlayer.getUserLocale()))
                     .replaceAll("{3}", transaction.getDate())
                     .replaceAll("{4}", transaction.getAmount() + "")
                     .replaceAll("{5}", StringUtils.format(transaction.getAmount()))

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
@@ -98,7 +98,7 @@ public final class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Locale.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
+            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
@@ -173,7 +173,7 @@ public final class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Locale.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
+            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);

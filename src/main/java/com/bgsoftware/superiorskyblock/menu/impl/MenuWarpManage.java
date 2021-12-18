@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -75,25 +75,25 @@ public final class MenuWarpManage extends SuperiorMenu {
             previousMove = false;
             e.getWhoClicked().closeInventory();
 
-            Locale.WARP_RENAME.send(e.getWhoClicked());
+            Message.WARP_RENAME.send(e.getWhoClicked());
 
             PlayerChat.listen((Player) e.getWhoClicked(), message -> {
                 if (!message.equalsIgnoreCase("-cancel")) {
                     String newName = IslandUtils.getWarpName(message);
 
                     if (islandWarp.getIsland().getWarp(newName) != null) {
-                        Locale.WARP_RENAME_ALREADY_EXIST.send(e.getWhoClicked());
+                        Message.WARP_RENAME_ALREADY_EXIST.send(e.getWhoClicked());
                         return true;
                     }
 
                     if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                        Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
+                        Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
                         return true;
                     }
 
                     islandWarp.getIsland().renameWarp(islandWarp, newName);
 
-                    Locale.WARP_RENAME_SUCCESS.send(e.getWhoClicked(), newName);
+                    Message.WARP_RENAME_SUCCESS.send(e.getWhoClicked(), newName);
 
                     if (successUpdateSound != null)
                         successUpdateSound.playSound(e.getWhoClicked());
@@ -109,17 +109,17 @@ public final class MenuWarpManage extends SuperiorMenu {
             plugin.getMenus().openWarpIconEdit(superiorPlayer, this, islandWarp);
         } else if (locationSlots.contains(e.getRawSlot())) {
             if (!islandWarp.getIsland().isInsideRange(superiorPlayer.getLocation())) {
-                Locale.SET_WARP_OUTSIDE.send(superiorPlayer);
+                Message.SET_WARP_OUTSIDE.send(superiorPlayer);
                 return;
             }
 
-            Locale.WARP_LOCATION_UPDATE.send(e.getWhoClicked());
+            Message.WARP_LOCATION_UPDATE.send(e.getWhoClicked());
 
             Block signBlock = islandWarp.getLocation().getBlock();
             if (signBlock.getState() instanceof Sign) {
                 signBlock.setType(Material.AIR);
                 signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
-                Locale.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
+                Message.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
             }
 
             islandWarp.setLocation(e.getWhoClicked().getLocation());
@@ -129,9 +129,9 @@ public final class MenuWarpManage extends SuperiorMenu {
         } else if (privateSlots.contains(e.getRawSlot())) {
             islandWarp.setPrivateFlag(!islandWarp.hasPrivateFlag());
             if (islandWarp.hasPrivateFlag())
-                Locale.WARP_PRIVATE_UPDATE.send(e.getWhoClicked());
+                Message.WARP_PRIVATE_UPDATE.send(e.getWhoClicked());
             else
-                Locale.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
+                Message.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
         }
 
     }

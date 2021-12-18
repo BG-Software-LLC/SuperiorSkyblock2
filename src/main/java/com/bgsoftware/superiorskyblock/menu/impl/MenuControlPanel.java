@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -114,7 +114,7 @@ public final class MenuControlPanel extends SuperiorMenu {
         } else if (settingsSlot.contains(e.getRawSlot())) {
             if (superiorPlayer.hasPermission("superior.island.settings")) {
                 if (!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)) {
-                    Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
+                    Message.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
                     return;
                 }
 

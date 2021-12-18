@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -33,16 +33,16 @@ public final class CmdAdminSetRoleLimit implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setrolelimit <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_LIMIT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_ROLE_LIMIT.getMessage(locale);
     }
 
     @Override
@@ -73,7 +73,7 @@ public final class CmdAdminSetRoleLimit implements IAdminIslandCommand {
             return;
 
         if (!IslandUtils.isValidRoleForLimit(playerRole)) {
-            Locale.INVALID_ROLE.send(sender, args[3], SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, args[3], SPlayerRole.getValuesString());
             return;
         }
 
@@ -87,11 +87,11 @@ public final class CmdAdminSetRoleLimit implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setRoleLimit(playerRole, limit)));
 
         if (islands.size() > 1)
-            Locale.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
+            Message.CHANGED_ROLE_LIMIT_ALL.send(sender, playerRole);
         else if (targetPlayer == null)
-            Locale.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());
+            Message.CHANGED_ROLE_LIMIT_NAME.send(sender, playerRole, islands.get(0).getName());
         else
-            Locale.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
+            Message.CHANGED_ROLE_LIMIT.send(sender, playerRole, targetPlayer.getName());
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -13,6 +12,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -40,12 +40,12 @@ public final class CmdRankup implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "rankup <" + Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
+        return "rankup <" + Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_RANKUP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_RANKUP.getMessage(locale);
     }
 
     @Override
@@ -69,8 +69,8 @@ public final class CmdRankup implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_RANKUP_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_RANKUP_PERMISSION;
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class CmdRankup implements IPermissibleCommand {
         String permission = nextUpgradeLevel == null ? "" : nextUpgradeLevel.getPermission();
 
         if (!permission.isEmpty() && !superiorPlayer.hasPermission(permission)) {
-            Locale.NO_UPGRADE_PERMISSION.send(superiorPlayer);
+            Message.NO_UPGRADE_PERMISSION.send(superiorPlayer);
             return;
         }
 
@@ -93,14 +93,14 @@ public final class CmdRankup implements IPermissibleCommand {
 
         if (island.hasActiveUpgradeCooldown()) {
             long timeNow = System.currentTimeMillis(), lastUpgradeTime = island.getLastTimeUpgrade();
-            Locale.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+            Message.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
                     lastUpgradeTime + plugin.getSettings().getUpgradeCooldown() - timeNow, TimeUnit.MILLISECONDS));
             hasNextLevel = false;
         } else {
             String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);
 
             if (!requiredCheckFailure.isEmpty()) {
-                Locale.sendMessage(superiorPlayer, requiredCheckFailure, false);
+                Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
                 EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
@@ -110,7 +110,7 @@ public final class CmdRankup implements IPermissibleCommand {
                     hasNextLevel = false;
 
                 } else if (!upgradeCost.hasEnoughBalance(superiorPlayer)) {
-                    Locale.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
+                    Message.NOT_ENOUGH_MONEY_TO_UPGRADE.send(superiorPlayer);
                     hasNextLevel = false;
 
                 } else {

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
@@ -30,13 +30,13 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setblockamount <" +
-                Locale.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "> <x> <y> <z> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "> <x> <y> <z> <" +
+                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_BLOCK_AMOUNT.getMessage(locale);
     }
 
     @Override
@@ -76,7 +76,7 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
         plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
 
         String formattedLocation = args[2] + ", " + args[3] + ", " + args[4] + ", " + args[5];
-        Locale.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
+        Message.CHANGED_BLOCK_AMOUNT.send(sender, formattedLocation, amount);
     }
 
     @Override

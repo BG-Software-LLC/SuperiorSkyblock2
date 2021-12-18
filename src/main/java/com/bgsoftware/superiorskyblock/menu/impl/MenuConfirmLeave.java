@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -60,9 +60,9 @@ public final class MenuConfirmLeave extends SuperiorMenu {
             if (EventsCaller.callIslandQuitEvent(superiorPlayer, island)) {
                 island.kickMember(superiorPlayer);
 
-                IslandUtils.sendMessage(island, Locale.LEAVE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
-                Locale.LEFT_ISLAND.send(superiorPlayer);
+                Message.LEFT_ISLAND.send(superiorPlayer);
 
                 previousMove = false;
                 e.getWhoClicked().closeInventory();

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -30,7 +30,7 @@ public final class CmdRatings implements IPermissibleCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_RATINGS.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_RATINGS.getMessage(locale);
     }
 
     @Override
@@ -54,8 +54,8 @@ public final class CmdRatings implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_RATINGS_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_RATINGS_PERMISSION;
     }
 
     @Override

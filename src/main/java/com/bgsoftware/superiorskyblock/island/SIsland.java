@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
@@ -32,6 +31,7 @@ import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -1257,13 +1257,13 @@ public final class SIsland implements Island {
             if (error != null) {
                 if (error instanceof TimeoutException) {
                     if (asker != null)
-                        Locale.ISLAND_WORTH_TIME_OUT.send(asker);
+                        Message.ISLAND_WORTH_TIME_OUT.send(asker);
                 } else {
                     SuperiorSkyblockPlugin.log("&cError occurred when calculating the island:");
                     error.printStackTrace();
 
                     if (asker != null)
-                        Locale.ISLAND_WORTH_ERROR.send(asker);
+                        Message.ISLAND_WORTH_ERROR.send(asker);
                 }
 
                 beingRecalculated = false;
@@ -1426,7 +1426,7 @@ public final class SIsland implements Island {
             for (SuperiorPlayer victimPlayer : getAllPlayersInside()) {
                 if (!hasPermission(victimPlayer, IslandPrivileges.CLOSE_BYPASS)) {
                     victimPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                    Locale.ISLAND_WAS_CLOSED.send(victimPlayer);
+                    Message.ISLAND_WAS_CLOSED.send(victimPlayer);
                 }
             }
         }
@@ -1457,7 +1457,7 @@ public final class SIsland implements Island {
 
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> Locale.sendMessage(superiorPlayer, message, false));
+                .forEach(superiorPlayer -> Message.CUSTOM.send(superiorPlayer, message, false));
     }
 
     @Override
@@ -2463,13 +2463,13 @@ public final class SIsland implements Island {
         IslandWarp islandWarp = getWarp(warp);
 
         if (islandWarp == null) {
-            Locale.INVALID_WARP.send(superiorPlayer, warp);
+            Message.INVALID_WARP.send(superiorPlayer, warp);
             return;
         }
 
         if (plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Locale.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
+            Message.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
                     plugin.getSettings().getWarpsWarmup(), TimeUnit.MILLISECONDS));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
@@ -2487,7 +2487,7 @@ public final class SIsland implements Island {
         if (islandWarp != null) {
             deleteWarp(islandWarp.getName());
             if (superiorPlayer != null)
-                Locale.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
+                Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
         }
     }
 
@@ -2651,7 +2651,7 @@ public final class SIsland implements Island {
                 if (plugin.getSettings().isTeleportOnPvPEnable())
                     getIslandVisitors().forEach(superiorPlayer -> {
                         superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                        Locale.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
+                        Message.ISLAND_GOT_PVP_ENABLED_WHILE_INSIDE.send(superiorPlayer);
                     });
                 break;
         }
@@ -3012,27 +3012,27 @@ public final class SIsland implements Island {
 
         // Warp doesn't exist anymore.
         if (getWarp(islandWarp.getName()) == null) {
-            Locale.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
+            Message.INVALID_WARP.send(superiorPlayer, islandWarp.getName());
             deleteWarp(islandWarp.getName());
             return;
         }
 
         if (!isInsideRange(location)) {
-            Locale.UNSAFE_WARP.send(superiorPlayer);
+            Message.UNSAFE_WARP.send(superiorPlayer);
             deleteWarp(islandWarp.getName());
             return;
         }
 
         if (!LocationUtils.isSafeBlock(location.getBlock())) {
-            Locale.UNSAFE_WARP.send(superiorPlayer);
+            Message.UNSAFE_WARP.send(superiorPlayer);
             return;
         }
 
         superiorPlayer.teleport(location, success -> {
             if (success) {
-                Locale.TELEPORTED_TO_WARP.send(superiorPlayer);
+                Message.TELEPORTED_TO_WARP.send(superiorPlayer);
                 if (superiorPlayer.isShownAsOnline()) {
-                    IslandUtils.sendMessage(this, Locale.TELEPORTED_TO_WARP_ANNOUNCEMENT,
+                    IslandUtils.sendMessage(this, Message.TELEPORTED_TO_WARP_ANNOUNCEMENT,
                             Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName(), islandWarp.getName());
                 }
             }
@@ -3397,7 +3397,7 @@ public final class SIsland implements Island {
         EventsCaller.callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
 
         if (asker != null)
-            Locale.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
+            Message.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);
 
         if (callback != null)
             callback.run();

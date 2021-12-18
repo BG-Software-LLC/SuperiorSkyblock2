@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -136,11 +136,11 @@ public final class IslandUtils {
             if (!player.getAllowFlight() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
-                Locale.ISLAND_FLY_ENABLED.send(player);
+                Message.ISLAND_FLY_ENABLED.send(player);
             } else if (player.getAllowFlight() && !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(false);
                 player.setFlying(false);
-                Locale.ISLAND_FLY_DISABLED.send(player);
+                Message.ISLAND_FLY_DISABLED.send(player);
             }
         });
     }
@@ -161,7 +161,7 @@ public final class IslandUtils {
         });
     }
 
-    public static void sendMessage(Island island, Locale message, List<UUID> ignoredMembers, Object... args) {
+    public static void sendMessage(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
         island.getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
@@ -174,12 +174,12 @@ public final class IslandUtils {
 
     public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         if (!island.isMember(targetPlayer)) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
         if (!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
@@ -195,21 +195,21 @@ public final class IslandUtils {
 
         island.kickMember(target);
 
-        IslandUtils.sendMessage(island, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
+        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
 
-        Locale.GOT_KICKED.send(target, callerName);
+        Message.GOT_KICKED.send(target, callerName);
     }
 
     public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         Island playerIsland = superiorPlayer.getIsland();
         if (playerIsland != null && playerIsland.isMember(targetPlayer) &&
                 !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
         if (island.isBanned(targetPlayer)) {
-            Locale.PLAYER_ALREADY_BANNED.send(superiorPlayer);
+            Message.PLAYER_ALREADY_BANNED.send(superiorPlayer);
             return false;
         }
 
@@ -221,9 +221,9 @@ public final class IslandUtils {
 
         island.banMember(target, caller);
 
-        IslandUtils.sendMessage(island, Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
+        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
 
-        Locale.GOT_BANNED.send(target, island.getOwner().getName());
+        Message.GOT_BANNED.send(target, island.getOwner().getName());
     }
 
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {

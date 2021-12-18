@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -33,14 +33,14 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin delwarp <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_DEL_WARP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_DEL_WARP.getMessage(locale);
     }
 
     @Override
@@ -81,10 +81,10 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
 
         island.deleteWarp(islandWarp.getName());
 
-        Locale.DELETE_WARP.send(sender, islandWarp.getName());
+        Message.DELETE_WARP.send(sender, islandWarp.getName());
 
         if (breakSign) {
-            Locale.DELETE_WARP_SIGN_BROKE.send(sender);
+            Message.DELETE_WARP_SIGN_BROKE.send(sender);
         }
     }
 

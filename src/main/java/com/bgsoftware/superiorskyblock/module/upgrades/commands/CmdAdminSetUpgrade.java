@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -30,15 +30,15 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setupgrade <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_LEVEL.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_LEVEL.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_UPGRADE.getMessage(locale);
     }
 
     @Override
@@ -77,16 +77,16 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
         int maxLevel = upgrade.getMaxUpgradeLevel();
 
         if (level > maxLevel) {
-            Locale.MAXIMUM_LEVEL.send(sender, maxLevel);
+            Message.MAXIMUM_LEVEL.send(sender, maxLevel);
             return;
         }
 
         island.setUpgradeLevel(upgrade, level);
 
         if (targetPlayer == null)
-            Locale.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), island.getName());
+            Message.SET_UPGRADE_LEVEL_NAME.send(sender, upgrade.getName(), island.getName());
         else
-            Locale.SET_UPGRADE_LEVEL.send(sender, upgrade.getName(), targetPlayer.getName());
+            Message.SET_UPGRADE_LEVEL.send(sender, upgrade.getName(), targetPlayer.getName());
     }
 
     @Override

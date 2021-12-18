@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -93,7 +93,7 @@ public final class BlocksProvider_EpicSpawners7 implements SpawnersProvider {
 
             if (island.hasReachedBlockLimit(spawnerKey, increaseAmount)) {
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(spawnerKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(spawnerKey.toString()));
             } else {
                 island.handleBlockPlace(spawnerKey, increaseAmount);
             }
@@ -114,7 +114,7 @@ public final class BlocksProvider_EpicSpawners7 implements SpawnersProvider {
                 island.handleBlockBreak(blockKey, -increaseAmount);
             } else if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Locale.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

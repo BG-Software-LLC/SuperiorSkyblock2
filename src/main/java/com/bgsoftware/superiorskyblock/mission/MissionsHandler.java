@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.mission;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -233,7 +233,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
-                        Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
                         if (result != null)
                             result.accept(false);
                         return;

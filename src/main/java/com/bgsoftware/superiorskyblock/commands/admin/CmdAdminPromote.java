@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -25,12 +25,12 @@ public final class CmdAdminPromote implements IAdminPlayerCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin promote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "admin promote <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_PROMOTE.getMessage(locale);
     }
 
     @Override
@@ -63,14 +63,14 @@ public final class CmdAdminPromote implements IAdminPlayerCommand {
         Island island = targetPlayer.getIsland();
 
         if (island == null) {
-            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
         PlayerRole currentRole = targetPlayer.getPlayerRole();
 
         if (currentRole.isLastRole()) {
-            Locale.LAST_ROLE_PROMOTE.send(sender);
+            Message.LAST_ROLE_PROMOTE.send(sender);
             return;
         }
 
@@ -85,14 +85,14 @@ public final class CmdAdminPromote implements IAdminPlayerCommand {
                 roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
 
         if (nextRole == null || nextRole.isLastRole()) {
-            Locale.LAST_ROLE_PROMOTE.send(sender);
+            Message.LAST_ROLE_PROMOTE.send(sender);
             return;
         }
 
         targetPlayer.setPlayerRole(nextRole);
 
-        Locale.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
-        Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+        Message.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
 }

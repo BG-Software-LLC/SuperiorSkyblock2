@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -33,13 +33,13 @@ public final class CmdSetRole implements IPermissibleCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "setrole <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_ISLAND_ROLE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_SET_ROLE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_SET_ROLE.getMessage(locale);
     }
 
     @Override
@@ -63,8 +63,8 @@ public final class CmdSetRole implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_SET_ROLE_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_SET_ROLE_PERMISSION;
     }
 
     @Override
@@ -76,7 +76,7 @@ public final class CmdSetRole implements IPermissibleCommand {
             return;
 
         if (targetPlayer.getName().equals(sender.getName())) {
-            Locale.SELF_ROLE_CHANGE.send(sender);
+            Message.SELF_ROLE_CHANGE.send(sender);
             return;
         }
 
@@ -86,7 +86,7 @@ public final class CmdSetRole implements IPermissibleCommand {
             return;
 
         if (!playerRole.isRoleLadder()) {
-            Locale.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, args[2], SPlayerRole.getValuesString());
             return;
         }
 
@@ -95,7 +95,7 @@ public final class CmdSetRole implements IPermissibleCommand {
         // Checking requirements for players
         if (superiorPlayer != null) {
             if (!playerIsland.isMember(targetPlayer)) {
-                Locale.PLAYER_NOT_INSIDE_ISLAND.send(sender);
+                Message.PLAYER_NOT_INSIDE_ISLAND.send(sender);
                 return;
             }
 
@@ -103,30 +103,30 @@ public final class CmdSetRole implements IPermissibleCommand {
 
             if (targetPlayer.getPlayerRole().isHigherThan(superiorPlayer.getPlayerRole()) ||
                     !playerRole.isLessThan(superiorPlayer.getPlayerRole())) {
-                Locale.CANNOT_SET_ROLE.send(sender, playerRole);
+                Message.CANNOT_SET_ROLE.send(sender, playerRole);
                 return;
             }
         } else {
             if (targetIsland == null) {
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
                 return;
             }
 
             if (playerRole.isLastRole()) {
-                Locale.CANNOT_SET_ROLE.send(sender, playerRole);
+                Message.CANNOT_SET_ROLE.send(sender, playerRole);
                 return;
             }
         }
 
         if (targetPlayer.getPlayerRole().equals(playerRole)) {
-            Locale.PLAYER_ALREADY_IN_ROLE.send(sender, targetPlayer.getName(), playerRole);
+            Message.PLAYER_ALREADY_IN_ROLE.send(sender, targetPlayer.getName(), playerRole);
             return;
         }
 
         int roleLimit = targetIsland.getRoleLimit(playerRole);
 
         if (roleLimit >= 0 && targetIsland.getIslandMembers(playerRole).size() >= roleLimit) {
-            Locale.CANNOT_SET_ROLE.send(sender, playerRole);
+            Message.CANNOT_SET_ROLE.send(sender, playerRole);
             return;
         }
 
@@ -134,11 +134,11 @@ public final class CmdSetRole implements IPermissibleCommand {
         targetPlayer.setPlayerRole(playerRole);
 
         if (currentRole.isLessThan(playerRole)) {
-            Locale.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
-            Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+            Message.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+            Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
         } else {
-            Locale.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
-            Locale.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+            Message.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());
+            Message.GOT_DEMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
         }
     }
 

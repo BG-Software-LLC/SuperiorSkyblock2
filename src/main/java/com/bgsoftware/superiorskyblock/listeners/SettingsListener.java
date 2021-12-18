@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
@@ -221,7 +222,7 @@ public final class SettingsListener implements Listener {
             ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
             hitBlock.setType(Material.AIR);
 
-            Locale.sendProtectionMessage(damagerPlayer);
+            PlayerLocales.sendProtectionMessage(damagerPlayer);
 
             Executor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()), 1L);
         }

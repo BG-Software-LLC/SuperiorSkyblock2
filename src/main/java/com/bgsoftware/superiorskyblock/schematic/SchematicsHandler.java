@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematic;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -142,7 +142,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
         saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
                 offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), offset.getYaw(), offset.getPitch(), schematicName, () ->
-                        Locale.SCHEMATIC_SAVED.send(superiorPlayer));
+                        Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);

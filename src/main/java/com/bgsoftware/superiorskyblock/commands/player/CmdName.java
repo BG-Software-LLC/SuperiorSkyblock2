@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -28,12 +28,12 @@ public final class CmdName implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "name <" + Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+        return "name <" + Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_NAME.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_NAME.getMessage(locale);
     }
 
     @Override
@@ -57,8 +57,8 @@ public final class CmdName implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_NAME_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_NAME_PERMISSION;
     }
 
     @Override
@@ -74,9 +74,9 @@ public final class CmdName implements IPermissibleCommand {
                 StringUtils.translateColors(islandName) : islandName;
 
         for (Player player : Bukkit.getOnlinePlayers())
-            Locale.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);
+            Message.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);
 
-        Locale.CHANGED_NAME.send(superiorPlayer, coloredName);
+        Message.CHANGED_NAME.send(superiorPlayer, coloredName);
     }
 
 }

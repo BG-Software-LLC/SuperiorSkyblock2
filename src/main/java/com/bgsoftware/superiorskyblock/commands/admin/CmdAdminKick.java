@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -26,12 +26,12 @@ public final class CmdAdminKick implements IAdminPlayerCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin kick <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "admin kick <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_KICK.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_KICK.getMessage(locale);
     }
 
     @Override
@@ -59,12 +59,12 @@ public final class CmdAdminKick implements IAdminPlayerCommand {
         Island targetIsland = targetPlayer.getIsland();
 
         if (targetIsland == null) {
-            Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+            Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
 
         if (targetIsland.getOwner() == targetPlayer) {
-            Locale.KICK_ISLAND_LEADER.send(sender);
+            Message.KICK_ISLAND_LEADER.send(sender);
             return;
         }
 

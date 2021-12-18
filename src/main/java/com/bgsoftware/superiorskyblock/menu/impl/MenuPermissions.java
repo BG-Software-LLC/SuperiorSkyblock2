@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -254,7 +254,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         }
 
         if (success) {
-            Locale.UPDATED_PERMISSION.send(superiorPlayer, permissionHolderName);
+            Message.UPDATED_PERMISSION.send(superiorPlayer, permissionHolderName);
 
             SoundWrapper soundWrapper = (SoundWrapper) getData(permissionName + "-has-access-sound");
             if (soundWrapper != null)
@@ -268,7 +268,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             open(previousMenu);
         } else {
             if (sendFailMessage)
-                Locale.LACK_CHANGE_PERMISSION.send(superiorPlayer);
+                Message.LACK_CHANGE_PERMISSION.send(superiorPlayer);
 
             SoundWrapper soundWrapper = (SoundWrapper) getData(permissionName + "-no-access-sound");
             if (soundWrapper != null)

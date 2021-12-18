@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -26,14 +26,14 @@ public class CmdAdminSetDisbands implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setdisbands <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_PLAYERS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_PLAYERS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_DISBANDS.getMessage(locale);
     }
 
     @Override
@@ -68,13 +68,13 @@ public class CmdAdminSetDisbands implements IAdminPlayerCommand {
         Executor.data(() -> targetPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(amount)));
 
         if (targetPlayers.size() > 1) {
-            Locale.DISBAND_SET_ALL.send(sender, amount);
+            Message.DISBAND_SET_ALL.send(sender, amount);
         } else if (!sender.equals(targetPlayers.get(0).asPlayer()))
-            Locale.DISBAND_SET_OTHER.send(sender, targetPlayers.get(0).getName(), amount);
+            Message.DISBAND_SET_OTHER.send(sender, targetPlayers.get(0).getName(), amount);
 
         targetPlayers.forEach(superiorPlayer -> {
             if (superiorPlayer.isOnline()) {
-                Locale.DISBAND_SET.send(superiorPlayer, amount);
+                Message.DISBAND_SET.send(superiorPlayer, amount);
             }
         });
     }

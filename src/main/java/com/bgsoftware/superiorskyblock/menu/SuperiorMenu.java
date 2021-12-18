@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -314,7 +314,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             return;
 
         if (player.isSleeping()) {
-            Locale.OPEN_MENU_WHILE_SLEEPING.send(superiorPlayer);
+            Message.OPEN_MENU_WHILE_SLEEPING.send(superiorPlayer);
             return;
         }
 

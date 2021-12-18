@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -13,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -41,11 +41,11 @@ public final class CommandArguments {
 
         if (island == null) {
             if (argument.equalsIgnoreCase(sender.getName()))
-                Locale.INVALID_ISLAND.send(sender);
+                Message.INVALID_ISLAND.send(sender);
             else if (targetPlayer == null)
-                Locale.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(argument));
+                Message.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(argument));
             else
-                Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
         }
 
         return new Pair<>(island, targetPlayer);
@@ -73,7 +73,7 @@ public final class CommandArguments {
         Island island = superiorPlayer.getIsland();
 
         if (island == null)
-            Locale.INVALID_ISLAND.send(superiorPlayer);
+            Message.INVALID_ISLAND.send(superiorPlayer);
 
         return new Pair<>(island, superiorPlayer);
     }
@@ -86,7 +86,7 @@ public final class CommandArguments {
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
 
         if (targetPlayer == null)
-            Locale.INVALID_PLAYER.send(sender, argument);
+            Message.INVALID_PLAYER.send(sender, argument);
 
         return targetPlayer;
     }
@@ -107,7 +107,7 @@ public final class CommandArguments {
 
     public static Pair<Island, SuperiorPlayer> getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         if (!(sender instanceof Player)) {
-            Locale.sendMessage(sender, "&cYou must specify a player's name.", true);
+            Message.CUSTOM.send(sender, "&cYou must specify a player's name.", true);
             return new Pair<>(null, null);
         }
 
@@ -116,7 +116,7 @@ public final class CommandArguments {
         Island island = locationIsland == null || locationIsland.isSpawn() ? superiorPlayer.getIsland() : locationIsland;
 
         if (island == null)
-            Locale.INVALID_ISLAND.send(sender);
+            Message.INVALID_ISLAND.send(sender);
 
         return new Pair<>(island, superiorPlayer);
     }
@@ -129,7 +129,7 @@ public final class CommandArguments {
         Mission<?> mission = plugin.getMissions().getMission(argument);
 
         if (mission == null)
-            Locale.INVALID_MISSION.send(sender, argument);
+            Message.INVALID_MISSION.send(sender, argument);
 
         return mission;
     }
@@ -156,7 +156,7 @@ public final class CommandArguments {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(argument);
 
         if (upgrade == null)
-            Locale.INVALID_UPGRADE.send(sender, argument, StringUtils.getUpgradesString(plugin));
+            Message.INVALID_UPGRADE.send(sender, argument, StringUtils.getUpgradesString(plugin));
 
         return upgrade;
     }
@@ -179,13 +179,13 @@ public final class CommandArguments {
         }
 
         if (playerRole == null)
-            Locale.INVALID_ROLE.send(sender, argument, SPlayerRole.getValuesString());
+            Message.INVALID_ROLE.send(sender, argument, SPlayerRole.getValuesString());
 
         return playerRole;
     }
 
     public static Pair<Integer, Boolean> getLimit(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_LIMIT);
+        return getInt(sender, argument, Message.INVALID_LIMIT);
     }
 
     public static BigDecimal getBigDecimalAmount(CommandSender sender, String argument) {
@@ -194,14 +194,14 @@ public final class CommandArguments {
         try {
             amount = new BigDecimal(argument);
         } catch (NumberFormatException ex) {
-            Locale.INVALID_AMOUNT.send(sender);
+            Message.INVALID_AMOUNT.send(sender);
         }
 
         return amount;
     }
 
     public static Pair<Integer, Boolean> getAmount(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_AMOUNT);
+        return getInt(sender, argument, Message.INVALID_AMOUNT);
     }
 
     public static Pair<Double, Boolean> getMultiplier(CommandSender sender, String argument) {
@@ -213,7 +213,7 @@ public final class CommandArguments {
             // Makes sure the multiplier is rounded.
             multiplier = Math.round(multiplier * 100) / 100D;
         } catch (IllegalArgumentException ex) {
-            Locale.INVALID_MULTIPLIER.send(sender, argument);
+            Message.INVALID_MULTIPLIER.send(sender, argument);
             status = false;
         }
 
@@ -224,13 +224,13 @@ public final class CommandArguments {
         PotionEffectType potionEffectType = PotionEffectType.getByName(argument.toUpperCase());
 
         if (potionEffectType == null)
-            Locale.INVALID_EFFECT.send(sender, argument);
+            Message.INVALID_EFFECT.send(sender, argument);
 
         return potionEffectType;
     }
 
     public static Pair<Integer, Boolean> getLevel(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_LEVEL);
+        return getInt(sender, argument, Message.INVALID_LEVEL);
     }
 
     public static Material getMaterial(CommandSender sender, String argument) {
@@ -239,14 +239,14 @@ public final class CommandArguments {
         try {
             material = Material.valueOf(argument.split(":")[0].toUpperCase());
         } catch (Exception ex) {
-            Locale.INVALID_MATERIAL.send(sender, argument);
+            Message.INVALID_MATERIAL.send(sender, argument);
         }
 
         return material;
     }
 
     public static Pair<Integer, Boolean> getSize(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_SIZE);
+        return getInt(sender, argument, Message.INVALID_SIZE);
     }
 
     public static IslandWarp getWarp(CommandSender sender, Island island, String[] args, int start) {
@@ -254,7 +254,7 @@ public final class CommandArguments {
         IslandWarp islandWarp = island.getWarp(warpName);
 
         if (islandWarp == null)
-            Locale.INVALID_WARP.send(sender, warpName);
+            Message.INVALID_WARP.send(sender, warpName);
 
         return islandWarp;
     }
@@ -265,7 +265,7 @@ public final class CommandArguments {
         try {
             biome = Biome.valueOf(argument.toUpperCase());
         } catch (Exception ex) {
-            Locale.INVALID_BIOME.send(sender, argument);
+            Message.INVALID_BIOME.send(sender, argument);
         }
 
         return biome;
@@ -275,7 +275,7 @@ public final class CommandArguments {
         World world = Bukkit.getWorld(argument);
 
         if (world == null)
-            Locale.INVALID_WORLD.send(sender, argument);
+            Message.INVALID_WORLD.send(sender, argument);
 
         return world;
     }
@@ -287,18 +287,18 @@ public final class CommandArguments {
             int i_x = Integer.parseInt(x), i_y = Integer.parseInt(y), i_z = Integer.parseInt(z);
             location = new Location(world, i_x, i_y, i_z);
         } catch (Throwable ex) {
-            Locale.INVALID_BLOCK.send(sender, world.getName() + ", " + x + ", " + y + ", " + z);
+            Message.INVALID_BLOCK.send(sender, world.getName() + ", " + x + ", " + y + ", " + z);
         }
 
         return location;
     }
 
     public static Pair<Integer, Boolean> getPage(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_PAGE);
+        return getInt(sender, argument, Message.INVALID_PAGE);
     }
 
     public static Pair<Integer, Boolean> getRows(CommandSender sender, String argument) {
-        return getInt(sender, argument, Locale.INVALID_ROWS);
+        return getInt(sender, argument, Message.INVALID_ROWS);
     }
 
     public static IslandPrivilege getIslandPrivilege(CommandSender sender, String argument) {
@@ -310,7 +310,7 @@ public final class CommandArguments {
         }
 
         if (islandPrivilege == null)
-            Locale.INVALID_ISLAND_PERMISSION.send(sender, argument, StringUtils.getPermissionsString());
+            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, StringUtils.getPermissionsString());
 
         return islandPrivilege;
     }
@@ -321,7 +321,7 @@ public final class CommandArguments {
         try {
             rating = Rating.valueOf(argument.toUpperCase());
         } catch (Exception ex) {
-            Locale.INVALID_RATE.send(sender, argument, Rating.getValuesString());
+            Message.INVALID_RATE.send(sender, argument, Rating.getValuesString());
         }
 
         return rating;
@@ -336,7 +336,7 @@ public final class CommandArguments {
         }
 
         if (islandFlag == null)
-            Locale.INVALID_SETTINGS.send(sender, argument, StringUtils.getSettingsString());
+            Message.INVALID_SETTINGS.send(sender, argument, StringUtils.getSettingsString());
 
         return islandFlag;
     }
@@ -350,16 +350,16 @@ public final class CommandArguments {
         }
 
         if (environment == null)
-            Locale.INVALID_ENVIRONMENT.send(sender, argument);
+            Message.INVALID_ENVIRONMENT.send(sender, argument);
 
         return environment;
     }
 
     public static Pair<Integer, Boolean> getInterval(CommandSender sender, String argument) {
-        Pair<Integer, Boolean> interval = getInt(sender, argument, Locale.INVALID_INTERVAL);
+        Pair<Integer, Boolean> interval = getInt(sender, argument, Message.INVALID_INTERVAL);
 
         if (interval.getValue() && interval.getKey() < 0) {
-            Locale.INVALID_INTERVAL.send(sender, argument);
+            Message.INVALID_INTERVAL.send(sender, argument);
             return new Pair<>(interval.getKey(), false);
         }
 
@@ -391,7 +391,7 @@ public final class CommandArguments {
         return parsedArgs;
     }
 
-    private static Pair<Integer, Boolean> getInt(CommandSender sender, String argument, Locale locale) {
+    private static Pair<Integer, Boolean> getInt(CommandSender sender, String argument, Message locale) {
         int i = 0;
         boolean status = true;
 

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -28,15 +28,15 @@ public final class CmdAdminAddCropGrowth implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin addcropgrowth <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MULTIPLIER.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_ADD_CROP_GROWTH.getMessage(locale);
     }
 
     @Override
@@ -71,11 +71,11 @@ public final class CmdAdminAddCropGrowth implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setCropGrowthMultiplier(island.getCropGrowthMultiplier() + multiplier)));
 
         if (islands.size() > 1)
-            Locale.CHANGED_CROP_GROWTH_ALL.send(sender);
+            Message.CHANGED_CROP_GROWTH_ALL.send(sender);
         else if (targetPlayer == null)
-            Locale.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
+            Message.CHANGED_CROP_GROWTH_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
+            Message.CHANGED_CROP_GROWTH.send(sender, targetPlayer.getName());
     }
 
 }

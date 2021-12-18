@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -197,7 +197,7 @@ public final class MenuBiomes extends SuperiorMenu {
                                         command.replace("%player%", superiorPlayer.getName())));
 
                             targetIsland.setBiome(event.getResult());
-                            Locale.CHANGED_BIOME.send(superiorPlayer, event.getResult().name().toLowerCase());
+                            Message.CHANGED_BIOME.send(superiorPlayer, event.getResult().name().toLowerCase());
 
                             Executor.sync(() -> {
                                 previousMove = false;

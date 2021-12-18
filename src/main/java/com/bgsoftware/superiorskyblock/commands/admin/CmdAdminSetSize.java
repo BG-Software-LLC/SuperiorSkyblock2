@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -28,15 +28,15 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setsize <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_SIZE.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_SIZE.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SIZE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_SIZE.getMessage(locale);
     }
 
     @Override
@@ -69,7 +69,7 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
         int size = arguments.getKey();
 
         if (size > plugin.getSettings().getMaxIslandSize()) {
-            Locale.SIZE_BIGGER_MAX.send(sender);
+            Message.SIZE_BIGGER_MAX.send(sender);
             return;
         }
 
@@ -79,14 +79,14 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
         });
 
         if (islands.size() > 1)
-            Locale.CHANGED_ISLAND_SIZE_ALL.send(sender);
+            Message.CHANGED_ISLAND_SIZE_ALL.send(sender);
         else if (targetPlayer == null)
-            Locale.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());
+            Message.CHANGED_ISLAND_SIZE_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
+            Message.CHANGED_ISLAND_SIZE.send(sender, targetPlayer.getName());
 
         if (plugin.getSettings().isBuildOutsideIsland())
-            Locale.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
+            Message.CHANGED_ISLAND_SIZE_BUILD_OUTSIDE.send(sender);
     }
 
 }
