@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.chat;
+package com.bgsoftware.superiorskyblock.player.chat;
 
 import org.bukkit.entity.Player;
 

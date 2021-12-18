@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;

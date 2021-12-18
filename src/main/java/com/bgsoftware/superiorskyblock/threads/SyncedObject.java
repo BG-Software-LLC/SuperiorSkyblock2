@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.threads;
+package com.bgsoftware.superiorskyblock.threads;
 
 import java.util.Collection;
 import java.util.Map;

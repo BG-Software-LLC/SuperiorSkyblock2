@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.threads;
+package com.bgsoftware.superiorskyblock.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
