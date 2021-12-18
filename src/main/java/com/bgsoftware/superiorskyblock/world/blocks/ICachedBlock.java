@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.blocks;
+package com.bgsoftware.superiorskyblock.world.blocks;
 
 import org.bukkit.Location;
 

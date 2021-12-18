@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.chunks;
+package com.bgsoftware.superiorskyblock.world.chunks;
 
 import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;

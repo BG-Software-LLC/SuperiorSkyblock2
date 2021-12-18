@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world.event;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;

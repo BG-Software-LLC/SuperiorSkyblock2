@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;

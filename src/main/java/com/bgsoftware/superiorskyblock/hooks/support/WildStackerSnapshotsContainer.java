@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Chunk;

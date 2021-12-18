@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;

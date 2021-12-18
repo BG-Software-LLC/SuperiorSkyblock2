@@ -57,7 +57,7 @@ import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.hooks.support.SlimefunHook;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;

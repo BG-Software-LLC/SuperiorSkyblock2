@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.world.blocks;
+package com.bgsoftware.superiorskyblock.world.blocks.stacked;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;

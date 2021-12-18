@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.chunks;
+package com.bgsoftware.superiorskyblock.world.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;

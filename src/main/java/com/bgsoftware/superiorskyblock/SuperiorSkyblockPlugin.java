@@ -63,7 +63,7 @@ import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
@@ -76,8 +76,8 @@ import com.bgsoftware.superiorskyblock.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContainer;
 import com.bgsoftware.superiorskyblock.values.container.GeneralBlockValuesContainer;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
-import com.bgsoftware.superiorskyblock.world.blocks.StackedBlocksHandler;
-import com.bgsoftware.superiorskyblock.world.blocks.container.DefaultStackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlocksHandler;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.DefaultStackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
@@ -384,7 +384,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         } catch (Exception ex) {
             new HandlerLoadException(
                     "The plugin doesn't support your minecraft version.\n" +
-                    "Please try a different version.",
+                            "Please try a different version.",
                     HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
             debug(ex);
             return false;

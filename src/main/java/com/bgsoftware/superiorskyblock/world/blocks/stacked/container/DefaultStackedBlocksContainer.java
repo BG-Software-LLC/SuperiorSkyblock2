@@ -1,7 +1,7 @@
-package com.bgsoftware.superiorskyblock.world.blocks.container;
+package com.bgsoftware.superiorskyblock.world.blocks.stacked.container;
 
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.blocks.StackedBlock;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
 import org.bukkit.Location;
 import org.jetbrains.annotations.Nullable;
 

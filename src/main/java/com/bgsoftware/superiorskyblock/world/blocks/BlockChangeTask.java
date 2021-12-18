@@ -1,11 +1,11 @@
-package com.bgsoftware.superiorskyblock.utils.blocks;
+package com.bgsoftware.superiorskyblock.world.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;

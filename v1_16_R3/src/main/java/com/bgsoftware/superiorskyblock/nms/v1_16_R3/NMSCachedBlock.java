@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
