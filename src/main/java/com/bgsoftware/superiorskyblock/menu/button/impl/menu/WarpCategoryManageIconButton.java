@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
-import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
@@ -39,7 +39,7 @@ public final class WarpCategoryManageIconButton extends SuperiorMenuButton<MenuW
 
         Player player = (Player) clickEvent.getWhoClicked();
 
-        Locale.WARP_CATEGORY_SLOT.send(player);
+        Message.WARP_CATEGORY_SLOT.send(player);
 
         superiorMenu.closePage();
 
@@ -52,17 +52,17 @@ public final class WarpCategoryManageIconButton extends SuperiorMenuButton<MenuW
                     if (slot < 0 || slot >= MenuWarpCategories.rowsSize * 9)
                         throw new IllegalArgumentException();
                 } catch (IllegalArgumentException ex) {
-                    Locale.INVALID_SLOT.send(player, message);
+                    Message.INVALID_SLOT.send(player, message);
                     return true;
                 }
 
                 if (warpCategory.getIsland().getWarpCategory(slot) != null) {
-                    Locale.WARP_CATEGORY_SLOT_ALREADY_TAKEN.send(player);
+                    Message.WARP_CATEGORY_SLOT_ALREADY_TAKEN.send(player);
                     return true;
                 }
 
                 warpCategory.setSlot(slot);
-                Locale.WARP_CATEGORY_SLOT_SUCCESS.send(player, slot);
+                Message.WARP_CATEGORY_SLOT_SUCCESS.send(player, slot);
 
                 if (MenuWarpCategoryManage.successUpdateSound != null)
                     MenuWarpCategoryManage.successUpdateSound.playSound(player);

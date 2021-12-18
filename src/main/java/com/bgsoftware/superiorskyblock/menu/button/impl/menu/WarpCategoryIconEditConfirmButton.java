@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryIconEdit;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -22,7 +22,7 @@ public final class WarpCategoryIconEditConfirmButton extends SuperiorMenuButton<
                               InventoryClickEvent clickEvent) {
         clickEvent.getWhoClicked().closeInventory();
 
-        Locale.WARP_CATEGORY_ICON_UPDATED.send(clickEvent.getWhoClicked());
+        Message.WARP_CATEGORY_ICON_UPDATED.send(clickEvent.getWhoClicked());
 
         superiorMenu.getIconProvider().setIcon(superiorMenu.getIconBuilder().build());
     }

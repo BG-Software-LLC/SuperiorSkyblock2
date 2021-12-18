@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
@@ -14,10 +14,10 @@ import java.util.List;
 
 public final class IconEditLoreButton<M extends SuperiorMenuIconEdit<M, T>, T> extends SuperiorMenuButton<M> {
 
-    private final Locale newLoreMessage;
+    private final Message newLoreMessage;
 
     private IconEditLoreButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
-                               String requiredPermission, SoundWrapper lackPermissionSound, Locale newLoreMessage) {
+                               String requiredPermission, SoundWrapper lackPermissionSound, Message newLoreMessage) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.newLoreMessage = newLoreMessage;
     }
@@ -46,9 +46,9 @@ public final class IconEditLoreButton<M extends SuperiorMenuIconEdit<M, T>, T> e
     public static class Builder<M extends SuperiorMenuIconEdit<M, T>, T> extends
             AbstractBuilder<Builder<M, T>, IconEditLoreButton<M, T>, M> {
 
-        private final Locale newLoreMessage;
+        private final Message newLoreMessage;
 
-        public Builder(Locale newLoreMessage) {
+        public Builder(Message newLoreMessage) {
             this.newLoreMessage = newLoreMessage;
         }
 

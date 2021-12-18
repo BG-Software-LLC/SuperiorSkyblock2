@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
-import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -26,8 +26,7 @@ public final class WarpManageRenameButton extends SuperiorMenuButton<MenuWarpMan
                               InventoryClickEvent clickEvent) {
         Player player = (Player) clickEvent.getWhoClicked();
 
-        Locale.WARP_RENAME.send(player);
-
+        Message.WARP_RENAME.send(player);
 
         superiorMenu.closePage();
 
@@ -38,18 +37,18 @@ public final class WarpManageRenameButton extends SuperiorMenuButton<MenuWarpMan
                 String newName = IslandUtils.getWarpName(message);
 
                 if (islandWarp.getIsland().getWarp(newName) != null) {
-                    Locale.WARP_RENAME_ALREADY_EXIST.send(player);
+                    Message.WARP_RENAME_ALREADY_EXIST.send(player);
                     return true;
                 }
 
                 if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                    Locale.WARP_NAME_TOO_LONG.send(player);
+                    Message.WARP_NAME_TOO_LONG.send(player);
                     return true;
                 }
 
                 islandWarp.getIsland().renameWarp(islandWarp, newName);
 
-                Locale.WARP_RENAME_SUCCESS.send(player, newName);
+                Message.WARP_RENAME_SUCCESS.send(player, newName);
 
                 if (MenuWarpManage.successUpdateSound != null)
                     MenuWarpManage.successUpdateSound.playSound(player);

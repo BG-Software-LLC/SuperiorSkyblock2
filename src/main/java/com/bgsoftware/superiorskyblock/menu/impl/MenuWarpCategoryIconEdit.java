@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconDisplayButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconEditLoreButton;
@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryIconEdi
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 
 public final class MenuWarpCategoryIconEdit extends SuperiorMenuIconEdit<MenuWarpCategoryIconEdit, WarpCategory> {
@@ -53,11 +52,11 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenuIconEdit<MenuWar
 
         menuPattern = patternBuilder
                 .mapButtons(getSlots(cfg, "icon-type", menuPatternSlots),
-                        new IconEditTypeButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_TYPE))
+                        new IconEditTypeButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_TYPE))
                 .mapButtons(getSlots(cfg, "icon-rename", menuPatternSlots),
-                        new IconRenameButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_NAME))
+                        new IconRenameButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_NAME))
                 .mapButtons(getSlots(cfg, "icon-relore", menuPatternSlots),
-                        new IconEditLoreButton.Builder<>(Locale.WARP_CATEGORY_ICON_NEW_LORE))
+                        new IconEditLoreButton.Builder<>(Message.WARP_CATEGORY_ICON_NEW_LORE))
                 .mapButtons(getSlots(cfg, "icon-confirm", menuPatternSlots),
                         new WarpCategoryIconEditConfirmButton.Builder())
                 .mapButtons(getSlots(cfg, "icon-slots", menuPatternSlots),

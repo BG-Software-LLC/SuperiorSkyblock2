@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -48,7 +48,7 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
             island.enableSettings(islandFlag);
         }
 
-        Locale.UPDATED_SETTINGS.send(clickedPlayer, StringUtils.format(islandFlag.getName()));
+        Message.UPDATED_SETTINGS.send(clickedPlayer, StringUtils.format(islandFlag.getName()));
 
         superiorMenu.refreshPage();
     }

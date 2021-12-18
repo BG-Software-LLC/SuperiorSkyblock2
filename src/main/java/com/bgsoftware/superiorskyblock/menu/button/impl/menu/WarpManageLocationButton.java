@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -30,17 +30,17 @@ public final class WarpManageLocationButton extends SuperiorMenuButton<MenuWarpM
         IslandWarp islandWarp = superiorMenu.getIslandWarp();
 
         if (!islandWarp.getIsland().isInsideRange(player.getLocation())) {
-            Locale.SET_WARP_OUTSIDE.send(player);
+            Message.SET_WARP_OUTSIDE.send(player);
             return;
         }
 
-        Locale.WARP_LOCATION_UPDATE.send(player);
+        Message.WARP_LOCATION_UPDATE.send(player);
 
         Block signBlock = islandWarp.getLocation().getBlock();
         if (signBlock.getState() instanceof Sign) {
             signBlock.setType(Material.AIR);
             signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
-            Locale.DELETE_WARP_SIGN_BROKE.send(player);
+            Message.DELETE_WARP_SIGN_BROKE.send(player);
         }
 
         islandWarp.setLocation(player.getLocation());

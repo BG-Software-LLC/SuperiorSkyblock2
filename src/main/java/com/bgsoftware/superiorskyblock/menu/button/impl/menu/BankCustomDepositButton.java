@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ public final class BankCustomDepositButton extends SuperiorMenuButton<MenuIsland
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = superiorMenu.getTargetIsland();
 
-        Locale.BANK_DEPOSIT_CUSTOM.send(clickedPlayer);
+        Message.BANK_DEPOSIT_CUSTOM.send(clickedPlayer);
 
         superiorMenu.closePage();
 
@@ -46,7 +46,7 @@ public final class BankCustomDepositButton extends SuperiorMenuButton<MenuIsland
                 MenuIslandBank.handleDeposit(clickedPlayer, island, superiorMenu, bankTransaction,
                         successSound, failSound, newAmount);
             } catch (IllegalArgumentException ex) {
-                Locale.INVALID_AMOUNT.send(clickedPlayer, message);
+                Message.INVALID_AMOUNT.send(clickedPlayer, message);
             }
 
             PlayerChat.remove(player);

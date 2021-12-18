@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -41,7 +41,7 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankL
                 .replaceAll("{0}", transaction.getPosition() + "")
                 .replaceAll("{1}", getFilteredPlayerName(transaction.getPlayer() == null ? CONSOLE_UUID : transaction.getPlayer()))
                 .replaceAll("{2}", (transaction.getAction() == BankAction.WITHDRAW_COMPLETED ?
-                        Locale.BANK_WITHDRAW_COMPLETED : Locale.BANK_DEPOSIT_COMPLETED).getMessage(inventoryViewer.getUserLocale()))
+                        Message.BANK_WITHDRAW_COMPLETED : Message.BANK_DEPOSIT_COMPLETED).getMessage(inventoryViewer.getUserLocale()))
                 .replaceAll("{3}", transaction.getDate())
                 .replaceAll("{4}", transaction.getAmount() + "")
                 .replaceAll("{5}", StringUtils.format(transaction.getAmount()))

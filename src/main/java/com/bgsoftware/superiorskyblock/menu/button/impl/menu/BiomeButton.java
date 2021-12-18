@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBiomes;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
@@ -89,7 +89,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
                 command.replace("%player%", clickedPlayer.getName())));
 
         superiorMenu.getTargetIsland().setBiome(event.getResult());
-        Locale.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase());
+        Message.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase());
 
         Executor.sync(superiorMenu::closePage, 1L);
     }

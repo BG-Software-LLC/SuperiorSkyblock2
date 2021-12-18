@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandCreation;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -73,7 +73,7 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
     }
 
     public void clickButton(SuperiorSkyblockPlugin plugin, Player whoClicked, boolean isRightClick,
-                                     String islandName, @Nullable MenuIslandCreation superiorMenu) {
+                            String islandName, @Nullable MenuIslandCreation superiorMenu) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(whoClicked);
 
         // Checking for preview of islands.
@@ -91,9 +91,9 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
         accessCommands.forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
 
-        Locale.ISLAND_CREATE_PROCCESS_REQUEST.send(clickedPlayer);
+        Message.ISLAND_CREATE_PROCCESS_REQUEST.send(clickedPlayer);
 
-        if(superiorMenu != null)
+        if (superiorMenu != null)
             superiorMenu.closePage();
 
         World.Environment environment = plugin.getSettings().getWorlds().getDefaultWorld();

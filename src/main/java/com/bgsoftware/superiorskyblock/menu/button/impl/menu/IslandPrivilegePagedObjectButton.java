@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -120,7 +120,7 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
         if (player == null)
             return;
 
-        Locale.UPDATED_PERMISSION.send(clickedPlayer, permissionHolderName);
+        Message.UPDATED_PERMISSION.send(clickedPlayer, permissionHolderName);
 
         SoundWrapper accessSound = pagedObject.getAccessSound();
         if (accessSound != null)
@@ -140,7 +140,7 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
             return;
 
         if (sendFailMessage)
-            Locale.LACK_CHANGE_PERMISSION.send(clickedPlayer);
+            Message.LACK_CHANGE_PERMISSION.send(clickedPlayer);
 
         SoundWrapper noAccessSound = pagedObject.getNoAccessSound();
         if (noAccessSound != null)

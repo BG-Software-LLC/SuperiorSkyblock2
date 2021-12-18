@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuControlPanel;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -37,7 +37,7 @@ public final class ControlPanelButton extends SuperiorMenuButton<MenuControlPane
             case OPEN_SETTINGS:
                 if (clickedPlayer.hasPermission("superior.island.settings")) {
                     if (!clickedPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)) {
-                        Locale.NO_SET_SETTINGS_PERMISSION.send(clickedPlayer,
+                        Message.NO_SET_SETTINGS_PERMISSION.send(clickedPlayer,
                                 targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
                         return;
                     }

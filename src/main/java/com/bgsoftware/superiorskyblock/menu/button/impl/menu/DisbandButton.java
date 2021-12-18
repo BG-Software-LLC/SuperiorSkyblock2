@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -35,12 +35,12 @@ public final class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> 
         Island targetIsland = superiorMenu.getTargetIsland();
 
         if (disbandIsland && EventsCaller.callIslandDisbandEvent(clickedPlayer, targetIsland)) {
-            IslandUtils.sendMessage(targetIsland, Locale.DISBAND_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());
+            IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());
 
-            Locale.DISBANDED_ISLAND.send(clickedPlayer);
+            Message.DISBANDED_ISLAND.send(clickedPlayer);
 
             if (BuiltinModules.BANK.disbandRefund > 0 && targetIsland.getOwner().isOnline()) {
-                Locale.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
+                Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
                         .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 

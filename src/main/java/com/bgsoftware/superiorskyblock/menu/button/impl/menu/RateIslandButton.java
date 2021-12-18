@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRate;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -33,9 +33,9 @@ public final class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
 
         island.setRating(clickedPlayer, rating);
 
-        Locale.RATE_SUCCESS.send(clickedPlayer, rating.getValue());
+        Message.RATE_SUCCESS.send(clickedPlayer, rating.getValue());
 
-        IslandUtils.sendMessage(island, Locale.RATE_ANNOUNCEMENT, new ArrayList<>(),
+        IslandUtils.sendMessage(island, Message.RATE_ANNOUNCEMENT, new ArrayList<>(),
                 clickedPlayer.getName(), rating.getValue());
 
         Executor.sync(superiorMenu::closePage, 1L);

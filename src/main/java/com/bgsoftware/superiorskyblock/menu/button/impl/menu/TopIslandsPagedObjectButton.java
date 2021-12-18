@@ -1,10 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
@@ -75,7 +76,7 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                 .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
                 .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
                 .replaceName("{7}", StringUtils.format(island.getTotalRating()))
-                .replaceName("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                .replaceName("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
                 .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
                 .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
 
@@ -94,8 +95,8 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                         } else {
                             members.forEach(member -> {
                                 String onlineMessage = member.isOnline() ?
-                                        Locale.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
-                                        Locale.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
+                                        Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
+                                        Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
 
                                 lore.add(PlaceholderHook.parse(member, memberFormat
                                         .replace("{}", member.getName())
@@ -113,7 +114,7 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                                 .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
                                 .replace("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
                                 .replace("{7}", StringUtils.format(island.getTotalRating()))
-                                .replace("{8}", StringUtils.formatRating(Locale.getDefaultLocale(), island.getTotalRating()))
+                                .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
                                 .replace("{9}", StringUtils.format(island.getRatingAmount()))
                                 .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
                     }
