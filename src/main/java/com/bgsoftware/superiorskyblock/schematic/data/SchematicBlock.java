@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.schematic.data;
 
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
 import org.bukkit.Location;
 
 public final class SchematicBlock {

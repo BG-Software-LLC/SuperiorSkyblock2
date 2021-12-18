@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.mission;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -17,7 +17,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -233,7 +233,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
-                        Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
                         if (result != null)
                             result.accept(false);
                         return;

@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -32,12 +32,12 @@ public final class CmdDelWarp implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "delwarp <" + Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
+        return "delwarp <" + Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "...>";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_DEL_WARP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_DEL_WARP.getMessage(locale);
     }
 
     @Override
@@ -61,8 +61,8 @@ public final class CmdDelWarp implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_DELETE_WARP_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_DELETE_WARP_PERMISSION;
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class CmdDelWarp implements IPermissibleCommand {
         IslandWarp islandWarp = island.getWarp(warpName);
 
         if (islandWarp == null) {
-            Locale.INVALID_WARP.send(superiorPlayer, warpName);
+            Message.INVALID_WARP.send(superiorPlayer, warpName);
             return;
         }
 
@@ -93,10 +93,10 @@ public final class CmdDelWarp implements IPermissibleCommand {
 
         island.deleteWarp(warpName);
 
-        Locale.DELETE_WARP.send(superiorPlayer, warpName);
+        Message.DELETE_WARP.send(superiorPlayer, warpName);
 
         if (breakSign) {
-            Locale.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
+            Message.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
         }
     }
 

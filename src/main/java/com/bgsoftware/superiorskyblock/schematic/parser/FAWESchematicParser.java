@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.schematic.parser;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
-import com.bgsoftware.superiorskyblock.schematic.WorldEditSchematic;
+import com.bgsoftware.superiorskyblock.schematic.impl.WorldEditSchematic;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 
 import java.io.DataInputStream;

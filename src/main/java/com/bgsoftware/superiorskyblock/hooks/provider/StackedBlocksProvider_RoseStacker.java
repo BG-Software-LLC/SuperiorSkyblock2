@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
@@ -113,7 +113,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
             if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
-                Locale.sendProtectionMessage(superiorPlayer);
+                PlayerLocales.sendProtectionMessage(superiorPlayer);
                 e.setCancelled(true);
             }
         }

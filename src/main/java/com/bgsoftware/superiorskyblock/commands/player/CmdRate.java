@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -29,13 +29,13 @@ public final class CmdRate implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "rate [" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_RATE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_RATE.getMessage(locale);
     }
 
     @Override
@@ -64,14 +64,14 @@ public final class CmdRate implements ISuperiorCommand {
             return;
 
         if (island.isSpawn()) {
-            Locale.INVALID_ISLAND_LOCATION.send(sender);
+            Message.INVALID_ISLAND_LOCATION.send(sender);
             return;
         }
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())) {
-            Locale.RATE_OWN_ISLAND.send(superiorPlayer);
+            Message.RATE_OWN_ISLAND.send(superiorPlayer);
             return;
         }
 

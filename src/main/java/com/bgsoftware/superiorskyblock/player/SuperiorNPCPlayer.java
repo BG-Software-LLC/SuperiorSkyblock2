@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -225,7 +226,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public Locale getUserLocale() {
-        return com.bgsoftware.superiorskyblock.Locale.getDefaultLocale();
+        return PlayerLocales.getDefaultLocale();
     }
 
     @Override
@@ -395,6 +396,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    @Deprecated
     public PlayerDataHandler getDataHandler() {
         return EmptyDataHandler.getInstance();
     }

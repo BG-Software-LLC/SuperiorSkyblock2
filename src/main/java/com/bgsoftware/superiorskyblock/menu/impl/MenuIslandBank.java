@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -17,7 +18,8 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 
 import java.math.BigDecimal;
@@ -128,19 +130,19 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
             if (!failureReason.isEmpty()) {
                 switch (failureReason) {
                     case "No permission":
-                        Locale.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
+                        Message.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
                         break;
                     case "Invalid amount":
-                        Locale.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
                         break;
                     case "Not enough money":
-                        Locale.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, StringUtils.format(amount));
                         break;
                     case "Exceed bank limit":
-                        Locale.BANK_LIMIT_EXCEED.send(superiorPlayer);
+                        Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
                         break;
                     default:
-                        Locale.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
+                        Message.DEPOSIT_ERROR.send(superiorPlayer, failureReason);
                         break;
                 }
             }
@@ -166,16 +168,16 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
             if (!failureReason.isEmpty()) {
                 switch (failureReason) {
                     case "No permission":
-                        Locale.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
+                        Message.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
                         break;
                     case "Invalid amount":
-                        Locale.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
                         break;
                     case "Bank is empty":
-                        Locale.ISLAND_BANK_EMPTY.send(superiorPlayer);
+                        Message.ISLAND_BANK_EMPTY.send(superiorPlayer);
                         break;
                     default:
-                        Locale.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
+                        Message.WITHDRAW_ERROR.send(superiorPlayer, failureReason);
                         break;
                 }
             }

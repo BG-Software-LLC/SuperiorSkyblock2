@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
 import java.util.ArrayList;
@@ -29,12 +29,12 @@ public final class CmdPardon implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "pardon <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "pardon <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_PARDON.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_PARDON.getMessage(locale);
     }
 
     @Override
@@ -58,8 +58,8 @@ public final class CmdPardon implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_BAN_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_BAN_PERMISSION;
     }
 
     @Override
@@ -70,15 +70,15 @@ public final class CmdPardon implements IPermissibleCommand {
             return;
 
         if (!island.isBanned(targetPlayer)) {
-            Locale.PLAYER_NOT_BANNED.send(superiorPlayer);
+            Message.PLAYER_NOT_BANNED.send(superiorPlayer);
             return;
         }
 
         island.unbanMember(targetPlayer);
 
-        IslandUtils.sendMessage(island, Locale.UNBAN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.UNBAN_ANNOUNCEMENT, new ArrayList<>(), targetPlayer.getName(), superiorPlayer.getName());
 
-        Locale.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
+        Message.GOT_UNBANNED.send(targetPlayer, island.getOwner().getName());
     }
 
     @Override

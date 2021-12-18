@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -29,13 +29,13 @@ public final class CmdBalance implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "balance [" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_BALANCE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_BALANCE.getMessage(locale);
     }
 
     @Override
@@ -67,11 +67,11 @@ public final class CmdBalance implements ISuperiorCommand {
         SuperiorPlayer targetPlayer = arguments.getValue();
 
         if (island == superiorPlayer.getIsland())
-            Locale.ISLAND_BANK_SHOW.send(sender, island.getIslandBank().getBalance());
+            Message.ISLAND_BANK_SHOW.send(sender, island.getIslandBank().getBalance());
         else if (targetPlayer == null)
-            Locale.ISLAND_BANK_SHOW_OTHER_NAME.send(sender, island.getName(), island.getIslandBank().getBalance());
+            Message.ISLAND_BANK_SHOW_OTHER_NAME.send(sender, island.getName(), island.getIslandBank().getBalance());
         else
-            Locale.ISLAND_BANK_SHOW_OTHER.send(sender, targetPlayer.getName(), island.getIslandBank().getBalance());
+            Message.ISLAND_BANK_SHOW_OTHER.send(sender, targetPlayer.getName(), island.getIslandBank().getBalance());
     }
 
     @Override

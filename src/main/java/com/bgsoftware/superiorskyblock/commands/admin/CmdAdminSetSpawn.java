@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -31,7 +31,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_SPAWN.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_SPAWN.getMessage(locale);
     }
 
     @Override
@@ -67,7 +67,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
             SuperiorSkyblockPlugin.debug(ex);
         }
 
-        Locale.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);
+        Message.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);
     }
 
     @Override

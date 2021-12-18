@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -19,7 +19,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
                 Island playerIsland = targetPlayer.getIsland();
 
                 if (requireIsland() && playerIsland == null) {
-                    Locale.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
+                    Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
                     return;
                 }
 

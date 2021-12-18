@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -221,7 +221,7 @@ public final class SettingsListener implements Listener {
             ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
             hitBlock.setType(Material.AIR);
 
-            Locale.sendProtectionMessage(damagerPlayer);
+            PlayerLocales.sendProtectionMessage(damagerPlayer);
 
             Executor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()), 1L);
         }

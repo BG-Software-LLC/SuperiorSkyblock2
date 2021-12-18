@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -26,14 +26,14 @@ public final class CmdAdminRemoveRatings implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin removeratings <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_REMOVE_RATINGS.getMessage(locale);
     }
 
     @Override
@@ -67,11 +67,11 @@ public final class CmdAdminRemoveRatings implements IAdminIslandCommand {
         });
 
         if (targetPlayer != null)
-            Locale.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
+            Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
         else if (islands.size() == 1)
-            Locale.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());
+            Message.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());
         else
-            Locale.RATE_REMOVE_ALL_ISLANDS.send(sender);
+            Message.RATE_REMOVE_ALL_ISLANDS.send(sender);
     }
 
 }

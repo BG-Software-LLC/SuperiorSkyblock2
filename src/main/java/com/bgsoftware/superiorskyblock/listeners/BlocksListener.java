@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -90,7 +90,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if (island != null && island.isBeingRecalculated()) {
             e.setCancelled(true);
-            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
+            Message.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 
@@ -141,7 +141,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
         if (island != null && island.isBeingRecalculated()) {
             e.setCancelled(true);
-            Locale.ISLAND_BEING_CALCULATED.send(e.getPlayer());
+            Message.ISLAND_BEING_CALCULATED.send(e.getPlayer());
         }
     }
 

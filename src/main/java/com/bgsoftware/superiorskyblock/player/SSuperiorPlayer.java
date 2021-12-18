@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
@@ -17,19 +16,19 @@ import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.database.deserializer.PlayersDeserializer;
+import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -108,7 +107,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             this.toggledPanel = playerSettings.getBoolean("toggled_panel");
             this.islandFly = playerSettings.getBoolean("island_fly");
             this.borderColor = BorderColor.safeValue(playerSettings.getString("border_color"), BorderColor.BLUE);
-            this.userLocale = LocaleUtils.getLocale(playerSettings.getString("language"));
+            this.userLocale = PlayerLocales.getLocale(playerSettings.getString("language"));
             this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
         });
 
@@ -121,7 +120,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
         this.playerRole = SPlayerRole.guestRole();
         this.disbands = plugin.getSettings().getDisbandCount();
-        this.userLocale = LocaleUtils.getDefault();
+        this.userLocale = PlayerLocales.getDefaultLocale();
         databaseBridge.startSavingData();
     }
 
@@ -545,14 +544,14 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public java.util.Locale getUserLocale() {
         if (userLocale == null)
-            userLocale = LocaleUtils.getDefault();
+            userLocale = PlayerLocales.getDefaultLocale();
         return userLocale;
     }
 
     @Override
     public void setUserLocale(java.util.Locale userLocale) {
         Preconditions.checkNotNull(userLocale, "userLocale parameter cannot be null.");
-        Preconditions.checkArgument(Locale.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
+        Preconditions.checkArgument(PlayerLocales.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
         SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
 

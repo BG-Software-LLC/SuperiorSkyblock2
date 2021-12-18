@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -29,7 +29,7 @@ public final class CmdAdminSpy implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SPY.getMessage(locale);
     }
 
     @Override
@@ -52,9 +52,9 @@ public final class CmdAdminSpy implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (superiorPlayer.hasAdminSpyEnabled()) {
-            Locale.TOGGLED_SPY_OFF.send(superiorPlayer);
+            Message.TOGGLED_SPY_OFF.send(superiorPlayer);
         } else {
-            Locale.TOGGLED_SPY_ON.send(superiorPlayer);
+            Message.TOGGLED_SPY_ON.send(superiorPlayer);
         }
 
         superiorPlayer.toggleAdminSpy();

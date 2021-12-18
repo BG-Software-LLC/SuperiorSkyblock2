@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -27,12 +27,12 @@ public final class CmdMission implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "mission complete <" + Locale.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + ">";
+        return "mission complete <" + Message.COMMAND_ARGUMENT_MISSION_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_MISSION.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_MISSION.getMessage(locale);
     }
 
     @Override
@@ -55,10 +55,10 @@ public final class CmdMission implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
         if (!args[1].equalsIgnoreCase("complete")) {
-            String description = getDescription(LocaleUtils.getLocale(sender));
+            String description = getDescription(PlayerLocales.getLocale(sender));
             if (description == null)
                 new NullPointerException("The description of the command " + getAliases().get(0) + " is null.").printStackTrace();
-            Locale.sendMessage(sender, description, false);
+            Message.CUSTOM.send(sender, description, false);
             return;
         }
 
@@ -77,20 +77,20 @@ public final class CmdMission implements ISuperiorCommand {
                     stringBuilder.append(_mission.getName()).append(", ");
             });
             if (stringBuilder.length() != 0) {
-                Locale.MISSION_NOT_COMPLETE_REQUIRED_MISSIONS.send(superiorPlayer, stringBuilder.substring(0, stringBuilder.length() - 2));
+                Message.MISSION_NOT_COMPLETE_REQUIRED_MISSIONS.send(superiorPlayer, stringBuilder.substring(0, stringBuilder.length() - 2));
                 return;
             }
         }
 
         if (!plugin.getMissions().canComplete(superiorPlayer, mission)) {
-            Locale.MISSION_CANNOT_COMPLETE.send(superiorPlayer);
+            Message.MISSION_CANNOT_COMPLETE.send(superiorPlayer);
             return;
         }
 
         try {
             plugin.getMissions().rewardMission(mission, superiorPlayer, false);
         } catch (IllegalStateException ex) {
-            Locale.INVALID_MISSION.send(superiorPlayer, args[2]);
+            Message.INVALID_MISSION.send(superiorPlayer, args[2]);
         }
     }
 

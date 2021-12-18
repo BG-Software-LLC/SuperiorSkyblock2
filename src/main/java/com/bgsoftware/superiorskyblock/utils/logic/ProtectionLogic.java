@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
@@ -41,7 +42,7 @@ public final class ProtectionLogic {
         if (island == null) {
             if (!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
                 if (sendMessages)
-                    Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+                    Message.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
                 return false;
             }
 
@@ -50,13 +51,13 @@ public final class ProtectionLogic {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
             if (sendMessages)
-                Locale.sendProtectionMessage(superiorPlayer);
+                PlayerLocales.sendProtectionMessage(superiorPlayer);
             return false;
         }
 
         if (!island.isInsideRange(block.getLocation())) {
             if (sendMessages)
-                Locale.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
+                Message.BUILD_OUTSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
@@ -70,7 +71,7 @@ public final class ProtectionLogic {
         if (island == null) {
             if (!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
                 if (sendMessages)
-                    Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
+                    Message.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
                 return false;
             }
 
@@ -84,20 +85,20 @@ public final class ProtectionLogic {
 
         if (!island.hasPermission(superiorPlayer, islandPermission)) {
             if (sendMessages)
-                Locale.sendProtectionMessage(player);
+                PlayerLocales.sendProtectionMessage(player);
             return false;
         }
 
         if (plugin.getSettings().getValuableBlocks().contains(Key.of(block)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
             if (sendMessages)
-                Locale.sendProtectionMessage(player);
+                PlayerLocales.sendProtectionMessage(player);
             return false;
         }
 
         if (!island.isInsideRange(block.getLocation())) {
             if (sendMessages)
-                Locale.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
+                Message.DESTROY_OUTSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
@@ -134,7 +135,7 @@ public final class ProtectionLogic {
 
         if (island != null && !island.hasPermission(superiorPlayer, islandPrivilege)) {
             e.setCancelled(true);
-            Locale.sendProtectionMessage(superiorPlayer);
+            PlayerLocales.sendProtectionMessage(superiorPlayer);
             if (closeInventory) {
                 Executor.sync(() -> {
                     Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
@@ -152,7 +153,7 @@ public final class ProtectionLogic {
 
         if (island == null) {
             if (!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(player.getWorld())) {
-                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+                Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 return false;
             }
 
@@ -160,12 +161,12 @@ public final class ProtectionLogic {
         }
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)) {
-            Locale.sendProtectionMessage(player);
+            PlayerLocales.sendProtectionMessage(player);
             return false;
         }
 
         if (!island.isInsideRange(itemFrame.getLocation())) {
-            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+            Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
@@ -177,7 +178,7 @@ public final class ProtectionLogic {
 
         if (island == null) {
             if (!superiorPlayer.hasBypassModeEnabled() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld())) {
-                Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+                Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
                 return false;
             }
 
@@ -185,12 +186,12 @@ public final class ProtectionLogic {
         }
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)) {
-            Locale.sendProtectionMessage(superiorPlayer);
+            PlayerLocales.sendProtectionMessage(superiorPlayer);
             return false;
         }
 
         if (!island.isInsideRange(itemFrame.getLocation())) {
-            Locale.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
+            Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
@@ -203,7 +204,7 @@ public final class ProtectionLogic {
 
         if (island != null && !plugin.getNMSPlayers().wasThrownByPlayer(item, player) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)) {
-            Locale.sendProtectionMessage(superiorPlayer);
+            PlayerLocales.sendProtectionMessage(superiorPlayer);
             return false;
         }
 

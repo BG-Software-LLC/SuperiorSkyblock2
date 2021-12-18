@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -32,14 +32,14 @@ public final class CmdWarp implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "warp [" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
-                Locale.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "] [" +
+                Message.COMMAND_ARGUMENT_WARP_NAME.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_WARP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_WARP.getMessage(locale);
     }
 
     @Override
@@ -102,7 +102,7 @@ public final class CmdWarp implements ISuperiorCommand {
                     }
                     break;
                 case 3:
-                    Locale.INVALID_WARP.send(superiorPlayer, targetWarpName);
+                    Message.INVALID_WARP.send(superiorPlayer, targetWarpName);
                     break;
             }
 
@@ -110,7 +110,7 @@ public final class CmdWarp implements ISuperiorCommand {
         }
 
         if (!targetIsland.isMember(superiorPlayer) && islandWarp.hasPrivateFlag()) {
-            Locale.INVALID_WARP.send(superiorPlayer, targetWarpName);
+            Message.INVALID_WARP.send(superiorPlayer, targetWarpName);
             return;
         }
 

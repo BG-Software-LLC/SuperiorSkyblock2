@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -32,7 +32,7 @@ public final class CmdRecalc implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_RECALC.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_RECALC.getMessage(locale);
     }
 
     @Override
@@ -62,11 +62,11 @@ public final class CmdRecalc implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
         if (island.isBeingRecalculated()) {
-            Locale.RECALC_ALREADY_RUNNING.send(superiorPlayer);
+            Message.RECALC_ALREADY_RUNNING.send(superiorPlayer);
             return;
         }
 
-        Locale.RECALC_PROCCESS_REQUEST.send(superiorPlayer);
+        Message.RECALC_PROCCESS_REQUEST.send(superiorPlayer);
         island.calcIslandWorth(superiorPlayer);
     }
 

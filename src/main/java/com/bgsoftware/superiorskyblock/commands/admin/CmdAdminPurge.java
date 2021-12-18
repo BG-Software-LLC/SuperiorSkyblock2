@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -28,12 +28,12 @@ public final class CmdAdminPurge implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin purge <cancel/" + Locale.COMMAND_ARGUMENT_TIME.getMessage(locale) + ">";
+        return "admin purge <cancel/" + Message.COMMAND_ARGUMENT_TIME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_PURGE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_PURGE.getMessage(locale);
     }
 
     @Override
@@ -55,7 +55,7 @@ public final class CmdAdminPurge implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if (args[2].equalsIgnoreCase("cancel")) {
             plugin.getGrid().getIslandsToPurge().forEach(island -> plugin.getGrid().removeIslandFromPurge(island));
-            Locale.PURGE_CLEAR.send(sender);
+            Message.PURGE_CLEAR.send(sender);
         } else {
             long timeToPurge = StringUtils.parseLong(args[2]), currentTime = System.currentTimeMillis() / 1000;
 
@@ -65,10 +65,10 @@ public final class CmdAdminPurge implements ISuperiorCommand {
             }).collect(Collectors.toList());
 
             if (islands.isEmpty()) {
-                Locale.NO_ISLANDS_TO_PURGE.send(sender);
+                Message.NO_ISLANDS_TO_PURGE.send(sender);
             } else {
                 Executor.async(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
-                Locale.PURGED_ISLANDS.send(sender, islands.size());
+                Message.PURGED_ISLANDS.send(sender, islands.size());
             }
         }
     }

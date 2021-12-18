@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -36,15 +36,15 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin rankup <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_UPGRADE_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_RANKUP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_RANKUP.getMessage(locale);
     }
 
     @Override
@@ -92,11 +92,11 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
         });
 
         if (islands.size() > 1)
-            Locale.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
+            Message.RANKUP_SUCCESS_ALL.send(sender, upgrade.getName());
         else if (targetPlayer == null)
-            Locale.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
+            Message.RANKUP_SUCCESS_NAME.send(sender, upgrade.getName(), islands.get(0).getName());
         else
-            Locale.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());
+            Message.RANKUP_SUCCESS.send(sender, upgrade.getName(), targetPlayer.getName());
     }
 
     @Override
