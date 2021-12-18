@@ -1,9 +1,10 @@
-package com.bgsoftware.superiorskyblock.schematic;
+package com.bgsoftware.superiorskyblock.schematic.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -19,7 +20,7 @@ import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
+import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;

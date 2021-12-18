@@ -1,11 +1,10 @@
-package com.bgsoftware.superiorskyblock.wrappers;
+package com.bgsoftware.superiorskyblock.schematic.data;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 public final class SchematicPosition {
 
-    private int x, y, z;
+    private final int x, y, z;
 
     private SchematicPosition(int x, int y, int z) {
         this.x = x;
@@ -36,10 +35,6 @@ public final class SchematicPosition {
 
     public int getZ() {
         return z;
-    }
-
-    public Location addToLocation(Location location) {
-        return location.clone().add(x, y, z);
     }
 
     @Override
