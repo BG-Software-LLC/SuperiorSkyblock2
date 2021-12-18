@@ -2,8 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.EntityAnimal;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.Entity;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
@@ -13,8 +12,6 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Modifier;
-
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.isBreedItem;
 
 public final class NMSEntitiesImpl implements NMSEntities {
 
@@ -38,8 +35,7 @@ public final class NMSEntitiesImpl implements NMSEntities {
 
     @Override
     public boolean isAnimalFood(ItemStack itemStack, Animals animals) {
-        EntityAnimal entityAnimal = ((CraftAnimals) animals).getHandle();
-        return isBreedItem(entityAnimal, CraftItemStack.asNMSCopy(itemStack));
+        return new Entity(((CraftAnimals) animals).getHandle()).isBreedItem(CraftItemStack.asNMSCopy(itemStack));
     }
 
     @Override

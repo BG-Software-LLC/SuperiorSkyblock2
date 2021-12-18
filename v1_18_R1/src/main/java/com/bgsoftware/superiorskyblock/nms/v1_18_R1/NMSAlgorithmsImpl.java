@@ -5,11 +5,13 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.algorithms.CustomTileEntityHopper;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.algorithms.GlowEnchantmentFactory;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.core.IRegistry;
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.world.level.World;
-import net.minecraft.world.level.block.state.IBlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.RegistryBlocks;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.network.chat.ChatBaseComponent;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -23,12 +25,9 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Minecart;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
-
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
 
 public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
@@ -41,7 +40,7 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public String parseSignLine(String original) {
-        return IChatBaseComponent.ChatSerializer.a(CraftChatMessage.fromString(original)[0]);
+        return ChatBaseComponent.ChatSerializer.toJson(CraftChatMessage.fromString(original)[0]);
     }
 
     @Override
@@ -51,27 +50,29 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
         if (bukkitWorld == null)
             return 0;
 
-        World world = ((CraftWorld) bukkitWorld).getHandle();
-        IBlockData blockData = getType(world, new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
-        return NMSMappings.getCombinedId(blockData);
+        WorldServer world = new WorldServer(((CraftWorld) bukkitWorld).getHandle());
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        BlockData blockData = world.getType(blockPosition);
+        return Block.getCombinedId(blockData);
     }
 
     @Override
     public int getCombinedId(Material material, byte data) {
-        return NMSMappings.getCombinedId(data == 0 ? getBlockData(CraftMagicNumbers.getBlock(material)) :
-                CraftMagicNumbers.getBlock(material, data));
+        BlockData blockData = data == 0 ? new Block(CraftMagicNumbers.getBlock(material)).getBlockData() :
+                new BlockData(CraftMagicNumbers.getBlock(material, data));
+        return Block.getCombinedId(blockData);
     }
 
     @Override
     public int compareMaterials(Material o1, Material o2) {
-        int firstMaterial = o1.isBlock() ? NMSMappings.getCombinedId(getBlockData(CraftMagicNumbers.getBlock(o1))) : o1.ordinal();
-        int secondMaterial = o2.isBlock() ? NMSMappings.getCombinedId(getBlockData(CraftMagicNumbers.getBlock(o2))) : o2.ordinal();
+        int firstMaterial = o1.isBlock() ? Block.getCombinedId(new Block(CraftMagicNumbers.getBlock(o1)).getBlockData()) : o1.ordinal();
+        int secondMaterial = o2.isBlock() ? Block.getCombinedId(new Block(CraftMagicNumbers.getBlock(o2)).getBlockData()) : o2.ordinal();
         return Integer.compare(firstMaterial, secondMaterial);
     }
 
     @Override
     public Key getBlockKey(int combinedId) {
-        Material material = CraftMagicNumbers.getMaterial(getBlock(getByCombinedId(combinedId)));
+        Material material = CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId).getBlock().getHandle());
         return Key.of(material, (byte) 0);
     }
 
@@ -98,8 +99,9 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public String getMinecraftKey(ItemStack itemStack) {
-        return getKey(IRegistry.aa, getItem(CraftItemStack.asNMSCopy(itemStack))).toString();
+    public String getMinecraftKey(org.bukkit.inventory.ItemStack itemStack) {
+        return RegistryBlocks.getKey(RegistryBlocks.ITEM_REGISTRY,
+                new ItemStack(CraftItemStack.asNMSCopy(itemStack)).getItem()).toString();
     }
 
     @Override

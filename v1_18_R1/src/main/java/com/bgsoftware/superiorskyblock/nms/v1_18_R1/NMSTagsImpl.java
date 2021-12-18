@@ -1,13 +1,16 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.item.ItemStack;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagByte;
 import net.minecraft.nbt.NBTTagByteArray;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
@@ -16,10 +19,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagLong;
 import net.minecraft.nbt.NBTTagShort;
 import net.minecraft.nbt.NBTTagString;
-import net.minecraft.resources.MinecraftKey;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
@@ -28,56 +28,57 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Set;
 
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
-
 @SuppressWarnings({"unused", "rawtypes"})
 public final class NMSTagsImpl implements NMSTags {
 
     @Override
     public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        NBTTagCompound nbtTagCompound = getOrCreateTag(itemStack);
-        return CompoundTag.fromNBT(nbtTagCompound);
+        ItemStack itemStack = new ItemStack(CraftItemStack.asNMSCopy(bukkitStack));
+        NBTTagCompound nbtTagCompound = itemStack.getOrCreateTag();
+        return CompoundTag.fromNBT(nbtTagCompound.getHandle());
     }
 
     @Override
     public CompoundTag convertToNBT(org.bukkit.inventory.ItemStack bukkitItem) {
-        return CompoundTag.fromNBT(save(CraftItemStack.asNMSCopy(bukkitItem), new NBTTagCompound()));
+        ItemStack itemStack = new ItemStack(CraftItemStack.asNMSCopy(bukkitItem));
+        return CompoundTag.fromNBT(itemStack.save(new NBTTagCompound()));
     }
 
     @Override
     public org.bukkit.inventory.ItemStack getFromNBTTag(org.bukkit.inventory.ItemStack bukkitStack, CompoundTag compoundTag) {
-        ItemStack itemStack = CraftItemStack.asNMSCopy(bukkitStack);
-        setTag(itemStack, (NBTTagCompound) compoundTag.toNBT());
-        return CraftItemStack.asBukkitCopy(itemStack);
+        ItemStack itemStack = new ItemStack(CraftItemStack.asNMSCopy(bukkitStack));
+        itemStack.setTag((net.minecraft.nbt.NBTTagCompound) compoundTag.toNBT());
+        return CraftItemStack.asBukkitCopy(itemStack.getHandle());
     }
 
     @Override
     public CompoundTag getNBTTag(org.bukkit.entity.Entity bukkitEntity) {
-        Entity entity = ((CraftEntity) bukkitEntity).getHandle();
+        Entity entity = new Entity(((CraftEntity) bukkitEntity).getHandle());
         NBTTagCompound nbtTagCompound = new NBTTagCompound();
-        save(entity, nbtTagCompound);
-        set(nbtTagCompound, "Yaw", NBTTagFloat.a(getYRot(entity)));
-        set(nbtTagCompound, "Pitch", NBTTagFloat.a(getXRot(entity)));
-        return CompoundTag.fromNBT(nbtTagCompound);
+        entity.save(nbtTagCompound);
+        nbtTagCompound.set("Yaw", NBTTagFloat.a(entity.getYRot()));
+        nbtTagCompound.set("Pitch", NBTTagFloat.a(entity.getXRot()));
+        return CompoundTag.fromNBT(nbtTagCompound.getHandle());
     }
 
     @Override
     @SuppressWarnings("ConstantConditions")
     public void spawnEntity(EntityType entityType, Location location, CompoundTag compoundTag) {
-        CraftWorld craftWorld = (CraftWorld) location.getWorld();
-        NBTTagCompound nbtTagCompound = (NBTTagCompound) compoundTag.toNBT();
+        NBTTagCompound nbtTagCompound = new NBTTagCompound((net.minecraft.nbt.NBTTagCompound) compoundTag.toNBT());
 
         if (nbtTagCompound == null)
             nbtTagCompound = new NBTTagCompound();
 
-        if (!hasKey(nbtTagCompound, "id"))
+        if (!nbtTagCompound.hasKey("id"))
             //noinspection deprecation
-            setString(nbtTagCompound, "id", getKey(new MinecraftKey(entityType.getName())));
+            nbtTagCompound.setString("id", entityType.getName());
 
-        Entity entity = EntityTypes.a(nbtTagCompound, craftWorld.getHandle(), (_entity) -> {
-            setPositionRotation(_entity, location.getX(), location.getY(), location.getZ(), getYRot(_entity), getXRot(_entity));
-            return !addEntitySerialized(craftWorld.getHandle(), _entity) ? null : _entity;
+        WorldServer worldServer = new WorldServer(((CraftWorld) location.getWorld()).getHandle());
+
+        EntityTypes.a(nbtTagCompound.getHandle(), worldServer.getHandle(), nmsEntity -> {
+            Entity entity = new Entity(nmsEntity);
+            entity.setPositionRotation(location.getX(), location.getY(), location.getZ(), entity.getYRot(), entity.getXRot());
+            return !worldServer.addEntitySerialized(entity) ? null : entity.getHandle();
         });
     }
 
@@ -93,7 +94,7 @@ public final class NMSTagsImpl implements NMSTags {
 
     @Override
     public Set<String> getNBTCompoundValue(Object object) {
-        return ((NBTTagCompound) object).d();
+        return ((net.minecraft.nbt.NBTTagCompound) object).d();
     }
 
     @Override
@@ -148,12 +149,12 @@ public final class NMSTagsImpl implements NMSTags {
 
     @Override
     public Object getNBTCompoundTag(Object object, String key) {
-        return ((NBTTagCompound) object).c(key);
+        return ((net.minecraft.nbt.NBTTagCompound) object).c(key);
     }
 
     @Override
     public void setNBTCompoundTagValue(Object object, String key, Object value) {
-        ((NBTTagCompound) object).a(key, (NBTBase) value);
+        ((net.minecraft.nbt.NBTTagCompound) object).a(key, (NBTBase) value);
     }
 
     @Override

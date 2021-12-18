@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.superiorskyblock.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.sounds.SoundEffect;
@@ -13,7 +14,6 @@ import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
@@ -24,17 +24,15 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftChatMessage;
 
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
-
 @SuppressWarnings("unused")
 public final class NMSHologramsImpl implements NMSHolograms {
 
     @Override
     public Hologram createHologram(Location location) {
         assert location.getWorld() != null;
-        World world = ((CraftWorld) location.getWorld()).getHandle();
+        WorldServer world = new WorldServer(((CraftWorld) location.getWorld()).getHandle());
         EntityHologram entityHologram = new EntityHologram(world, location.getX(), location.getY(), location.getZ());
-        addEntity(world, entityHologram);
+        world.addEntity(entityHologram);
         return entityHologram;
     }
 
@@ -44,8 +42,8 @@ public final class NMSHologramsImpl implements NMSHolograms {
 
         private CraftEntity bukkitEntity;
 
-        EntityHologram(World world, double x, double y, double z) {
-            super(world, x, y, z);
+        EntityHologram(WorldServer world, double x, double y, double z) {
+            super(world.getHandle(), x, y, z);
             j(true); // Invisible
             a(true); // Small
             r(false); // Arms
