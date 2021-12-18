@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.scripts;
+package com.bgsoftware.superiorskyblock.engine;
 
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 

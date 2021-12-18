@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.utils.engine;
+package com.bgsoftware.superiorskyblock.engine;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;

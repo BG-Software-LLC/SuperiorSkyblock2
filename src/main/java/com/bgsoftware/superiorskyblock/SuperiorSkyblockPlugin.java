@@ -52,7 +52,7 @@ import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
-import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
+import com.bgsoftware.superiorskyblock.engine.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
@@ -61,7 +61,7 @@ import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLo
 import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.engine.NashornEngineDownloader;
+import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
