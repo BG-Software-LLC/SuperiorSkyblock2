@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import org.bukkit.Bukkit;
@@ -55,7 +56,7 @@ public final class SkinsRestorerHook {
                 SkinStorage skinStorage = SkinsRestorer.getInstance().getSkinStorage();
                 return (Property) skinStorage.getOrCreateSkinForPlayer(superiorPlayer.getName(), true);
             } catch (SkinRequestException | NullPointerException ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 return null;
             }
         }

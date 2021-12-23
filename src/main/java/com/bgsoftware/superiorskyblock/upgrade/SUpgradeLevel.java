@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
@@ -106,7 +107,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                 if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
                     return requirement.getValue();
             } catch (ScriptException error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 

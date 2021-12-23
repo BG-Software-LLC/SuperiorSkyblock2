@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -53,7 +54,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -68,7 +69,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             try {
                 updateSettings(IslandFlag.getByName(key.toLowerCase()), cfg, position++);
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -210,7 +211,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             ).clone().build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

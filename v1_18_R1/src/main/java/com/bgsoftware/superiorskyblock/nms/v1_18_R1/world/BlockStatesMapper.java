@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.state.properties.BlockState;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 
 import java.lang.reflect.Field;
@@ -62,7 +63,7 @@ public final class BlockStatesMapper {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
     }

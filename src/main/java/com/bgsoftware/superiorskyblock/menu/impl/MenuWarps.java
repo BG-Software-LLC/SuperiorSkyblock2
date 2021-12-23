@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -74,7 +75,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
             cfg.syncWithConfig(file, FileUtils.getResource("menus/warps.yml"), MENU_IGNORED_SECTIONS);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
         if (convertOldGUI(cfg)) {
@@ -82,7 +83,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -206,7 +207,7 @@ public final class MenuWarps extends PagedSuperiorMenu<IslandWarp> {
                     .build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of warp: " + islandWarp.getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

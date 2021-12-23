@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -184,7 +185,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -224,7 +225,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                     }
 
                     if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                        SuperiorSkyblockPlugin.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
+                        PluginDebugger.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
                         Message.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.enchantments.Enchantment;
 
 public final class EnchantsUtils {
@@ -21,7 +22,7 @@ public final class EnchantsUtils {
         try {
             Enchantment.registerEnchantment(glowEnchant);
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
     }
 

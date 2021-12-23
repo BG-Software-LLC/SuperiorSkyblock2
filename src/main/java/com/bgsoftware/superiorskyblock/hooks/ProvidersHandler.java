@@ -57,6 +57,7 @@ import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.hooks.support.SlimefunHook;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -104,7 +105,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             runnable.run();
         } catch (Throwable ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -531,7 +532,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("Detected PaperSpigot but failed to load async chunk-loading support...");
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }

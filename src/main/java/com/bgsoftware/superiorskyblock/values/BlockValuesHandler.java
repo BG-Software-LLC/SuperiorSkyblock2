@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -62,7 +63,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
         BigDecimal customBlockValue = customBlockWorthValues.getBlockValue(key);
         if (customBlockValue != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth, Worth: " + customBlockValue);
+            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth, Worth: " + customBlockValue);
             return customBlockValue;
         }
 
@@ -70,25 +71,25 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             BigDecimal value = blockWorthValues.getBlockValue(key);
 
             if (value != null) {
-                SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
+                PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
                 return value;
             }
         }
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPrice((Key) key);
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Price, Worth: " + price);
+            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Price, Worth: " + price);
             return price;
         }
 
         BigDecimal value = blockWorthValues.getBlockValue(key);
 
         if (value != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
+            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
             return value;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: 0");
+        PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: 0");
 
         return BigDecimal.ZERO;
     }
@@ -99,7 +100,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
         BigDecimal customBlockLevel = customBlockLevels.getBlockValue(key);
         if (customBlockLevel != null) {
-            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Custom Block Level, Level: " + customBlockLevel);
+            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Custom Block Level, Level: " + customBlockLevel);
             return customBlockLevel;
         }
 
@@ -108,10 +109,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         if (level == null) {
             level = convertValueToLevel(getBlockWorth(key));
             blockLevels.setBlockValue(key, level);
-            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Converted From Worth, Level: " + level);
-        }
-        else {
-            SuperiorSkyblockPlugin.debug("Action: Get Level, Block: " + key + " - Levels File, Level: " + level);
+            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Converted From Worth, Level: " + level);
+        } else {
+            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Levels File, Level: " + level);
         }
 
         return level;
@@ -236,7 +236,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return new BigDecimal(obj.toString());
         } catch (ScriptException ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return value;
         }
     }

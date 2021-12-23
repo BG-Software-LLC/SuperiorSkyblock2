@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,7 +48,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -156,7 +157,7 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<Island> {
                     .replaceAll("{2}", island.getIslandWarps().size() + "").build(island.getOwner());
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of the island of " + island.getOwner().getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

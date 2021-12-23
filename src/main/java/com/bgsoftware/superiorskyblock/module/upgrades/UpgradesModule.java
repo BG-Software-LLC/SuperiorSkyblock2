@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -69,7 +70,7 @@ public final class UpgradesModule extends BuiltinModule {
                 config.save(upgradesFile);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
 
             upgradesFile.delete();
@@ -138,7 +139,7 @@ public final class UpgradesModule extends BuiltinModule {
                         upgradeCost = costLoader.loadCost(levelSection);
                     } catch (UpgradeCostLoadException ex) {
                         SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: " + ex.getMessage() + ". Skipping...");
-                        SuperiorSkyblockPlugin.debug(ex);
+                        PluginDebugger.debug(ex);
                         continue;
                     }
 
@@ -200,7 +201,7 @@ public final class UpgradesModule extends BuiltinModule {
                             try {
                                 rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
                             } catch (NumberFormatException error) {
-                                SuperiorSkyblockPlugin.debug(error);
+                                PluginDebugger.debug(error);
                             }
                         }
                     }

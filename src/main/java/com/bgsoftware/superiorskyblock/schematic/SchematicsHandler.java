@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -179,7 +180,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        SuperiorSkyblockPlugin.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
+        PluginDebugger.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
                 ", Pos #2: " + LocationUtils.getLocation(pos2) + ", OffsetX: " + offsetX + ", OffsetY: " + offsetY +
                 ", OffsetZ: " + offsetZ + ", Yaw: " + yaw + ", Pitch: " + pitch + ", Name: " + schematicName);
 
@@ -264,7 +265,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         } catch (Exception error) {
             SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
             error.printStackTrace();
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
 
         return null;
@@ -312,7 +313,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -91,7 +92,7 @@ public final class ChunksTracker {
                         markDirty(island, ChunkPosition.of(worldName, Integer.parseInt(chunkPositionSections[0]),
                                 Integer.parseInt(chunkPositionSections[1])), false);
                     } catch (Exception error) {
-                        SuperiorSkyblockPlugin.debug(error);
+                        PluginDebugger.debug(error);
                     }
                 });
             });
@@ -122,7 +123,7 @@ public final class ChunksTracker {
                 }
             }
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
     }
 

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -117,7 +118,7 @@ public final class ItemUtils {
             compoundTag.write(dataOutput);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return "";
         }
 
@@ -132,7 +133,7 @@ public final class ItemUtils {
             TagUtils.itemToCompound(itemStack).write(dataOutput);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return "";
         }
 
@@ -147,7 +148,7 @@ public final class ItemUtils {
             compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return new ItemStack[0];
         }
 
@@ -171,7 +172,7 @@ public final class ItemUtils {
                 return TagUtils.compoundToItem(compoundTag);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 

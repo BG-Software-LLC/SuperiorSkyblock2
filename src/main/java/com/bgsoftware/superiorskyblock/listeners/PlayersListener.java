@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
@@ -415,7 +416,7 @@ public final class PlayersListener implements Listener {
                 !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
             return;
 
-        SuperiorSkyblockPlugin.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
+        PluginDebugger.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         superiorPlayer.teleport(island, result -> {

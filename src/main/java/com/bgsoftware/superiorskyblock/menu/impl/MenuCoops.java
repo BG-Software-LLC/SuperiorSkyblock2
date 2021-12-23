@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -67,7 +68,7 @@ public final class MenuCoops extends PagedSuperiorMenu<SuperiorPlayer> {
                     .asSkullOf(superiorPlayer).build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

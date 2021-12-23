@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.grinderwolf.swm.plugin.config.WorldData;
@@ -25,7 +26,7 @@ public final class SWMHook {
         try {
             slimePlugin.getLoader(worldData.getDataSource()).loadWorld(worldName, false);
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
     }
 

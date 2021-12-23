@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.database.sql;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.io.File;
 import java.sql.PreparedStatement;
@@ -448,7 +449,7 @@ public final class SQLDatabaseInitializer {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }, Throwable::printStackTrace);
         } else {
@@ -462,7 +463,7 @@ public final class SQLDatabaseInitializer {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }, Throwable::printStackTrace);
         }

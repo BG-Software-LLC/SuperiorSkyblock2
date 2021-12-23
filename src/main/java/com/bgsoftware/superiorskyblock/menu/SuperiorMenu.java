@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -107,7 +108,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                     callback.accept(player, superiorMenu);
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
     }
@@ -243,7 +244,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             e.getWhoClicked().closeInventory();
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " +
+        PluginDebugger.debug("Action: Menu Click, Target: " + superiorPlayer.getName() + ", Item: " +
                 (e.getCurrentItem() == null ? "AIR" : e.getCurrentItem().getType()) + ", Slot: " + e.getRawSlot());
 
         onPlayerClick(e);
@@ -318,7 +319,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
+        PluginDebugger.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
 
         if (!(this instanceof SuperiorMenuBlank) && !isCompleted()) {
             SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
@@ -335,7 +336,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
                 SuperiorMenuBlank.openInventory(superiorPlayer, previousMenu);
             }
 
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             ex.printStackTrace();
             return;
         }

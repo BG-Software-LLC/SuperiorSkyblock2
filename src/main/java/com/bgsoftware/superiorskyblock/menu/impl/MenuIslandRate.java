@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,7 +48,7 @@ public final class MenuIslandRate extends SuperiorMenu {
             try {
                 cfg.save(file);
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 ex.printStackTrace();
             }
         }

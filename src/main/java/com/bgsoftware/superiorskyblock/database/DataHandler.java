@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
@@ -96,7 +97,7 @@ public final class DataHandler extends AbstractHandler {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -158,7 +159,7 @@ public final class DataHandler extends AbstractHandler {
                 } catch (Exception error) {
                     SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
                     error.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             });
 

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
                             } catch (Exception ex) {
                                 Message.MODULE_LOADED_FAILURE.send(sender, args[2]);
                                 ex.printStackTrace();
-                                SuperiorSkyblockPlugin.debug(ex);
+                                PluginDebugger.debug(ex);
                             }
                         } else {
                             if (pluginModule.isInitialized()) {

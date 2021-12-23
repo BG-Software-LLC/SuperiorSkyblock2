@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -88,7 +89,7 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<Pair<SuperiorPla
                     .asSkullOf(pair.getKey()).build(pair.getKey());
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + pair.getKey().getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

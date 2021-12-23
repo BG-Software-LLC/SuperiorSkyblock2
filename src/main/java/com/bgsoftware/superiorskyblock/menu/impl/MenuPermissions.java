@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
@@ -61,7 +62,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             cfg.syncWithConfig(file, FileUtils.getResource("menus/permissions.yml"), additionalMenuSections("permissions"));
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
         if (convertOldGUI(cfg)) {
@@ -69,7 +70,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -90,7 +91,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                     String permission = key.toLowerCase();
                     updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -334,7 +335,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             return permissionItem.build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of permission: " + islandPermission.getName());
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
@@ -43,7 +44,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu {
                         else throw new IllegalArgumentException();
                     } catch (IllegalArgumentException ex) {
                         SuperiorSkyblockPlugin.log("&c[player-language.yml] The language " + language + " is not valid.");
-                        SuperiorSkyblockPlugin.debug(ex);
+                        PluginDebugger.debug(ex);
                     }
                 }
             }

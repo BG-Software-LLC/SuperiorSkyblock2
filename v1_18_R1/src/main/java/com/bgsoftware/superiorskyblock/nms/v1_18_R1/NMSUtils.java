@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Suppliers;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
@@ -111,7 +112,7 @@ public final class NMSUtils {
                         chunkCompounds.add(new Pair<>(chunkCoords, chunkCompound));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             });
 
@@ -122,7 +123,7 @@ public final class NMSUtils {
                     playerChunkMap.saveChunk(chunkCompoundPair.getKey(), chunkCompoundPair.getValue());
                 } catch (IOException error) {
                     error.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             });
 
@@ -172,7 +173,7 @@ public final class NMSUtils {
                         }
                     }
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }

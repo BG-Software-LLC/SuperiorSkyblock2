@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategor
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -64,7 +65,7 @@ public final class JsonDeserializer implements IDeserializer {
                 int i = World.Environment.valueOf(locationObject.get("env").getAsString()).ordinal();
                 locations[i] = locationObject.get("location").getAsString();
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 
@@ -102,11 +103,11 @@ public final class JsonDeserializer implements IDeserializer {
                         IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
                         playerPermissionNode.setPermission(islandPrivilege, permObject.get("status").getAsString().equals("1"));
                     } catch (Exception error) {
-                        SuperiorSkyblockPlugin.debug(error);
+                        PluginDebugger.debug(error);
                     }
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 
@@ -127,7 +128,7 @@ public final class JsonDeserializer implements IDeserializer {
                     IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permElement.getAsString());
                     rolePermissions.put(islandPrivilege, playerRole);
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             });
         });
@@ -197,7 +198,7 @@ public final class JsonDeserializer implements IDeserializer {
                 Rating rating = Rating.valueOf(ratingObject.get("rating").getAsInt());
                 ratingsMap.put(uuid, rating);
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 
@@ -215,7 +216,7 @@ public final class JsonDeserializer implements IDeserializer {
                 byte status = islandFlagObject.get("status").getAsByte();
                 islandFlags.put(islandFlag, status);
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 
@@ -238,7 +239,7 @@ public final class JsonDeserializer implements IDeserializer {
                     (cobbleGenerator[i] = new KeyMap<>()).put(blockKey, rate);
                 });
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 
@@ -257,7 +258,7 @@ public final class JsonDeserializer implements IDeserializer {
                 long lastTimeRecorded = playerObject.get("lastTimeRecorded").getAsLong();
                 visitorsList.add(new Pair<>(uuid, lastTimeRecorded));
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
 

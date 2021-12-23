@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
@@ -66,7 +67,7 @@ public final class RawDeserializer implements IDeserializer {
                 String environment = locationSection[0].toUpperCase();
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -85,7 +86,7 @@ public final class RawDeserializer implements IDeserializer {
                     if (playerAttributes != null)
                         playerAttributesList.add(playerAttributes);
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -116,7 +117,7 @@ public final class RawDeserializer implements IDeserializer {
                             null, sections.length == 1 ? "" : sections[1]));
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -153,12 +154,12 @@ public final class RawDeserializer implements IDeserializer {
                                 rolePermissions.put(islandPrivilege, playerRole);
                             }
                         } catch (Exception error) {
-                            SuperiorSkyblockPlugin.debug(error);
+                            PluginDebugger.debug(error);
                         }
                     }
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -175,7 +176,7 @@ public final class RawDeserializer implements IDeserializer {
                     String[] sections = entry.split("=");
                     upgradesMap.put(sections[0], Integer.parseInt(sections[1]));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -221,7 +222,7 @@ public final class RawDeserializer implements IDeserializer {
                         .setValue(IslandWarpAttributes.Field.PRIVATE_STATUS, privateFlag)
                         .setValue(IslandWarpAttributes.Field.ICON, sections[3]));
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -238,7 +239,7 @@ public final class RawDeserializer implements IDeserializer {
                     String[] sections = limit.split("=");
                     blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -256,7 +257,7 @@ public final class RawDeserializer implements IDeserializer {
                     String[] sections = entry.split("=");
                     ratingsMap.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -279,7 +280,7 @@ public final class RawDeserializer implements IDeserializer {
                             islandSettings.put(IslandFlag.getByName(setting), (byte) 1);
                     }
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -302,7 +303,7 @@ public final class RawDeserializer implements IDeserializer {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
                     deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = new KeyMap<>());
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         } else {
@@ -323,7 +324,7 @@ public final class RawDeserializer implements IDeserializer {
                     long lastTimeJoined = visitorSections.length == 2 ? Long.parseLong(visitorSections[1]) : System.currentTimeMillis();
                     visitors.add(new Pair<>(UUID.fromString(visitorSections[0]), lastTimeJoined));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -341,7 +342,7 @@ public final class RawDeserializer implements IDeserializer {
                     String[] sections = limit.split("=");
                     entityLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -395,7 +396,7 @@ public final class RawDeserializer implements IDeserializer {
                     if (playerRole != null)
                         roleLimits.put(playerRole, Integer.parseInt(sections[1]));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -422,7 +423,7 @@ public final class RawDeserializer implements IDeserializer {
                         .setValue(WarpCategoryAttributes.Field.SLOT, slot)
                         .setValue(WarpCategoryAttributes.Field.ICON, icon));
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -435,7 +436,7 @@ public final class RawDeserializer implements IDeserializer {
                 String[] sections = limit.split("=");
                 cobbleGenerator.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
     }

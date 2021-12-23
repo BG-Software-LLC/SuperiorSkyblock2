@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.threads.SyncedObject;
@@ -93,7 +94,7 @@ public final class IslandsDeserializer {
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
     }
@@ -107,7 +108,7 @@ public final class IslandsDeserializer {
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading role permissions:");
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
     }
@@ -203,7 +204,7 @@ public final class IslandsDeserializer {
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading island flags:");
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
     }
@@ -218,7 +219,7 @@ public final class IslandsDeserializer {
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading generators:");
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         });
     }
