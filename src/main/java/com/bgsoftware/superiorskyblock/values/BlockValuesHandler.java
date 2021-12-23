@@ -52,8 +52,11 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     @Override
     public void loadData() {
-        blockWorthValues.loadDefaultValues(plugin);
-        blockLevels.loadDefaultValues(plugin);
+        this.blockWorthValues.clear();
+        this.blockLevels.clear();
+
+        this.blockWorthValues.loadDefaultValues(plugin);
+        this.blockLevels.loadDefaultValues(plugin);
         convertValuesToLevels();
     }
 

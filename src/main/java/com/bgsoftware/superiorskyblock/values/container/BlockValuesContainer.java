@@ -47,4 +47,8 @@ public abstract class BlockValuesContainer {
         return Collections.unmodifiableSet(valuesMap.entrySet());
     }
 
+    public void clear() {
+        valuesMap.clear();
+    }
+
 }
