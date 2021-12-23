@@ -1,0 +1,13 @@
+group 'Hook_MergedSpawner'
+
+dependencies {
+    compileOnly 'com.vk2gpz:MergedSpawner:latest'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_mergedspawner') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_mergedspawner").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

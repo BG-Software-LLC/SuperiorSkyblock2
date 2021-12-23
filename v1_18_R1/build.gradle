@@ -30,3 +30,7 @@ dependencies {
     compileOnly project(":API")
     compileOnly parent
 }
+
+if (project.hasProperty('nms.compile_v1_18') && !Boolean.valueOf(project.findProperty("nms.compile_v1_18").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

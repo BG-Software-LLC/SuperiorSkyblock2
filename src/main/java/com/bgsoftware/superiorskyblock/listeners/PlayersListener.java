@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
@@ -141,11 +140,11 @@ public final class PlayersListener implements Listener {
 
         Executor.sync(() -> {
             if (e.getPlayer().isOnline()) {
-                if (SkinsRestorerHook.isEnabled()) {
-                    SkinsRestorerHook.setSkinTexture(superiorPlayer);
-                } else {
-                    plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
-                }
+//                if (SkinsRestorerHook.isEnabled()) {
+//                    SkinsRestorerHook.setSkinTexture(superiorPlayer);
+//                } else {
+                plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
+                //}
             }
         }, 5L);
 
