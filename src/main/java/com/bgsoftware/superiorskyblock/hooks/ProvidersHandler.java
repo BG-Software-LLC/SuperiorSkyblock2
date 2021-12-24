@@ -10,12 +10,11 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
@@ -41,7 +40,6 @@ import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -51,7 +49,6 @@ import org.bukkit.inventory.ItemStack;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -201,7 +198,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     public void notifyStackedBlocksListeners(OfflinePlayer offlinePlayer, Block block,
-                                                IStackedBlocksListener.Action action) {
+                                             IStackedBlocksListener.Action action) {
         this.stackedBlocksListeners.forEach(stackedBlocksListener ->
                 stackedBlocksListener.recordBlockAction(offlinePlayer, block, action));
     }
@@ -220,16 +217,8 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         this.worldsListeners.forEach(worldsListener -> worldsListener.loadWorld(worldName));
     }
 
-    public Pair<Integer, String> getSpawner(Location location) {
-        return spawnersProvider.getSpawner(location);
-    }
-
     public Key getSpawnerKey(ItemStack itemStack) {
         return Key.of(Materials.SPAWNER.toBukkitType() + "", spawnersProvider.getSpawnerType(itemStack) + "");
-    }
-
-    public Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition) {
-        return stackedBlocksProvider.getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
     }
 
     public boolean hasSnapshotsSupport() {
@@ -539,7 +528,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
             try {
                 Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
-                if(!(boolean) compatibleMethod.invoke(null))
+                if (!(boolean) compatibleMethod.invoke(null))
                     return Optional.empty();
             } catch (Exception ignored) {
             }

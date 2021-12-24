@@ -76,7 +76,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
                 // Load spawners
                 for (Location location : calculatedChunk.getSpawners()) {
-                    Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(location);
+                    Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(location);
 
                     if (spawnerInfo.getValue() == null) {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
@@ -86,9 +86,12 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     }
                 }
 
+                ChunkPosition chunkPosition = calculatedChunk.getPosition();
+
                 // Load stacked blocks
                 Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
-                        plugin.getProviders().getBlocks(calculatedChunk.getPosition());
+                        plugin.getProviders().getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(),
+                                chunkPosition.getX(), chunkPosition.getZ());
 
                 if (stackedBlocks == null) {
                     chunksToCheck.add(calculatedChunk.getPosition());
@@ -113,7 +116,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     blockCount = pair.getValue();
 
                     if (blockCount <= 0) {
-                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
+                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(pair.getKey());
 
                         String entityType = spawnerInfo.getValue();
                         if (entityType == null)
@@ -131,7 +134,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             spawnersToCheck.clear();
 
             for (ChunkPosition chunkPosition : chunksToCheck) {
-                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition)) {
+                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders()
+                        .getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
                 }
             }
