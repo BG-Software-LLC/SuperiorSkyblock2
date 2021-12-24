@@ -7,6 +7,7 @@ import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unused")
 public final class PermissionsProvider_LuckPerms implements PermissionsProvider {
 
     private static LuckPerms luckPerms = null;

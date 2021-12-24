@@ -536,8 +536,15 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     private static <T> Optional<T> createInstance(String className) {
         try {
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
+            try {
+                Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
+                if(!(boolean) compatibleMethod.invoke(null))
+                    return Optional.empty();
+            } catch (Exception ignored) {
+            }
             // noinspection unchecked
-            return Optional.of((T) Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className).newInstance());
+            return Optional.of((T) clazz.newInstance());
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Exception error) {
