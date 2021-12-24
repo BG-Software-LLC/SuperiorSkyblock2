@@ -119,15 +119,15 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
                 switch (environment) {
                     case NORMAL:
-                        if (plugin.getProviders().isNormalEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isNormalEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                     case NETHER:
-                        if (plugin.getProviders().isNetherEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isNetherEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                     case THE_END:
-                        if (plugin.getProviders().isEndEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isEndEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                 }

@@ -22,7 +22,7 @@ public final class TeleportUtils {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island != null) {
-            plugin.getProviders().prepareTeleport(island, location.clone(),
+            plugin.getProviders().getWorldsProvider().prepareTeleport(island, location.clone(),
                     () -> _teleport(entity, location, teleportResult));
         } else {
             _teleport(entity, location, teleportResult);
@@ -30,7 +30,7 @@ public final class TeleportUtils {
     }
 
     private static void _teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
-        plugin.getProviders().teleport(entity, location, teleportResult);
+        plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
     }
 
 }

@@ -241,7 +241,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean isVanished() {
         Player player = asPlayer();
-        return player != null && plugin.getProviders().isVanished(player);
+        return player != null && plugin.getProviders().getVanishProvider().isVanished(player);
     }
 
     @Override
@@ -261,7 +261,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermissionWithoutOP(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Player player = asPlayer();
-        return player != null && plugin.getProviders().hasPermission(player, permission);
+        return player != null && plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
     }
 
     @Override

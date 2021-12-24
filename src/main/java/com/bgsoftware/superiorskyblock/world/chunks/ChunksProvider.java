@@ -73,7 +73,7 @@ public final class ChunksProvider {
         @Override
         public void work() {
             PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
-            plugin.getProviders().loadChunk(chunkPosition, this::finishLoad);
+            plugin.getProviders().getAsyncProvider().loadChunk(chunkPosition, this::finishLoad);
         }
 
         private void finishLoad(Chunk chunk) {

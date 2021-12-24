@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
@@ -41,7 +40,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -52,8 +50,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
@@ -75,16 +71,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
         this.menusProvider = new MenusProvider_Default(plugin);
-    }
-
-    private static boolean hasPaperAsyncSupport() {
-        try {
-            //noinspection JavaReflectionMemberAccess
-            World.class.getMethod("getChunkAtAsync", int.class, int.class);
-            return true;
-        } catch (Throwable ex) {
-            return false;
-        }
     }
 
     @Override
@@ -216,36 +202,20 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
     }
 
-    public boolean hasPermission(Player player, String permission) {
-        return permissionsProvider.hasPermission(player, permission.toLowerCase());
+    public PermissionsProvider getPermissionsProvider() {
+        return permissionsProvider;
     }
 
-    public BigDecimal getPrice(Key key) {
-        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey(), "0") : key);
+    public PricesProvider getPricesProvider() {
+        return pricesProvider;
     }
 
-    public Key getPriceBlockKey(Key key) {
-        return pricesProvider.getBlockKey(key);
+    public VanishProvider getVanishProvider() {
+        return vanishProvider;
     }
 
-    public boolean isVanished(Player player) {
-        return vanishProvider.isVanished(player);
-    }
-
-    public void loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> chunkResult) {
-        asyncProvider.loadChunk(chunkPosition, chunkResult);
-    }
-
-    public void teleport(Entity entity, Location location) {
-        asyncProvider.teleport(entity, location);
-    }
-
-    public void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
-        asyncProvider.teleport(entity, location, teleportResult);
-    }
-
-    public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
-        return economyProvider.getBalance(superiorPlayer);
+    public AsyncProvider getAsyncProvider() {
+        return asyncProvider;
     }
 
     public EconomyProvider.EconomyResult depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
@@ -262,74 +232,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
         while (amount.compareTo(MAX_DOUBLE) > 0) {
-            EconomyProvider.EconomyResult result = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            EconomyProvider.EconomyResult result = economyProvider.withdrawMoney(superiorPlayer, Double.MAX_VALUE);
             if (result.hasFailed())
                 return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        return withdrawMoney(superiorPlayer, amount.doubleValue());
-    }
-
-    public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return economyProvider.withdrawMoney(superiorPlayer, amount);
-    }
-
-    public void prepareWorlds() {
-        worldsProvider.prepareWorlds();
-    }
-
-    public World getIslandsWorld(Island island, World.Environment environment) {
-        return worldsProvider.getIslandsWorld(island, environment);
-    }
-
-    public boolean isIslandsWorld(World world) {
-        return worldsProvider.isIslandsWorld(world);
-    }
-
-    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
-        return worldsProvider.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner, islandUUID);
-    }
-
-    public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
-        worldsProvider.finishIslandCreation(islandLocation, islandOwner, islandUUID);
-    }
-
-    public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
-        worldsProvider.prepareTeleport(island, location, finishCallback);
-    }
-
-    public boolean isNormalEnabled() {
-        return worldsProvider.isNormalEnabled();
-    }
-
-    public boolean isNormalUnlocked() {
-        return worldsProvider.isNormalUnlocked();
-    }
-
-    public boolean isNetherEnabled() {
-        return worldsProvider.isNetherEnabled();
-    }
-
-    public boolean isNetherUnlocked() {
-        return worldsProvider.isNetherUnlocked();
-    }
-
-    public boolean isEndEnabled() {
-        return worldsProvider.isEndEnabled();
-    }
-
-    public boolean isEndUnlocked() {
-        return worldsProvider.isEndUnlocked();
-    }
-
-    public boolean hasCustomWorldsSupport() {
-        return !(worldsProvider instanceof WorldsProvider_Default);
-    }
-
-    public BigDecimal getBalanceForBanks(SuperiorPlayer superiorPlayer) {
-        return bankEconomyProvider.getBalance(superiorPlayer);
+        return economyProvider.withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
     public EconomyProvider.EconomyResult depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount) {
@@ -346,18 +256,18 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount) {
         while (amount.compareTo(MAX_DOUBLE) > 0) {
-            EconomyProvider.EconomyResult result = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
+            EconomyProvider.EconomyResult result = bankEconomyProvider.withdrawMoney(superiorPlayer, Double.MAX_VALUE);
             if (result.hasFailed())
                 return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        return withdrawMoneyForBanks(superiorPlayer, amount.doubleValue());
+        return bankEconomyProvider.withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount) {
-        return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
+    public boolean hasCustomWorldsSupport() {
+        return !(worldsProvider instanceof WorldsProvider_Default);
     }
 
     public boolean isAFK(Player player) {
@@ -556,6 +466,16 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Exception ignored) {
+        }
+    }
+
+    private static boolean hasPaperAsyncSupport() {
+        try {
+            //noinspection JavaReflectionMemberAccess
+            World.class.getMethod("getChunkAtAsync", int.class, int.class);
+            return true;
+        } catch (Throwable ex) {
+            return false;
         }
     }
 

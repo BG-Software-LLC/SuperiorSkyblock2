@@ -257,7 +257,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
             try {
-                providersHandler.prepareWorlds();
+                providersHandler.getWorldsProvider().prepareWorlds();
             } catch (RuntimeException ex) {
                 HandlerLoadException handlerError = new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 shouldEnable = false;
@@ -512,7 +512,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void unloadIslandWorlds() {
         for (World world : Bukkit.getWorlds()) {
-            if (providersHandler.isIslandsWorld(world))
+            if (providersHandler.getWorldsProvider().isIslandsWorld(world))
                 Bukkit.unloadWorld(world, true);
         }
     }

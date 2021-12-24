@@ -148,7 +148,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         UUID islandUUID = generateIslandUUID();
 
-        Location islandLocation = plugin.getProviders().getNextLocation(
+        Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
                 lastIsland.parse().clone(),
                 plugin.getSettings().getIslandHeight(),
                 plugin.getSettings().getMaxIslandSize(),
@@ -200,10 +200,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                     }
                 });
 
-                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
+                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                        superiorPlayer.getUniqueId(), islandUUID);
             }, ex -> {
                 pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-                plugin.getProviders().finishIslandCreation(islandLocation, superiorPlayer.getUniqueId(), islandUUID);
+                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                        superiorPlayer.getUniqueId(), islandUUID);
                 ex.printStackTrace();
                 PluginDebugger.debug(ex);
                 Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
@@ -419,13 +421,13 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public World getIslandsWorld(Island island, World.Environment environment) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        return plugin.getProviders().getIslandsWorld(island, environment);
+        return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
     }
 
     @Override
     public boolean isIslandsWorld(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
-        return customWorlds.contains(world.getUID()) || plugin.getProviders().isIslandsWorld(world);
+        return customWorlds.contains(world.getUID()) || plugin.getProviders().getWorldsProvider().isIslandsWorld(world);
     }
 
     @Override

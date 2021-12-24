@@ -77,7 +77,7 @@ public final class SIslandBank implements IslandBank {
 
             EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
 
-            BigDecimal playerBalance = plugin.getProviders().getBalanceForBanks(superiorPlayer);
+            BigDecimal playerBalance = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
 
             if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";

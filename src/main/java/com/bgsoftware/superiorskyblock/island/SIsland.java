@@ -891,7 +891,7 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isNormalEnabled() {
-        return plugin.getProviders().isNormalUnlocked() || (unlockedWorlds.get() & 4) == 4;
+        return plugin.getProviders().getWorldsProvider().isNormalUnlocked() || (unlockedWorlds.get() & 4) == 4;
     }
 
     @Override
@@ -909,7 +909,7 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getProviders().isNetherUnlocked() || (unlockedWorlds.get() & 1) == 1;
+        return plugin.getProviders().getWorldsProvider().isNetherUnlocked() || (unlockedWorlds.get() & 1) == 1;
     }
 
     @Override
@@ -927,7 +927,7 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getProviders().isEndUnlocked() || (unlockedWorlds.get() & 2) == 2;
+        return plugin.getProviders().getWorldsProvider().isEndUnlocked() || (unlockedWorlds.get() & 2) == 2;
     }
 
     @Override
@@ -1392,7 +1392,7 @@ public final class SIsland implements Island {
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
 
-        if (plugin.getProviders().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
+        if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
             Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                     ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
@@ -1400,7 +1400,7 @@ public final class SIsland implements Island {
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
-        if (plugin.getProviders().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
+        if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
             Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);

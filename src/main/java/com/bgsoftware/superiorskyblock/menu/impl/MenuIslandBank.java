@@ -233,7 +233,8 @@ public final class MenuIslandBank extends SuperiorMenu {
                 });
 
             } else {
-                BigDecimal amount = plugin.getProviders().getBalanceForBanks(superiorPlayer).multiply(BigDecimal.valueOf(depositPercentage / 100D));
+                BigDecimal amount = plugin.getProviders().getBankEconomyProvider()
+                        .getBalance(superiorPlayer).multiply(BigDecimal.valueOf(depositPercentage / 100D));
                 BankTransaction bankTransaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
                 handleDeposit(superiorPlayer, island, this, bankTransaction, e.getRawSlot(), amount);
             }

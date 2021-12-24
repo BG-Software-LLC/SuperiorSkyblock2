@@ -64,7 +64,7 @@ public final class CmdDeposit implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = arguments.getValue();
 
-        BigDecimal moneyInBank = plugin.getProviders().getBalance(superiorPlayer);
+        BigDecimal moneyInBank = plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);
 
         if (args[1].equalsIgnoreCase("all") || args[1].equals("*")) {

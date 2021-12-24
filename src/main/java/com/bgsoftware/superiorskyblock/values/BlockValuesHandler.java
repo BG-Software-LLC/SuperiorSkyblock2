@@ -80,7 +80,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         }
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-            BigDecimal price = plugin.getProviders().getPrice((Key) key);
+            BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
             PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Price, Worth: " + price);
             return price;
         }
@@ -136,7 +136,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return convertedKey;
         } else {
             if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-                Key newKey = plugin.getProviders().getPriceBlockKey(convertedKey);
+                Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(convertedKey);
                 if (newKey != null) {
                     return newKey;
                 }
