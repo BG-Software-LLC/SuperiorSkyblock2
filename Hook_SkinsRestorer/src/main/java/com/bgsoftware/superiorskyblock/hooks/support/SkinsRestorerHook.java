@@ -12,25 +12,11 @@ import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
 import skinsrestorer.shared.storage.SkinStorage;
 
+@SuppressWarnings("unused")
 public final class SkinsRestorerHook {
 
     private static SuperiorSkyblockPlugin plugin;
     private static ISkinsRestorer skinsRestorer = null;
-
-    public static void setSkinTexture(SuperiorPlayer superiorPlayer) {
-        if (Bukkit.isPrimaryThread()) {
-            Executor.async(() -> setSkinTexture(superiorPlayer));
-            return;
-        }
-
-        Property property = skinsRestorer.getSkin(superiorPlayer);
-        if (property != null)
-            Executor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
-    }
-
-    public static boolean isEnabled() {
-        return skinsRestorer != null;
-    }
 
     public static void register(SuperiorSkyblockPlugin plugin) {
         SkinsRestorerHook.plugin = plugin;
@@ -40,6 +26,18 @@ public final class SkinsRestorerHook {
         } catch (Exception ex) {
             skinsRestorer = new SkinsRestorerOld();
         }
+        plugin.getProviders().registerSkinsListener(SkinsRestorerHook::setSkinTexture);
+    }
+
+    private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
+        if (Bukkit.isPrimaryThread()) {
+            Executor.async(() -> setSkinTexture(superiorPlayer));
+            return;
+        }
+
+        Property property = skinsRestorer.getSkin(superiorPlayer);
+        if (property != null)
+            Executor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     interface ISkinsRestorer {

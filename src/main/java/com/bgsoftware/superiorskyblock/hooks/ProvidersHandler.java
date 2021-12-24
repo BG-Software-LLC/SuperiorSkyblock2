@@ -10,9 +10,12 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
@@ -39,7 +42,9 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -53,7 +58,8 @@ import java.util.Optional;
 
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
-    private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
+    private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
+
     private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
@@ -66,6 +72,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private WorldsProvider worldsProvider;
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
+
+    private final List<ISkinsListener> skinsListeners = new ArrayList<>();
+    private final List<IStackedBlocksListener> stackedBlocksListeners = new ArrayList<>();
+    private final List<IWorldsListener> worldsListeners = new ArrayList<>();
 
     public ProvidersHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -163,6 +173,51 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     public void setMenusProvider(MenusProvider menusProvider) {
         Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
         this.menusProvider = menusProvider;
+    }
+
+    @Override
+    public void registerSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.add(skinsListener);
+    }
+
+    @Override
+    public void unregisterSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.remove(skinsListener);
+    }
+
+    public boolean notifySkinsListeners(SuperiorPlayer superiorPlayer) {
+        this.skinsListeners.forEach(skinsListener -> skinsListener.setSkinTexture(superiorPlayer));
+        return !this.skinsListeners.isEmpty();
+    }
+
+    @Override
+    public void registerStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.add(stackedBlocksListener);
+    }
+
+    @Override
+    public void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.remove(stackedBlocksListener);
+    }
+
+    public void notifyStackedBlocksListeners(OfflinePlayer offlinePlayer, Block block,
+                                                IStackedBlocksListener.Action action) {
+        this.stackedBlocksListeners.forEach(stackedBlocksListener ->
+                stackedBlocksListener.recordBlockAction(offlinePlayer, block, action));
+    }
+
+    @Override
+    public void registerWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.add(worldsListener);
+    }
+
+    @Override
+    public void unregisterWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.remove(worldsListener);
+    }
+
+    public void runWorldsListeners(String worldName) {
+        this.worldsListeners.forEach(worldsListener -> worldsListener.loadWorld(worldName));
     }
 
     public Pair<Integer, String> getSpawner(Location location) {

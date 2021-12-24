@@ -28,6 +28,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public final class SlimefunHook {
 
     private static final ReflectField<Map<Location, Config>> BLOCK_STORAGE_STORAGE = new ReflectField<>(BlockStorage.class, Map.class, "storage");

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
@@ -134,7 +135,7 @@ public final class StackedBlocksLogic {
             island.handleBlockPlace(block, amount);
         }
 
-        //CoreProtectHook.recordBlockChange(player, block, true);
+        plugin.getProviders().notifyStackedBlocksListeners(player, block, IStackedBlocksListener.Action.BLOCK_PLACE);
 
         depositedAmount.accept(amount);
 
@@ -162,7 +163,7 @@ public final class StackedBlocksLogic {
 
         plugin.getNMSWorld().playBreakAnimation(block);
 
-        //CoreProtectHook.recordBlockChange(player, block, false);
+        plugin.getProviders().notifyStackedBlocksListeners(player, block, IStackedBlocksListener.Action.BLOCK_BREAK);
 
         if (!stackedBlockSuccess) {
             if (island != null)

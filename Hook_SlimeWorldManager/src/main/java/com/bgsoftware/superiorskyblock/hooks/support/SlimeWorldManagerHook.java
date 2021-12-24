@@ -8,14 +8,17 @@ import com.grinderwolf.swm.plugin.config.WorldData;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+@SuppressWarnings("unused")
 public final class SlimeWorldManagerHook {
 
     private static Plugin slimeWorldPlugin = null;
 
-    public static void tryWorldLoad(String worldName) {
-        if (slimeWorldPlugin == null)
-            return;
+    public static void register(SuperiorSkyblockPlugin plugin) {
+        slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+        plugin.getProviders().registerWorldsListener(SlimeWorldManagerHook::loadWorld);
+    }
 
+    private static void loadWorld(String worldName) {
         SlimePlugin slimePlugin = (SlimePlugin) slimeWorldPlugin;
 
         WorldData worldData = ConfigManager.getWorldConfig().getWorlds().get(worldName);
@@ -28,10 +31,6 @@ public final class SlimeWorldManagerHook {
         } catch (Exception error) {
             PluginDebugger.debug(error);
         }
-    }
-
-    public static void register() {
-        slimeWorldPlugin = Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
     }
 
 }

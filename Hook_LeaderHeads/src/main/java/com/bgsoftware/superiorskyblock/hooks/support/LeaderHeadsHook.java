@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 public final class LeaderHeadsHook {
 
     private static SuperiorSkyblockPlugin plugin;
@@ -79,7 +80,7 @@ public final class LeaderHeadsHook {
 
     private static abstract class SuperiorDataController extends DataCollector {
 
-        private SortingType sortingType;
+        private final SortingType sortingType;
 
         SuperiorDataController(String name, String command, SortingType sortingType) {
             super(

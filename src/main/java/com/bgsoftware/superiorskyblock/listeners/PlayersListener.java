@@ -140,11 +140,8 @@ public final class PlayersListener implements Listener {
 
         Executor.sync(() -> {
             if (e.getPlayer().isOnline()) {
-//                if (SkinsRestorerHook.isEnabled()) {
-//                    SkinsRestorerHook.setSkinTexture(superiorPlayer);
-//                } else {
-                plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
-                //}
+                if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
+                    plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
             }
         }, 5L);
 

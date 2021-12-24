@@ -6,6 +6,9 @@ import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 
 import java.util.List;
 
@@ -94,5 +97,47 @@ public interface ProvidersManager {
      * @param menuProvider The new menus-provider to use.
      */
     void setMenusProvider(MenusProvider menuProvider);
+
+    /**
+     * Register a new skins listener.
+     *
+     * @param skinsListener The new skins listener to register.
+     */
+    void registerSkinsListener(ISkinsListener skinsListener);
+
+    /**
+     * Unregister a skins listener.
+     *
+     * @param skinsListener The new skins listener to unregister.
+     */
+    void unregisterSkinsListener(ISkinsListener skinsListener);
+
+    /**
+     * Register a new stacked-blocks listener.
+     *
+     * @param stackedBlocksListener The new stacked-blocks listener to register.
+     */
+    void registerStackedBlocksListener(IStackedBlocksListener stackedBlocksListener);
+
+    /**
+     * Unregister a stacked-blocks listener.
+     *
+     * @param stackedBlocksListener The stacked-blocks listener to unregister.
+     */
+    void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener);
+
+    /**
+     * Register a new worlds listener.
+     *
+     * @param worldsListener The new worlds listener to register.
+     */
+    void registerWorldsListener(IWorldsListener worldsListener);
+
+    /**
+     * Unregister a worlds listener.
+     *
+     * @param worldsListener The worlds listener to unregister.
+     */
+    void unregisterWorldsListener(IWorldsListener worldsListener);
 
 }

@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+@SuppressWarnings("unused")
 public final class JetsMinionsHook implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;

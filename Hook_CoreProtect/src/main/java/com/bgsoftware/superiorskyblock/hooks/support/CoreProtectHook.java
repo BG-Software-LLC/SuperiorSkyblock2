@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
@@ -9,7 +10,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"deprecation", "unused"})
 public final class CoreProtectHook {
 
     private static SuperiorSkyblockPlugin plugin;
@@ -18,31 +19,38 @@ public final class CoreProtectHook {
     public static void register(SuperiorSkyblockPlugin plugin) {
         CoreProtectHook.plugin = plugin;
         coreProtect = Bukkit.getPluginManager().getPlugin("CoreProtect");
+        plugin.getProviders().registerStackedBlocksListener(CoreProtectHook::recordBlockAction);
     }
 
-    public static void recordBlockChange(OfflinePlayer offlinePlayer, Block block, boolean place) {
-        if (coreProtect == null)
-            return;
-
+    private static void recordBlockAction(OfflinePlayer offlinePlayer, Block block,
+                                         IStackedBlocksListener.Action action) {
         if (!Bukkit.isPrimaryThread()) {
-            Executor.sync(() -> recordBlockChange(offlinePlayer, block, place));
+            Executor.sync(() -> recordBlockAction(offlinePlayer, block, action));
             return;
         }
 
         CoreProtectAPI coreProtectAPI = ((CoreProtect) coreProtect).getAPI();
 
         if (coreProtectAPI.APIVersion() == 5) {
-            if (!place)
-                coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
-            else
-                coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
+            switch (action) {
+                case BLOCK_BREAK:
+                    coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
+                    break;
+                case BLOCK_PLACE:
+                    coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
+                    break;
+            }
         } else if (coreProtectAPI.APIVersion() == 6) {
-            if (!place)
-                coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(),
-                        (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
-            else
-                coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(),
-                        (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
+            switch (action) {
+                case BLOCK_BREAK:
+                    coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(),
+                            (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
+                    break;
+                case BLOCK_PLACE:
+                    coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(),
+                            (org.bukkit.block.data.BlockData) plugin.getNMSWorld().getBlockData(block));
+                    break;
+            }
         }
     }
 
