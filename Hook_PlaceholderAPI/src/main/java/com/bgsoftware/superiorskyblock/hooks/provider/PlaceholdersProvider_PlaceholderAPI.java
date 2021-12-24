@@ -1,20 +1,27 @@
-package com.bgsoftware.superiorskyblock.hooks.support;
+package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public final class PlaceholderHook_PAPI extends PlaceholderHook {
+@SuppressWarnings("unused")
+public final class PlaceholdersProvider_PlaceholderAPI extends PlaceholderHook implements PlaceholdersProvider {
 
-    PlaceholderHook_PAPI() {
-        SuperiorSkyblockPlugin.log("Using PlaceholderAPI for placeholders support.");
+    private final SuperiorSkyblockPlugin plugin;
+
+    public PlaceholdersProvider_PlaceholderAPI(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         new EZPlaceholder().register();
+
+        SuperiorSkyblockPlugin.log("Using PlaceholderAPI for placeholders support.");
     }
 
-    public static String parse(OfflinePlayer offlinePlayer, String str) {
-        return PlaceholderAPI.setPlaceholders(offlinePlayer, str);
+    @Override
+    public String parsePlaceholder(OfflinePlayer offlinePlayer, String value) {
+        return PlaceholderAPI.setPlaceholders(offlinePlayer, value);
     }
 
     private class EZPlaceholder extends PlaceholderExpansion {
@@ -41,7 +48,7 @@ public final class PlaceholderHook_PAPI extends PlaceholderHook {
 
         @Override
         public String onRequest(OfflinePlayer player, String placeholder) {
-            return parsePlaceholder(player, placeholder);
+            return handlePluginPlaceholder(player, placeholder);
         }
 
         @Override

@@ -6,15 +6,14 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -45,21 +44,16 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
-    protected static SuperiorSkyblockPlugin plugin;
-    private static boolean PlaceholderAPI = false;
 
-    public static void register(SuperiorSkyblockPlugin plugin) {
+    private static SuperiorSkyblockPlugin plugin;
+    private static List<PlaceholdersProvider> placeholdersProviders;
+
+    protected PlaceholderHook() {
+    }
+
+    public static void register(SuperiorSkyblockPlugin plugin, List<PlaceholdersProvider> placeholdersProviders) {
         PlaceholderHook.plugin = plugin;
-
-        Executor.ensureMain(() -> {
-            if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
-                new PlaceholderHook_MVdW();
-            }
-            if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-                new PlaceholderHook_PAPI();
-                PlaceholderAPI = true;
-            }
-        });
+        PlaceholderHook.placeholdersProviders = placeholdersProviders;
     }
 
     public static String parse(SuperiorPlayer superiorPlayer, String str) {
@@ -67,13 +61,13 @@ public abstract class PlaceholderHook {
     }
 
     public static String parse(OfflinePlayer offlinePlayer, String str) {
-        if (PlaceholderAPI && str.contains("%"))
-            str = PlaceholderHook_PAPI.parse(offlinePlayer, str);
+        for (PlaceholdersProvider placeholdersProvider : placeholdersProviders)
+            str = placeholdersProvider.parsePlaceholder(offlinePlayer, str);
 
         return str;
     }
 
-    protected String parsePlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
+    protected final String handlePluginPlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
         Player player = offlinePlayer.isOnline() ? offlinePlayer.getPlayer() : null;
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
         Island island = superiorPlayer.getIsland();

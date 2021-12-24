@@ -1,0 +1,13 @@
+group 'Hook_PlaceholderAPI'
+
+dependencies {
+    compileOnly 'me.clip:PlaceholderAPI:latest'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_placeholderapi') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_placeholderapi").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

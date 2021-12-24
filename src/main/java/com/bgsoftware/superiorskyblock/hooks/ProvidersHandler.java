@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AutoDetect;
@@ -93,6 +94,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             registerAFKProvider();
             registerAsyncProvider();
             registerEconomyProviders();
+            registerPlaceholdersProvider();
         });
     }
 
@@ -344,8 +346,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
         if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
             registerHook("SlimeWorldManagerHook");
-
-        PlaceholderHook.register(plugin);
     }
 
     private void registerSpawnersProvider() {
@@ -495,6 +495,21 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 setBankEconomyProvider(economyProvider);
             }
         }
+    }
+
+    private void registerPlaceholdersProvider() {
+        List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_MVdWPlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_PlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+
+        PlaceholderHook.register(plugin, placeholdersProviders);
     }
 
     private void setPermissionsProvider(PermissionsProvider permissionsProvider) {
