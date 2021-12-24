@@ -10,12 +10,11 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IWorldsListener;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_CMI;
-import com.bgsoftware.superiorskyblock.hooks.provider.AFKProvider_Essentials;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
@@ -23,63 +22,43 @@ import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_LuckPerms;
+import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_ShopGUIPlus;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AdvancedSpawners;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_EpicSpawners;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_MergedSpawner;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_PvpingSpawners;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_RoseStacker;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_SilkSpawners;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_UltimateStacker;
-import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_RoseStacker;
-import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_WildStacker;
 import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider;
-import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_CMI;
-import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_Essentials;
-import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_SuperVanish;
-import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider_VanishNoPacket;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.support.ChangeSkinHook;
-import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
-import com.bgsoftware.superiorskyblock.hooks.support.JetsMinionsHook;
-import com.bgsoftware.superiorskyblock.hooks.support.LeaderHeadsHook;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
-import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
-import com.bgsoftware.superiorskyblock.hooks.support.SlimefunHook;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
 
-    private final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
+    private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
+
     private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
@@ -93,29 +72,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
 
+    private final List<ISkinsListener> skinsListeners = new ArrayList<>();
+    private final List<IStackedBlocksListener> stackedBlocksListeners = new ArrayList<>();
+    private final List<IWorldsListener> worldsListeners = new ArrayList<>();
+
     public ProvidersHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
         this.worldsProvider = new WorldsProvider_Default(plugin);
         this.menusProvider = new MenusProvider_Default(plugin);
-    }
-
-    private static void runSafe(Runnable runnable) {
-        try {
-            runnable.run();
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
-        }
-    }
-
-    private static boolean hasPaperAsyncSupport() {
-        try {
-            //noinspection JavaReflectionMemberAccess
-            World.class.getMethod("getChunkAtAsync", int.class, int.class);
-            return true;
-        } catch (Throwable ex) {
-            return false;
-        }
     }
 
     @Override
@@ -130,6 +94,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             registerAFKProvider();
             registerAsyncProvider();
             registerEconomyProviders();
+            registerPlaceholdersProvider();
         });
     }
 
@@ -210,16 +175,53 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         this.menusProvider = menusProvider;
     }
 
-    public Pair<Integer, String> getSpawner(Location location) {
-        return spawnersProvider.getSpawner(location);
+    @Override
+    public void registerSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.add(skinsListener);
+    }
+
+    @Override
+    public void unregisterSkinsListener(ISkinsListener skinsListener) {
+        this.skinsListeners.remove(skinsListener);
+    }
+
+    public boolean notifySkinsListeners(SuperiorPlayer superiorPlayer) {
+        this.skinsListeners.forEach(skinsListener -> skinsListener.setSkinTexture(superiorPlayer));
+        return !this.skinsListeners.isEmpty();
+    }
+
+    @Override
+    public void registerStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.add(stackedBlocksListener);
+    }
+
+    @Override
+    public void unregisterStackedBlocksListener(IStackedBlocksListener stackedBlocksListener) {
+        this.stackedBlocksListeners.remove(stackedBlocksListener);
+    }
+
+    public void notifyStackedBlocksListeners(OfflinePlayer offlinePlayer, Block block,
+                                             IStackedBlocksListener.Action action) {
+        this.stackedBlocksListeners.forEach(stackedBlocksListener ->
+                stackedBlocksListener.recordBlockAction(offlinePlayer, block, action));
+    }
+
+    @Override
+    public void registerWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.add(worldsListener);
+    }
+
+    @Override
+    public void unregisterWorldsListener(IWorldsListener worldsListener) {
+        this.worldsListeners.remove(worldsListener);
+    }
+
+    public void runWorldsListeners(String worldName) {
+        this.worldsListeners.forEach(worldsListener -> worldsListener.loadWorld(worldName));
     }
 
     public Key getSpawnerKey(ItemStack itemStack) {
         return Key.of(Materials.SPAWNER.toBukkitType() + "", spawnersProvider.getSpawnerType(itemStack) + "");
-    }
-
-    public Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> getBlocks(ChunkPosition chunkPosition) {
-        return stackedBlocksProvider.getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
     }
 
     public boolean hasSnapshotsSupport() {
@@ -247,36 +249,20 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
     }
 
-    public boolean hasPermission(Player player, String permission) {
-        return permissionsProvider.hasPermission(player, permission.toLowerCase());
+    public PermissionsProvider getPermissionsProvider() {
+        return permissionsProvider;
     }
 
-    public BigDecimal getPrice(Key key) {
-        return pricesProvider.getPrice(key.getSubKey().isEmpty() ? Key.of(key.getGlobalKey(), "0") : key);
+    public PricesProvider getPricesProvider() {
+        return pricesProvider;
     }
 
-    public Key getPriceBlockKey(Key key) {
-        return pricesProvider.getBlockKey(key);
+    public VanishProvider getVanishProvider() {
+        return vanishProvider;
     }
 
-    public boolean isVanished(Player player) {
-        return vanishProvider.isVanished(player);
-    }
-
-    public void loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> chunkResult) {
-        asyncProvider.loadChunk(chunkPosition, chunkResult);
-    }
-
-    public void teleport(Entity entity, Location location) {
-        asyncProvider.teleport(entity, location);
-    }
-
-    public void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
-        asyncProvider.teleport(entity, location, teleportResult);
-    }
-
-    public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
-        return economyProvider.getBalance(superiorPlayer);
+    public AsyncProvider getAsyncProvider() {
+        return asyncProvider;
     }
 
     public EconomyProvider.EconomyResult depositMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
@@ -293,74 +279,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, BigDecimal amount) {
         while (amount.compareTo(MAX_DOUBLE) > 0) {
-            EconomyProvider.EconomyResult result = withdrawMoney(superiorPlayer, Double.MAX_VALUE);
+            EconomyProvider.EconomyResult result = economyProvider.withdrawMoney(superiorPlayer, Double.MAX_VALUE);
             if (result.hasFailed())
                 return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        return withdrawMoney(superiorPlayer, amount.doubleValue());
-    }
-
-    public EconomyProvider.EconomyResult withdrawMoney(SuperiorPlayer superiorPlayer, double amount) {
-        return economyProvider.withdrawMoney(superiorPlayer, amount);
-    }
-
-    public void prepareWorlds() {
-        worldsProvider.prepareWorlds();
-    }
-
-    public World getIslandsWorld(Island island, World.Environment environment) {
-        return worldsProvider.getIslandsWorld(island, environment);
-    }
-
-    public boolean isIslandsWorld(World world) {
-        return worldsProvider.isIslandsWorld(world);
-    }
-
-    public Location getNextLocation(Location previousLocation, int islandsHeight, int maxIslandSize, UUID islandOwner, UUID islandUUID) {
-        return worldsProvider.getNextLocation(previousLocation, islandsHeight, maxIslandSize, islandOwner, islandUUID);
-    }
-
-    public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
-        worldsProvider.finishIslandCreation(islandLocation, islandOwner, islandUUID);
-    }
-
-    public void prepareTeleport(Island island, Location location, Runnable finishCallback) {
-        worldsProvider.prepareTeleport(island, location, finishCallback);
-    }
-
-    public boolean isNormalEnabled() {
-        return worldsProvider.isNormalEnabled();
-    }
-
-    public boolean isNormalUnlocked() {
-        return worldsProvider.isNormalUnlocked();
-    }
-
-    public boolean isNetherEnabled() {
-        return worldsProvider.isNetherEnabled();
-    }
-
-    public boolean isNetherUnlocked() {
-        return worldsProvider.isNetherUnlocked();
-    }
-
-    public boolean isEndEnabled() {
-        return worldsProvider.isEndEnabled();
-    }
-
-    public boolean isEndUnlocked() {
-        return worldsProvider.isEndUnlocked();
-    }
-
-    public boolean hasCustomWorldsSupport() {
-        return !(worldsProvider instanceof WorldsProvider_Default);
-    }
-
-    public BigDecimal getBalanceForBanks(SuperiorPlayer superiorPlayer) {
-        return bankEconomyProvider.getBalance(superiorPlayer);
+        return economyProvider.withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
     public EconomyProvider.EconomyResult depositMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount) {
@@ -377,18 +303,18 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, BigDecimal amount) {
         while (amount.compareTo(MAX_DOUBLE) > 0) {
-            EconomyProvider.EconomyResult result = withdrawMoneyForBanks(superiorPlayer, Double.MAX_VALUE);
+            EconomyProvider.EconomyResult result = bankEconomyProvider.withdrawMoney(superiorPlayer, Double.MAX_VALUE);
             if (result.hasFailed())
                 return result;
 
             amount = amount.subtract(MAX_DOUBLE);
         }
 
-        return withdrawMoneyForBanks(superiorPlayer, amount.doubleValue());
+        return bankEconomyProvider.withdrawMoney(superiorPlayer, amount.doubleValue());
     }
 
-    public EconomyProvider.EconomyResult withdrawMoneyForBanks(SuperiorPlayer superiorPlayer, double amount) {
-        return bankEconomyProvider.withdrawMoney(superiorPlayer, amount);
+    public boolean hasCustomWorldsSupport() {
+        return !(worldsProvider instanceof WorldsProvider_Default);
     }
 
     public boolean isAFK(Player player) {
@@ -401,137 +327,159 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     private void registerGeneralHooks() {
         if (Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
-            runSafe(LeaderHeadsHook::register);
+            registerHook("LeaderHeadsHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("JetsMinions"))
-            runSafe(() -> JetsMinionsHook.register(plugin));
+            registerHook("JetsMinionsHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer"))
-            runSafe(() -> SkinsRestorerHook.register(plugin));
+            registerHook("SkinsRestorerHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("ChangeSkin"))
-            runSafe(() -> ChangeSkinHook.register(plugin));
+            registerHook("ChangeSkinHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
-            runSafe(() -> SlimefunHook.register(plugin));
+            registerHook("SlimefunHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
-            runSafe(() -> CoreProtectHook.register(plugin));
+            registerHook("CoreProtectHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
-            runSafe(SWMHook::register);
-
-        PlaceholderHook.register(plugin);
+            registerHook("SlimeWorldManagerHook");
     }
 
     private void registerSpawnersProvider() {
         if (!(spawnersProvider instanceof SpawnersProvider_AutoDetect))
             return;
 
-        String spawnersProvider = plugin.getSettings().getSpawnersProvider();
-        boolean auto = spawnersProvider.equalsIgnoreCase("Auto");
+        String configSpawnersProvider = plugin.getSettings().getSpawnersProvider();
+        boolean auto = configSpawnersProvider.equalsIgnoreCase("Auto");
+
+        Optional<SpawnersProvider> spawnersProvider = Optional.empty();
 
         if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
-                (auto || spawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_MergedSpawner()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
+            spawnersProvider = createInstance("SpawnersProvider_MergedSpawner");
             listenToSpawnerChanges = false;
         } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
-                (auto || spawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_AdvancedSpawners()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
+            spawnersProvider = createInstance("SpawnersProvider_AdvancedSpawners");
         } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                (auto || spawnersProvider.equalsIgnoreCase("WildStacker"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_WildStacker()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("WildStacker"))) {
+            spawnersProvider = createInstance("SpawnersProvider_WildStacker");
         } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
                 Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
-                (auto || spawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_SilkSpawners()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
+            spawnersProvider = createInstance("SpawnersProvider_SilkSpawners");
         } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
-                (auto || spawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_PvpingSpawners()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
+            spawnersProvider = createInstance("SpawnersProvider_PvpingSpawners");
         } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
-                (auto || spawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
+                (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
             if (Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion().startsWith("7")) {
-                try {
-                    SpawnersProvider epicSpawnersProvider = (SpawnersProvider)
-                            Class.forName("com.bgsoftware.superiorskyblock.hooks.BlocksProvider_EpicSpawners7").newInstance();
-                    runSafe(() -> setSpawnersProvider(epicSpawnersProvider));
-                } catch (Exception ignored) {
-                }
+                spawnersProvider = createInstance("SpawnersProvider_EpicSpawners7");
             } else {
-                runSafe(() -> setSpawnersProvider(new SpawnersProvider_EpicSpawners()));
+                spawnersProvider = createInstance("SpawnersProvider_EpicSpawners6");
             }
         } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
-                (auto || spawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_UltimateStacker()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
+            spawnersProvider = createInstance("SpawnersProvider_UltimateStacker");
             listenToSpawnerChanges = false;
         } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
-                (auto || spawnersProvider.equalsIgnoreCase("RoseStacker"))) {
-            runSafe(() -> setSpawnersProvider(new SpawnersProvider_RoseStacker()));
+                (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
+            spawnersProvider = createInstance("SpawnersProvider_RoseStacker");
             listenToSpawnerChanges = false;
         }
+
+        spawnersProvider.ifPresent(this::setSpawnersProvider);
     }
 
     private void registerStackedBlocksProvider() {
         if (!(stackedBlocksProvider instanceof StackedBlocksProvider_AutoDetect))
             return;
 
-        String stackedBlocksProvider = plugin.getSettings().getStackedBlocksProvider();
-        boolean auto = stackedBlocksProvider.equalsIgnoreCase("Auto");
+        String configStackedBlocksProvider = plugin.getSettings().getStackedBlocksProvider();
+        boolean auto = configStackedBlocksProvider.equalsIgnoreCase("Auto");
+
+        Optional<StackedBlocksProvider> stackedBlocksProvider = Optional.empty();
 
         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
-                (auto || stackedBlocksProvider.equalsIgnoreCase("WildStacker"))) {
-            runSafe(() -> setStackedBlocksProvider(new StackedBlocksProvider_WildStacker()));
+                (auto || configStackedBlocksProvider.equalsIgnoreCase("WildStacker"))) {
+            stackedBlocksProvider = createInstance("StackedBlocksProvider_WildStacker");
         } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
-                (auto || stackedBlocksProvider.equalsIgnoreCase("RoseStacker"))) {
-            runSafe(() -> setStackedBlocksProvider(new StackedBlocksProvider_RoseStacker()));
+                (auto || configStackedBlocksProvider.equalsIgnoreCase("RoseStacker"))) {
+            stackedBlocksProvider = createInstance("StackedBlocksProvider_RoseStacker");
         }
+
+        stackedBlocksProvider.ifPresent(this::setStackedBlocksProvider);
     }
 
     private void registerPermissionsProvider() {
-        if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms") && PermissionsProvider_LuckPerms.isCompatible()) {
-            runSafe(() -> this.permissionsProvider = new PermissionsProvider_LuckPerms());
+        Optional<PermissionsProvider> permissionsProvider = Optional.empty();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
+            permissionsProvider = createInstance("PermissionsProvider_LuckPerms");
         }
+
+        permissionsProvider.ifPresent(this::setPermissionsProvider);
     }
 
     private void registerPricesProvider() {
+        Optional<PricesProvider> pricesProvider = Optional.empty();
+
         if (Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
-            runSafe(() -> pricesProvider = new PricesProvider_ShopGUIPlus());
+            pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
         }
+
+        pricesProvider.ifPresent(this::setPricesProvider);
     }
 
     private void registerVanishProvider() {
+        Optional<VanishProvider> vanishProvider = Optional.empty();
+
         if (Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket")) {
-            runSafe(() -> vanishProvider = new VanishProvider_VanishNoPacket(plugin));
+            vanishProvider = createInstance("VanishProvider_VanishNoPacket");
         } else if (Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
                 Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
-            runSafe(() -> vanishProvider = new VanishProvider_SuperVanish(plugin));
+            vanishProvider = createInstance("VanishProvider_SuperVanish");
         } else if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
-            runSafe(() -> vanishProvider = new VanishProvider_Essentials(plugin));
+            vanishProvider = createInstance("VanishProvider_Essentials");
         } else if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
-            runSafe(() -> vanishProvider = new VanishProvider_CMI(plugin));
+            vanishProvider = createInstance("VanishProvider_CMI");
         }
+
+        vanishProvider.ifPresent(this::setVanishProvider);
+    }
+
+    private void setVanishProvider(VanishProvider vanishProvider) {
+        this.vanishProvider = vanishProvider;
     }
 
     private void registerAFKProvider() {
         if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
-            runSafe(() -> addAFKProvider(new AFKProvider_CMI()));
+            Optional<AFKProvider> afkProvider = createInstance("AFKProvider_CMI");
+            afkProvider.ifPresent(this::addAFKProvider);
         }
         if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
-            runSafe(() -> addAFKProvider(new AFKProvider_Essentials()));
+            Optional<AFKProvider> afkProvider = createInstance("AFKProvider_Essentials");
+            afkProvider.ifPresent(this::addAFKProvider);
         }
     }
 
     private void registerAsyncProvider() {
         if (hasPaperAsyncSupport()) {
             try {
-                asyncProvider = (AsyncProvider) Class.forName("com.bgsoftware.superiorskyblock.hooks.AsyncProvider_Paper").newInstance();
-                // Only added in versions 1.13+ of paper, so it can be here
-                Bukkit.getPluginManager().registerEvents(new PaperListener(plugin), plugin);
-                SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
+                Optional<AsyncProvider> asyncProviderOptional = createInstance("AsyncProvider_Paper");
+                asyncProviderOptional.ifPresent(asyncProvider -> {
+                    this.asyncProvider = asyncProvider;
+                    // Only added in versions 1.13+ of paper, so it can be here
+                    Bukkit.getPluginManager().registerEvents(new PaperListener(plugin), plugin);
+                    SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
+                });
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("Detected PaperSpigot but failed to load async chunk-loading support...");
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }
@@ -546,6 +494,75 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             if (bankEconomyProvider instanceof EconomyProvider_Default && (alreadyCheckedForVault || EconomyProvider_Vault.isCompatible())) {
                 setBankEconomyProvider(economyProvider);
             }
+        }
+    }
+
+    private void registerPlaceholdersProvider() {
+        List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_MVdWPlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_PlaceholderAPI");
+            placeholdersProvider.ifPresent(placeholdersProviders::add);
+        }
+
+        PlaceholderHook.register(plugin, placeholdersProviders);
+    }
+
+    private void setPermissionsProvider(PermissionsProvider permissionsProvider) {
+        this.permissionsProvider = permissionsProvider;
+    }
+
+    private void setPricesProvider(PricesProvider pricesProvider) {
+        this.pricesProvider = pricesProvider;
+    }
+
+    private void registerHook(String className) {
+        try {
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.support." + className);
+            Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
+            registerMethod.invoke(null, plugin);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static boolean hasPaperAsyncSupport() {
+        try {
+            //noinspection JavaReflectionMemberAccess
+            World.class.getMethod("getChunkAtAsync", int.class, int.class);
+            return true;
+        } catch (Throwable ex) {
+            return false;
+        }
+    }
+
+    private <T> Optional<T> createInstance(String className) {
+        try {
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
+            try {
+                Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
+                if (!(boolean) compatibleMethod.invoke(null))
+                    return Optional.empty();
+            } catch (Exception ignored) {
+            }
+
+            try {
+                Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class);
+                // noinspection unchecked
+                return Optional.of((T) constructor.newInstance(plugin));
+            } catch (Exception error) {
+                // noinspection unchecked
+                return Optional.of((T) clazz.newInstance());
+            }
+        } catch (ClassNotFoundException ignored) {
+            return Optional.empty();
+        } catch (Exception error) {
+            error.printStackTrace();
+            PluginDebugger.debug(error);
+            return Optional.empty();
         }
     }
 

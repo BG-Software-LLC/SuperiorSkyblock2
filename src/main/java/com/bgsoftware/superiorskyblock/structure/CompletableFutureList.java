@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.structure;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +37,7 @@ public final class CompletableFutureList<E> extends ArrayList<CompletableFuture<
         } else try {
             allTasks.get(plugin.getSettings().getRecalcTaskTimeout(), TimeUnit.SECONDS);
         } catch (Throwable error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
             onFailure.accept(error);
         }
     }

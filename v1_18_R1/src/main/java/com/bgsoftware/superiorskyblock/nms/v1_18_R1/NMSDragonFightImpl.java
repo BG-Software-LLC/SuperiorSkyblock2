@@ -6,25 +6,35 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.IslandsChunkGenerator;
-import com.google.common.collect.ImmutableList;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.MathHelper;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.BossBattleServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.ChunkProviderServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.entity.TileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.chunk.ChunkAccess;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.pathfinder.PathEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.pathfinder.PathPoint;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.nbt.NBTTagList;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.boss.enderdragon.phases.DragonController;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.boss.enderdragon.phases.DragonControllerManager;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.level.block.state.pattern.ShapeDetectorBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.phys.AxisAlignedBB;
 import net.minecraft.advancements.CriterionTriggers;
-import net.minecraft.core.BaseBlockPosition;
-import net.minecraft.core.BlockPosition;
 import net.minecraft.core.particles.Particles;
 import net.minecraft.data.worldgen.features.EndFeatures;
 import net.minecraft.nbt.GameProfileSerializer;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagInt;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.server.level.TicketType;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.Unit;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
@@ -33,35 +43,25 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerFly;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerHold;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLanding;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLandingFly;
-import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
 import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityEnderPortal;
 import net.minecraft.world.level.block.state.pattern.ShapeDetector;
-import net.minecraft.world.level.block.state.pattern.ShapeDetectorBlock;
 import net.minecraft.world.level.block.state.pattern.ShapeDetectorBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockPredicate;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.dimension.end.EnumDragonRespawn;
 import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 import net.minecraft.world.level.levelgen.feature.configurations.WorldGenFeatureConfiguration;
-import net.minecraft.world.level.pathfinder.PathEntity;
-import net.minecraft.world.level.pathfinder.PathPoint;
-import net.minecraft.world.level.storage.Convertable;
-import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.entity.CraftEnderDragon;
@@ -80,37 +80,31 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
-
 @SuppressWarnings({"unused", "NullableProblems"})
 public final class NMSDragonFightImpl implements NMSDragonFight {
 
-    private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<>(
-            EntityEnderDragon.class, EnderDragonBattle.class,
-            Modifier.PRIVATE | Modifier.FINAL, 1);
+    private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<EnderDragonBattle>(
+            EntityEnderDragon.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)
+            .removeFinal();
     private static final ReflectField<IDragonController> DRAGON_PHASE = new ReflectField<>(
-            DragonControllerManager.class, IDragonController.class,
+            net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager.class, IDragonController.class,
             Modifier.PRIVATE, 1);
-    private static final ReflectMethod<PathEntity> DRAGON_FIND_PATH = new ReflectMethod<>(
-            EntityEnderDragon.class, 1, int.class, int.class, PathPoint.class);
-
-    static {
-        DRAGON_BATTLE.removeFinal();
-    }
+    private static final ReflectMethod<net.minecraft.world.level.pathfinder.PathEntity> DRAGON_FIND_PATH = new ReflectMethod<>(
+            EntityEnderDragon.class, 1, int.class, int.class, net.minecraft.world.level.pathfinder.PathPoint.class);
 
     private final Map<UUID, EnderDragonBattle> activeBattles = new HashMap<>();
 
-    private static Vec3D navigateToNextPathNode(PathEntity currentPath, EntityEnderDragon entityEnderDragon, Vec3D currentTargetBlock) {
-        if (currentPath != null && !currentPath.c()) {
-            BaseBlockPosition basePosition = currentPath.g();
-            currentPath.a();
+    private static Vec3D navigateToNextPathNode(PathEntity currentPath, Entity entityEnderDragon, Vec3D currentTargetBlock) {
+        if (currentPath != null && !currentPath.isDone()) {
+            BlockPosition basePosition = currentPath.getNextNodePos();
+            currentPath.advance();
 
             double y;
             do {
-                y = getY(basePosition) + getRandom(entityEnderDragon).nextFloat() * 20.0F;
-            } while (y < getY(basePosition));
+                y = basePosition.getY() + entityEnderDragon.getRandom().nextFloat() * 20.0F;
+            } while (y < basePosition.getY());
 
-            return new Vec3D(getX(basePosition), y, getZ(basePosition));
+            return new Vec3D(basePosition.getX(), y, basePosition.getZ());
         }
 
         return currentTargetBlock;
@@ -120,7 +114,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     public void startDragonBattle(Island island, Location location) {
         org.bukkit.World bukkitWorld = location.getWorld();
         if (bukkitWorld != null) {
-            WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
+            WorldServer worldServer = new WorldServer(((CraftWorld) bukkitWorld).getHandle());
             IslandEnderDragonBattle islandEnderDragonBattle = new IslandEnderDragonBattle(island, worldServer, location);
             activeBattles.put(island.getUniqueId(), islandEnderDragonBattle);
         }
@@ -141,16 +135,19 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     @Override
     public void setDragonPhase(EnderDragon enderDragon, Object objectPhase) {
         EnderDragon.Phase phase = (EnderDragon.Phase) objectPhase;
+        Entity entity = new Entity(((CraftEnderDragon) enderDragon).getHandle());
 
-        if (!(((CraftEnderDragon) enderDragon).getHandle() instanceof IslandEntityEnderDragon entityEnderDragon))
+        if (!(entity.getHandle() instanceof IslandEntityEnderDragon entityEnderDragon))
             return;
 
+        DragonControllerManager dragonControllerManager = entity.getDragonControllerManager();
+
         switch (phase) {
-            case DYING -> DRAGON_PHASE.set(getDragonControllerManager(entityEnderDragon), new IslandDragonControllerDying(entityEnderDragon));
-            case LEAVE_PORTAL -> DRAGON_PHASE.set(getDragonControllerManager(entityEnderDragon), new IslandDragonControllerFly(entityEnderDragon));
-            case CIRCLING -> DRAGON_PHASE.set(getDragonControllerManager(entityEnderDragon), new IslandDragonControllerHold(entityEnderDragon));
-            case LAND_ON_PORTAL -> DRAGON_PHASE.set(getDragonControllerManager(entityEnderDragon), new IslandDragonControllerLanding(entityEnderDragon));
-            case FLY_TO_PORTAL -> DRAGON_PHASE.set(getDragonControllerManager(entityEnderDragon), new IslandDragonControllerLandingFly(entityEnderDragon));
+            case DYING -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerDying(entityEnderDragon));
+            case LEAVE_PORTAL -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerFly(entityEnderDragon));
+            case CIRCLING -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerHold(entityEnderDragon));
+            case LAND_ON_PORTAL -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerLanding(entityEnderDragon));
+            case FLY_TO_PORTAL -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerLandingFly(entityEnderDragon));
         }
     }
 
@@ -164,54 +161,40 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     private static final class IslandEntityEnderDragon extends EntityEnderDragon {
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entity = new Entity(this);
 
-        IslandEntityEnderDragon(WorldServer world, BlockPosition islandBlockPosition, IslandEnderDragonBattle islandEnderDragonBattle) {
-            super(null, getDragonBattleInjection(islandEnderDragonBattle));
+        IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition, IslandEnderDragonBattle islandEnderDragonBattle) {
+            super(null, worldServer.getHandle());
             this.islandBlockPosition = islandBlockPosition;
-            a(world);
         }
 
         @Override
         public Vec3D y(float f) {
-            IDragonController dragonController = getDragonControllerManager(this).a();
-            DragonControllerPhase<? extends IDragonController> dragonControllerPhase = getControllerPhase(dragonController);
+            DragonController dragonController = entity.getDragonControllerManager().getDragonController();
+            DragonControllerPhase<?> dragonControllerPhase = dragonController.getControllerPhase();
             float f1;
             Vec3D vec3d;
 
             if (dragonControllerPhase != DragonControllerPhase.d && dragonControllerPhase != DragonControllerPhase.e) {
-                if (dragonController.a()) {
-                    float f2 = getXRot(this);
-                    setXRot(this, -45.0F);
+                if (dragonController.isSitting()) {
+                    float f2 = entity.getXRot();
+                    entity.setXRot(-45.0F);
                     vec3d = this.e(f);
-                    setXRot(this, f2);
+                    entity.setXRot(f2);
                 } else {
                     vec3d = this.e(f);
                 }
             } else {
-                BlockPosition blockposition = getHighestBlockYAt(this.t, HeightMap.Type.f, islandBlockPosition);
-                f1 = Math.max(MathHelper.c(blockposition.a(getPositionVector(this), true)) / 4.0F, 1.0F);
+                BlockPosition blockPosition = entity.getWorld().getHighestBlockYAt(HeightMap.Type.f, islandBlockPosition);
+                f1 = Math.max((float) Math.sqrt(blockPosition.distSqr(entity.getPositionVector(), true)) / 4.0F, 1.0F);
                 float f3 = 6.0F / f1;
-                float f4 = getXRot(this);
-                setXRot(this, -f3 * 1.5F * 5.0F);
+                float f4 = entity.getXRot();
+                entity.setXRot(-f3 * 1.5F * 5.0F);
                 vec3d = this.e(f);
-                setXRot(this, f4);
+                entity.setXRot(f4);
             }
 
             return vec3d;
-        }
-
-        private static WorldServer getDragonBattleInjection(IslandEnderDragonBattle islandEnderDragonBattle) {
-            WorldServer worldServer = islandEnderDragonBattle.l;
-            return new WorldServer(worldServer.n(), worldServer.n().az, worldServer.convertable, worldServer.N,
-                    worldServer.aa(), worldServer.q_(), worldServer.n().L.create(11), new IslandsChunkGenerator(worldServer),
-                    worldServer.N.A().g(), j, ImmutableList.of(), true, World.Environment.NORMAL,
-                    worldServer.generator, worldServer.getWorld().getBiomeProvider()) {
-
-                @Override
-                public EnderDragonBattle F() {
-                    return islandEnderDragonBattle;
-                }
-            };
         }
 
     }
@@ -220,14 +203,19 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+        private static final BlockData DRAGON_EGG_DATA = new Block(Blocks.er).getBlockData();
+
         private static final ShapeDetector portalShape = ShapeDetectorBuilder.a()
                 .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
                 .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
                 .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
                 .a(new String[]{"  ###  ", " #   # ", "#     #", "#  #  #", "#     #", " #   # ", "  ###  "})
                 .a(new String[]{"       ", "  ###  ", " ##### ", " ##### ", " ##### ", "  ###  ", "       "})
-                .a('#', ShapeDetectorBlock.a(BlockPredicate.a(Blocks.z)))
+                .a('#', ShapeDetectorBlock.hasState(BlockPredicate.a(Blocks.z)))
                 .b();
+
+        private final BossBattleServer bossBattleServer;
+        private final WorldServer worldServer;
 
         private final BlockPosition islandBlockPosition;
         private final ChunkCoordIntPair islandChunkCoord;
@@ -244,45 +232,48 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         private boolean previouslyKilled = false;
 
         public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location) {
-            super(worldServer, getSeed(getGeneratorSettings(getWorldData(worldServer))), new NBTTagCompound());
+            super(worldServer.getHandle(), worldServer.getSeed(), new net.minecraft.nbt.NBTTagCompound());
             this.islandBlockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
             this.islandChunkCoord = new ChunkCoordIntPair(islandBlockPosition);
             this.island = island;
 
             int radius = plugin.getSettings().getMaxIslandSize();
-            this.borderArea = new AxisAlignedBB(new BlockPosition(islandBlockPosition.c(-radius, -radius, -radius)),
-                    new BlockPosition(islandBlockPosition.c(radius, radius, radius)));
+            this.borderArea = new AxisAlignedBB(islandBlockPosition.offset(-radius, -radius, -radius),
+                    islandBlockPosition.offset(radius, radius, radius));
+
+            this.bossBattleServer = new BossBattleServer(this.k);
+            this.worldServer = worldServer;
 
             spawnEnderDragon();
         }
 
         @Override
-        public NBTTagCompound a() {
+        public net.minecraft.nbt.NBTTagCompound a() {
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
 
             if (this.u != null) {
-                nbtTagCompound.a("Dragon", this.u);
+                nbtTagCompound.setUUID("Dragon", this.u);
             }
 
-            setBoolean(nbtTagCompound, "DragonKilled", this.dragonKilled);
-            setBoolean(nbtTagCompound, "PreviouslyKilled", this.previouslyKilled);
+            nbtTagCompound.setBoolean("DragonKilled", this.dragonKilled);
+            nbtTagCompound.setBoolean("PreviouslyKilled", this.previouslyKilled);
 
             if (this.w != null) {
-                set(nbtTagCompound, "ExitPortalLocation", GameProfileSerializer.a(this.w));
+                nbtTagCompound.set("ExitPortalLocation", GameProfileSerializer.a(this.w));
             }
 
             NBTTagList nbtTagList = new NBTTagList();
             for (Integer gateway : this.gateways)
                 nbtTagList.add(NBTTagInt.a(gateway));
 
-            set(nbtTagCompound, "Gateways", nbtTagList);
+            nbtTagCompound.set("Gateways", nbtTagList.getHandle());
 
-            return nbtTagCompound;
+            return nbtTagCompound.getHandle();
         }
 
         @Override
         public void b() {
-            setVisible(this.k, !dragonKilled);
+            bossBattleServer.setVisible(!dragonKilled);
 
             // Update battle players
             if (++currentTick >= 20) {
@@ -290,12 +281,14 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 currentTick = 0;
             }
 
-            if (getPlayers(this.k).isEmpty()) {
-                removeTicket(getChunkProvider(this.l), TicketType.b, islandChunkCoord, 9, Unit.a);
+            ChunkProviderServer chunkProviderServer = worldServer.getChunkProvider();
+
+            if (bossBattleServer.getPlayers().isEmpty()) {
+                chunkProviderServer.removeTicket(TicketType.b, islandChunkCoord, 9, Unit.a);
                 return;
             }
 
-            addTicket(getChunkProvider(this.l), TicketType.b, islandChunkCoord, 9, Unit.a);
+            chunkProviderServer.addTicket(TicketType.b, islandChunkCoord, 9, Unit.a);
 
             boolean tickingChunks = areChunkTicking();
 
@@ -327,8 +320,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 this.x = null;
                 dragonKilled = false;
                 EntityEnderDragon entityEnderDragon = spawnEnderDragon();
-                for (EntityPlayer entityPlayer : getPlayers(this.k))
-                    CriterionTriggers.n.a(entityPlayer, entityEnderDragon);
+                for (Entity entityPlayer : bossBattleServer.getPlayers())
+                    CriterionTriggers.n.a((EntityPlayer) entityPlayer.getHandle(), entityEnderDragon);
             }
         }
 
@@ -336,16 +329,19 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         public ShapeDetector.ShapeDetectorCollection j() {
             for (int x = -8; x <= 8; x++) {
                 for (int z = -8; z <= 8; z++) {
-                    Chunk chunk = getChunkAt(this.l, islandChunkCoord.c + x, islandChunkCoord.d + z);
+                    ChunkAccess chunk = worldServer.getChunkAt(islandChunkCoord.getX() + x, islandChunkCoord.getZ() + z);
 
-                    for (TileEntity tileEntity : getTileEntities(chunk).values()) {
-                        if (tileEntity instanceof TileEntityEnderPortal) {
-                            ShapeDetector.ShapeDetectorCollection shapeDetectorCollection =
-                                    portalShape.a(this.l, getPosition(tileEntity));
+                    for (TileEntity tileEntity : chunk.getTileEntities().values()) {
+                        if (tileEntity.getHandle() instanceof TileEntityEnderPortal) {
+                            ShapeDetector.ShapeDetectorCollection shapeDetectorCollection = portalShape.a(
+                                    worldServer.getHandle(), tileEntity.getPosition().getHandle());
+
                             if (shapeDetectorCollection != null) {
-                                BlockPosition blockposition = getPosition(shapeDetectorCollection.a(3, 3, 3));
-                                if (this.w == null && getX(blockposition) == 0 && getZ(blockposition) == 0) {
-                                    this.w = blockposition;
+                                ShapeDetectorBlock shapeDetectorBlock = new ShapeDetectorBlock(shapeDetectorCollection
+                                        .a(3, 3, 3));
+                                BlockPosition blockposition = shapeDetectorBlock.getPosition();
+                                if (this.w == null && blockposition.getX() == 0 && blockposition.getZ() == 0) {
+                                    this.w = blockposition.getHandle();
                                 }
 
                                 return shapeDetectorCollection;
@@ -355,14 +351,17 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
             }
 
-            int highestBlock = getY(getHighestBlockYAt(this.l, HeightMap.Type.e, islandBlockPosition));
+            int highestBlock = worldServer.getHighestBlockYAt(HeightMap.Type.e, islandBlockPosition).getY();
 
             for (int y = highestBlock; y >= 0; y--) {
-                ShapeDetector.ShapeDetectorCollection shapeDetectorCollection = portalShape.a(
-                        this.l, new BlockPosition(getX(islandBlockPosition), y, getZ(islandBlockPosition)));
+                ShapeDetector.ShapeDetectorCollection shapeDetectorCollection = portalShape.a(this.l,
+                        new net.minecraft.core.BlockPosition(islandBlockPosition.getX(), y, islandBlockPosition.getZ()));
+
                 if (shapeDetectorCollection != null) {
                     if (this.w == null) {
-                        this.w = getPosition(shapeDetectorCollection.a(3, 3, 3));
+                        ShapeDetectorBlock shapeDetectorBlock = new ShapeDetectorBlock(
+                                shapeDetectorCollection.a(3, 3, 3));
+                        this.w = shapeDetectorBlock.getPosition().getHandle();
                     }
 
                     return shapeDetectorCollection;
@@ -374,25 +373,25 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         @Override
         public void a(EntityEnderDragon entityEnderDragon) {
-            if (!getUniqueID(entityEnderDragon).equals(this.u))
+            if (!new Entity(entityEnderDragon).getUniqueID().equals(this.u))
                 return;
 
-            setProgress(this.k, 0.0F);
-            setVisible(this.k, false);
+            bossBattleServer.setProgress(0.0F);
+            bossBattleServer.setVisible(false);
             this.a(true);
 
             if (!gateways.isEmpty()) {
                 int i = gateways.remove(gateways.size() - 1);
-                int j = floor(96.0D * Math.cos(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
-                int k = floor(96.0D * Math.sin(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
+                int j = MathHelper.floor(96.0D * Math.cos(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
+                int k = MathHelper.floor(96.0D * Math.sin(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
                 BlockPosition blockPosition = new BlockPosition(j, 75, k);
-                triggerEffect(this.l, 3000, blockPosition, 0);
-                EndFeatures.c.a(this.l, getChunkProvider(this.l).g(), new Random(), blockPosition);
+                worldServer.triggerEffect(3000, blockPosition, 0);
+                EndFeatures.c.a(this.l, worldServer.getChunkProvider().getGenerator(), new Random(),
+                        blockPosition.getHandle());
             }
 
             if (!previouslyKilled) {
-                setTypeUpdate(this.l, getHighestBlockYAt(this.l, HeightMap.Type.e, islandBlockPosition),
-                        getBlockData(Blocks.er));
+                worldServer.setTypeUpdate(worldServer.getHighestBlockYAt(HeightMap.Type.e, islandBlockPosition), DRAGON_EGG_DATA);
             }
 
             previouslyKilled = true;
@@ -402,26 +401,31 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         @Override
         public void a(boolean flag) {
             WorldGenEndTrophy worldGenEndTrophy = new WorldGenEndTrophy(flag);
+            BlockPosition exitPortalPos = BlockPosition.ofNullable(this.w);
 
-            if (this.w == null) {
-                this.w = down(getHighestBlockYAt(this.l, HeightMap.Type.f, islandBlockPosition));
-                while (getType(this.l, this.w).a(Blocks.z) && getY(this.w) > getSeaLevel(this.l))
-                    this.w = down(this.w);
+            if (exitPortalPos == null) {
+                int seaLevel = this.worldServer.getWorld().getSeaLevel();
+                exitPortalPos = worldServer.getHighestBlockYAt(HeightMap.Type.f, islandBlockPosition).down();
+                while (worldServer.getType(exitPortalPos).isSimilar(Blocks.z) && exitPortalPos.getY() > seaLevel)
+                    exitPortalPos = exitPortalPos.down();
+                this.w = exitPortalPos.getHandle();
             }
 
-            worldGenEndTrophy.a(WorldGenFeatureConfiguration.m).a(this.l, getChunkProvider(this.l).g(),
-                    new Random(), up(this.w, 2));
+            worldGenEndTrophy.a(WorldGenFeatureConfiguration.m).a(this.l,
+                    worldServer.getChunkProvider().getGenerator(), new Random(), exitPortalPos.up(2).getHandle());
         }
 
         @Override
         public void b(EntityEnderDragon entityEnderDragon) {
-            if (!getUniqueID(entityEnderDragon).equals(this.u))
+            Entity entity = new Entity(entityEnderDragon);
+
+            if (!entity.getUniqueID().equals(this.u))
                 return;
 
-            setProgress(this.k, getHealth(entityEnderDragon) / getMaxHealth(entityEnderDragon));
+            bossBattleServer.setProgress(entity.getHealth() / entity.getMaxHealth());
 
-            if (hasCustomName(entityEnderDragon))
-                this.k.a(getScoreboardDisplayName(entityEnderDragon));
+            if (entity.hasCustomName())
+                bossBattleServer.setName(entity.getScoreboardDisplayName());
         }
 
         @Override
@@ -438,9 +442,9 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 a(true);
             } else {
                 countCrystals();
-                Entity entity = getEntity(this.l, this.u);
-                if (entity instanceof EntityEnderDragon)
-                    ((EntityEnderDragon) entity).a(entityEnderCrystal, getChunkCoordinates(entityEnderCrystal), damageSource);
+                Entity entity = worldServer.getEntity(this.u);
+                if (entity != null && entity.getHandle() instanceof EntityEnderDragon)
+                    entity.onCrystalDestroyed(entityEnderCrystal, new Entity(entityEnderCrystal).getChunkCoordinates(), damageSource);
             }
         }
 
@@ -454,7 +458,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             if (!dragonKilled || this.x != null)
                 return;
 
-            crystalsList = this.l.a(EntityEnderCrystal.class, borderArea);
+            crystalsList = worldServer.getEntities(EntityEnderCrystal.class, borderArea);
 
             this.x = EnumDragonRespawn.a;
             respawnTick = 0;
@@ -463,25 +467,26 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         @Override
         public void f() {
-            for (EntityEnderCrystal entityEnderCrystal : this.l.a(EntityEnderCrystal.class, borderArea)) {
-                setInvulnerable(entityEnderCrystal, false);
-                setBeamTarget(entityEnderCrystal, null);
+            for (EntityEnderCrystal entityEnderCrystal : worldServer.getEntities(EntityEnderCrystal.class, borderArea)) {
+                Entity entity = new Entity(entityEnderCrystal);
+                entity.setInvulnerable(false);
+                entity.setBeamTarget(null);
             }
         }
 
         public void removeBattlePlayers() {
-            for (EntityPlayer entityPlayer : getPlayers(this.k))
-                removePlayer(this.k, entityPlayer);
+            for (Entity entity : bossBattleServer.getPlayers())
+                bossBattleServer.removePlayer(entity);
         }
 
         private boolean areChunkTicking() {
             for (int i = -8; i <= 8; ++i) {
                 for (int j = 8; j <= 8; ++j) {
-                    IChunkAccess chunkAccess = getChunkAt(this.l, islandChunkCoord.c + i, islandChunkCoord.d + j,
-                            ChunkStatus.m, false);
+                    ChunkAccess chunkAccess = worldServer.getChunkAt(islandChunkCoord.getX() + i,
+                            islandChunkCoord.getZ() + j, ChunkStatus.m, false);
 
-                    if (!(chunkAccess instanceof Chunk) ||
-                            !isAtLeast(getState((Chunk) chunkAccess), PlayerChunk.State.c)) {
+                    if (chunkAccess == null || !(chunkAccess.getHandle() instanceof Chunk) ||
+                            chunkAccess.getState().ordinal() < PlayerChunk.State.c.ordinal()) {
                         return false;
                     }
                 }
@@ -491,40 +496,42 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         }
 
         private void updateBattlePlayers() {
-            Set<EntityPlayer> nearbyPlayers = new HashSet<>();
+            Set<UUID> nearbyPlayers = new HashSet<>();
 
             for (SuperiorPlayer superiorPlayer : island.getAllPlayersInside()) {
-                Player player = superiorPlayer.asPlayer();
-                assert player != null;
-                if (((CraftWorld) player.getWorld()).getHandle() == this.l) {
-                    EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
-                    addPlayer(this.k, entityPlayer);
-                    nearbyPlayers.add(entityPlayer);
+                Player bukkitPlayer = superiorPlayer.asPlayer();
+                assert bukkitPlayer != null;
+
+                Entity player = new Entity(((CraftPlayer) bukkitPlayer).getHandle());
+
+                if (player.isInWorld(worldServer)) {
+                    bossBattleServer.addPlayer(player);
+                    nearbyPlayers.add(player.getUniqueID());
                 }
             }
 
-            new HashSet<>(getPlayers(this.k)).stream()
-                    .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer))
-                    .forEach(entityPlayer -> removePlayer(this.k, entityPlayer));
+            bossBattleServer.getPlayers().stream()
+                    .filter(entityPlayer -> !nearbyPlayers.contains(entityPlayer.getUniqueID()))
+                    .forEach(bossBattleServer::removePlayer);
         }
 
         private EntityEnderDragon spawnEnderDragon() {
-            EntityEnderDragon entityEnderDragon = new IslandEntityEnderDragon(this.l, islandBlockPosition, this);
-            setControllerPhase(getDragonControllerManager(entityEnderDragon), DragonControllerPhase.a);
-            setPositionRotation(entityEnderDragon, getX(islandBlockPosition), 128, getZ(islandBlockPosition),
-                    this.l.w.nextFloat() * 360.0F, 0.0F);
+            IslandEntityEnderDragon entityEnderDragon = new IslandEntityEnderDragon(worldServer, islandBlockPosition, this);
+            entityEnderDragon.entity.getDragonControllerManager().setControllerPhase(DragonControllerPhase.a);
+            entityEnderDragon.entity.setPositionRotation(islandBlockPosition.getX(), 128,
+                    islandBlockPosition.getZ(), worldServer.getRandom().nextFloat() * 360.0F, 0.0F);
             DRAGON_BATTLE.set(entityEnderDragon, this);
 
-            addEntity(this.l, entityEnderDragon, CreatureSpawnEvent.SpawnReason.NATURAL);
+            worldServer.addEntity(entityEnderDragon.entity, CreatureSpawnEvent.SpawnReason.NATURAL);
 
-            this.u = getUniqueID(entityEnderDragon);
+            this.u = entityEnderDragon.entity.getUniqueID();
             f();
 
             return entityEnderDragon;
         }
 
         private void countCrystals() {
-            this.crystalsCount = this.l.a(EntityEnderCrystal.class, borderArea).size();
+            this.crystalsCount = this.worldServer.getEntities(EntityEnderCrystal.class, borderArea).size();
         }
 
     }
@@ -532,6 +539,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     private static final class IslandDragonControllerDying extends DragonControllerDying {
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entityEnderDragon;
 
         private Vec3D targetBlock;
         private int currentTick;
@@ -539,23 +547,18 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         IslandDragonControllerDying(IslandEntityEnderDragon entityEnderDragon) {
             super(entityEnderDragon);
             this.islandBlockPosition = entityEnderDragon.islandBlockPosition;
+            this.entityEnderDragon = entityEnderDragon.entity;
         }
 
         @Override
         public void b() {
             if (currentTick++ % 10 == 0) {
-                float offsetX = (getRandom(this.a).nextFloat() - 0.5F) * 8.0F;
-                float offsetY = (getRandom(this.a).nextFloat() - 0.5F) * 4.0F;
-                float offsetZ = (getRandom(this.a).nextFloat() - 0.5F) * 8.0F;
-                addParticle(this.a.t,
-                        Particles.x,
-                        locX(this.a) + offsetX,
-                        locY(this.a) + 2.0D + offsetY,
-                        locZ(this.a) + offsetZ,
-                        0.0D,
-                        0.0D,
-                        0.0D
-                );
+                float offsetX = (entityEnderDragon.getRandom().nextFloat() - 0.5F) * 8.0F;
+                float offsetY = (entityEnderDragon.getRandom().nextFloat() - 0.5F) * 4.0F;
+                float offsetZ = (entityEnderDragon.getRandom().nextFloat() - 0.5F) * 8.0F;
+                entityEnderDragon.getWorld().addParticle(Particles.x, entityEnderDragon.locX() + offsetX,
+                        entityEnderDragon.locY() + 2.0D + offsetY, entityEnderDragon.locZ() + offsetZ,
+                        0.0D, 0.0D, 0.0D);
             }
         }
 
@@ -564,14 +567,15 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             currentTick++;
 
             if (targetBlock == null)
-                targetBlock = Vec3D.c(getHighestBlockYAt(this.a.t, HeightMap.Type.e, islandBlockPosition));
+                targetBlock = Vec3D.c(entityEnderDragon.getWorld()
+                        .getHighestBlockYAt(HeightMap.Type.e, islandBlockPosition).getHandle());
 
-            double distance = targetBlock.c(locX(this.a), locY(this.a), locZ(this.a));
+            double distance = targetBlock.c(entityEnderDragon.locX(), entityEnderDragon.locY(), entityEnderDragon.locZ());
 
             if (distance >= 100.0D && distance <= 22500.0D && !a.A && !a.B) {
-                setHealth(this.a, 1.0F);
+                entityEnderDragon.setHealth(1.0F);
             } else {
-                setHealth(this.a, 0.0F);
+                entityEnderDragon.setHealth(0.0F);
             }
 
         }
@@ -591,6 +595,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     private static final class IslandDragonControllerFly extends DragonControllerFly {
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entityEnderDragon;
 
         private PathEntity currentPath;
         private Vec3D targetBlock;
@@ -599,14 +604,16 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         IslandDragonControllerFly(IslandEntityEnderDragon entityEnderDragon) {
             super(entityEnderDragon);
             this.islandBlockPosition = entityEnderDragon.islandBlockPosition;
+            this.entityEnderDragon = entityEnderDragon.entity;
         }
 
         @Override
         public void c() {
             if (!firstTick && currentPath != null) {
-                BlockPosition highestBlock = getHighestBlockYAt(this.a.t, HeightMap.Type.f, islandBlockPosition);
-                if (!highestBlock.a(getPositionVector(this.a), 10.0D)) {
-                    setControllerPhase(getDragonControllerManager(this.a), DragonControllerPhase.a);
+                BlockPosition highestBlock = entityEnderDragon.getWorld().getHighestBlockYAt(
+                        HeightMap.Type.f, islandBlockPosition);
+                if (!highestBlock.closerThan(entityEnderDragon.getPositionVector(), 10.0D)) {
+                    entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.a);
                 }
             } else {
                 firstTick = false;
@@ -631,7 +638,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
             int headClosestNode = a.q(-headLookVector.b * 40.0D, 105.0D, -headLookVector.c * 40.0D);
 
-            if (getEnderDragonBattle(this.a) != null && getEnderDragonBattle(this.a).c() > 0) {
+            if (entityEnderDragon.getEnderDragonBattle() != null &&
+                    entityEnderDragon.getEnderDragonBattle().getCrystalsAlive() > 0) {
                 headClosestNode %= 12;
                 if (headClosestNode < 0) {
                     headClosestNode += 12;
@@ -643,12 +651,12 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             }
 
             if (DRAGON_FIND_PATH.isValid()) {
-                currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode, headClosestNode, null);
+                currentPath = PathEntity.ofNullable(DRAGON_FIND_PATH.invoke(this.a, closestNode, headClosestNode, null));
             } else {
-                currentPath = findPath(this.a, closestNode, headClosestNode, null);
+                currentPath = entityEnderDragon.findPath(closestNode, headClosestNode, null);
             }
 
-            targetBlock = navigateToNextPathNode(currentPath, this.a, targetBlock);
+            targetBlock = navigateToNextPathNode(currentPath, entityEnderDragon, targetBlock);
         }
 
     }
@@ -658,6 +666,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         private static final PathfinderTargetCondition targetCondition = PathfinderTargetCondition.a().a(64.0D);
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entityEnderDragon;
 
         private PathEntity currentPath;
         private Vec3D targetBlock;
@@ -666,11 +675,13 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         IslandDragonControllerHold(IslandEntityEnderDragon entityEnderDragon) {
             super(entityEnderDragon);
             this.islandBlockPosition = entityEnderDragon.islandBlockPosition;
+            this.entityEnderDragon = entityEnderDragon.entity;
         }
 
         @Override
         public void c() {
-            double distance = targetBlock == null ? 0.0D : targetBlock.c(locX(this.a), locY(this.a), locZ(this.a));
+            double distance = targetBlock == null ? 0.0D : targetBlock.c(entityEnderDragon.locX(),
+                    entityEnderDragon.locY(), entityEnderDragon.locZ());
             if (distance < 100.0D || distance > 22500.0D || this.a.A || this.a.B)
                 findNewTarget();
         }
@@ -686,37 +697,42 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         }
 
         @Override
-        public void a(EntityEnderCrystal entityEnderCrystal, BlockPosition blockPosition, DamageSource damageSource,
-                      EntityHuman entityHuman) {
-            if (entityHuman != null && !isInvisible(entityHuman))
+        public void a(EntityEnderCrystal entityEnderCrystal, net.minecraft.core.BlockPosition blockPosition,
+                      DamageSource damageSource, EntityHuman entityHuman) {
+            Entity entity = Entity.ofNullable(entityHuman);
+            if (entity != null && !entity.isInvisible())
                 strafePlayer(entityHuman);
         }
 
         private void findNewTarget() {
-            if (currentPath != null && currentPath.c()) {
-                BlockPosition highestBlock = getHighestBlockYAt(this.a.t, HeightMap.Type.f, islandBlockPosition);
-                int crystalsCount = getEnderDragonBattle(this.a) == null ? 0 : getEnderDragonBattle(this.a).c();
-                if (getRandom(this.a).nextInt(crystalsCount + 3) == 0) {
-                    setControllerPhase(getDragonControllerManager(this.a), DragonControllerPhase.c);
+            if (currentPath != null && currentPath.isDone()) {
+                BlockPosition highestBlock = entityEnderDragon.getWorld().getHighestBlockYAt(HeightMap.Type.f, islandBlockPosition);
+                int crystalsCount = entityEnderDragon.getEnderDragonBattle() == null ? 0 :
+                        entityEnderDragon.getEnderDragonBattle().getCrystalsAlive();
+                if (entityEnderDragon.getRandom().nextInt(crystalsCount + 3) == 0) {
+                    entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.c);
                     return;
                 }
 
                 double distance = 64.0D;
-                EntityHuman closestHuman = this.a.t.a(targetCondition, getX(highestBlock), getY(highestBlock), getZ(highestBlock));
-                if (closestHuman != null)
-                    distance = highestBlock.a(getPositionVector(closestHuman), true) / 512.0D;
+                Entity closestHuman = entityEnderDragon.getWorld().getNearestPlayer(targetCondition,
+                        highestBlock.getX(), highestBlock.getY(), highestBlock.getZ());
 
-                if (closestHuman != null && (getRandom(this.a).nextInt(MathHelper.a((int) distance) + 2) == 0 ||
-                        getRandom(this.a).nextInt(crystalsCount + 2) == 0)) {
-                    strafePlayer(closestHuman);
+                if (closestHuman != null)
+                    distance = highestBlock.distSqr(closestHuman.getPositionVector(), true) / 512.0D;
+
+                if (closestHuman != null && (entityEnderDragon.getRandom()
+                        .nextInt(MathHelper.abs((int) distance) + 2) == 0 ||
+                        entityEnderDragon.getRandom().nextInt(crystalsCount + 2) == 0)) {
+                    strafePlayer((EntityHuman) closestHuman.getHandle());
                     return;
                 }
             }
 
-            if (currentPath == null || currentPath.c()) {
+            if (currentPath == null || currentPath.isDone()) {
                 int closestNode = this.a.q();
                 int closestNode1 = closestNode;
-                if (getRandom(this.a).nextInt(8) == 0) {
+                if (entityEnderDragon.getRandom().nextInt(8) == 0) {
                     clockwise = !clockwise;
                     closestNode1 = closestNode + 6;
                 }
@@ -727,7 +743,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                     --closestNode;
                 }
 
-                if (getEnderDragonBattle(this.a) != null && getEnderDragonBattle(this.a).c() >= 0) {
+                if (entityEnderDragon.getEnderDragonBattle() != null &&
+                        entityEnderDragon.getEnderDragonBattle().getCrystalsAlive() >= 0) {
                     closestNode %= 12;
                     if (closestNode < 0) {
                         closestNode += 12;
@@ -739,22 +756,22 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 }
 
                 if (DRAGON_FIND_PATH.isValid()) {
-                    currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode1, closestNode, null);
+                    currentPath = PathEntity.ofNullable(DRAGON_FIND_PATH.invoke(this.a, closestNode1, closestNode, null));
                 } else {
-                    currentPath = findPath(this.a, closestNode1, closestNode, null);
+                    currentPath = entityEnderDragon.findPath(closestNode1, closestNode, null);
                 }
 
                 if (currentPath != null) {
-                    currentPath.a();
+                    currentPath.advance();
                 }
             }
 
-            targetBlock = navigateToNextPathNode(currentPath, this.a, targetBlock);
+            targetBlock = navigateToNextPathNode(currentPath, entityEnderDragon, targetBlock);
         }
 
         private void strafePlayer(EntityHuman entityHuman) {
-            setControllerPhase(getDragonControllerManager(this.a), DragonControllerPhase.b);
-            getDragonControllerManager(this.a).b(DragonControllerPhase.b).a(entityHuman);
+            entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.b);
+            entityEnderDragon.getDragonControllerManager().getHandle().b(DragonControllerPhase.b).a(entityHuman);
         }
 
     }
@@ -762,12 +779,14 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     private static final class IslandDragonControllerLanding extends DragonControllerLanding {
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entityEnderDragon;
 
         private Vec3D targetBlock;
 
         IslandDragonControllerLanding(IslandEntityEnderDragon entityEnderDragon) {
             super(entityEnderDragon);
             this.islandBlockPosition = entityEnderDragon.islandBlockPosition;
+            this.entityEnderDragon = entityEnderDragon.entity;
         }
 
         @Override
@@ -775,19 +794,23 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             Vec3D vec3D = this.a.y(1.0F).d();
             vec3D.b(-0.7853982F);
 
-            double originLocX = locX(this.a.e);
-            double originLocY = this.a.e.e(0.5D);
-            double originLocZ = locZ(this.a.e);
+            Entity dragonHead = entityEnderDragon.getEntityHeadComplexPart();
 
-            Random random = getRandom(this.a);
+            double originLocX = dragonHead.locX();
+            double originLocY = this.a.e.e(0.5D);
+            double originLocZ = dragonHead.locZ();
+
+            Random random = entityEnderDragon.getRandom();
 
             for (int i = 0; i < 8; i++) {
                 double locX = originLocX + random.nextGaussian() / 2.0D;
                 double locY = originLocY + random.nextGaussian() / 2.0D;
                 double locZ = originLocZ + random.nextGaussian() / 2.0D;
-                Vec3D mot = getMot(this.a);
-                addParticle(this.a.t, Particles.j, locX, locY, locZ, -vec3D.b * 0.07999999821186066D + mot.b,
-                        -vec3D.c * 0.30000001192092896D + mot.c, -vec3D.d * 0.07999999821186066D + mot.d);
+                Vec3D mot = entityEnderDragon.getMot();
+                entityEnderDragon.getWorld().addParticle(Particles.j, locX, locY, locZ,
+                        -vec3D.b * 0.07999999821186066D + mot.b,
+                        -vec3D.c * 0.30000001192092896D + mot.c,
+                        -vec3D.d * 0.07999999821186066D + mot.d);
                 vec3D.b(0.19634955F);
             }
         }
@@ -795,12 +818,13 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         @Override
         public void c() {
             if (targetBlock == null) {
-                targetBlock = Vec3D.c(getHighestBlockYAt(this.a.t, HeightMap.Type.f, islandBlockPosition));
+                targetBlock = Vec3D.c(entityEnderDragon.getWorld().getHighestBlockYAt(HeightMap.Type.f,
+                        islandBlockPosition).getHandle());
             }
 
-            if (targetBlock.c(locX(this.a), locY(this.a), locZ(this.a)) < 1.0D) {
-                getDragonControllerManager(this.a).b(DragonControllerPhase.f).j();
-                setControllerPhase(getDragonControllerManager(this.a), DragonControllerPhase.g);
+            if (targetBlock.c(entityEnderDragon.locX(), entityEnderDragon.locY(), entityEnderDragon.locZ()) < 1.0D) {
+                entityEnderDragon.getDragonControllerManager().getHandle().b(DragonControllerPhase.f).j();
+                entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.g);
             }
 
         }
@@ -813,7 +837,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         @Override
         public float h() {
             // Turning speed
-            float xzSquared = (float) getMot(this.a).h() + 1.0F;
+            float xzSquared = (float) entityEnderDragon.getMot().h() + 1.0F;
             return Math.min(xzSquared, 40.0F) / xzSquared;
         }
 
@@ -833,6 +857,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         private static final PathfinderTargetCondition targetCondition = PathfinderTargetCondition.a().a(128.0D);
 
         private final BlockPosition islandBlockPosition;
+        private final Entity entityEnderDragon;
 
         private PathEntity currentPath;
         private Vec3D targetBlock;
@@ -840,6 +865,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         IslandDragonControllerLandingFly(IslandEntityEnderDragon entityEnderDragon) {
             super(entityEnderDragon);
             this.islandBlockPosition = entityEnderDragon.islandBlockPosition;
+            this.entityEnderDragon = entityEnderDragon.entity;
         }
 
         @Override
@@ -850,7 +876,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         @Override
         public void c() {
-            double distance = targetBlock == null ? 0.0D : targetBlock.c(locX(this.a), locY(this.a), locZ(this.a));
+            double distance = targetBlock == null ? 0.0D :
+                    targetBlock.c(entityEnderDragon.locX(), entityEnderDragon.locY(), entityEnderDragon.locZ());
             if (distance < 100.0D || distance > 22500.0D || this.a.A || this.a.B)
                 findNewTarget();
         }
@@ -860,34 +887,36 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         }
 
         private void findNewTarget() {
-            if (currentPath == null || currentPath.c()) {
+            if (currentPath == null || currentPath.isDone()) {
                 int closestNode = this.a.eO();
-                BlockPosition highestBlock = getHighestBlockYAt(this.a.t, HeightMap.Type.f, islandBlockPosition);
-                EntityHuman closestHuman = this.a.t.a(targetCondition, getX(highestBlock), getY(highestBlock), getZ(highestBlock));
+                BlockPosition highestBlock = entityEnderDragon.getWorld().getHighestBlockYAt(HeightMap.Type.f, islandBlockPosition);
+                Entity closestHuman = entityEnderDragon.getWorld().getNearestPlayer(targetCondition,
+                        highestBlock.getX(), highestBlock.getY(), highestBlock.getZ());
                 int closestNode1;
+
                 if (closestHuman != null) {
-                    Vec3D var4 = (new Vec3D(locX(closestHuman), 0.0D, locZ(closestHuman))).d();
+                    Vec3D var4 = new Vec3D(closestHuman.locX(), 0.0D, closestHuman.locZ()).d();
                     closestNode1 = this.a.q(-var4.b * 40.0D, 105.0D, -var4.c * 40.0D);
                 } else {
-                    closestNode1 = this.a.q(40.0D, getY(highestBlock), 0.0D);
+                    closestNode1 = this.a.q(40.0D, highestBlock.getY(), 0.0D);
                 }
 
-                PathPoint var4 = new PathPoint(getX(highestBlock), getY(highestBlock), getZ(highestBlock));
+                PathPoint pathPoint = new PathPoint(highestBlock.getX(), highestBlock.getY(), highestBlock.getZ());
 
                 if (DRAGON_FIND_PATH.isValid()) {
-                    currentPath = DRAGON_FIND_PATH.invoke(this.a, closestNode, closestNode1, var4);
+                    currentPath = PathEntity.ofNullable(DRAGON_FIND_PATH.invoke(this.a, closestNode, closestNode1, pathPoint.getHandle()));
                 } else {
-                    currentPath = findPath(this.a, closestNode, closestNode1, var4);
+                    currentPath = entityEnderDragon.findPath(closestNode, closestNode1, pathPoint);
                 }
 
                 if (currentPath != null)
-                    currentPath.a();
+                    currentPath.advance();
             }
 
-            targetBlock = navigateToNextPathNode(currentPath, this.a, targetBlock);
+            targetBlock = navigateToNextPathNode(currentPath, entityEnderDragon, targetBlock);
 
-            if (currentPath != null && currentPath.c())
-                setControllerPhase(getDragonControllerManager(this.a), DragonControllerPhase.d);
+            if (currentPath != null && currentPath.isDone())
+                entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.d);
         }
 
     }

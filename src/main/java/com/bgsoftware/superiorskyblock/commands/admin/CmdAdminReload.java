@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public final class CmdAdminReload implements ISuperiorCommand {
         try {
             plugin.reloadPlugin(false);
         } catch (HandlerLoadException error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
 
         Message.RELOAD_COMPLETED.send(sender);

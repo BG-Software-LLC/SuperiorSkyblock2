@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -44,7 +45,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         });
@@ -154,7 +155,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         });

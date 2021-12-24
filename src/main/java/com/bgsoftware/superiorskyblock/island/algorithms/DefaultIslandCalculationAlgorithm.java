@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -65,7 +66,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
         Executor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
-                SuperiorSkyblockPlugin.debug("Action: Chunk Calculation, Island: " + island.getOwner().getName() + ", Chunk: " + calculatedChunk.getPosition());
+                PluginDebugger.debug("Action: Chunk Calculation, Island: " + island.getOwner().getName() + ", Chunk: " + calculatedChunk.getPosition());
 
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->
@@ -75,7 +76,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
                 // Load spawners
                 for (Location location : calculatedChunk.getSpawners()) {
-                    Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(location);
+                    Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(location);
 
                     if (spawnerInfo.getValue() == null) {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
@@ -85,9 +86,12 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     }
                 }
 
+                ChunkPosition chunkPosition = calculatedChunk.getPosition();
+
                 // Load stacked blocks
                 Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
-                        plugin.getProviders().getBlocks(calculatedChunk.getPosition());
+                        plugin.getProviders().getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(),
+                                chunkPosition.getX(), chunkPosition.getZ());
 
                 if (stackedBlocks == null) {
                     chunksToCheck.add(calculatedChunk.getPosition());
@@ -112,7 +116,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     blockCount = pair.getValue();
 
                     if (blockCount <= 0) {
-                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawner(pair.getKey());
+                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(pair.getKey());
 
                         String entityType = spawnerInfo.getValue();
                         if (entityType == null)
@@ -124,13 +128,14 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
                     blockCounts.addCounts(blockKey, blockCount);
                 } catch (Throwable error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
             spawnersToCheck.clear();
 
             for (ChunkPosition chunkPosition : chunksToCheck) {
-                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders().getBlocks(chunkPosition)) {
+                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders()
+                        .getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
                 }
             }

@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -218,7 +219,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
             plugin.setSettings(new SettingsHandler(plugin));
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -227,7 +228,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
             config.load(new File(plugin.getDataFolder(), "config.yml"));
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -333,7 +334,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
                     }
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.handler;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
@@ -33,7 +34,7 @@ public class HandlerLoadException extends Exception {
     }
 
     public static boolean handle(HandlerLoadException ex) {
-        SuperiorSkyblockPlugin.debug(ex);
+        PluginDebugger.debug(ex);
         ex.printStackTrace();
 
         if (ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN) {

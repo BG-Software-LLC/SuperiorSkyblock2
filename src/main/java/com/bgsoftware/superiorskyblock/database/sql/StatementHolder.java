@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,11 +57,11 @@ public final class StatementHolder {
 
             Optional<Object> mutex = SQLHelper.getMutex();
 
-            if(!mutex.isPresent())
+            if (!mutex.isPresent())
                 return;
 
             synchronized (mutex.get()) {
-                SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
+                PluginDebugger.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
 
@@ -105,11 +106,11 @@ public final class StatementHolder {
 
             Optional<Object> mutex = SQLHelper.getMutex();
 
-            if(!mutex.isPresent())
+            if (!mutex.isPresent())
                 return;
 
             synchronized (mutex.get()) {
-                SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
+                PluginDebugger.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.buildStatement(query, preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());

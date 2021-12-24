@@ -62,6 +62,7 @@ import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
@@ -99,8 +100,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static final Pattern LISTENER_REGISTER_FAILURE =
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
+
     private static SuperiorSkyblockPlugin plugin;
     private final Updater updater = new Updater(this, "superiorskyblock2");
+
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this,
@@ -132,6 +135,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler = null;
     private IScriptEngine scriptEngine = NashornEngine.getInstance();
     private WorldEventsManager worldEventsManager = new WorldEventsManagerImpl(this);
+
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -140,10 +144,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSPlayers nmsPlayers;
     private NMSTags nmsTags;
     private NMSWorld nmsWorld;
+
     private ChunkGenerator worldGenerator = null;
+
     private boolean shouldEnable = true;
-    private boolean debugMode = false;
-    private Pattern debugFilter = null;
     private String listenerRegisterFailure = "";
 
     public static void log(String message) {
@@ -153,16 +157,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
         else
             plugin.getLogger().info(message);
-    }
-
-    public static void debug(String message) {
-        //plugin.pluginDebugger.debug(message);
-        if (plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
-            plugin.getLogger().info("[DEBUG] " + message);
-    }
-
-    public static void debug(Throwable error) {
-        //plugin.pluginDebugger.debug(error);
     }
 
     public static SuperiorSkyblockPlugin getPlugin() {
@@ -219,7 +213,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             });
         } catch (Exception ex) {
             ex.printStackTrace();
-            debug(ex);
+            PluginDebugger.debug(ex);
         } finally {
             CalcTask.cancelTask();
             Executor.close();
@@ -263,12 +257,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
             try {
-                providersHandler.prepareWorlds();
+                providersHandler.getWorldsProvider().prepareWorlds();
             } catch (RuntimeException ex) {
                 HandlerLoadException handlerError = new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 shouldEnable = false;
                 handlerError.printStackTrace();
-                debug(handlerError);
+                PluginDebugger.debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -296,7 +290,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         HandlerLoadException.ErrorLevel.CONTINUE);
                 shouldEnable = false;
                 handlerError.printStackTrace();
-                debug(handlerError);
+                PluginDebugger.debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -336,7 +330,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         } catch (Throwable ex) {
             shouldEnable = false;
             ex.printStackTrace();
-            debug(ex);
+            PluginDebugger.debug(ex);
             Bukkit.shutdown();
         }
     }
@@ -383,7 +377,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                     "The plugin doesn't support your minecraft version.\n" +
                             "Please try a different version.",
                     HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-            debug(ex);
+            PluginDebugger.debug(ex);
             return false;
         }
     }
@@ -438,7 +432,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             } catch (Exception ex) {
                 log("An error occurred while loading the generator:");
                 ex.printStackTrace();
-                debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }
@@ -518,7 +512,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void unloadIslandWorlds() {
         for (World world : Bukkit.getWorlds()) {
-            if (providersHandler.isIslandsWorld(world))
+            if (providersHandler.getWorldsProvider().isIslandsWorld(world))
                 Bukkit.unloadWorld(world, true);
         }
     }
@@ -665,21 +659,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public String getFileName() {
         return getFile().getName();
-    }
-
-    public boolean isDebugMode() {
-        return debugMode;
-    }
-
-    public void toggleDebugMode() {
-        debugMode = !debugMode;
-    }
-
-    public void setDebugFilter(String debugFilter) {
-        if (debugFilter.isEmpty())
-            this.debugFilter = null;
-        else
-            this.debugFilter = Pattern.compile(debugFilter.toUpperCase());
     }
 
     private void loadUpgradeCostLoaders() {

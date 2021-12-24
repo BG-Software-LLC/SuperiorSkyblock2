@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import org.bukkit.ChunkSnapshot;
@@ -31,7 +32,7 @@ public final class LocationUtils {
             return new SmartLocation(sections[0], x, y, z, yaw, pitch);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Error while parsing location: " + location);
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             throw ex;
         }
     }

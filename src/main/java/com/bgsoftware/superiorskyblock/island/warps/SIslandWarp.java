@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
@@ -48,7 +49,7 @@ public final class SIslandWarp implements IslandWarp {
     @Override
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Update Warp Name, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Name: " + name);
+        PluginDebugger.debug("Action: Update Warp Name, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Name: " + name);
         String oldName = this.name;
         this.name = name;
         IslandsDatabaseBridge.updateWarpName(getIsland(), this, oldName);
@@ -62,7 +63,7 @@ public final class SIslandWarp implements IslandWarp {
     @Override
     public void setLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " + SBlockPosition.of(location));
+        PluginDebugger.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " + SBlockPosition.of(location));
         this.location = location.clone();
         IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }
@@ -74,7 +75,7 @@ public final class SIslandWarp implements IslandWarp {
 
     @Override
     public void setPrivateFlag(boolean privateFlag) {
-        SuperiorSkyblockPlugin.debug("Action: Update Warp Private, Island: " + getOwnerName() + ", Warp: " + this.name + ", Private: " + privateFlag);
+        PluginDebugger.debug("Action: Update Warp Private, Island: " + getOwnerName() + ", Warp: " + this.name + ", Private: " + privateFlag);
         this.privateFlag = privateFlag;
         IslandsDatabaseBridge.updateWarpPrivateStatus(getIsland(), this);
     }
@@ -95,14 +96,14 @@ public final class SIslandWarp implements IslandWarp {
             return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
         } catch (Exception ex) {
             setIcon(null);
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return null;
         }
     }
 
     @Override
     public void setIcon(ItemStack icon) {
-        SuperiorSkyblockPlugin.debug("Action: Update Warp Icon, Island: " + getOwnerName() + ", Warp: " + this.name);
+        PluginDebugger.debug("Action: Update Warp Icon, Island: " + getOwnerName() + ", Warp: " + this.name);
         this.icon = icon == null ? null : icon.clone();
         IslandsDatabaseBridge.updateWarpIcon(getIsland(), this);
     }

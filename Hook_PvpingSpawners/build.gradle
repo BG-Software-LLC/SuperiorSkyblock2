@@ -1,0 +1,13 @@
+group 'Hook_PvpingSpawners'
+
+dependencies {
+    compileOnly 'skyblock.hassan:PvpingSpawners:latest'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_pvpingspawners') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_pvpingspawners").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

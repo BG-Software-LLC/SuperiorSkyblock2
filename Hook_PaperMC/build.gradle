@@ -1,0 +1,13 @@
+group 'Hook_PaperMC'
+
+dependencies {
+    compileOnly 'com.songoda:EpicSpawners-7:latest'
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_papermc') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_papermc").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

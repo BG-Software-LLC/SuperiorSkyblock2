@@ -61,7 +61,7 @@ public final class IslandUtils {
         Map<World, List<ChunkPosition>> chunkCoords = new HashMap<>();
 
         {
-            if (plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+            if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
                 List<ChunkPosition> chunkPositions = getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks);
                 if (!chunkPositions.isEmpty())
@@ -69,14 +69,14 @@ public final class IslandUtils {
             }
         }
 
-        if (plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
+        if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             List<ChunkPosition> chunkPositions = getChunkCoords(island, netherWorld, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
                 chunkCoords.put(netherWorld, chunkPositions);
         }
 
-        if (plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
+        if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             List<ChunkPosition> chunkPositions = getChunkCoords(island, endWorld, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
@@ -109,18 +109,18 @@ public final class IslandUtils {
         List<CompletableFuture<Chunk>> chunkCoords = new ArrayList<>();
 
         {
-            if (plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+            if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
                 chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
             }
         }
 
-        if (plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
+        if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }
 
-        if (plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
+        if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }

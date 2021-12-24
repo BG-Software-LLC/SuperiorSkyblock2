@@ -16,7 +16,7 @@ public final class VaultUpgradeCost extends UpgradeCostAbstract {
 
     @Override
     public boolean hasEnoughBalance(SuperiorPlayer superiorPlayer) {
-        return plugin.getProviders().getBalance(superiorPlayer).compareTo(cost) >= 0;
+        return plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer).compareTo(cost) >= 0;
     }
 
     @Override

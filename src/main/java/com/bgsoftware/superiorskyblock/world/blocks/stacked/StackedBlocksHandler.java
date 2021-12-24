@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.StackedBlocksContainer;
@@ -97,7 +98,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
         Preconditions.checkNotNull(blockKey, "blockKey parameter cannot be null.");
 
-        SuperiorSkyblockPlugin.debug("Action: Set Block Amount, Block: " + blockKey + ", Amount: " + amount);
+        PluginDebugger.debug("Action: Set Block Amount, Block: " + blockKey + ", Amount: " + amount);
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location);
 

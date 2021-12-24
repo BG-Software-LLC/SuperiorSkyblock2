@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
@@ -96,7 +97,7 @@ public final class BlockData {
                     if (items != null)
                         clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }

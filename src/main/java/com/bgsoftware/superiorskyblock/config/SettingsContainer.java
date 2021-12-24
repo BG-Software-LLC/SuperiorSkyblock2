@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -256,7 +257,7 @@ public final class SettingsContainer {
                 else if (sections.length == 3)
                     stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
@@ -346,7 +347,7 @@ public final class SettingsContainer {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase());
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
                 } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         } else {
@@ -392,12 +393,12 @@ public final class SettingsContainer {
 
                             items.addTag(itemCompound);
                         } catch (Exception ex) {
-                            SuperiorSkyblockPlugin.debug(ex);
+                            PluginDebugger.debug(ex);
                         }
                     }
                 } catch (IllegalArgumentException ex) {
                     SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         }

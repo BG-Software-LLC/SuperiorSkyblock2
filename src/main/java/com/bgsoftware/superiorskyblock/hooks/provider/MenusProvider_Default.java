@@ -51,6 +51,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpIconEdit;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,7 +71,7 @@ public final class MenusProvider_Default implements MenusProvider {
         } catch (Exception ex) {
             HandlerLoadException handlerError = new HandlerLoadException(ex, HandlerLoadException.ErrorLevel.CONTINUE);
             handlerError.printStackTrace();
-            SuperiorSkyblockPlugin.debug(handlerError);
+            PluginDebugger.debug(handlerError);
         }
     }
 

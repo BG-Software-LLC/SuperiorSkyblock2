@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.config.section.VoidTeleportSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -64,7 +65,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
                     "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
         this.container = new SettingsContainer(plugin, cfg);
@@ -633,7 +634,7 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
             commentedConfig.save(file);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
 

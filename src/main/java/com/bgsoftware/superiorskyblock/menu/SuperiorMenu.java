@@ -1,14 +1,12 @@
 package com.bgsoftware.superiorskyblock.menu;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
@@ -102,7 +100,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
                     callback.accept(player, superiorMenu);
                 }
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
     }
@@ -281,7 +279,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Open Menu, Target: " + inventoryViewer.getName() + ", Menu: " + getClass().getName());
+        PluginDebugger.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
 
         if (menuPattern == null) {
             if (!(this instanceof SuperiorMenuBlank))
@@ -299,7 +297,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
                 SuperiorMenuBlank.openInventory(inventoryViewer, previousMenu);
             }
 
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             ex.printStackTrace();
             return;
         }

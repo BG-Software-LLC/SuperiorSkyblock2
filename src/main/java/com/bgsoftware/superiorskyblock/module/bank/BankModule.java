@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdWithdraw;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
@@ -59,7 +60,7 @@ public final class BankModule extends BuiltinModule {
                 config.save(configFile);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }

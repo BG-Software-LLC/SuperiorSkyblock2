@@ -4,6 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -754,7 +755,7 @@ public enum Message {
                 fileLocale = PlayerLocales.getLocale(fileName);
             } catch (IllegalArgumentException ex) {
                 SuperiorSkyblockPlugin.log("&cThe language \"" + fileName + "\" is invalid. Please correct the file name.");
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 continue;
             }
 
@@ -769,7 +770,7 @@ public enum Message {
             try {
                 cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 ex.printStackTrace();
             }
 

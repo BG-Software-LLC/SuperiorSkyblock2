@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -126,7 +127,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
             SuperiorSkyblockPlugin.log("&cAn error occurred while enabling the module " + pluginModule.getName() + ":");
             ex.printStackTrace();
             SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
 
             // Calling onDisable so the plugin can unregister its data if needed
             pluginModule.onDisable(plugin);
@@ -152,7 +153,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
                         HandlerLoadException handlerError = new HandlerLoadException(ex, "Couldn't register module " + file.getName() + ".",
                                 HandlerLoadException.ErrorLevel.CONTINUE);
                         handlerError.printStackTrace();
-                        SuperiorSkyblockPlugin.debug(handlerError);
+                        PluginDebugger.debug(handlerError);
                     }
                 }
             }

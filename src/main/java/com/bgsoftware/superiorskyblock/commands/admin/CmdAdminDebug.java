@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -53,23 +54,23 @@ public final class CmdAdminDebug implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if (plugin.isDebugMode() && args.length == 2) {
+        if (PluginDebugger.isDebugMode() && args.length == 2) {
             Message.DEBUG_MODE_DISABLED.send(sender);
-            plugin.toggleDebugMode();
-            plugin.setDebugFilter("");
+            PluginDebugger.toggleDebugMode();
+            PluginDebugger.setDebugFilter("");
             return;
         }
 
-        if (!plugin.isDebugMode()) {
+        if (!PluginDebugger.isDebugMode()) {
             Message.DEBUG_MODE_ENABLED.send(sender);
-            plugin.toggleDebugMode();
+            PluginDebugger.toggleDebugMode();
         }
 
         if (args.length > 2) {
             StringBuilder debugFilter = new StringBuilder();
             for (int i = 2; i < args.length; i++)
                 debugFilter.append(" ").append(args[i]);
-            plugin.setDebugFilter(debugFilter.length() == 0 ? "" : debugFilter.substring(1));
+            PluginDebugger.setDebugFilter(debugFilter.length() == 0 ? "" : debugFilter.substring(1));
             Message.DEBUG_MODE_FILTER.send(sender);
         }
     }

@@ -1,14 +1,15 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks;
 
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.entity.TileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.chunk.ChunkAccess;
 import com.google.common.base.Preconditions;
-import net.minecraft.core.BlockPosition;
 import net.minecraft.server.level.RegionLimitedWorldAccess;
-import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.BiomeBase;
-import net.minecraft.world.level.block.ITileEntity;
-import net.minecraft.world.level.block.entity.TileEntity;
-import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import org.bukkit.block.Biome;
@@ -19,36 +20,38 @@ import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
 
-import static com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSMappings.*;
-
 public final class IslandsChunkGenerator extends CustomChunkGenerator {
 
     private final Random random = new Random();
     private final WorldServer worldServer;
 
     public IslandsChunkGenerator(WorldServer worldServer) {
-        super(worldServer, getChunkProvider(worldServer).g(), worldServer.generator);
+        super(worldServer.getHandle(), worldServer.getChunkProvider().getGenerator(), worldServer.getBukkitGenerator());
         this.worldServer = worldServer;
     }
 
     @Override
-    public void a(RegionLimitedWorldAccess region, StructureManager structureManager, IChunkAccess chunk) {
-        int chunkX = getPos(chunk).c;
-        int chunkZ = getPos(chunk).d;
+    public void a(RegionLimitedWorldAccess region, StructureManager structureManager, IChunkAccess nmsChunkAccess) {
+        ChunkAccess chunk = new ChunkAccess(nmsChunkAccess);
+
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+        int chunkX = chunkCoords.getX();
+        int chunkZ = chunkCoords.getZ();
 
         this.random.setSeed(chunkX * 341873128712L + chunkZ * 132897987541L);
 
         IslandsBiomeGrid biomeGrid = new IslandsBiomeGrid(worldServer, chunk);
 
+        ChunkGenerator chunkGenerator = worldServer.getBukkitGenerator();
         ChunkGenerator.ChunkData data;
         //noinspection deprecation
-        if (worldServer.generator.isParallelCapable()) {
+        if (chunkGenerator.isParallelCapable()) {
             //noinspection deprecation
-            data = worldServer.generator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
+            data = chunkGenerator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
         } else {
             synchronized (this) {
                 //noinspection deprecation
-                data = worldServer.generator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
+                data = chunkGenerator.generateChunkData(worldServer.getWorld(), this.random, chunkX, chunkZ, biomeGrid);
             }
         }
 
@@ -57,10 +60,10 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
 
         assert data instanceof CraftChunkData;
 
-        IChunkAccess chunkAccess = ((CraftChunkData) data).getHandle();
+        ChunkAccess chunkAccess = new ChunkAccess(((CraftChunkData) data).getHandle());
 
-        ChunkSection[] chunkDataSections = getSections(chunkAccess);
-        ChunkSection[] chunkSections = getSections(chunk);
+        net.minecraft.world.level.chunk.ChunkSection[] chunkDataSections = chunkAccess.getSections();
+        ChunkSection[] chunkSections = chunk.getSections();
         int chunkSectionsLength = Math.min(chunkSections.length, chunkDataSections.length);
 
         for (int i = 0; i < chunkSectionsLength; i++) {
@@ -68,21 +71,21 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
                 chunkSections[i] = chunkDataSections[i];
         }
 
-        for (BlockPosition tilePosition : getTileEntities(chunkAccess).keySet()) {
-            int tileX = getX(tilePosition), tileY = getY(tilePosition), tileZ = getZ(tilePosition);
-            IBlockData tileBlock = ((CraftChunkData) data).getTypeId(tileX, tileY, tileZ);
-            if (isTileEntity(tileBlock)) {
+        for (BlockPosition tilePosition : chunkAccess.getTileEntities().keySet()) {
+            int tileX = tilePosition.getX(), tileY = tilePosition.getY(), tileZ = tilePosition.getZ();
+            BlockData tileBlock = new BlockData(((CraftChunkData) data).getTypeId(tileX, tileY, tileZ));
+            if (tileBlock.isTileEntity()) {
                 BlockPosition worldTilePosition = new BlockPosition((chunkX << 4) + tileX, tileY, (chunkZ << 4) + tileZ);
-                TileEntity tile = createTile(((ITileEntity) getBlock(tileBlock)), worldTilePosition, tileBlock);
+                TileEntity tile = tileBlock.getBlock().createTile(worldTilePosition, tileBlock);
                 if (tile != null)
-                    setTileEntity(chunk, tile);
+                    chunk.setTileEntity(tile);
             }
         }
     }
 
     @SuppressWarnings({"NullableProblems", "deprecation"})
     private record IslandsBiomeGrid(WorldServer worldServer,
-                                    IChunkAccess chunkAccess) implements ChunkGenerator.BiomeGrid {
+                                    ChunkAccess chunkAccess) implements ChunkGenerator.BiomeGrid {
 
         @Override
         public Biome getBiome(int x, int z) {
@@ -91,13 +94,15 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
 
         @Override
         public Biome getBiome(int x, int y, int z) {
-            return CraftBlock.biomeBaseToBiome(chunkAccess.biomeRegistry, chunkAccess.getNoiseBiome(x, y, z));
+            return CraftBlock.biomeBaseToBiome(chunkAccess.getBiomeRegistry(), chunkAccess.getNoiseBiome(x, y, z));
         }
 
         @Override
         public void setBiome(int x, int z, Biome biome) {
-            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(chunkAccess.biomeRegistry, biome);
-            for (int y = getMinBuildHeight(worldServer); y < getMaxBuildHeight(worldServer); y++) {
+            BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(chunkAccess.getBiomeRegistry(), biome);
+            int minBuildHeight = worldServer.getWorld().getMinHeight();
+            int maxBuildHeight = worldServer.getWorld().getMaxHeight();
+            for (int y = minBuildHeight; y < maxBuildHeight; ++y) {
                 chunkAccess.setBiome(x, y, z, biomeBase);
             }
         }
@@ -105,7 +110,7 @@ public final class IslandsChunkGenerator extends CustomChunkGenerator {
         @Override
         public void setBiome(int x, int y, int z, Biome biome) {
             Preconditions.checkArgument(biome != Biome.CUSTOM, "Cannot set the biome to %s", biome);
-            chunkAccess.setBiome(x, y, z, CraftBlock.biomeToBiomeBase(chunkAccess.biomeRegistry, biome));
+            chunkAccess.setBiome(x, y, z, CraftBlock.biomeToBiomeBase(chunkAccess.getBiomeRegistry(), biome));
         }
 
     }

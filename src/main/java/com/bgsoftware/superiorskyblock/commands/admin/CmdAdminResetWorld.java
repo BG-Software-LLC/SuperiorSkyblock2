@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.World;
@@ -80,7 +81,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             try {
                 world = island.getCenter(environment).getWorld();
             } catch (NullPointerException ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 return;
             }
 
@@ -118,15 +119,15 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
                 switch (environment) {
                     case NORMAL:
-                        if (plugin.getProviders().isNormalEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isNormalEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                     case NETHER:
-                        if (plugin.getProviders().isNetherEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isNetherEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                     case THE_END:
-                        if (plugin.getProviders().isEndEnabled())
+                        if (plugin.getProviders().getWorldsProvider().isEndEnabled())
                             environments.add(environment.name().toLowerCase());
                         break;
                 }

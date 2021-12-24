@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.engine;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -35,7 +36,7 @@ public final class NashornEngineDownloader {
             return true;
         } catch (Exception error) {
             SuperiorSkyblockPlugin.log("&cFailed to download the nashorn engine.");
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
             return false;
         }
     }

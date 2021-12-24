@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -111,7 +112,7 @@ public final class Executor {
             shutdownAndAwaitTermination();
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 

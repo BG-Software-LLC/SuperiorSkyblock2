@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -86,7 +87,7 @@ public final class GeneratorsListener implements Listener {
 
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
 
-        SuperiorSkyblockPlugin.debug("Action: Generate Block, Island: " + island.getOwner().getName() + ", Block: " + typeSections[0] + ":" + blockData);
+        PluginDebugger.debug("Action: Generate Block, Island: " + island.getOwner().getName() + ", Block: " + typeSections[0] + ":" + blockData);
 
         plugin.getNMSWorld().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
 

@@ -50,6 +50,8 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public final class UpgradesListener implements Listener {
 
+    public static UpgradesListener IMP;
+
     private final Set<UUID> alreadySet = new HashSet<>();
     private final Set<UUID> noRightClickTwice = new HashSet<>();
     private final SuperiorSkyblockPlugin plugin;
@@ -63,10 +65,7 @@ public final class UpgradesListener implements Listener {
 
     public UpgradesListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        Executor.sync(() -> {
-            if (Bukkit.getPluginManager().isPluginEnabled("WildStacker"))
-                Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
-        }, 1L);
+        IMP = this;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -78,7 +77,7 @@ public final class UpgradesListener implements Listener {
      *   MOB DROPS
      */
 
-    private void handleSpawnerSpawn(CreatureSpawner spawner) {
+    public void handleSpawnerSpawn(CreatureSpawner spawner) {
         if (spawner == null || spawner.getLocation() == null)
             return;
 
@@ -429,15 +428,6 @@ public final class UpgradesListener implements Listener {
         }
 
         throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
-    }
-
-    private class WildStackerListener implements Listener {
-
-        @EventHandler
-        public void onWildStackerStackSpawn(com.bgsoftware.wildstacker.api.events.SpawnerStackedEntitySpawnEvent e) {
-            handleSpawnerSpawn(e.getSpawner());
-        }
-
     }
 
 }

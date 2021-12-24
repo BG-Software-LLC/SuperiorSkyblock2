@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.hooks.support.SWMHook;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
@@ -82,8 +81,8 @@ public final class SpawnIsland implements Island {
         islandSize = plugin.getSettings().getSpawn().getSize();
         islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
-        if (center.getWorld() == null)
-            SWMHook.tryWorldLoad(spawnLocation.split(",")[0]);
+        if(center.getWorld() == null)
+            plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);
 
         if (center.getWorld() == null) {
             new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();

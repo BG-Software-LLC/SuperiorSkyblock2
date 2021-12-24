@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
@@ -174,7 +175,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setTextureValue(@Nonnull String textureValue) {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
+        PluginDebugger.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
         this.textureValue = textureValue;
         PlayersDatabaseBridge.saveTextureValue(this);
     }
@@ -183,7 +184,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public void updateLastTimeStatus() {
         lastTimeStatus = System.currentTimeMillis() / 1000;
 
-        SuperiorSkyblockPlugin.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
+        PluginDebugger.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
 
         PlayersDatabaseBridge.saveLastTimeStatus(this);
     }
@@ -240,7 +241,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean isVanished() {
         Player player = asPlayer();
-        return player != null && plugin.getProviders().isVanished(player);
+        return player != null && plugin.getProviders().getVanishProvider().isVanished(player);
     }
 
     @Override
@@ -260,7 +261,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     public boolean hasPermissionWithoutOP(String permission) {
         Preconditions.checkNotNull(permission, "permission parameter cannot be null.");
         Player player = asPlayer();
-        return player != null && plugin.getProviders().hasPermission(player, permission);
+        return player != null && plugin.getProviders().getPermissionsProvider().hasPermission(player, permission);
     }
 
     @Override
@@ -349,7 +350,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Block islandTeleportBlock = islandTeleportLocation.getBlock();
 
         if (island instanceof SpawnIsland) {
-            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
+            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
             teleport(islandTeleportLocation.add(0, 0.5, 0));
             if (result != null)
                 result.accept(true);
@@ -413,7 +414,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                             chunkSnapshot = chunkToLoad.get();
                         } catch (Exception ex) {
                             SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                            SuperiorSkyblockPlugin.debug(ex);
+                            PluginDebugger.debug(ex);
                             continue;
                         }
 
@@ -492,7 +493,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setIsland(Island island) {
-        SuperiorSkyblockPlugin.debug("Action: Change Island, Player: " + getName() + ", New Island: " +
+        PluginDebugger.debug("Action: Change Island, Player: " + getName() + ", New Island: " +
                 (island == null ? "None" : island.getUniqueId().toString()));
         this.playerIsland = island;
     }
@@ -513,7 +514,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
+        PluginDebugger.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
         Island island = getIsland();
         if (island != null && island.getOwner() != this)
@@ -527,7 +528,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        SuperiorSkyblockPlugin.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
+        PluginDebugger.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
         this.disbands = Math.max(disbands, 0);
         PlayersDatabaseBridge.saveDisbands(this);
     }
@@ -553,7 +554,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(userLocale, "userLocale parameter cannot be null.");
         Preconditions.checkArgument(PlayerLocales.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
-        SuperiorSkyblockPlugin.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
+        PluginDebugger.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
 
         this.userLocale = userLocale;
 
@@ -568,7 +569,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleWorldBorder() {
         worldBorderEnabled = !worldBorderEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
+        PluginDebugger.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
         PlayersDatabaseBridge.saveToggledBorder(this);
     }
 
@@ -585,7 +586,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleBlocksStacker() {
         blocksStackerEnabled = !blocksStackerEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + blocksStackerEnabled);
+        PluginDebugger.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + blocksStackerEnabled);
     }
 
     @Override
@@ -596,7 +597,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleSchematicMode() {
         schematicModeEnabled = !schematicModeEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + schematicModeEnabled);
+        PluginDebugger.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + schematicModeEnabled);
     }
 
     @Override
@@ -607,7 +608,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleTeamChat() {
         teamChatEnabled = !teamChatEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
+        PluginDebugger.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
     }
 
     @Override
@@ -623,7 +624,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleBypassMode() {
         bypassModeEnabled = !bypassModeEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
+        PluginDebugger.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
     }
 
     @Override
@@ -634,7 +635,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
+        PluginDebugger.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
         PlayersDatabaseBridge.saveToggledPanel(this);
     }
 
@@ -656,7 +657,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleIslandFly() {
         islandFly = !islandFly;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
+        PluginDebugger.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
         PlayersDatabaseBridge.saveIslandFly(this);
     }
 
@@ -668,7 +669,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void toggleAdminSpy() {
         adminSpyEnabled = !adminSpyEnabled;
-        SuperiorSkyblockPlugin.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + adminSpyEnabled);
+        PluginDebugger.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + adminSpyEnabled);
     }
 
     @Override
@@ -679,7 +680,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setBorderColor(BorderColor borderColor) {
         Preconditions.checkNotNull(borderColor, "borderColor parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
+        PluginDebugger.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
         this.borderColor = borderColor;
         PlayersDatabaseBridge.saveBorderColor(this);
     }
@@ -696,7 +697,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setSchematicPos1(Block block) {
         this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
-        SuperiorSkyblockPlugin.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
+        PluginDebugger.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
     }
 
     @Override
@@ -707,7 +708,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setSchematicPos2(Block block) {
         this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
-        SuperiorSkyblockPlugin.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
+        PluginDebugger.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
     }
 
     /*
@@ -721,7 +722,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPvP(boolean immunedToPvP) {
-        SuperiorSkyblockPlugin.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
+        PluginDebugger.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
         this.immuneToPvP = immunedToPvP;
     }
 
@@ -732,7 +733,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setLeavingFlag(boolean leavingFlag) {
-        SuperiorSkyblockPlugin.debug("Action: Set Leaving Flag, Player: " + getName() + ", Flag: " + leavingFlag);
+        PluginDebugger.debug("Action: Set Leaving Flag, Player: " + getName() + ", Flag: " + leavingFlag);
         this.leavingFlag = leavingFlag;
     }
 
@@ -759,7 +760,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPortals(boolean immuneToTeleport) {
-        SuperiorSkyblockPlugin.debug("Action: Set Portals Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
+        PluginDebugger.debug("Action: Set Portals Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
         this.immuneToPortals = immuneToTeleport;
     }
 
@@ -807,7 +808,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         location.setYaw(yaw);
         location.setPitch(pitch);
 
-        SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
+        PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
 
         island.setTeleportLocation(location);
         teleport(location.add(0, 0.5, 0));
@@ -818,7 +819,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
+        PluginDebugger.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
         int finishCount = completedMissions.getOrDefault(mission, 0) + 1;
         completedMissions.put(mission, finishCount);
         PlayersDatabaseBridge.saveMission(this, mission, finishCount);
@@ -827,7 +828,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
+        PluginDebugger.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
 
         int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
 
@@ -914,7 +915,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 island.setTeleportLocation(toTeleport);
             }
 
-            SuperiorSkyblockPlugin.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
+            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
             teleport(toTeleport.add(0, 0.5, 0));
 
             if (teleportResult != null)

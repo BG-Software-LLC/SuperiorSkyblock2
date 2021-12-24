@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -199,7 +200,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
                         } catch (Exception error) {
-                            SuperiorSkyblockPlugin.debug(error);
+                            PluginDebugger.debug(error);
                         }
                     }
                 }
@@ -219,7 +220,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                     tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
                     tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }
@@ -297,7 +298,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         try {
-            SuperiorSkyblockPlugin.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
+            PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
 
             Location min = location.clone().subtract(offsets[0], offsets[1], offsets[2]);
 

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.values.container;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -32,7 +33,7 @@ public final class BlockWorthValuesContainer extends BlockValuesContainer {
                 setBlockValue(Key.of(key), new BigDecimal(value));
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("&cInvalid worth value: " + value);
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }

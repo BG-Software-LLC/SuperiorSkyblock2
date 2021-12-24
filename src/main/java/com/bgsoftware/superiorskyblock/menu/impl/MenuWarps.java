@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -73,12 +74,14 @@ public final class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
 
     public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {
         if (!superiorPlayer.hasBypassModeEnabled() && plugin.getSettings().getChargeOnWarp() > 0) {
-            if (plugin.getProviders().getBalance(superiorPlayer).compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
+            if (plugin.getProviders().getEconomyProvider().getBalance(superiorPlayer)
+                    .compareTo(BigDecimal.valueOf(plugin.getSettings().getChargeOnWarp())) < 0) {
                 Message.NOT_ENOUGH_MONEY_TO_WARP.send(superiorPlayer);
                 return;
             }
 
-            plugin.getProviders().withdrawMoney(superiorPlayer, plugin.getSettings().getChargeOnWarp());
+            plugin.getProviders().getEconomyProvider().withdrawMoney(superiorPlayer,
+                    plugin.getSettings().getChargeOnWarp());
         }
 
         Executor.sync(() -> {

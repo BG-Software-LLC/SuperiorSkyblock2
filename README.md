@@ -12,9 +12,17 @@
 ## Compiling
 
 You can compile the project using gradlew.<br>
-Run `gradlew shadowJar build` in console to build the project.<br>
+Run `gradlew build` in console to build the project.<br>
 You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/) hub!<br>
-You must add yourself all the private jars or purchase access to our private repository.
+
+When compiling you will receive errors about missing dependencies.<br>
+These dependencies are premium plugins that cannot be published on a public repository.<br>
+You can do either of the followings in order to solve it:
+- Add manually all the jar files of the premium plugins.
+- Purchase access to our private repository. 
+- Disabling compiling of the modules of these dependencies in the `gradle.properties` file.
+
+<br>
 
 ##### Private Jars:
 

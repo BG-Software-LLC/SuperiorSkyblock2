@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
@@ -166,7 +167,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
             } catch (ScriptException ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 return false;
             }
         });
@@ -204,7 +205,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
+        PluginDebugger.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
 
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();
@@ -309,7 +310,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -325,7 +326,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             data.save(file);
         } catch (IOException ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -347,7 +348,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -416,7 +417,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
             HandlerLoadException handlerError = new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".",
                     HandlerLoadException.ErrorLevel.CONTINUE);
-            SuperiorSkyblockPlugin.debug(handlerError);
+            PluginDebugger.debug(handlerError);
             handlerError.printStackTrace();
         }
 

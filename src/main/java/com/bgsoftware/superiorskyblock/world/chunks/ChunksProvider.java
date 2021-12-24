@@ -4,6 +4,7 @@ import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Chunk;
 
 import java.util.HashSet;
@@ -27,7 +28,7 @@ public final class ChunksProvider {
     }
 
     public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> onLoadConsumer) {
-        SuperiorSkyblockPlugin.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString());
+        PluginDebugger.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString());
 
         Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);
 
@@ -71,12 +72,12 @@ public final class ChunksProvider {
 
         @Override
         public void work() {
-            SuperiorSkyblockPlugin.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
-            plugin.getProviders().loadChunk(chunkPosition, this::finishLoad);
+            PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
+            plugin.getProviders().getAsyncProvider().loadChunk(chunkPosition, this::finishLoad);
         }
 
         private void finishLoad(Chunk chunk) {
-            SuperiorSkyblockPlugin.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString());
+            PluginDebugger.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString());
 
             Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.remove(chunkPosition);
 

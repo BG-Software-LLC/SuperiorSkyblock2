@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
@@ -16,6 +15,7 @@ import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
@@ -140,11 +140,8 @@ public final class PlayersListener implements Listener {
 
         Executor.sync(() -> {
             if (e.getPlayer().isOnline()) {
-                if (SkinsRestorerHook.isEnabled()) {
-                    SkinsRestorerHook.setSkinTexture(superiorPlayer);
-                } else {
+                if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
                     plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
-                }
             }
         }, 5L);
 
@@ -415,7 +412,7 @@ public final class PlayersListener implements Listener {
                 !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
             return;
 
-        SuperiorSkyblockPlugin.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
+        PluginDebugger.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         superiorPlayer.teleport(island, result -> {

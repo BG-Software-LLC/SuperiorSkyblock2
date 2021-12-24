@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -72,11 +73,11 @@ public final class SIslandBank implements IslandBank {
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
         } else {
-            SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + amount);
+            PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + amount);
 
             EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
 
-            BigDecimal playerBalance = plugin.getProviders().getBalanceForBanks(superiorPlayer);
+            BigDecimal playerBalance = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
 
             if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";
@@ -113,7 +114,7 @@ public final class SIslandBank implements IslandBank {
     public BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
+        PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
@@ -147,7 +148,7 @@ public final class SIslandBank implements IslandBank {
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
         } else {
-            SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
+            PluginDebugger.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
 
             EventsCaller.callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
@@ -188,7 +189,7 @@ public final class SIslandBank implements IslandBank {
     public BankTransaction withdrawAdminMoney(CommandSender commandSender, BigDecimal amount) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        SuperiorSkyblockPlugin.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
+        PluginDebugger.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
