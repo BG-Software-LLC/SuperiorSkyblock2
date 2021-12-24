@@ -1,5 +1,38 @@
+plugins {
+    id 'maven-publish'
+}
+
 group 'API'
 
 dependencies {
     compileOnly "org.spigotmc:v1_8_R1:latest"
+}
+
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.bgsoftware'
+            artifactId = 'SuperiorSkyblockAPI'
+            version = System.getenv("BUILD_NUMBER") == null ? parent.version : parent.version + "." + System.getenv("BUILD_NUMBER")
+
+            from components.java
+        }
+    }
+
+    repositories {
+        String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
+        String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
+
+        if (mavenUsername != null && mavenPassword != null) {
+            maven {
+                url 'https://repo.bg-software.com/repository/api/'
+                credentials {
+                    username mavenUsername
+                    password mavenPassword
+                }
+            }
+        }
+    }
+
 }
