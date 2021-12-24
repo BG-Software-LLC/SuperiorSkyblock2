@@ -46,6 +46,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -523,7 +524,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
     }
 
-    private static <T> Optional<T> createInstance(String className) {
+    private <T> Optional<T> createInstance(String className) {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.provider." + className);
             try {
@@ -532,8 +533,15 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                     return Optional.empty();
             } catch (Exception ignored) {
             }
-            // noinspection unchecked
-            return Optional.of((T) clazz.newInstance());
+
+            try {
+                Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class);
+                // noinspection unchecked
+                return Optional.of((T) constructor.newInstance(plugin));
+            } catch (Exception error) {
+                // noinspection unchecked
+                return Optional.of((T) clazz.newInstance());
+            }
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Exception error) {
