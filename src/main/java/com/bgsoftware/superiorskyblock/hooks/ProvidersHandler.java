@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Vault;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
@@ -486,13 +485,15 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
     private void registerEconomyProviders() {
         if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
-            boolean alreadyCheckedForVault = false;
-            if (economyProvider instanceof EconomyProvider_Default && EconomyProvider_Vault.isCompatible()) {
-                setEconomyProvider(new EconomyProvider_Vault());
-                alreadyCheckedForVault = true;
-            }
-            if (bankEconomyProvider instanceof EconomyProvider_Default && (alreadyCheckedForVault || EconomyProvider_Vault.isCompatible())) {
-                setBankEconomyProvider(economyProvider);
+            if (this.economyProvider instanceof EconomyProvider_Default ||
+                    this.bankEconomyProvider instanceof EconomyProvider_Default) {
+                Optional<EconomyProvider> economyProviderOptional = createInstance("EconomyProvider_Vault");
+                economyProviderOptional.ifPresent(economyProvider -> {
+                    if (this.economyProvider instanceof EconomyProvider_Default)
+                        setEconomyProvider(economyProvider);
+                    if (this.bankEconomyProvider instanceof EconomyProvider_Default)
+                        setBankEconomyProvider(economyProvider);
+                });
             }
         }
     }
