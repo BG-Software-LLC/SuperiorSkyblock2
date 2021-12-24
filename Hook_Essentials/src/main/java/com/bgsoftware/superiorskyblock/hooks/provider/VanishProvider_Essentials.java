@@ -13,14 +13,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class VanishProvider_Essentials implements VanishProvider, Listener {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static boolean alreadyEnabled = false;
 
     private final Essentials instance;
-    private final SuperiorSkyblockPlugin plugin;
 
-    public VanishProvider_Essentials(SuperiorSkyblockPlugin plugin) {
+    public VanishProvider_Essentials() {
         instance = JavaPlugin.getPlugin(Essentials.class);
-        this.plugin = plugin;
 
         if (!alreadyEnabled) {
             alreadyEnabled = true;
