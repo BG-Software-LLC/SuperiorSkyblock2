@@ -70,9 +70,21 @@ public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPo
         Iterator<net.minecraft.core.BlockPosition> iterable = net.minecraft.core.BlockPosition.b(minX, minY, minZ, maxX, maxY, maxZ).iterator();
         return () -> {
             return new AbstractIterator<>() {
+                private BlockPosition iterablePosition = null;
+
                 @Override
                 protected BlockPosition computeNext() {
-                    return new BlockPosition(iterable.next());
+                    if(!iterable.hasNext())
+                        return this.endOfData();
+
+                    if(iterablePosition == null) {
+                        iterablePosition = new BlockPosition(iterable.next());
+                    }
+                    else {
+                        iterablePosition.setHandle(iterable.next());
+                    }
+
+                    return iterablePosition;
                 }
             };
         };
