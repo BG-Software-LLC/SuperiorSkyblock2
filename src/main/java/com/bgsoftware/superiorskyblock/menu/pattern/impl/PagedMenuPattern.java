@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.CurrentPageButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.NextPageButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.PreviousPageButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryType;
@@ -61,7 +62,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
                 buttonItem = button.getButtonItem(superiorMenu);
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
                 return;
             }
 

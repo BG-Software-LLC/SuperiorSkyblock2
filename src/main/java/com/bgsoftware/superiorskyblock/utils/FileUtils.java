@@ -163,11 +163,11 @@ public final class FileUtils {
             cfg.load(file);
         } catch (InvalidConfigurationException error) {
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] There is an issue with the format of the file.");
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
             return null;
         } catch (IOException error) {
             SuperiorSkyblockPlugin.log("&c[" + fileName + "] An unexpected error occurred while parsing the file:");
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
             error.printStackTrace();
             return null;
         }
@@ -177,7 +177,7 @@ public final class FileUtils {
                 cfg.save(file);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 

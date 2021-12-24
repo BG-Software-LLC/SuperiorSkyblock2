@@ -32,7 +32,7 @@ public final class BankDepositButton extends SuperiorMenuButton<MenuIslandBank> 
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuIslandBank superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         Island island = superiorMenu.getTargetIsland();
-        BigDecimal amount = plugin.getProviders().getBalanceForBanks(clickedPlayer).multiply(depositPercentage);
+        BigDecimal amount = plugin.getProviders().getBankEconomyProvider().getBalance(clickedPlayer).multiply(depositPercentage);
         BankTransaction bankTransaction = island.getIslandBank().depositMoney(clickedPlayer, amount);
         MenuIslandBank.handleDeposit(clickedPlayer, island, superiorMenu, bankTransaction,
                 successSound, failSound, amount);

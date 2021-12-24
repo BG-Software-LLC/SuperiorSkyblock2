@@ -5,11 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -191,7 +193,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
 
         menuButton.getCommands().forEach(command -> runCommand(plugin, command, clickEvent, Bukkit.getConsoleSender()));
 
-        SuperiorSkyblockPlugin.debug("Action: Menu Click, Target: " + inventoryViewer.getName() + ", Item: " +
+        PluginDebugger.debug("Action: Menu Click, Target: " + inventoryViewer.getName() + ", Item: " +
                 (clickEvent.getCurrentItem() == null ? "AIR" : clickEvent.getCurrentItem().getType()) +
                 ", Slot: " + clickEvent.getRawSlot());
 
@@ -279,7 +281,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             return;
         }
 
-        PluginDebugger.debug("Action: Open Menu, Target: " + superiorPlayer.getName() + ", Menu: " + identifier);
+        PluginDebugger.debug("Action: Open Menu, Target: " + inventoryViewer.getName() + ", Menu: " + getClass().getName());
 
         if (menuPattern == null) {
             if (!(this instanceof SuperiorMenuBlank))
