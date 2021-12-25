@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.potion.PotionEffectType;
 
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,6 @@ public final class MultipleDeserializer implements IDeserializer {
             try {
                 return function.apply(deserializer);
             } catch (Exception error) {
-                error.printStackTrace();
                 PluginDebugger.debug(error);
             }
         }
