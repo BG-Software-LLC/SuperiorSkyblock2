@@ -14,7 +14,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'com.bgsoftware'
             artifactId = 'SuperiorSkyblockAPI'
-            version = System.getenv("BUILD_NUMBER") == null ? parent.version : parent.version + "." + System.getenv("BUILD_NUMBER")
+            version = parent.version
 
             from components.java
         }
