@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.database.loader.v1.deserializer;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -15,6 +14,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +34,7 @@ public final class MultipleDeserializer implements IDeserializer {
             try {
                 return function.apply(deserializer);
             } catch (Exception error) {
+                error.printStackTrace();
                 PluginDebugger.debug(error);
             }
         }
@@ -124,6 +125,16 @@ public final class MultipleDeserializer implements IDeserializer {
     @Override
     public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
         return runDeserializers(deserializer -> deserializer.deserializeWarpCategories(categories));
+    }
+
+    @Override
+    public String deserializeBlockCounts(String blockCountsParam) {
+        return runDeserializers(deserializer -> deserializer.deserializeBlockCounts(blockCountsParam));
+    }
+
+    @Override
+    public String deserializeDirtyChunks(String dirtyChunksParam) {
+        return runDeserializers(deserializer -> deserializer.deserializeDirtyChunks(dirtyChunksParam));
     }
 
 }

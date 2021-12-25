@@ -12,19 +12,24 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandChest
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class RawDeserializer implements IDeserializer {
@@ -428,6 +433,47 @@ public final class RawDeserializer implements IDeserializer {
         }
 
         return warpCategoryAttributes;
+    }
+
+    @Override
+    public String deserializeBlockCounts(String blockCountsParam) {
+        KeyMap<BigInteger> blockCounts = new KeyMap<>();
+
+        if (blockCountsParam != null) {
+            for (String blockCountSection : blockCountsParam.split(";")) {
+                String[] blockCountSections = blockCountSection.split("=");
+                try {
+                    blockCounts.put(Key.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
+                } catch (NumberFormatException error) {
+                    PluginDebugger.debug(error);
+                }
+            }
+        }
+
+        return IslandsSerializer.serializeBlockCounts(blockCounts);
+    }
+
+    @Override
+    public String deserializeDirtyChunks(String dirtyChunksParam) {
+        Set<ChunkPosition> dirtyChunks = new HashSet<>();
+
+        if (dirtyChunksParam != null) {
+            for (String dirtyChunkSection : dirtyChunksParam.split("\\|")) {
+                String[] dirtyChunkSections = dirtyChunkSection.split("=");
+                String worldName = dirtyChunkSections[0];
+                for(String chunkCoords : dirtyChunkSections[1].split(";")) {
+                    String[] chunkCoordsSections = chunkCoords.split(",");
+                    try {
+                        dirtyChunks.add(ChunkPosition.of(worldName, Integer.parseInt(chunkCoordsSections[0]),
+                                Integer.parseInt(chunkCoordsSections[1])));
+                    } catch (NumberFormatException error) {
+                        PluginDebugger.debug(error);
+                    }
+                }
+            }
+        }
+
+        return IslandsSerializer.serializeDirtyChunks(dirtyChunks);
     }
 
     private void deserializeGenerators(String generator, KeyMap<Integer> cobbleGenerator) {

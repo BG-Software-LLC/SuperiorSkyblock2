@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import org.bukkit.potion.PotionEffectType;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,5 +53,9 @@ public interface IDeserializer {
     Map<PlayerRole, Integer> deserializeRoleLimits(String roles);
 
     List<WarpCategoryAttributes> deserializeWarpCategories(String categories);
+
+    String deserializeBlockCounts(String blockCountsParam);
+
+    String deserializeDirtyChunks(String dirtyChunksParam);
 
 }

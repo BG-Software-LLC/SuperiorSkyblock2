@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.database.loader.v1.deserializer;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -344,6 +343,18 @@ public final class JsonDeserializer implements IDeserializer {
         });
 
         return warpCategories;
+    }
+
+    @Override
+    public String deserializeBlockCounts(String blockCountsParam) {
+        gson.fromJson(blockCountsParam, JsonArray.class);
+        return blockCountsParam;
+    }
+
+    @Override
+    public String deserializeDirtyChunks(String dirtyChunksParam) {
+        gson.fromJson(dirtyChunksParam, JsonArray.class);
+        return dirtyChunksParam;
     }
 
 }
