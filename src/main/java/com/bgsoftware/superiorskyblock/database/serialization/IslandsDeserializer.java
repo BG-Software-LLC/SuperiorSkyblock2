@@ -13,22 +13,27 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserializer;
+import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
+import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
+import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.threads.SyncedObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -46,8 +51,11 @@ import java.util.function.Consumer;
 
 public final class IslandsDeserializer {
 
-    static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    static final Gson gson = new GsonBuilder().create();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final Gson gson = new GsonBuilder().create();
+    private static final IDeserializer oldDataDeserializer = new MultipleDeserializer(
+            new JsonDeserializer(null), new RawDeserializer(null, plugin)
+    );
 
     private IslandsDeserializer() {
 
@@ -150,8 +158,15 @@ public final class IslandsDeserializer {
         if (blocks == null || blocks.isEmpty())
             return;
 
-        JsonArray blockCountsArray = gson.fromJson(blocks, JsonArray.class);
-        blockCountsArray.forEach(blockCountElement -> {
+        JsonArray blockCounts;
+
+        try {
+            blockCounts = gson.fromJson(blocks, JsonArray.class);
+        } catch (JsonSyntaxException error) {
+            blockCounts = gson.fromJson(oldDataDeserializer.deserializeBlockCounts(blocks), JsonArray.class);
+        }
+
+        blockCounts.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = Key.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());

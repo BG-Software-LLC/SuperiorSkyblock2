@@ -23,6 +23,7 @@ import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,10 +35,11 @@ import java.util.UUID;
 
 public final class RawDeserializer implements IDeserializer {
 
+    @Nullable
     private final DatabaseLoader_V1 databaseLoader;
     private final SuperiorSkyblockPlugin plugin;
 
-    public RawDeserializer(DatabaseLoader_V1 databaseLoader, SuperiorSkyblockPlugin plugin) {
+    public RawDeserializer(@Nullable DatabaseLoader_V1 databaseLoader, SuperiorSkyblockPlugin plugin) {
         this.databaseLoader = databaseLoader;
         this.plugin = plugin;
     }
@@ -83,8 +85,7 @@ public final class RawDeserializer implements IDeserializer {
     public List<PlayerAttributes> deserializePlayers(String players) {
         List<PlayerAttributes> playerAttributesList = new ArrayList<>();
 
-        if (players != null) {
-
+        if (players != null && databaseLoader != null) {
             for (String uuid : players.split(",")) {
                 try {
                     PlayerAttributes playerAttributes = databaseLoader.getPlayerAttributes(uuid);
@@ -461,7 +462,7 @@ public final class RawDeserializer implements IDeserializer {
             for (String dirtyChunkSection : dirtyChunksParam.split("\\|")) {
                 String[] dirtyChunkSections = dirtyChunkSection.split("=");
                 String worldName = dirtyChunkSections[0];
-                for(String chunkCoords : dirtyChunkSections[1].split(";")) {
+                for (String chunkCoords : dirtyChunkSections[1].split(";")) {
                     String[] chunkCoordsSections = chunkCoords.split(",");
                     try {
                         dirtyChunks.add(ChunkPosition.of(worldName, Integer.parseInt(chunkCoordsSections[0]),

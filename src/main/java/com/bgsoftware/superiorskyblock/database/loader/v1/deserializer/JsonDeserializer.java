@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +33,10 @@ public final class JsonDeserializer implements IDeserializer {
 
     private static final Gson gson = new Gson();
 
+    @Nullable
     private final DatabaseLoader_V1 databaseLoader;
 
-    public JsonDeserializer(DatabaseLoader_V1 databaseLoader) {
+    public JsonDeserializer(@Nullable DatabaseLoader_V1 databaseLoader) {
         this.databaseLoader = databaseLoader;
     }
 
@@ -73,12 +75,14 @@ public final class JsonDeserializer implements IDeserializer {
 
     public List<PlayerAttributes> deserializePlayers(String players) {
         List<PlayerAttributes> playerAttributes = new ArrayList<>();
-        JsonArray playersArray = gson.fromJson(players, JsonArray.class);
-        playersArray.forEach(uuid -> {
-            PlayerAttributes _playerAttributes = databaseLoader.getPlayerAttributes(uuid.getAsString());
-            if (_playerAttributes != null)
-                playerAttributes.add(_playerAttributes);
-        });
+        if (databaseLoader != null) {
+            JsonArray playersArray = gson.fromJson(players, JsonArray.class);
+            playersArray.forEach(uuid -> {
+                PlayerAttributes _playerAttributes = databaseLoader.getPlayerAttributes(uuid.getAsString());
+                if (_playerAttributes != null)
+                    playerAttributes.add(_playerAttributes);
+            });
+        }
         return playerAttributes;
     }
 
