@@ -565,7 +565,7 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("description", island.getDescription()),
                 new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()),
                 new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
-                new Pair<>("last_time_updated", island.getLastTimeUpdate()),
+                new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
                 new Pair<>("dirty_chunks", ChunksTracker.serialize(island)),
                 new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
         );
