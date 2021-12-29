@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
@@ -330,15 +331,18 @@ public final class BlocksListener implements Listener {
                 recentlyClicked.contains(e.getPlayer().getUniqueId()))
             return;
 
-        if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking() &&
-                plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) > 1) {
+        if (plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) <= 1)
+            return;
+
+        if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking()) {
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
         } else {
             recentlyClicked.add(e.getPlayer().getUniqueId());
             Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
 
-            if (StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
+            if (!ProtectionLogic.handleBlockBreak(e.getClickedBlock(), e.getPlayer(), true) ||
+                    StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
                 e.setCancelled(true);
         }
     }
