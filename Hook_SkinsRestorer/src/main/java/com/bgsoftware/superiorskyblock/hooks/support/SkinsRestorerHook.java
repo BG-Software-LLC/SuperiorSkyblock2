@@ -7,7 +7,11 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
+import net.skinsrestorer.api.bukkit.events.SkinApplyBukkitEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import skinsrestorer.bukkit.SkinsRestorer;
 import skinsrestorer.shared.exception.SkinRequestException;
 import skinsrestorer.shared.storage.SkinStorage;
@@ -27,6 +31,7 @@ public final class SkinsRestorerHook {
             skinsRestorer = new SkinsRestorerOld();
         }
         plugin.getProviders().registerSkinsListener(SkinsRestorerHook::setSkinTexture);
+        plugin.getServer().getPluginManager().registerEvents(new SkinsListener(), plugin);
     }
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
@@ -71,6 +76,18 @@ public final class SkinsRestorerHook {
                 return (Property) SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
             } catch (Throwable ex) {
                 return (Property) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
+            }
+        }
+
+    }
+
+    private static final class SkinsListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSkinApply(SkinApplyBukkitEvent event) {
+            if(event.getProperty() instanceof Property) {
+                SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(event.getWho());
+                plugin.getNMSPlayers().setSkinTexture(superiorPlayer, (Property) event.getProperty());
             }
         }
 
