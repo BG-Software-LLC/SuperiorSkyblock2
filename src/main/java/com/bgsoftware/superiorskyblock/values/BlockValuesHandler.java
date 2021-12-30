@@ -136,7 +136,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return convertedKey;
         } else {
             if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-                Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(convertedKey);
+                Key newKey = (Key) plugin.getProviders().getPricesProvider().getBlockKey(convertedKey);
                 if (newKey != null) {
                     return newKey;
                 }

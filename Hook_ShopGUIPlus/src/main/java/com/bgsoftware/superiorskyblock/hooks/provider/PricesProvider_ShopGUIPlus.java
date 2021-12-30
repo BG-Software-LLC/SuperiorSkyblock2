@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import net.brcdev.shopgui.ShopGuiPlugin;
@@ -59,8 +60,8 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.key.Key getBlockKey(com.bgsoftware.superiorskyblock.key.Key blockKey) {
-        return cachedPrices.getKey(blockKey, null);
+    public Key getBlockKey(Key blockKey) {
+        return cachedPrices.getKey((com.bgsoftware.superiorskyblock.key.Key) blockKey, null);
     }
 
 }

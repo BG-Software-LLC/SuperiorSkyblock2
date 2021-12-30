@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedDataManager;
 import net.luckperms.api.model.user.User;

@@ -5,10 +5,13 @@ import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksSnapshotProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
@@ -19,16 +22,13 @@ import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
-import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.PricesProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.provider.VanishProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.key.Key;
@@ -153,14 +153,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     @Override
-    public void addAFKProvider(AFKProvider afkProvider) {
-        Preconditions.checkNotNull(afkProvider, "afkProvider parameter cannot be null.");
-        AFKProvidersList.add(afkProvider);
+    public List<AFKProvider> getAFKProviders() {
+        return Collections.unmodifiableList(this.AFKProvidersList);
     }
 
     @Override
-    public List<AFKProvider> getAFKProviders() {
-        return Collections.unmodifiableList(this.AFKProvidersList);
+    public void addAFKProvider(AFKProvider afkProvider) {
+        Preconditions.checkNotNull(afkProvider, "afkProvider parameter cannot be null.");
+        AFKProvidersList.add(afkProvider);
     }
 
     @Override
@@ -172,6 +172,36 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     public void setMenusProvider(MenusProvider menusProvider) {
         Preconditions.checkNotNull(menusProvider, "menusProvider parameter cannot be null.");
         this.menusProvider = menusProvider;
+    }
+
+    @Override
+    public PermissionsProvider getPermissionsProvider() {
+        return permissionsProvider;
+    }
+
+    @Override
+    public void setPermissionsProvider(PermissionsProvider permissionsProvider) {
+        this.permissionsProvider = permissionsProvider;
+    }
+
+    @Override
+    public PricesProvider getPricesProvider() {
+        return pricesProvider;
+    }
+
+    @Override
+    public void setPricesProvider(PricesProvider pricesProvider) {
+        this.pricesProvider = pricesProvider;
+    }
+
+    @Override
+    public VanishProvider getVanishProvider() {
+        return vanishProvider;
+    }
+
+    @Override
+    public void setVanishProvider(VanishProvider vanishProvider) {
+        this.vanishProvider = vanishProvider;
     }
 
     @Override
@@ -246,18 +276,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             ((StackedBlocksSnapshotProvider) stackedBlocksProvider).releaseSnapshot(
                     chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
         }
-    }
-
-    public PermissionsProvider getPermissionsProvider() {
-        return permissionsProvider;
-    }
-
-    public PricesProvider getPricesProvider() {
-        return pricesProvider;
-    }
-
-    public VanishProvider getVanishProvider() {
-        return vanishProvider;
     }
 
     public AsyncProvider getAsyncProvider() {
@@ -450,10 +468,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         vanishProvider.ifPresent(this::setVanishProvider);
     }
 
-    private void setVanishProvider(VanishProvider vanishProvider) {
-        this.vanishProvider = vanishProvider;
-    }
-
     private void registerAFKProvider() {
         if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
             Optional<AFKProvider> afkProvider = createInstance("AFKProvider_CMI");
@@ -511,14 +525,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
         }
 
         PlaceholderHook.register(plugin, placeholdersProviders);
-    }
-
-    private void setPermissionsProvider(PermissionsProvider permissionsProvider) {
-        this.permissionsProvider = permissionsProvider;
-    }
-
-    private void setPricesProvider(PricesProvider pricesProvider) {
-        this.pricesProvider = pricesProvider;
     }
 
     private void registerHook(String className) {

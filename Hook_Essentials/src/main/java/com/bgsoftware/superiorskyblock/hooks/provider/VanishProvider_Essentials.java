@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.earth2me.essentials.Essentials;
 import net.ess3.api.events.VanishStatusChangeEvent;

@@ -4,6 +4,7 @@ import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.events.CMIPlayerUnVanishEvent;
 import com.Zrips.CMI.events.CMIPlayerVanishEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
