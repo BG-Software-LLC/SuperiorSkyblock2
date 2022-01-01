@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.entity.Player;
 
@@ -109,5 +110,10 @@ public interface PlayersManager {
      */
     @Deprecated
     List<PlayerRole> getRoles();
+
+    /**
+     * Get the players container.
+     */
+    PlayersContainer getPlayersContainer();
 
 }

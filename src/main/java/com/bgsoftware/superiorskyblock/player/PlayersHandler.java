@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.player.container.PlayersContainer;
+import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -112,6 +112,11 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
     @Deprecated
     public List<PlayerRole> getRoles() {
         return plugin.getRoles().getRoles();
+    }
+
+    @Override
+    public PlayersContainer getPlayersContainer() {
+        return this.playersContainer;
     }
 
     public SuperiorPlayer getSuperiorPlayer(CommandSender commandSender) {
