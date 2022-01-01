@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -349,6 +350,19 @@ public interface GridManager {
      * Get the location of the last island that was generated.
      */
     Location getLastIslandLocation();
+
+    /**
+     * Set the location of the last island.
+     * Warning: Do not use this method unless you know what you're doing
+     *
+     * @param location The location to set.
+     */
+    void setLastIslandLocation(Location location);
+
+    /**
+     * Get the islands container.
+     */
+    IslandsContainer getIslandsContainer();
 
     /**
      * Get the database-bridge of the grid.

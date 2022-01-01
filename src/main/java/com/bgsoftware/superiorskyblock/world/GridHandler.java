@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -325,7 +325,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
-        return this.islandsContainer.getIslandByOwner(uuid);
+        return this.islandsContainer.getIslandByLeader(uuid);
     }
 
     @Override
@@ -572,6 +572,16 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Location getLastIslandLocation() {
         return lastIsland.parse();
+    }
+
+    @Override
+    public void setLastIslandLocation(Location location) {
+        this.setLastIsland(SBlockPosition.of(location));
+    }
+
+    @Override
+    public IslandsContainer getIslandsContainer() {
+        return this.islandsContainer;
     }
 
     @Override
