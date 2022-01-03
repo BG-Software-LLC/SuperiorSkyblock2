@@ -26,6 +26,7 @@ import org.bukkit.Bukkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
@@ -122,14 +123,20 @@ public final class DataHandler extends AbstractHandler {
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
         DatabaseCache<CachedPlayerInfo> databaseCache = new DatabaseCache<>();
+        AtomicInteger playersCount = new AtomicInteger();
+        long startTime = System.currentTimeMillis();
 
         PlayersDeserializer.deserializeMissions(playersLoader, databaseCache);
         PlayersDeserializer.deserializePlayerSettings(playersLoader, databaseCache);
 
-        playersLoader.loadAllObjects("players", resultSet ->
-                plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet)));
+        playersLoader.loadAllObjects("players", resultSet -> {
+            plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet));
+            playersCount.incrementAndGet();
+        });
 
-        SuperiorSkyblockPlugin.log("Finished players!");
+        long endTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("Finished loading " + playersCount.get() + " players (Took " + (endTime - startTime) + "ms)");
     }
 
     private void loadIslands() {
@@ -138,6 +145,8 @@ public final class DataHandler extends AbstractHandler {
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
         DatabaseCache<CachedIslandInfo> databaseCache = new DatabaseCache<>();
+        AtomicInteger islandsCount = new AtomicInteger();
+        long startTime = System.currentTimeMillis();
 
         IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeMembers(islandsLoader, databaseCache);
@@ -161,10 +170,14 @@ public final class DataHandler extends AbstractHandler {
         IslandsDeserializer.deserializeVisitorHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeIslandSettings(islandsLoader, databaseCache);
 
-        islandsLoader.loadAllObjects("islands", resultSet ->
-                plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet)));
+        islandsLoader.loadAllObjects("islands", resultSet -> {
+            plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
+            islandsCount.incrementAndGet();
+        });
 
-        SuperiorSkyblockPlugin.log("Finished islands!");
+        long endTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
     }
 
 
