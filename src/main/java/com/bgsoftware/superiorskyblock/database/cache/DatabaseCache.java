@@ -5,27 +5,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public final class DatabaseCache {
+public final class DatabaseCache<V> {
 
-    private final Map<UUID, CachedIslandInfo> islandInfoMap = new HashMap<>();
+    private final Map<UUID, V> cache = new HashMap<>();
 
     public DatabaseCache() {
 
     }
 
-    public CachedIslandInfo addCachedIslandInfo(UUID uuid) {
-        CachedIslandInfo cachedIslandInfo = new CachedIslandInfo();
-        islandInfoMap.put(uuid, cachedIslandInfo);
-        return cachedIslandInfo;
+    public V addCachedInfo(UUID uuid, V value) {
+        cache.put(uuid, value);
+        return value;
     }
 
     @Nullable
-    public CachedIslandInfo getCachedIslandInfo(UUID uuid) {
-        return islandInfoMap.get(uuid);
-    }
-
-    public void clearCache() {
-        islandInfoMap.clear();
+    public V getCachedInfo(UUID uuid) {
+        return cache.get(uuid);
     }
 
 }

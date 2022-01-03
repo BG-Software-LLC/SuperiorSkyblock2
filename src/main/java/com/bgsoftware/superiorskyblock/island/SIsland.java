@@ -191,7 +191,7 @@ public final class SIsland implements Island {
     private UpgradeValue<Double> mobDrops = UpgradeValue.NEGATIVE_DOUBLE;
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
 
-    public SIsland(DatabaseCache cache, DatabaseResult resultSet) {
+    public SIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
 
@@ -220,7 +220,7 @@ public final class SIsland implements Island {
         String blockCountsString = resultSet.getString("block_counts");
         Executor.sync(() -> deserializeBlockCounts(blockCountsString), 5L);
 
-        CachedIslandInfo cachedIslandInfo = cache.getCachedIslandInfo(this.uuid);
+        CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(this.uuid);
 
         if (cachedIslandInfo != null)
             loadFromCachedInfo(cachedIslandInfo);

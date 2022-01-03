@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
@@ -28,7 +29,6 @@ import java.util.UUID;
 public final class DataHandler extends AbstractHandler {
 
     private final List<DatabaseLoader> databaseLoaders = new ArrayList<>();
-    private final DatabaseCache databaseCache = new DatabaseCache();
 
     public DataHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
@@ -110,10 +110,6 @@ public final class DataHandler extends AbstractHandler {
         }
     }
 
-    public DatabaseCache getCache() {
-        return this.databaseCache;
-    }
-
     private void loadDatabaseLoaders() {
         DatabaseLoader_V1.register(this);
     }
@@ -134,32 +130,32 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
-        IslandsDeserializer.deserializeIslandHomes(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeMembers(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeBanned(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializePlayerPermissions(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeRolePermissions(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeUpgrades(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeWarps(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeBlockLimits(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeRatings(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeMissions(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeIslandFlags(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeGenerators(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeVisitors(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeEntityLimits(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeEffects(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeIslandChest(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeRoleLimits(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeWarpCategories(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeIslandBank(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeVisitorHomes(islandsLoader, this.databaseCache);
-        IslandsDeserializer.deserializeIslandSettings(islandsLoader, this.databaseCache);
+        DatabaseCache<CachedIslandInfo> databaseCache = new DatabaseCache<>();
+
+        IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeMembers(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBanned(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializePlayerPermissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRolePermissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeUpgrades(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeWarps(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBlockLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRatings(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeMissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandFlags(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeGenerators(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeVisitors(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeEntityLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeEffects(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandChest(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRoleLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeWarpCategories(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandBank(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeVisitorHomes(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandSettings(islandsLoader, databaseCache);
 
         islandsLoader.loadAllObjects("islands", resultSet ->
-                plugin.getGrid().createIsland(this.databaseCache, new DatabaseResult(resultSet)));
-
-        this.databaseCache.clearCache();
+                plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished islands!");
     }

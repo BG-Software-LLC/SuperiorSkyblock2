@@ -54,10 +54,10 @@ public final class IslandsDeserializer {
 
     }
 
-    public static void deserializeMembers(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeMembers(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_members", membersRow -> {
             UUID uuid = UUID.fromString((String) membersRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             UUID playerUUID = UUID.fromString((String) membersRow.get("player"));
             PlayerRole playerRole = SPlayerRole.fromId((int) membersRow.get("role"));
@@ -70,10 +70,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeBanned(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeBanned(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_bans", bansRow -> {
             UUID uuid = UUID.fromString((String) bansRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             UUID playerUUID = UUID.fromString((String) bansRow.get("player"));
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
@@ -81,10 +81,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeVisitors(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeVisitors(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_visitors", visitorsRow -> {
             UUID islandUUID = UUID.fromString((String) visitorsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(islandUUID);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID, new CachedIslandInfo());
 
             UUID uuid = UUID.fromString((String) visitorsRow.get("player"));
             long visitTime = (long) visitorsRow.get("visit_time");
@@ -92,10 +92,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializePlayerPermissions(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializePlayerPermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_player_permissions", playerPermissionRow -> {
             UUID uuid = UUID.fromString((String) playerPermissionRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             UUID playerUUID = UUID.fromString((String) playerPermissionRow.get("player"));
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
@@ -112,10 +112,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeRolePermissions(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeRolePermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_role_permissions", rolePermissionRow -> {
             UUID uuid = UUID.fromString((String) rolePermissionRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             try {
                 PlayerRole playerRole = SPlayerRole.fromId((int) rolePermissionRow.get("role"));
@@ -129,10 +129,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeUpgrades(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeUpgrades(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_upgrades", upgradeRow -> {
             UUID uuid = UUID.fromString((String) upgradeRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             String upgradeName = (String) upgradeRow.get("upgrade");
             int level = (int) upgradeRow.get("level");
@@ -140,7 +140,7 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeWarps(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeWarps(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_warps", islandWarpRow -> {
             String name = IslandUtils.getWarpName((String) islandWarpRow.get("name"));
 
@@ -159,7 +159,7 @@ public final class IslandsDeserializer {
                 cachedWarpInfo.icon = ItemUtils.deserializeItem((String) islandWarpRow.get("icon"));
 
             UUID uuid = UUID.fromString((String) islandWarpRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
         });
     }
@@ -184,10 +184,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_block_limits", blockLimitsRow -> {
             UUID uuid = UUID.fromString((String) blockLimitsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             Key blockKey = Key.of((String) blockLimitsRow.get("block"));
             int limit = (int) blockLimitsRow.get("limit");
@@ -195,10 +195,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeEntityLimits(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeEntityLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_entity_limits", entityLimitsRow -> {
             UUID uuid = UUID.fromString((String) entityLimitsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             Key entity = Key.of((String) entityLimitsRow.get("entity"));
             int limit = (int) entityLimitsRow.get("limit");
@@ -206,10 +206,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeRatings(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeRatings(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_ratings", ratingsRow -> {
             UUID islandUUID = UUID.fromString((String) ratingsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(islandUUID);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID, new CachedIslandInfo());
 
             UUID uuid = UUID.fromString((String) ratingsRow.get("player"));
             Rating rating = Rating.valueOf((int) ratingsRow.get("rating"));
@@ -217,10 +217,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_missions", missionsRow -> {
             UUID uuid = UUID.fromString((String) missionsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             String name = (String) missionsRow.get("name");
             int finishCount = (int) missionsRow.get("finish_count");
@@ -232,10 +232,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeIslandFlags(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeIslandFlags(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_flags", islandFlagRow -> {
             UUID uuid = UUID.fromString((String) islandFlagRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             try {
                 IslandFlag islandFlag = IslandFlag.getByName((String) islandFlagRow.get("name"));
@@ -249,10 +249,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeGenerators(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeGenerators(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_generators", generatorsRow -> {
             UUID uuid = UUID.fromString((String) generatorsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             try {
                 int environment = World.Environment.valueOf((String) generatorsRow.get("environment")).ordinal();
@@ -268,28 +268,28 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeIslandHomes(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeIslandHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_homes", teleportLocationRow -> {
             UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
             cachedIslandInfo.teleportLocations[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
         });
     }
 
-    public static void deserializeVisitorHomes(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeVisitorHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_visitor_homes", teleportLocationRow -> {
             UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
             cachedIslandInfo.visitorsLocations[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
         });
     }
 
-    public static void deserializeEffects(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeEffects(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_effects", islandEffectRow -> {
             UUID uuid = UUID.fromString((String) islandEffectRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             PotionEffectType potionEffectType = PotionEffectType.getByName((String) islandEffectRow.get("effect_type"));
             if (potionEffectType != null) {
                 int level = (int) islandEffectRow.get("level");
@@ -298,10 +298,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeIslandChest(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeIslandChest(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_chests", islandChestRow -> {
             UUID uuid = UUID.fromString((String) islandChestRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             int index = (int) islandChestRow.get("index");
             String contents = (String) islandChestRow.get("contents");
 
@@ -313,10 +313,10 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeRoleLimits(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeRoleLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_role_limits", roleLimitRaw -> {
             UUID uuid = UUID.fromString((String) roleLimitRaw.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             PlayerRole playerRole = SPlayerRole.fromId((int) roleLimitRaw.get("role"));
             if (playerRole != null) {
                 int limit = (int) roleLimitRaw.get("limit");
@@ -325,7 +325,7 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeWarpCategories(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeWarpCategories(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_warp_categories", warpCategoryRow -> {
             String name = StringUtils.stripColors((String) warpCategoryRow.get("name"));
 
@@ -335,15 +335,15 @@ public final class IslandsDeserializer {
             cachedWarpCategoryInfo.icon = ItemUtils.deserializeItem((String) warpCategoryRow.get("icon"));
 
             UUID uuid = UUID.fromString((String) warpCategoryRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);
         });
     }
 
-    public static void deserializeIslandBank(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeIslandBank(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_banks", islandBankRow -> {
             UUID uuid = UUID.fromString((String) islandBankRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
             long lastInterestTime = getAsLong(islandBankRow.get("last_interest_time"));
@@ -355,12 +355,12 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeIslandSettings(DatabaseBridge databaseBridge, DatabaseCache databaseCache) {
+    public static void deserializeIslandSettings(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_settings", islandSettingsRow -> {
             DatabaseResult islandSettings = new DatabaseResult(islandSettingsRow);
 
             UUID uuid = UUID.fromString(islandSettings.getString("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedIslandInfo(uuid);
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
             cachedIslandInfo.islandSize = new UpgradeValue<>(islandSettings.getInt("size"), i -> i < 0);
             cachedIslandInfo.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit"), i -> i < 0);
