@@ -54,7 +54,6 @@ public interface DatabaseBridge {
 
     /**
      * Load data from the database for this object.
-     * Please note, this is currently unused. Instead, {@link #loadAllObjects(String, Consumer)} is used on all tables.
      *
      * @param table          The table to get the data from.
      * @param filter         The filter of the column.
