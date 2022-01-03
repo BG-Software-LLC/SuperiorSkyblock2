@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
@@ -9,14 +8,16 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
+import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
+import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.threads.SyncedObject;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -26,13 +27,8 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class SIslandBank implements IslandBank {
@@ -41,13 +37,13 @@ public final class SIslandBank implements IslandBank {
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    private final SyncedObject<SortedSet<BankTransaction>> transactions = SyncedObject.of(new TreeSet<>(SortingComparators.BANK_TRANSACTIONS_COMPARATOR));
-    private final Map<UUID, SyncedObject<List<BankTransaction>>> transactionsByPlayers = new ConcurrentHashMap<>();
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
+    private final IBankLogs bankLogs;
 
     public SIslandBank(Island island) {
         this.island = island;
+        this.bankLogs = BuiltinModules.BANK.cacheAllLogs ? new CacheBankLogs() : new DatabaseBankLogs(island);
     }
 
     @Override
@@ -91,7 +87,7 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(SortedSet::size) + 1;
+        int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         if (failureReason == null || failureReason.isEmpty()) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
@@ -118,7 +114,7 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(SortedSet::size) + 1;
+        int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
         increaseBalance(amount);
@@ -166,7 +162,7 @@ public final class SIslandBank implements IslandBank {
             }
         }
 
-        int position = transactions.readAndGet(SortedSet::size) + 1;
+        int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         if (failureReason == null || failureReason.isEmpty()) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
@@ -193,7 +189,7 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
-        int position = transactions.readAndGet(SortedSet::size) + 1;
+        int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", amount);
         decreaseBalance(amount);
@@ -208,28 +204,22 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public List<BankTransaction> getAllTransactions() {
-        return transactions.readAndGet(bankTransactions -> Collections.unmodifiableList(new ArrayList<>(bankTransactions)));
+        return this.bankLogs.getTransactions();
     }
 
     @Override
     public List<BankTransaction> getTransactions(SuperiorPlayer superiorPlayer) {
-        return getTransactions(superiorPlayer.getUniqueId());
+        return this.bankLogs.getTransactions(superiorPlayer.getUniqueId());
     }
 
     @Override
     public List<BankTransaction> getConsoleTransactions() {
-        return getTransactions(CONSOLE_UUID);
+        return this.bankLogs.getTransactions(CONSOLE_UUID);
     }
 
     @Override
     public void loadTransaction(BankTransaction bankTransaction) {
         addTransaction(bankTransaction, false);
-    }
-
-    private List<BankTransaction> getTransactions(UUID uuid) {
-        SyncedObject<List<BankTransaction>> transactions = this.transactionsByPlayers.get(uuid);
-        return transactions == null ? Collections.unmodifiableList(new ArrayList<>()) :
-                transactions.readAndGet(Collections::unmodifiableList);
     }
 
     private void addTransaction(BankTransaction bankTransaction, boolean save) {
@@ -238,9 +228,7 @@ public final class SIslandBank implements IslandBank {
 
         UUID senderUUID = bankTransaction.getPlayer();
 
-        transactions.write(transactions -> transactions.add(bankTransaction));
-        transactionsByPlayers.computeIfAbsent(senderUUID != null ? senderUUID : CONSOLE_UUID, p -> SyncedObject.of(new ArrayList<>()))
-                .write(transactions -> transactions.add(bankTransaction));
+        this.bankLogs.addTransaction(bankTransaction, senderUUID == null ? CONSOLE_UUID : senderUUID, !save);
 
         if (save) {
             IslandsDatabaseBridge.saveBankTransaction(island, bankTransaction);

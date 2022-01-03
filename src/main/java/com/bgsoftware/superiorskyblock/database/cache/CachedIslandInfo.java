@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -58,10 +59,7 @@ public final class CachedIslandInfo {
     public long lastInterestTime = 0L;
     public List<CachedWarpInfo> cachedWarpInfoList = new ArrayList<>();
     public List<CachedWarpCategoryInfo> cachedWarpCategoryInfoList = new ArrayList<>();
-
-//        IslandsDeserializer.deserializeWarps(this);
-//        IslandsDeserializer.deserializeWarpCategories(this);
-//        IslandsDeserializer.deserializeIslandBank(this);
+    public List<BankTransaction> bankTransactions = new ArrayList<>();
 
     public CachedIslandInfo() {
 

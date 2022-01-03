@@ -73,7 +73,6 @@ public final class DataHandler extends AbstractHandler {
         loadPlayers();
         loadIslands();
         loadGrid();
-        loadBankTransactions();
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -169,6 +168,7 @@ public final class DataHandler extends AbstractHandler {
         IslandsDeserializer.deserializeIslandBank(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeVisitorHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeIslandSettings(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBankTransactions(islandsLoader, databaseCache);
 
         islandsLoader.loadAllObjects("islands", resultSet -> {
             plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
@@ -190,29 +190,6 @@ public final class DataHandler extends AbstractHandler {
                 resultSet -> plugin.getGrid().loadGrid(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished grid!");
-    }
-
-    private void loadBankTransactions() {
-        if (BuiltinModules.BANK.bankLogs) {
-            SuperiorSkyblockPlugin.log("Starting to load bank transactions...");
-
-            DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
-
-            islandsLoader.loadAllObjects("bank_transactions", _resultSet -> {
-                DatabaseResult resultSet = new DatabaseResult(_resultSet);
-                try {
-                    Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
-                    if (island != null)
-                        island.getIslandBank().loadTransaction(new SBankTransaction(resultSet));
-                } catch (Exception error) {
-                    SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
-                    error.printStackTrace();
-                    PluginDebugger.debug(error);
-                }
-            });
-
-            SuperiorSkyblockPlugin.log("Finished bank transactions!");
-        }
     }
 
 }

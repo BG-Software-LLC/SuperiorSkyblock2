@@ -3211,6 +3211,8 @@ public final class SIsland implements Island {
                     warpCategory.setIcon(cachedWarpCategoryInfo.icon);
             }
         });
+
+        cachedIslandInfo.bankTransactions.forEach(islandBank::loadTransaction);
     }
 
     private void startBankInterest() {

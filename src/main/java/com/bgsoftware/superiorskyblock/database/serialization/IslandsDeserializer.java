@@ -20,9 +20,11 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeser
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -371,6 +373,25 @@ public final class IslandsDeserializer {
             cachedIslandInfo.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit"), i -> i < 0);
             cachedIslandInfo.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit"), i -> i.compareTo(new BigDecimal(-1)) < 0);
         });
+    }
+
+    public static void deserializeBankTransactions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+        if (BuiltinModules.BANK.bankLogs && BuiltinModules.BANK.cacheAllLogs) {
+            databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
+                DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
+
+                UUID uuid = UUID.fromString((String) bankTransactionRow.get("island"));
+                CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+
+                try {
+                    cachedIslandInfo.bankTransactions.add(new SBankTransaction(bankTransaction));
+                } catch (Exception error) {
+                    SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
+                    error.printStackTrace();
+                    PluginDebugger.debug(error);
+                }
+            });
+        }
     }
 
     private static long getAsLong(Object value) {
