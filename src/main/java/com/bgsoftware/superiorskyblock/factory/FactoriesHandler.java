@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -67,8 +68,8 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(DatabaseResult resultSet) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
+    public SuperiorPlayer createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
+        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(databaseCache, resultSet);
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
 

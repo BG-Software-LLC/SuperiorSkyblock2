@@ -7,10 +7,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
@@ -119,8 +121,13 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
+        DatabaseCache<CachedPlayerInfo> databaseCache = new DatabaseCache<>();
+
+        PlayersDeserializer.deserializeMissions(playersLoader, databaseCache);
+        PlayersDeserializer.deserializePlayerSettings(playersLoader, databaseCache);
+
         playersLoader.loadAllObjects("players", resultSet ->
-                plugin.getPlayers().loadPlayer(new DatabaseResult(resultSet)));
+                plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished players!");
     }

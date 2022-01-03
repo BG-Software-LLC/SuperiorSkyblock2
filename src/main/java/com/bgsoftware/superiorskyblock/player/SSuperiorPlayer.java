@@ -16,20 +16,21 @@ import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -94,23 +95,17 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(DatabaseResult resultSet) {
+    public SSuperiorPlayer(DatabaseCache<CachedPlayerInfo> cache, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.name = resultSet.getString("last_used_name");
         this.textureValue = resultSet.getString("last_used_skin");
         this.disbands = resultSet.getInt("disbands");
         this.lastTimeStatus = resultSet.getLong("last_time_updated");
 
-        PlayersDeserializer.deserializeMissions(this, this.completedMissions);
+        CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(this.uuid);
 
-        PlayersDeserializer.deserializePlayerSettings(this, playerSettingsRaw -> {
-            DatabaseResult playerSettings = new DatabaseResult(playerSettingsRaw);
-            this.toggledPanel = playerSettings.getBoolean("toggled_panel");
-            this.islandFly = playerSettings.getBoolean("island_fly");
-            this.borderColor = BorderColor.safeValue(playerSettings.getString("border_color"), BorderColor.BLUE);
-            this.userLocale = PlayerLocales.getLocale(playerSettings.getString("language"));
-            this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
-        });
+        if (cachedPlayerInfo != null)
+            loadFromCachedInfo(cachedPlayerInfo);
 
         databaseBridge.startSavingData();
     }
@@ -893,6 +888,14 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 "uuid=[" + uuid + "]," +
                 "name=[" + name + "]" +
                 "}";
+    }
+
+    private void loadFromCachedInfo(CachedPlayerInfo cachedPlayerInfo) {
+        this.toggledPanel = cachedPlayerInfo.toggledPanel;
+        this.islandFly = cachedPlayerInfo.islandFly;
+        this.borderColor = cachedPlayerInfo.borderColor;
+        this.userLocale = cachedPlayerInfo.userLocale;
+        this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
     }
 
     private void teleportIfSafe(Island island, Block block, Location customLocation, float yaw, float pitch,
