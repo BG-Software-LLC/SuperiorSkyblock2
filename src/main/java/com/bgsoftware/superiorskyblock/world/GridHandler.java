@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.world;
 
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
@@ -98,9 +99,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         getIslands().forEach(Island::updateUpgrades);
     }
 
-    public void createIsland(DatabaseResult resultSet) {
+    public void createIsland(DatabaseCache cache, DatabaseResult resultSet) {
         UUID owner = UUID.fromString(resultSet.getString("owner"));
-        Island island = plugin.getFactory().createIsland(resultSet);
+        Island island = plugin.getFactory().createIsland(cache, resultSet);
         this.islandsContainer.addIsland(island);
     }
 

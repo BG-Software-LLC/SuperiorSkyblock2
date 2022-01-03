@@ -12,7 +12,7 @@ import java.util.Map;
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     protected final SuperiorPlayer superiorPlayer;
-    protected final Island island;
+    protected Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island) {
         this.superiorPlayer = superiorPlayer;
@@ -29,6 +29,10 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         super(privileges);
 
         this.superiorPlayer = superiorPlayer;
+        this.island = island;
+    }
+
+    public void setIsland(Island island) {
         this.island = island;
     }
 

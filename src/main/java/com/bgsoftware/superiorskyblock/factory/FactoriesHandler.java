@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAl
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
@@ -55,8 +56,8 @@ public final class FactoriesHandler implements FactoriesManager {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 
-    public Island createIsland(DatabaseResult resultSet) {
-        SIsland island = new SIsland(resultSet);
+    public Island createIsland(DatabaseCache cache, DatabaseResult resultSet) {
+        SIsland island = new SIsland(cache, resultSet);
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 

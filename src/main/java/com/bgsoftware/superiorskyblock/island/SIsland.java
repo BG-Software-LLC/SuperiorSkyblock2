@@ -24,7 +24,11 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
@@ -36,6 +40,8 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.SyncedObject;
 import com.bgsoftware.superiorskyblock.upgrade.DefaultUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
@@ -43,18 +49,13 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.world.GridHandler;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -190,7 +191,7 @@ public final class SIsland implements Island {
     private UpgradeValue<Double> mobDrops = UpgradeValue.NEGATIVE_DOUBLE;
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
 
-    public SIsland(DatabaseResult resultSet) {
+    public SIsland(DatabaseCache cache, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
 
@@ -219,38 +220,10 @@ public final class SIsland implements Island {
         String blockCountsString = resultSet.getString("block_counts");
         Executor.sync(() -> deserializeBlockCounts(blockCountsString), 5L);
 
-        IslandsDeserializer.deserializeIslandHomes(this, this.teleportLocations);
-        IslandsDeserializer.deserializeMembers(this, this.members);
-        IslandsDeserializer.deserializeBanned(this, this.banned);
-        IslandsDeserializer.deserializePlayerPermissions(this, this.playerPermissions);
-        IslandsDeserializer.deserializeRolePermissions(this, this.rolePermissions);
-        IslandsDeserializer.deserializeUpgrades(this, this.upgrades);
-        IslandsDeserializer.deserializeWarps(this);
-        IslandsDeserializer.deserializeBlockLimits(this, this.blockLimits);
-        IslandsDeserializer.deserializeRatings(this, this.ratings);
-        IslandsDeserializer.deserializeMissions(this, this.completedMissions);
-        IslandsDeserializer.deserializeIslandFlags(this, this.islandSettings);
-        IslandsDeserializer.deserializeGenerators(this, this.cobbleGeneratorValues);
-        IslandsDeserializer.deserializeVisitors(this, this.uniqueVisitors);
-        IslandsDeserializer.deserializeEntityLimits(this, this.entityLimits);
-        IslandsDeserializer.deserializeEffects(this, this.islandEffects);
-        IslandsDeserializer.deserializeIslandChest(this, this.islandChest);
-        IslandsDeserializer.deserializeRoleLimits(this, this.roleLimits);
-        IslandsDeserializer.deserializeWarpCategories(this);
-        IslandsDeserializer.deserializeIslandBank(this);
-        IslandsDeserializer.deserializeVisitorHomes(this, this.visitorsLocations);
+        CachedIslandInfo cachedIslandInfo = cache.getCachedIslandInfo(this.uuid);
 
-        IslandsDeserializer.deserializeIslandSettings(this, islandSettingsRaw -> {
-            DatabaseResult islandSettings = new DatabaseResult(islandSettingsRaw);
-            this.islandSize = new UpgradeValue<>(islandSettings.getInt("size"), i -> i < 0);
-            this.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit"), i -> i < 0);
-            this.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit"), i -> i < 0);
-            this.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier"), i -> i < 0);
-            this.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier"), i -> i < 0);
-            this.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier"), i -> i < 0);
-            this.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit"), i -> i < 0);
-            this.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit"), i -> i.compareTo(new BigDecimal(-1)) < 0);
-        });
+        if (cachedIslandInfo != null)
+            loadFromCachedInfo(cachedIslandInfo);
 
         updateDatesFormatter();
         startBankInterest();
@@ -3168,6 +3141,76 @@ public final class SIsland implements Island {
 
         if (this.blockCounts.isEmpty())
             calcIslandWorth(null);
+    }
+
+    private void loadFromCachedInfo(CachedIslandInfo cachedIslandInfo) {
+        this.teleportLocations.set(cachedIslandInfo.teleportLocations);
+        this.members.write(members -> {
+            members.addAll(cachedIslandInfo.members);
+            members.forEach(member -> member.setIsland(this));
+        });
+        this.banned.addAll(cachedIslandInfo.banned);
+        this.playerPermissions.putAll(cachedIslandInfo.playerPermissions);
+        this.playerPermissions.values().forEach(permissionNode -> permissionNode.setIsland(this));
+        this.rolePermissions.putAll(cachedIslandInfo.rolePermissions);
+        this.upgrades.putAll(cachedIslandInfo.upgrades);
+        this.blockLimits.putAll(cachedIslandInfo.blockLimits);
+        this.ratings.putAll(cachedIslandInfo.ratings);
+        this.completedMissions.putAll(cachedIslandInfo.completedMissions);
+        this.islandSettings.putAll(cachedIslandInfo.islandSettings);
+        System.arraycopy(cachedIslandInfo.cobbleGeneratorValues, 0, this.cobbleGeneratorValues,
+                0, this.cobbleGeneratorValues.length);
+        this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(cachedIslandInfo.uniqueVisitors));
+        this.entityLimits.putAll(cachedIslandInfo.entityLimits);
+        this.islandEffects.putAll(cachedIslandInfo.islandEffects);
+        this.islandChest.write(islandChest -> {
+            for (int index = 0; index < cachedIslandInfo.islandChest.size(); ++index) {
+                islandChest[index] = SIslandChest.createChest(this, index, cachedIslandInfo.islandChest.get(index));
+            }
+        });
+        this.roleLimits.putAll(cachedIslandInfo.roleLimits);
+        this.visitorsLocations.set(cachedIslandInfo.visitorsLocations);
+
+        this.islandSize = cachedIslandInfo.islandSize;
+        this.teamLimit = cachedIslandInfo.teamLimit;
+        this.warpsLimit = cachedIslandInfo.warpsLimit;
+        this.cropGrowth = cachedIslandInfo.cropGrowth;
+        this.spawnerRates = cachedIslandInfo.spawnerRates;
+        this.mobDrops = cachedIslandInfo.mobDrops;
+        this.coopLimit = cachedIslandInfo.coopLimit;
+        this.bankLimit = cachedIslandInfo.bankLimit;
+
+        this.islandBank.setBalance(cachedIslandInfo.balance);
+        this.lastInterest = cachedIslandInfo.lastInterestTime;
+
+        cachedIslandInfo.cachedWarpInfoList.forEach(cachedWarpInfo -> {
+            WarpCategory warpCategory = null;
+
+            if (!cachedWarpInfo.category.isEmpty())
+                warpCategory = createWarpCategory(cachedWarpInfo.category);
+
+            IslandWarp islandWarp = createWarp(cachedWarpInfo.name, cachedWarpInfo.location, warpCategory);
+            islandWarp.setPrivateFlag(cachedWarpInfo.isPrivate);
+
+            if (cachedWarpInfo.icon != null)
+                islandWarp.setIcon(cachedWarpInfo.icon);
+        });
+
+        cachedIslandInfo.cachedWarpCategoryInfoList.forEach(cachedWarpCategoryInfo -> {
+            WarpCategory warpCategory = getWarpCategory(cachedWarpCategoryInfo.name);
+
+            if (warpCategory != null) {
+                if (warpCategory.getWarps().isEmpty()) {
+                    deleteCategory(warpCategory);
+                    return;
+                }
+
+                warpCategory.setSlot(cachedWarpCategoryInfo.slot);
+
+                if (cachedWarpCategoryInfo.icon != null)
+                    warpCategory.setIcon(cachedWarpCategoryInfo.icon);
+            }
+        });
     }
 
     private void startBankInterest() {
