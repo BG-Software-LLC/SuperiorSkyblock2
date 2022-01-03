@@ -100,7 +100,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void createIsland(DatabaseResult resultSet) {
         UUID owner = UUID.fromString(resultSet.getString("owner"));
-        Island island = plugin.getFactory().createIsland(this, resultSet);
+        Island island = plugin.getFactory().createIsland(resultSet);
         this.islandsContainer.addIsland(island);
     }
 

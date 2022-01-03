@@ -190,7 +190,7 @@ public final class SIsland implements Island {
     private UpgradeValue<Double> mobDrops = UpgradeValue.NEGATIVE_DOUBLE;
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
 
-    public SIsland(GridHandler grid, DatabaseResult resultSet) {
+    public SIsland(DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
         this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
 
@@ -215,7 +215,7 @@ public final class SIsland implements Island {
         this.unlockedWorlds.set(resultSet.getInt("unlocked_worlds"));
         this.lastTimeUpdate = resultSet.getLong("last_time_updated");
 
-        ChunksTracker.deserialize(grid, this, resultSet.getString("dirty_chunks"));
+        ChunksTracker.deserialize(plugin.getGrid(), this, resultSet.getString("dirty_chunks"));
         String blockCountsString = resultSet.getString("block_counts");
         Executor.sync(() -> deserializeBlockCounts(blockCountsString), 5L);
 

@@ -55,8 +55,8 @@ public final class FactoriesHandler implements FactoriesManager {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 
-    public Island createIsland(GridHandler grid, DatabaseResult resultSet) {
-        SIsland island = new SIsland(grid, resultSet);
+    public Island createIsland(DatabaseResult resultSet) {
+        SIsland island = new SIsland(resultSet);
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
