@@ -105,14 +105,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class SIsland implements Island {
 
-    private static final int NORMAL_GENERATED_SCHEMATIC_BIT_INDEX = 3;
-    private static final int NETHER_GENERATED_SCHEMATIC_BIT_INDEX = 2;
-    private static final int THE_END_GENERATED_SCHEMATIC_BIT_INDEX = 1;
-
-    private static final int NORMAL_UNLOCKED_WORLDS_BIT_INDEX = 3;
-    private static final int NETHER_UNLOCKED_WORLDS_BIT_INDEX = 0;
-    private static final int THE_END_UNLOCKED_WORLDS_BIT_INDEX = 1;
-
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
@@ -205,8 +197,8 @@ public final class SIsland implements Island {
     private volatile String islandRawName;
     private volatile String description = "";
     private volatile Biome biome = null;
-    private final BitSet generatedSchematics = new BitSet(3);
-    private final BitSet unlockedWorlds = new BitSet(3);
+    private final AtomicInteger generatedSchematics = new AtomicInteger(0);
+    private final AtomicInteger unlockedWorlds = new AtomicInteger(0);
 
     public SIsland(GridHandler grid, DatabaseResult resultSet) {
         this.uuid = UUID.fromString(resultSet.getString("uuid"));
@@ -963,13 +955,12 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isNormalEnabled() {
-        return plugin.getProviders().getWorldsProvider().isNormalUnlocked() ||
-                unlockedWorlds.get(NORMAL_UNLOCKED_WORLDS_BIT_INDEX);
+        return plugin.getProviders().getWorldsProvider().isNormalUnlocked() || (unlockedWorlds.get() & 4) == 4;
     }
 
     @Override
     public void setNormalEnabled(boolean enabled) {
-        this.unlockedWorlds.set(NORMAL_UNLOCKED_WORLDS_BIT_INDEX, enabled);
+        this.unlockedWorlds.updateAndGet(unlockedWorlds -> enabled ? unlockedWorlds | 4 : unlockedWorlds & 3);
 
         if (enabled) {
             PluginDebugger.debug("Action: Enable Normal, Island: " + owner.getName());
@@ -982,13 +973,12 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isNetherEnabled() {
-        return plugin.getProviders().getWorldsProvider().isNetherUnlocked() ||
-                unlockedWorlds.get(NETHER_UNLOCKED_WORLDS_BIT_INDEX);
+        return plugin.getProviders().getWorldsProvider().isNetherUnlocked() || (unlockedWorlds.get() & 1) == 1;
     }
 
     @Override
     public void setNetherEnabled(boolean enabled) {
-        this.unlockedWorlds.set(NETHER_UNLOCKED_WORLDS_BIT_INDEX, enabled);
+        this.unlockedWorlds.updateAndGet(unlockedWorlds -> enabled ? unlockedWorlds | 1 : unlockedWorlds & 6);
 
         if (enabled) {
             PluginDebugger.debug("Action: Enable Nether, Island: " + owner.getName());
@@ -1001,13 +991,12 @@ public final class SIsland implements Island {
 
     @Override
     public boolean isEndEnabled() {
-        return plugin.getProviders().getWorldsProvider().isEndUnlocked() ||
-                unlockedWorlds.get(THE_END_UNLOCKED_WORLDS_BIT_INDEX);
+        return plugin.getProviders().getWorldsProvider().isEndUnlocked() || (unlockedWorlds.get() & 2) == 2;
     }
 
     @Override
     public void setEndEnabled(boolean enabled) {
-        this.unlockedWorlds.set(THE_END_UNLOCKED_WORLDS_BIT_INDEX, enabled);
+        this.unlockedWorlds.updateAndGet(unlockedWorlds -> enabled ? unlockedWorlds | 2 : unlockedWorlds & 5);
 
         if (enabled) {
             PluginDebugger.debug("Action: Enable End, Island: " + owner.getName());
@@ -1020,7 +1009,7 @@ public final class SIsland implements Island {
 
     @Override
     public int getUnlockedWorldsFlag() {
-        return (int) this.unlockedWorlds.toLongArray()[0];
+        return this.unlockedWorlds.get();
     }
 
     /*
@@ -2919,11 +2908,11 @@ public final class SIsland implements Island {
 
         switch (environment) {
             case NORMAL:
-                return this.generatedSchematics.get(NORMAL_GENERATED_SCHEMATIC_BIT_INDEX);
+                return (generatedSchematics.get() & 8) == 8;
             case NETHER:
-                return this.generatedSchematics.get(NETHER_GENERATED_SCHEMATIC_BIT_INDEX);
+                return (generatedSchematics.get() & 4) == 4;
             case THE_END:
-                return this.generatedSchematics.get(THE_END_GENERATED_SCHEMATIC_BIT_INDEX);
+                return (generatedSchematics.get() & 3) == 3;
         }
 
         return false;
@@ -2942,13 +2931,13 @@ public final class SIsland implements Island {
 
         switch (environment) {
             case NORMAL:
-                this.generatedSchematics.set(NORMAL_GENERATED_SCHEMATIC_BIT_INDEX);
+                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
                 break;
             case NETHER:
-                this.generatedSchematics.set(NETHER_GENERATED_SCHEMATIC_BIT_INDEX);
+                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
                 break;
             case THE_END:
-                this.generatedSchematics.set(THE_END_GENERATED_SCHEMATIC_BIT_INDEX);
+                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
                 break;
         }
 
@@ -2957,7 +2946,7 @@ public final class SIsland implements Island {
 
     @Override
     public int getGeneratedSchematicsFlag() {
-        return (int) this.generatedSchematics.toLongArray()[0];
+        return this.generatedSchematics.get();
     }
 
     /*
