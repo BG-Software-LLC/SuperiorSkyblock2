@@ -32,12 +32,7 @@ public final class DataHandler extends AbstractHandler {
     }
 
     @Override
-    public void loadData() {
-        throw new UnsupportedOperationException("Not supported for DataHandler.");
-    }
-
-    @Override
-    public void loadDataWithException() throws HandlerLoadException {
+    public void loadData() throws HandlerLoadException {
         loadDatabaseLoaders();
 
         for (DatabaseLoader databaseLoader : databaseLoaders) {
