@@ -1,13 +1,11 @@
 package com.bgsoftware.superiorskyblock.island.bank.logs;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -71,15 +69,8 @@ public final class DatabaseBankLogs implements IBankLogs {
         List<BankTransaction> bankTransactionsList = new ArrayList<>();
         island.getDatabaseBridge().loadObject("bank_transactions",
                 new DatabaseFilter(Collections.singletonList(new Pair<>("island", island.getUniqueId().toString()))),
-                bankTransactionRow -> {
-                    try {
-                        bankTransactionsList.add(new SBankTransaction(new DatabaseResult(bankTransactionRow)));
-                    } catch (Exception error) {
-                        SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
-                        error.printStackTrace();
-                        PluginDebugger.debug(error);
-                    }
-                });
+                bankTransactionRow -> SBankTransaction.fromDatabase(new DatabaseResult(bankTransactionRow))
+                        .ifPresent(bankTransactionsList::add));
         return bankTransactionsList;
     }
 

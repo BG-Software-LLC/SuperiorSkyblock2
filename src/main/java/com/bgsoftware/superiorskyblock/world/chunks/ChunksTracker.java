@@ -19,8 +19,10 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,7 +80,7 @@ public final class ChunksTracker {
         return IslandsSerializer.serializeDirtyChunks(dirtyChunks);
     }
 
-    public static void deserialize(GridHandler grid, Island island, String serialized) {
+    public static void deserialize(GridHandler grid, Island island, @Nullable String serialized) {
         try {
             if (serialized == null || serialized.isEmpty()) throw new JsonSyntaxException("");
             JsonObject dirtyChunksObject = gson.fromJson(serialized, JsonObject.class);

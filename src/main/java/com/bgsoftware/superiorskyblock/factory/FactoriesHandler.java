@@ -21,10 +21,10 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public final class FactoriesHandler implements FactoriesManager {
@@ -58,9 +58,13 @@ public final class FactoriesHandler implements FactoriesManager {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 
-    public Island createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        SIsland island = new SIsland(cache, resultSet);
-        return islandsFactory == null ? island : islandsFactory.createIsland(island);
+    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
+        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
+
+        if (!island.isPresent())
+            return island;
+
+        return islandsFactory == null ? island : island.map(islandsFactory::createIsland);
     }
 
     public Island createIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
@@ -68,9 +72,13 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(databaseCache, resultSet);
-        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
+    public Optional<SuperiorPlayer> createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
+        Optional<SuperiorPlayer> superiorPlayer = SSuperiorPlayer.fromDatabase(databaseCache, resultSet);
+
+        if (!superiorPlayer.isPresent())
+            return superiorPlayer;
+
+        return playersFactory == null ? superiorPlayer : superiorPlayer.map(playersFactory::createPlayer);
     }
 
     public SuperiorPlayer createPlayer(UUID player) {

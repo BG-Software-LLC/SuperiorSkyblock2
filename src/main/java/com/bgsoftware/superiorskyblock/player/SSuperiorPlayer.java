@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -95,29 +96,51 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(DatabaseCache<CachedPlayerInfo> cache, DatabaseResult resultSet) {
-        this.uuid = UUID.fromString(resultSet.getString("uuid"));
-        this.name = resultSet.getString("last_used_name");
-        this.textureValue = resultSet.getString("last_used_skin");
-        this.disbands = resultSet.getInt("disbands");
-        this.lastTimeStatus = resultSet.getLong("last_time_updated");
+    public SSuperiorPlayer(UUID player) {
+        this(player, Bukkit.getOfflinePlayer(player), SPlayerRole.guestRole(), plugin.getSettings().getDisbandCount(),
+                PlayerLocales.getDefaultLocale());
+    }
 
-        CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(this.uuid);
+    public SSuperiorPlayer(UUID uuid, @Nullable OfflinePlayer offlinePlayer, PlayerRole playerRole, int disbands,
+                           Locale userLocale) {
+        this(uuid, offlinePlayer == null ? null : offlinePlayer.getName(), playerRole, disbands, userLocale);
+    }
 
-        if (cachedPlayerInfo != null)
-            loadFromCachedInfo(cachedPlayerInfo);
-
+    public SSuperiorPlayer(UUID uuid, @Nullable String name, PlayerRole playerRole, int disbands, Locale userLocale) {
+        this.uuid = uuid;
+        this.name = name == null ? "null" : name;
+        this.playerRole = playerRole;
+        this.disbands = disbands;
+        this.userLocale = userLocale;
         databaseBridge.startSavingData();
     }
 
-    public SSuperiorPlayer(UUID player) {
-        OfflinePlayer offlinePlayer;
-        this.uuid = player;
-        this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
-        this.playerRole = SPlayerRole.guestRole();
-        this.disbands = plugin.getSettings().getDisbandCount();
-        this.userLocale = PlayerLocales.getDefaultLocale();
-        databaseBridge.startSavingData();
+    public static Optional<SuperiorPlayer> fromDatabase(DatabaseCache<CachedPlayerInfo> cache,
+                                                        DatabaseResult resultSet) {
+        Optional<UUID> uuid = resultSet.getUUID("uuid");
+        if (!uuid.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load player with null uuid, skipping...");
+            return Optional.empty();
+        }
+
+        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(
+                uuid.get(),
+                resultSet.getString("last_used_name").orElse(null),
+                SPlayerRole.defaultRole(),
+                resultSet.getInt("disbands").orElse(0),
+                PlayerLocales.getDefaultLocale()
+        );
+
+        superiorPlayer.textureValue = resultSet.getString("last_used_skin").orElse("");
+        superiorPlayer.lastTimeStatus = resultSet.getLong("last_time_updated")
+                .orElse(System.currentTimeMillis() / 1000);
+
+        CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(uuid.get());
+
+        if (cachedPlayerInfo != null)
+            superiorPlayer.loadFromCachedInfo(cachedPlayerInfo);
+
+        return Optional.of(superiorPlayer);
     }
 
     /*

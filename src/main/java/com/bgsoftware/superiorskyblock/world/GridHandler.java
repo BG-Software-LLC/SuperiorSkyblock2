@@ -1,35 +1,35 @@
 package com.bgsoftware.superiorskyblock.world;
 
-import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
-import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -101,9 +102,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        UUID owner = UUID.fromString(resultSet.getString("owner"));
-        Island island = plugin.getFactory().createIsland(cache, resultSet);
-        this.islandsContainer.addIsland(island);
+        Optional<Island> island = plugin.getFactory().createIsland(cache, resultSet);
+        island.ifPresent(this.islandsContainer::addIsland);
     }
 
     @Override
@@ -611,14 +611,16 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void loadGrid(DatabaseResult resultSet) {
-        lastIsland = SBlockPosition.of(resultSet.getString("last_island"));
+        resultSet.getString("last_island").map(SBlockPosition::of)
+                .ifPresent(lastIsland -> this.lastIsland = lastIsland);
+
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
             lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 
-        int maxIslandSize = resultSet.getInt("max_island_size");
-        String world = resultSet.getString("world");
+        int maxIslandSize = resultSet.getInt("max_island_size").orElse(plugin.getSettings().getMaxIslandSize());
+        String world = resultSet.getString("world").orElse(plugin.getSettings().getWorlds().getDefaultWorldName());
 
         try {
             if (plugin.getSettings().getMaxIslandSize() != maxIslandSize) {

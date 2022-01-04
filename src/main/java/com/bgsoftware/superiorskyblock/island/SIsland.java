@@ -200,78 +200,101 @@ public final class SIsland implements Island {
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
     private final AtomicInteger unlockedWorlds = new AtomicInteger(0);
 
-    public SIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        this.uuid = UUID.fromString(resultSet.getString("uuid"));
-        this.owner = plugin.getPlayers().getSuperiorPlayer(UUID.fromString(resultSet.getString("owner")));
-
-        PluginDebugger.debug("Action: Load Island, UUID: " + this.uuid + ", Owner: " + this.owner.getUniqueId());
-
-        this.owner.setIsland(this);
-        this.owner.setPlayerRole(SPlayerRole.lastRole());
-
-        this.center = SBlockPosition.of(Objects.requireNonNull(LocationUtils.getLocation(resultSet.getString("center"))));
-        this.creationTime = resultSet.getLong("creation_time");
-        this.schemName = resultSet.getString("island_type");
-        this.discord = resultSet.getString("discord");
-        this.paypal = resultSet.getString("paypal");
-        this.bonusWorth.set(resultSet.getBigDecimal("worth_bonus"));
-        this.bonusLevel.set(resultSet.getBigDecimal("levels_bonus"));
-        this.isLocked = resultSet.getBoolean("locked");
-        this.isTopIslandsIgnored = resultSet.getBoolean("ignored");
-        this.islandName = resultSet.getString("name");
-        this.islandRawName = StringUtils.stripColors(this.islandName);
-        this.description = resultSet.getString("description");
-        this.generatedSchematics.set(resultSet.getInt("generated_schematics"));
-        this.unlockedWorlds.set(resultSet.getInt("unlocked_worlds"));
-        this.lastTimeUpdate = resultSet.getLong("last_time_updated");
-
-        ChunksTracker.deserialize(plugin.getGrid(), this, resultSet.getString("dirty_chunks"));
-        String blockCountsString = resultSet.getString("block_counts");
-        Executor.sync(() -> deserializeBlockCounts(blockCountsString), 5L);
-
-        CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(this.uuid);
-
-        if (cachedIslandInfo != null)
-            loadFromCachedInfo(cachedIslandInfo);
-
-        updateDatesFormatter();
-        startBankInterest();
-        checkMembersDuplication();
-        updateOldUpgradeValues();
-        updateUpgrades();
-        updateIslandChests();
-
-        // We want to save all the limits to the custom block keys
-        plugin.getBlockValues().addCustomBlockKeys(this.blockLimits.keySet());
-
-        databaseBridge.startSavingData();
-    }
-
-    @SuppressWarnings("WeakerAccess")
-    public SIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
-        this.uuid = uuid;
-        this.owner = superiorPlayer;
-
-        if (this.owner != null) {
-            this.owner.setPlayerRole(SPlayerRole.lastRole());
-            this.owner.setIsland(this);
-        }
-
-        long currentTime = System.currentTimeMillis() / 1000;
-
-        this.center = SBlockPosition.of(location);
-        this.creationTime = currentTime;
-        this.islandName = islandName;
-        this.islandRawName = StringUtils.stripColors(islandName);
-        this.schemName = schemName;
+    public SIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location location, String islandName,
+                   @Nullable String schemName) {
+        this(owner, uuid, location, islandName, schemName, System.currentTimeMillis() / 1000);
 
         setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
-        setLastInterestTime(currentTime);
+        setLastInterestTime(this.creationTime);
         updateDatesFormatter();
         assignIslandChest();
         updateUpgrades();
 
         databaseBridge.startSavingData();
+    }
+
+    private SIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location location, String islandName,
+                    @Nullable String schemName, long creationTime) {
+        this.uuid = uuid;
+        this.owner = owner;
+
+        if (owner != null) {
+            owner.setPlayerRole(SPlayerRole.lastRole());
+            owner.setIsland(this);
+        }
+
+        this.center = SBlockPosition.of(location);
+        this.creationTime = creationTime;
+        this.islandName = islandName;
+        this.islandRawName = StringUtils.stripColors(islandName);
+        this.schemName = schemName;
+    }
+
+    public static Optional<Island> fromDatabase(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
+        Optional<UUID> uuid = resultSet.getUUID("uuid");
+        if (!uuid.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load island with invalid uuid, skipping...");
+            return Optional.empty();
+        }
+
+        Optional<SuperiorPlayer> owner = resultSet.getUUID("owner").map(plugin.getPlayers()::getSuperiorPlayer);
+        if (!owner.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load island with invalid owner uuid, skipping...");
+            return Optional.empty();
+        }
+
+        Optional<Location> center = resultSet.getString("center").map(LocationUtils::getLocation);
+        if (!center.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
+            return Optional.empty();
+        }
+
+        PluginDebugger.debug("Action: Load Island, UUID: " + uuid.get() + ", Owner: " + owner.get().getUniqueId());
+
+        SIsland island = new SIsland(
+                owner.get(),
+                uuid.get(),
+                center.get(),
+                resultSet.getString("name").orElse(""),
+                resultSet.getString("island_type").orElse(null),
+                resultSet.getLong("creation_time").orElse(System.currentTimeMillis() / 1000L)
+        );
+
+        island.discord = resultSet.getString("discord").orElse("None");
+        island.paypal = resultSet.getString("paypal").orElse("None");
+        island.bonusWorth.set(resultSet.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO));
+        island.bonusLevel.set(resultSet.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO));
+        island.isLocked = resultSet.getBoolean("locked").orElse(false);
+        island.isTopIslandsIgnored = resultSet.getBoolean("ignored").orElse(false);
+        island.description = resultSet.getString("description").orElse("");
+        island.generatedSchematics.set(resultSet.getInt("generated_schematics").orElse(0));
+        island.unlockedWorlds.set(resultSet.getInt("unlocked_worlds").orElse(0));
+        island.lastTimeUpdate = resultSet.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L);
+
+        Optional<String> dirtyChunks = resultSet.getString("dirty_chunks");
+        if (dirtyChunks.isPresent())
+            ChunksTracker.deserialize(plugin.getGrid(), island, dirtyChunks.get());
+
+        Optional<String> blockCountsString = resultSet.getString("block_counts");
+        if (blockCountsString.isPresent())
+            Executor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
+
+        CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(uuid.get());
+
+        if (cachedIslandInfo != null)
+            island.loadFromCachedInfo(cachedIslandInfo);
+
+        island.updateDatesFormatter();
+        island.startBankInterest();
+        island.checkMembersDuplication();
+        island.updateOldUpgradeValues();
+        island.updateUpgrades();
+        island.updateIslandChests();
+
+        // We want to save all the limits to the custom block keys
+        plugin.getBlockValues().addCustomBlockKeys(island.blockLimits.keySet());
+
+        return Optional.of(island);
     }
 
     /*
@@ -3194,7 +3217,7 @@ public final class SIsland implements Island {
         });
     }
 
-    private void deserializeBlockCounts(String blockCounts) {
+    private void deserializeBlockCounts(@Nullable String blockCounts) {
         try {
             rawKeyPlacements = true;
             IslandsDeserializer.deserializeBlockCounts(blockCounts, this);

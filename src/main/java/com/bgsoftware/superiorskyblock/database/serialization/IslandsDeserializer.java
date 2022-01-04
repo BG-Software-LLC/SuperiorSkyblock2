@@ -26,9 +26,8 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.gson.Gson;
@@ -36,12 +35,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class IslandsDeserializer {
@@ -58,14 +60,26 @@ public final class IslandsDeserializer {
 
     public static void deserializeMembers(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_members", membersRow -> {
-            UUID uuid = UUID.fromString((String) membersRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult members = new DatabaseResult(membersRow);
 
-            UUID playerUUID = UUID.fromString((String) membersRow.get("player"));
-            PlayerRole playerRole = SPlayerRole.fromId((int) membersRow.get("role"));
+            Optional<UUID> uuid = members.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island members for null islands, skipping...");
+                return;
+            }
 
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
-            //superiorPlayer.setIsland(island);
+            Optional<UUID> playerUUID = members.getUUID("player");
+            if (!playerUUID.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island members with invalid uuids, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+
+            PlayerRole playerRole = members.getInt("role").map(SPlayerRole::fromId)
+                    .orElse(SPlayerRole.defaultRole());
+
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             superiorPlayer.setPlayerRole(playerRole);
 
             cachedIslandInfo.members.add(superiorPlayer);
@@ -74,99 +88,188 @@ public final class IslandsDeserializer {
 
     public static void deserializeBanned(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_bans", bansRow -> {
-            UUID uuid = UUID.fromString((String) bansRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult bans = new DatabaseResult(bansRow);
 
-            UUID playerUUID = UUID.fromString((String) bansRow.get("player"));
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
+            Optional<UUID> uuid = bans.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load banned players for null islands, skipping...");
+                return;
+            }
+
+            Optional<UUID> playerUUID = bans.getUUID("player");
+            if (!playerUUID.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load banned players with invalid uuids, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             cachedIslandInfo.bannedPlayers.add(superiorPlayer);
         });
     }
 
     public static void deserializeVisitors(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_visitors", visitorsRow -> {
-            UUID islandUUID = UUID.fromString((String) visitorsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID, new CachedIslandInfo());
+            DatabaseResult visitors = new DatabaseResult(visitorsRow);
 
-            UUID uuid = UUID.fromString((String) visitorsRow.get("player"));
-            long visitTime = (long) visitorsRow.get("visit_time");
-            cachedIslandInfo.uniqueVisitors.add(new Pair<>(plugin.getPlayers().getSuperiorPlayer(uuid), visitTime));
+            Optional<UUID> islandUUID = visitors.getUUID("island");
+            if (!islandUUID.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island visitors for null islands, skipping...");
+                return;
+            }
+
+            Optional<UUID> uuid = visitors.getUUID("player");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island visitors with invalid uuids, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID.get(), new CachedIslandInfo());
+            SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
+            long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
+            cachedIslandInfo.uniqueVisitors.add(new Pair<>(visitorPlayer, visitTime));
         });
     }
 
     public static void deserializePlayerPermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_player_permissions", playerPermissionRow -> {
-            UUID uuid = UUID.fromString((String) playerPermissionRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult playerPermissions = new DatabaseResult(playerPermissionRow);
 
-            UUID playerUUID = UUID.fromString((String) playerPermissionRow.get("player"));
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
-
-            try {
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) playerPermissionRow.get("permission"));
-                cachedIslandInfo.playerPermissions.computeIfAbsent(superiorPlayer, s -> new PlayerPermissionNode(superiorPlayer, null))
-                        .loadPrivilege(islandPrivilege, getAsByte(playerPermissionRow.get("status")));
-            } catch (Exception error) {
-                SuperiorSkyblockPlugin.log("&cError occurred while loading player permissions:");
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+            Optional<UUID> uuid = playerPermissions.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load player permissions for null islands, skipping...");
+                return;
             }
+
+            Optional<UUID> playerUUID = playerPermissions.getUUID("player");
+            if (!playerUUID.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load player permissions for invalid players, skipping...");
+                return;
+            }
+
+            Optional<IslandPrivilege> islandPrivilege = playerPermissions.getString("permission").map(name -> {
+                try {
+                    return IslandPrivilege.getByName(name);
+                } catch (NullPointerException error) {
+                    return null;
+                }
+            });
+            if (!islandPrivilege.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load player permissions with invalid permission, skipping...");
+                return;
+            }
+
+            Optional<Byte> status = playerPermissions.getByte("status");
+            if (!status.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load player permissions with invalid status, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
+            PlayerPermissionNode permissionNode = cachedIslandInfo.playerPermissions.computeIfAbsent(superiorPlayer,
+                    s -> new PlayerPermissionNode(superiorPlayer, null));
+            permissionNode.loadPrivilege(islandPrivilege.get(), status.get());
         });
     }
 
     public static void deserializeRolePermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_role_permissions", rolePermissionRow -> {
-            UUID uuid = UUID.fromString((String) rolePermissionRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+        databaseBridge.loadAllObjects("islands_role_permissions", rolePermissionsRow -> {
+            DatabaseResult rolePermissions = new DatabaseResult(rolePermissionsRow);
 
-            try {
-                PlayerRole playerRole = SPlayerRole.fromId((int) rolePermissionRow.get("role"));
-                IslandPrivilege islandPrivilege = IslandPrivilege.getByName((String) rolePermissionRow.get("permission"));
-                cachedIslandInfo.rolePermissions.put(islandPrivilege, playerRole);
-            } catch (Exception error) {
-                SuperiorSkyblockPlugin.log("&cError occurred while loading role permissions:");
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+            Optional<UUID> uuid = rolePermissions.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role permissions for null islands, skipping...");
+                return;
             }
+
+            Optional<PlayerRole> playerRole = rolePermissions.getInt("role").map(SPlayerRole::fromId);
+            if (!playerRole.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role permissions with invalid role, skipping...");
+                return;
+            }
+
+            Optional<IslandPrivilege> islandPrivilege = rolePermissions.getString("permission").map(name -> {
+                try {
+                    return IslandPrivilege.getByName(name);
+                } catch (NullPointerException error) {
+                    return null;
+                }
+            });
+            if (!islandPrivilege.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role permissions with invalid permission, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.rolePermissions.put(islandPrivilege.get(), playerRole.get());
         });
     }
 
     public static void deserializeUpgrades(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_upgrades", upgradeRow -> {
-            UUID uuid = UUID.fromString((String) upgradeRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+        databaseBridge.loadAllObjects("islands_upgrades", upgradesRow -> {
+            DatabaseResult upgrades = new DatabaseResult(upgradesRow);
 
-            String upgradeName = (String) upgradeRow.get("upgrade");
-            int level = (int) upgradeRow.get("level");
-            cachedIslandInfo.upgrades.put(upgradeName, level);
+            Optional<UUID> uuid = upgrades.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load upgrades for null islands, skipping...");
+                return;
+            }
+
+            Optional<String> upgrade = upgrades.getString("upgrade");
+            if (!upgrade.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load upgrades with invalid upgrade names, skipping...");
+                return;
+            }
+
+            Optional<Integer> level = upgrades.getInt("level");
+            if (!level.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load upgrades with invalid levels, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.upgrades.put(upgrade.get(), level.get());
         });
     }
 
     public static void deserializeWarps(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_warps", islandWarpRow -> {
-            String name = IslandUtils.getWarpName((String) islandWarpRow.get("name"));
+        databaseBridge.loadAllObjects("islands_warps", islandWarpsRow -> {
+            DatabaseResult islandWarp = new DatabaseResult(islandWarpsRow);
 
-            if (name.isEmpty())
+            Optional<UUID> uuid = islandWarp.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load warps for null islands, skipping...");
                 return;
+            }
 
-            if (!IslandUtils.isWarpNameLengthValid(name))
-                name = name.substring(0, IslandUtils.getMaxWarpNameLength());
+            Optional<String> name = islandWarp.getString("name").map(IslandUtils::getWarpName).map(_name -> {
+                return IslandUtils.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandUtils.getMaxWarpNameLength());
+            });
+            if (!name.isPresent() || name.get().isEmpty()) {
+                SuperiorSkyblockPlugin.log("&cCannot load warps with invalid names, skipping...");
+                return;
+            }
+
+            Optional<Location> location = islandWarp.getString("location").map(LocationUtils::getLocation);
+            if (!location.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load warps with invalid locations, skipping...");
+                return;
+            }
 
             CachedWarpInfo cachedWarpInfo = new CachedWarpInfo();
-            cachedWarpInfo.name = name;
-            cachedWarpInfo.category = (String) islandWarpRow.getOrDefault("category", "");
-            cachedWarpInfo.location = FileUtils.toLocation((String) islandWarpRow.get("location"));
-            cachedWarpInfo.isPrivate = getAsByte(islandWarpRow.get("private")) == 1;
-            if (!((String) islandWarpRow.getOrDefault("icon", "")).isEmpty())
-                cachedWarpInfo.icon = ItemUtils.deserializeItem((String) islandWarpRow.get("icon"));
+            cachedWarpInfo.name = name.get();
+            cachedWarpInfo.category = islandWarp.getString("category").orElse("");
+            cachedWarpInfo.location = location.get();
+            cachedWarpInfo.isPrivate = islandWarp.getBoolean("private").orElse(true);
+            cachedWarpInfo.icon = islandWarp.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
 
-            UUID uuid = UUID.fromString((String) islandWarpRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
             cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
         });
     }
 
-    public static void deserializeBlockCounts(String blocks, Island island) {
+    public static void deserializeBlockCounts(@Nullable String blocks, Island island) {
         if (blocks == null || blocks.isEmpty())
             return;
 
@@ -187,173 +290,380 @@ public final class IslandsDeserializer {
     }
 
     public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_block_limits", blockLimitsRow -> {
-            UUID uuid = UUID.fromString((String) blockLimitsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+        databaseBridge.loadAllObjects("islands_block_limits", blockLimitRow -> {
+            DatabaseResult blockLimits = new DatabaseResult(blockLimitRow);
 
-            Key blockKey = Key.of((String) blockLimitsRow.get("block"));
-            int limit = (int) blockLimitsRow.get("limit");
-            cachedIslandInfo.blockLimits.put(blockKey, new UpgradeValue<>(limit, i -> i < 0));
+            Optional<UUID> uuid = blockLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load block limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<Key> block = blockLimits.getString("block").map(Key::of);
+            if (!block.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load block limits for invalid blocks, skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = blockLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load block limits with invalid limits, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.blockLimits.put(block.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
 
     public static void deserializeEntityLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_entity_limits", entityLimitsRow -> {
-            UUID uuid = UUID.fromString((String) entityLimitsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult entityLimits = new DatabaseResult(entityLimitsRow);
 
-            Key entity = Key.of((String) entityLimitsRow.get("entity"));
-            int limit = (int) entityLimitsRow.get("limit");
-            cachedIslandInfo.entityLimits.put(entity, new UpgradeValue<>(limit, i -> i < 0));
+            Optional<UUID> uuid = entityLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load entity limits for null islands, skipping...");
+                return;
+            }
+
+            Optional<Key> entity = entityLimits.getString("entity").map(Key::of);
+            if (!entity.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load entity limits for invalid entities, skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = entityLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load entity limits with invalid limits, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.entityLimits.put(entity.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
 
     public static void deserializeRatings(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_ratings", ratingsRow -> {
-            UUID islandUUID = UUID.fromString((String) ratingsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID, new CachedIslandInfo());
+            DatabaseResult ratings = new DatabaseResult(ratingsRow);
 
-            UUID uuid = UUID.fromString((String) ratingsRow.get("player"));
-            Rating rating = Rating.valueOf((int) ratingsRow.get("rating"));
-            cachedIslandInfo.ratings.put(uuid, rating);
+            Optional<UUID> islandUUID = ratings.getUUID("island");
+            if (!islandUUID.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load ratings for null islands, skipping...");
+                return;
+            }
+
+            Optional<UUID> uuid = ratings.getUUID("player");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load ratings with invalid players, skipping...");
+                return;
+            }
+
+            Optional<Rating> rating = ratings.getInt("rating").map(value -> {
+                try {
+                    return Rating.valueOf(value);
+                } catch (ArrayIndexOutOfBoundsException error) {
+                    return null;
+                }
+            });
+            if (!rating.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load ratings with invalid rating value, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID.get(), new CachedIslandInfo());
+            cachedIslandInfo.ratings.put(uuid.get(), rating.get());
         });
     }
 
     public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_missions", missionsRow -> {
-            UUID uuid = UUID.fromString((String) missionsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult missions = new DatabaseResult(missionsRow);
 
-            String name = (String) missionsRow.get("name");
-            int finishCount = (int) missionsRow.get("finish_count");
+            Optional<UUID> uuid = missions.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island missions for null islands, skipping...");
+                return;
+            }
 
-            Mission<?> mission = plugin.getMissions().getMission(name);
+            Optional<Mission<?>> mission = missions.getString("name").map(plugin.getMissions()::getMission);
+            if (!mission.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island missions with invalid missions, skipping...");
+                return;
+            }
 
-            if (mission != null)
-                cachedIslandInfo.completedMissions.put(mission, finishCount);
+            Optional<Integer> finishCount = missions.getInt("finish_count");
+            if (!finishCount.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island missions with invalid finish count, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.completedMissions.put(mission.get(), finishCount.get());
         });
     }
 
     public static void deserializeIslandFlags(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_flags", islandFlagRow -> {
-            UUID uuid = UUID.fromString((String) islandFlagRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult islandFlagResult = new DatabaseResult(islandFlagRow);
 
-            try {
-                IslandFlag islandFlag = IslandFlag.getByName((String) islandFlagRow.get("name"));
-                byte status = getAsByte(islandFlagRow.get("status"));
-                cachedIslandInfo.islandFlags.put(islandFlag, status);
-            } catch (Exception error) {
-                SuperiorSkyblockPlugin.log("&cError occurred while loading island flags:");
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+            Optional<UUID> uuid = islandFlagResult.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island flags for null islands, skipping...");
+                return;
             }
+
+            Optional<IslandFlag> islandFlag = islandFlagResult.getString("name").map(name -> {
+                try {
+                    return IslandFlag.getByName(name);
+                } catch (NullPointerException error) {
+                    return null;
+                }
+            });
+            if (!islandFlag.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island flags with invalid flags, skipping...");
+                return;
+            }
+
+            Optional<Byte> status = islandFlagResult.getByte("status");
+            if (!status.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island flags with invalid status, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.islandFlags.put(islandFlag.get(), status.get());
         });
     }
 
     public static void deserializeGenerators(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_generators", generatorsRow -> {
-            UUID uuid = UUID.fromString((String) generatorsRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult generators = new DatabaseResult(generatorsRow);
 
-            try {
-                int environment = World.Environment.valueOf((String) generatorsRow.get("environment")).ordinal();
-                Key blockKey = Key.of((String) generatorsRow.get("block"));
-                int rate = (int) generatorsRow.get("rate");
-                (cachedIslandInfo.cobbleGeneratorValues[environment] = new KeyMap<>())
-                        .put(blockKey, new UpgradeValue<>(rate, n -> n < 0));
-            } catch (Exception error) {
-                SuperiorSkyblockPlugin.log("&cError occurred while loading generators:");
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+            Optional<UUID> uuid = generators.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load generator rates for null islands, skipping...");
+                return;
             }
+
+            Optional<Integer> environment = generators.getEnum("environment", World.Environment.class)
+                    .map(Enum::ordinal);
+            if (!environment.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load generator rates with invalid environment, skipping...");
+                return;
+            }
+
+            Optional<Key> block = generators.getString("block").map(Key::of);
+            if (!block.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load generator rates with invalid block, skipping...");
+                return;
+            }
+
+            Optional<Integer> rate = generators.getInt("rate");
+            if (!rate.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load generator rates with invalid rate, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = new KeyMap<>())
+                    .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
         });
     }
 
     public static void deserializeIslandHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_homes", teleportLocationRow -> {
-            UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-            int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
-            cachedIslandInfo.islandHomes[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
+        databaseBridge.loadAllObjects("islands_homes", islandHomesRow -> {
+            DatabaseResult islandHomes = new DatabaseResult(islandHomesRow);
+
+            Optional<UUID> uuid = islandHomes.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes for null islands, skipping...");
+                return;
+            }
+
+            Optional<Integer> environment = islandHomes.getEnum("environment", World.Environment.class)
+                    .map(Enum::ordinal);
+            if (!environment.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes with invalid environment, skipping...");
+                return;
+            }
+
+            Optional<Location> location = islandHomes.getString("location").map(LocationUtils::getLocation);
+            if (!location.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes with invalid location, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.islandHomes[environment.get()] = location.get();
         });
     }
 
     public static void deserializeVisitorHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_visitor_homes", teleportLocationRow -> {
-            UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-            int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
-            cachedIslandInfo.visitorHomes[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
+        databaseBridge.loadAllObjects("islands_visitor_homes", islandVisitorHomesRow -> {
+            DatabaseResult islandVisitorHomes = new DatabaseResult(islandVisitorHomesRow);
+
+            Optional<UUID> uuid = islandVisitorHomes.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes for null islands, skipping...");
+                return;
+            }
+
+            Optional<Integer> environment = islandVisitorHomes.getEnum("environment", World.Environment.class)
+                    .map(Enum::ordinal);
+            if (!environment.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes with invalid environment, skipping...");
+                return;
+            }
+
+            Optional<Location> location = islandVisitorHomes.getString("location").map(LocationUtils::getLocation);
+            if (!location.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island homes with invalid location, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.visitorHomes[environment.get()] = location.get();
         });
     }
 
     public static void deserializeEffects(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_effects", islandEffectRow -> {
-            UUID uuid = UUID.fromString((String) islandEffectRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-            PotionEffectType potionEffectType = PotionEffectType.getByName((String) islandEffectRow.get("effect_type"));
-            if (potionEffectType != null) {
-                int level = (int) islandEffectRow.get("level");
-                cachedIslandInfo.islandEffects.put(potionEffectType, new UpgradeValue<>(level, i -> i < 0));
+            DatabaseResult islandEffects = new DatabaseResult(islandEffectRow);
+
+            Optional<UUID> uuid = islandEffects.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island effects for null islands, skipping...");
+                return;
             }
+
+            Optional<PotionEffectType> effectType = islandEffects.getString("effect_type")
+                    .map(PotionEffectType::getByName);
+            if (!effectType.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island effects with invalid effect, skipping...");
+                return;
+            }
+
+            Optional<Integer> level = islandEffects.getInt("level");
+            if (!level.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island effects with invalid level, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.islandEffects.put(effectType.get(), new UpgradeValue<>(level.get(), i -> i < 0));
         });
     }
 
     public static void deserializeIslandChest(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
-        databaseBridge.loadAllObjects("islands_chests", islandChestRow -> {
-            UUID uuid = UUID.fromString((String) islandChestRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-            int index = (int) islandChestRow.get("index");
-            String contents = (String) islandChestRow.get("contents");
+        databaseBridge.loadAllObjects("islands_chests", islandChestsRow -> {
+            DatabaseResult islandChests = new DatabaseResult(islandChestsRow);
 
-            while (index > cachedIslandInfo.islandChests.size()) {
+            Optional<UUID> uuid = islandChests.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island chests for null islands, skipping...");
+                return;
+            }
+
+            Optional<Integer> index = islandChests.getInt("index");
+            if (!index.isPresent() || index.get() < 0) {
+                SuperiorSkyblockPlugin.log("&cCannot load island chest with invalid index, skipping...");
+                return;
+            }
+
+            Optional<ItemStack[]> contents = islandChests.getString("contents").map(ItemUtils::deserialize);
+            if (!contents.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island chest with invalid contents, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+
+            while (index.get() > cachedIslandInfo.islandChests.size()) {
                 cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize()]);
             }
 
-            cachedIslandInfo.islandChests.add(ItemUtils.deserialize(contents));
+            cachedIslandInfo.islandChests.add(contents.get());
         });
     }
 
     public static void deserializeRoleLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_role_limits", roleLimitRaw -> {
-            UUID uuid = UUID.fromString((String) roleLimitRaw.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-            PlayerRole playerRole = SPlayerRole.fromId((int) roleLimitRaw.get("role"));
-            if (playerRole != null) {
-                int limit = (int) roleLimitRaw.get("limit");
-                cachedIslandInfo.roleLimits.put(playerRole, new UpgradeValue<>(limit, i -> i < 0));
+            DatabaseResult roleLimits = new DatabaseResult(roleLimitRaw);
+
+            Optional<UUID> uuid = roleLimits.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role limits for null islands, skipping...");
+                return;
             }
+
+            Optional<PlayerRole> playerRole = roleLimits.getInt("role").map(SPlayerRole::fromId);
+            if (!playerRole.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role limit for invalid role, skipping...");
+                return;
+            }
+
+            Optional<Integer> limit = roleLimits.getInt("limit");
+            if (!limit.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load role limit for invalid limit, skipping...");
+                return;
+            }
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.roleLimits.put(playerRole.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
 
     public static void deserializeWarpCategories(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_warp_categories", warpCategoryRow -> {
-            String name = StringUtils.stripColors((String) warpCategoryRow.get("name"));
+            DatabaseResult warpCategory = new DatabaseResult(warpCategoryRow);
+
+            Optional<UUID> uuid = warpCategory.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load warp categories for null islands, skipping...");
+                return;
+            }
+
+            Optional<String> name = warpCategory.getString("name").map(StringUtils::stripColors);
+            if (!name.isPresent() || name.get().isEmpty()) {
+                SuperiorSkyblockPlugin.log("&cCannot load warp categories with invalid name, skipping...");
+                return;
+            }
 
             CachedWarpCategoryInfo cachedWarpCategoryInfo = new CachedWarpCategoryInfo();
-            cachedWarpCategoryInfo.name = name;
-            cachedWarpCategoryInfo.slot = (int) warpCategoryRow.get("slot");
-            cachedWarpCategoryInfo.icon = ItemUtils.deserializeItem((String) warpCategoryRow.get("icon"));
+            cachedWarpCategoryInfo.name = name.get();
+            cachedWarpCategoryInfo.slot = warpCategory.getInt("slot").orElse(-1);
+            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
 
-            UUID uuid = UUID.fromString((String) warpCategoryRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
             cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);
         });
     }
 
     public static void deserializeIslandBank(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
         databaseBridge.loadAllObjects("islands_banks", islandBankRow -> {
-            UUID uuid = UUID.fromString((String) islandBankRow.get("island"));
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            DatabaseResult islandBank = new DatabaseResult(islandBankRow);
 
-            BigDecimal balance = new BigDecimal((String) islandBankRow.get("balance"));
-            long lastInterestTime = getAsLong(islandBankRow.get("last_interest_time"));
-            if (lastInterestTime > (System.currentTimeMillis() / 1000))
-                lastInterestTime /= 1000;
+            Optional<UUID> uuid = islandBank.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island banks for null islands, skipping...");
+                return;
+            }
 
-            cachedIslandInfo.balance = balance;
-            cachedIslandInfo.lastInterestTime = lastInterestTime;
+            Optional<BigDecimal> balance = islandBank.getBigDecimal("balance");
+            if (!balance.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island banks with invalid balance, skipping...");
+                return;
+            }
+
+            long currentTime = System.currentTimeMillis() / 1000;
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            cachedIslandInfo.balance = balance.get();
+            cachedIslandInfo.lastInterestTime = islandBank.getLong("last_interest_time").orElse(currentTime);
+
+            if (cachedIslandInfo.lastInterestTime > currentTime)
+                cachedIslandInfo.lastInterestTime /= 1000L;
         });
     }
 
@@ -361,17 +671,31 @@ public final class IslandsDeserializer {
         databaseBridge.loadAllObjects("islands_settings", islandSettingsRow -> {
             DatabaseResult islandSettings = new DatabaseResult(islandSettingsRow);
 
-            UUID uuid = UUID.fromString(islandSettings.getString("island"));
+            Optional<String> island = islandSettings.getString("island");
+            if (!island.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island settings of null island, skipping ");
+                return;
+            }
+
+            UUID uuid = UUID.fromString(island.get());
             CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
 
-            cachedIslandInfo.islandSize = new UpgradeValue<>(islandSettings.getInt("size"), i -> i < 0);
-            cachedIslandInfo.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit"), i -> i < 0);
-            cachedIslandInfo.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit"), i -> i < 0);
-            cachedIslandInfo.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier"), i -> i < 0);
-            cachedIslandInfo.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier"), i -> i < 0);
-            cachedIslandInfo.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier"), i -> i < 0);
-            cachedIslandInfo.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit"), i -> i < 0);
-            cachedIslandInfo.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit"), i -> i.compareTo(new BigDecimal(-1)) < 0);
+            cachedIslandInfo.islandSize = new UpgradeValue<>(islandSettings.getInt("size")
+                    .orElse(-1), i -> i < 0);
+            cachedIslandInfo.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit")
+                    .orElse(-1), i -> i < 0);
+            cachedIslandInfo.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit")
+                    .orElse(-1), i -> i < 0);
+            cachedIslandInfo.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier")
+                    .orElse(-1D), i -> i < 0);
+            cachedIslandInfo.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier")
+                    .orElse(-1D), i -> i < 0);
+            cachedIslandInfo.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier")
+                    .orElse(-1D), i -> i < 0);
+            cachedIslandInfo.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit")
+                    .orElse(-1), i -> i < 0);
+            cachedIslandInfo.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit")
+                    .orElse(new BigDecimal(-2)), i -> i.compareTo(new BigDecimal(-1)) < 0);
         });
     }
 
@@ -380,39 +704,15 @@ public final class IslandsDeserializer {
             databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
                 DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
 
-                UUID uuid = UUID.fromString((String) bankTransactionRow.get("island"));
-                CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
-
-                try {
-                    cachedIslandInfo.bankTransactions.add(new SBankTransaction(bankTransaction));
-                } catch (Exception error) {
-                    SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
-                    error.printStackTrace();
-                    PluginDebugger.debug(error);
+                Optional<UUID> uuid = bankTransaction.getUUID("island");
+                if (!uuid.isPresent()) {
+                    SuperiorSkyblockPlugin.log("&cCannot load bank transaction for null islands, skipping...");
+                    return;
                 }
+
+                CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+                SBankTransaction.fromDatabase(bankTransaction).ifPresent(cachedIslandInfo.bankTransactions::add);
             });
-        }
-    }
-
-    private static long getAsLong(Object value) {
-        if (value instanceof Long) {
-            return (long) value;
-        } else if (value instanceof Integer) {
-            return (int) value;
-        } else {
-            throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to long.");
-        }
-    }
-
-    private static byte getAsByte(Object value) {
-        if (value instanceof Byte) {
-            return (byte) value;
-        } else if (value instanceof Boolean) {
-            return (Boolean) value ? (byte) 1 : 0;
-        } else if (value instanceof Integer) {
-            return (byte) (int) value;
-        } else {
-            throw new IllegalArgumentException("Cannot cast " + value + " from type " + value.getClass() + " to byte.");
         }
     }
 
