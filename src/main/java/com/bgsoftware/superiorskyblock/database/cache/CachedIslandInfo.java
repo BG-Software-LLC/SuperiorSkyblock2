@@ -30,23 +30,23 @@ public final class CachedIslandInfo {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    public final Location[] teleportLocations = new Location[World.Environment.values().length];
+    public final Location[] islandHomes = new Location[World.Environment.values().length];
     public final List<SuperiorPlayer> members = new ArrayList<>();
-    public final List<SuperiorPlayer> banned = new ArrayList<>();
+    public final List<SuperiorPlayer> bannedPlayers = new ArrayList<>();
     public final Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions = new HashMap<>();
     public final Map<IslandPrivilege, PlayerRole> rolePermissions = new HashMap<>();
     public final Map<String, Integer> upgrades = new HashMap<>();
     public final KeyMap<UpgradeValue<Integer>> blockLimits = new KeyMap<>();
     public final Map<UUID, Rating> ratings = new HashMap<>();
     public final Map<Mission<?>, Integer> completedMissions = new HashMap<>();
-    public final Map<IslandFlag, Byte> islandSettings = new HashMap<>();
+    public final Map<IslandFlag, Byte> islandFlags = new HashMap<>();
     public final KeyMap<UpgradeValue<Integer>>[] cobbleGeneratorValues = new KeyMap[World.Environment.values().length];
     public final List<Pair<SuperiorPlayer, Long>> uniqueVisitors = new ArrayList<>();
     public final KeyMap<UpgradeValue<Integer>> entityLimits = new KeyMap<>();
     public final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
-    public final List<ItemStack[]> islandChest = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
+    public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());
     public final Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new HashMap<>();
-    public final Location[] visitorsLocations = new Location[World.Environment.values().length];
+    public final Location[] visitorHomes = new Location[World.Environment.values().length];
     public UpgradeValue<Integer> islandSize = UpgradeValue.NEGATIVE;
     public UpgradeValue<Integer> warpsLimit = UpgradeValue.NEGATIVE;
     public UpgradeValue<Integer> teamLimit = UpgradeValue.NEGATIVE;

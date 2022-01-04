@@ -3207,12 +3207,12 @@ public final class SIsland implements Island {
     }
 
     private void loadFromCachedInfo(CachedIslandInfo cachedIslandInfo) {
-        this.teleportLocations.set(cachedIslandInfo.teleportLocations);
+        this.islandHomes.set(cachedIslandInfo.islandHomes);
         this.members.write(members -> {
             members.addAll(cachedIslandInfo.members);
             members.forEach(member -> member.setIsland(this));
         });
-        this.banned.addAll(cachedIslandInfo.banned);
+        this.bannedPlayers.addAll(cachedIslandInfo.bannedPlayers);
         this.playerPermissions.putAll(cachedIslandInfo.playerPermissions);
         this.playerPermissions.values().forEach(permissionNode -> permissionNode.setIsland(this));
         this.rolePermissions.putAll(cachedIslandInfo.rolePermissions);
@@ -3220,19 +3220,19 @@ public final class SIsland implements Island {
         this.blockLimits.putAll(cachedIslandInfo.blockLimits);
         this.ratings.putAll(cachedIslandInfo.ratings);
         this.completedMissions.putAll(cachedIslandInfo.completedMissions);
-        this.islandSettings.putAll(cachedIslandInfo.islandSettings);
+        this.islandFlags.putAll(cachedIslandInfo.islandFlags);
         System.arraycopy(cachedIslandInfo.cobbleGeneratorValues, 0, this.cobbleGeneratorValues,
                 0, this.cobbleGeneratorValues.length);
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(cachedIslandInfo.uniqueVisitors));
         this.entityLimits.putAll(cachedIslandInfo.entityLimits);
         this.islandEffects.putAll(cachedIslandInfo.islandEffects);
-        this.islandChest.write(islandChest -> {
-            for (int index = 0; index < cachedIslandInfo.islandChest.size(); ++index) {
-                islandChest[index] = SIslandChest.createChest(this, index, cachedIslandInfo.islandChest.get(index));
+        this.islandChests.write(islandChest -> {
+            for (int index = 0; index < cachedIslandInfo.islandChests.size(); ++index) {
+                islandChest[index] = SIslandChest.createChest(this, index, cachedIslandInfo.islandChests.get(index));
             }
         });
         this.roleLimits.putAll(cachedIslandInfo.roleLimits);
-        this.visitorsLocations.set(cachedIslandInfo.visitorsLocations);
+        this.visitorHomes.set(cachedIslandInfo.visitorHomes);
 
         this.islandSize = cachedIslandInfo.islandSize;
         this.teamLimit = cachedIslandInfo.teamLimit;

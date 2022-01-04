@@ -79,7 +79,7 @@ public final class IslandsDeserializer {
 
             UUID playerUUID = UUID.fromString((String) bansRow.get("player"));
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID);
-            cachedIslandInfo.banned.add(superiorPlayer);
+            cachedIslandInfo.bannedPlayers.add(superiorPlayer);
         });
     }
 
@@ -242,7 +242,7 @@ public final class IslandsDeserializer {
             try {
                 IslandFlag islandFlag = IslandFlag.getByName((String) islandFlagRow.get("name"));
                 byte status = getAsByte(islandFlagRow.get("status"));
-                cachedIslandInfo.islandSettings.put(islandFlag, status);
+                cachedIslandInfo.islandFlags.put(islandFlag, status);
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("&cError occurred while loading island flags:");
                 error.printStackTrace();
@@ -275,7 +275,7 @@ public final class IslandsDeserializer {
             UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
             CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
-            cachedIslandInfo.teleportLocations[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
+            cachedIslandInfo.islandHomes[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
         });
     }
 
@@ -284,7 +284,7 @@ public final class IslandsDeserializer {
             UUID uuid = UUID.fromString((String) teleportLocationRow.get("island"));
             CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
             int environment = World.Environment.valueOf((String) teleportLocationRow.get("environment")).ordinal();
-            cachedIslandInfo.visitorsLocations[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
+            cachedIslandInfo.visitorHomes[environment] = FileUtils.toLocation((String) teleportLocationRow.get("location"));
         });
     }
 
@@ -307,11 +307,11 @@ public final class IslandsDeserializer {
             int index = (int) islandChestRow.get("index");
             String contents = (String) islandChestRow.get("contents");
 
-            while (index > cachedIslandInfo.islandChest.size()) {
-                cachedIslandInfo.islandChest.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize()]);
+            while (index > cachedIslandInfo.islandChests.size()) {
+                cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize()]);
             }
 
-            cachedIslandInfo.islandChest.add(ItemUtils.deserialize(contents));
+            cachedIslandInfo.islandChests.add(ItemUtils.deserialize(contents));
         });
     }
 
