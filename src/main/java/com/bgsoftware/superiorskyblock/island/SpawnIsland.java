@@ -81,7 +81,7 @@ public final class SpawnIsland implements Island {
         islandSize = plugin.getSettings().getSpawn().getSize();
         islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(IslandFlag::getByName).collect(Collectors.toList());
 
-        if(center.getWorld() == null)
+        if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);
 
         if (center.getWorld() == null) {
@@ -268,14 +268,44 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getTeleportLocation(World.Environment environment) {
-        return getCenter(environment);
+        return this.getIslandHome(environment);
     }
 
     @Override
     public Map<World.Environment, Location> getTeleportLocations() {
+        return this.getIslandHomes();
+    }
+
+    @Override
+    public void setTeleportLocation(Location teleportLocation) {
+        this.setIslandHome(teleportLocation);
+    }
+
+    @Override
+    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
+        this.setIslandHome(environment, teleportLocation);
+    }
+
+    @Override
+    public Location getIslandHome(World.Environment environment) {
+        return getCenter(environment);
+    }
+
+    @Override
+    public Map<World.Environment, Location> getIslandHomes() {
         Map<World.Environment, Location> map = new HashMap<>();
         map.put(plugin.getSettings().getWorlds().getDefaultWorld(), center);
         return map;
+    }
+
+    @Override
+    public void setIslandHome(Location homeLocation) {
+
+    }
+
+    @Override
+    public void setIslandHome(World.Environment environment, @org.jetbrains.annotations.Nullable Location homeLocation) {
+
     }
 
     @Override
@@ -285,16 +315,6 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setVisitorsLocation(Location visitorsLocation) {
-
-    }
-
-    @Override
-    public void setTeleportLocation(Location teleportLocation) {
-
-    }
-
-    @Override
-    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
 
     }
 

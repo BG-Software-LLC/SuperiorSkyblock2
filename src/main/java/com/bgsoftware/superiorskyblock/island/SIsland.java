@@ -438,11 +438,16 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         PluginDebugger.debug("Action: Add Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Role: " + playerRole);
 
-        // Removing player from being a coop.
-        if (isCoop(superiorPlayer))
-            removeCoop(superiorPlayer);
+        boolean addedNewMember = members.writeAndGet(members -> members.add(superiorPlayer));
 
-        members.write(members -> members.add(superiorPlayer));
+        // This player is already an member of the island
+        if (!addedNewMember)
+            return;
+
+        // Removing player from being a coop.
+        if (isCoop(superiorPlayer)) {
+            removeCoop(superiorPlayer);
+        }
 
         superiorPlayer.setIsland(this);
         superiorPlayer.setPlayerRole(playerRole);
@@ -464,14 +469,18 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Kick Member, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        boolean succeed = members.writeAndGet(members -> members.remove(superiorPlayer));
+        boolean removedMember = members.writeAndGet(members -> members.remove(superiorPlayer));
 
-        if (!succeed) {
+        if (!removedMember) {
             // If the remove method failed, we iterate through all the members and remove the member manually.
             // Should fix issues if members are not in the correct order.
             // Reference: https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/734
-            members.write(members -> members.removeIf(superiorPlayer::equals));
+            removedMember = members.writeAndGet(members -> members.removeIf(superiorPlayer::equals));
         }
+
+        // This player is not a member of the island.
+        if (!removedMember)
+            return;
 
         superiorPlayer.setIsland(null);
 
@@ -512,7 +521,11 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Ban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        bannedPlayers.add(superiorPlayer);
+        boolean bannedPlayer = bannedPlayers.add(superiorPlayer);
+
+        // This player is already banned.
+        if (!bannedPlayer)
+            return;
 
         if (isMember(superiorPlayer))
             kickMember(superiorPlayer);
@@ -532,8 +545,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Unban Player, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        bannedPlayers.remove(superiorPlayer);
-        IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
+        boolean unbannedPlayer = bannedPlayers.remove(superiorPlayer);
+
+        if (unbannedPlayer)
+            IslandsDatabaseBridge.removeBannedPlayer(this, superiorPlayer);
     }
 
     @Override
@@ -547,8 +562,10 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Coop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        coopPlayers.add(superiorPlayer);
-        plugin.getMenus().refreshCoops(this);
+        boolean coopPlayer = coopPlayers.add(superiorPlayer);
+
+        if (coopPlayer)
+            plugin.getMenus().refreshCoops(this);
     }
 
     @Override
@@ -556,7 +573,11 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Uncoop, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
-        coopPlayers.remove(superiorPlayer);
+        boolean uncoopPlayer = coopPlayers.remove(superiorPlayer);
+
+        // This player was not coop.
+        if (!uncoopPlayer)
+            return;
 
         Location location = superiorPlayer.getLocation();
 
@@ -585,34 +606,44 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void setCoopLimit(int coopLimit) {
-        coopLimit = Math.max(0, coopLimit);
-        PluginDebugger.debug("Action: Set Coop Limit, Island: " + owner.getName() + ", Coop Limit: " + coopLimit);
-        this.coopLimit = new UpgradeValue<>(coopLimit, false);
-        IslandsDatabaseBridge.saveCoopLimit(this);
+    public int getCoopLimitRaw() {
+        return this.coopLimit.isSynced() ? -1 : this.coopLimit.get();
     }
 
     @Override
-    public int getCoopLimitRaw() {
-        return this.coopLimit.isSynced() ? -1 : this.coopLimit.get();
+    public void setCoopLimit(int coopLimit) {
+        coopLimit = Math.max(0, coopLimit);
+
+        PluginDebugger.debug("Action: Set Coop Limit, Island: " + owner.getName() + ", Coop Limit: " + coopLimit);
+
+        // Original and new coop limit are the same
+        if (coopLimit == getCoopLimitRaw())
+            return;
+
+        this.coopLimit = new UpgradeValue<>(coopLimit, false);
+        IslandsDatabaseBridge.saveCoopLimit(this);
     }
 
     @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        playersInside.write(playersInside -> {
-            if (inside)
-                playersInside.add(superiorPlayer);
-            else
-                playersInside.remove(superiorPlayer);
-        });
-
         if (inside) {
             PluginDebugger.debug("Action: Entered Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         } else {
             PluginDebugger.debug("Action: Left Island, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
         }
+
+        boolean changePlayers = playersInside.writeAndGet(playersInside -> {
+            if (inside)
+                return playersInside.add(superiorPlayer);
+            else
+                return playersInside.remove(superiorPlayer);
+        });
+
+        // The players inside the player weren't changed.
+        if (!changePlayers)
+            return;
 
         if (!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()) {
             Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
@@ -660,6 +691,26 @@ public final class SIsland implements Island {
 
     @Override
     public Location getTeleportLocation(World.Environment environment) {
+        return this.getIslandHome(environment);
+    }
+
+    @Override
+    public Map<World.Environment, Location> getTeleportLocations() {
+        return this.getIslandHomes();
+    }
+
+    @Override
+    public void setTeleportLocation(Location teleportLocation) {
+        this.setIslandHome(teleportLocation);
+    }
+
+    @Override
+    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
+        this.setIslandHome(environment, teleportLocation);
+    }
+
+    @Override
+    public Location getIslandHome(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         Location teleportLocation = islandHomes.readAndGet(teleportLocations -> teleportLocations[environment.ordinal()]);
@@ -679,7 +730,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public Map<World.Environment, Location> getTeleportLocations() {
+    public Map<World.Environment, Location> getIslandHomes() {
         return islandHomes.readAndGet(teleportLocations -> {
             Map<World.Environment, Location> map = new HashMap<>();
             for (World.Environment env : World.Environment.values()) {
@@ -688,6 +739,26 @@ public final class SIsland implements Island {
             }
             return Collections.unmodifiableMap(map);
         });
+    }
+
+    @Override
+    public void setIslandHome(Location homeLocation) {
+        Preconditions.checkNotNull(homeLocation, "homeLocation parameter cannot be null.");
+        Preconditions.checkNotNull(homeLocation.getWorld(), "homeLocation's world cannot be null.");
+        setIslandHome(homeLocation.getWorld().getEnvironment(), homeLocation);
+    }
+
+    @Override
+    public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
+        PluginDebugger.debug("Action: Change Home Location, Island: " + owner.getName() +
+                ", Location: " + LocationUtils.getLocation(homeLocation));
+
+        islandHomes.write(islandHomes -> islandHomes[environment.ordinal()] =
+                homeLocation == null ? null : homeLocation.clone());
+
+        IslandsDatabaseBridge.saveIslandHome(this, environment, homeLocation);
     }
 
     @Override
@@ -714,23 +785,6 @@ public final class SIsland implements Island {
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
             IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
         }
-    }
-
-    @Override
-    public void setTeleportLocation(Location teleportLocation) {
-        Preconditions.checkNotNull(teleportLocation, "teleportLocation parameter cannot be null.");
-        Preconditions.checkNotNull(teleportLocation.getWorld(), "teleportLocation's world cannot be null.");
-        setTeleportLocation(teleportLocation.getWorld().getEnvironment(), teleportLocation);
-    }
-
-    @Override
-    public void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation) {
-        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        PluginDebugger.debug("Action: Change Teleport Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(teleportLocation));
-        islandHomes.write(teleportLocations ->
-                teleportLocations[environment.ordinal()] = teleportLocation == null ? null : teleportLocation.clone());
-
-        IslandsDatabaseBridge.saveTeleportLocation(this, environment, teleportLocation);
     }
 
     @Override

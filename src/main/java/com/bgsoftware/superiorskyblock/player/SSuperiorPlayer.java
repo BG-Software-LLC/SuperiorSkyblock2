@@ -345,19 +345,22 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         if (!isOnline())
             return;
 
-        Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
-        assert islandTeleportLocation != null;
-        Block islandTeleportBlock = islandTeleportLocation.getBlock();
+        Location homeLocation = island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
+
+        Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
+                island.getUniqueId());
+
+        Block islandTeleportBlock = homeLocation.getBlock();
 
         if (island instanceof SpawnIsland) {
-            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
-            teleport(islandTeleportLocation.add(0, 0.5, 0));
+            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(homeLocation));
+            teleport(homeLocation.add(0, 0.5, 0));
             if (result != null)
                 result.accept(true);
             return;
         }
 
-        teleportIfSafe(island, islandTeleportBlock, islandTeleportLocation, 0, 0, (teleportResult, teleportLocation) -> {
+        teleportIfSafe(island, islandTeleportBlock, homeLocation, 0, 0, (teleportResult, teleportLocation) -> {
             if (teleportResult) {
                 if (result != null)
                     result.accept(true);
@@ -365,12 +368,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
             }
 
             Block islandCenterBlock = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock();
-            float rotationYaw = islandTeleportLocation.getYaw();
-            float rotationPitch = islandTeleportLocation.getPitch();
+            float rotationYaw = homeLocation.getYaw();
+            float rotationPitch = homeLocation.getPitch();
 
             teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch, (centerTeleportResult, centerTeleportLocation) -> {
                 if (centerTeleportResult) {
-                    island.setTeleportLocation(centerTeleportLocation);
+                    island.setIslandHome(centerTeleportLocation);
                     if (result != null)
                         result.accept(true);
                     return;
@@ -450,7 +453,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                     }
 
                     return safeLocations.stream().min(Comparator.comparingDouble(loc ->
-                            loc.distanceSquared(islandTeleportLocation))).orElse(null);
+                            loc.distanceSquared(homeLocation))).orElse(null);
                 }).runSync(location -> {
                     if (location != null) {
                         adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
@@ -810,7 +813,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
 
-        island.setTeleportLocation(location);
+        island.setIslandHome(location);
         teleport(location.add(0, 0.5, 0));
         if (result != null)
             result.accept(true);
@@ -912,7 +915,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 toTeleport = block.getLocation().add(0.5, 0, 0.5);
                 toTeleport.setYaw(yaw);
                 toTeleport.setPitch(pitch);
-                island.setTeleportLocation(toTeleport);
+                island.setIslandHome(toTeleport);
             }
 
             PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));

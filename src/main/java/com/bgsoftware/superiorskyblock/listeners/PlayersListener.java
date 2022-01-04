@@ -437,7 +437,7 @@ public final class PlayersListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
             if (island != null && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 Executor.sync(() -> TeleportUtils.teleport(e.getEntity(),
-                        island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+                        island.getIslandHome(World.Environment.NORMAL)), 5L);
             }
         }
     }

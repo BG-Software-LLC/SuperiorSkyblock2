@@ -68,7 +68,7 @@ public final class CmdSetTeleport implements IPermissibleCommand {
             return;
         }
 
-        island.setTeleportLocation(newLocation);
+        island.setIslandHome(newLocation);
         Message.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
     }
 

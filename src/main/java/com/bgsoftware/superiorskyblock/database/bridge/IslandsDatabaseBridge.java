@@ -85,7 +85,7 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("coops_limit", island.getCoopLimit()));
     }
 
-    public static void saveTeleportLocation(Island island, World.Environment environment, Location location) {
+    public static void saveIslandHome(Island island, World.Environment environment, Location location) {
         if (location == null) {
             island.getDatabaseBridge().deleteObject("islands_homes",
                     createFilter("island", island, new Pair<>("environment", environment.name()))
