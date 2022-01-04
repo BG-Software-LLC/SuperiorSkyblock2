@@ -68,7 +68,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     /**
      * Get the list of members of the island.
      *
-     * @param includeOwner Whether or not the owner should be returned.
+     * @param includeOwner Whether the owner should be returned.
      */
     List<SuperiorPlayer> getIslandMembers(boolean includeOwner);
 
@@ -126,7 +126,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void revokeInvite(SuperiorPlayer superiorPlayer);
 
     /**
-     * Checks whether or not the player has been invited to the island.
+     * Checks whether the player has been invited to the island.
      */
     boolean isInvited(SuperiorPlayer superiorPlayer);
 
@@ -151,7 +151,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void kickMember(SuperiorPlayer superiorPlayer);
 
     /**
-     * Check whether or not a player is a member of the island.
+     * Check whether a player is a member of the island.
      *
      * @param superiorPlayer The player to check.
      */
@@ -181,7 +181,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void unbanMember(SuperiorPlayer superiorPlayer);
 
     /**
-     * Checks whether or not a player is banned from the island.
+     * Checks whether a player is banned from the island.
      *
      * @param superiorPlayer The player to check.
      */
@@ -202,7 +202,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void removeCoop(SuperiorPlayer superiorPlayer);
 
     /**
-     * Check whether or not a player is a co-op member of the island.
+     * Check whether a player is a co-op member of the island.
      *
      * @param superiorPlayer The player to check.
      */
@@ -219,16 +219,16 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     int getCoopLimit();
 
     /**
+     * Get the coop players limit of the island that was set using a command.
+     */
+    int getCoopLimitRaw();
+
+    /**
      * Set the coop players limit of the island.
      *
      * @param coopLimit The coop players limit to set.
      */
     void setCoopLimit(int coopLimit);
-
-    /**
-     * Get the coop players limit of the island that was set using a command.
-     */
-    int getCoopLimitRaw();
 
     /**
      * Update status of a player if he's inside the island or not.
@@ -259,6 +259,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
 
     /**
      * Get the members' teleport location of the island, depends on the world environment.
+     * Similar to {@link #getIslandHome(World.Environment)}
      *
      * @param environment The environment.
      */
@@ -267,8 +268,54 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
 
     /**
      * Get all the teleport locations of the island.
+     * Similar to {@link #getIslandHomes()}
      */
     Map<World.Environment, Location> getTeleportLocations();
+
+    /**
+     * Set the members' teleport location of the island.
+     * Similar to {@link #setIslandHome(Location)}
+     *
+     * @param teleportLocation The new teleport location.
+     */
+    void setTeleportLocation(Location teleportLocation);
+
+    /**
+     * Set the members' teleport location of the island.
+     * Similar to {@link #setIslandHome(org.bukkit.World.Environment, Location)}
+     *
+     * @param environment      The environment to change teleport location for.
+     * @param teleportLocation The new teleport location.
+     */
+    void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation);
+
+    /**
+     * Get the members' home location of the island, depends on the world environment.
+     *
+     * @param environment The environment.
+     */
+    @Nullable
+    Location getIslandHome(World.Environment environment);
+
+    /**
+     * Get all the home locations of the island.
+     */
+    Map<World.Environment, Location> getIslandHomes();
+
+    /**
+     * Set the members' teleport location of the island.
+     *
+     * @param homeLocation The new home location.
+     */
+    void setIslandHome(Location homeLocation);
+
+    /**
+     * Set the members' teleport location of the island.
+     *
+     * @param environment  The environment to change teleport location for.
+     * @param homeLocation The new home location.
+     */
+    void setIslandHome(World.Environment environment, @Nullable Location homeLocation);
 
     /**
      * Get the visitors' teleport location of the island.
@@ -282,21 +329,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * @param visitorsLocation The new visitors location.
      */
     void setVisitorsLocation(@Nullable Location visitorsLocation);
-
-    /**
-     * Set the members' teleport location of the island.
-     *
-     * @param teleportLocation The new teleport location.
-     */
-    void setTeleportLocation(Location teleportLocation);
-
-    /**
-     * Set the members' teleport location of the island.
-     *
-     * @param environment      The environment to change teleport location for.
-     * @param teleportLocation The new teleport location.
-     */
-    void setTeleportLocation(World.Environment environment, @Nullable Location teleportLocation);
 
     /**
      * Get the minimum location of the island.
@@ -326,7 +358,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     /**
      * Get all the chunks of the island from all the environments.
      *
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      */
     List<Chunk> getAllChunks(boolean onlyProtected);
 
@@ -341,7 +373,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Get all the chunks of the island, including empty ones.
      *
      * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      */
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
 
@@ -349,7 +381,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Get all the chunks of the island.
      *
      * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      */
     List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
@@ -357,7 +389,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     /**
      * Get all the loaded chunks of the island.
      *
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      */
     List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
@@ -366,7 +398,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Get all the loaded chunks of the island.
      *
      * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      */
     List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
@@ -375,7 +407,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Get all the chunks of the island asynchronized, including empty chunks.
      *
      * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
      */
     List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad);
@@ -384,7 +416,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Get all the chunks of the island asynchronized.
      *
      * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be returned.
+     * @param onlyProtected Whether only chunks inside the protected area should be returned.
      * @param noEmptyChunks Should empty chunks be loaded or not?
      * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
      */
@@ -394,7 +426,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Reset all the chunks of the island (will make all chunks empty).
      *
      * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
      */
     void resetChunks(World.Environment environment, boolean onlyProtected);
 
@@ -402,7 +434,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Reset all the chunks of the island (will make all chunks empty).
      *
      * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
      */
     void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
@@ -410,14 +442,14 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
      *
-     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
      */
     void resetChunks(boolean onlyProtected);
 
     /**
      * Reset all the chunks of the island from all the worlds (will make all chunks empty).
      *
-     * @param onlyProtected Whether or not only chunks inside the protected area should be reset.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
      * @param onFinish      Callback runnable.
      */
     void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
@@ -571,7 +603,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      */
 
     /**
-     * Checks whether or not the island is the spawn island.
+     * Checks whether the island is the spawn island.
      */
     boolean isSpawn();
 
@@ -707,24 +739,24 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void setBiome(Biome biome, boolean updateBlocks);
 
     /**
-     * Check whether or not the island is locked to visitors.
+     * Check whether the island is locked to visitors.
      */
     boolean isLocked();
 
     /**
      * Lock or unlock the island to visitors.
      *
-     * @param locked Whether or not the island should be locked to visitors.
+     * @param locked Whether the island should be locked to visitors.
      */
     void setLocked(boolean locked);
 
     /**
-     * Checks whether or not the island is ignored in the top islands.
+     * Checks whether the island is ignored in the top islands.
      */
     boolean isIgnored();
 
     /**
-     * Set whether or not the island should be ignored in the top islands.
+     * Set whether the island should be ignored in the top islands.
      */
     void setIgnored(boolean ignored);
 
@@ -753,13 +785,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * You can use {player-name} as a placeholder for the member's name.
      *
      * @param command           The command to execute.
-     * @param onlyOnlineMembers Whether or not the command should be executed only for online members.
+     * @param onlyOnlineMembers Whether the command should be executed only for online members.
      * @param ignoredMembers    An array of ignored members.
      */
     void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers);
 
     /**
-     * Checks whether or not the island is being recalculated currently.
+     * Checks whether the island is being recalculated currently.
      */
     boolean isBeingRecalculated();
 
@@ -815,7 +847,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Give the bank interest to this island.
      *
      * @param checkOnlineOwner Check if the island-owner was online recently.
-     * @return Whether or not the money was given.
+     * @return Whether the money was given.
      */
     boolean giveInterest(boolean checkOnlineOwner);
 
@@ -860,7 +892,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param block  The block that was placed.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into database.
+     * @param save   Whether the block counts should be saved into database.
      */
     void handleBlockPlace(Block block, int amount, boolean save);
 
@@ -877,7 +909,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into database.
+     * @param save   Whether the block counts should be saved into database.
      */
     void handleBlockPlace(Key key, int amount, boolean save);
 
@@ -886,7 +918,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param key    The block's key that was placed.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into database.
+     * @param save   Whether the block counts should be saved into database.
      */
     void handleBlockPlace(Key key, BigInteger amount, boolean save);
 
@@ -895,7 +927,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param key                  The block's key that was placed.
      * @param amount               The amount of the block.
-     * @param save                 Whether or not the block counts should be saved into database.
+     * @param save                 Whether the block counts should be saved into database.
      * @param updateLastTimeStatus Whether to update last time island was updated or not.
      */
     void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus);
@@ -927,7 +959,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param block  The block that was broken.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into the database.
+     * @param save   Whether the block counts should be saved into the database.
      */
     void handleBlockBreak(Block block, int amount, boolean save);
 
@@ -944,7 +976,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into the database.
+     * @param save   Whether the block counts should be saved into the database.
      */
     void handleBlockBreak(Key key, int amount, boolean save);
 
@@ -953,7 +985,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param key    The block's key that was broken.
      * @param amount The amount of the block.
-     * @param save   Whether or not the block counts should be saved into the database.
+     * @param save   Whether the block counts should be saved into the database.
      */
     void handleBlockBreak(Key key, BigInteger amount, boolean save);
 

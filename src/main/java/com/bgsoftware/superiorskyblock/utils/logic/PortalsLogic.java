@@ -54,7 +54,7 @@ public final class PortalsLogic {
         }
 
         try {
-            Location destinationLocation = island.getTeleportLocation(destinationEnvironment);
+            Location destinationLocation = island.getIslandHome(destinationEnvironment);
 
             // If schematic was already generated, simply teleport player to destination location.
             if (island.wasSchematicGenerated(destinationEnvironment)) {

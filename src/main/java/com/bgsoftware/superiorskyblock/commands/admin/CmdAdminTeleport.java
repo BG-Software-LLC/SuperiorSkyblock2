@@ -77,8 +77,8 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
             }
         }
 
-        Location visitLocation = island.getTeleportLocation(environment);
-        superiorPlayer.teleport(visitLocation);
+        Location homeLocation = island.getIslandHome(environment);
+        superiorPlayer.teleport(homeLocation);
     }
 
     @Override

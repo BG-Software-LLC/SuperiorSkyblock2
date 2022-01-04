@@ -180,7 +180,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
                 island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                 island.setBiome(biome);
-                island.setTeleportLocation(schematic.adjustRotation(islandLocation));
+                island.setIslandHome(schematic.adjustRotation(islandLocation));
 
                 IslandsDatabaseBridge.insertIsland(island);
 

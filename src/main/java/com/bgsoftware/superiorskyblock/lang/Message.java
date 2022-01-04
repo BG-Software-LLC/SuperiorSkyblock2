@@ -734,6 +734,7 @@ public enum Message {
         File langFolder = new File(plugin.getDataFolder(), "lang");
 
         if (!langFolder.exists()) {
+            plugin.saveResource("lang/de-DE.yml", false);
             plugin.saveResource("lang/en-US.yml", false);
             plugin.saveResource("lang/es-ES.yml", false);
             plugin.saveResource("lang/fr-FR.yml", false);

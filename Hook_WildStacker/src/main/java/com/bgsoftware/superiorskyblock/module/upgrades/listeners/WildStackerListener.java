@@ -7,7 +7,8 @@ public final class WildStackerListener implements Listener {
 
     @EventHandler
     public void onWildStackerStackSpawn(com.bgsoftware.wildstacker.api.events.SpawnerStackedEntitySpawnEvent e) {
-        UpgradesListener.IMP.handleSpawnerSpawn(e.getSpawner());
+        if (UpgradesListener.IMP != null)
+            UpgradesListener.IMP.handleSpawnerSpawn(e.getSpawner());
     }
 
 }
