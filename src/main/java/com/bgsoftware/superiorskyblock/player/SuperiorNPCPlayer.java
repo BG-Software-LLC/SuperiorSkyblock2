@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -155,8 +154,9 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Location location, Consumer<Boolean> teleportResult) {
-        TeleportUtils.teleport(npc, location, teleportResult);
+    public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(false);
     }
 
     @Override
@@ -165,8 +165,9 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, Consumer<Boolean> teleportResult) {
-        teleport(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()), teleportResult);
+    public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(false);
     }
 
     @Override

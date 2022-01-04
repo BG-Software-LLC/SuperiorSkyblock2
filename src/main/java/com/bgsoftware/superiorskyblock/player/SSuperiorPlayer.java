@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
@@ -18,30 +18,21 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -50,23 +41,21 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+    private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+
+    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
 
     private Island playerIsland = null;
@@ -326,13 +315,15 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
-        if (isOnline()) {
-            TeleportUtils.teleport(asPlayer(), location, teleportResult);
-            return;
-        }
-
-        if (teleportResult != null)
+        Player player = asPlayer();
+        if (player != null) {
+            playerTeleportAlgorithm.teleport(player, location).whenComplete((result, error) -> {
+                if (teleportResult != null)
+                    teleportResult.accept(error != null && result);
+            });
+        } else if (teleportResult != null) {
             teleportResult.accept(false);
+        }
     }
 
     @Override
@@ -341,130 +332,16 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, Consumer<Boolean> result) {
-        if (!isOnline())
-            return;
-
-        Location homeLocation = island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
-
-        Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
-                island.getUniqueId());
-
-        Block islandTeleportBlock = homeLocation.getBlock();
-
-        if (island instanceof SpawnIsland) {
-            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(homeLocation));
-            teleport(homeLocation.add(0, 0.5, 0));
-            if (result != null)
-                result.accept(true);
-            return;
-        }
-
-        teleportIfSafe(island, islandTeleportBlock, homeLocation, 0, 0, (teleportResult, teleportLocation) -> {
-            if (teleportResult) {
-                if (result != null)
-                    result.accept(true);
-                return;
-            }
-
-            Block islandCenterBlock = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock();
-            float rotationYaw = homeLocation.getYaw();
-            float rotationPitch = homeLocation.getPitch();
-
-            teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch, (centerTeleportResult, centerTeleportLocation) -> {
-                if (centerTeleportResult) {
-                    island.setIslandHome(centerTeleportLocation);
-                    if (result != null)
-                        result.accept(true);
-                    return;
-                }
-
-                {
-                    Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
-                            .getHighestBlockAt(islandTeleportBlock.getLocation()).getRelative(BlockFace.UP);
-                    if (LocationUtils.isSafeBlock(teleportLocationHighestBlock)) {
-                        adjustAndTeleportPlayerToLocation(island, teleportLocationHighestBlock.getLocation(),
-                                rotationYaw, rotationPitch, result);
-                        return;
-                    }
-                }
-
-                {
-                    Block centerHighestBlock = islandCenterBlock.getWorld()
-                            .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
-                    if (LocationUtils.isSafeBlock(centerHighestBlock)) {
-                        adjustAndTeleportPlayerToLocation(island, centerHighestBlock.getLocation(), rotationYaw,
-                                rotationPitch, result);
-                        return;
-                    }
-                }
-
-                /*
-                 *   Finding a new block to teleport the player to.
-                 */
-
-                List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
-                                plugin.getSettings().getWorlds().getDefaultWorld(), true, true, null)
-                        .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
-
-                Executor.createTask().runAsync(v -> {
-                    List<Location> safeLocations = new ArrayList<>();
-
-                    for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
-                        ChunkSnapshot chunkSnapshot;
-
-                        try {
-                            chunkSnapshot = chunkToLoad.get();
-                        } catch (Exception ex) {
-                            SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                            PluginDebugger.debug(ex);
-                            continue;
-                        }
-
-                        if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
-                            continue;
-
-                        World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
-                        int worldBuildLimit = world.getMaxHeight();
-                        int worldMinLimit = plugin.getNMSWorld().getMinHeight(world);
-
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
-                                Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
-                                Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
-                                        y == worldMinLimit ? worldMinLimit : y - 1, z);
-
-                                Material blockType, belowType;
-
-                                try {
-                                    blockType = Material.valueOf(blockKey.getGlobalKey());
-                                    belowType = Material.valueOf(belowKey.getGlobalKey());
-                                } catch (IllegalArgumentException ex) {
-                                    continue;
-                                }
-
-                                if (blockType.isSolid() || belowType.isSolid()) {
-                                    safeLocations.add(new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                                            chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z));
-                                }
-                            }
-                        }
-                    }
-
-                    return safeLocations.stream().min(Comparator.comparingDouble(loc ->
-                            loc.distanceSquared(homeLocation))).orElse(null);
-                }).runSync(location -> {
-                    if (location != null) {
-                        adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
-                    } else if (result != null) {
-                        result.accept(false);
-                    }
-                });
-
+    public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+        Player player = asPlayer();
+        if (player != null) {
+            playerTeleportAlgorithm.teleport(player, island).whenComplete((result, error) -> {
+                if (teleportResult != null)
+                    teleportResult.accept(error != null && result);
             });
-
-        });
+        } else if (teleportResult != null) {
+            teleportResult.accept(false);
+        }
     }
 
     @Override
@@ -806,19 +683,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         return databaseBridge;
     }
 
-    private void adjustAndTeleportPlayerToLocation(Island island, Location location, float yaw, float pitch, Consumer<Boolean> result) {
-        location = location.add(0.5, 0, 0.5);
-        location.setYaw(yaw);
-        location.setPitch(pitch);
-
-        PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
-
-        island.setIslandHome(location);
-        teleport(location.add(0, 0.5, 0));
-        if (result != null)
-            result.accept(true);
-    }
-
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
@@ -896,34 +760,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 "uuid=[" + uuid + "]," +
                 "name=[" + name + "]" +
                 "}";
-    }
-
-    private void teleportIfSafe(Island island, Block block, Location customLocation, float yaw, float pitch,
-                                BiConsumer<Boolean, Location> teleportResult) {
-        ChunksProvider.loadChunk(ChunkPosition.of(block), chunk -> {
-            if (!LocationUtils.isSafeBlock(block)) {
-                if (teleportResult != null)
-                    teleportResult.accept(false, null);
-                return;
-            }
-
-            Location toTeleport;
-
-            if (customLocation != null) {
-                toTeleport = customLocation;
-            } else {
-                toTeleport = block.getLocation().add(0.5, 0, 0.5);
-                toTeleport.setYaw(yaw);
-                toTeleport.setPitch(pitch);
-                island.setIslandHome(toTeleport);
-            }
-
-            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
-            teleport(toTeleport.add(0, 0.5, 0));
-
-            if (teleportResult != null)
-                teleportResult.accept(true, toTeleport);
-        });
     }
 
 }
