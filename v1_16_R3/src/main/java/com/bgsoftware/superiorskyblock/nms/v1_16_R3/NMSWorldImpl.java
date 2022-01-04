@@ -353,7 +353,11 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public int getMinHeight(World world) {
-        return world.getMinHeight();
+        try {
+            return world.getMinHeight();
+        } catch (Throwable error) {
+            return 0;
+        }
     }
 
 }
