@@ -79,7 +79,6 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1199,8 +1198,11 @@ public final class SIsland implements Island {
     @Override
     public void disbandIsland() {
         getIslandMembers(true).forEach(superiorPlayer -> {
-            if (isMember(superiorPlayer))
+            if (superiorPlayer.equals(owner)) {
+                owner.setIsland(null);
+            } else {
                 kickMember(superiorPlayer);
+            }
 
             if (plugin.getSettings().isDisbandInventoryClear())
                 plugin.getNMSPlayers().clearInventory(superiorPlayer.asOfflinePlayer());
