@@ -61,4 +61,6 @@ public interface NMSWorld {
 
     int getMinHeight(World world);
 
+    void removeAntiXray(World world);
+
 }

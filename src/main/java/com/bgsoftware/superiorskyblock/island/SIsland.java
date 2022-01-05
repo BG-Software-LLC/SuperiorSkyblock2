@@ -1194,8 +1194,11 @@ public final class SIsland implements Island {
     @Override
     public void disbandIsland() {
         getIslandMembers(true).forEach(superiorPlayer -> {
-            if (isMember(superiorPlayer))
+            if (superiorPlayer.equals(owner)) {
+                owner.setIsland(null);
+            } else {
                 kickMember(superiorPlayer);
+            }
 
             if (plugin.getSettings().isDisbandInventoryClear())
                 plugin.getNMSPlayers().clearInventory(superiorPlayer.asOfflinePlayer());
@@ -2901,16 +2904,12 @@ public final class SIsland implements Island {
     public boolean wasSchematicGenerated(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
-        switch (environment) {
-            case NORMAL:
-                return (generatedSchematics.get() & 8) == 8;
-            case NETHER:
-                return (generatedSchematics.get() & 4) == 4;
-            case THE_END:
-                return (generatedSchematics.get() & 3) == 3;
-        }
+        int generateBitChange = getGeneratedSchematicBitMask(environment);
 
-        return false;
+        if (generateBitChange == 0)
+            return false;
+
+        return (generatedSchematics.get() & generateBitChange) != 0;
     }
 
     @Override
@@ -2924,17 +2923,14 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         PluginDebugger.debug("Action: Set Schematic, Island: " + owner.getName() + ", Environment: " + environment);
 
-        switch (environment) {
-            case NORMAL:
-                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
-                break;
-            case NETHER:
-                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
-                break;
-            case THE_END:
-                this.generatedSchematics.updateAndGet(generatedSchematics -> generatedSchematics);
-                break;
-        }
+        int generateBitChange = getGeneratedSchematicBitMask(environment);
+
+        if (generateBitChange == 0)
+            return;
+
+        this.generatedSchematics.updateAndGet(generatedSchematics -> {
+            return generated ? generatedSchematics | generateBitChange : generatedSchematics & ~generateBitChange & 0xF;
+        });
 
         IslandsDatabaseBridge.saveGeneratedSchematics(this);
     }
@@ -3630,6 +3626,19 @@ public final class SIsland implements Island {
 
         warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
                 location.getBlockY(), location.getBlockZ()), islandWarp);
+    }
+
+    private static int getGeneratedSchematicBitMask(World.Environment environment) {
+        switch (environment) {
+            case NORMAL:
+                return 8;
+            case NETHER:
+                return 4;
+            case THE_END:
+                return 3;
+            default:
+                return 0;
+        }
     }
 
 }

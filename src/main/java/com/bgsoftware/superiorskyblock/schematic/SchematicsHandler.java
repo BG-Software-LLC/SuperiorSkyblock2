@@ -61,12 +61,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         this.schematicsContainer = schematicsContainer;
     }
 
-    @Override
-    public void loadData() {
-        throw new UnsupportedOperationException("Not supported for SchematicsHandler.");
-    }
-
-    public void loadDataWithException() throws HandlerLoadException {
+    public void loadData() throws HandlerLoadException {
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
         if (!schematicsFolder.exists()) {

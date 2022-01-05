@@ -485,12 +485,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.syncUpgrades();
         }
 
-        schematicsHandler.loadDataWithException();
+        schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
 
         if (loadGrid) {
-            dataHandler.loadDataWithException();
+            dataHandler.loadData();
             stackedBlocksHandler.loadData();
         } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);

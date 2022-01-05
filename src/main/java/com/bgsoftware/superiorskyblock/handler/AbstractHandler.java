@@ -10,10 +10,6 @@ public abstract class AbstractHandler {
         this.plugin = plugin;
     }
 
-    public abstract void loadData();
-
-    public void loadDataWithException() throws HandlerLoadException {
-        loadData();
-    }
+    public abstract void loadData() throws HandlerLoadException;
 
 }

@@ -155,6 +155,8 @@ public final class WorldsProvider_Default implements WorldsProvider {
         world.setDifficulty(difficulty);
         islandWorlds.put(environment, world);
 
+        plugin.getNMSWorld().removeAntiXray(world);
+
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);

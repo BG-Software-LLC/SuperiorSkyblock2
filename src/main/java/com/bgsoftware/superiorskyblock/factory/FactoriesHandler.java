@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
@@ -94,6 +96,11 @@ public final class FactoriesHandler implements FactoriesManager {
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
         return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
+    }
+
+    public PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {
+        return playersFactory == null ? DefaultPlayerTeleportAlgorithm.getInstance() :
+                playersFactory.createPlayerTeleportAlgorithm(superiorPlayer);
     }
 
     public boolean hasCustomDatabaseBridge() {
