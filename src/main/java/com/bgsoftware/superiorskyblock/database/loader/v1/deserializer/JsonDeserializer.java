@@ -357,7 +357,7 @@ public final class JsonDeserializer implements IDeserializer {
 
     @Override
     public String deserializeDirtyChunks(String dirtyChunksParam) {
-        gson.fromJson(dirtyChunksParam, JsonArray.class);
+        gson.fromJson(dirtyChunksParam, JsonObject.class);
         return dirtyChunksParam;
     }
 
