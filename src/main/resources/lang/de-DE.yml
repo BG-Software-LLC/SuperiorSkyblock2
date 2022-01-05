@@ -462,6 +462,7 @@ INVALID_BLOCK: '&c&lError | &7Ungültige Blockposition {0}.'
 INVALID_EFFECT: '&c&lError | &7Ungültige Wirkung {0}.'
 INVALID_ENTITY: '&c&lError | &7Ungültige Entität {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Ungültige Welt {0}.'
+INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lError | &7Du hast keine Insel.'
 INVALID_ISLAND_LOCATION: '&c&lError | &7An deinem Standort gibt es keine Insel.'
 INVALID_ISLAND_OTHER: '&c&lError | &7{0} hat keine Insel.'
@@ -911,6 +912,7 @@ WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Das Symbol der Kategorie wurde erfolg
   aktualisiert.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lFehler | &7Du kannst nur alphabetische Buchstaben,
   Zahlen und ''_'' für Warp-Kategorienamen verwenden.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
 WARP_CATEGORY_SLOT: '&e&lWarps | &7Gebe einen neuen Slot ein (Gebe "-cancel" ein,
   um abzubrechen):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lFehler | &7Dieser Slot ist bereits von einer
@@ -934,6 +936,7 @@ WARP_ILLEGAL_NAME: '&c&lError | &7Du kannst nur alphabetische Buchstaben, Zahlen
   ''_'' für Warp-Namen verwenden.'
 WARP_LOCATION_UPDATE: '&e&lWarps | &7Der Standort des Warps wurde erfolgreich auf
   deinen Standort aktualisiert.'
+WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
 WARP_PUBLIC_UPDATE: '&e&lWarps | &7Der Warp wurde erfolgreich für die Öffentlichkeit
   geöffnet.'
 WARP_PRIVATE_UPDATE: '&e&lWarps | &7Der Warp wurde erfolgreich für die Öffentlichkeit
