@@ -82,14 +82,17 @@ public final class SettingsContainer {
     public final boolean normalWorldEnabled;
     public final boolean normalWorldUnlocked;
     public final boolean normalSchematicOffset;
+    public final String normalBiome;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
     public final String netherWorldName;
     public final boolean netherSchematicOffset;
+    public final String netherBiome;
     public final boolean endWorldEnabled;
     public final boolean endWorldUnlocked;
     public final String endWorldName;
     public final boolean endSchematicOffset;
+    public final String endBiome;
     public final boolean endDragonFight;
     public final String worldsDifficulty;
     public final String spawnLocation;
@@ -278,16 +281,19 @@ public final class SettingsContainer {
         normalWorldEnabled = config.getBoolean("worlds.normal.enabled", true);
         normalWorldUnlocked = config.getBoolean("worlds.normal.unlock", true);
         normalSchematicOffset = config.getBoolean("worlds.normal.schematic-offset", true);
+        normalBiome = config.getString("worlds.normal.biome", "PLAINS");
         netherWorldEnabled = config.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = config.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = config.getString("worlds.nether.name", "");
         this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
         netherSchematicOffset = config.getBoolean("worlds.nether.schematic-offset", true);
+        netherBiome = config.getString("worlds.nether.biome", "NETHER_WASTES");
         endWorldEnabled = config.getBoolean("worlds.end.enabled", false);
         endWorldUnlocked = config.getBoolean("worlds.end.unlock", false);
         String endWorldName = config.getString("worlds.end.name", "");
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = config.getBoolean("worlds.end.schematic-offset", true);
+        endBiome = config.getString("worlds.end.biome", "THE_END");
         endDragonFight = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         String defaultWorldEnvironment = config.getString("worlds.default-world");
         if (defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled) {

@@ -11,8 +11,9 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
 
@@ -20,9 +21,42 @@ import java.util.Random;
 public final class IslandsGeneratorImpl extends IslandsGenerator {
 
     private final SuperiorSkyblockPlugin plugin;
+    private final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
 
     public IslandsGeneratorImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+
+        {
+            Biome targetBiome;
+            try {
+                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome().toUpperCase());
+            } catch (IllegalArgumentException error) {
+                targetBiome = Biome.PLAINS;
+            }
+            
+            biomeEnumMap.put(World.Environment.NORMAL, targetBiome == Biome.CUSTOM ? Biome.PLAINS : targetBiome);
+        }
+
+        {
+            Biome targetBiome;
+            try {
+                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+            } catch (IllegalArgumentException error) {
+                targetBiome = Biome.NETHER_WASTES;
+            }
+            biomeEnumMap.put(World.Environment.NETHER, targetBiome == Biome.CUSTOM ? Biome.NETHER_WASTES : targetBiome);
+        }
+
+        {
+            Biome targetBiome;
+            try {
+                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+            } catch (IllegalArgumentException error) {
+                targetBiome = Biome.THE_END;
+            }
+            biomeEnumMap.put(World.Environment.THE_END, targetBiome == Biome.CUSTOM ? Biome.THE_END : targetBiome);
+        }
+
     }
 
     @Override
@@ -39,16 +73,12 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
         return new BiomeProvider() {
             @Override
             public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
-                return switch (worldInfo.getEnvironment()) {
-                    case NETHER -> Biome.NETHER_WASTES;
-                    case THE_END -> Biome.THE_END;
-                    default -> Biome.PLAINS;
-                };
+                return biomeEnumMap.getOrDefault(worldInfo.getEnvironment(), Biome.PLAINS);
             }
 
             @Override
             public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
-                return Arrays.asList(Biome.NETHER_WASTES, Biome.THE_END, Biome.PLAINS);
+                return new ArrayList<>(biomeEnumMap.values());
             }
 
         };

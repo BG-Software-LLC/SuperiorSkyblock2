@@ -25,20 +25,33 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid) {
         ChunkData chunkData = createChunkData(world);
 
+        Biome targetBiome;
+
         switch (world.getEnvironment()) {
-            case NORMAL: {
-                plugin.getNMSWorld().setBiome(biomeGrid, Biome.PLAINS);
-                break;
+            case NETHER -> {
+                try {
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+                } catch (IllegalArgumentException error) {
+                    targetBiome = Biome.NETHER_WASTES;
+                }
             }
-            case NETHER: {
-                plugin.getNMSWorld().setBiome(biomeGrid, Biome.NETHER_WASTES);
-                break;
+            case THE_END -> {
+                try {
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+                } catch (IllegalArgumentException error) {
+                    targetBiome = Biome.THE_END;
+                }
             }
-            case THE_END: {
-                plugin.getNMSWorld().setBiome(biomeGrid, Biome.THE_END);
-                break;
+            default -> {
+                try {
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome().toUpperCase());
+                } catch (IllegalArgumentException error) {
+                    targetBiome = Biome.PLAINS;
+                }
             }
         }
+
+        plugin.getNMSWorld().setBiome(biomeGrid, targetBiome);
 
         if (chunkX == 0 && chunkZ == 0 && world.getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
             chunkData.setBlock(0, 99, 0, Material.BEDROCK);
