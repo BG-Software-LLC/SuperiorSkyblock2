@@ -141,6 +141,10 @@ public abstract class PlaceholderHook {
                             StringUtils.fancyFormat(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale()))
                     .put("nether_unlocked", (island, superiorPlayer) -> island.isNetherEnabled() ? "Yes" : "No")
                     .put("end_unlocked", (island, superiorPlayer) -> island.isEndEnabled() ? "Yes" : "No")
+                    .put("visitors_count", (island, superiorPlayer) -> {
+                        return island.getAllPlayersInside().stream().filter(visitor ->
+                                island.isVisitor(visitor, false)).count() + "";
+                    })
                     .build();
 
     private static List<PlaceholdersProvider> placeholdersProviders;
