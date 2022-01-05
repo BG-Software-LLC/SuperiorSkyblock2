@@ -49,6 +49,7 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
      */
     public void setMessage(String message) {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
+        Preconditions.checkArgument(!message.isEmpty(), "message cannot be empty.");
         this.message = message;
     }
 
