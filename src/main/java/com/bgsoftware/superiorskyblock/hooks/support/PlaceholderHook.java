@@ -145,6 +145,9 @@ public abstract class PlaceholderHook {
                         return island.getAllPlayersInside().stream().filter(visitor ->
                                 island.isVisitor(visitor, false)).count() + "";
                     })
+                    .put("bank_limit", (island, superiorPlayer) -> StringUtils.format(island.getBankLimit()))
+                    .put("bank_limit_format", (island, superiorPlayer) ->
+                            StringUtils.fancyFormat(island.getBankLimit(), superiorPlayer.getUserLocale()))
                     .build();
 
     private static List<PlaceholdersProvider> placeholdersProviders;
