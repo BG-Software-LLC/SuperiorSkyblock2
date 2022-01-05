@@ -524,7 +524,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             placeholdersProvider.ifPresent(placeholdersProviders::add);
         }
 
-        PlaceholderHook.register(plugin, placeholdersProviders);
+        PlaceholderHook.register(placeholdersProviders);
     }
 
     private void registerHook(String className) {
