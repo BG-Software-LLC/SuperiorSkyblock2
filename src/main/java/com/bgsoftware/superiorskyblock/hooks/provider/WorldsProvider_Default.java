@@ -151,7 +151,12 @@ public final class WorldsProvider_Default implements WorldsProvider {
                     "- Your level-name property in server.properties is set to " + worldName + ".");
         }
 
-        World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(plugin.getGenerator()).createWorld();
+        World world = WorldCreator.name(worldName)
+                .type(WorldType.FLAT)
+                .environment(environment)
+                .generator(plugin.getGenerator())
+                .createWorld();
+
         world.setDifficulty(difficulty);
         islandWorlds.put(environment, world);
 
