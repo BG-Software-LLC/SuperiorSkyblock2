@@ -294,4 +294,9 @@ public final class NMSWorldImpl implements NMSWorld {
         return 0;
     }
 
+    @Override
+    public void removeAntiXray(World world) {
+
+    }
+
 }

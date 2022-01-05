@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
@@ -40,13 +41,13 @@ import net.minecraft.server.v1_15_R1.TagsBlock;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_15_R1.TileEntitySign;
+import net.minecraft.server.v1_15_R1.World;
 import net.minecraft.server.v1_15_R1.WorldBorder;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
@@ -71,6 +72,8 @@ public final class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f", "g");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
+    private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
+            Object.class, "chunkPacketBlockController").removeFinal();
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
@@ -114,7 +117,7 @@ public final class NMSWorldImpl implements NMSWorld {
             boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
             Player player = superiorPlayer.asPlayer();
-            World world = superiorPlayer.getWorld();
+            org.bukkit.World world = superiorPlayer.getWorld();
 
             if (world == null || player == null)
                 return;
@@ -331,8 +334,15 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getMinHeight(World world) {
+    public int getMinHeight(org.bukkit.World world) {
         return 0;
+    }
+
+    @Override
+    public void removeAntiXray(org.bukkit.World bukkitWorld) {
+        World world = ((CraftWorld) bukkitWorld).getHandle();
+        if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
+            CHUNK_PACKET_BLOCK_CONTROLLER.set(world, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
     }
 
 }
