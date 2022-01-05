@@ -239,18 +239,22 @@ public final class EventsCaller {
         return !blockUnstackEvent.isCancelled();
     }
 
-    public static void callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
-        if (!plugin.getSettings().getDisabledEvents().contains("islandbankdepositevent")) {
-            IslandBankDepositEvent islandBankDepositEvent = new IslandBankDepositEvent(superiorPlayer, island, amount);
-            Bukkit.getPluginManager().callEvent(islandBankDepositEvent);
-        }
+    public static EventResult<String> callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
+        if (plugin.getSettings().getDisabledEvents().contains("islandbankdepositevent"))
+            return EventResult.of(false, null);
+
+        IslandBankDepositEvent islandBankDepositEvent = new IslandBankDepositEvent(superiorPlayer, island, amount);
+        Bukkit.getPluginManager().callEvent(islandBankDepositEvent);
+        return EventResult.of(islandBankDepositEvent.isCancelled(), islandBankDepositEvent.getFailureReason());
     }
 
-    public static void callIslandBankWithdrawEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
-        if (!plugin.getSettings().getDisabledEvents().contains("islandbankwithdrawevent")) {
-            IslandBankWithdrawEvent islandBankWithdrawEvent = new IslandBankWithdrawEvent(superiorPlayer, island, amount);
-            Bukkit.getPluginManager().callEvent(islandBankWithdrawEvent);
-        }
+    public static EventResult<String> callIslandBankWithdrawEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
+        if (plugin.getSettings().getDisabledEvents().contains("islandbankwithdrawevent"))
+            return EventResult.of(false, null);
+
+        IslandBankWithdrawEvent islandBankWithdrawEvent = new IslandBankWithdrawEvent(superiorPlayer, island, amount);
+        Bukkit.getPluginManager().callEvent(islandBankWithdrawEvent);
+        return EventResult.of(islandBankWithdrawEvent.isCancelled(), islandBankWithdrawEvent.getFailureReason());
     }
 
     public static void callIslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, IslandRestrictMoveEvent.RestrictReason restrictReason) {

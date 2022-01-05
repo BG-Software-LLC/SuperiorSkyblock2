@@ -85,8 +85,6 @@ public final class CmdAdminWithdraw implements IAdminIslandCommand {
             amount = island.getIslandBank().getBalance();
         }
 
-        EventsCaller.callIslandBankWithdrawEvent(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, island, amount);
-
         island.getIslandBank().withdrawAdminMoney(sender, amount);
 
         if (targetPlayer == null)
