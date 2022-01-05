@@ -51,8 +51,27 @@ public abstract class PlaceholderHook {
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
 
-    private static final Map<String, PlaceholderParser> DEFAULT_PARSES =
-            ImmutableMap.<String, PlaceholderParser>builder()
+    private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
+            ImmutableMap.<String, PlayerPlaceholderParser>builder()
+                    .put("texture", SuperiorPlayer::getTextureValue)
+                    .put("role", superiorPlayer -> superiorPlayer.getPlayerRole().toString())
+                    .put("locale", superiorPlayer -> StringUtils.format(superiorPlayer.getUserLocale()))
+                    .put("world_border", superiorPlayer -> superiorPlayer.hasWorldBorderEnabled() ? "Yes" : "No")
+                    .put("blocks_stacker", superiorPlayer -> superiorPlayer.hasBlocksStackerEnabled() ? "Yes" : "No")
+                    .put("schematics", superiorPlayer -> superiorPlayer.hasSchematicModeEnabled() ? "Yes" : "No")
+                    .put("team_chat", superiorPlayer -> superiorPlayer.hasTeamChatEnabled() ? "Yes" : "No")
+                    .put("bypass", superiorPlayer -> superiorPlayer.hasBypassModeEnabled() ? "Yes" : "No")
+                    .put("disbands", superiorPlayer -> superiorPlayer.getDisbands() + "")
+                    .put("panel", superiorPlayer -> superiorPlayer.hasToggledPanel() ? "Yes" : "No")
+                    .put("fly", superiorPlayer -> superiorPlayer.hasIslandFlyEnabled() ? "Yes" : "No")
+                    .put("chat_spy", superiorPlayer -> superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No")
+                    .put("border_color", superiorPlayer ->
+                            StringUtils.format(superiorPlayer.getUserLocale(), superiorPlayer.getBorderColor()))
+                    .put("missions_completed", superiorPlayer -> superiorPlayer.getCompletedMissions().size() + "")
+                    .build();
+
+    private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
+            ImmutableMap.<String, IslandPlaceholderParser>builder()
                     .put("center", (island, superiorPlayer) ->
                             SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())).toString())
                     .put("x", (island, superiorPlayer) ->
@@ -178,7 +197,8 @@ public abstract class PlaceholderHook {
         Matcher matcher;
 
         if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            placeholderResult = handlePlayersPlaceholder(superiorPlayer, matcher.group(1).toLowerCase());
+            placeholderResult = Optional.ofNullable(PLAYER_PARSES.get(matcher.group(1)))
+                    .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
         } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String subPlaceholder = matcher.group(1).toLowerCase();
 
@@ -217,48 +237,13 @@ public abstract class PlaceholderHook {
                         .map(Pair::getValue).map(StringUtils::formatDate)
                         .orElse("Haven't Joined"));
             } else {
-                placeholderResult = Optional.ofNullable(DEFAULT_PARSES.get(subPlaceholder))
+                placeholderResult = Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
                         .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
             }
         }
 
         return placeholderResult.orElse(plugin.getSettings().getDefaultPlaceholders()
                 .getOrDefault(placeholder, ""));
-    }
-
-    private static Optional<String> handlePlayersPlaceholder(SuperiorPlayer superiorPlayer, String placeholder) {
-        switch (placeholder) {
-            case "texture":
-                return Optional.of(superiorPlayer.getTextureValue());
-            case "role":
-                return Optional.of(superiorPlayer.getPlayerRole().toString());
-            case "locale":
-                return Optional.of(StringUtils.format(superiorPlayer.getUserLocale()));
-            case "world_border":
-                return Optional.of(superiorPlayer.hasWorldBorderEnabled() ? "Yes" : "No");
-            case "blocks_stacker":
-                return Optional.of(superiorPlayer.hasBlocksStackerEnabled() ? "Yes" : "No");
-            case "schematics":
-                return Optional.of(superiorPlayer.hasSchematicModeEnabled() ? "Yes" : "No");
-            case "team_chat":
-                return Optional.of(superiorPlayer.hasTeamChatEnabled() ? "Yes" : "No");
-            case "bypass":
-                return Optional.of(superiorPlayer.hasBypassModeEnabled() ? "Yes" : "No");
-            case "disbands":
-                return Optional.of(String.valueOf(superiorPlayer.getDisbands()));
-            case "panel":
-                return Optional.of(superiorPlayer.hasToggledPanel() ? "Yes" : "No");
-            case "fly":
-                return Optional.of(superiorPlayer.hasIslandFlyEnabled() ? "Yes" : "No");
-            case "chat_spy":
-                return Optional.of(superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No");
-            case "border_color":
-                return Optional.of(StringUtils.format(superiorPlayer.getUserLocale(), superiorPlayer.getBorderColor()));
-            case "missions_completed":
-                return Optional.of(String.valueOf(superiorPlayer.getCompletedMissions().size()));
-        }
-
-        return Optional.empty();
     }
 
     private static Optional<String> handlePermissionsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
@@ -342,7 +327,11 @@ public abstract class PlaceholderHook {
         return Optional.of(members.get(targetMemberIndex).getName());
     }
 
-    private interface PlaceholderParser extends BiFunction<Island, SuperiorPlayer, String> {
+    private interface PlayerPlaceholderParser extends Function<SuperiorPlayer, String> {
+
+    }
+
+    private interface IslandPlaceholderParser extends BiFunction<Island, SuperiorPlayer, String> {
 
     }
 
