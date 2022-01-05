@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -50,6 +51,7 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
+    private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             ImmutableMap.<String, PlayerPlaceholderParser>builder()
@@ -236,6 +238,8 @@ public abstract class PlaceholderHook {
                         .findFirst()
                         .map(Pair::getValue).map(StringUtils::formatDate)
                         .orElse("Haven't Joined"));
+            } else if((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                placeholderResult = handleIslandFlagsPlaceholder(island, matcher.group(1));
             } else {
                 placeholderResult = Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
                         .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
@@ -251,6 +255,15 @@ public abstract class PlaceholderHook {
         try {
             IslandPrivilege islandPrivilege = IslandPrivilege.getByName(placeholder);
             return Optional.of(island.hasPermission(superiorPlayer, islandPrivilege) + "");
+        } catch (IllegalArgumentException ex) {
+            return Optional.empty();
+        }
+    }
+
+    private static Optional<String> handleIslandFlagsPlaceholder(Island island, String placeholder) {
+        try {
+            IslandFlag islandFlag = IslandFlag.getByName(placeholder);
+            return Optional.of(island.hasSettingsEnabled(islandFlag) + "");
         } catch (IllegalArgumentException ex) {
             return Optional.empty();
         }
