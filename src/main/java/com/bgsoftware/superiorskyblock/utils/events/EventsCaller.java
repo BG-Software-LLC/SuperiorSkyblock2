@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandBanEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChatEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
@@ -288,6 +289,16 @@ public final class EventsCaller {
         IslandChunkResetEvent islandChunkResetEvent = new IslandChunkResetEvent(island, chunkPosition.getWorld(),
                 chunkPosition.getX(), chunkPosition.getZ());
         Bukkit.getPluginManager().callEvent(islandChunkResetEvent);
+    }
+
+    public static EventResult<String> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer,
+                                                          String message) {
+        if (plugin.getSettings().getDisabledEvents().contains("islandchatevent"))
+            return EventResult.of(false, message);
+
+        IslandChatEvent islandChatEvent = new IslandChatEvent(island, superiorPlayer, message);
+        Bukkit.getPluginManager().callEvent(islandChatEvent);
+        return EventResult.of(islandChatEvent.isCancelled(), message);
     }
 
 }
