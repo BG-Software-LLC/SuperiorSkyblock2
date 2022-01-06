@@ -572,6 +572,7 @@ ISLAND_INFO_HEADER: Servernetzwerk seit 2020
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lInsel | &7Letzte Aktualisierung: vor {0}'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lInsel | &7Letzte Aktualisierung:
   &aDerzeit aktiv'
+ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
 ISLAND_INFO_LOCATION: '&e&lInsel | &7Heimat: {0}'
 ISLAND_INFO_NAME: '&e&lInsel | &7Name: {0}'
 ISLAND_INFO_OWNER: '&e&lIsland | &7Besitzer: {0}'

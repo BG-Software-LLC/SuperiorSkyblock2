@@ -133,6 +133,10 @@ public final class CmdAdminShow implements IAdminIslandCommand {
         if (!Message.ISLAND_INFO_WORTH.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_WORTH.getMessage(locale, island.getWorth())).append("\n");
 
+        // Island level
+        if (!Message.ISLAND_INFO_LEVEL.isEmpty(locale))
+            infoMessage.append(Message.ISLAND_INFO_LEVEL.getMessage(locale, island.getIslandLevel())).append("\n");
+
         // Island discord
         if (!Message.ISLAND_INFO_DISCORD.isEmpty(locale))
             infoMessage.append(Message.ISLAND_INFO_DISCORD.getMessage(locale, island.getDiscord())).append("\n");
