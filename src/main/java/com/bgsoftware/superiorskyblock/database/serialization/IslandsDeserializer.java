@@ -74,7 +74,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
 
             PlayerRole playerRole = members.getInt("role").map(SPlayerRole::fromId)
                     .orElse(SPlayerRole.defaultRole());
@@ -102,7 +102,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             cachedIslandInfo.bannedPlayers.add(superiorPlayer);
         });
@@ -124,7 +124,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
             SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
             cachedIslandInfo.uniqueVisitors.add(new Pair<>(visitorPlayer, visitTime));
@@ -165,7 +165,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             PlayerPermissionNode permissionNode = cachedIslandInfo.playerPermissions.computeIfAbsent(superiorPlayer,
                     s -> new PlayerPermissionNode(superiorPlayer, null));
@@ -201,7 +201,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.rolePermissions.put(islandPrivilege.get(), playerRole.get());
         });
     }
@@ -228,7 +228,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.upgrades.put(upgrade.get(), level.get());
         });
     }
@@ -264,7 +264,7 @@ public final class IslandsDeserializer {
             cachedWarpInfo.isPrivate = islandWarp.getBoolean("private").orElse(true);
             cachedWarpInfo.icon = islandWarp.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
         });
     }
@@ -311,7 +311,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.blockLimits.put(block.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
@@ -338,7 +338,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.entityLimits.put(entity.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
@@ -371,7 +371,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(islandUUID.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
             cachedIslandInfo.ratings.put(uuid.get(), rating.get());
         });
     }
@@ -398,7 +398,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.completedMissions.put(mission.get(), finishCount.get());
         });
     }
@@ -431,7 +431,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.islandFlags.put(islandFlag.get(), status.get());
         });
     }
@@ -465,7 +465,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = new KeyMap<>())
                     .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
         });
@@ -494,7 +494,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.islandHomes[environment.get()] = location.get();
         });
     }
@@ -522,7 +522,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.visitorHomes[environment.get()] = location.get();
         });
     }
@@ -550,7 +550,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.islandEffects.put(effectType.get(), new UpgradeValue<>(level.get(), i -> i < 0));
         });
     }
@@ -577,7 +577,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
 
             while (index.get() > cachedIslandInfo.islandChests.size()) {
                 cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize()]);
@@ -609,7 +609,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.roleLimits.put(playerRole.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
         });
     }
@@ -635,7 +635,7 @@ public final class IslandsDeserializer {
             cachedWarpCategoryInfo.slot = warpCategory.getInt("slot").orElse(-1);
             cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);
         });
     }
@@ -658,7 +658,7 @@ public final class IslandsDeserializer {
 
             long currentTime = System.currentTimeMillis() / 1000;
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.balance = balance.get();
             cachedIslandInfo.lastInterestTime = islandBank.getLong("last_interest_time").orElse(currentTime);
 
@@ -678,7 +678,7 @@ public final class IslandsDeserializer {
             }
 
             UUID uuid = UUID.fromString(island.get());
-            CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid, new CachedIslandInfo());
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid, CachedIslandInfo::new);
 
             cachedIslandInfo.islandSize = new UpgradeValue<>(islandSettings.getInt("size")
                     .orElse(-1), i -> i < 0);
@@ -710,7 +710,7 @@ public final class IslandsDeserializer {
                     return;
                 }
 
-                CachedIslandInfo cachedIslandInfo = databaseCache.addCachedInfo(uuid.get(), new CachedIslandInfo());
+                CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
                 SBankTransaction.fromDatabase(bankTransaction).ifPresent(cachedIslandInfo.bankTransactions::add);
             });
         }

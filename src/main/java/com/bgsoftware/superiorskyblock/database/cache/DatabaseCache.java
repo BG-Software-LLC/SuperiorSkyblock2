@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public final class DatabaseCache<V> {
 
@@ -13,9 +14,8 @@ public final class DatabaseCache<V> {
 
     }
 
-    public V addCachedInfo(UUID uuid, V value) {
-        cache.put(uuid, value);
-        return value;
+    public V computeIfAbsentInfo(UUID uuid, Supplier<V> value) {
+        return cache.computeIfAbsent(uuid, u -> value.get());
     }
 
     @Nullable

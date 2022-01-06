@@ -32,7 +32,7 @@ public final class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            CachedPlayerInfo cachedPlayerInfo = databaseCache.addCachedInfo(uuid, new CachedPlayerInfo());
+            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid, CachedPlayerInfo::new);
 
             Optional<String> name = missions.getString("name");
 
@@ -67,18 +67,18 @@ public final class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            CachedPlayerInfo cachedPlayerInfo = databaseCache.addCachedInfo(uuid, new CachedPlayerInfo());
+            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid, CachedPlayerInfo::new);
 
-            playerSettings.getBoolean("toggled_panel").ifPresent(toggledPanel ->
-                    cachedPlayerInfo.toggledPanel = toggledPanel);
-            playerSettings.getBoolean("island_fly").ifPresent(islandFly ->
-                    cachedPlayerInfo.islandFly = islandFly);
-            playerSettings.getString("border_color").ifPresent(borderColor ->
-                    BorderColor.safeValue(borderColor, BorderColor.BLUE));
-            playerSettings.getString("language").ifPresent(userLocale ->
-                    cachedPlayerInfo.userLocale = PlayerLocales.getLocale(userLocale));
-            playerSettings.getBoolean("toggled_border").ifPresent(worldBorderEnabled ->
-                    cachedPlayerInfo.worldBorderEnabled = worldBorderEnabled);
+            cachedPlayerInfo.toggledPanel = playerSettings.getBoolean("toggled_panel")
+                    .orElse(plugin.getSettings().isDefaultToggledPanel());
+            cachedPlayerInfo.islandFly = playerSettings.getBoolean("island_fly")
+                    .orElse(plugin.getSettings().isDefaultIslandFly());
+            cachedPlayerInfo.borderColor = playerSettings.getEnum("border_color", BorderColor.class)
+                    .orElse(BorderColor.BLUE);
+            cachedPlayerInfo.userLocale = playerSettings.getString("language").map(PlayerLocales::getLocale)
+                    .orElse(PlayerLocales.getDefaultLocale());
+            cachedPlayerInfo.worldBorderEnabled = playerSettings.getBoolean("toggled_border")
+                    .orElse(plugin.getSettings().isDefaultWorldBorder());
         });
     }
 
