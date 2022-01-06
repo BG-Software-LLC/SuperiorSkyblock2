@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
@@ -9,16 +8,19 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -26,7 +28,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -347,12 +348,22 @@ public final class PlayersListener implements Listener {
             }
 
             e.setCancelled(true);
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+
+            EventResult<String> eventResult = EventsCaller.callIslandChatEvent(island, superiorPlayer, e.getMessage());
+
+            if (eventResult.isCancelled())
+                return;
+
+            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(),
+                    superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
+
+            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(),
+                    superiorPlayer.getName(), eventResult.getResult());
             for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
                 if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(),
+                            superiorPlayer.getName(), eventResult.getResult());
             }
         } else {
             String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),

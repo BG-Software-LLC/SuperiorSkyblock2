@@ -337,7 +337,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         if (player != null) {
             playerTeleportAlgorithm.teleport(player, location).whenComplete((result, error) -> {
                 if (teleportResult != null)
-                    teleportResult.accept(error != null && result);
+                    teleportResult.accept(error == null && result);
             });
         } else if (teleportResult != null) {
             teleportResult.accept(false);
@@ -355,7 +355,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         if (player != null) {
             playerTeleportAlgorithm.teleport(player, island).whenComplete((result, error) -> {
                 if (teleportResult != null)
-                    teleportResult.accept(error != null && result);
+                    teleportResult.accept(error == null && result);
             });
         } else if (teleportResult != null) {
             teleportResult.accept(false);

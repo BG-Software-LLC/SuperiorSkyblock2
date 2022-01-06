@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_15_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_15_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -343,6 +344,11 @@ public final class NMSWorldImpl implements NMSWorld {
         World world = ((CraftWorld) bukkitWorld).getHandle();
         if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
             CHUNK_PACKET_BLOCK_CONTROLLER.set(world, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
+    }
+
+    @Override
+    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
+        return new IslandsGeneratorImpl(plugin);
     }
 
 }

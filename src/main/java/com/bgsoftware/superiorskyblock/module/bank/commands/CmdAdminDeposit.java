@@ -69,10 +69,7 @@ public final class CmdAdminDeposit implements IAdminIslandCommand {
         if (amount == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> {
-            EventsCaller.callIslandBankDepositEvent(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, island, amount);
-            island.getIslandBank().depositAdminMoney(sender, amount);
-        }));
+        Executor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount)));
 
         if (targetPlayer == null)
             Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, StringUtils.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");

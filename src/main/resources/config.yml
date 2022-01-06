@@ -287,6 +287,9 @@ worlds:
     unlock: true
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, PLAINS will be set.
+    biome: PLAINS
   # Settings related to the nether world.
   nether:
     # Should the nether world be enabled?
@@ -298,6 +301,9 @@ worlds:
     name: ''
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
+    biome: NETHER_WASTES
   end:
     # Should the end world be enabled?
     enabled: false
@@ -308,6 +314,9 @@ worlds:
     name: ''
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, THE_END will be used.
+    biome: THE_END
     # Should dragon fight be enabled? This will spawn dragons for each island.
     # This feature is in beta, expect bugs!
     dragon-fight: false

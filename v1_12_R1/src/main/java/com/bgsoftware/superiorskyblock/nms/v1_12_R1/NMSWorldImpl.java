@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
@@ -297,6 +298,11 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public void removeAntiXray(World world) {
 
+    }
+
+    @Override
+    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
+        return new IslandsGeneratorImpl(plugin);
     }
 
 }
