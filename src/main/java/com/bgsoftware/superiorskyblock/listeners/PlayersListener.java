@@ -48,7 +48,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -87,12 +86,6 @@ public final class PlayersListener implements Listener {
         String fileName = plugin.getFileName().split("\\.")[0];
         String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";
         this.buildName = buildName.isEmpty() ? "" : " (Build: " + buildName + ")";
-
-        try {
-            Class.forName("org.bukkit.event.entity.EntityPotionEffectEvent");
-            Bukkit.getPluginManager().registerEvents(new EffectsListener(), plugin);
-        } catch (Throwable ignored) {
-        }
     }
 
     @EventHandler
@@ -631,28 +624,6 @@ public final class PlayersListener implements Listener {
         } else {
             islandChest.updateContents();
         }
-    }
-
-    private final class EffectsListener implements Listener {
-
-        @EventHandler(ignoreCancelled = true)
-        public void onPlayerEffect(EntityPotionEffectEvent e) {
-            if (e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
-                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
-                return;
-
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-            if (island == null)
-                return;
-
-            int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
-
-            if (islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
-                e.setCancelled(true);
-            }
-        }
-
     }
 
 }

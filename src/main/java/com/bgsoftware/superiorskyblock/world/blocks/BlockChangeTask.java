@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.world.blocks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
@@ -55,7 +57,8 @@ public final class BlockChangeTask {
 
                     IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
 
-                    if (island.isInsideRange(chunk))
+                    boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+                    if (cropGrowthEnabled && island.isInsideRange(chunk))
                         plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
                     ChunksTracker.markDirty(island, chunk, false);

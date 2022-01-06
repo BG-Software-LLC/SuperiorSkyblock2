@@ -37,6 +37,8 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.threads.SyncedObject;
@@ -1384,15 +1386,21 @@ public final class SIsland implements Island {
 
         PluginDebugger.debug("Action: Set Size, Island: " + owner.getName() + ", Size: " + islandSize);
 
-        // First, we want to remove all the current crop tile entities
-        getLoadedChunks(true, false).forEach(chunk ->
-                plugin.getNMSChunks().startTickingChunk(this, chunk, true));
+        boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+
+        if (cropGrowthEnabled) {
+            // First, we want to remove all the current crop tile entities
+            getLoadedChunks(true, false).forEach(chunk ->
+                    plugin.getNMSChunks().startTickingChunk(this, chunk, true));
+        }
 
         this.islandSize = new UpgradeValue<>(islandSize, false);
 
-        // Now, we want to update the tile entities again
-        getLoadedChunks(true, false).forEach(chunk ->
-                plugin.getNMSChunks().startTickingChunk(this, chunk, false));
+        if (cropGrowthEnabled) {
+            // Now, we want to update the tile entities again
+            getLoadedChunks(true, false).forEach(chunk ->
+                    plugin.getNMSChunks().startTickingChunk(this, chunk, false));
+        }
 
         IslandsDatabaseBridge.saveSize(this);
     }
@@ -2336,22 +2344,34 @@ public final class SIsland implements Island {
     @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
+
+        if (!BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
+            return;
+
         Player player = superiorPlayer.asPlayer();
-        if (player != null)
-            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+        if (player != null) {
+            getPotionEffects().forEach((potionEffectType, level) -> player.addPotionEffect(
+                    new PotionEffect(potionEffectType, Integer.MAX_VALUE, level - 1), true));
+        }
     }
 
     @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        Player player = superiorPlayer.asPlayer();
-        if (player != null)
-            getPotionEffects().keySet().forEach(player::removePotionEffect);
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
+            removeEffectsNoUpgradeCheck(superiorPlayer);
     }
 
     @Override
     public void removeEffects() {
-        getAllPlayersInside().forEach(this::removeEffects);
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class))
+            getAllPlayersInside().forEach(this::removeEffectsNoUpgradeCheck);
+    }
+
+    private void removeEffectsNoUpgradeCheck(SuperiorPlayer superiorPlayer) {
+        Player player = superiorPlayer.asPlayer();
+        if (player != null)
+            getPotionEffects().keySet().forEach(player::removePotionEffect);
     }
 
     @Override
