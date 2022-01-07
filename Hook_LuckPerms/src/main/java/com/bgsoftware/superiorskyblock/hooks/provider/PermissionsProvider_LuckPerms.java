@@ -29,7 +29,8 @@ public final class PermissionsProvider_LuckPerms implements PermissionsProvider 
     @Override
     public boolean hasPermission(Player player, String permission) {
         User user = luckPerms.getUserManager().getUser(player.getUniqueId());
-        return user != null && user.getCachedData().getPermissionData().getPermissionMap().getOrDefault(permission, false);
+        return user != null && user.getCachedData().getPermissionData().getPermissionMap()
+                .getOrDefault(permission.toLowerCase(), false);
     }
 
 }
