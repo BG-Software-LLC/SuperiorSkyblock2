@@ -6,10 +6,18 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+/**
+ * Simple implementation of a custom logger for modules.
+ */
 public final class ModuleLogger extends Logger {
 
     private final String loggerPrefix;
 
+    /**
+     * Constructor for the logger.
+     *
+     * @param pluginModule The module that uses the logger.
+     */
     public ModuleLogger(PluginModule pluginModule) {
         super(pluginModule.getClass().getCanonicalName(), null);
         this.loggerPrefix = "[" + pluginModule.getName() + "] ";
