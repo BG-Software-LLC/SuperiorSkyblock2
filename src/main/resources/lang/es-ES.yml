@@ -8,6 +8,8 @@
 # If you wish to create a new language file, please copy this one.
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&lIsla | &7Añadiste al jugador {0} a la isala de {1}'
 ADMIN_ADD_PLAYER_NAME: '&e&lIsla | &7Añadiste al jugador {0} a la isala de {1}.'

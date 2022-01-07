@@ -8,6 +8,8 @@
 # If you wish to create a new language file, please copy this one.
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&l岛屿 | &7成功将玩家 {0} 添加到 {1} 的岛屿中.'
 ADMIN_ADD_PLAYER_NAME: '&e&l岛屿 | &7成功将玩家 {0} 添加到岛屿 {1} 中.'

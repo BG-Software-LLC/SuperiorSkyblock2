@@ -30,6 +30,7 @@ block-limits: true
 entity-limits: true
 
 # All the upgrades of the plugin
+# https://wiki.bg-software.com/superiorskyblock/upgrades
 upgrades:
   hoppers-limit:
     '1':

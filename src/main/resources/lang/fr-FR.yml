@@ -8,6 +8,8 @@
 # Si vous souhaitez créer un nouveau fichier de langue, vous pouvez copier ce fichier, ou vous servir du fichier anglais.
 # Assurez-vous d'attribuer à votre fichier le nom correct en vous référant au lien ci-dessous.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&lIle | &7{0} a été ajouté à l''île de {1}.'
 ADMIN_ADD_PLAYER_NAME: '&e&lIle | &e{0} a été ajouté à l''île {1}.'
