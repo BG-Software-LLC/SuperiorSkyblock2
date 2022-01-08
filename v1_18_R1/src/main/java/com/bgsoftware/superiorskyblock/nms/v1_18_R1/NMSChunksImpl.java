@@ -56,6 +56,7 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -140,10 +141,12 @@ public final class NMSChunksImpl implements NMSChunks {
     private static void removeBlocks(ChunkAccess chunk) {
         WorldServer worldServer = chunk.getWorld();
 
-        if (!(worldServer.getBukkitGenerator() instanceof IslandsGenerator)) {
+        ChunkGenerator bukkitGenerator = worldServer.getWorld().getGenerator();
+
+        if (bukkitGenerator != null && !(bukkitGenerator instanceof IslandsGenerator)) {
             CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer.getHandle(),
                     worldServer.getChunkProvider().getGenerator(),
-                    worldServer.getBukkitGenerator());
+                    bukkitGenerator);
 
             RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer.getHandle(),
                     Collections.singletonList(chunk.getHandle()), ChunkStatus.h, 0);
