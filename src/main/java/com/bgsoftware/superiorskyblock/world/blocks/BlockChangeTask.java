@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import org.bukkit.Chunk;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public final class BlockChangeTask {
 
@@ -32,6 +33,7 @@ public final class BlockChangeTask {
     private final Island island;
 
     private boolean submitted = false;
+    private boolean failed = false;
 
     public BlockChangeTask(Island island) {
         this.island = island;
@@ -43,7 +45,7 @@ public final class BlockChangeTask {
                 .add(new BlockData(location, combinedId, skyLightLevel, blockLightLevel, statesTag, tileEntity));
     }
 
-    public void submitUpdate(Runnable onFinish) {
+    public void submitUpdate(Runnable onFinish, Consumer<Throwable> onFailure) {
         try {
             Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
 
@@ -53,33 +55,47 @@ public final class BlockChangeTask {
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
                 chunkFutures.add(ChunksProvider.loadChunk(entry.getKey(), chunk -> {
-                    interactedChunks.add(entry.getKey());
+                    if (failed)
+                        return;
 
-                    IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
+                    try {
+                        interactedChunks.add(entry.getKey());
 
-                    boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
-                    if (cropGrowthEnabled && island.isInsideRange(chunk))
-                        plugin.getNMSChunks().startTickingChunk(island, chunk, false);
+                        IslandUtils.deleteChunks(island, Collections.singletonList(entry.getKey()), null);
 
-                    ChunksTracker.markDirty(island, chunk, false);
+                        boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+                        if (cropGrowthEnabled && island.isInsideRange(chunk))
+                            plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
-                    entry.getValue().forEach(blockData -> blockData.doPrePlace(island));
+                        ChunksTracker.markDirty(island, chunk, false);
 
-                    plugin.getNMSWorld().setBlocks(chunk, entry.getValue());
+                        entry.getValue().forEach(blockData -> blockData.doPrePlace(island));
 
-                    if (island.getOwner().isOnline())
-                        entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
+                        plugin.getNMSWorld().setBlocks(chunk, entry.getValue());
 
-                    plugin.getNMSChunks().refreshChunk(chunk);
-                    Executor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
+                        if (island.getOwner().isOnline())
+                            entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
+
+                        plugin.getNMSChunks().refreshChunk(chunk);
+                        Executor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
+                    } catch (Throwable error) {
+                        failed = true;
+                        if (onFailure != null)
+                            onFailure.accept(error);
+                    }
                 }));
             }
 
             if (onFinish != null) {
                 CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
-                    onFinish.run();
+                    if (!failed)
+                        onFinish.run();
                 });
             }
+        } catch (Throwable error) {
+            failed = true;
+            if (onFailure != null)
+                onFailure.accept(error);
         } finally {
             blocksCache.clear();
         }

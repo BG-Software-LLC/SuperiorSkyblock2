@@ -73,12 +73,19 @@ public final class ChunksProvider {
         @Override
         public void work() {
             PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
-            try {
-                plugin.getProviders().getAsyncProvider().loadChunk(chunkPosition, this::finishLoad);
-            } catch (Throwable error) {
-                SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading chunk " + chunkPosition + ":");
-                error.printStackTrace();
-            }
+            plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
+                    chunkPosition.getX(), chunkPosition.getZ()).whenComplete((chunk, error) -> {
+                if (error != null) {
+                    error.printStackTrace();
+                }
+                
+                try {
+                    finishLoad(chunk);
+                } catch (Exception ex) {
+                    SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading chunk " + chunkPosition + ":");
+                    ex.printStackTrace();
+                }
+            });
         }
 
         private void finishLoad(Chunk chunk) {
