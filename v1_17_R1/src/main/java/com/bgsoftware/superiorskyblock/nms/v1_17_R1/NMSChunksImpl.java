@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.IslandsChunkGenerator;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
@@ -26,6 +25,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.LightEngineThreaded;
+import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
@@ -42,6 +42,7 @@ import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
 import net.minecraft.world.level.chunk.BiomeStorage;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.NibbleArray;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.LightEngine;
@@ -149,19 +150,17 @@ public final class NMSChunksImpl implements NMSChunks {
     }
 
     private static void removeBlocks(Chunk chunk) {
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
         if (!(worldServer.generator instanceof IslandsGenerator)) {
-            IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
-            ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
-            //noinspection ConstantConditions
-            chunkGenerator.buildBase(null, protoChunk);
+            CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer,
+                    worldServer.getChunkProvider().getChunkGenerator(),
+                    worldServer.generator);
 
-            for (int i = 0; i < 16; i++)
-                chunk.getSections()[i] = protoChunk.getSections()[i];
+            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer,
+                    Collections.singletonList(chunk), ChunkStatus.f, 0);
 
-            protoChunk.y().values().forEach(worldServer::setTileEntity);
+            chunkGenerator.buildBase(region, chunk);
         }
     }
 
