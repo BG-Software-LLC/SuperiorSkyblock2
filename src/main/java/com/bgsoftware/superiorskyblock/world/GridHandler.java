@@ -203,12 +203,17 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         superiorPlayer.getUniqueId(), islandUUID);
             }, ex -> {
-                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        superiorPlayer.getUniqueId(), islandUUID);
                 ex.printStackTrace();
                 PluginDebugger.debug(ex);
+
+                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+
+                superiorPlayer.setIsland(null);
+
                 Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
+
+                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
+                        superiorPlayer.getUniqueId(), islandUUID);
             });
         }
     }
