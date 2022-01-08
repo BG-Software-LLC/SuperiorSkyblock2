@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.world;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
@@ -15,19 +16,18 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.SpawnIsland;
-import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.algorithm.DefaultIslandCreationAlgorithm;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -40,8 +40,8 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -62,6 +62,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private final IslandPreviews islandPreviews;
     private final IslandsContainer islandsContainer;
     private DatabaseBridge databaseBridge;
+    private IslandCreationAlgorithm islandCreationAlgorithm;
 
     private SpawnIsland spawnIsland;
     private SBlockPosition lastIsland;
@@ -84,8 +85,9 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public void loadData() {
         initializeDatabaseBridge();
+        this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
-        lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
+        this.lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
         Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
@@ -125,7 +127,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset) {
+    public void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth,
+                             BigDecimal bonusLevel, Biome biome, String islandName, boolean offset) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
         Preconditions.checkNotNull(bonusWorth, "bonusWorth parameter cannot be null.");
@@ -138,7 +141,14 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             return;
         }
 
-        PluginDebugger.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " + schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome + ", Name: " + islandName + ", Offset: " + offset);
+        PluginDebugger.debug("Action: Create Island, Target: " + superiorPlayer.getName() + ", Schematic: " +
+                schemName + ", Bonus Worth: " + bonusWorth + ", Bonus Level: " + bonusLevel + ", Biome: " + biome +
+                ", Name: " + islandName + ", Offset: " + offset);
+
+        Schematic schematic = plugin.getSchematics().getSchematic(schemName);
+
+        if (schematic == null)
+            throw new IllegalArgumentException("Cannot create an island with an invalid schematic.");
 
         // Removing any active previews for the player.
         boolean updateGamemode = this.islandPreviews.endIslandPreview(superiorPlayer) != null;
@@ -148,74 +158,66 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         UUID islandUUID = generateIslandUUID();
 
-        Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
-                lastIsland.parse().clone(),
-                plugin.getSettings().getIslandHeight(),
-                plugin.getSettings().getMaxIslandSize(),
-                superiorPlayer.getUniqueId(),
-                islandUUID
-        );
+        long startTime = System.currentTimeMillis();
 
-        PluginDebugger.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(islandLocation));
+        pendingCreationTasks.add(superiorPlayer.getUniqueId());
 
-        Island island = plugin.getFactory().createIsland(superiorPlayer, islandUUID, islandLocation.add(0.5, 0, 0.5), islandName, schemName);
-        EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(superiorPlayer, island, schemName);
+        this.islandCreationAlgorithm.createIsland(islandUUID, superiorPlayer, this.lastIsland, islandName, schematic)
+                .whenComplete((islandCreationResult, error) -> {
+                    if (error == null) {
+                        Island island = islandCreationResult.getIsland();
+                        Location islandLocation = islandCreationResult.getIslandLocation();
+                        boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
-        if (!event.isCancelled()) {
-            pendingCreationTasks.add(superiorPlayer.getUniqueId());
+                        Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
 
-            Schematic schematic = plugin.getSchematics().getSchematic(schemName);
-            long startTime = System.currentTimeMillis();
-            assert schematic != null;
-            schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {
-                Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
+                        this.islandsContainer.addIsland(island);
+                        setLastIsland(SBlockPosition.of(islandLocation));
 
-                this.islandsContainer.addIsland(island);
-                setLastIsland(SBlockPosition.of(islandLocation));
+                        pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
-                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+                        island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
+                        island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
+                        island.setBiome(biome);
+                        island.setIslandHome(schematic.adjustRotation(islandLocation));
 
-                island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
-                island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
-                island.setBiome(biome);
-                island.setIslandHome(schematic.adjustRotation(islandLocation));
+                        IslandsDatabaseBridge.insertIsland(island);
 
-                IslandsDatabaseBridge.insertIsland(island);
-
-                superiorPlayer.runIfOnline(player -> {
-                    Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation), System.currentTimeMillis() - startTime);
-                    if (event.getResult()) {
-                        if (updateGamemode)
-                            player.setGameMode(GameMode.SURVIVAL);
-                        superiorPlayer.teleport(island, result -> {
-                            if (result) {
-                                Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
-                                if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
-                                    plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                    if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                                        plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
-                                }
+                        superiorPlayer.runIfOnline(player -> {
+                            Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation),
+                                    System.currentTimeMillis() - startTime);
+                            if (teleportPlayer) {
+                                if (updateGamemode)
+                                    player.setGameMode(GameMode.SURVIVAL);
+                                superiorPlayer.teleport(island, result -> {
+                                    if (result) {
+                                        Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                                        if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
+                                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                                            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
+                                                plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
+                                        }
+                                    }
+                                });
                             }
                         });
+                    } else {
+                        error.printStackTrace();
+                        PluginDebugger.debug(error);
+
+                        pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+
+                        superiorPlayer.setIsland(null);
+
+                        Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
                     }
                 });
+    }
 
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        superiorPlayer.getUniqueId(), islandUUID);
-            }, ex -> {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-
-                pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-
-                superiorPlayer.setIsland(null);
-
-                Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
-
-                plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
-                        superiorPlayer.getUniqueId(), islandUUID);
-            });
-        }
+    @Override
+    public void setIslandCreationAlgorithm(@Nullable IslandCreationAlgorithm islandCreationAlgorithm) {
+        this.islandCreationAlgorithm = islandCreationAlgorithm != null ? islandCreationAlgorithm :
+                DefaultIslandCreationAlgorithm.getInstance();
     }
 
     @Override
