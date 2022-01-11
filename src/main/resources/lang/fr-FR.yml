@@ -1,14 +1,14 @@
 ######################################################
 ##                                                  ##
 ##                SuperiorSkyblock 2                ##
-##                Developed by Ome_R                ##
+##                Développé par Ome_R               ##
 ##                                                  ##
 ######################################################
 
 # Si vous souhaitez créer un nouveau fichier de langue, vous pouvez copier ce fichier, ou vous servir du fichier anglais.
 # Assurez-vous d'attribuer à votre fichier le nom correct en vous référant au lien ci-dessous.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
-# You can find a tutorial about configuring messages here:
+# Un tutoriel sur la customisation des messages est disponnible à cette adresse :
 # https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&lIle | &7{0} a été ajouté à l''île de {1}.'
@@ -355,7 +355,7 @@ INVALID_EFFECT: '&c&lErreur | &7Effet invalide {0}.'
 INVALID_ENTITY: '&c&lErreur | &7Entité invalide {0}.'
 INVALID_SCHEMATIC: '&c&lErreur | &7Il n''existe aucun schematic portant le nom {0}.'
 INVALID_ENVIRONMENT: '&c&lErreur | &7Monde invalide {0}.'
-INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
+INVALID_INTERVAL: '&c&lErreur | &7Interval invalide {0}.'
 INVALID_ISLAND: '&c&lErreur | &7Vous n''avez pas d''île.'
 INVALID_ISLAND_LOCATION: '&c&lErreur | &7Il n''y a pas d''île sur votre position.'
 INVALID_ISLAND_OTHER: '&c&lErreur | &7{0} n''a pas d''île.'
@@ -436,9 +436,9 @@ ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   {0}
 ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lIle | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_ROLE_LIMITS: |
-  &e&lIsland | &7Role Limits:
+  &e&lIle | &7Limite de Roles:
   {0}
-ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIsland | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lIle | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_SIZE: '&e&lIle | &7Taille de la bordure: {0}'
 ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lIle | &7Multiplicateur de Spawners:
   {0}'
@@ -458,7 +458,7 @@ ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LOCATION: '&e&lIle | &7Accueil: {0}'
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lIle | &7Dernière mise à jour: Il y à {0}'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lIle | &7Dernière mise à jour: &aActuellement Active'
-ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
+ISLAND_INFO_LEVEL: '&e&lIle | &7Niveau: {0}'
 ISLAND_INFO_CREATION_TIME: '&e&lIle | &7Date de Création: {0}'
 ISLAND_INFO_NAME: '&e&lIle | &7Nom: {0}'
 ISLAND_INFO_OWNER: '&e&lIle | &7Chef: {0}'
@@ -584,7 +584,7 @@ NO_UPGRADE_PERMISSION: '&c&lErreur | &7Vous n''avez pas la permission d''augment
 NO_WITHDRAW_PERMISSION: '&c&lErreur | &7Vous devez être {0} afin de retirer de l''argent du compte de l''île.'
 NOT_ENOUGH_MONEY_TO_DEPOSIT: '&c&lErreur | &7Vous n''avez pas suffisamment d''argent pour déposer {0}$ sur le compte de vôtre île.'
 NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lErreur | &7Vous n''avez pas suffisamment d''argent.'
-NOT_ENOUGH_MONEY_TO_WARP: '&c&lError | &7You don''t have enough money to use island warps.'
+NOT_ENOUGH_MONEY_TO_WARP: '&c&lErreur | &7Vous n''avez pas suffisamment d''argent pour utiliser les warps d''île.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oVous êtes trop fatigué pour interagir avec le menu vous ne pensez pas ?'
 PANEL_TOGGLE_OFF: |-
   &e&lPanel | &7Panel de gestion de l'île &cDÉSACTIVÉ&7.
@@ -668,7 +668,7 @@ TITLE_SENT: '&e&lIle | &7Envoie du titré {0} effectué !'
 TELEPORTED_FAILED: '&e&lIle | &7Il semblerait que cette île ne soit pas sécurisée. Veuillez contacter un Administrateur.'
 TELEPORTED_SUCCESS: '&e&lIle | &7Vous avez été téléporté sur votre île.'
 TELEPORTED_TO_WARP: '&e&lIle | &7Vous avez été télporté au warp de l''île.'
-TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lIsland | &7The player {0} teleported to the island warp {1}.'
+TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lIle | &7{0} s''est téléporté(e) au warp d''île {1}.'
 TOGGLED_BYPASS_OFF: '&e&lBypass | &7Mode bypass &cDÉSACTIVÉ&7.'
 TOGGLED_BYPASS_ON: '&e&lBypass | &7Mode bypass &aACTIVÉ&7.'
 TOGGLED_FLY_OFF: '&e&lVol | &7Mode de fly d''île &cDÉSACTIVÉ&7.'
@@ -700,37 +700,37 @@ UNLOCK_WORLD_ANNOUNCEMENT: '&e&lMondes | &7Votre monde {0} est désormais dévé
 UNSAFE_WARP: '&e&lIle | &7&oIl semblerait que ce warp ne soit pas sécurisé. Veuillez en essayer un autre.'
 UPDATED_PERMISSION: '&e&lIle | &7Permission mise à jour pour {0}.'
 UPDATED_SETTINGS: '&e&lIle | &7Paramètre de l''île mit à jour {0}.'
-UPGRADE_COOLDOWN_FORMAT: '&c&lError | &7You may only upgrade again in {0}.'
+UPGRADE_COOLDOWN_FORMAT: '&c&lErreur | &7Vous devez patienter {0} afin d''effectuer une nouvelle amélioration.'
 VISITOR_BLOCK_COMMAND: '&c&lErreur | &7Vous ne pouvez pas utiliser cette commande sur d''autres îles.'
 WARP_ALREADY_EXIST: '&c&lErreur | &7Un warp portant ce nom éxiste déjà.'
 WARP_CATEGORY_ICON_NEW_LORE: |
-  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
-  &e&lWarps | &7You can separate lines by using "\n".
-WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
-WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
-WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
-WARP_CATEGORY_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp category names.'
-WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
-WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
-WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
-WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
-WARP_CATEGORY_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
-WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another category.'
-WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the category to {0}.'
+  &e&lWarps | &7Spécifiez un nouveau lore (Entrez "-cancel" to pour annuler) :
+  &e&lWarps | &7Vous pouvez ajouter une nouvelle ligne en utilisant "\n".
+WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
+WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Spécifiez un nouveau matériau (Entrez "-cancel" to pour annuler) :'
+WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Mise à jour de l''icone de la catégorie.'
+WARP_CATEGORY_ILLEGAL_NAME: '&c&lErreur | &7Vous ne pouvez utiliser uniquement des lettres, nombres et ''_'' comme nom de catégorie de warp.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lErreur | &7Le nom d''une catégorie de warp ne peut dépasser 255 caractères.'
+WARP_CATEGORY_SLOT: '&e&lWarps | &7Spécifiez un nouvel emplacement (Entrez "-cancel" to pour annuler) :'
+WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lErreur | &7Cet emplacement est déjà utilisé par une autre catégorie.'
+WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7L''emplacement de la catégorie est désormais {0}.'
+WARP_CATEGORY_RENAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
+WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lErreur | &7Ce nom est déjà utilisé par une autre catégorie.'
+WARP_CATEGORY_RENAME_SUCCESS: '&e&lWarps | &7Cette catégorie a été renommée en {0}.'
 WARP_ICON_NEW_LORE: |
-  &e&lWarps | &7Enter a new lore (Type "-cancel" to cancel):
-  &e&lWarps | &7You can separate lines by using "\n".
-WARP_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to cancel):'
-WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
-WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
-WARP_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp names.'
-WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
-WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
-WARP_PUBLIC_UPDATE: '&e&lWarps | &7Successfully opened the warp to the public.'
-WARP_PRIVATE_UPDATE: '&e&lWarps | &7Successfully closed the warp to the public.'
-WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'
-WARP_RENAME_ALREADY_EXIST: '&c&lError | &7This name is already taken by another warp.'
-WARP_RENAME_SUCCESS: '&e&lWarps | &7Successfully renamed the warp to {0}.'
+  &e&lWarps | &7Spécifiez un nouveau lore (Entrez "-cancel" to pour annuler) :
+  &e&lWarps | &7Vous pouvez ajouter une nouvelle ligne en utilisant "\n".
+WARP_ICON_NEW_NAME: '&e&lWarps | &7Spécifiez un nom (Entrez "-cancel" to pour annuler) :'
+WARP_ICON_NEW_TYPE: '&e&lWarps | &7Spécifiez un nouveau matériau (Entrez "-cancel" to pour annuler) :'
+WARP_ICON_UPDATED: '&e&lWarps | &7Mise à jour de l''icone du warp.'
+WARP_ILLEGAL_NAME: '&c&lErreur | &7Vous ne pouvez utiliser uniquement des lettres, nombres et ''_'' comme nom de warp.'
+WARP_LOCATION_UPDATE: '&e&lWarps | &7Mise à jour de la position de téléportation du warp sur votre emplacement actuel.'
+WARP_NAME_TOO_LONG: '&c&lErreur | &7Le nom d''un warp ne peut dépasser 255 caractères.'
+WARP_PUBLIC_UPDATE: '&e&lWarps | &7Le warp est désormais accessible au public.'
+WARP_PRIVATE_UPDATE: '&e&lWarps | &7Le warp n''est plus accessible au public.'
+WARP_RENAME: '&e&lWarps | &7Spécifiez un nouveau nom (Entrez "-cancel" to pour annuler) :'
+WARP_RENAME_ALREADY_EXIST: '&c&lErreur | &7Ce nom est déjà utilisé par un autre warp.'
+WARP_RENAME_SUCCESS: '&e&lWarps | &7Le warp a été renommé en {0}.'
 WITHDRAW_ALL_MONEY: |-
   &e&lBanque | &7Le compte de l'île ne contient que {0}$.
   &e&lBanque | &7&oRécupération de tout l'argent..."
