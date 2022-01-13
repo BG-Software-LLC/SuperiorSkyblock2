@@ -131,7 +131,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                     continue;
 
                                 World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
-                                int worldBuildLimit = world.getMaxHeight();
+                                int worldBuildLimit = world.getMaxHeight() - 1;
                                 int worldMinLimit = plugin.getNMSWorld().getMinHeight(world);
 
                                 for (int x = 0; x < 16; x++) {
