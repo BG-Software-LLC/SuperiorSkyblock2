@@ -10,6 +10,9 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadExceptio
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
+import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.IUpgradeType;
@@ -38,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class UpgradesModule extends BuiltinModule {
 
@@ -77,10 +81,19 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        return !isEnabled() ? null : enabledUpgrades.stream()
+        if(!isEnabled())
+            return null;
+
+        List<SuperiorCommand> adminCommands = enabledUpgrades.stream()
                 .map(IUpgradeType::getCommands)
                 .flatMap(List::stream)
-                .toArray(SuperiorCommand[]::new);
+                .collect(Collectors.toList());
+
+        adminCommands.add(new CmdAdminRankup());
+        adminCommands.add(new CmdAdminSetUpgrade());
+        adminCommands.add(new CmdAdminSyncUpgrades());
+
+        return adminCommands.toArray(new SuperiorCommand[0]);
     }
 
     @Override
