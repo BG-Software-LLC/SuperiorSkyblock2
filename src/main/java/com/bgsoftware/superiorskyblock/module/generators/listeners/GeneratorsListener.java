@@ -48,6 +48,11 @@ public final class GeneratorsListener implements Listener {
         if (!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
             return;
 
+        // Should fix solid blocks from generating custom blocks
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/837
+        if (block.getType().isSolid())
+            return;
+
         World.Environment environment = block.getWorld().getEnvironment();
         Map<String, Integer> generatorAmounts = island.getGeneratorAmounts(environment);
 
