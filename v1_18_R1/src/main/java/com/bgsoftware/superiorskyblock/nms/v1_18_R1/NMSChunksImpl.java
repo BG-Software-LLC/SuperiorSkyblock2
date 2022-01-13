@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.IslandsChunkGenerator;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.SectionPosition;
@@ -34,6 +33,7 @@ import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
+import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.biome.BiomeBase;
@@ -43,6 +43,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
 import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.chunk.NibbleArray;
 import org.bukkit.Location;
@@ -55,10 +56,12 @@ import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_18_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_18_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -136,18 +139,21 @@ public final class NMSChunksImpl implements NMSChunks {
     }
 
     private static void removeBlocks(ChunkAccess chunk) {
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = chunk.getWorld();
 
-        if (!(worldServer.getBukkitGenerator() instanceof IslandsGenerator)) {
-            IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
-            ChunkAccess protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
-            chunkGenerator.a(null, null, protoChunk.getHandle());
+        ChunkGenerator bukkitGenerator = worldServer.getWorld().getGenerator();
 
-            net.minecraft.world.level.chunk.ChunkSection[] chunkSections = protoChunk.getSections();
-            System.arraycopy(chunkSections, 0, chunk.getSections(), 0, chunkSections.length);
+        if (bukkitGenerator != null && !(bukkitGenerator instanceof IslandsGenerator)) {
+            CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer.getHandle(),
+                    worldServer.getChunkProvider().getGenerator(),
+                    bukkitGenerator);
 
-            protoChunk.getTileEntities().values().forEach(worldServer::setTileEntity);
+            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer.getHandle(),
+                    Collections.singletonList(chunk.getHandle()), ChunkStatus.h, 0);
+
+            chunkGenerator.a(region,
+                    worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    chunk.getHandle());
         }
     }
 

@@ -1,18 +1,20 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
+import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -21,6 +23,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.IronGolem;
+import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Snowman;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wither;
@@ -47,21 +50,21 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
 
-    private final SuperiorSkyblockPlugin plugin;
+    private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
+            PlayerInteractEvent.class, "getHand");
 
-    private final Set<UUID> recentlyClicked = new HashSet<>();
+    private final SuperiorSkyblockPlugin plugin;
 
     public BlocksListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -327,8 +330,10 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockUnstack(PlayerInteractEvent e) {
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() != null ||
-                recentlyClicked.contains(e.getPlayer().getUniqueId()))
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() != null)
+            return;
+
+        if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)
             return;
 
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) <= 1)
@@ -337,13 +342,9 @@ public final class BlocksListener implements Listener {
         if (plugin.getSettings().getStackedBlocks().getDepositMenu().isEnabled() && e.getPlayer().isSneaking()) {
             StackedBlocksDepositMenu depositMenu = new StackedBlocksDepositMenu(e.getClickedBlock().getLocation());
             e.getPlayer().openInventory(depositMenu.getInventory());
-        } else {
-            recentlyClicked.add(e.getPlayer().getUniqueId());
-            Executor.sync(() -> recentlyClicked.remove(e.getPlayer().getUniqueId()), 5L);
-
-            if (!ProtectionLogic.handleBlockBreak(e.getClickedBlock(), e.getPlayer(), true) ||
-                    StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin))
-                e.setCancelled(true);
+        } else if (!ProtectionLogic.handleBlockBreak(e.getClickedBlock(), e.getPlayer(), true) ||
+                StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin)) {
+            e.setCancelled(true);
         }
     }
 
@@ -449,6 +450,58 @@ public final class BlocksListener implements Listener {
     public void onBlockChangeState(BlockFormEvent e) {
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
             e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCartPlaceMonitor(PlayerInteractEvent e) {
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
+                !e.getClickedBlock().getType().name().contains("RAIL") ||
+                !e.getItem().getType().name().contains("MINECART"))
+            return;
+
+        if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
+
+        if (island == null)
+            return;
+
+        switch (e.getItem().getType().name()) {
+            case "HOPPER_MINECART":
+                island.handleBlockPlace(ConstantKeys.HOPPER, 1);
+                break;
+            case "COMMAND_MINECART":
+            case "COMMAND_BLOCK_MINECART":
+                island.handleBlockPlace(ServerVersion.isAtLeast(ServerVersion.v1_13) ?
+                        ConstantKeys.COMMAND_BLOCK : ConstantKeys.COMMAND, 1);
+                break;
+            case "EXPLOSIVE_MINECART":
+            case "TNT_MINECART":
+                island.handleBlockPlace(ConstantKeys.TNT, 1);
+                break;
+            case "POWERED_MINECART":
+            case "FURNACE_MINECART":
+                island.handleBlockPlace(ConstantKeys.FURNACE, 1);
+                break;
+            case "STORAGE_MINECART":
+            case "CHEST_MINECART":
+                island.handleBlockPlace(ConstantKeys.CHEST, 1);
+                break;
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCartBreakMonitor(VehicleDestroyEvent e) {
+        if (!(e.getVehicle() instanceof Minecart))
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+
+        if (island == null)
+            return;
+
+        island.handleBlockBreak(plugin.getNMSAlgorithms().getMinecartBlock((Minecart) e.getVehicle()), 1);
     }
 
     /*

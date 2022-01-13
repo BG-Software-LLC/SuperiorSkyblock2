@@ -1,3 +1,16 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# If you wish to create a new language file, please copy this one.
+# Make sure you give the name a correct language name.
+# https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
+
 ADMIN_ADD_PLAYER: '&e&lWyspa | &7Pomyslnie dodano gracza {0} do wyspy {1}.'
 ADMIN_ADD_PLAYER_NAME: '&e&lWyspa | &7Pomyslnie dodano gracza {0} do wyspy {1}.'
 ADMIN_DEPOSIT_MONEY: '&e&lBank | &7Wplaciles {0}$ do banku wyspy {1}.'
@@ -445,6 +458,7 @@ ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lWyspa | &7Ostatnia aktualizacja: {0} temu'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lWyspa | &7Ostatnia aktualizacja: &aObecnie aktywny'
+ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
 ISLAND_INFO_LOCATION: '&e&lWyspa | &7Strona glówna: {0}'
 ISLAND_INFO_NAME: '&e&lWyspa | &7Nazwa: {0}'
 ISLAND_INFO_OWNER: '&e&lWyspa | &7Lider: {0}'

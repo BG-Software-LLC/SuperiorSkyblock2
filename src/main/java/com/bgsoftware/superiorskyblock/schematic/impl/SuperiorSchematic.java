@@ -314,24 +314,18 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             }
 
             blockChangeTask.submitUpdate(() -> {
-                try {
-                    for (SchematicEntity entity : entities) {
-                        entity.spawnEntity(min);
-                    }
-
-                    island.handleBlocksPlace(cachedCounts);
-
-                    EventsCaller.callIslandSchematicPasteEvent(island, name, location);
-
-                    loadedChunks = blockChangeTask.getLoadedChunks();
-                    callback.run();
-                    loadedChunks = null;
-
-                } catch (Throwable ex) {
-                    if (onFailure != null)
-                        onFailure.accept(ex);
+                for (SchematicEntity entity : entities) {
+                    entity.spawnEntity(min);
                 }
-            });
+
+                island.handleBlocksPlace(cachedCounts);
+
+                EventsCaller.callIslandSchematicPasteEvent(island, name, location);
+
+                loadedChunks = blockChangeTask.getLoadedChunks();
+                callback.run();
+                loadedChunks = null;
+            }, onFailure);
         } catch (Throwable ex) {
             if (onFailure != null)
                 onFailure.accept(ex);

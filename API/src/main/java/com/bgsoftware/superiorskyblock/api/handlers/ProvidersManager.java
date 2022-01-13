@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
@@ -64,6 +65,18 @@ public interface ProvidersManager {
      * @param worldsProvider The worlds provider to set.
      */
     void setWorldsProvider(WorldsProvider worldsProvider);
+
+    /**
+     * Get the currently used chunks-provider.
+     */
+    ChunksProvider getChunksProvider();
+
+    /**
+     * Set a custom chunks provider for the plugin.
+     *
+     * @param chunksProvider The chunks provider to set.
+     */
+    void setChunksProvider(ChunksProvider chunksProvider);
 
     /**
      * Get the currently used bank-economy provider.
