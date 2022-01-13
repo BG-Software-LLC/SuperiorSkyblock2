@@ -133,7 +133,7 @@ public final class IslandsDeserializer {
         loadObject(island, "islands_warps", islandWarpRow -> {
             String name = IslandUtils.getWarpName((String) islandWarpRow.get("name"));
 
-            if (name.isEmpty())
+            if (name.isEmpty() || island.getWarp(name) != null)
                 return;
 
             if (!IslandUtils.isWarpNameLengthValid(name))
