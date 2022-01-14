@@ -19,7 +19,6 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final KeyMap<BigInteger> blockCounts = new KeyMap<>();
-    private final Map<Key, BigInteger> unmodifiableBlockCounts = Collections.unmodifiableMap(blockCounts);
 
     private final Island island;
     private boolean loadingDataMode = false;
@@ -127,7 +126,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
 
     @Override
     public Map<Key, BigInteger> getBlockCounts() {
-        return this.unmodifiableBlockCounts;
+        return Collections.unmodifiableMap(this.blockCounts);
     }
 
     @Override
