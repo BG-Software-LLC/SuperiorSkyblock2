@@ -1046,23 +1046,28 @@ public final class SIsland implements Island {
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
+        if (value)
+            this.setPermission(playerRole, islandPrivilege);
+    }
+
+    @Override
+    public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        PluginDebugger.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
+        PluginDebugger.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole +
+                ", Permission: " + islandPrivilege.getName());
 
-        if (value) {
-            PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
+        PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
 
-            if (islandPrivilege == IslandPrivileges.FLY) {
-                getAllPlayersInside().forEach(this::updateIslandFly);
-            } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
-                getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
-            }
-
-            if (oldRole != null)
-                IslandsDatabaseBridge.removeRolePermission(this, oldRole);
-            IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
+        if (islandPrivilege == IslandPrivileges.FLY) {
+            getAllPlayersInside().forEach(this::updateIslandFly);
+        } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
+            getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
         }
+
+        if (oldRole != null)
+            IslandsDatabaseBridge.removeRolePermission(this, oldRole);
+        IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
     }
 
     @Override

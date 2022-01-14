@@ -217,7 +217,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                         sendFailMessage = false;
                         success = false;
                     } else {
-                        island.setPermission(previousRole, permission, true);
+                        island.setPermission(previousRole, permission);
                     }
                 }
             }
@@ -232,7 +232,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
                         sendFailMessage = false;
                         success = false;
                     } else {
-                        island.setPermission(nextRole, permission, true);
+                        island.setPermission(nextRole, permission);
                     }
                 }
             } else return;
