@@ -68,7 +68,6 @@ public final class SpawnIsland implements Island {
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final Location center;
     private final int islandSize;
-    private final List<IslandFlag> islandSettings;
     private Biome biome = Biome.PLAINS;
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
@@ -80,13 +79,6 @@ public final class SpawnIsland implements Island {
         assert smartCenter != null;
         center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().getSpawn().getSize();
-        islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(islandFlagName -> {
-            try {
-                return IslandFlag.getByName(islandFlagName);
-            } catch (NullPointerException error) {
-                return null;
-            }
-        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);
@@ -1290,7 +1282,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public boolean hasSettingsEnabled(IslandFlag islandFlag) {
-        return this.islandSettings.contains(islandFlag);
+        return plugin.getSettings().getSpawn().getSettings().contains(islandFlag.getName());
     }
 
     @Override
