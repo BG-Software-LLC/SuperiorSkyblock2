@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -154,7 +155,7 @@ public final class IslandsDeserializer {
         });
     }
 
-    public static void deserializeBlockCounts(String blocks, Island island) {
+    public static void deserializeBlockCounts(String blocks, IslandBlocksTrackerAlgorithm blocksTrackerAlgorithm) {
         if (blocks == null || blocks.isEmpty())
             return;
 
@@ -170,7 +171,7 @@ public final class IslandsDeserializer {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = Key.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            island.handleBlockPlace(blockKey, amount, false, false);
+            blocksTrackerAlgorithm.trackBlock(blockKey, amount);
         });
     }
 

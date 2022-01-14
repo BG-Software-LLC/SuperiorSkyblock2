@@ -522,7 +522,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
-        
+
     }
 
     @Override
@@ -994,6 +994,11 @@ public final class SpawnIsland implements Island {
     @Override
     public int getExactBlockLimit(Key key) {
         return IslandUtils.NO_LIMIT.get();
+    }
+
+    @Override
+    public Key getBlockLimitKey(Key key) {
+        return key;
     }
 
     @Override

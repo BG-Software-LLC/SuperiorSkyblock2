@@ -1182,6 +1182,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     int getExactBlockLimit(Key key);
 
     /**
+     * Get the block key used as a limit for another block key.
+     *
+     * @param key The block's key to check.
+     */
+    Key getBlockLimitKey(Key key);
+
+    /**
      * Get all the blocks limits for the island.
      */
     Map<Key, Integer> getBlocksLimits();
