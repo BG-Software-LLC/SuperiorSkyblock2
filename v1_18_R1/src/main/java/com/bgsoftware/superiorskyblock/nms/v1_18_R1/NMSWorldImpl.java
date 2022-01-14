@@ -207,7 +207,7 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlock(Location location, Material material, byte data) {
+    public void setBlock(Location location, int combinedId) {
         org.bukkit.World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
@@ -215,10 +215,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
         WorldServer world = new WorldServer(((CraftWorld) bukkitWorld).getHandle());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-
-        NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition,
-                plugin.getNMSAlgorithms().getCombinedId(material, data), null, null);
-
+        NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
         NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world.getHandle(), blockPosition.getHandle()));
     }

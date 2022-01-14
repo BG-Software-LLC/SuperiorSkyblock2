@@ -15,8 +15,12 @@ import java.util.Random;
 
 public final class BlockData extends MappedObject<IBlockData> {
 
-    public BlockData(net.minecraft.world.level.block.state.IBlockData handle) {
+    public BlockData(IBlockData handle) {
         super(handle);
+    }
+
+    public static BlockData ofNullable(IBlockData blockData) {
+        return blockData == null ? null : new BlockData(blockData);
     }
 
     public Block getBlock() {

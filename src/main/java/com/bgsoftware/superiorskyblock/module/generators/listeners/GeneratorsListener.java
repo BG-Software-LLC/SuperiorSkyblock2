@@ -90,11 +90,21 @@ public final class GeneratorsListener implements Listener {
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         island.handleBlockPlace(Key.of(newState), 1);
 
+        Material generateBlockType = Material.valueOf(typeSections[0]);
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
+        int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
 
-        PluginDebugger.debug("Action: Generate Block, Island: " + island.getOwner().getName() + ", Block: " + typeSections[0] + ":" + blockData);
+        if(combinedId == -1) {
+            SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
+            generateBlockType = Material.COBBLESTONE;
+            blockData = 0;
+            combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+        }
 
-        plugin.getNMSWorld().setBlock(block.getLocation(), Material.valueOf(typeSections[0]), blockData);
+        PluginDebugger.debug("Action: Generate Block, Island: " + island.getOwner().getName() +
+                ", Block: " + generateBlockType + ":" + blockData);
+
+        plugin.getNMSWorld().setBlock(block.getLocation(), combinedId);
 
         plugin.getNMSWorld().playGeneratorSound(block.getLocation());
     }

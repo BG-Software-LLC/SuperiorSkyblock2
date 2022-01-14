@@ -51,7 +51,8 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public int getCombinedId(Material material, byte data) {
-        return 0;
+        //noinspection deprecation
+        return material.getId() + (data << 12);
     }
 
     @Override

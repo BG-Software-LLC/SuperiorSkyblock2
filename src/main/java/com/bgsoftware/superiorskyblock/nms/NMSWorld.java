@@ -36,7 +36,7 @@ public interface NMSWorld {
 
     void setBlocks(Chunk chunk, List<BlockData> blockDataList);
 
-    void setBlock(Location location, Material material, byte data);
+    void setBlock(Location location, int combinedId);
 
     ICachedBlock cacheBlock(Block block);
 
