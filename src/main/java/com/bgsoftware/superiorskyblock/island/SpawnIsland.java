@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -79,7 +80,13 @@ public final class SpawnIsland implements Island {
         assert smartCenter != null;
         center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().getSpawn().getSize();
-        islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(IslandFlag::getByName).collect(Collectors.toList());
+        islandSettings = plugin.getSettings().getSpawn().getSettings().stream().map(islandFlagName -> {
+            try {
+                return IslandFlag.getByName(islandFlagName);
+            } catch (NullPointerException error) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);

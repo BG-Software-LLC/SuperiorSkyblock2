@@ -332,7 +332,7 @@ public final class CommandArguments {
 
         try {
             islandFlag = IslandFlag.getByName(argument);
-        } catch (IllegalArgumentException ignored) {
+        } catch (NullPointerException ignored) {
         }
 
         if (islandFlag == null)

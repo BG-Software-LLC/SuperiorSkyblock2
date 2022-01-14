@@ -238,7 +238,7 @@ public abstract class PlaceholderHook {
                         .findFirst()
                         .map(Pair::getValue).map(StringUtils::formatDate)
                         .orElse("Haven't Joined"));
-            } else if((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                 placeholderResult = handleIslandFlagsPlaceholder(island, matcher.group(1));
             } else {
                 placeholderResult = Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
@@ -264,7 +264,7 @@ public abstract class PlaceholderHook {
         try {
             IslandFlag islandFlag = IslandFlag.getByName(placeholder);
             return Optional.of(island.hasSettingsEnabled(islandFlag) + "");
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException ex) {
             return Optional.empty();
         }
     }
