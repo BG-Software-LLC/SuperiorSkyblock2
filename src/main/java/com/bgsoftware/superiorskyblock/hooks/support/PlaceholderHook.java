@@ -255,7 +255,7 @@ public abstract class PlaceholderHook {
         try {
             IslandPrivilege islandPrivilege = IslandPrivilege.getByName(placeholder);
             return Optional.of(island.hasPermission(superiorPlayer, islandPrivilege) + "");
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException ex) {
             return Optional.empty();
         }
     }

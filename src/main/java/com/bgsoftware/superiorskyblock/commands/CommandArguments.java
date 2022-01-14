@@ -306,7 +306,7 @@ public final class CommandArguments {
 
         try {
             islandPrivilege = IslandPrivilege.getByName(argument);
-        } catch (IllegalArgumentException ignored) {
+        } catch (NullPointerException ignored) {
         }
 
         if (islandPrivilege == null)
