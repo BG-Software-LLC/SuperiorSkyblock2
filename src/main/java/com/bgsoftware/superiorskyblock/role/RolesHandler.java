@@ -14,7 +14,8 @@ import java.util.List;
 
 public final class RolesHandler extends AbstractHandler implements RolesManager {
 
-    private static final int GUEST_ROLE_INDEX = -2, COOP_ROLE_INDEX = -1;
+    private static final int GUEST_ROLE_INDEX = -2;
+    private static final int COOP_ROLE_INDEX = -1;
     private final RolesContainer rolesContainer;
     private int lastRole = Integer.MIN_VALUE;
 

@@ -141,7 +141,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                         Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
                                                 y == worldMinLimit ? worldMinLimit : y - 1, z);
 
-                                        Material blockType, belowType;
+                                        Material blockType;
+                                        Material belowType;
 
                                         try {
                                             blockType = Material.valueOf(blockKey.getGlobalKey());

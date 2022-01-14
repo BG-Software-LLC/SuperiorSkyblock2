@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -28,7 +28,10 @@ import java.util.function.Function;
 
 public final class MenuWarpManage extends SuperiorMenu {
 
-    private static List<Integer> renameSlots, iconSlots, locationSlots, privateSlots;
+    private static List<Integer> renameSlots;
+    private static List<Integer> iconSlots;
+    private static List<Integer> locationSlots;
+    private static List<Integer> privateSlots;
     private static SoundWrapper successUpdateSound;
 
     private final IslandWarp islandWarp;

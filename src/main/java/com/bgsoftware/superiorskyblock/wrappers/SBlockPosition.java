@@ -8,7 +8,9 @@ import org.bukkit.block.Block;
 
 public final class SBlockPosition implements BlockPosition {
 
-    private final int x, y, z;
+    private final int x;
+    private final int y;
+    private final int z;
     private final String world;
 
     public SBlockPosition(String world, int x, int y, int z) {

@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
 public final class MenuBankLogs extends PagedSuperiorMenu<BankTransaction> {
 
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static List<Integer> timeSortSlots, moneySortSlots;
+    private static List<Integer> timeSortSlots;
+    private static List<Integer> moneySortSlots;
 
     private final Island island;
 

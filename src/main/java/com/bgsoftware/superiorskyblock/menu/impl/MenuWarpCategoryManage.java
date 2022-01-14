@@ -24,7 +24,9 @@ import java.util.function.Function;
 
 public final class MenuWarpCategoryManage extends SuperiorMenu {
 
-    private static List<Integer> renameSlots, iconSlots, warpsSlots;
+    private static List<Integer> renameSlots;
+    private static List<Integer> iconSlots;
+    private static List<Integer> warpsSlots;
     private static SoundWrapper successUpdateSound;
 
     private final WarpCategory warpCategory;

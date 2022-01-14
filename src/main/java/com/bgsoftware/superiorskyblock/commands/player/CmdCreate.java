@@ -83,7 +83,8 @@ public final class CmdCreate implements ISuperiorCommand {
             return;
         }
 
-        String islandName = "", schematicName = null;
+        String islandName = "";
+        String schematicName = null;
 
         if (plugin.getSettings().getIslandNames().isRequiredForCreation()) {
             if (args.length >= 2) {

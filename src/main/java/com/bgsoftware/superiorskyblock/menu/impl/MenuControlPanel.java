@@ -22,7 +22,9 @@ import java.util.List;
 
 public final class MenuControlPanel extends SuperiorMenu {
 
-    private static List<Integer> membersSlot, settingsSlot, visitorsSlot;
+    private static List<Integer> membersSlot;
+    private static List<Integer> settingsSlot;
+    private static List<Integer> visitorsSlot;
 
     private final Island targetIsland;
 
@@ -90,7 +92,9 @@ public final class MenuControlPanel extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char membersChar = itemChars[charCounter++], settingsChar = itemChars[charCounter++], visitorsChar = itemChars[charCounter++];
+        char membersChar = itemChars[charCounter++];
+        char settingsChar = itemChars[charCounter++];
+        char visitorsChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.members"), patternChars, membersChar,
                 itemsSection, commandsSection, soundsSection);

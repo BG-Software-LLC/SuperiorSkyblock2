@@ -57,7 +57,8 @@ public final class CmdAdminPurge implements ISuperiorCommand {
             plugin.getGrid().getIslandsToPurge().forEach(island -> plugin.getGrid().removeIslandFromPurge(island));
             Message.PURGE_CLEAR.send(sender);
         } else {
-            long timeToPurge = StringUtils.parseLong(args[2]), currentTime = System.currentTimeMillis() / 1000;
+            long timeToPurge = StringUtils.parseLong(args[2]);
+            long currentTime = System.currentTimeMillis() / 1000;
 
             List<Island> islands = plugin.getGrid().getIslands().stream().filter(island -> {
                 long lastTimeUpdate = island.getLastTimeUpdate();

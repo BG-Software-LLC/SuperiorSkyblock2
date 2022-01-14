@@ -1,19 +1,18 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -29,7 +28,10 @@ import java.util.function.Function;
 
 public final class MenuBorderColor extends SuperiorMenu {
 
-    private static List<Integer> greenColorSlot, blueColorSlot, redColorSlot, toggleBorderSlot;
+    private static List<Integer> greenColorSlot;
+    private static List<Integer> blueColorSlot;
+    private static List<Integer> redColorSlot;
+    private static List<Integer> toggleBorderSlot;
 
     private MenuBorderColor(SuperiorPlayer superiorPlayer) {
         super("menuBorderColor", superiorPlayer);
@@ -119,7 +121,9 @@ public final class MenuBorderColor extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char greenChar = itemChars[charCounter++], blueChar = itemChars[charCounter++], redChar = itemChars[charCounter++];
+        char greenChar = itemChars[charCounter++];
+        char blueChar = itemChars[charCounter++];
+        char redChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("border-gui.green_color"), patternChars, greenChar,
                 itemsSection, commandsSection, soundsSection);

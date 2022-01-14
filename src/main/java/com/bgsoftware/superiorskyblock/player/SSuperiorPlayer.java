@@ -59,7 +59,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private final UUID uuid;
 
     private Island playerIsland = null;
-    private String name, textureValue = "";
+    private String name;
+    private String textureValue = "";
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
 
@@ -72,7 +73,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     private boolean adminSpyEnabled = false;
 
-    private SBlockPosition schematicPos1 = null, schematicPos2 = null;
+    private SBlockPosition schematicPos1 = null;
+    private SBlockPosition schematicPos2 = null;
     private int disbands;
     private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
     private long lastTimeStatus = -1;

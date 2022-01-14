@@ -265,9 +265,14 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public void playGeneratorSound(Location location) {
         net.minecraft.server.v1_12_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
-        double x = location.getX(), y = location.getY(), z = location.getZ();
+
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+
         BlockPosition blockPosition = new BlockPosition(x, y, z);
-        world.a(null, blockPosition, SoundEffects.dE, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+        world.a(null, blockPosition, SoundEffects.dE, SoundCategory.BLOCKS, 0.5F,
+                2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
         for (int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);

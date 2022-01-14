@@ -8,7 +8,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
  */
 public class IslandBanEvent extends IslandEvent {
 
-    private final SuperiorPlayer superiorPlayer, targetPlayer;
+    private final SuperiorPlayer superiorPlayer;
+    private final SuperiorPlayer targetPlayer;
 
     /**
      * The constructor of the event.

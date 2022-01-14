@@ -243,7 +243,8 @@ public final class PlayersListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
@@ -289,7 +290,8 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        boolean cancelFlames = false, cancelEvent = false;
+        boolean cancelFlames = false;
+        boolean cancelEvent = false;
         Message messageToSend = null;
 
         HitActionResult hitActionResult = damagerPlayer.canHit(targetPlayer);

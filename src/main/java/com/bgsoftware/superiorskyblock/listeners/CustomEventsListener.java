@@ -130,7 +130,8 @@ public final class CustomEventsListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerMove(PlayerMoveEvent e) {
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
@@ -190,8 +191,16 @@ public final class CustomEventsListener implements Listener {
         if (commands == null)
             return;
 
-        String islandName = e.getIsland().getName(), playerName = "", schematicName = "", enterCause = "",
-                targetName = "", leaveCause = "", oldOwner = "", newOwner = "", worth = "", level = "";
+        String islandName = e.getIsland().getName();
+        String playerName = "";
+        String schematicName = "";
+        String enterCause = "";
+        String targetName = "";
+        String leaveCause = "";
+        String oldOwner = "";
+        String newOwner = "";
+        String worth = "";
+        String level = "";
 
         switch (e.getClass().getSimpleName().toLowerCase()) {
             case "islandcreateevent":

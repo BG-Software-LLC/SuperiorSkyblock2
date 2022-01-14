@@ -361,7 +361,8 @@ public final class SpawnIsland implements Island {
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
-        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+        Chunk minChunk = min.getChunk();
+        Chunk maxChunk = max.getChunk();
         World world = center.getWorld();
 
         List<Chunk> chunks = new ArrayList<>();
@@ -436,7 +437,9 @@ public final class SpawnIsland implements Island {
         if (!location.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
-        Location min = getMinimum(), max = getMaximum();
+        Location min = getMinimum();
+        Location max = getMaximum();
+        
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
@@ -456,7 +459,9 @@ public final class SpawnIsland implements Island {
         if (!chunk.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
             return false;
 
-        Location min = getMinimum(), max = getMaximum();
+        Location min = getMinimum();
+        Location max = getMaximum();
+
         return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
                 (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
     }

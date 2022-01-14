@@ -149,7 +149,7 @@ public final class StackedBlocksLogic {
             return false;
 
         // When sneaking, you'll break 64 from the stack. Otherwise, 1.
-        int amount = player == null || !player.isSneaking() ? 1 : 64, leftAmount;
+        int amount = player == null || !player.isSneaking() ? 1 : 64;
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
@@ -159,6 +159,7 @@ public final class StackedBlocksLogic {
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
 
+        int leftAmount;
         boolean stackedBlockSuccess = plugin.getStackedBlocks().setStackedBlock(block, (leftAmount = blockAmount - amount));
 
         plugin.getNMSWorld().playBreakAnimation(block);

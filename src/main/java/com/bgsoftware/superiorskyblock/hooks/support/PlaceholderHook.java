@@ -54,7 +54,7 @@ public abstract class PlaceholderHook {
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
-            ImmutableMap.<String, PlayerPlaceholderParser>builder()
+            new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
                     .put("texture", SuperiorPlayer::getTextureValue)
                     .put("role", superiorPlayer -> superiorPlayer.getPlayerRole().toString())
                     .put("locale", superiorPlayer -> StringUtils.format(superiorPlayer.getUserLocale()))
@@ -73,7 +73,7 @@ public abstract class PlaceholderHook {
                     .build();
 
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
-            ImmutableMap.<String, IslandPlaceholderParser>builder()
+            new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
                             SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())).toString())
                     .put("x", (island, superiorPlayer) ->
@@ -91,7 +91,8 @@ public abstract class PlaceholderHook {
                     .put("coop_limit", (island, superiorPlayer) -> island.getCoopLimit() + "")
                     .put("leader", (island, superiorPlayer) -> island.getOwner().getName())
                     .put("size_format", (island, superiorPlayer) -> {
-                        int size = island.getIslandSize() * 2 + 1, rounded = 5 * (Math.round(size / 5.0F));
+                        int size = island.getIslandSize() * 2 + 1;
+                        int rounded = 5 * (Math.round(size / 5.0F));
                         if (Math.abs(size - rounded) == 1)
                             size = rounded;
                         return size + " x " + size;

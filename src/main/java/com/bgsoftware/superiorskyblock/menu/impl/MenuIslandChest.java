@@ -23,7 +23,8 @@ import java.util.List;
 
 public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
-    private static ItemBuilder validPage, invalidPage;
+    private static ItemBuilder validPage;
+    private static ItemBuilder invalidPage;
 
     private final Island island;
 

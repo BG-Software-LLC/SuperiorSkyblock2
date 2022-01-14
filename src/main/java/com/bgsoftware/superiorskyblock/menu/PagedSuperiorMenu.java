@@ -31,11 +31,11 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
     @Override
     protected final void onPlayerClick(InventoryClickEvent e) {
-        List<Integer> previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot(), slots = getSlots();
+        List<Integer> slots = getSlots();
 
-        boolean isPreviousSlot = previousSlot.contains(e.getRawSlot()),
-                isNextSlot = nextSlot.contains(e.getRawSlot()),
-                isCurrentSlot = currentSlot.contains(e.getRawSlot());
+        boolean isPreviousSlot = getPreviousSlot().contains(e.getRawSlot());
+        boolean isNextSlot = getNextSlot().contains(e.getRawSlot());
+        boolean isCurrentSlot = getCurrentSlot().contains(e.getRawSlot());
 
         if (isPreviousSlot || isNextSlot || isCurrentSlot) {
             if (isCurrentSlot)

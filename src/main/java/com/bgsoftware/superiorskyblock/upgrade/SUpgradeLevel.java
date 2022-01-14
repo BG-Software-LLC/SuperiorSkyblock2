@@ -36,9 +36,15 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final List<String> commands;
     private final String permission;
     private final Set<Pair<String, String>> requirements;
-    private final UpgradeValue<Double> cropGrowth, spawnerRates, mobDrops;
-    private final UpgradeValue<Integer> teamLimit, warpsLimit, coopLimit, borderSize;
-    private final KeyMap<Integer> blockLimits, entityLimits;
+    private final UpgradeValue<Double> cropGrowth;
+    private final UpgradeValue<Double> spawnerRates;
+    private final UpgradeValue<Double> mobDrops;
+    private final UpgradeValue<Integer> teamLimit;
+    private final UpgradeValue<Integer> warpsLimit;
+    private final UpgradeValue<Integer> coopLimit;
+    private final UpgradeValue<Integer> borderSize;
+    private final KeyMap<Integer> blockLimits;
+    private final KeyMap<Integer> entityLimits;
     private final KeyMap<Integer>[] generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
     private final UpgradeValue<BigDecimal> bankLimit;
@@ -319,9 +325,12 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     public static class ItemData {
 
-        public ItemBuilder hasNextLevel, noNextLevel;
-        public SoundWrapper hasNextLevelSound, noNextLevelSound;
-        public List<String> hasNextLevelCommands, noNextLevelCommands;
+        public ItemBuilder hasNextLevel;
+        public ItemBuilder noNextLevel;
+        public SoundWrapper hasNextLevelSound;
+        public SoundWrapper noNextLevelSound;
+        public List<String> hasNextLevelCommands;
+        public List<String> noNextLevelCommands;
 
         public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
             this.hasNextLevel = hasNextLevel;

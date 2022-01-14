@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -23,7 +22,9 @@ import java.util.List;
 
 public final class MenuMemberManage extends SuperiorMenu {
 
-    private static List<Integer> rolesSlot, banSlot, kickSlot;
+    private static List<Integer> rolesSlot;
+    private static List<Integer> banSlot;
+    private static List<Integer> kickSlot;
 
     private final SuperiorPlayer targetPlayer;
 
@@ -96,7 +97,9 @@ public final class MenuMemberManage extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char rolesChar = itemChars[charCounter++], banChar = itemChars[charCounter++], kickChar = itemChars[charCounter++];
+        char rolesChar = itemChars[charCounter++];
+        char banChar = itemChars[charCounter++];
+        char kickChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("players-panel.roles"), patternChars, rolesChar,
                 itemsSection, commandsSection, soundsSection);

@@ -9,7 +9,8 @@ public final class SchematicBlock {
     public final static SchematicBlock AIR = of(0, (byte) 0, (byte) 0, null, null);
 
     private final int combinedId;
-    private final byte skyLightLevel, blockLightLevel;
+    private final byte skyLightLevel;
+    private final byte blockLightLevel;
     private final CompoundTag statesTag;
     private final CompoundTag tileEntity;
 

@@ -922,7 +922,9 @@ public final class SIsland implements Island {
         if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
-        Location min = getMinimum(), max = getMaximum();
+        Location min = getMinimum();
+        Location max = getMaximum();
+        
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
@@ -937,7 +939,9 @@ public final class SIsland implements Island {
         if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
-        Location min = getMinimumProtected(), max = getMaximumProtected();
+        Location min = getMinimumProtected();
+        Location max = getMaximumProtected();
+
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
@@ -1315,7 +1319,8 @@ public final class SIsland implements Island {
 
         PluginDebugger.debug("Action: Calculate Island, Island: " + owner.getName() + ", Target: " + (asker == null ? "Null" : asker.getName()));
 
-        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+        BigDecimal oldWorth = getWorth();
+        BigDecimal oldLevel = getIslandLevel();
 
         CompletableFuture<IslandCalculationAlgorithm.IslandCalculationResult> calculationResult;
 
@@ -1837,14 +1842,15 @@ public final class SIsland implements Island {
     @Override
     public BigDecimal getWorth() {
         double bankWorthRate = BuiltinModules.BANK.bankWorthRate;
-        BigDecimal islandWorth = this.islandWorth.get(), islandBank = this.islandBank.getBalance(), bonusWorth = this.bonusWorth.get();
-        BigDecimal finalIslandWorth = bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
-                islandBank.multiply(BigDecimal.valueOf(bankWorthRate)));
 
-        finalIslandWorth = finalIslandWorth.add(bonusWorth);
+        BigDecimal islandWorth = this.islandWorth.get();
+        BigDecimal islandBank = this.islandBank.getBalance();
+        BigDecimal bonusWorth = this.bonusWorth.get();
+        BigDecimal finalIslandWorth = (bankWorthRate <= 0 ? getRawWorth() : islandWorth.add(
+                islandBank.multiply(BigDecimal.valueOf(bankWorthRate)))).add(bonusWorth);
 
         if (!plugin.getSettings().isNegativeWorth() && finalIslandWorth.compareTo(BigDecimal.ZERO) < 0)
-            finalIslandWorth = BigDecimal.ZERO;
+            return BigDecimal.ZERO;
 
         return finalIslandWorth;
     }
@@ -1892,7 +1898,8 @@ public final class SIsland implements Island {
 
     @Override
     public BigDecimal getIslandLevel() {
-        BigDecimal bonusLevel = this.bonusLevel.get(), islandLevel = this.islandLevel.get().add(bonusLevel);
+        BigDecimal bonusLevel = this.bonusLevel.get();
+        BigDecimal islandLevel = this.islandLevel.get().add(bonusLevel);
 
         if (plugin.getSettings().isRoundedIslandLevels()) {
             islandLevel = islandLevel.setScale(0, RoundingMode.HALF_UP);
@@ -1983,8 +1990,9 @@ public final class SIsland implements Island {
 
     @Override
     public boolean hasActiveUpgradeCooldown() {
-        long lastTimeUpgrade = getLastTimeUpgrade(), currentTime = System.currentTimeMillis(),
-                upgradeCooldown = plugin.getSettings().getUpgradeCooldown();
+        long lastTimeUpgrade = getLastTimeUpgrade();
+        long currentTime = System.currentTimeMillis();
+        long upgradeCooldown = plugin.getSettings().getUpgradeCooldown();
         return upgradeCooldown > 0 && lastTimeUpgrade > 0 && currentTime - lastTimeUpgrade <= upgradeCooldown;
     }
 
@@ -2651,7 +2659,8 @@ public final class SIsland implements Island {
 
         islandFlags.put(settings, (byte) 1);
 
-        boolean disableTime = false, disableWeather = false;
+        boolean disableTime = false;
+        boolean disableWeather = false;
 
         //Updating times / weather if necessary
         switch (settings.getName()) {
@@ -3018,7 +3027,8 @@ public final class SIsland implements Island {
     }
 
     private void saveBlockCounts(BigDecimal oldWorth, BigDecimal oldLevel) {
-        BigDecimal newWorth = getWorth(), newLevel = getIslandLevel();
+        BigDecimal newWorth = getWorth();
+        BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
             Executor.async(() ->

@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -35,7 +35,9 @@ import java.util.List;
 public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
 
     private static final List<IslandPrivilege> islandPermissions = new ArrayList<>();
-    private static String noRolePermission = "", exactRolePermission = "", higherRolePermission = "";
+    private static String noRolePermission = "";
+    private static String exactRolePermission = "";
+    private static String higherRolePermission = "";
 
     private final Island island;
     private final Object permissionHolder;
@@ -202,7 +204,8 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
         String permissionName = permission.getName().toLowerCase();
         String permissionHolderName = "";
 
-        boolean success = false, sendFailMessage = true;
+        boolean success = false;
+        boolean sendFailMessage = true;
 
         if (permissionHolder instanceof PlayerRole) {
             PlayerRole currentRole = island.getRequiredPlayerRole(permission);

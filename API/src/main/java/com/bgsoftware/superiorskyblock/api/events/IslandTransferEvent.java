@@ -9,7 +9,8 @@ import org.bukkit.event.Cancellable;
  */
 public class IslandTransferEvent extends IslandEvent implements Cancellable {
 
-    private final SuperiorPlayer oldOwner, newOwner;
+    private final SuperiorPlayer oldOwner;
+    private final SuperiorPlayer newOwner;
     private boolean cancelled = false;
 
     /**

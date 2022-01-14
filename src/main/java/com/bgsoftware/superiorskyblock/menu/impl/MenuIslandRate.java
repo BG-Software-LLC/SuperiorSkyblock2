@@ -1,19 +1,18 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,7 +24,12 @@ import java.util.List;
 
 public final class MenuIslandRate extends SuperiorMenu {
 
-    private static List<Integer> zeroStarsSlot, oneStarSlot, twoStarsSlot, threeStarsSlot, fourStarsSlot, fiveStarsSlot;
+    private static List<Integer> zeroStarsSlot;
+    private static List<Integer> oneStarSlot;
+    private static List<Integer> twoStarsSlot;
+    private static List<Integer> threeStarsSlot;
+    private static List<Integer> fourStarsSlot;
+    private static List<Integer> fiveStarsSlot;
 
     private final Island island;
 
@@ -95,9 +99,11 @@ public final class MenuIslandRate extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char oneStarChar = itemChars[charCounter++], twoStarsChar = itemChars[charCounter++],
-                threeStarsChar = itemChars[charCounter++], fourStarsChar = itemChars[charCounter++],
-                fiveStarsChar = itemChars[charCounter++];
+        char oneStarChar = itemChars[charCounter++];
+        char twoStarsChar = itemChars[charCounter++];
+        char threeStarsChar = itemChars[charCounter++];
+        char fourStarsChar = itemChars[charCounter++];
+        char fiveStarsChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("rate-gui.one_star"), patternChars, oneStarChar,
                 itemsSection, commandsSection, soundsSection);

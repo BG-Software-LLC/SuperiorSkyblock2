@@ -27,7 +27,8 @@ import java.util.List;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
 
-    private static List<Integer> confirmSlot, cancelSlot;
+    private static List<Integer> confirmSlot;
+    private static List<Integer> cancelSlot;
 
     private final Island targetIsland;
 
@@ -93,7 +94,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char confirmChar = itemChars[charCounter++], cancelChar = itemChars[charCounter++];
+        char confirmChar = itemChars[charCounter++];
+        char cancelChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
                 itemsSection, commandsSection, soundsSection);

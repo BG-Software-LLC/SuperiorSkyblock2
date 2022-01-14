@@ -79,7 +79,8 @@ public final class IntArrayTag extends Tag<int[]> {
     }
 
     public static IntArrayTag fromUUID(UUID uuid) {
-        long MSB = uuid.getMostSignificantBits(), LSB = uuid.getLeastSignificantBits();
+        long MSB = uuid.getMostSignificantBits();
+        long LSB = uuid.getLeastSignificantBits();
         return new IntArrayTag(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
     }
 

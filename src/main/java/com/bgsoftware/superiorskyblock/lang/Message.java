@@ -882,8 +882,13 @@ public enum Message {
     private static final class ComplexMessage extends MessageContainer {
 
         private final TextComponent[] textComponents;
-        private final String rawMessage, actionBarMessage, titleMessage, subtitleMessage;
-        private final int fadeIn, duration, fadeOut;
+        private final String rawMessage;
+        private final String actionBarMessage;
+        private final String titleMessage;
+        private final String subtitleMessage;
+        private final int fadeIn;
+        private final int duration;
+        private final int fadeOut;
 
         ComplexMessage(String name, ConfigurationSection section) {
             super(name);

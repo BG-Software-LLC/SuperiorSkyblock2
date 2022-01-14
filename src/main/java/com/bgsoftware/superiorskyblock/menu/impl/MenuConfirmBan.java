@@ -15,7 +15,8 @@ import java.util.List;
 
 public final class MenuConfirmBan extends SuperiorMenu {
 
-    private static List<Integer> confirmSlot, cancelSlot;
+    private static List<Integer> confirmSlot;
+    private static List<Integer> cancelSlot;
 
     private final Island targetIsland;
 
