@@ -3247,11 +3247,11 @@ public final class SIsland implements Island {
         this.uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.addAll(cachedIslandInfo.uniqueVisitors));
         this.entityLimits.putAll(cachedIslandInfo.entityLimits);
         this.islandEffects.putAll(cachedIslandInfo.islandEffects);
-        this.islandChests.write(islandChest -> {
-            for (int index = 0; index < cachedIslandInfo.islandChests.size(); ++index) {
-                islandChest[index] = SIslandChest.createChest(this, index, cachedIslandInfo.islandChests.get(index));
-            }
-        });
+        IslandChest[] islandChests = new IslandChest[cachedIslandInfo.islandChests.size()];
+        for (int index = 0; index < islandChests.length; ++index) {
+            islandChests[index] = SIslandChest.createChest(this, index, cachedIslandInfo.islandChests.get(index));
+        }
+        this.islandChests.set(islandChests);
         this.roleLimits.putAll(cachedIslandInfo.roleLimits);
         this.visitorHomes.set(cachedIslandInfo.visitorHomes);
 
