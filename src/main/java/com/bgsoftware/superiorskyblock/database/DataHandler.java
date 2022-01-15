@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseInitializer;
+import com.bgsoftware.superiorskyblock.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -142,6 +143,9 @@ public final class DataHandler extends AbstractHandler {
         AtomicInteger islandsCount = new AtomicInteger();
         long startTime = System.currentTimeMillis();
 
+        SQLHelper.executeQuery("PRAGMA journal_mode=MEMORY;", result -> {
+        });
+
         IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeMembers(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeBanned(islandsLoader, databaseCache);
@@ -168,6 +172,9 @@ public final class DataHandler extends AbstractHandler {
         islandsLoader.loadAllObjects("islands", resultSet -> {
             plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
             islandsCount.incrementAndGet();
+        });
+
+        SQLHelper.executeQuery("PRAGMA journal_mode=DELETE;", result -> {
         });
 
         long endTime = System.currentTimeMillis();
