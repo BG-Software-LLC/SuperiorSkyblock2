@@ -11,6 +11,8 @@
 
 ## Compiling
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2ad8edb8f724db1b4511c81592a34ce)](https://app.codacy.com/gh/BG-Software-LLC/SuperiorSkyblock2?utm_source=github.com&utm_medium=referral&utm_content=BG-Software-LLC/SuperiorSkyblock2&utm_campaign=Badge_Grade_Settings)
+
 You can compile the project using gradlew.<br>
 Run `gradlew build` in console to build the project.<br>
 You can find already compiled jars on our [Jenkins](https://hub.bg-software.com/) hub!<br>
