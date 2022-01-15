@@ -40,7 +40,7 @@ public final class MenuWarpIconEdit extends SuperiorMenu {
         super("menuWarpIconEdit", superiorPlayer);
         this.islandWarp = islandWarp;
         this.itemStack = islandWarp == null ? null : islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.clone().build() : islandWarp.getRawIcon();
+                SIslandWarp.DEFAULT_WARP_ICON.copy().build() : islandWarp.getRawIcon();
         if (itemStack != null) {
             ItemMeta itemMeta = itemStack.getItemMeta();
             itemName = itemMeta.getDisplayName();

@@ -36,7 +36,6 @@
 //@formatter:on
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
@@ -127,21 +126,7 @@ public final class IntArrayTag extends Tag<int[]> {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof IntArrayTag)) {
-            return false;
-        }
-        final IntArrayTag other = (IntArrayTag) obj;
-        //noinspection all
-        if (!Arrays.equals(value, other.value)) {
-            return false;
-        }
-        return true;
+        return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));
     }
 
 }

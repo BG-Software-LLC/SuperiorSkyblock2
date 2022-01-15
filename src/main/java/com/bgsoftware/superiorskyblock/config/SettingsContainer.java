@@ -348,7 +348,7 @@ public final class SettingsContainer {
         clearOnJoin = config.getBoolean("clear-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         defaultSettings = config.getStringList("default-settings")
-                .stream().map(String::toUpperCase).collect(Collectors.toList());;
+                .stream().map(String::toUpperCase).collect(Collectors.toList());
         defaultGenerator = new KeyMap[World.Environment.values().length];
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {

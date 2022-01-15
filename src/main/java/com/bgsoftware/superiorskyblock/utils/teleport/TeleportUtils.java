@@ -23,13 +23,13 @@ public final class TeleportUtils {
 
         if (island != null) {
             plugin.getProviders().getWorldsProvider().prepareTeleport(island, location.clone(),
-                    () -> _teleport(entity, location, teleportResult));
+                    () -> teleportEntity(entity, location, teleportResult));
         } else {
-            _teleport(entity, location, teleportResult);
+            teleportEntity(entity, location, teleportResult);
         }
     }
 
-    private static void _teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
+    private static void teleportEntity(Entity entity, Location location, Consumer<Boolean> teleportResult) {
         plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
     }
 

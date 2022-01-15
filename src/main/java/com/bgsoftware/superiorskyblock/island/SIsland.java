@@ -924,7 +924,7 @@ public final class SIsland implements Island {
 
         Location min = getMinimum();
         Location max = getMaximum();
-        
+
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }
@@ -953,7 +953,9 @@ public final class SIsland implements Island {
         if (chunk.getWorld() == null || !plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return false;
 
-        Location min = getMinimumProtected(), max = getMaximumProtected();
+        Location min = getMinimumProtected();
+        Location max = getMaximumProtected();
+
         return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
                 (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
     }
@@ -1725,7 +1727,8 @@ public final class SIsland implements Island {
         if (!trackedBlock)
             return;
 
-        BigDecimal oldWorth = getWorth(), oldLevel = getIslandLevel();
+        BigDecimal oldWorth = getWorth();
+        BigDecimal oldLevel = getIslandLevel();
 
         BigDecimal blockValue = plugin.getBlockValues().getBlockWorth(key);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(key);

@@ -32,6 +32,11 @@ public final class StackedBlocksLogic {
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return false;
 
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        if (!superiorPlayer.hasBlocksStackerEnabled())
+            return false;
+
         if (plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(againstBlock.getWorld().getName()))
             return false;
 
@@ -58,13 +63,8 @@ public final class StackedBlocksLogic {
         if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(againstBlock)))
             return false;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-
-        if (!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
-                !superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType())))
-            return false;
-
-        return true;
+        return superiorPlayer.hasPermission("superior.island.stacker.*") ||
+                superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType());
     }
 
     public static boolean tryStack(Player player, ItemStack itemToDeposit, Location stackedBlock, Event event) {

@@ -414,7 +414,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();
 
         for (Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
-            ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
+            ItemBuilder itemBuilder = itemStackEntry.getValue().copy();
             if (itemStackEntry.getKey() >= 0)
                 inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ?
                         itemBuilder.build() : itemBuilder.build(targetPlayer == null ? superiorPlayer : targetPlayer));

@@ -184,7 +184,7 @@ public final class MenuBorderColor extends SuperiorMenu {
         for (int slot : toggleBorderSlot) {
             if (containsData(slot + "-enable-border")) {
                 ItemStack itemStack = ((ItemBuilder) getData(slot + (superiorPlayer.hasWorldBorderEnabled() ?
-                        "-disable-border" : "-enable-border"))).clone().build(superiorPlayer);
+                        "-disable-border" : "-enable-border"))).copy().build(superiorPlayer);
                 inv.setItem(slot, itemStack);
             }
         }

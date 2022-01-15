@@ -293,7 +293,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             if (permissionHolder instanceof PlayerRole) {
                 if (containsData(permissionName + "-role-permission")) {
                     PlayerRole requiredRole = island.getRequiredPlayerRole(islandPermission);
-                    permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).clone()
+                    permissionItem = ((ItemBuilder) getData(permissionName + "-role-permission")).copy()
                             .replaceAll("{}", requiredRole.toString());
 
                     if (!noRolePermission.isEmpty() && !exactRolePermission.isEmpty() && !higherRolePermission.isEmpty()) {
@@ -331,7 +331,7 @@ public final class MenuPermissions extends PagedSuperiorMenu<IslandPrivilege> {
             } else {
                 if (containsData(permissionName + "-permission-enabled")) {
                     boolean hasPermission = island.getPermissionNode((SuperiorPlayer) permissionHolder).hasPermission(islandPermission);
-                    permissionItem = ((ItemBuilder) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"))).clone();
+                    permissionItem = ((ItemBuilder) getData(permissionName + "-permission-" + (hasPermission ? "enabled" : "disabled"))).copy();
                 }
             }
 

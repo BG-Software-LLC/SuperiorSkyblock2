@@ -12,7 +12,6 @@ public class IslandChatEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private String message;
-    private String format;
     private boolean cancelled = false;
 
     /**

@@ -87,15 +87,15 @@ public final class MissionData {
     }
 
     public ItemBuilder getCompleted() {
-        return completed.clone();
+        return completed.copy();
     }
 
     public ItemBuilder getCanComplete() {
-        return canComplete.clone();
+        return canComplete.copy();
     }
 
     public ItemBuilder getNotCompleted() {
-        return notCompleted.clone();
+        return notCompleted.copy();
     }
 
     @Override

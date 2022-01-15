@@ -895,8 +895,12 @@ public enum Message {
 
             List<TextComponent> textComponents = new ArrayList<>();
             StringBuilder stringBuilder = new StringBuilder();
-            String actionBarMessage = "", titleMessage = null, subtitleMessage = null;
-            int fadeIn = -1, fadeOut = -1, duration = -1;
+            String actionBarMessage = "";
+            String titleMessage = null;
+            String subtitleMessage = null;
+            int fadeIn = -1;
+            int fadeOut = -1;
+            int duration = -1;
 
             for (String key : section.getKeys(false)) {
                 if (key.equals("action-bar")) {

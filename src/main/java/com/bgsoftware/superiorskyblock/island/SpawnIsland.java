@@ -23,17 +23,17 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -52,12 +52,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class SpawnIsland implements Island {
 
@@ -439,7 +437,7 @@ public final class SpawnIsland implements Island {
 
         Location min = getMinimum();
         Location max = getMaximum();
-        
+
         return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
                 max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
     }

@@ -268,7 +268,7 @@ public final class MenuIslandCreation extends SuperiorMenu {
                 String schematicItemKey = superiorPlayer.hasPermission(permission) ? schematic + "-has-access-item" : schematic + "-no-access-item";
                 ItemBuilder schematicItem = (ItemBuilder) getData(schematicItemKey);
                 int slot = (int) getData(schematic + "-slot");
-                inv.setItem(slot, schematicItem.clone().build(superiorPlayer));
+                inv.setItem(slot, schematicItem.copy().build(superiorPlayer));
             }
         }
 

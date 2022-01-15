@@ -244,7 +244,7 @@ public final class MenuBiomes extends SuperiorMenu {
                     if (!superiorPlayer.hasPermission(permission))
                         biomeItem = (ItemBuilder) getData(biomeName + "-no-access-item");
 
-                    biomeItem = biomeItem.clone();
+                    biomeItem = biomeItem.copy();
 
                     if (currentBiomeGlow && island.getBiome() == biome)
                         biomeItem.withEnchant(EnchantsUtils.getGlowEnchant(), 1);

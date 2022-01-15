@@ -150,7 +150,7 @@ public final class MenuWarpManage extends SuperiorMenu {
 
         iconSlots.forEach(slot -> {
             ItemBuilder itemBuilder = islandWarp.getRawIcon() == null ?
-                    SIslandWarp.DEFAULT_WARP_ICON.clone() : new ItemBuilder(islandWarp.getRawIcon());
+                    SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon());
 
             ItemStack currentItem = inventory.getItem(slot);
 

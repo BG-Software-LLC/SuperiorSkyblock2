@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;

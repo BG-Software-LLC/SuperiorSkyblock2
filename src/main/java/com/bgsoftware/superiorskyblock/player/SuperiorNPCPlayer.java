@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.player;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
@@ -34,8 +33,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class SuperiorNPCPlayer implements SuperiorPlayer {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Entity npc;
 

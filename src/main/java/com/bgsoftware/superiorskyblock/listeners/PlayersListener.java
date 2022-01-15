@@ -406,7 +406,8 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e) {
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockY() == to.getBlockY() || to.getBlockY() > plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5)
             return;
