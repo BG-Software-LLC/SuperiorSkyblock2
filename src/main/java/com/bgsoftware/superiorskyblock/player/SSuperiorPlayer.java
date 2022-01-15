@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -103,7 +104,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.playerRole = playerRole;
         this.disbands = disbands;
         this.userLocale = userLocale;
-        databaseBridge.startSavingData();
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
     public static Optional<SuperiorPlayer> fromDatabase(DatabaseCache<CachedPlayerInfo> cache,

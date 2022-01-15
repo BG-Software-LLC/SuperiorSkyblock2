@@ -19,8 +19,13 @@ public interface DatabaseBridge {
     /**
      * Start saving data for the object.
      * If this method is not called, data should not be saved when saveRow is called.
+     *
+     * @deprecated See {@link #setDatabaseBridgeMode(DatabaseBridgeMode)}
      */
-    void startSavingData();
+    @Deprecated
+    default void startSavingData() {
+        setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+    }
 
     /**
      * Set whether to execute operations in batches or not.
@@ -60,5 +65,12 @@ public interface DatabaseBridge {
      * @param resultConsumer Consumer that receives data for each row.
      */
     void loadObject(String table, @Nullable DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer);
+
+    /**
+     * Set the mode for the database bridge.
+     *
+     * @param databaseBridgeMode The {@link DatabaseBridgeMode} mode to set.
+     */
+    void setDatabaseBridgeMode(DatabaseBridgeMode databaseBridgeMode);
 
 }

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
@@ -675,7 +676,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     private void initializeDatabaseBridge() {
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-        databaseBridge.startSavingData();
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
 }

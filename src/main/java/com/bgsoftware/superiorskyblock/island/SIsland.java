@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -212,7 +213,7 @@ public final class SIsland implements Island {
         assignIslandChest();
         updateUpgrades();
 
-        databaseBridge.startSavingData();
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
     private SIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location location, String islandName,
@@ -262,39 +263,45 @@ public final class SIsland implements Island {
                 resultSet.getLong("creation_time").orElse(System.currentTimeMillis() / 1000L)
         );
 
-        island.discord = resultSet.getString("discord").orElse("None");
-        island.paypal = resultSet.getString("paypal").orElse("None");
-        island.bonusWorth.set(resultSet.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO));
-        island.bonusLevel.set(resultSet.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO));
-        island.isLocked = resultSet.getBoolean("locked").orElse(false);
-        island.isTopIslandsIgnored = resultSet.getBoolean("ignored").orElse(false);
-        island.description = resultSet.getString("description").orElse("");
-        island.generatedSchematics.set(resultSet.getInt("generated_schematics").orElse(0));
-        island.unlockedWorlds.set(resultSet.getInt("unlocked_worlds").orElse(0));
-        island.lastTimeUpdate = resultSet.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L);
+        try {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-        Optional<String> dirtyChunks = resultSet.getString("dirty_chunks");
-        if (dirtyChunks.isPresent())
-            ChunksTracker.deserialize(plugin.getGrid(), island, dirtyChunks.get());
+            island.discord = resultSet.getString("discord").orElse("None");
+            island.paypal = resultSet.getString("paypal").orElse("None");
+            island.bonusWorth.set(resultSet.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO));
+            island.bonusLevel.set(resultSet.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO));
+            island.isLocked = resultSet.getBoolean("locked").orElse(false);
+            island.isTopIslandsIgnored = resultSet.getBoolean("ignored").orElse(false);
+            island.description = resultSet.getString("description").orElse("");
+            island.generatedSchematics.set(resultSet.getInt("generated_schematics").orElse(0));
+            island.unlockedWorlds.set(resultSet.getInt("unlocked_worlds").orElse(0));
+            island.lastTimeUpdate = resultSet.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L);
 
-        Optional<String> blockCountsString = resultSet.getString("block_counts");
-        if (blockCountsString.isPresent())
-            Executor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
+            Optional<String> dirtyChunks = resultSet.getString("dirty_chunks");
+            if (dirtyChunks.isPresent())
+                ChunksTracker.deserialize(plugin.getGrid(), island, dirtyChunks.get());
 
-        CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(uuid.get());
+            Optional<String> blockCountsString = resultSet.getString("block_counts");
+            if (blockCountsString.isPresent())
+                Executor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
 
-        if (cachedIslandInfo != null)
-            island.loadFromCachedInfo(cachedIslandInfo);
+            CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(uuid.get());
 
-        island.updateDatesFormatter();
-        island.startBankInterest();
-        island.checkMembersDuplication();
-        island.updateOldUpgradeValues();
-        island.updateUpgrades();
-        island.updateIslandChests();
+            if (cachedIslandInfo != null)
+                island.loadFromCachedInfo(cachedIslandInfo);
 
-        // We want to save all the limits to the custom block keys
-        plugin.getBlockValues().addCustomBlockKeys(island.blockLimits.keySet());
+            island.updateDatesFormatter();
+            island.startBankInterest();
+            island.checkMembersDuplication();
+            island.updateOldUpgradeValues();
+            island.updateUpgrades();
+            island.updateIslandChests();
+
+            // We want to save all the limits to the custom block keys
+            plugin.getBlockValues().addCustomBlockKeys(island.blockLimits.keySet());
+        } finally {
+            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+        }
 
         return Optional.of(island);
     }

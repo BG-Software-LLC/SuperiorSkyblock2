@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -11,7 +12,7 @@ import java.util.function.Consumer;
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
     private static final SQLDatabaseBridge INSTANCE = new SQLDatabaseBridge();
-    private boolean shouldSaveData = false;
+    private DatabaseBridgeMode databaseBridgeMode = DatabaseBridgeMode.IDLE;
     private StatementHolder batchStatementHolder;
 
     private SQLDatabaseBridge() {
@@ -51,11 +52,6 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
     }
 
     @Override
-    public void startSavingData() {
-        shouldSaveData = true;
-    }
-
-    @Override
     public void batchOperations(boolean batchOperations) {
         if (batchOperations) {
             batchStatementHolder = new StatementHolder("");
@@ -67,7 +63,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void updateObject(String table, DatabaseFilter filter, Pair<String, Object>[] columns) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         StringBuilder columnsBuilder = new StringBuilder();
@@ -97,7 +93,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void insertObject(String table, Pair<String, Object>... columns) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         StringBuilder columnsBuilder = new StringBuilder();
@@ -124,7 +120,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void deleteObject(String table, DatabaseFilter filter) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         String columnFilter = getColumnFilter(filter);
@@ -158,6 +154,11 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                 }
             }
         });
+    }
+
+    @Override
+    public void setDatabaseBridgeMode(DatabaseBridgeMode databaseBridgeMode) {
+        this.databaseBridgeMode = databaseBridgeMode;
     }
 
     private StatementHolder buildStatementHolder(String query) {

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.world.blocks.stacked;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -289,7 +290,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
     private void initializeDatabaseBridge() {
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-        databaseBridge.startSavingData();
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
 }
