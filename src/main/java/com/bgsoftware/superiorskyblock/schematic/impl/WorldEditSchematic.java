@@ -142,12 +142,10 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
     private static abstract class BlockReader extends FaweClipboard.BlockReader {
 
-        public void run(int x, int y, int z, BaseBlock block) {
-
-        }
+        public abstract void run(int x, int y, int z, BaseBlock block);
 
         public void run(int x, int y, int z, BlockState block) {
-
+            // Do nothing.
         }
 
     }

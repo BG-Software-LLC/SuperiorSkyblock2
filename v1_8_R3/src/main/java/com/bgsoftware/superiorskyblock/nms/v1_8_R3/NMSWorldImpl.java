@@ -261,7 +261,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-
+        // Not implemented - only needed for Paper 1.16+
     }
 
     @Override
@@ -302,7 +302,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void removeAntiXray(World bukkitWorld) {
-
+        // Doesn't exist in this version.
     }
 
     @Override

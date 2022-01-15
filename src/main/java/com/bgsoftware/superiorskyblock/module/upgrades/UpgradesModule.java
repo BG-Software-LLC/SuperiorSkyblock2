@@ -61,10 +61,12 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
     }
 
     @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
     }
 
     @Override
@@ -81,7 +83,7 @@ public final class UpgradesModule extends BuiltinModule {
 
     @Override
     public SuperiorCommand[] getSuperiorAdminCommands(SuperiorSkyblockPlugin plugin) {
-        if(!isEnabled())
+        if (!isEnabled())
             return null;
 
         List<SuperiorCommand> adminCommands = enabledUpgrades.stream()

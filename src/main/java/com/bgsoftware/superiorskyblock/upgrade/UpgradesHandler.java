@@ -22,6 +22,7 @@ public final class UpgradesHandler extends AbstractHandler implements UpgradesMa
 
     @Override
     public void loadData() {
+        // Data is loaded later.
     }
 
     @Override

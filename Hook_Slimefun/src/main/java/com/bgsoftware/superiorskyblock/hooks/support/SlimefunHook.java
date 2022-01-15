@@ -153,7 +153,7 @@ public final class SlimefunHook {
 
         @Override
         public void load() {
-
+            // Do nothing.
         }
 
         @Override

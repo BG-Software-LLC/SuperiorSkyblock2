@@ -49,6 +49,7 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public final class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer(spawnUUID);
+    private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
@@ -112,22 +114,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void updateDatesFormatter() {
-
+        // Do nothing.
     }
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(PlayerRole... playerRoles) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
@@ -137,32 +139,32 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return new ArrayList<>(playersInside);
+        return Collections.unmodifiableList(new ArrayList<>(playersInside));
     }
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public void inviteMember(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void revokeInvite(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -172,17 +174,17 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public void addMember(SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
-
+        // Do nothing.
     }
 
     @Override
     public void kickMember(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -192,17 +194,17 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void banMember(SuperiorPlayer superiorPlayer, SuperiorPlayer whom) {
-
+        // Do nothing.
     }
 
     @Override
     public void unbanMember(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -212,12 +214,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void addCoop(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void removeCoop(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -227,7 +229,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getCoopPlayers() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
@@ -237,7 +239,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setCoopLimit(int coopLimit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -297,12 +299,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setIslandHome(Location homeLocation) {
-
+        // Do nothing.
     }
 
     @Override
-    public void setIslandHome(World.Environment environment, @org.jetbrains.annotations.Nullable Location homeLocation) {
-
+    public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
+        // Do nothing.
     }
 
     @Override
@@ -312,7 +314,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setVisitorsLocation(Location visitorsLocation) {
-
+        // Do nothing.
     }
 
     @Override
@@ -412,22 +414,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void resetChunks(World.Environment environment, boolean onlyProtected) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetChunks(World.Environment environment, boolean onlyProtected, Runnable onFinish) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetChunks(boolean onlyProtected) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetChunks(boolean onlyProtected, Runnable onFinish) {
-
+        // Do nothing.
     }
 
     @Override
@@ -471,7 +473,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setNormalEnabled(boolean enabled) {
-
+        // Do nothing.
     }
 
     @Override
@@ -481,7 +483,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setNetherEnabled(boolean enabled) {
-
+        // Do nothing.
     }
 
     @Override
@@ -491,7 +493,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setEndEnabled(boolean enabled) {
-
+        // Do nothing.
     }
 
     @Override
@@ -519,27 +521,27 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value) {
-
+        // Do nothing.
     }
 
     @Override
     public void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetPermissions() {
-
+        // Do nothing.
     }
 
     @Override
     public void setPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetPermissions(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -555,12 +557,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -575,7 +577,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setName(String islandName) {
-
+        // Do nothing.
     }
 
     @Override
@@ -590,12 +592,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setDescription(String description) {
-
+        // Do nothing.
     }
 
     @Override
     public void disbandIsland() {
-
+        // Do nothing.
     }
 
     @Override
@@ -605,17 +607,17 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void replacePlayers(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void calcIslandWorth(SuperiorPlayer asker) {
-
+        // Do nothing.
     }
 
     @Override
     public void calcIslandWorth(SuperiorPlayer asker, Runnable callback) {
-
+        // Do nothing.
     }
 
     @Override
@@ -635,7 +637,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setIslandSize(int islandSize) {
-
+        // Do nothing.
     }
 
     @Override
@@ -650,7 +652,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setDiscord(String discord) {
-
+        // Do nothing.
     }
 
     @Override
@@ -660,7 +662,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setPaypal(String paypal) {
-
+        // Do nothing.
     }
 
     @Override
@@ -670,12 +672,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setBiome(Biome biome) {
-
+        // Do nothing.
     }
 
     @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
-
+        // Do nothing.
     }
 
     @Override
@@ -685,7 +687,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setLocked(boolean locked) {
-
+        // Do nothing.
     }
 
     @Override
@@ -695,22 +697,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setIgnored(boolean ignored) {
-
+        // Do nothing.
     }
 
     @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
-
+        // Do nothing.
     }
 
     @Override
     public void sendTitle(String title, String subtitle, int fadeIn, int duration, int fadeOut, UUID... ignoredMembers) {
-
+        // Do nothing.
     }
 
     @Override
     public void executeCommand(String command, boolean onlyOnlineMembers, UUID... ignoredMembers) {
-
+        // Do nothing.
     }
 
     @Override
@@ -720,12 +722,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void updateLastTime() {
-
+        // Do nothing.
     }
 
     @Override
     public void setCurrentlyActive() {
-
+        // Do nothing.
     }
 
     @Override
@@ -735,7 +737,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setLastTimeUpdate(long lastTimeUpdate) {
-
+        // Do nothing.
     }
 
     @Override
@@ -750,7 +752,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setBankLimit(BigDecimal bankLimit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -770,7 +772,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setLastInterestTime(long lastInterest) {
-
+        // Do nothing.
     }
 
     @Override
@@ -780,72 +782,72 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void handleBlockPlace(Block block) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Key key, int amount) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Key key, int amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlocksPlace(Map<Key, Integer> blocks) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Block block) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Block block, int amount) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Block block, int amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Key key, int amount) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Key key, int amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
-
+        // Do nothing.
     }
 
     @Override
@@ -855,7 +857,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -865,7 +867,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void clearBlockCounts() {
-
+        // Do nothing.
     }
 
     @Override
@@ -885,7 +887,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setBonusWorth(BigDecimal bonusWorth) {
-
+        // Do nothing.
     }
 
     @Override
@@ -895,7 +897,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setBonusLevel(BigDecimal bonusLevel) {
-
+        // Do nothing.
     }
 
     @Override
@@ -915,22 +917,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setUpgradeLevel(Upgrade upgrade, int level) {
-
+        // Do nothing.
     }
 
     @Override
     public Map<String, Integer> getUpgrades() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void syncUpgrades() {
-
+        // Do nothing.
     }
 
     @Override
     public void updateUpgrades() {
-
+        // Do nothing.
     }
 
     @Override
@@ -950,7 +952,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setCropGrowthMultiplier(double cropGrowth) {
-
+        // Do nothing.
     }
 
     @Override
@@ -965,7 +967,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setSpawnerRatesMultiplier(double spawnerRates) {
-
+        // Do nothing.
     }
 
     @Override
@@ -980,7 +982,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setMobDropsMultiplier(double mobDrops) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1005,27 +1007,27 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<Key, Integer> getBlocksLimits() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomBlocksLimits() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void clearBlockLimits() {
-
+        // Do nothing.
     }
 
     @Override
     public void setBlockLimit(Key key, int limit) {
-
+        // Do nothing.
     }
 
     @Override
     public void removeBlockLimit(Key key) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1050,27 +1052,27 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<Key, Integer> getEntitiesLimitsAsKeys() {
-        return new KeyMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomEntitiesLimits() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void clearEntitiesLimits() {
-
+        // Do nothing.
     }
 
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
-
+        // Do nothing.
     }
 
     @Override
     public void setEntityLimit(Key key, int limit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1100,7 +1102,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setTeamLimit(int teamLimit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1115,7 +1117,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setWarpsLimit(int warpsLimit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1125,7 +1127,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setPotionEffect(PotionEffectType type, int level) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1135,32 +1137,32 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<PotionEffectType, Integer> getPotionEffects() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void applyEffects(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void removeEffects(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
     public void removeEffects() {
-
+        // Do nothing.
     }
 
     @Override
     public void clearEffects() {
-
+        // Do nothing.
     }
 
     @Override
     public void setRoleLimit(PlayerRole playerRole, int limit) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1175,12 +1177,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<PlayerRole, Integer> getRoleLimits() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<PlayerRole, Integer> getCustomRoleLimits() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -1200,17 +1202,17 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void renameCategory(WarpCategory warpCategory, String newName) {
-
+        // Do nothing.
     }
 
     @Override
     public void deleteCategory(WarpCategory warpCategory) {
-
+        // Do nothing.
     }
 
     @Override
     public Map<String, WarpCategory> getWarpCategories() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -1220,7 +1222,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void renameWarp(IslandWarp islandWarp, String newName) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1235,22 +1237,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void warpPlayer(SuperiorPlayer superiorPlayer, String warp) {
-
+        // Do nothing.
     }
 
     @Override
     public void deleteWarp(SuperiorPlayer superiorPlayer, Location location) {
-
+        // Do nothing.
     }
 
     @Override
     public void deleteWarp(String name) {
-
+        // Do nothing.
     }
 
     @Override
     public Map<String, IslandWarp> getIslandWarps() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -1260,7 +1262,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setRating(SuperiorPlayer superiorPlayer, Rating rating) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1275,12 +1277,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<UUID, Rating> getRatings() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void removeRatings() {
-
+        // Do nothing.
     }
 
     @Override
@@ -1290,22 +1292,22 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<IslandFlag, Byte> getAllSettings() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void enableSettings(IslandFlag islandFlag) {
-
+        // Do nothing.
     }
 
     @Override
     public void disableSettings(IslandFlag islandFlag) {
-
+        // Do nothing.
     }
 
     @Override
     public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1315,12 +1317,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1335,17 +1337,17 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
     public void clearGeneratorAmounts(World.Environment environment) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1355,12 +1357,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setSchematicGenerate(World.Environment environment) {
-
+        // Do nothing.
     }
 
     @Override
     public void setSchematicGenerate(World.Environment environment, boolean generated) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1380,7 +1382,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public IslandChest[] getChest() {
-        return new IslandChest[0];
+        return EMPTY_ISLAND_CHESTS;
     }
 
     @Override
@@ -1390,7 +1392,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setChestRows(int index, int rows) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1405,12 +1407,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void completeMission(Mission<?> mission) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
-
+        // Do nothing.
     }
 
     @Override
@@ -1430,12 +1432,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @SuppressWarnings("NullableProblems")

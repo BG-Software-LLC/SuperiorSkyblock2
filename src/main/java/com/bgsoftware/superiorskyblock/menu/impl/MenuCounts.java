@@ -198,6 +198,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
     @Override
     public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
+        // Do nothing.
     }
 
     @Override

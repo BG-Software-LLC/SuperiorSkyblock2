@@ -68,7 +68,7 @@ public final class EndTag extends Tag<Object> {
 
     @Override
     protected void writeData(DataOutputStream os) {
-
+        // Do nothing.
     }
 
 }

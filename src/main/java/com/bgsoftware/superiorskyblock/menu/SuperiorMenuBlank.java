@@ -50,7 +50,7 @@ public final class SuperiorMenuBlank extends SuperiorMenu {
 
     @Override
     protected void onPlayerClick(InventoryClickEvent e) {
-
+        // Do nothing.
     }
 
 }

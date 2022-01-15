@@ -67,7 +67,7 @@ public abstract class PluginModule {
      * @param plugin Instance of the plugin.
      */
     protected void onPluginInit(SuperiorSkyblock plugin) {
-
+        // Can be overridden by custom modules.
     }
 
     /**
