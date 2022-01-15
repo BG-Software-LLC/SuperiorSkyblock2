@@ -4,7 +4,9 @@ import org.bukkit.block.Block;
 
 public final class SchematicPosition {
 
-    private final int x, y, z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     private SchematicPosition(int x, int y, int z) {
         this.x = x;

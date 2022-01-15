@@ -31,7 +31,11 @@ public final class StringUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
+    private static final double Q = 1000000000000000D;
+    private static final double T = 1000000000000D;
+    private static final double B = 1000000000D;
+    private static final double M = 1000000D;
+    private static final double K = 1000D;
     private static final char SPACE_ASCII = 160;
 
     @SuppressWarnings("all")

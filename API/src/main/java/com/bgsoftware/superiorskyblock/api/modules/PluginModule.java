@@ -18,7 +18,8 @@ import java.util.logging.Logger;
  */
 public abstract class PluginModule {
 
-    private final String moduleName, authorName;
+    private final String moduleName;
+    private final String authorName;
 
     private File dataFolder;
     private File moduleFile;
@@ -66,7 +67,7 @@ public abstract class PluginModule {
      * @param plugin Instance of the plugin.
      */
     protected void onPluginInit(SuperiorSkyblock plugin) {
-
+        // Can be overridden by custom modules.
     }
 
     /**

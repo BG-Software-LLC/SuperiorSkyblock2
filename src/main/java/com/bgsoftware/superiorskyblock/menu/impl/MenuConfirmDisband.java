@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
@@ -27,7 +26,8 @@ import java.util.List;
 
 public final class MenuConfirmDisband extends SuperiorMenu {
 
-    private static List<Integer> confirmSlot, cancelSlot;
+    private static List<Integer> confirmSlot;
+    private static List<Integer> cancelSlot;
 
     private final Island targetIsland;
 
@@ -93,7 +93,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char confirmChar = itemChars[charCounter++], cancelChar = itemChars[charCounter++];
+        char confirmChar = itemChars[charCounter++];
+        char cancelChar = itemChars[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
                 itemsSection, commandsSection, soundsSection);

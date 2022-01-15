@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;
+import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
@@ -15,13 +16,12 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import com.google.common.collect.Maps;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -66,7 +66,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
     private final CompoundTag compoundTag;
 
     private final int[] offsets = new int[3];
-    private final float yaw, pitch;
+    private final float yaw;
+    private final float pitch;
     private final int[] sizes = new int[3];
     private final SchematicBlock[][][] blocks;
     private final SchematicEntity[] entities;
@@ -97,7 +98,9 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             for (Tag<?> tag : ((ListTag) compoundTag.getValue().get("blocks")).getValue()) {
                 Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
                 SchematicPosition schematicPosition = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue());
-                int x = schematicPosition.getX(), y = schematicPosition.getY(), z = schematicPosition.getZ();
+                int x = schematicPosition.getX();
+                int y = schematicPosition.getY();
+                int z = schematicPosition.getZ();
                 int combinedId;
 
                 if (compoundValue.containsKey("combinedId")) {

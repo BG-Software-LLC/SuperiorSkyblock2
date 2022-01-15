@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.schematic.impl;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -143,12 +142,10 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
 
     private static abstract class BlockReader extends FaweClipboard.BlockReader {
 
-        public void run(int x, int y, int z, BaseBlock block) {
-
-        }
+        public abstract void run(int x, int y, int z, BaseBlock block);
 
         public void run(int x, int y, int z, BlockState block) {
-
+            // Do nothing.
         }
 
     }

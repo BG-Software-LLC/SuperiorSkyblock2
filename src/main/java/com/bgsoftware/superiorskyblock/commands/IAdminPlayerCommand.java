@@ -61,11 +61,11 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
     }
 
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-
+        // Not all commands should implement this method.
     }
 
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, List<SuperiorPlayer> targetPlayers, String[] args) {
-
+        // Not all commands should implement this method.
     }
 
     default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {

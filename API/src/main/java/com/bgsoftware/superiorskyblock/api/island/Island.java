@@ -551,9 +551,19 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      *
      * @param playerRole      The role to set the permission to.
      * @param islandPrivilege The permission to set.
-     * @param value           The value to give the permission.
+     * @param value           The value to give the permission (Unused)
+     * @deprecated See {@link #setPermission(PlayerRole, IslandPrivilege)}
      */
+    @Deprecated
     void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege, boolean value);
+
+    /**
+     * Set a permission to a specific role.
+     *
+     * @param playerRole      The role to set the permission to.
+     * @param islandPrivilege The permission to set.
+     */
+    void setPermission(PlayerRole playerRole, IslandPrivilege islandPrivilege);
 
     /**
      * Reset the roles permissions to default values.
@@ -1170,6 +1180,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * @param key The block's key to check.
      */
     int getExactBlockLimit(Key key);
+
+    /**
+     * Get the block key used as a limit for another block key.
+     *
+     * @param key The block's key to check.
+     */
+    Key getBlockLimitKey(Key key);
 
     /**
      * Get all the blocks limits for the island.

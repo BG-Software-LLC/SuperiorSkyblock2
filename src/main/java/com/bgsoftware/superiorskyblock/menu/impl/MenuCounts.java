@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,136 +26,132 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger>> {
 
     private static final BigInteger MAX_STACK = BigInteger.valueOf(64);
-    private static final Map<String, String> blocksToItems = new HashMap<>();
-
-    static {
-        blocksToItems.put("ACACIA_DOOR", "ACACIA_DOOR_ITEM");
-        blocksToItems.put("ACACIA_WALL_SIGN", "ACACIA_SIGN");
-        blocksToItems.put("BAMBOO_SAPLING", "BAMBOO");
-        blocksToItems.put("BED_BLOCK", "BED");
-        blocksToItems.put("BEETROOT_BLOCK", "BEETROOT");
-        blocksToItems.put("BEETROOTS", "BEETROOT");
-        blocksToItems.put("BIRCH_DOOR", "BIRCH_DOOR_ITEM");
-        blocksToItems.put("BIRCH_WALL_SIGN", "BIRCH_SIGN");
-        blocksToItems.put("BLACK_WALL_BANNER", "BLACK_BANNER");
-        blocksToItems.put("BLUE_WALL_BANNER", "BLUE_BANNER");
-        blocksToItems.put("BRAIN_CORAL_WALL_FAN", "BRAIN_CORAL");
-        blocksToItems.put("BURNING_FURNACE", "FURNACE");
-        blocksToItems.put("BREWING_STAND", "BREWING_STAND_ITEM");
-        blocksToItems.put("BROWN_WALL_BANNER", "BROWN_BANNER");
-        blocksToItems.put("BUBBLE_CORAL_WALL_FAN", "BUBBLE_CORAL");
-        blocksToItems.put("CAKE_BLOCK", "CAKE");
-        blocksToItems.put("CARROT", "CARROT_ITEM");
-        blocksToItems.put("CARROTS", "CARROT");
-        blocksToItems.put("CAULDRON", "CAULDRON_ITEM");
-        blocksToItems.put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS");
-        blocksToItems.put("CREEPER_WALL_HEAD", "CREEPER_HEAD");
-        blocksToItems.put("CROPS", "SEEDS");
-        blocksToItems.put("CYAN_WALL_BANNER", "CYAN_BANNER");
-        blocksToItems.put("DARK_OAK_DOOR", "DARK_OAK_DOOR_ITEM");
-        blocksToItems.put("DARK_OAK_WALL_SIGN", "DARK_OAK_SIGN");
-        blocksToItems.put("DAYLIGHT_DETECTOR_INVERTED", "DAYLIGHT_DETECTOR");
-        blocksToItems.put("DEAD_BRAIN_CORAL_WALL_FAN", "DEAD_BRAIN_CORAL");
-        blocksToItems.put("DEAD_BUBBLE_CORAL_WALL_FAN", "DEAD_BUBBLE_CORAL");
-        blocksToItems.put("DEAD_FIRE_CORAL_WALL_FAN", "DEAD_FIRE_CORAL");
-        blocksToItems.put("DEAD_HORN_CORAL_WALL_FAN", "DEAD_HORN_CORAL");
-        blocksToItems.put("DEAD_TUBE_CORAL_WALL_FAN", "DEAD_TUBE_CORAL");
-        blocksToItems.put("DIODE_BLOCK_OFF", "DIODE");
-        blocksToItems.put("DIODE_BLOCK_ON", "DIODE");
-        blocksToItems.put("DRAGON_WALL_HEAD", "DRAGON_HEAD");
-        blocksToItems.put("END_PORTAL", "END_PORTAL_FRAME");
-        blocksToItems.put("FIRE_CORAL_WALL_FAN", "FIRE_CORAL");
-        blocksToItems.put("FLOWER_POT", "FLOWER_POT_ITEM");
-        blocksToItems.put("GLOWING_REDSTONE_ORE", "REDSTONE_ORE");
-        blocksToItems.put("GRAY_WALL_BANNER", "GRAY_BANNER");
-        blocksToItems.put("GREEN_WALL_BANNER", "GREEN_BANNER");
-        blocksToItems.put("HORN_CORAL_WALL_FAN", "HORN_CORAL");
-        blocksToItems.put("IRON_DOOR_BLOCK", "IRON_DOOR");
-        blocksToItems.put("JUNGLE_DOOR", "JUNGLE_DOOR_ITEM");
-        blocksToItems.put("JUNGLE_WALL_SIGN", "JUNGLE_SIGN");
-        blocksToItems.put("KELP_PLANT", "KELP");
-        blocksToItems.put("LAVA", "LAVA_BUCKET");
-        blocksToItems.put("LIGHT_BLUE_WALL_BANNER", "LIGHT_BLUE_BANNER");
-        blocksToItems.put("LIGHT_GRAY_WALL_BANNER", "LIGHT_GRAY_BANNER");
-        blocksToItems.put("LIME_WALL_BANNER", "LIME_BANNER");
-        blocksToItems.put("MAGENTA_WALL_BANNER", "MAGENTA_BANNER");
-        blocksToItems.put("MELON_STEM", "MELON_SEEDS");
-        blocksToItems.put("MOVING_PISTON", "PISTON");
-        blocksToItems.put("NETHER_WARTS", "NETHER_STALK");
-        blocksToItems.put("OAK_WALL_SIGN", "OAK_SIGN");
-        blocksToItems.put("ORANGE_WALL_BANNER", "ORANGE_BANNER");
-        blocksToItems.put("PINK_WALL_BANNER", "PINK_BANNER");
-        blocksToItems.put("PISTON_EXTENSION", "PISTON");
-        blocksToItems.put("PISTON_HEAD", "PISTON");
-        blocksToItems.put("PISTON_MOVING_PIECE", "PISTON");
-        blocksToItems.put("PLAYER_WALL_HEAD", "PLAYER_HEAD");
-        blocksToItems.put("POTATO", "POTATO_ITEM");
-        blocksToItems.put("POTATOES", "POTATO");
-        blocksToItems.put("POTTED_ACACIA_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_ALLIUM", "FLOWER_POT");
-        blocksToItems.put("POTTED_AZURE_BLUET", "FLOWER_POT");
-        blocksToItems.put("POTTED_BAMBOO", "FLOWER_POT");
-        blocksToItems.put("POTTED_BIRCH_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_BLUE_ORCHID", "FLOWER_POT");
-        blocksToItems.put("POTTED_BROWN_MUSHROOM", "FLOWER_POT");
-        blocksToItems.put("POTTED_CACTUS", "FLOWER_POT");
-        blocksToItems.put("POTTED_CORNFLOWER", "FLOWER_POT");
-        blocksToItems.put("POTTED_DANDELION", "FLOWER_POT");
-        blocksToItems.put("POTTED_DARK_OAK_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_DEAD_BUSH", "FLOWER_POT");
-        blocksToItems.put("POTTED_FERN", "FLOWER_POT");
-        blocksToItems.put("POTTED_JUNGLE_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_LILY_OF_THE_VALLEY", "FLOWER_POT");
-        blocksToItems.put("POTTED_OAK_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_ORANGE_TULIP", "FLOWER_POT");
-        blocksToItems.put("POTTED_OXEYE_DAISY", "FLOWER_POT");
-        blocksToItems.put("POTTED_PINK_TULIP", "FLOWER_POT");
-        blocksToItems.put("POTTED_POPPY", "FLOWER_POT");
-        blocksToItems.put("POTTED_RED_MUSHROOM", "FLOWER_POT");
-        blocksToItems.put("POTTED_RED_TULIP", "FLOWER_POT");
-        blocksToItems.put("POTTED_SPRUCE_SAPLING", "FLOWER_POT");
-        blocksToItems.put("POTTED_WHITE_TULIP", "FLOWER_POT");
-        blocksToItems.put("POTTED_WITHER_ROSE", "FLOWER_POT");
-        blocksToItems.put("PUMPKIN_STEM", "PUMPKIN_SEEDS");
-        blocksToItems.put("PURPLE_WALL_BANNER", "PURPLE_BANNER");
-        blocksToItems.put("REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR");
-        blocksToItems.put("REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR");
-        blocksToItems.put("REDSTONE_LAMP_ON", "REDSTONE_LAMP");
-        blocksToItems.put("REDSTONE_TORCH_OFF", "REDSTONE_TORCH");
-        blocksToItems.put("REDSTONE_WALL_TORCH", "REDSTONE_TORCH");
-        blocksToItems.put("REDSTONE_WIRE", "REDSTONE");
-        blocksToItems.put("RED_WALL_BANNER", "RED_BANNER");
-        blocksToItems.put("SIGN_POST", "SIGN");
-        blocksToItems.put("STANDING_BANNER", "BANNER");
-        blocksToItems.put("STATIONARY_LAVA", "LAVA_BUCKET");
-        blocksToItems.put("STATIONARY_WATER", "WATER_BUCKET");
-        blocksToItems.put("SKELETON_WALL_SKULL", "SKELETON_SKULL");
-        blocksToItems.put("SKULL", "SKULL_ITEM");
-        blocksToItems.put("SPRUCE_DOOR", "SPRUCE_DOOR_ITEM");
-        blocksToItems.put("SPRUCE_WALL_SIGN", "SPRUCE_SIGN");
-        blocksToItems.put("SUGAR_CANE_BLOCK", "SUGAR_CANE");
-        blocksToItems.put("SWEET_BERRY_BUSH", "SWEET_BERRY");
-        blocksToItems.put("TALL_SEAGRASS", "SEAGRASS");
-        blocksToItems.put("TRIPWIRE", "TRIPWIRE_HOOK");
-        blocksToItems.put("TUBE_CORAL_WALL_FAN", "TUBE_CORAL");
-        blocksToItems.put("WALL_BANNER", "BANNER");
-        blocksToItems.put("WALL_SIGN", "SIGN");
-        blocksToItems.put("WALL_TORCH", "TORCH");
-        blocksToItems.put("WATER", "WATER_BUCKET");
-        blocksToItems.put("WHITE_WALL_BANNER", "WHITE_BANNER");
-        blocksToItems.put("WITHER_SKELETON_WALL_SKULL", "WITHER_SKELETON_SKULL");
-        blocksToItems.put("WOODEN_DOOR", "WOOD_DOOR");
-        blocksToItems.put("YELLOW_WALL_BANNER", "YELLOW_BANNER");
-        blocksToItems.put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD");
-    }
+    private static final ImmutableMap<String, String> blocksToItems = new ImmutableMap.Builder<String, String>()
+            .put("ACACIA_DOOR", "ACACIA_DOOR_ITEM")
+            .put("ACACIA_WALL_SIGN", "ACACIA_SIGN")
+            .put("BAMBOO_SAPLING", "BAMBOO")
+            .put("BED_BLOCK", "BED")
+            .put("BEETROOT_BLOCK", "BEETROOT")
+            .put("BEETROOTS", "BEETROOT")
+            .put("BIRCH_DOOR", "BIRCH_DOOR_ITEM")
+            .put("BIRCH_WALL_SIGN", "BIRCH_SIGN")
+            .put("BLACK_WALL_BANNER", "BLACK_BANNER")
+            .put("BLUE_WALL_BANNER", "BLUE_BANNER")
+            .put("BRAIN_CORAL_WALL_FAN", "BRAIN_CORAL")
+            .put("BURNING_FURNACE", "FURNACE")
+            .put("BREWING_STAND", "BREWING_STAND_ITEM")
+            .put("BROWN_WALL_BANNER", "BROWN_BANNER")
+            .put("BUBBLE_CORAL_WALL_FAN", "BUBBLE_CORAL")
+            .put("CAKE_BLOCK", "CAKE")
+            .put("CARROT", "CARROT_ITEM")
+            .put("CARROTS", "CARROT")
+            .put("CAULDRON", "CAULDRON_ITEM")
+            .put("COCOA", ServerVersion.isLegacy() ? "INK_SACK:3" : "COCOA_BEANS")
+            .put("CREEPER_WALL_HEAD", "CREEPER_HEAD")
+            .put("CROPS", "SEEDS")
+            .put("CYAN_WALL_BANNER", "CYAN_BANNER")
+            .put("DARK_OAK_DOOR", "DARK_OAK_DOOR_ITEM")
+            .put("DARK_OAK_WALL_SIGN", "DARK_OAK_SIGN")
+            .put("DAYLIGHT_DETECTOR_INVERTED", "DAYLIGHT_DETECTOR")
+            .put("DEAD_BRAIN_CORAL_WALL_FAN", "DEAD_BRAIN_CORAL")
+            .put("DEAD_BUBBLE_CORAL_WALL_FAN", "DEAD_BUBBLE_CORAL")
+            .put("DEAD_FIRE_CORAL_WALL_FAN", "DEAD_FIRE_CORAL")
+            .put("DEAD_HORN_CORAL_WALL_FAN", "DEAD_HORN_CORAL")
+            .put("DEAD_TUBE_CORAL_WALL_FAN", "DEAD_TUBE_CORAL")
+            .put("DIODE_BLOCK_OFF", "DIODE")
+            .put("DIODE_BLOCK_ON", "DIODE")
+            .put("DRAGON_WALL_HEAD", "DRAGON_HEAD")
+            .put("END_PORTAL", "END_PORTAL_FRAME")
+            .put("FIRE_CORAL_WALL_FAN", "FIRE_CORAL")
+            .put("FLOWER_POT", "FLOWER_POT_ITEM")
+            .put("GLOWING_REDSTONE_ORE", "REDSTONE_ORE")
+            .put("GRAY_WALL_BANNER", "GRAY_BANNER")
+            .put("GREEN_WALL_BANNER", "GREEN_BANNER")
+            .put("HORN_CORAL_WALL_FAN", "HORN_CORAL")
+            .put("IRON_DOOR_BLOCK", "IRON_DOOR")
+            .put("JUNGLE_DOOR", "JUNGLE_DOOR_ITEM")
+            .put("JUNGLE_WALL_SIGN", "JUNGLE_SIGN")
+            .put("KELP_PLANT", "KELP")
+            .put("LAVA", "LAVA_BUCKET")
+            .put("LIGHT_BLUE_WALL_BANNER", "LIGHT_BLUE_BANNER")
+            .put("LIGHT_GRAY_WALL_BANNER", "LIGHT_GRAY_BANNER")
+            .put("LIME_WALL_BANNER", "LIME_BANNER")
+            .put("MAGENTA_WALL_BANNER", "MAGENTA_BANNER")
+            .put("MELON_STEM", "MELON_SEEDS")
+            .put("MOVING_PISTON", "PISTON")
+            .put("NETHER_WARTS", "NETHER_STALK")
+            .put("OAK_WALL_SIGN", "OAK_SIGN")
+            .put("ORANGE_WALL_BANNER", "ORANGE_BANNER")
+            .put("PINK_WALL_BANNER", "PINK_BANNER")
+            .put("PISTON_EXTENSION", "PISTON")
+            .put("PISTON_HEAD", "PISTON")
+            .put("PISTON_MOVING_PIECE", "PISTON")
+            .put("PLAYER_WALL_HEAD", "PLAYER_HEAD")
+            .put("POTATO", "POTATO_ITEM")
+            .put("POTATOES", "POTATO")
+            .put("POTTED_ACACIA_SAPLING", "FLOWER_POT")
+            .put("POTTED_ALLIUM", "FLOWER_POT")
+            .put("POTTED_AZURE_BLUET", "FLOWER_POT")
+            .put("POTTED_BAMBOO", "FLOWER_POT")
+            .put("POTTED_BIRCH_SAPLING", "FLOWER_POT")
+            .put("POTTED_BLUE_ORCHID", "FLOWER_POT")
+            .put("POTTED_BROWN_MUSHROOM", "FLOWER_POT")
+            .put("POTTED_CACTUS", "FLOWER_POT")
+            .put("POTTED_CORNFLOWER", "FLOWER_POT")
+            .put("POTTED_DANDELION", "FLOWER_POT")
+            .put("POTTED_DARK_OAK_SAPLING", "FLOWER_POT")
+            .put("POTTED_DEAD_BUSH", "FLOWER_POT")
+            .put("POTTED_FERN", "FLOWER_POT")
+            .put("POTTED_JUNGLE_SAPLING", "FLOWER_POT")
+            .put("POTTED_LILY_OF_THE_VALLEY", "FLOWER_POT")
+            .put("POTTED_OAK_SAPLING", "FLOWER_POT")
+            .put("POTTED_ORANGE_TULIP", "FLOWER_POT")
+            .put("POTTED_OXEYE_DAISY", "FLOWER_POT")
+            .put("POTTED_PINK_TULIP", "FLOWER_POT")
+            .put("POTTED_POPPY", "FLOWER_POT")
+            .put("POTTED_RED_MUSHROOM", "FLOWER_POT")
+            .put("POTTED_RED_TULIP", "FLOWER_POT")
+            .put("POTTED_SPRUCE_SAPLING", "FLOWER_POT")
+            .put("POTTED_WHITE_TULIP", "FLOWER_POT")
+            .put("POTTED_WITHER_ROSE", "FLOWER_POT")
+            .put("PUMPKIN_STEM", "PUMPKIN_SEEDS")
+            .put("PURPLE_WALL_BANNER", "PURPLE_BANNER")
+            .put("REDSTONE_COMPARATOR_OFF", "REDSTONE_COMPARATOR")
+            .put("REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR")
+            .put("REDSTONE_LAMP_ON", "REDSTONE_LAMP")
+            .put("REDSTONE_TORCH_OFF", "REDSTONE_TORCH")
+            .put("REDSTONE_WALL_TORCH", "REDSTONE_TORCH")
+            .put("REDSTONE_WIRE", "REDSTONE")
+            .put("RED_WALL_BANNER", "RED_BANNER")
+            .put("SIGN_POST", "SIGN")
+            .put("STANDING_BANNER", "BANNER")
+            .put("STATIONARY_LAVA", "LAVA_BUCKET")
+            .put("STATIONARY_WATER", "WATER_BUCKET")
+            .put("SKELETON_WALL_SKULL", "SKELETON_SKULL")
+            .put("SKULL", "SKULL_ITEM")
+            .put("SPRUCE_DOOR", "SPRUCE_DOOR_ITEM")
+            .put("SPRUCE_WALL_SIGN", "SPRUCE_SIGN")
+            .put("SUGAR_CANE_BLOCK", "SUGAR_CANE")
+            .put("SWEET_BERRY_BUSH", "SWEET_BERRY")
+            .put("TALL_SEAGRASS", "SEAGRASS")
+            .put("TRIPWIRE", "TRIPWIRE_HOOK")
+            .put("TUBE_CORAL_WALL_FAN", "TUBE_CORAL")
+            .put("WALL_BANNER", "BANNER")
+            .put("WALL_SIGN", "SIGN")
+            .put("WALL_TORCH", "TORCH")
+            .put("WATER", "WATER_BUCKET")
+            .put("WHITE_WALL_BANNER", "WHITE_BANNER")
+            .put("WITHER_SKELETON_WALL_SKULL", "WITHER_SKELETON_SKULL")
+            .put("WOODEN_DOOR", "WOOD_DOOR")
+            .put("YELLOW_WALL_BANNER", "YELLOW_BANNER")
+            .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
+            .build();
 
     private final Island island;
 
@@ -201,6 +198,7 @@ public final class MenuCounts extends PagedSuperiorMenu<Pair<com.bgsoftware.supe
 
     @Override
     public void onPlayerClick(InventoryClickEvent event, Pair<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> block) {
+        // Do nothing.
     }
 
     @Override

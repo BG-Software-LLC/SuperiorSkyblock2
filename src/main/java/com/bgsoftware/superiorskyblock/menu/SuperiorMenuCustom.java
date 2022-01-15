@@ -90,6 +90,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
+        // Do nothing.
     }
 
     private static final class CustomMenuCommand implements ISuperiorCommand {

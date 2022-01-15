@@ -22,37 +22,37 @@ public final class EmptyDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
-
+        // Do nothing.
     }
 
     @Override
     public void startSavingData() {
-
+        // Do nothing.
     }
 
     @Override
     public void batchOperations(boolean batchOperations) {
-
+        // Do nothing.
     }
 
     @Override
     public void updateObject(String table, @Nullable DatabaseFilter filter, Pair<String, Object>... columns) {
-
+        // Do nothing.
     }
 
     @Override
     public void insertObject(String table, Pair<String, Object>... columns) {
-
+        // Do nothing.
     }
 
     @Override
     public void deleteObject(String table, @Nullable DatabaseFilter filter) {
-
+        // Do nothing.
     }
 
     @Override
     public void loadObject(String table, @Nullable DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer) {
-
+        // Do nothing.
     }
 
 }

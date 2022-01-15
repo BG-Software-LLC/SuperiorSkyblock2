@@ -54,7 +54,7 @@ public abstract class PlaceholderHook {
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
-            ImmutableMap.<String, PlayerPlaceholderParser>builder()
+            new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
                     .put("texture", SuperiorPlayer::getTextureValue)
                     .put("role", superiorPlayer -> superiorPlayer.getPlayerRole().toString())
                     .put("locale", superiorPlayer -> StringUtils.format(superiorPlayer.getUserLocale()))
@@ -73,7 +73,7 @@ public abstract class PlaceholderHook {
                     .build();
 
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
-            ImmutableMap.<String, IslandPlaceholderParser>builder()
+            new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
                             SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())).toString())
                     .put("x", (island, superiorPlayer) ->
@@ -91,7 +91,8 @@ public abstract class PlaceholderHook {
                     .put("coop_limit", (island, superiorPlayer) -> island.getCoopLimit() + "")
                     .put("leader", (island, superiorPlayer) -> island.getOwner().getName())
                     .put("size_format", (island, superiorPlayer) -> {
-                        int size = island.getIslandSize() * 2 + 1, rounded = 5 * (Math.round(size / 5.0F));
+                        int size = island.getIslandSize() * 2 + 1;
+                        int rounded = 5 * (Math.round(size / 5.0F));
                         if (Math.abs(size - rounded) == 1)
                             size = rounded;
                         return size + " x " + size;
@@ -238,7 +239,7 @@ public abstract class PlaceholderHook {
                         .findFirst()
                         .map(Pair::getValue).map(StringUtils::formatDate)
                         .orElse("Haven't Joined"));
-            } else if((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
                 placeholderResult = handleIslandFlagsPlaceholder(island, matcher.group(1));
             } else {
                 placeholderResult = Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
@@ -255,7 +256,7 @@ public abstract class PlaceholderHook {
         try {
             IslandPrivilege islandPrivilege = IslandPrivilege.getByName(placeholder);
             return Optional.of(island.hasPermission(superiorPlayer, islandPrivilege) + "");
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException ex) {
             return Optional.empty();
         }
     }
@@ -264,7 +265,7 @@ public abstract class PlaceholderHook {
         try {
             IslandFlag islandFlag = IslandFlag.getByName(placeholder);
             return Optional.of(island.hasSettingsEnabled(islandFlag) + "");
-        } catch (IllegalArgumentException ex) {
+        } catch (NullPointerException ex) {
             return Optional.empty();
         }
     }

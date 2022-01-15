@@ -58,7 +58,9 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
     protected SuperiorPlayer targetPlayer = null;
 
     protected ISuperiorMenu previousMenu;
-    protected boolean previousMove = true, closeButton = false, nextMove = false;
+    protected boolean previousMove = true;
+    protected boolean closeButton = false;
+    protected boolean nextMove = false;
     private boolean refreshing = false;
 
     public SuperiorMenu(String identifier, SuperiorPlayer superiorPlayer) {
@@ -254,7 +256,8 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         Matcher matcher = COMMAND_PATTERN_ARGS.matcher(command);
 
         if (matcher.matches()) {
-            String subCommand = matcher.group(1), args = matcher.group(2).trim();
+            String subCommand = matcher.group(1);
+            String args = matcher.group(2).trim();
             handleSubCommand(subCommand, args, e, sender);
         } else if ((matcher = COMMAND_PATTERN.matcher(command)).matches()) {
             String subCommand = matcher.group(1);
@@ -411,7 +414,7 @@ public abstract class SuperiorMenu implements ISuperiorMenu {
         List<Integer> slots = containsData("slots") ? (List<Integer>) getData("slots") : new ArrayList<>();
 
         for (Map.Entry<Integer, ItemBuilder> itemStackEntry : menuData.fillItems.entrySet()) {
-            ItemBuilder itemBuilder = itemStackEntry.getValue().clone();
+            ItemBuilder itemBuilder = itemStackEntry.getValue().copy();
             if (itemStackEntry.getKey() >= 0)
                 inventory.setItem(itemStackEntry.getKey(), slots.contains(itemStackEntry.getKey()) ?
                         itemBuilder.build() : itemBuilder.build(targetPlayer == null ? superiorPlayer : targetPlayer));

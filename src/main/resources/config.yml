@@ -620,7 +620,10 @@ crops-to-grow:
   - 'CROPS'
   - 'WHEAT'
   - 'CARROT'
+  - 'CARROTS'
   - 'POTATO'
+  - 'POTATOES'
+  - 'BEETROOTS'
 
 # How frequency should the crops task run? (in ticks)
 # You can disable this feature by setting it to 0.

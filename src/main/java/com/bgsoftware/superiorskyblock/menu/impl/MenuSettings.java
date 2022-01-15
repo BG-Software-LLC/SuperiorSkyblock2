@@ -208,7 +208,7 @@ public final class MenuSettings extends PagedSuperiorMenu<IslandFlag> {
             return (containsData(settingsName + "-settings-enabled") ?
                     (ItemBuilder) getData(settingsName + "-settings-" + (island.hasSettingsEnabled(islandFlag) ? "enabled" : "disabled")) :
                     new ItemBuilder(Material.AIR)
-            ).clone().build(superiorPlayer);
+            ).copy().build(superiorPlayer);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Failed to load menu because of flag: " + islandFlag.getName());
             PluginDebugger.debug(ex);

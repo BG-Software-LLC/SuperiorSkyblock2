@@ -45,7 +45,9 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
 
     private final class MobDropsListener implements Listener {
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        // Priority is set to HIGH for fixing detection with WildStacker
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/540
+        @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
         public void onLastDamageEntity(EntityDamageEvent e) {
             if (!(e.getEntity() instanceof LivingEntity))
                 return;

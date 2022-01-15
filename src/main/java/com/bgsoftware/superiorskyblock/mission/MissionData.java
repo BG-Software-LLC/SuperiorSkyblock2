@@ -17,9 +17,13 @@ public final class MissionData {
     private final Mission<?> mission;
     private final List<ItemStack> itemRewards = new ArrayList<>();
     private final List<String> commandRewards = new ArrayList<>();
-    private final boolean autoReward, islandMission;
-    private final boolean disbandReset, leaveReset;
-    private final ItemBuilder notCompleted, canComplete, completed;
+    private final boolean autoReward;
+    private final boolean islandMission;
+    private final boolean disbandReset;
+    private final boolean leaveReset;
+    private final ItemBuilder notCompleted;
+    private final ItemBuilder canComplete;
+    private final ItemBuilder completed;
     private final int resetAmount;
 
     MissionData(Mission<?> mission, ConfigurationSection section) {
@@ -83,15 +87,15 @@ public final class MissionData {
     }
 
     public ItemBuilder getCompleted() {
-        return completed.clone();
+        return completed.copy();
     }
 
     public ItemBuilder getCanComplete() {
-        return canComplete.clone();
+        return canComplete.copy();
     }
 
     public ItemBuilder getNotCompleted() {
-        return notCompleted.clone();
+        return notCompleted.copy();
     }
 
     @Override

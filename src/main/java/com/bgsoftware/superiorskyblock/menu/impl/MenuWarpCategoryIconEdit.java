@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -23,8 +23,12 @@ import java.util.List;
 import java.util.function.Function;
 
 public final class MenuWarpCategoryIconEdit extends SuperiorMenu {
-
-    private static List<Integer> typeSlots, renameSlots, loreSlots, confirmSlots, iconSlots;
+    
+    private static List<Integer> typeSlots;
+    private static List<Integer> renameSlots;
+    private static List<Integer> loreSlots;
+    private static List<Integer> confirmSlots;
+    private static List<Integer> iconSlots;
 
     private final WarpCategory warpCategory;
     private final ItemStack itemStack;

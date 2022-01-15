@@ -133,8 +133,13 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();
-        Location min = new Location(pos1.getWorld(), Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
+        Location pos1 = superiorPlayer.getSchematicPos1().parse();
+        Location pos2 = superiorPlayer.getSchematicPos2().parse();
+        Location min = new Location(pos1.getWorld(),
+                Math.min(pos1.getX(), pos2.getX()),
+                Math.min(pos1.getY(), pos2.getY()),
+                Math.min(pos1.getZ(), pos2.getZ())
+        );
         Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
 
         saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
@@ -187,13 +192,13 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         int ySize = max.getBlockY() - min.getBlockY();
         int zSize = max.getBlockZ() - min.getBlockZ();
 
-        List<Tag<?>> blocks = new ArrayList<>(), entities = new ArrayList<>();
+        List<Tag<?>> blocks = new ArrayList<>();
+        List<Tag<?>> entities = new ArrayList<>();
 
         for (int x = 0; x <= xSize; x++) {
             for (int z = 0; z <= zSize; z++) {
                 for (int y = 0; y <= ySize; y++) {
-                    int _x = x + min.getBlockX(), _y = y + min.getBlockY(), _z = z + min.getBlockZ();
-                    Block block = world.getBlockAt(_x, _y, _z);
+                    Block block = world.getBlockAt(x + min.getBlockX(), y + min.getBlockY(), z + min.getBlockZ());
                     Material blockType = block.getType();
                     Location blockLocation = block.getLocation();
 
@@ -315,7 +320,8 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
     private List<Entity> getEntities(Location min, Location max) {
         List<Entity> livingEntities = new ArrayList<>();
 
-        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+        Chunk minChunk = min.getChunk();
+        Chunk maxChunk = max.getChunk();
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
                 Chunk currentChunk = min.getWorld().getChunkAt(x, z);

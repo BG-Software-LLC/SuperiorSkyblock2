@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
@@ -23,7 +22,8 @@ import java.util.List;
 
 public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
-    private static ItemBuilder validPage, invalidPage;
+    private static ItemBuilder validPage;
+    private static ItemBuilder invalidPage;
 
     private final Island island;
 
@@ -103,7 +103,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
     @Override
     protected ItemStack getObjectItem(ItemStack clickedItem, IslandChest islandChest) {
         try {
-            return validPage.clone()
+            return validPage.copy()
                     .replaceAll("{0}", (islandChest.getIndex() + 1) + "")
                     .replaceAll("{1}", (islandChest.getRows() * 9) + "")
                     .build(superiorPlayer);
@@ -116,7 +116,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<IslandChest> {
 
     @Override
     protected ItemStack getNullItem() {
-        return invalidPage.clone().build();
+        return invalidPage.copy().build();
     }
 
     @Override

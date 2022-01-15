@@ -35,7 +35,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public void loadData() {
-
+        // Data is loaded by the database bridge.
     }
 
     @Override

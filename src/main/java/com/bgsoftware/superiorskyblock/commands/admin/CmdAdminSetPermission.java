@@ -76,7 +76,7 @@ public final class CmdAdminSetPermission implements IAdminIslandCommand {
         if (playerRole == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPrivilege, true)));
+        Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPrivilege)));
 
         if (islands.size() > 1)
             Message.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPrivilege.getName()));

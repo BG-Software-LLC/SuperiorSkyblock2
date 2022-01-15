@@ -21,7 +21,8 @@ import java.util.List;
  */
 public final class MenuConfirmLeave extends SuperiorMenu {
 
-    private static List<Integer> confirmSlot, cancelSlot;
+    private static List<Integer> confirmSlot;
+    private static List<Integer> cancelSlot;
 
     private MenuConfirmLeave(SuperiorPlayer superiorPlayer) {
         super("menuConfirmLeave", superiorPlayer);

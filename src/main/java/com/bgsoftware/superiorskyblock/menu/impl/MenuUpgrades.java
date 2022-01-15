@@ -89,14 +89,14 @@ public final class MenuUpgrades extends SuperiorMenu {
 
                                 if (hasNextLevel == null) {
                                     SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing has-next-level item.");
-                                    hasNextLevel = INVALID_ITEM.clone();
+                                    hasNextLevel = INVALID_ITEM.copy();
                                 }
 
                                 ItemBuilder noNextLevel = FileUtils.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
 
                                 if (noNextLevel == null) {
                                     SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing no-next-level item.");
-                                    noNextLevel = INVALID_ITEM.clone();
+                                    noNextLevel = INVALID_ITEM.copy();
                                 }
 
                                 SoundWrapper hasNextLevelSound = FileUtils.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));
@@ -204,7 +204,8 @@ public final class MenuUpgrades extends SuperiorMenu {
                 if (itemData != null) {
                     boolean nextLevel = levelCost.hasEnoughBalance(superiorPlayer) &&
                             (permission.isEmpty() || superiorPlayer.hasPermission(permission)) && requirements.isEmpty();
-                    inv.setItem(upgrade.getSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel).clone().build(superiorPlayer));
+                    inv.setItem(upgrade.getSlot(), (nextLevel ? itemData.hasNextLevel : itemData.noNextLevel)
+                            .copy().build(superiorPlayer));
                 }
             }
         }

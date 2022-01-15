@@ -15,8 +15,10 @@ public final class BlockData {
 
     private final Location location;
     private final int combinedId;
-    private final byte skyLightLevel, blockLightLevel;
-    private final CompoundTag statesTag, tileEntity;
+    private final byte skyLightLevel;
+    private final byte blockLightLevel;
+    private final CompoundTag statesTag;
+    private final CompoundTag tileEntity;
 
     private CompoundTag clonedTileEntity = null;
 

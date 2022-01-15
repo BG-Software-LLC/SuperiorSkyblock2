@@ -11,7 +11,8 @@ public class BlockStackEvent extends BlockEvent implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final Player player;
-    private final int originalCount, newCount;
+    private final int originalCount;
+    private final int newCount;
     private boolean cancelled = false;
 
     public BlockStackEvent(Block block, Player player, int originalCount, int newCount) {

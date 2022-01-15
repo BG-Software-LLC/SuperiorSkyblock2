@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
@@ -19,6 +20,7 @@ import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
@@ -96,6 +98,11 @@ public final class FactoriesHandler implements FactoriesManager {
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
         return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
+    }
+
+    public IslandBlocksTrackerAlgorithm createIslandBlocksTrackerAlgorithm(Island island) {
+        return islandsFactory == null ? new DefaultIslandBlocksTrackerAlgorithm(island) :
+                islandsFactory.createIslandBlocksTrackerAlgorithm(island);
     }
 
     public PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {

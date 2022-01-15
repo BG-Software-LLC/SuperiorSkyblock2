@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.player;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
@@ -26,6 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -34,8 +34,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class SuperiorNPCPlayer implements SuperiorPlayer {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final Entity npc;
 
@@ -60,12 +58,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setTextureValue(@Nonnull String textureValue) {
-
+        // Do nothing.
     }
 
     @Override
     public void updateLastTimeStatus() {
-
+        // Do nothing.
     }
 
     @Override
@@ -75,7 +73,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void updateName() {
-
+        // Do nothing.
     }
 
     @Override
@@ -95,7 +93,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void runIfOnline(Consumer<Player> toRun) {
-
+        // Do nothing.
     }
 
     @Override
@@ -182,7 +180,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setIslandLeader(SuperiorPlayer superiorPlayer) {
-
+        // Do nothing.
     }
 
     @Override
@@ -192,7 +190,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setIsland(Island island) {
-
+        // Do nothing.
     }
 
     @Override
@@ -207,7 +205,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
-
+        // Do nothing.
     }
 
     @Override
@@ -217,7 +215,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-
+        // Do nothing.
     }
 
     @Override
@@ -232,7 +230,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setUserLocale(Locale locale) {
-
+        // Do nothing.
     }
 
     @Override
@@ -242,12 +240,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleWorldBorder() {
-
+        // Do nothing.
     }
 
     @Override
     public void updateWorldBorder(@Nullable Island island) {
-
+        // Do nothing.
     }
 
     @Override
@@ -257,7 +255,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleBlocksStacker() {
-
+        // Do nothing.
     }
 
     @Override
@@ -267,7 +265,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleSchematicMode() {
-
+        // Do nothing.
     }
 
     @Override
@@ -277,7 +275,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleTeamChat() {
-
+        // Do nothing.
     }
 
     @Override
@@ -287,7 +285,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleBypassMode() {
-
+        // Do nothing.
     }
 
     @Override
@@ -297,7 +295,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setToggledPanel(boolean toggledPanel) {
-
+        // Do nothing.
     }
 
     @Override
@@ -307,7 +305,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleIslandFly() {
-
+        // Do nothing.
     }
 
     @Override
@@ -317,7 +315,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleAdminSpy() {
-
+        // Do nothing.
     }
 
     @Override
@@ -327,7 +325,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setBorderColor(BorderColor borderColor) {
-
+        // Do nothing.
     }
 
     @Override
@@ -337,7 +335,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos1(Block block) {
-
+        // Do nothing.
     }
 
     @Override
@@ -347,7 +345,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos2(Block block) {
-
+        // Do nothing.
     }
 
     @Override
@@ -357,7 +355,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPvP(boolean immunedToPvP) {
-
+        // Do nothing.
     }
 
     @Override
@@ -367,7 +365,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setLeavingFlag(boolean leavingFlag) {
-
+        // Do nothing.
     }
 
     @Nullable
@@ -378,7 +376,7 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setTeleportTask(@Nullable BukkitTask teleportTask) {
-
+        // Do nothing.
     }
 
     @Override
@@ -388,12 +386,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPortals(boolean immuneToPortals) {
-
+        // Do nothing.
     }
 
     @Override
     public void merge(SuperiorPlayer other) {
-
+        // Do nothing.
     }
 
     @Override
@@ -409,12 +407,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void completeMission(Mission<?> mission) {
-
+        // Do nothing.
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
-
+        // Do nothing.
     }
 
     @Override
@@ -434,12 +432,12 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     @Override
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
 }

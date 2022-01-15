@@ -284,8 +284,7 @@ public final class CommandArguments {
         Location location = null;
 
         try {
-            int i_x = Integer.parseInt(x), i_y = Integer.parseInt(y), i_z = Integer.parseInt(z);
-            location = new Location(world, i_x, i_y, i_z);
+            location = new Location(world, Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z));
         } catch (Throwable ex) {
             Message.INVALID_BLOCK.send(sender, world.getName() + ", " + x + ", " + y + ", " + z);
         }
@@ -306,7 +305,7 @@ public final class CommandArguments {
 
         try {
             islandPrivilege = IslandPrivilege.getByName(argument);
-        } catch (IllegalArgumentException ignored) {
+        } catch (NullPointerException ignored) {
         }
 
         if (islandPrivilege == null)
@@ -332,7 +331,7 @@ public final class CommandArguments {
 
         try {
             islandFlag = IslandFlag.getByName(argument);
-        } catch (IllegalArgumentException ignored) {
+        } catch (NullPointerException ignored) {
         }
 
         if (islandFlag == null)

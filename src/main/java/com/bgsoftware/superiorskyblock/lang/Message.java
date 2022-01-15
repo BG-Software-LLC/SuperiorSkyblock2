@@ -882,16 +882,25 @@ public enum Message {
     private static final class ComplexMessage extends MessageContainer {
 
         private final TextComponent[] textComponents;
-        private final String rawMessage, actionBarMessage, titleMessage, subtitleMessage;
-        private final int fadeIn, duration, fadeOut;
+        private final String rawMessage;
+        private final String actionBarMessage;
+        private final String titleMessage;
+        private final String subtitleMessage;
+        private final int fadeIn;
+        private final int duration;
+        private final int fadeOut;
 
         ComplexMessage(String name, ConfigurationSection section) {
             super(name);
 
             List<TextComponent> textComponents = new ArrayList<>();
             StringBuilder stringBuilder = new StringBuilder();
-            String actionBarMessage = "", titleMessage = null, subtitleMessage = null;
-            int fadeIn = -1, fadeOut = -1, duration = -1;
+            String actionBarMessage = "";
+            String titleMessage = null;
+            String subtitleMessage = null;
+            int fadeIn = -1;
+            int fadeOut = -1;
+            int duration = -1;
 
             for (String key : section.getKeys(false)) {
                 if (key.equals("action-bar")) {

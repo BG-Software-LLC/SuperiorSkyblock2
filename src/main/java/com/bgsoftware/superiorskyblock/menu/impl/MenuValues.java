@@ -215,6 +215,7 @@ public final class MenuValues extends SuperiorMenu {
 
     @Override
     public void onPlayerClick(InventoryClickEvent e) {
+        // Do nothing.
     }
 
     @Override

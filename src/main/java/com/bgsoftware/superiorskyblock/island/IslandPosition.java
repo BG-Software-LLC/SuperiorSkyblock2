@@ -7,7 +7,8 @@ public final class IslandPosition {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final int x, z;
+    private final int x;
+    private final int z;
     private final String worldName;
 
     private IslandPosition(int x, int z, String worldName) {

@@ -99,7 +99,8 @@ public final class MenuConverter {
     }
 
     public static List<String> buildPattern(int size, char[] patternChars, char replaceChar) {
-        int charCount = 0, lineLength = patternChars.length == 5 ? 5 : 9;
+        int lineLength = patternChars.length == 5 ? 5 : 9;
+        int charCount = 0;
 
         List<String> pattern = new ArrayList<>(size);
         StringBuilder line = new StringBuilder();

@@ -31,11 +31,11 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
     @Override
     protected final void onPlayerClick(InventoryClickEvent e) {
-        List<Integer> previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot(), slots = getSlots();
+        List<Integer> slots = getSlots();
 
-        boolean isPreviousSlot = previousSlot.contains(e.getRawSlot()),
-                isNextSlot = nextSlot.contains(e.getRawSlot()),
-                isCurrentSlot = currentSlot.contains(e.getRawSlot());
+        boolean isPreviousSlot = getPreviousSlot().contains(e.getRawSlot());
+        boolean isNextSlot = getNextSlot().contains(e.getRawSlot());
+        boolean isCurrentSlot = getCurrentSlot().contains(e.getRawSlot());
 
         if (isPreviousSlot || isNextSlot || isCurrentSlot) {
             if (isCurrentSlot)
@@ -80,7 +80,7 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
 
         objects = requestObjects();
 
-        List<Integer> previousSlot = getPreviousSlot(), nextSlot = getNextSlot(), currentSlot = getCurrentSlot(), slots = getSlots();
+        List<Integer> slots = getSlots();
 
         for (int i = 0; i < slots.size(); i++) {
             int objectIndex = i + (slots.size() * (currentPage - 1));
@@ -100,23 +100,21 @@ public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
             }
         }
 
-        for (int _previousSlot : previousSlot) {
-            if (_previousSlot >= 0)
-                inventory.setItem(_previousSlot, new ItemBuilder(inventory.getItem(_previousSlot))
-                        .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
-        }
+        getPreviousSlot().stream().filter(previousSlot -> previousSlot >= 0).forEach(previousSlot -> {
+            inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
+                    .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
+        });
 
-        for (int _currentSlot : currentSlot) {
-            if (_currentSlot >= 0)
-                inventory.setItem(_currentSlot, new ItemBuilder(inventory.getItem(_currentSlot))
-                        .replaceAll("{0}", currentPage + "").build(superiorPlayer));
-        }
+        getCurrentSlot().stream().filter(currentSlot -> currentSlot >= 0).forEach(currentSlot -> {
+            inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
+                    .replaceAll("{0}", currentPage + "").build(superiorPlayer));
+        });
 
-        for (int _nextSlot : nextSlot) {
-            if (_nextSlot >= 0)
-                inventory.setItem(_nextSlot, new ItemBuilder(inventory.getItem(_nextSlot))
-                        .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c")).build(superiorPlayer));
-        }
+        getNextSlot().stream().filter(nextSlot -> nextSlot >= 0).forEach(nextSlot -> {
+            inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
+                    .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c"))
+                    .build(superiorPlayer));
+        });
 
         return inventory;
     }

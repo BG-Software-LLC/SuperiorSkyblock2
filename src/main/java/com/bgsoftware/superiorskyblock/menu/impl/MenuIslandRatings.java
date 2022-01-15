@@ -111,7 +111,7 @@ public final class MenuIslandRatings extends PagedMappedSuperiorMenu<UUID, Ratin
 
     @Override
     protected void onPlayerClick(InventoryClickEvent event, UUID clickedObjectKey, Rating clickedObjectValue) {
-
+        // Do nothing.
     }
 
     @Override

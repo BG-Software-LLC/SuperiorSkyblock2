@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 
 public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
 
-    private static boolean sortByCompletion, removeCompleted;
+    private static boolean sortByCompletion;
+    private static boolean removeCompleted;
 
     private final MissionCategory missionCategory;
     private List<Mission<?>> missions;

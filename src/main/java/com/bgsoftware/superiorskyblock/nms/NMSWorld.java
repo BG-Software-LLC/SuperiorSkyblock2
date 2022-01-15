@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -36,7 +35,7 @@ public interface NMSWorld {
 
     void setBlocks(Chunk chunk, List<BlockData> blockDataList);
 
-    void setBlock(Location location, Material material, byte data);
+    void setBlock(Location location, int combinedId);
 
     ICachedBlock cacheBlock(Block block);
 
