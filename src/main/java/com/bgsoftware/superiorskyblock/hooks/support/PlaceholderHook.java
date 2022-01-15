@@ -306,16 +306,16 @@ public abstract class PlaceholderHook {
         } else if ((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             getValueFunction = targetIsland -> StringUtils.format(targetIsland.getWorth());
         } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+            getValueFunction = targetIsland -> targetIsland.getOwner().getName();
+        } else {
             getValueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();
-        } else {
-            return Optional.empty();
         }
 
         int targetPosition;
 
         try {
-            targetPosition = Integer.parseInt(matcher.group(1));
+            targetPosition = Integer.parseInt(matcher.matches() ? matcher.group(1) : placeholderValue);
         } catch (NumberFormatException error) {
             return Optional.empty();
         }
