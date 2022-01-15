@@ -128,6 +128,11 @@ public final class SQLDatabaseInitializer {
         SQLHelper.close();
     }
 
+    public void setJournalMode(String jounralMode) {
+        SQLHelper.executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode), result -> {
+        });
+    }
+
     private void createSQLiteFile() throws HandlerLoadException {
         try {
             File file = new File(plugin.getDataFolder(), "database.db");

@@ -14,19 +14,15 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseInitializer;
-import com.bgsoftware.superiorskyblock.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
@@ -64,11 +60,16 @@ public final class DataHandler extends AbstractHandler {
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().createIndexes();
+            SQLDatabaseInitializer.getInstance().setJournalMode("MEMORY");
         }
 
         loadPlayers();
         loadIslands();
         loadGrid();
+
+        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
+            SQLDatabaseInitializer.getInstance().setJournalMode("DELETE");
+        }
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -143,9 +144,6 @@ public final class DataHandler extends AbstractHandler {
         AtomicInteger islandsCount = new AtomicInteger();
         long startTime = System.currentTimeMillis();
 
-        SQLHelper.executeQuery("PRAGMA journal_mode=MEMORY;", result -> {
-        });
-
         IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeMembers(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeBanned(islandsLoader, databaseCache);
@@ -172,9 +170,6 @@ public final class DataHandler extends AbstractHandler {
         islandsLoader.loadAllObjects("islands", resultSet -> {
             plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
             islandsCount.incrementAndGet();
-        });
-
-        SQLHelper.executeQuery("PRAGMA journal_mode=DELETE;", result -> {
         });
 
         long endTime = System.currentTimeMillis();
