@@ -3222,7 +3222,7 @@ public final class SIsland implements Island {
     private void deserializeBlockCounts(String blockCounts) {
         try {
             this.blocksTracker.setLoadingDataMode(true);
-            IslandsDeserializer.deserializeBlockCounts(blockCounts, this.blocksTracker);
+            IslandsDeserializer.deserializeBlockCounts(blockCounts, this);
         } finally {
             this.blocksTracker.setLoadingDataMode(false);
         }
