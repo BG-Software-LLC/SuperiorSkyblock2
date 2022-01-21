@@ -146,11 +146,26 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
             failedBackup.set(false);
 
-            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}bkp_islands", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}bkp_players", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}grid TO {prefix}bkp_grid", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}stackedBlocks TO {prefix}bkp_stackedBlocks", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> failedBackup.set(true));
+            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}bkp_islands", failure -> {
+                failure.printStackTrace();
+                failedBackup.set(true);
+            });
+            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}bkp_players", failure -> {
+                failure.printStackTrace();
+                failedBackup.set(true);
+            });
+            sqlSession.executeUpdate("RENAME TABLE {prefix}grid TO {prefix}bkp_grid", failure -> {
+                failure.printStackTrace();
+                failedBackup.set(true);
+            });
+            sqlSession.executeUpdate("RENAME TABLE {prefix}stackedBlocks TO {prefix}bkp_stackedBlocks", failure -> {
+                failure.printStackTrace();
+                failedBackup.set(true);
+            });
+            sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> {
+                failure.printStackTrace();
+                failedBackup.set(true);
+            });
         }
 
         if (sqlSession.isUsingMySQL())
