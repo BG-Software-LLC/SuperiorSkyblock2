@@ -2230,6 +2230,11 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public IslandEntitiesTrackerAlgorithm getEntitiesTracker() {
+        return this.entitiesTracker;
+    }
+
+    @Override
     public int getTeamLimit() {
         return this.teamLimit.get();
     }
