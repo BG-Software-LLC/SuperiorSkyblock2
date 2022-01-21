@@ -41,4 +41,9 @@ public interface IslandEntitiesTrackerAlgorithm {
      */
     void clearEntityCounts();
 
+    /**
+     * Recalculate entity counts on the island.
+     */
+    void recalculateEntityCounts();
+
 }
