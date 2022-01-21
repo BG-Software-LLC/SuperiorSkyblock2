@@ -137,17 +137,14 @@ public final class SQLiteSession implements SQLSession {
                     .append(column.getValue());
         }
 
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-
-        return executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s%s (%s);",
-                        prefix, tableName, columnsSection.substring(1)),
+        return executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s (%s);",
+                        tableName, columnsSection.substring(1)),
                 QueryResult.VOID, QueryResult::ofFail);
     }
 
     @Override
     public QueryResult<Void> renameTable(String tableName, String newName) {
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeUpdate(String.format("RENAME TABLE %s%s TO %s%s;", prefix, tableName, prefix, newName),
+        return executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName),
                 QueryResult.VOID, QueryResult::ofFail);
     }
 
@@ -158,23 +155,19 @@ public final class SQLiteSession implements SQLSession {
             columnsSection.append(",").append(column);
         }
 
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-
-        return executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s%s (%s);", indexName, prefix, tableName,
+        return executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s (%s);", indexName, tableName,
                 columnsSection.substring(1)), QueryResult.VOID, QueryResult::ofFail);
     }
 
     @Override
     public QueryResult<Void> modifyColumnType(String tableName, String columnName, String newType) {
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeUpdate(String.format("ALTER TABLE %s%s MODIFY COLUMN %s %s;", prefix, tableName,
+        return executeUpdate(String.format("ALTER TABLE %s MODIFY COLUMN %s %s;", tableName,
                 columnName, newType), QueryResult.VOID, QueryResult::ofFail);
     }
 
     @Override
     public QueryResult<ResultSet> select(String tableName, String filters) {
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeQuery(String.format("SELECT * FROM %s%s%s;", prefix, tableName, filters),
+        return executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters),
                 QueryResult::ofSuccess, QueryResult::ofFail);
     }
 
@@ -188,10 +181,8 @@ public final class SQLiteSession implements SQLSession {
     public QueryResult<PreparedStatement> customQuery(String query) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-
         try {
-            return QueryResult.ofSuccess(this.conn.prepareStatement(query.replace("{prefix}", prefix)))
+            return QueryResult.ofSuccess(this.conn.prepareStatement(query.replace("{prefix}", "")))
                     .onFinish(preparedStatement -> {
                         try {
                             preparedStatement.close();
@@ -229,8 +220,7 @@ public final class SQLiteSession implements SQLSession {
     private <T> T executeQuery(String statement, Function<ResultSet, T> callback, Function<SQLException, T> onFailure) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-        String query = statement.replace("{prefix}", prefix);
+        String query = statement.replace("{prefix}", "");
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {

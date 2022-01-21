@@ -12,10 +12,6 @@ import java.util.Optional;
 
 public final class StatementHolder {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final String prefix = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL") ?
-            plugin.getSettings().getDatabase().getPrefix() : "";
-
     private final List<Map<Integer, Object>> batches = new ArrayList<>();
 
     private final Map<Integer, Object> values = new HashMap<>();
@@ -27,7 +23,7 @@ public final class StatementHolder {
     }
 
     public void setQuery(String query) {
-        this.query = query.replace("{prefix}", prefix);
+        this.query = query;
     }
 
     public void addBatch() {
