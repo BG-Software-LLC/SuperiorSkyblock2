@@ -46,7 +46,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
     @Override
     public Listener getListener() {
-        return new BlockLimitsListener();
+        return new EntityLimitsListener();
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
         return Collections.emptyList();
     }
 
-    private final class BlockLimitsListener implements Listener {
+    private final class EntityLimitsListener implements Listener {
 
         private final Map<Location, UUID> vehiclesOwners = new HashMap<>();
 
