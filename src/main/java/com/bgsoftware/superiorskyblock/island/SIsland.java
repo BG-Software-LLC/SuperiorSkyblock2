@@ -213,6 +213,7 @@ public final class SIsland implements Island {
         updateDatesFormatter();
         assignIslandChest();
         updateUpgrades();
+        this.entitiesTracker.recalculateEntityCounts();
 
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
