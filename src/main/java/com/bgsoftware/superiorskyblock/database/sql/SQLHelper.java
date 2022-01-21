@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.sql.session.MariaDBSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.PostgreSQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
@@ -42,6 +43,9 @@ public final class SQLHelper {
                 break;
             case "MARIADB":
                 session = new MariaDBSession(plugin, true);
+                break;
+            case "POSTGRESQL":
+                session = new PostgreSQLSession(plugin, true);
                 break;
             default:
                 session = new SQLiteSession(plugin, true);

@@ -206,6 +206,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
             case "MYSQL":
             case "MARIADB":
+            case "POSTGRESQL":
                 return true;
             default:
                 return false;
