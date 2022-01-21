@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.island;
+package com.bgsoftware.superiorskyblock.island.spawn;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
@@ -11,6 +11,8 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -23,10 +25,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandBlocksTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -621,6 +625,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public IslandCalculationAlgorithm getCalculationAlgorithm() {
+        return SpawnIslandCalculationAlgorithm.getInstance();
+    }
+
+    @Override
     public void updateBorder() {
         getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
     }
@@ -868,6 +877,11 @@ public final class SpawnIsland implements Island {
     @Override
     public void clearBlockCounts() {
         // Do nothing.
+    }
+
+    @Override
+    public IslandBlocksTrackerAlgorithm getBlocksTracker() {
+        return SpawnIslandBlocksTrackerAlgorithm.getInstance();
     }
 
     @Override

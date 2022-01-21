@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -22,7 +22,6 @@ import org.bukkit.block.Block;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
