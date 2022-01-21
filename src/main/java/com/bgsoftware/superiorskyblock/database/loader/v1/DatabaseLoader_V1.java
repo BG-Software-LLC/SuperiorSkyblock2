@@ -48,7 +48,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
     private static File databaseFile;
     private static SQLSession session;
-    private static boolean isUsingMySQL;
+    private static boolean isRemoteDatabase;
 
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
@@ -65,16 +65,16 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     private static boolean isDatabaseOldFormat() {
-        isUsingMySQL = plugin.getSettings().getDatabase().getType().equals("MySQL");
+        isRemoteDatabase = plugin.getSettings().getDatabase().getType().equals("MySQL");
 
-        if (!isUsingMySQL) {
+        if (!isRemoteDatabase) {
             databaseFile = new File(plugin.getDataFolder(), "database.db");
 
             if (!databaseFile.exists())
                 return false;
         }
 
-        session = isUsingMySQL ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
+        session = isRemoteDatabase ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
 
         if (!session.createConnection()) {
             return false;
@@ -142,7 +142,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         AtomicBoolean failedBackup = new AtomicBoolean(true);
 
-        if (!isUsingMySQL) {
+        if (!isRemoteDatabase) {
             session.closeConnection();
             if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackup.set(false);
@@ -150,7 +150,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
 
         if (failedBackup.get()) {
-            if (!isUsingMySQL) {
+            if (!isRemoteDatabase) {
                 session = new SQLiteSession(plugin, false);
                 session.createConnection();
             }
@@ -183,7 +183,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             });
         }
 
-        if (isUsingMySQL)
+        if (isRemoteDatabase)
             session.closeConnection();
 
         if (failedBackup.get()) {
