@@ -30,9 +30,8 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
     }
 
     @Override
-    public boolean trackEntity(Key key, Integer amount) {
+    public boolean trackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
         if (amount <= 0)
             return false;
@@ -50,9 +49,8 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
     }
 
     @Override
-    public boolean untrackEntity(Key key, Integer amount) {
+    public boolean untrackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
         if (amount <= 0)
             return false;
@@ -74,7 +72,7 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
     }
 
     @Override
-    public Integer getEntityCount(Key key) {
+    public int getEntityCount(Key key) {
         return entityCounts.getOrDefault(key, 0);
     }
 
