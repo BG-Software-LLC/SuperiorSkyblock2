@@ -68,7 +68,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     private DatabaseBridge databaseBridge;
     private IslandCreationAlgorithm islandCreationAlgorithm;
 
-    private SpawnIsland spawnIsland;
+    private Island spawnIsland;
     private SBlockPosition lastIsland;
 
     private BigDecimal totalWorth = BigDecimal.ZERO;
@@ -420,7 +420,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
-    public SpawnIsland getSpawnIsland() {
+    public Island getSpawnIsland() {
         if (spawnIsland == null)
             updateSpawn();
 

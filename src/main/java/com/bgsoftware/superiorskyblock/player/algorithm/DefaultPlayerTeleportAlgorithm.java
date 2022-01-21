@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
-import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -60,7 +59,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
         Block islandTeleportBlock = homeLocation.getBlock();
 
-        if (island instanceof SpawnIsland) {
+        if (island.isSpawn()) {
             PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(homeLocation));
             return teleport(player, homeLocation.add(0, 0.5, 0));
         }

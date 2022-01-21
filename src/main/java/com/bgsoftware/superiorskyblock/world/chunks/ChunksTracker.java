@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.world.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
@@ -162,7 +161,7 @@ public final class ChunksTracker {
         if (island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        if (dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save && !(island instanceof SpawnIsland))
+        if (dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save && !island.isSpawn())
             IslandsDatabaseBridge.saveDirtyChunks(island);
     }
 
