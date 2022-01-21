@@ -36,7 +36,7 @@ public final class WarpManageIconButton extends SuperiorMenuButton<MenuWarpManag
         IslandWarp islandWarp = superiorMenu.getIslandWarp();
 
         ItemBuilder itemBuilder = islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.clone() : new ItemBuilder(islandWarp.getRawIcon());
+                SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon());
 
         ItemStack buttonItem = super.getButtonItem(superiorMenu);
 

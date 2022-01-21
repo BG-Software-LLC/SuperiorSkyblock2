@@ -27,7 +27,7 @@ public final class IconDisplayButton<M extends SuperiorMenuIconEdit<M, T>, T> ex
     @Override
     public ItemStack getButtonItem(M superiorMenu) {
         ItemBuilder iconBuilder = superiorMenu.getIconBuilder();
-        return iconBuilder == null ? null : iconBuilder.clone().build();
+        return iconBuilder == null ? null : iconBuilder.copy().build();
     }
 
     public static class Builder<M extends SuperiorMenuIconEdit<M, T>, T> extends

@@ -29,7 +29,7 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
     }
 
     public ItemBuilder getNullItem() {
-        return nullItem.clone();
+        return nullItem.copy();
     }
 
     public int getObjectIndex() {

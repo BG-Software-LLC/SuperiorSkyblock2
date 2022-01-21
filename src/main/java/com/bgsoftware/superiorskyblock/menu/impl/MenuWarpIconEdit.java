@@ -24,7 +24,7 @@ public final class MenuWarpIconEdit extends SuperiorMenuIconEdit<MenuWarpIconEdi
 
     private MenuWarpIconEdit(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
         super(menuPattern, superiorPlayer, islandWarp, islandWarp == null ? null : islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.clone() : new ItemBuilder(islandWarp.getRawIcon()));
+                SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon()));
     }
 
     @Override

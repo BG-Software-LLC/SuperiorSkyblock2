@@ -62,7 +62,7 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
     public ItemStack getButtonItem(MenuIslandCreation superiorMenu) {
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         return (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission) ?
-                buttonItem : lackPermissionItem).clone().build(inventoryViewer);
+                buttonItem : lackPermissionItem).copy().build(inventoryViewer);
     }
 
     @Override

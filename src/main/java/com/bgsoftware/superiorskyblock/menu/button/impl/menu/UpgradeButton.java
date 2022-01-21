@@ -49,7 +49,7 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
 
         ItemBuilder buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
 
-        return (buttonItem == null ? INVALID_ITEM : buttonItem).clone().build(inventoryViewer);
+        return (buttonItem == null ? INVALID_ITEM : buttonItem).copy().build(inventoryViewer);
     }
 
     @Override

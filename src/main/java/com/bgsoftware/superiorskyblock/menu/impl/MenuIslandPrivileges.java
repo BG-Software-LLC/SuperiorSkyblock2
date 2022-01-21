@@ -92,7 +92,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         int position = 0;
 
         ConfigurationSection permissionsSection = cfg.getConfigurationSection("permissions");
-        if(permissionsSection != null) {
+        if (permissionsSection != null) {
             for (String key : permissionsSection.getKeys(false)) {
                 if (permissionsSection.getBoolean(key + ".display-menu", true)) {
                     String permission = key.toLowerCase();
@@ -247,16 +247,16 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         }
 
         public ItemBuilder getEnabledIslandPrivilegeItem() {
-            return enabledIslandPrivilegeItem.clone();
+            return enabledIslandPrivilegeItem.copy();
         }
 
         public ItemBuilder getDisabledIslandPrivilegeItem() {
-            return disabledIslandPrivilegeItem.clone();
+            return disabledIslandPrivilegeItem.copy();
         }
 
         @Nullable
         public ItemBuilder getRoleIslandPrivilegeItem() {
-            return roleIslandPrivilegeItem == null ? null : roleIslandPrivilegeItem.clone();
+            return roleIslandPrivilegeItem == null ? null : roleIslandPrivilegeItem.copy();
         }
 
         @Nullable

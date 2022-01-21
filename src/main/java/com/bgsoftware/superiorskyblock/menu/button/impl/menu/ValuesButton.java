@@ -33,7 +33,7 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
     @Nullable
     @Override
     public ItemStack getButtonItem(MenuValues superiorMenu) {
-        if(buttonItem == null)
+        if (buttonItem == null)
             return null;
 
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
@@ -45,7 +45,7 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(block);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(block);
 
-        ItemStack itemStack = buttonItem.clone()
+        ItemStack itemStack = buttonItem.copy()
                 .replaceAll("{0}", amount + "")
                 .replaceAll("{1}", StringUtils.format(blockWorth.multiply(amount)))
                 .replaceAll("{2}", StringUtils.format(blockLevel.multiply(amount)))

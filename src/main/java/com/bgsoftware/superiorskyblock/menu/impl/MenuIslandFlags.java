@@ -194,11 +194,11 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         }
 
         public ItemBuilder getEnabledIslandFlagItem() {
-            return enabledIslandFlagItem.clone();
+            return enabledIslandFlagItem.copy();
         }
 
         public ItemBuilder getDisabledIslandFlagItem() {
-            return disabledIslandFlagItem.clone();
+            return disabledIslandFlagItem.copy();
         }
 
         @Override
