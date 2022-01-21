@@ -1,9 +1,16 @@
-package com.bgsoftware.superiorskyblock.menu;
+package com.bgsoftware.superiorskyblock.menu.impl.internal;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.SettingsHandler;
+import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -33,7 +40,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
+public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings, ItemStack> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static PagedMenuPattern<SuperiorMenuSettings, ItemStack> menuPattern;
 
     private static final List<String> pathSlots = new ArrayList<>();
     private static final String[] ignorePaths = new String[]{"database", "max-island-size", "island-roles",
@@ -45,38 +56,65 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
     private static CommentedConfiguration config;
 
     private SuperiorMenuSettings(SuperiorPlayer superiorPlayer) {
-        super("menuConfigSettings", superiorPlayer, true);
+        super(menuPattern, superiorPlayer, true);
         setPageMoveRunnable(_superiorPlayer -> pageMove.add(_superiorPlayer.getUniqueId()));
     }
 
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu);
+    }
+
+    @Override
+    protected List<ItemStack> requestObjects() {
+        List<ItemStack> itemStacks = new ArrayList<>();
+        buildFromSection(itemStacks, config.getConfigurationSection(""));
+        return itemStacks;
+    }
+
+    @Override
+    public void open(ISuperiorMenu previousMenu) {
+        lastPage.put(inventoryViewer.getUniqueId(), currentPage);
+        super.open(previousMenu);
+    }
+
+    @Override
+    public void closeInventory(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer) {
+        super.closeInventory(plugin, superiorPlayer);
+
+        if (!activePlayers.remove(superiorPlayer.getUniqueId()) && !pageMove.remove(superiorPlayer.getUniqueId())) {
+            reloadConfiguration();
+            lastPage.remove(superiorPlayer.getUniqueId());
+        }
+    }
+
     public static void init() {
-        SuperiorMenuSettings menuConfigSettings = new SuperiorMenuSettings(null);
+        menuPattern = null;
 
         File file = new File(plugin.getDataFolder(), "config.yml");
-
         config = CommentedConfiguration.loadConfiguration(file);
 
-        menuConfigSettings.resetData();
+        PagedMenuPattern.Builder<SuperiorMenuSettings, ItemStack> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        menuConfigSettings.setTitle(ChatColor.BOLD + "Settings Editor");
-        menuConfigSettings.setInventoryType(InventoryType.CHEST);
-        menuConfigSettings.setRowsSize(6);
-        menuConfigSettings.setBackButton(-1);
-        menuConfigSettings.setPreviousSlot(Collections.singletonList(47));
-        menuConfigSettings.setCurrentSlot(Collections.singletonList(49));
-        menuConfigSettings.setNextSlot(Collections.singletonList(51));
-        menuConfigSettings.setSlots(IntStream.range(0, 36).boxed().collect(Collectors.toList()));
-
-        menuConfigSettings.addFillItem(47, new ItemBuilder(Material.PAPER).withName("{0}Previous Page"));
-        menuConfigSettings.addFillItem(49, new ItemBuilder(Materials.SUNFLOWER.toBukkitType()).withName("&aCurrent Page").withLore("&7Page {0}"));
-        menuConfigSettings.addFillItem(51, new ItemBuilder(Material.PAPER).withName("{0}Next Page"));
-
-        for (int i = 36; i < 45; i++)
-            menuConfigSettings.addFillItem(i, new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.toBukkitItem()).withName(" "));
-
-        menuConfigSettings.addFillItem(40, new ItemBuilder(Material.EMERALD).withName("&aSave Changes"));
-
-        menuConfigSettings.markCompleted();
+        menuPattern = patternBuilder
+                .setTitle(ChatColor.BOLD + "Settings Editor")
+                .setInventoryType(InventoryType.CHEST)
+                .setRowsSize(6)
+                .setButton(47, new DummyButton.Builder<SuperiorMenuSettings>()
+                        .setButtonItem(new ItemBuilder(Material.PAPER).withName("{0}Previous Page")))
+                .setPreviousPageSlots(Collections.singletonList(47))
+                .setButton(49, new DummyButton.Builder<SuperiorMenuSettings>()
+                        .setButtonItem(new ItemBuilder(Materials.SUNFLOWER.toBukkitType()).withName("&aCurrent Page").withLore("&7Page {0}")))
+                .setCurrentPageSlots(Collections.singletonList(49))
+                .setButton(51, new DummyButton.Builder<SuperiorMenuSettings>()
+                        .setButtonItem(new ItemBuilder(Material.PAPER).withName("{0}Next Page")))
+                .setNextPageSlots(Collections.singletonList(51))
+                .setPagedObjectSlots(IntStream.range(0, 36).boxed().collect(Collectors.toList()),
+                        new SuperiorSettingsPagedObjectButton.Builder())
+                .setButtons(IntStream.range(36, 45).boxed().collect(Collectors.toList()), new DummyButton.Builder<SuperiorMenuSettings>()
+                        .setButtonItem(new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.toBukkitItem()).withName(" ")))
+                .setButton(40, new SaveButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
@@ -229,79 +267,87 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<ItemStack> {
         }
     }
 
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e, ItemStack clickedObject) {
-        Player player = (Player) e.getWhoClicked();
+    private static final class SaveButton extends SuperiorMenuButton<SuperiorMenuSettings> {
 
-        if (e.getRawSlot() == 40) {
+        private SaveButton() {
+            super(new ItemBuilder(Material.EMERALD).withName("&aSave Changes"),
+                    null, null, null, null);
+        }
+
+        @Override
+        public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenuSettings superiorMenu, InventoryClickEvent clickEvent) {
+            Player player = (Player) clickEvent.getWhoClicked();
             Executor.async(() -> {
                 saveConfiguration();
                 player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Saved configuration successfully.");
                 Executor.sync(player::closeInventory);
             });
-            return;
         }
 
-        try {
-            String path = pathSlots.get((currentPage - 1) * 36 + e.getRawSlot());
+        private static class Builder extends AbstractBuilder<Builder, SaveButton, SuperiorMenuSettings> {
 
-            if (path == null)
-                return;
-
-            if (config.isBoolean(path)) {
-                updateConfig(player, path, !config.getBoolean(path));
-                activePlayers.add(player.getUniqueId());
-
-                previousMove = false;
-                player.closeInventory();
-                reopenMenu(player);
-            } else {
-                activePlayers.add(player.getUniqueId());
-                PlayerChat.listen(player, message -> onPlayerChat(player, message, path));
-
-                player.closeInventory();
-                player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
-
-                if (config.isList(path) || config.isConfigurationSection(path)) {
-                    player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
-                }
+            @Override
+            public SaveButton build() {
+                return new SaveButton();
             }
-        } catch (Exception error) {
-            PluginDebugger.debug(error);
+
         }
+
     }
 
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, ItemStack value) {
-        return value;
-    }
+    private static final class SuperiorSettingsPagedObjectButton extends PagedObjectButton<SuperiorMenuSettings, ItemStack> {
 
-    @Override
-    protected List<ItemStack> requestObjects() {
-        List<ItemStack> itemStacks = new ArrayList<>();
-        buildFromSection(itemStacks, config.getConfigurationSection(""));
-        return itemStacks;
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
-    }
-
-    @Override
-    public void open(ISuperiorMenu previousMenu) {
-        lastPage.put(superiorPlayer.getUniqueId(), currentPage);
-        super.open(previousMenu);
-    }
-
-    @Override
-    public void closeInventory(SuperiorPlayer superiorPlayer) {
-        super.closeInventory(superiorPlayer);
-
-        if (!activePlayers.remove(superiorPlayer.getUniqueId()) && !pageMove.remove(superiorPlayer.getUniqueId())) {
-            reloadConfiguration();
-            lastPage.remove(superiorPlayer.getUniqueId());
+        private SuperiorSettingsPagedObjectButton(int objectIndex) {
+            super(null, null, null, null, null,
+                    null, objectIndex);
         }
+
+        @Override
+        public ItemStack modifyButtonItem(ItemStack buttonItem, SuperiorMenuSettings superiorMenu, ItemStack itemStack) {
+            return itemStack;
+        }
+
+        @Override
+        public void onButtonClick(SuperiorSkyblockPlugin plugin, SuperiorMenuSettings superiorMenu,
+                                  InventoryClickEvent clickEvent) {
+            try {
+                Player player = (Player) clickEvent.getWhoClicked();
+                String path = pathSlots.get((superiorMenu.currentPage - 1) * 36 + clickEvent.getRawSlot());
+
+                if (path == null)
+                    return;
+
+                if (config.isBoolean(path)) {
+                    updateConfig(player, path, !config.getBoolean(path));
+                    activePlayers.add(player.getUniqueId());
+
+                    superiorMenu.closePage();
+                    reopenMenu(player);
+                } else {
+                    activePlayers.add(player.getUniqueId());
+                    PlayerChat.listen(player, message -> onPlayerChat(player, message, path));
+
+                    player.closeInventory();
+                    player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
+
+                    if (config.isList(path) || config.isConfigurationSection(path)) {
+                        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
+                    }
+                }
+            } catch (Exception error) {
+                PluginDebugger.debug(error);
+            }
+        }
+
+        private static class Builder extends PagedObjectBuilder<Builder, SuperiorSettingsPagedObjectButton, SuperiorMenuSettings> {
+
+            @Override
+            public SuperiorSettingsPagedObjectButton build() {
+                return new SuperiorSettingsPagedObjectButton(getObjectIndex());
+            }
+
+        }
+
     }
 
 }

@@ -1,13 +1,19 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BorderColorButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BorderColorToggleButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -16,86 +22,69 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
 
-public final class MenuBorderColor extends SuperiorMenu {
+public final class MenuBorderColor extends SuperiorMenu<MenuBorderColor> {
 
-    private static List<Integer> greenColorSlot;
-    private static List<Integer> blueColorSlot;
-    private static List<Integer> redColorSlot;
-    private static List<Integer> toggleBorderSlot;
+    private static RegularMenuPattern<MenuBorderColor> menuPattern;
 
     private MenuBorderColor(SuperiorPlayer superiorPlayer) {
-        super("menuBorderColor", superiorPlayer);
+        super(menuPattern, superiorPlayer);
+    }
+
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu);
     }
 
     public static void init() {
-        MenuBorderColor menuBorderColor = new MenuBorderColor(null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/border-color.yml");
+        RegularMenuPattern.Builder<MenuBorderColor> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/border-color.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "border-color.yml", MenuBorderColor::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
+
+        if (cfg.isConfigurationSection("items")) {
+            for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+                ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
+
+                if (!itemsSection.contains("enable-border") || !itemsSection.contains("disable-border"))
+                    continue;
+
+                patternBuilder.setButtons(menuPatternSlots.getSlots(itemsSectionName),
+                        new BorderColorToggleButton.Builder()
+                                .setEnabledItem(FileUtils.getItemStack("border-color.yml",
+                                        itemsSection.getConfigurationSection("disable-border")))
+                                .setDisabledItem(FileUtils.getItemStack("border-color.yml",
+                                        itemsSection.getConfigurationSection("enable-border"))));
             }
         }
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuBorderColor, "border-color.yml", cfg);
-
-        greenColorSlot = getSlots(cfg, "green-color", menuPatternSlots);
-        redColorSlot = getSlots(cfg, "red-color", menuPatternSlots);
-        blueColorSlot = getSlots(cfg, "blue-color", menuPatternSlots);
-
-        toggleBorderSlot = new ArrayList<>();
-        for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
-            if (cfg.contains("items." + itemChar + ".enable-border")) {
-                List<Integer> slots = menuPatternSlots.getSlots(itemChar);
-                toggleBorderSlot.addAll(slots);
-
-                ItemBuilder enableBorder = FileUtils.getItemStack("border-color.yml",
-                        cfg.getConfigurationSection("items." + itemChar + ".enable-border"));
-                ItemBuilder disableBorder = FileUtils.getItemStack("border-color.yml",
-                        cfg.getConfigurationSection("items." + itemChar + ".disable-border"));
-
-                List<String> commands = cfg.getStringList("commands." + itemChar);
-                SoundWrapper sound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar));
-                String permission = cfg.getString("permissions." + itemChar + ".permission");
-                SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + itemChar + ".no-access-sound"));
-
-                slots.forEach(i -> {
-                    menuBorderColor.addCommands(i, commands);
-                    menuBorderColor.addSound(i, sound);
-                    menuBorderColor.addPermission(i, permission, noAccessSound);
-                    menuBorderColor.addData(i + "-enable-border", enableBorder);
-                    menuBorderColor.addData(i + "-disable-border", disableBorder);
-                });
-            }
-        }
-
-        menuBorderColor.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "green-color", menuPatternSlots), new BorderColorButton.Builder()
+                        .setBorderColor(BorderColor.GREEN))
+                .mapButtons(getSlots(cfg, "red-color", menuPatternSlots), new BorderColorButton.Builder()
+                        .setBorderColor(BorderColor.RED))
+                .mapButtons(getSlots(cfg, "blue-color", menuPatternSlots), new BorderColorButton.Builder()
+                        .setBorderColor(BorderColor.BLUE))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
         new MenuBorderColor(superiorPlayer).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/border-gui.yml");
 
         if (!oldFile.exists())
@@ -121,9 +110,9 @@ public final class MenuBorderColor extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char greenChar = itemChars[charCounter++];
-        char blueChar = itemChars[charCounter++];
-        char redChar = itemChars[charCounter++];
+        char greenChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char blueChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char redChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("border-gui.green_color"), patternChars, greenChar,
                 itemsSection, commandsSection, soundsSection);
@@ -136,60 +125,10 @@ public final class MenuBorderColor extends SuperiorMenu {
         newMenu.set("red-color", redChar + "");
         newMenu.set("blue-color", blueChar + "");
 
-        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e) {
-        BorderColor borderColor;
-
-        if (toggleBorderSlot.contains(e.getRawSlot())) {
-            plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "toggle", "border");
-        } else {
-            if (greenColorSlot.contains(e.getRawSlot()))
-                borderColor = BorderColor.GREEN;
-            else if (blueColorSlot.contains(e.getRawSlot()))
-                borderColor = BorderColor.BLUE;
-            else if (redColorSlot.contains(e.getRawSlot()))
-                borderColor = BorderColor.RED;
-            else return;
-
-            if (!superiorPlayer.hasWorldBorderEnabled())
-                superiorPlayer.toggleWorldBorder();
-
-            superiorPlayer.setBorderColor(borderColor);
-            plugin.getNMSWorld().setWorldBorder(superiorPlayer, plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
-
-            Message.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
-                    StringUtils.format(superiorPlayer.getUserLocale(), borderColor));
-        }
-
-        Executor.sync(() -> {
-            previousMove = false;
-            e.getWhoClicked().closeInventory();
-        }, 1L);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inv = super.buildInventory(titleReplacer);
-
-        for (int slot : toggleBorderSlot) {
-            if (containsData(slot + "-enable-border")) {
-                ItemStack itemStack = ((ItemBuilder) getData(slot + (superiorPlayer.hasWorldBorderEnabled() ?
-                        "-disable-border" : "-enable-border"))).copy().build(superiorPlayer);
-                inv.setItem(slot, itemStack);
-            }
-        }
-
-        return inv;
     }
 
 }

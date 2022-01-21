@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuSettings;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

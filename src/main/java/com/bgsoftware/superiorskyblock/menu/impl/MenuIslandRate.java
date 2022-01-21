@@ -1,79 +1,83 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.RateIslandButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public final class MenuIslandRate extends SuperiorMenu {
+public final class MenuIslandRate extends SuperiorMenu<MenuIslandRate> {
 
-    private static List<Integer> zeroStarsSlot;
-    private static List<Integer> oneStarSlot;
-    private static List<Integer> twoStarsSlot;
-    private static List<Integer> threeStarsSlot;
-    private static List<Integer> fourStarsSlot;
-    private static List<Integer> fiveStarsSlot;
+    private static RegularMenuPattern<MenuIslandRate> menuPattern;
 
     private final Island island;
 
     private MenuIslandRate(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuIslandRate", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.island = island;
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, island);
+    }
+
     public static void init() {
-        MenuIslandRate menuIslandRate = new MenuIslandRate(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/island-rate.yml");
+        RegularMenuPattern.Builder<MenuIslandRate> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/island-rate.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "island-rate.yml", MenuIslandRate::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                PluginDebugger.debug(ex);
-                ex.printStackTrace();
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuIslandRate, "island-rate.yml", cfg);
-
-        zeroStarsSlot = getSlots(cfg, "zero-stars", menuPatternSlots);
-        oneStarSlot = getSlots(cfg, "one-star", menuPatternSlots);
-        twoStarsSlot = getSlots(cfg, "two-stars", menuPatternSlots);
-        threeStarsSlot = getSlots(cfg, "three-stars", menuPatternSlots);
-        fourStarsSlot = getSlots(cfg, "four-stars", menuPatternSlots);
-        fiveStarsSlot = getSlots(cfg, "five-stars", menuPatternSlots);
-
-        menuIslandRate.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "zero-stars", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.ZERO_STARS))
+                .mapButtons(getSlots(cfg, "one-star", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.ONE_STAR))
+                .mapButtons(getSlots(cfg, "two-stars", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.TWO_STARS))
+                .mapButtons(getSlots(cfg, "three-stars", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.THREE_STARS))
+                .mapButtons(getSlots(cfg, "four-stars", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.FOUR_STARS))
+                .mapButtons(getSlots(cfg, "five-stars", menuPatternSlots), new RateIslandButton.Builder()
+                        .setRating(Rating.FIVE_STARS))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
         new MenuIslandRate(superiorPlayer, island).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/ratings-gui.yml");
 
         if (!oldFile.exists())
@@ -99,11 +103,11 @@ public final class MenuIslandRate extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char oneStarChar = itemChars[charCounter++];
-        char twoStarsChar = itemChars[charCounter++];
-        char threeStarsChar = itemChars[charCounter++];
-        char fourStarsChar = itemChars[charCounter++];
-        char fiveStarsChar = itemChars[charCounter++];
+        char oneStarChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char twoStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char threeStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char fourStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char fiveStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("rate-gui.one_star"), patternChars, oneStarChar,
                 itemsSection, commandsSection, soundsSection);
@@ -122,46 +126,10 @@ public final class MenuIslandRate extends SuperiorMenu {
         newMenu.set("four-stars", fourStarsChar + "");
         newMenu.set("five-stars", fiveStarsChar + "");
 
-        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        Rating rating = Rating.UNKNOWN;
-
-        if (zeroStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.ZERO_STARS;
-        else if (oneStarSlot.contains(e.getRawSlot()))
-            rating = Rating.ONE_STAR;
-        else if (twoStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.TWO_STARS;
-        else if (threeStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.THREE_STARS;
-        else if (fourStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.FOUR_STARS;
-        else if (fiveStarsSlot.contains(e.getRawSlot()))
-            rating = Rating.FIVE_STARS;
-
-        if (rating == Rating.UNKNOWN)
-            return;
-
-        island.setRating(superiorPlayer, rating);
-
-        Message.RATE_SUCCESS.send(e.getWhoClicked(), rating.getValue());
-
-        IslandUtils.sendMessage(island, Message.RATE_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), rating.getValue());
-
-        Executor.sync(() -> {
-            previousMove = false;
-            e.getWhoClicked().closeInventory();
-        }, 1L);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

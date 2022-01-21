@@ -3,65 +3,76 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpManageIconButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpManageLocationButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpManagePrivateButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpManageRenameButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
-import java.util.List;
-import java.util.function.Function;
+public final class MenuWarpManage extends SuperiorMenu<MenuWarpManage> {
 
-public final class MenuWarpManage extends SuperiorMenu {
+    private static RegularMenuPattern<MenuWarpManage> menuPattern;
 
-    private static List<Integer> renameSlots;
-    private static List<Integer> iconSlots;
-    private static List<Integer> locationSlots;
-    private static List<Integer> privateSlots;
-    private static SoundWrapper successUpdateSound;
+    public static SoundWrapper successUpdateSound;
 
     private final IslandWarp islandWarp;
 
     private MenuWarpManage(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
-        super("menuWarpManage", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.islandWarp = islandWarp;
     }
 
+    public IslandWarp getIslandWarp() {
+        return islandWarp;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, islandWarp);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return title.replace("{0}", islandWarp.getName());
+    }
+
     public static void init() {
-        MenuWarpManage menuWarpManage = new MenuWarpManage(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/warp-manage.yml");
+        RegularMenuPattern.Builder<MenuWarpManage> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/warp-manage.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "warp-manage.yml", null);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuWarpManage, "warp-manage.yml", cfg);
-
-        renameSlots = getSlots(cfg, "warp-rename", menuPatternSlots);
-        iconSlots = getSlots(cfg, "warp-icon", menuPatternSlots);
-        locationSlots = getSlots(cfg, "warp-location", menuPatternSlots);
-        privateSlots = getSlots(cfg, "warp-private", menuPatternSlots);
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         if (cfg.isConfigurationSection("success-update-sound"))
             successUpdateSound = FileUtils.getSound(cfg.getConfigurationSection("success-update-sound"));
 
-        menuWarpManage.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "warp-rename", menuPatternSlots),
+                        new WarpManageRenameButton.Builder())
+                .mapButtons(getSlots(cfg, "warp-icon", menuPatternSlots),
+                        new WarpManageIconButton.Builder())
+                .mapButtons(getSlots(cfg, "warp-location", menuPatternSlots),
+                        new WarpManageLocationButton.Builder())
+                .mapButtons(getSlots(cfg, "warp-private", menuPatternSlots),
+                        new WarpManagePrivateButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, IslandWarp islandWarp) {
@@ -70,103 +81,6 @@ public final class MenuWarpManage extends SuperiorMenu {
 
     public static void refreshMenus(IslandWarp islandWarp) {
         refreshMenus(MenuWarpManage.class, superiorMenu -> superiorMenu.islandWarp.equals(islandWarp));
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e) {
-        if (renameSlots.contains(e.getRawSlot())) {
-            previousMove = false;
-            e.getWhoClicked().closeInventory();
-
-            Message.WARP_RENAME.send(e.getWhoClicked());
-
-            PlayerChat.listen((Player) e.getWhoClicked(), message -> {
-                if (!message.equalsIgnoreCase("-cancel")) {
-                    String newName = IslandUtils.getWarpName(message);
-
-                    if (islandWarp.getIsland().getWarp(newName) != null) {
-                        Message.WARP_RENAME_ALREADY_EXIST.send(e.getWhoClicked());
-                        return true;
-                    }
-
-                    if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                        Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
-                        return true;
-                    }
-
-                    islandWarp.getIsland().renameWarp(islandWarp, newName);
-
-                    Message.WARP_RENAME_SUCCESS.send(e.getWhoClicked(), newName);
-
-                    if (successUpdateSound != null)
-                        successUpdateSound.playSound(e.getWhoClicked());
-                }
-
-                open(previousMenu);
-                PlayerChat.remove((Player) e.getWhoClicked());
-
-                return true;
-            });
-        } else if (iconSlots.contains(e.getRawSlot())) {
-            previousMove = false;
-            plugin.getMenus().openWarpIconEdit(superiorPlayer, this, islandWarp);
-        } else if (locationSlots.contains(e.getRawSlot())) {
-            if (!islandWarp.getIsland().isInsideRange(superiorPlayer.getLocation())) {
-                Message.SET_WARP_OUTSIDE.send(superiorPlayer);
-                return;
-            }
-
-            Message.WARP_LOCATION_UPDATE.send(e.getWhoClicked());
-
-            Block signBlock = islandWarp.getLocation().getBlock();
-            if (signBlock.getState() instanceof Sign) {
-                signBlock.setType(Material.AIR);
-                signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
-                Message.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);
-            }
-
-            islandWarp.setLocation(e.getWhoClicked().getLocation());
-
-            if (successUpdateSound != null)
-                successUpdateSound.playSound(e.getWhoClicked());
-        } else if (privateSlots.contains(e.getRawSlot())) {
-            islandWarp.setPrivateFlag(!islandWarp.hasPrivateFlag());
-            if (islandWarp.hasPrivateFlag())
-                Message.WARP_PRIVATE_UPDATE.send(e.getWhoClicked());
-            else
-                Message.WARP_PUBLIC_UPDATE.send(e.getWhoClicked());
-        }
-
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, islandWarp);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inventory = super.buildInventory(title -> title.replace("{0}", islandWarp.getName()));
-
-        iconSlots.forEach(slot -> {
-            ItemBuilder itemBuilder = islandWarp.getRawIcon() == null ?
-                    SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon());
-
-            ItemStack currentItem = inventory.getItem(slot);
-
-            if (currentItem != null && currentItem.hasItemMeta()) {
-                ItemMeta itemMeta = currentItem.getItemMeta();
-                if (itemMeta.hasDisplayName())
-                    itemBuilder.withName(itemMeta.getDisplayName());
-
-                if (itemMeta.hasLore())
-                    itemBuilder.appendLore(itemMeta.getLore());
-            }
-
-            inventory.setItem(slot, itemBuilder.build(islandWarp.getIsland().getOwner()));
-        });
-
-        return inventory;
     }
 
 }

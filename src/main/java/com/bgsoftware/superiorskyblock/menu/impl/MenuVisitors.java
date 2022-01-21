@@ -4,62 +4,69 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.OpenUniqueVisitorsButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.VisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
+public final class MenuVisitors extends PagedSuperiorMenu<MenuVisitors, SuperiorPlayer> {
 
-    private static List<Integer> uniqueVisitorsSlot;
+    private static PagedMenuPattern<MenuVisitors, SuperiorPlayer> menuPattern;
 
     private final Island island;
 
     private MenuVisitors(SuperiorPlayer superiorPlayer, Island island) {
-        super("menuVisitors", superiorPlayer, true);
+        super(menuPattern, superiorPlayer);
         this.island = island;
     }
 
+    public Island getTargetIsland() {
+        return island;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, island);
+    }
+
+    @Override
+    protected List<SuperiorPlayer> requestObjects() {
+        return island.getIslandVisitors(false);
+    }
+
     public static void init() {
-        MenuVisitors menuVisitors = new MenuVisitors(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/visitors.yml");
+        PagedMenuPattern.Builder<MenuVisitors, SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/visitors.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "visitors.yml", MenuVisitors::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuVisitors, "visitors.yml", cfg);
-
-        uniqueVisitorsSlot = getSlots(cfg, "unique-visitors", menuPatternSlots);
-
-        menuVisitors.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuVisitors.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuVisitors.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuVisitors.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuVisitors.markCompleted();
+        menuPattern = patternBuilder
+                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .setPagedObjectSlots(getSlots(cfg, "slots", menuPatternSlots), new VisitorPagedObjectButton.Builder())
+                .mapButtons(getSlots(cfg, "unique-visitors", menuPatternSlots), new OpenUniqueVisitorsButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island island) {
@@ -70,7 +77,7 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
         refreshMenus(MenuVisitors.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if (!oldFile.exists())
@@ -97,58 +104,18 @@ public final class MenuVisitors extends PagedSuperiorMenu<SuperiorPlayer> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = itemChars[charCounter++];
+        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertPagedButtons(cfg.getConfigurationSection("visitors-panel"),
                 cfg.getConfigurationSection("visitors-panel.visitor-item"), newMenu, patternChars,
-                slotsChar, itemChars[charCounter++], itemChars[charCounter++], itemChars[charCounter++],
+                slotsChar, SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++], SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
                 itemsSection, commandsSection, soundsSection);
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, SuperiorPlayer targetPlayer) {
-        if (uniqueVisitorsSlot.contains(event.getRawSlot())) {
-            previousMove = false;
-            plugin.getMenus().openUniqueVisitors(superiorPlayer, this, island);
-        } else if (targetPlayer != null) {
-            if (event.getClick().name().contains("RIGHT")) {
-                plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "invite", targetPlayer.getName());
-            } else if (event.getClick().name().contains("LEFT")) {
-                plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "expel", targetPlayer.getName());
-            }
-        }
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, SuperiorPlayer superiorPlayer) {
-        try {
-            Island island = superiorPlayer.getIsland();
-            String islandOwner = island != null ? island.getOwner().getName() : "None";
-            String islandName = island != null ? island.getName().isEmpty() ? islandOwner : island.getName() : "None";
-            return new ItemBuilder(clickedItem)
-                    .replaceAll("{0}", superiorPlayer.getName())
-                    .replaceAll("{1}", islandOwner)
-                    .replaceAll("{2}", islandName)
-                    .asSkullOf(superiorPlayer).build(superiorPlayer);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Failed to load menu because of player: " + superiorPlayer.getName());
-            PluginDebugger.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected List<SuperiorPlayer> requestObjects() {
-        return island.getIslandVisitors(false);
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, island);
     }
 
 }

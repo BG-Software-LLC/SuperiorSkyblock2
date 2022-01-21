@@ -5,166 +5,137 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ChangeSortingTypeButton;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.TopIslandsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import org.bukkit.Bukkit;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
-public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
+public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
 
-    private static List<Integer> playerIslandSlot;
-    private static boolean sortGlowWhenSelected;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static PagedMenuPattern<MenuTopIslands, Island> menuPattern;
+
+    public static boolean sortGlowWhenSelected;
+
     private final Set<SortingType> alreadySorted = new HashSet<>();
     private SortingType sortingType;
 
     private MenuTopIslands(SuperiorPlayer superiorPlayer, SortingType sortingType) {
-        super("menuTopIslands", superiorPlayer, true);
+        super(menuPattern, superiorPlayer, true);
         this.sortingType = sortingType;
     }
 
+    public SortingType getSortingType() {
+        return sortingType;
+    }
+
+    public boolean setSortingType(SortingType sortingType) {
+        this.sortingType = sortingType;
+        return this.alreadySorted.add(sortingType);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, sortingType);
+    }
+
+    @Override
+    protected List<Island> requestObjects() {
+        return plugin.getGrid().getIslands(sortingType);
+    }
+
     public static void init() {
-        MenuTopIslands menuTopIslands = new MenuTopIslands(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/top-islands.yml");
+        PagedMenuPattern.Builder<MenuTopIslands, Island> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/top-islands.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "top-islands.yml", MenuTopIslands::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
-        /*We must implement our own FileUtils.loadGUI for the menu, because of how complicated the menu is.*/
+        patternBuilder.mapButtons(getSlots(cfg, "player-island", menuPatternSlots), new TopIslandsPagedObjectButton.Builder()
+                .setPlayerSelfIsland(true));
 
-        menuTopIslands.resetData();
+        patternBuilder.mapButtons(getSlots(cfg, "worth-sort", menuPatternSlots),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
 
-        menuTopIslands.setTitle(StringUtils.translateColors(cfg.getString("title", "")));
-        menuTopIslands.setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")));
-        menuTopIslands.setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true));
-        menuTopIslands.setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
+        patternBuilder.mapButtons(getSlots(cfg, "level-sort", menuPatternSlots),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_LEVEL));
 
-        List<String> pattern = cfg.getStringList("pattern");
+        patternBuilder.mapButtons(getSlots(cfg, "rating-sort", menuPatternSlots),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_RATING));
 
-        menuTopIslands.setRowsSize(pattern.size());
-        int backButton = -1;
-        char backButtonChar = cfg.getString("back", " ").charAt(0);
+        patternBuilder.mapButtons(getSlots(cfg, "players-sort", menuPatternSlots),
+                new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_PLAYERS));
 
-        MenuPatternSlots menuPatternSlots = new MenuPatternSlots();
+        if (cfg.isConfigurationSection("items")) {
+            for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+                ConfigurationSection itemSection = cfg.getConfigurationSection("items." + itemSectionName);
 
-        for (int row = 0; row < pattern.size(); row++) {
-            String patternLine = pattern.get(row);
-            int slot = row * 9;
+                if (!itemSection.isString("sorting-type"))
+                    continue;
 
-            for (int i = 0; i < patternLine.length(); i++) {
-                char ch = patternLine.charAt(i);
-                if (ch != ' ') {
-                    if (backButtonChar == ch) {
-                        backButton = slot;
-                    }
+                SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
 
-                    menuTopIslands.addFillItem(slot, FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + ch)));
-                    menuTopIslands.addCommands(slot, cfg.getStringList("commands." + ch));
-                    menuTopIslands.addSound(slot, FileUtils.getSound(cfg.getConfigurationSection("sounds." + ch)));
-
-                    String permission = cfg.getString("permissions." + ch + ".permission");
-                    SoundWrapper noAccessSound = FileUtils.getSound(cfg.getConfigurationSection("permissions." + ch + ".no-access-sound"));
-                    menuTopIslands.addPermission(slot, permission, noAccessSound);
-
-                    if (cfg.contains("items." + ch + ".sorting-type")) {
-                        String sortingType = cfg.getString("items." + ch + ".sorting-type");
-                        menuTopIslands.addData(slot + "", sortingType);
-                        //noinspection unchecked
-                        List<Integer> slots = (List<Integer>) menuTopIslands.getData(sortingType, new ArrayList<>());
-                        slots.add(slot);
-                        menuTopIslands.addData(sortingType, slots);
-                    }
-
-                    menuPatternSlots.addSlot(ch, slot);
-
-                    slot++;
+                if (sortingType == null) {
+                    SuperiorSkyblockPlugin.log("&c[top-islands.yml] The sorting type is invalid for the item " + itemSectionName);
+                    continue;
                 }
+
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName),
+                        new ChangeSortingTypeButton.Builder().setSortingType(sortingType));
             }
         }
 
-        menuTopIslands.setBackButton(backButton);
+        if (cfg.isString("slots")) {
+            for (char slotsChar : cfg.getString("slots", "").toCharArray()) {
+                ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + slotsChar);
 
-        if (plugin.getSettings().isOnlyBackButton() && backButton == -1)
-            SuperiorSkyblockPlugin.log("&c[top-islands.yml] Menu doesn't have a back button, it's impossible to close it.");
+                if (itemsSection == null)
+                    continue;
 
-        if (cfg.contains("worth-sort")) {
-            List<Integer> worthSortSlots = getSlots(cfg, "worth-sort", menuPatternSlots);
-            worthSortSlots.forEach(slot -> menuTopIslands.addData(slot + "", "WORTH"));
-            menuTopIslands.addData("WORTH", worthSortSlots);
-        }
-        if (cfg.contains("level-sort")) {
-            List<Integer> levelSortSlots = getSlots(cfg, "level-sort", menuPatternSlots);
-            levelSortSlots.forEach(slot -> menuTopIslands.addData(slot + "", "LEVEL"));
-            menuTopIslands.addData("LEVEL", levelSortSlots);
-        }
-        if (cfg.contains("rating-sort")) {
-            List<Integer> ratingSortSlots = getSlots(cfg, "rating-sort", menuPatternSlots);
-            ratingSortSlots.forEach(slot -> menuTopIslands.addData(slot + "", "RATING"));
-            menuTopIslands.addData("RATING", ratingSortSlots);
-        }
-        if (cfg.contains("players-sort")) {
-            List<Integer> playerSortSlots = getSlots(cfg, "players-sort", menuPatternSlots);
-            playerSortSlots.forEach(slot -> menuTopIslands.addData(slot + "", "PLAYERS"));
-            menuTopIslands.addData("PLAYERS", playerSortSlots);
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(slotsChar), new TopIslandsPagedObjectButton.Builder()
+                        .setIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")))
+                        .setNoIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")))
+                        .setIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")))
+                        .setNoIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")))
+                        .setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"))
+                        .setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island")));
+            }
         }
 
-        playerIslandSlot = getSlots(cfg, "player-island", menuPatternSlots);
-
-        char slotsChar = cfg.getString("slots", " ").charAt(0);
-
-        menuTopIslands.addData("island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".island")));
-        menuTopIslands.addData("no-island-item", FileUtils.getItemStack("top-islands.yml", cfg.getConfigurationSection("items." + slotsChar + ".no-island")));
-        menuTopIslands.addData("island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")));
-        menuTopIslands.addData("no-island-sound", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")));
-        menuTopIslands.addData("island-commands", cfg.getStringList("commands." + slotsChar + ".island"));
-        menuTopIslands.addData("no-island-commands", cfg.getStringList("commands." + slotsChar + ".no-island"));
-
-        menuTopIslands.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuTopIslands.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuTopIslands.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuTopIslands.setSlots(getSlots(cfg, "slots", menuPatternSlots));
-
-        menuTopIslands.markCompleted();
+        menuPattern = patternBuilder
+                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SortingType sortingType) {
@@ -175,7 +146,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         SuperiorMenu.refreshMenus(MenuTopIslands.class, superiorMenu -> superiorMenu.sortingType.equals(sortingType));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/top-islands.yml");
 
         if (!oldFile.exists())
@@ -202,12 +173,12 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char slotsChar = itemChars[charCounter++];
-        char worthChar = itemChars[charCounter++];
-        char levelChar = itemChars[charCounter++];
-        char ratingChar = itemChars[charCounter++];
-        char playersChar = itemChars[charCounter++];
-        char playerIslandChar = itemChars[charCounter++];
+        char slotsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char worthChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char levelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char ratingChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char playersChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char playerIslandChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         for (String slot : cfg.getString("top-islands.slots").split(","))
             patternChars[Integer.parseInt(slot)] = slotsChar;
@@ -249,200 +220,17 @@ public final class MenuTopIslands extends PagedSuperiorMenu<Island> {
         newMenu.set("player-island", playerIslandChar);
         newMenu.set("sort-glow-when-selected", false);
 
-        char invalidChar = itemChars[charCounter++];
+        char invalidChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         newMenu.set("slots", slotsChar);
         newMenu.set("previous-page", invalidChar);
         newMenu.set("current-page", invalidChar);
         newMenu.set("next-page", invalidChar);
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, sortingType);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inventory = super.buildInventory(titleReplacer);
-
-        if (sortGlowWhenSelected) {
-            //noinspection unchecked
-            List<Integer> glowSlots = (List<Integer>) getData(sortingType.getName(), Collections.singletonList(-1));
-            glowSlots.stream().filter(slot -> slot != -1).forEach(slot ->
-                    inventory.setItem(slot, new ItemBuilder(inventory.getItem(slot)).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build(superiorPlayer)));
-        }
-
-        for (int playerIslandSlot : playerIslandSlot) {
-            if (playerIslandSlot != -1) {
-                Island island = superiorPlayer.getIsland();
-                inventory.setItem(playerIslandSlot, getObjectItem(null, island));
-            }
-        }
-
-        return inventory;
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, Island island) {
-        if (!clickSort(event.getRawSlot())) {
-            if (playerIslandSlot.contains(event.getRawSlot())) {
-                clickItem(superiorPlayer.getIsland(), superiorPlayer, event.getAction());
-            } else {
-                clickItem(island, superiorPlayer, event.getAction());
-            }
-        }
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Island island) {
-        SuperiorPlayer islandOwner = island == null ? null : island.getOwner();
-        try {
-            int place = island == null ? 0 : plugin.getGrid().getIslandPosition(island, sortingType) + 1;
-
-            ItemBuilder itemBuilder = ((ItemBuilder) getData(islandOwner == null ? "no-island-item" : "island-item"))
-                    .copy().asSkullOf(islandOwner);
-
-            if (island != null && islandOwner != null) {
-                String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
-                        island.getName().isEmpty() ? islandOwner.getName() :
-                        plugin.getSettings().getIslandNames().isColorSupport() ?
-                                StringUtils.translateColors(island.getName()) : island.getName();
-
-                itemBuilder.replaceName("{0}", islandName)
-                        .replaceName("{1}", String.valueOf(place))
-                        .replaceName("{2}", StringUtils.format(island.getIslandLevel()))
-                        .replaceName("{3}", StringUtils.format(island.getWorth()))
-                        .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
-                        .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
-                        .replaceName("{7}", StringUtils.format(island.getTotalRating()))
-                        .replaceName("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
-                        .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
-                        .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
-
-                if (itemBuilder.getItemMeta().hasLore()) {
-                    List<String> lore = new ArrayList<>();
-
-                    for (String line : itemBuilder.getItemMeta().getLore()) {
-                        if (line.contains("{4}")) {
-                            List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader());
-                            String memberFormat = line.split("\\{4}:")[1];
-                            if (members.size() == 0) {
-                                lore.add(memberFormat.replace("{}", "None"));
-                            } else {
-                                members.forEach(member -> {
-                                    String onlineMessage = member.isOnline() ?
-                                            Message.ISLAND_TOP_STATUS_ONLINE.getMessage(superiorPlayer.getUserLocale()) :
-                                            Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(superiorPlayer.getUserLocale());
-
-                                    lore.add(PlaceholderHook.parse(member, memberFormat
-                                            .replace("{}", member.getName())
-                                            .replace("{0}", member.getName())
-                                            .replace("{1}", onlineMessage == null ? "" : onlineMessage))
-                                    );
-                                });
-                            }
-                        } else {
-                            lore.add(line
-                                    .replace("{0}", island.getOwner().getName())
-                                    .replace("{1}", String.valueOf(place))
-                                    .replace("{2}", StringUtils.format(island.getIslandLevel()))
-                                    .replace("{3}", StringUtils.format(island.getWorth()))
-                                    .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale()))
-                                    .replace("{6}", StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale()))
-                                    .replace("{7}", StringUtils.format(island.getTotalRating()))
-                                    .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
-                                    .replace("{9}", StringUtils.format(island.getRatingAmount()))
-                                    .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
-                        }
-                    }
-
-                    itemBuilder.withLore(lore);
-                }
-
-                return itemBuilder.build(islandOwner);
-            }
-
-            return itemBuilder.build(superiorPlayer);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Failed to load menu because of the island of: " + (islandOwner == null ? "null" : islandOwner.getName()));
-            PluginDebugger.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected ItemStack getNullItem() {
-        return getObjectItem(null, null);
-    }
-
-    @Override
-    protected List<Island> requestObjects() {
-        return plugin.getGrid().getIslands(sortingType);
-    }
-
-    private boolean clickSort(int slot) {
-        SortingType sortingType = null;
-
-        try {
-            sortingType = SortingType.getByName((String) getData(slot + "", ""));
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        if (sortingType != null) {
-            this.sortingType = sortingType;
-            previousMove = false;
-
-            if (alreadySorted.add(sortingType)) {
-                plugin.getGrid().sortIslands(sortingType, () -> open(previousMenu));
-            } else {
-                open(previousMenu);
-            }
-        }
-
-        return sortingType != null;
-    }
-
-    private void clickItem(Island island, SuperiorPlayer superiorPlayer, InventoryAction inventoryAction) {
-        if (island != null) {
-            SoundWrapper sound = (SoundWrapper) getData("island-sound");
-            if (sound != null)
-                superiorPlayer.runIfOnline(sound::playSound);
-            //noinspection unchecked
-            List<String> commands = (List<String>) getData("island-commands");
-            if (commands != null)
-                commands.forEach(command ->
-                        Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
-                                command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
-
-            previousMove = false;
-
-            if (inventoryAction == InventoryAction.PICKUP_HALF) {
-                if (MenuGlobalWarps.visitorWarps) {
-                    plugin.getCommands().dispatchSubCommand(superiorPlayer.asPlayer(), "visit", island.getOwner().getName());
-                } else {
-                    plugin.getMenus().openWarpCategories(superiorPlayer, this, island);
-                }
-            } else if (plugin.getSettings().isValuesMenu()) {
-                plugin.getMenus().openValues(superiorPlayer, this, island);
-            }
-
-            return;
-        }
-
-        SoundWrapper sound = (SoundWrapper) getData("no-island-sound");
-        if (sound != null)
-            superiorPlayer.runIfOnline(sound::playSound);
-        //noinspection unchecked
-        List<String> commands = (List<String>) getData("no-island-commands");
-        if (commands != null)
-            commands.forEach(command ->
-                    Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? superiorPlayer.asPlayer() : Bukkit.getConsoleSender(),
-                            command.replace("PLAYER:", "").replace("%player%", superiorPlayer.getName())));
     }
 
 }

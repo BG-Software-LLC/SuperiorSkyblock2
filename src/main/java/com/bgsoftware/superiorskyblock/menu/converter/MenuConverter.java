@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.menu.converter;
 
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ public final class MenuConverter {
             String[] slots = section.getString("slots").split(",");
             section.set("slots", null);
 
-            char itemChar = SuperiorMenu.itemChars[charCounter++];
+            char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
             for (String slot : slots) {
                 patternChars[Integer.parseInt(slot)] = itemChar;
             }

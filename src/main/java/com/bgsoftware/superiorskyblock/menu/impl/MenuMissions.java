@@ -1,35 +1,48 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.OpenMissionCategoryButton;
+import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
-import java.io.File;
-import java.util.Optional;
+public final class MenuMissions extends SuperiorMenu<MenuMissions> {
 
-public final class MenuMissions extends SuperiorMenu {
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static RegularMenuPattern<MenuMissions> menuPattern;
 
     private MenuMissions(SuperiorPlayer superiorPlayer) {
-        super("menuMissions", superiorPlayer);
+        super(menuPattern, superiorPlayer);
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu);
     }
 
     public static void init() {
-        MenuMissions menuMissions = createEmptyInstance();
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/missions.yml");
+        RegularMenuPattern.Builder<MenuMissions> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/missions.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "missions.yml", null);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        FileUtils.loadGUI(menuMissions, "missions.yml", cfg);
+        plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
+            patternBuilder.mapButton(missionCategory.getSlot(), new OpenMissionCategoryButton.Builder()
+                    .setMissionsCategory(missionCategory));
+        });
 
-        menuMissions.markCompleted();
+        menuPattern = patternBuilder.build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
@@ -38,23 +51,6 @@ public final class MenuMissions extends SuperiorMenu {
 
     public static MenuMissions createEmptyInstance() {
         return new MenuMissions(null);
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        Optional<MissionCategory> clickedMissionCategory = plugin.getMissions().getMissionCategories()
-                .stream().filter(missionCategory -> missionCategory.getSlot() == e.getRawSlot()).findFirst();
-
-        if (!clickedMissionCategory.isPresent())
-            return;
-
-        previousMove = false;
-        plugin.getMenus().openMissionsCategory(superiorPlayer, this, clickedMissionCategory.get());
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu);
     }
 
 }

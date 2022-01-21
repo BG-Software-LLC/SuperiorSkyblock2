@@ -1,176 +1,81 @@
 package com.bgsoftware.superiorskyblock.menu;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import org.bukkit.Material;
+import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
+import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
+import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public abstract class PagedSuperiorMenu<T> extends SuperiorMenu {
+public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenu<M> {
 
     private final boolean acceptNull;
-    protected int currentPage = 1;
     protected Consumer<SuperiorPlayer> onPageMove = null;
     private List<T> objects;
 
-    public PagedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer) {
-        this(identifier, superiorPlayer, false);
+    protected int currentPage = 1;
+
+    public PagedSuperiorMenu(PagedMenuPattern<M, T> menuPattern, SuperiorPlayer superiorPlayer) {
+        this(menuPattern, superiorPlayer, false);
     }
 
-    public PagedSuperiorMenu(String identifier, SuperiorPlayer superiorPlayer, boolean acceptNull) {
-        super(identifier, superiorPlayer);
+    public PagedSuperiorMenu(PagedMenuPattern<M, T> menuPattern, SuperiorPlayer superiorPlayer, boolean acceptNull) {
+        super(menuPattern, superiorPlayer);
         this.acceptNull = acceptNull;
     }
 
-    @Override
-    protected final void onPlayerClick(InventoryClickEvent e) {
-        List<Integer> slots = getSlots();
+    public int getCurrentPage() {
+        return currentPage;
+    }
 
-        boolean isPreviousSlot = getPreviousSlot().contains(e.getRawSlot());
-        boolean isNextSlot = getNextSlot().contains(e.getRawSlot());
-        boolean isCurrentSlot = getCurrentSlot().contains(e.getRawSlot());
-
-        if (isPreviousSlot || isNextSlot || isCurrentSlot) {
-            if (isCurrentSlot)
-                return;
-
-            boolean nextPage = slots.size() * currentPage < objects.size();
-
-            if ((!nextPage && isNextSlot) || (currentPage == 1 && isPreviousSlot))
-                return;
-
-            currentPage = isNextSlot ? currentPage + 1 : currentPage - 1;
-
-            if (onPageMove != null)
-                onPageMove.accept(superiorPlayer);
-
-            previousMove = false;
-            open(previousMenu);
-        } else {
-            if (e.getCurrentItem() == null)
-                return;
-
+    public List<T> getPagedObjects() {
+        if (objects == null)
             objects = requestObjects();
 
-            int indexOf = getSlots().indexOf(e.getRawSlot());
-            int objectIndex = indexOf + (slots.size() * (currentPage - 1));
+        return Collections.unmodifiableList(objects);
+    }
 
-            if (objectIndex >= objects.size() || indexOf == -1) {
-                if (acceptNull) {
-                    onPlayerClick(e, null);
-                }
+    public void movePage(int newPage) {
+        Preconditions.checkArgument(newPage >= 1, "invalid page " + newPage);
 
-                return;
-            }
+        this.currentPage = newPage;
 
-            onPlayerClick(e, objects.get(objectIndex));
-        }
+        if (onPageMove != null)
+            onPageMove.accept(inventoryViewer);
+
+        previousMove = false;
+        open(previousMenu);
     }
 
     @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        Inventory inventory = super.buildInventory(titleReplacer);
+    public boolean preButtonClick(SuperiorMenuButton<M> menuButton, InventoryClickEvent clickEvent) {
+        if (!(menuButton instanceof PagedObjectButton))
+            return true;
+
+        PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) menuButton;
 
         objects = requestObjects();
 
-        List<Integer> slots = getSlots();
+        int objectIndex = pagedObjectButton.getObjectIndex() + (objects.size() * (currentPage - 1));
 
-        for (int i = 0; i < slots.size(); i++) {
-            int objectIndex = i + (slots.size() * (currentPage - 1));
-
-            int slot = slots.get(i);
-
-            if (slot >= 0) {
-                if (objectIndex < objects.size()) {
-                    ItemStack itemStack = getObjectItem(inventory.getItem(slots.get(i)), objects.get(objectIndex));
-                    inventory.setItem(slot, itemStack);
-                    if (itemStack == null)
-                        SuperiorSkyblockPlugin.log("Warning: Cannot get item-type of " + objects.get(objectIndex));
-                } else {
-                    inventory.setItem(slot, getNullItem());
-                }
-
-            }
+        if (objectIndex >= objects.size()) {
+            return acceptNull;
         }
 
-        getPreviousSlot().stream().filter(previousSlot -> previousSlot >= 0).forEach(previousSlot -> {
-            inventory.setItem(previousSlot, new ItemBuilder(inventory.getItem(previousSlot))
-                    .replaceAll("{0}", (currentPage == 1 ? "&c" : "&a")).build(superiorPlayer));
-        });
+        pagedObjectButton.updateObject(objects.get(objectIndex));
 
-        getCurrentSlot().stream().filter(currentSlot -> currentSlot >= 0).forEach(currentSlot -> {
-            inventory.setItem(currentSlot, new ItemBuilder(inventory.getItem(currentSlot))
-                    .replaceAll("{0}", currentPage + "").build(superiorPlayer));
-        });
-
-        getNextSlot().stream().filter(nextSlot -> nextSlot >= 0).forEach(nextSlot -> {
-            inventory.setItem(nextSlot, new ItemBuilder(inventory.getItem(nextSlot))
-                    .replaceAll("{0}", (objects.size() > currentPage * slots.size() ? "&a" : "&c"))
-                    .build(superiorPlayer));
-        });
-
-        return inventory;
-    }
-
-    protected abstract void onPlayerClick(InventoryClickEvent event, T clickedObject);
-
-    protected abstract ItemStack getObjectItem(ItemStack clickedItem, T value);
-
-    protected ItemStack getNullItem() {
-        return new ItemStack(Material.AIR);
+        return true;
     }
 
     protected abstract List<T> requestObjects();
 
     protected void setPageMoveRunnable(Consumer<SuperiorPlayer> onPageMove) {
         this.onPageMove = onPageMove;
-    }
-
-    private List<Integer> getCurrentSlot() {
-        //noinspection unchecked
-        return (List<Integer>) getData("currentSlot");
-    }
-
-    public void setCurrentSlot(List<Integer> currentSlot) {
-        addData("currentSlot", currentSlot);
-    }
-
-    private List<Integer> getNextSlot() {
-        //noinspection unchecked
-        return (List<Integer>) getData("nextSlot");
-    }
-
-    public void setNextSlot(List<Integer> nextSlot) {
-        addData("nextSlot", nextSlot);
-    }
-
-    private List<Integer> getPreviousSlot() {
-        //noinspection unchecked
-        return (List<Integer>) getData("previousSlot");
-    }
-
-    public void setPreviousSlot(List<Integer> previousSlot) {
-        addData("previousSlot", previousSlot);
-    }
-
-    private List<Integer> getSlots() {
-        //noinspection unchecked
-        return (List<Integer>) getData("slots");
-    }
-
-    public void setSlots(List<Integer> slots) {
-        if (slots == null)
-            throw new IllegalArgumentException("The menu " + getIdentifier() + " doesn't have any available slots.");
-
-        addData("slots", slots);
-        slots.sort(Integer::compareTo);
     }
 
 }

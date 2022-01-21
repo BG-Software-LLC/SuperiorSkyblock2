@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.menu;
+package com.bgsoftware.superiorskyblock.menu.impl.internal;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;

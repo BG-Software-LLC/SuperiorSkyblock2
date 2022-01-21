@@ -1,73 +1,70 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.DisbandButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-public final class MenuConfirmDisband extends SuperiorMenu {
+public final class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
 
-    private static List<Integer> confirmSlot;
-    private static List<Integer> cancelSlot;
+    private static RegularMenuPattern<MenuConfirmDisband> menuPattern;
 
     private final Island targetIsland;
 
     private MenuConfirmDisband(SuperiorPlayer superiorPlayer, Island targetIsland) {
-        super("menuConfirmDisband", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.targetIsland = targetIsland;
     }
 
+    public Island getTargetIsland() {
+        return targetIsland;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, targetIsland);
+    }
+
     public static void init() {
-        MenuConfirmDisband menuConfirmDisband = new MenuConfirmDisband(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/confirm-disband.yml");
+        RegularMenuPattern.Builder<MenuConfirmDisband> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/confirm-disband.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "confirm-disband.yml", MenuConfirmDisband::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuConfirmDisband, "confirm-disband.yml", cfg);
-
-        confirmSlot = getSlots(cfg, "confirm", menuPatternSlots);
-        cancelSlot = getSlots(cfg, "cancel", menuPatternSlots);
-
-        menuConfirmDisband.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "confirm", menuPatternSlots), new DisbandButton.Builder().setDisbandIsland(true))
+                .mapButtons(getSlots(cfg, "cancel", menuPatternSlots), new DisbandButton.Builder())
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
         new MenuConfirmDisband(superiorPlayer, targetIsland).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/confirm-disband.yml");
 
         if (!oldFile.exists())
@@ -93,8 +90,8 @@ public final class MenuConfirmDisband extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char confirmChar = itemChars[charCounter++];
-        char cancelChar = itemChars[charCounter++];
+        char confirmChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char cancelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
                 itemsSection, commandsSection, soundsSection);
@@ -104,40 +101,10 @@ public final class MenuConfirmDisband extends SuperiorMenu {
         newMenu.set("confirm", confirmChar + "");
         newMenu.set("cancel", cancelChar + "");
 
-        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(1, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent e) {
-        if (confirmSlot.contains(e.getRawSlot())) {
-            if (EventsCaller.callIslandDisbandEvent(superiorPlayer, targetIsland)) {
-                IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
-
-                Message.DISBANDED_ISLAND.send(superiorPlayer);
-
-                if (BuiltinModules.BANK.disbandRefund > 0 && targetIsland.getOwner().isOnline()) {
-                    Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
-                            .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
-                }
-
-                superiorPlayer.setDisbands(superiorPlayer.getDisbands() - 1);
-
-                previousMove = false;
-                e.getWhoClicked().closeInventory();
-
-                targetIsland.disbandIsland();
-            }
-        } else if (cancelSlot.contains(e.getRawSlot())) {
-            previousMove = false;
-            e.getWhoClicked().closeInventory();
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
     }
 
 }

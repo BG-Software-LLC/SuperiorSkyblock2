@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.menu.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.entity.Player;
@@ -63,7 +63,7 @@ public final class MenusListener implements Listener {
             e.setCancelled(true);
 
             if (e.getClickedInventory().equals(e.getView().getTopInventory()))
-                ((SuperiorMenu) inventoryHolder).onClick(e);
+                ((SuperiorMenu) inventoryHolder).onClick(plugin, e);
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onInteract(e);
         }
@@ -77,7 +77,7 @@ public final class MenusListener implements Listener {
             return;
 
         if (inventoryHolder instanceof SuperiorMenu) {
-            ((SuperiorMenu) inventoryHolder).closeInventory(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+            ((SuperiorMenu) inventoryHolder).closeInventory(plugin, plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         } else if (inventoryHolder instanceof StackedBlocksDepositMenu) {
             ((StackedBlocksDepositMenu) inventoryHolder).onClose(e);
         }

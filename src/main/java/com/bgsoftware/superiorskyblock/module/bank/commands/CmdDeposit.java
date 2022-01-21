@@ -75,7 +75,8 @@ public final class CmdDeposit implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().depositMoney(superiorPlayer, amount);
-        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction, 0, amount);
+        MenuIslandBank.handleDeposit(superiorPlayer, island, null, transaction,
+                null, null, amount);
     }
 
     @Override
