@@ -12,9 +12,10 @@ calc-interval: 0
 
 # All settings related to the database of the plugin.
 database:
-  # Choose between SQLite (localhost database) and MySQL (remote database)
+  # For local database, use "SQLite".
+  # For remote database, use "MySQL" or "MariaDB" (Depends on your setup).
   type: SQLite
-  # MySQL database information
+  # Remote database information
   address: 'localhost'
   port: 3306
   db-name: 'SuperiorSkyblock'

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.database.sql.session.MariaDBSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
@@ -35,10 +36,16 @@ public final class SQLHelper {
     public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
         SQLSession session;
 
-        if (plugin.getSettings().getDatabase().getType().equals("MySQL")) {
-            session = new MySQLSession(plugin, true);
-        } else {
-            session = new SQLiteSession(plugin, true);
+        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+            case "MYSQL":
+                session = new MySQLSession(plugin, true);
+                break;
+            case "MARIADB":
+                session = new MariaDBSession(plugin, true);
+                break;
+            default:
+                session = new SQLiteSession(plugin, true);
+                break;
         }
 
         if (session.createConnection()) {

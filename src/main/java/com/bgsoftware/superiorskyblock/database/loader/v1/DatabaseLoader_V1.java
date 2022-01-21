@@ -64,32 +64,6 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
     }
 
-    private static boolean isDatabaseOldFormat() {
-        isRemoteDatabase = plugin.getSettings().getDatabase().getType().equals("MySQL");
-
-        if (!isRemoteDatabase) {
-            databaseFile = new File(plugin.getDataFolder(), "database.db");
-
-            if (!databaseFile.exists())
-                return false;
-        }
-
-        session = isRemoteDatabase ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
-
-        if (!session.createConnection()) {
-            return false;
-        }
-
-        AtomicBoolean isOldFormat = new AtomicBoolean(true);
-
-        session.select("stackedBlocks", "").ifFail(error -> {
-            session.closeConnection();
-            isOldFormat.set(false);
-        });
-
-        return isOldFormat.get();
-    }
-
     @Override
     public void loadData() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
@@ -200,6 +174,42 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         saveStackedBlocks();
         saveBankTransactions();
         saveGrid();
+    }
+
+    private static boolean isDatabaseOldFormat() {
+        isRemoteDatabase = isRemoteDatabase();
+
+        if (!isRemoteDatabase) {
+            databaseFile = new File(plugin.getDataFolder(), "database.db");
+
+            if (!databaseFile.exists())
+                return false;
+        }
+
+        session = isRemoteDatabase ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
+
+        if (!session.createConnection()) {
+            return false;
+        }
+
+        AtomicBoolean isOldFormat = new AtomicBoolean(true);
+
+        session.select("stackedBlocks", "").ifFail(error -> {
+            session.closeConnection();
+            isOldFormat.set(false);
+        });
+
+        return isOldFormat.get();
+    }
+
+    private static boolean isRemoteDatabase() {
+        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+            case "MYSQL":
+            case "MARIADB":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void savePlayers() {
