@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.utils.logic.EntitiesLogic;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 
@@ -26,7 +26,7 @@ public final class EntitiesListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onEntitySpawn(EntitySpawnEvent e) {
+    public void onEntitySpawn(CreatureSpawnEvent e) {
         EntitiesLogic.handleSpawn(e.getEntity());
     }
 
