@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -683,6 +685,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback);
 
     /**
+     * Get the calculation algorithm used by this island.
+     */
+    IslandCalculationAlgorithm getCalculationAlgorithm();
+
+    /**
      * Update the border of all the players inside the island.
      */
     void updateBorder();
@@ -1024,6 +1031,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Clear all the block counts of the island.
      */
     void clearBlockCounts();
+
+    /**
+     * Get the blocks-tracker used by this island.
+     */
+    IslandBlocksTrackerAlgorithm getBlocksTracker();
 
     /**
      * Get the worth value of the island, including the money in the bank.

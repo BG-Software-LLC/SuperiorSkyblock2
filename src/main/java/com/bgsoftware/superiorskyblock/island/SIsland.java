@@ -1375,6 +1375,11 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public IslandCalculationAlgorithm getCalculationAlgorithm() {
+        return this.calculationAlgorithm;
+    }
+
+    @Override
     public void updateBorder() {
         PluginDebugger.debug("Action: Update Border, Island: " + owner.getName());
         getAllPlayersInside().forEach(superiorPlayer -> superiorPlayer.updateWorldBorder(this));
@@ -1843,6 +1848,11 @@ public final class SIsland implements Island {
         blocksTracker.clearBlockCounts();
         islandWorth.set(BigDecimal.ZERO);
         islandLevel.set(BigDecimal.ZERO);
+    }
+
+    @Override
+    public IslandBlocksTrackerAlgorithm getBlocksTracker() {
+        return this.blocksTracker;
     }
 
     @Override
