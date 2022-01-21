@@ -111,7 +111,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
 
         @Override
         public void setPermission(IslandPrivilege permission, boolean value) {
-
+            // Do nothing.
         }
 
     }

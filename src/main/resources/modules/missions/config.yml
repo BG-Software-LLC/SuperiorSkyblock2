@@ -9,6 +9,8 @@
 enabled: true
 
 # Settings related to mission categories.
+# A tutorial about configuring missions can be found here:
+# https://wiki.bg-software.com/superiorskyblock/missions
 categories:
   miner:
     name: 'Miner'

@@ -6,11 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
-import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import net.minecraft.server.v1_8_R3.BiomeBase;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -165,13 +166,10 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlock(Location location, Material material, byte data) {
+    public void setBlock(Location location, int combinedId) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        //noinspection deprecation
-        int combinedId = material.getId() + (data << 12);
         NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null);
-
         NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
@@ -263,14 +261,19 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-
+        // Not implemented - only needed for Paper 1.16+
     }
 
     @Override
     public void playGeneratorSound(Location location) {
         net.minecraft.server.v1_8_R3.World world = ((CraftWorld) location.getWorld()).getHandle();
-        double x = location.getX(), y = location.getY(), z = location.getZ();
-        world.makeSound(x + 0.5D, y + 0.5D, z + 0.5D, "random.fizz", 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+
+        world.makeSound(x + 0.5D, y + 0.5D, z + 0.5D, "random.fizz", 0.5F,
+                2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
         for (int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
@@ -295,6 +298,16 @@ public final class NMSWorldImpl implements NMSWorld {
     @Override
     public int getMinHeight(World world) {
         return 0;
+    }
+
+    @Override
+    public void removeAntiXray(World bukkitWorld) {
+        // Doesn't exist in this version.
+    }
+
+    @Override
+    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
+        return new IslandsGeneratorImpl(plugin);
     }
 
 }

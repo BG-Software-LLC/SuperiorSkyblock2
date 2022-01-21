@@ -97,9 +97,9 @@ public final class MenuMemberManage extends SuperiorMenu<MenuMemberManage> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char rolesChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                banChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                kickChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char rolesChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char banChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char kickChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("players-panel.roles"), patternChars, rolesChar,
                 itemsSection, commandsSection, soundsSection);

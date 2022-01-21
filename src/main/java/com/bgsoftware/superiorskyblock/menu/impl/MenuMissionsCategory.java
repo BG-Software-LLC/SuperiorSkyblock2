@@ -27,7 +27,8 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCa
 
     private static PagedMenuPattern<MenuMissionsCategory, Mission<?>> menuPattern;
 
-    private static boolean sortByCompletion, removeCompleted;
+    private static boolean sortByCompletion;
+    private static boolean removeCompleted;
 
     private final MissionCategory missionCategory;
     private List<Mission<?>> missions;

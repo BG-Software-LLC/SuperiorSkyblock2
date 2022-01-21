@@ -83,7 +83,8 @@ public final class CmdAdminTitleAll implements IAdminIslandCommand {
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
 
-        String title = parsedArguments.get("title"), subtitle = parsedArguments.get("subtitle");
+        String title = parsedArguments.get("title");
+        String subtitle = parsedArguments.get("subtitle");
 
         if (title == null && subtitle == null) {
             Message.INVALID_TITLE.send(sender);

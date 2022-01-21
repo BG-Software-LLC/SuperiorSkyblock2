@@ -30,7 +30,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     private static final KeySet valuesMenuBlocks = new KeySet();
     private static final KeySet customBlockKeys = new KeySet();
 
-    private final BlockValuesContainer blockWorthValues, blockLevels, customBlockWorthValues, customBlockLevels;
+    private final BlockValuesContainer blockWorthValues;
+    private final BlockValuesContainer blockLevels;
+    private final BlockValuesContainer customBlockWorthValues;
+    private final BlockValuesContainer customBlockLevels;
 
     public BlockValuesHandler(SuperiorSkyblockPlugin plugin,
                               BlockValuesContainer blockWorthValuesContainer,
@@ -136,7 +139,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
             return convertedKey;
         } else {
             if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
-                Key newKey = plugin.getProviders().getPricesProvider().getBlockKey(convertedKey);
+                Key newKey = (Key) plugin.getProviders().getPricesProvider().getBlockKey(convertedKey);
                 if (newKey != null) {
                     return newKey;
                 }

@@ -186,7 +186,7 @@ public abstract class Mission<V> {
      * @param section The mission's section in the config.
      */
     public void saveProgress(ConfigurationSection section) {
-
+        // Should be overridden by missions.
     }
 
     /**
@@ -195,7 +195,7 @@ public abstract class Mission<V> {
      * @param section The mission's section in the config.
      */
     public void loadProgress(ConfigurationSection section) {
-
+        // Should be overridden by missions.
     }
 
     /**
@@ -315,7 +315,7 @@ public abstract class Mission<V> {
      * @param itemStack      The item of the mission.
      */
     public void formatItem(SuperiorPlayer superiorPlayer, ItemStack itemStack) {
-
+        // Should be overridden by missions.
     }
 
     @Override

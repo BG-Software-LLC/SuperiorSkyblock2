@@ -11,7 +11,8 @@ import java.math.BigDecimal;
  */
 public class IslandWorthCalculatedEvent extends IslandEvent {
 
-    private final BigDecimal level, worth;
+    private final BigDecimal level;
+    private final BigDecimal worth;
     private final SuperiorPlayer player;
 
     /**

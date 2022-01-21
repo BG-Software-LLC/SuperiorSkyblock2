@@ -137,6 +137,8 @@ stacked-blocks:
 
 # Set a formula to calculate the island level by it's worth.
 # Use {} as a placeholder for worth. Make sure you only use digits and mathematical operations!
+# If you use Java 15 or above (Minecraft 1.16+), check out this page:
+# https://wiki.bg-software.com/superiorskyblock/new-java-engine
 island-level-formula: '{} / 2'
 
 # Should the island levels be a rounded integer?
@@ -147,7 +149,7 @@ rounded-island-level: false
 island-top-order: 'WORTH'
 
 # All settings related to island roles.
-# You can find a list of permissions here: https://bg-software.com/superiorskyblock/docs/island-permissions/
+# You can find a list of permissions here: https://wiki.bg-software.com/superiorskyblock/island-permissions
 island-roles:
   # This role is given to players that are not part of your island.
   guest:
@@ -287,6 +289,9 @@ worlds:
     unlock: true
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, PLAINS will be set.
+    biome: PLAINS
   # Settings related to the nether world.
   nether:
     # Should the nether world be enabled?
@@ -298,6 +303,9 @@ worlds:
     name: ''
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, NETHER (or it's 1.16 equivalent) will be used.
+    biome: NETHER_WASTES
   end:
     # Should the end world be enabled?
     enabled: false
@@ -308,6 +316,9 @@ worlds:
     name: ''
     # Should the schematics in this world will not be counted towards worth and level values?
     schematic-offset: true
+    # The default biome for the world.
+    # If the biome is invalid, THE_END will be used.
+    biome: THE_END
     # Should dragon fight be enabled? This will spawn dragons for each island.
     # This feature is in beta, expect bugs!
     dragon-fight: false
@@ -436,7 +447,7 @@ clear-on-join: false
 rate-own-island: false
 
 # A list of default settings for new islands.
-# You can find a list of settings here: https://bg-software.com/superiorskyblock/docs/island-settings/
+# You can find a list of settings here: https://wiki.bg-software.com/superiorskyblock/island-settings
 default-settings:
   - 'CREEPER_EXPLOSION'
   - 'NATURAL_ANIMALS_SPAWN'
@@ -609,7 +620,10 @@ crops-to-grow:
   - 'CROPS'
   - 'WHEAT'
   - 'CARROT'
+  - 'CARROTS'
   - 'POTATO'
+  - 'POTATOES'
+  - 'BEETROOTS'
 
 # How frequency should the crops task run? (in ticks)
 # You can disable this feature by setting it to 0.

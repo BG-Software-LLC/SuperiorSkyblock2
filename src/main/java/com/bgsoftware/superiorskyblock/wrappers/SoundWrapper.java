@@ -7,7 +7,8 @@ import org.bukkit.entity.Player;
 public final class SoundWrapper {
 
     private final Sound sound;
-    private final float volume, pitch;
+    private final float volume;
+    private final float pitch;
 
     public SoundWrapper(Sound sound, float volume, float pitch) {
         this.sound = sound;

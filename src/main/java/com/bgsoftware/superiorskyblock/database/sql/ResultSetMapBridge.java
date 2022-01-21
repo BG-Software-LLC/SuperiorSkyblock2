@@ -44,10 +44,14 @@ public final class ResultSetMapBridge implements Map<String, Object> {
 
     @Override
     public Object get(Object key) {
+        return getSafe(key + "");
+    }
+
+    public <T> T get(Object key, T def) {
         try {
-            return resultSet.getObject(key + "");
+            return get(key + "");
         } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            return def;
         }
     }
 
@@ -88,6 +92,19 @@ public final class ResultSetMapBridge implements Map<String, Object> {
     @Override
     public Set<Entry<String, Object>> entrySet() {
         throw new UnsupportedOperationException("This operation is not supported on this map.");
+    }
+
+    private <T> T get(String key) throws SQLException {
+        // noinspection all
+        return (T) resultSet.getObject(key);
+    }
+
+    private <T> T getSafe(String key) {
+        try {
+            return get(key + "");
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }

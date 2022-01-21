@@ -1,7 +1,10 @@
 package com.bgsoftware.superiorskyblock.database;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public final class DatabaseResult {
 
@@ -11,70 +14,121 @@ public final class DatabaseResult {
         this.resultSet = resultSet;
     }
 
-    public String getString(String key) {
-        return getObject(key, String.class, null);
+    public Optional<String> getString(String key) {
+        return getObject(key, String.class);
     }
 
-    public long getLong(String key) {
-        Object value = getObject(key, 0L);
+    public Optional<Integer> getInt(String key) {
+        return getObject(key, Integer.class);
+    }
 
-        if (value instanceof Long) {
-            return (long) value;
-        } else if (value instanceof Integer) {
-            return (int) value;
-        } else {
-            return 0L;
+    public Optional<Long> getLong(String key) {
+        Object value = getObject(key);
+
+        if (value != null) {
+            if (value instanceof Long) {
+                return Optional.of((long) value);
+            } else if (value instanceof Integer) {
+                return Optional.of((long) (int) value);
+            }
         }
+
+        return Optional.empty();
     }
 
-    public int getInt(String key) {
-        return getObject(key, Integer.class, 0);
-    }
+    public Optional<Double> getDouble(String key) {
+        Object value = getObject(key);
 
-    public double getDouble(String key) {
-        Object value = getObject(key, 0D);
-
-        if (value instanceof Double) {
-            return (double) value;
-        } else if (value instanceof Long) {
-            return (double) (long) value;
-        } else if (value instanceof Integer) {
-            return (double) (int) value;
-        } else if (value instanceof BigDecimal) {
-            return ((BigDecimal) value).doubleValue();
-        } else {
-            return 0L;
+        if (value != null) {
+            if (value instanceof Double) {
+                return Optional.of((double) value);
+            } else if (value instanceof Long) {
+                return Optional.of((double) (long) value);
+            } else if (value instanceof Integer) {
+                return Optional.of((double) (int) value);
+            } else if (value instanceof BigDecimal) {
+                return Optional.of(((BigDecimal) value).doubleValue());
+            }
         }
+
+        return Optional.empty();
     }
 
-    public boolean getBoolean(String key) {
-        Object value = getObject(key, false);
+    public Optional<Boolean> getBoolean(String key) {
+        Object value = getObject(key);
 
-        if (value instanceof Integer) {
-            return (int) value == 1;
-        } else if (value instanceof Boolean) {
-            return (boolean) value;
-        } else {
-            return false;
+        if (value != null) {
+            if (value instanceof Integer) {
+                return Optional.of((int) value == 1);
+            } else if (value instanceof Boolean) {
+                return Optional.of((boolean) value);
+            } else if (value instanceof Byte) {
+                return Optional.of((byte) value == 1);
+            }
         }
+
+        return Optional.empty();
     }
 
-    public BigDecimal getBigDecimal(String key) {
-        String value = getString(key);
+    public Optional<Byte> getByte(String key) {
+        Object value = getObject(key);
+
+        if (value != null) {
+            if (value instanceof Byte) {
+                return Optional.of((byte) value);
+            } else if (value instanceof Boolean) {
+                return Optional.of((Boolean) value ? (byte) 1 : 0);
+            } else if (value instanceof Integer) {
+                return Optional.of((byte) (int) value);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<BigDecimal> getBigDecimal(String key) {
+        Optional<String> value = getString(key);
         try {
-            return new BigDecimal(value);
+            return value.map(BigDecimal::new);
         } catch (NumberFormatException | NullPointerException ex) {
-            return BigDecimal.ZERO;
+            return Optional.empty();
         }
     }
 
-    private Object getObject(String key, Object def) {
-        return resultSet.getOrDefault(key, def);
+    public Optional<UUID> getUUID(String key) {
+        Optional<String> value = getString(key);
+
+        if (!value.isPresent())
+            return Optional.empty();
+
+        try {
+            return Optional.of(UUID.fromString(value.get()));
+        } catch (IllegalArgumentException error) {
+            return Optional.empty();
+        }
     }
 
-    private <T> T getObject(String key, Class<T> clazz, T def) {
-        Object value = resultSet.get(key);
-        return value == null || !value.getClass().isAssignableFrom(clazz) ? def : clazz.cast(value);
+    public <T extends Enum<T>> Optional<T> getEnum(String key, Class<T> enumType) {
+        Optional<String> value = getString(key);
+
+        if (!value.isPresent())
+            return Optional.empty();
+
+        try {
+            return Optional.of(Enum.valueOf(enumType, value.get()));
+        } catch (IllegalArgumentException error) {
+            return Optional.empty();
+        }
+
     }
 
+    private <T> Optional<T> getObject(String key, Class<T> clazz) {
+        Object value = getObject(key);
+        return Optional.ofNullable(value == null || !value.getClass().isAssignableFrom(clazz) ? null : clazz.cast(value));
+    }
+
+    @Nullable
+    private Object getObject(String key) {
+        return resultSet.get(key);
+    }
 }

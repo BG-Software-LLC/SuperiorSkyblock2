@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.DisbandButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -90,8 +89,8 @@ public final class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char confirmChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                cancelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char confirmChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char cancelChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("disband-gui.confirm"), patternChars, confirmChar,
                 itemsSection, commandsSection, soundsSection);

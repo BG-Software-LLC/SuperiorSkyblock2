@@ -190,39 +190,44 @@ public final class NMSUtils {
             return;
         }
 
-        if (plugin.getSettings().isLightsUpdate()) {
-            chunk.setType(blockPosition, blockData, true, true);
-        } else {
-            int indexY = chunk.getSectionIndex(blockPosition.getY());
+        int indexY = chunk.getSectionIndex(blockPosition.getY());
 
-            ChunkSection chunkSection = chunk.getSections()[indexY];
+        ChunkSection chunkSection = chunk.getSections()[indexY];
 
-            if (chunkSection == null) {
-                int yOffset = SectionPosition.a(blockPosition.getY());
-                try {
-                    // Paper's constructor for ChunkSection for more optimized chunk sections.
-                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset, chunk, chunk.getWorld(), true);
-                } catch (Throwable ex) {
-                    // Spigot's constructor for ChunkSection
-                    // noinspection deprecation
-                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset);
-                }
+        if (chunkSection == null) {
+            int yOffset = SectionPosition.a(blockPosition.getY());
+            try {
+                // Paper's constructor for ChunkSection for more optimized chunk sections.
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset, chunk, chunk.getWorld(), true);
+            } catch (Throwable ex) {
+                // Spigot's constructor for ChunkSection
+                // noinspection deprecation
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(yOffset);
             }
-
-            int blockX = blockPosition.getX() & 15;
-            int blockY = blockPosition.getY();
-            int blockZ = blockPosition.getZ() & 15;
-
-            chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
-
-            chunk.j.get(HeightMap.Type.e).a(blockX, blockY, blockZ, blockData);
-            chunk.j.get(HeightMap.Type.f).a(blockX, blockY, blockZ, blockData);
-            chunk.j.get(HeightMap.Type.d).a(blockX, blockY, blockZ, blockData);
-            chunk.j.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
-
-            chunk.markDirty();
-            chunk.setNeedsSaving(true);
         }
+
+        int blockX = blockPosition.getX() & 15;
+        int blockY = blockPosition.getY();
+        int blockZ = blockPosition.getZ() & 15;
+
+        boolean isOriginallyChunkSectionEmpty = chunkSection.c();
+
+        chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
+
+        chunk.j.get(HeightMap.Type.e).a(blockX, blockY, blockZ, blockData);
+        chunk.j.get(HeightMap.Type.f).a(blockX, blockY, blockZ, blockData);
+        chunk.j.get(HeightMap.Type.d).a(blockX, blockY, blockZ, blockData);
+        chunk.j.get(HeightMap.Type.b).a(blockX, blockY, blockZ, blockData);
+
+        chunk.markDirty();
+        chunk.setNeedsSaving(true);
+
+        boolean isChunkSectionEmpty = chunkSection.c();
+
+        if (isOriginallyChunkSectionEmpty != isChunkSectionEmpty)
+            chunk.getWorld().k_().a(blockPosition, isChunkSectionEmpty);
+
+        chunk.getWorld().k_().a(blockPosition);
 
         if (tileEntity != null) {
             NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();

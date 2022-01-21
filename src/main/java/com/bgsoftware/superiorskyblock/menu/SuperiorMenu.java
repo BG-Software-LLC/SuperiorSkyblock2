@@ -51,7 +51,9 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     protected SuperiorPlayer targetPlayer = null;
 
     protected ISuperiorMenu previousMenu;
-    protected boolean previousMove = true, closeButton = false, nextMove = false;
+    protected boolean previousMove = true;
+    protected boolean closeButton = false;
+    protected boolean nextMove = false;
     private boolean refreshing = false;
 
     public SuperiorMenu(@Nullable SuperiorMenuPattern<M> menuPattern, SuperiorPlayer inventoryViewer) {

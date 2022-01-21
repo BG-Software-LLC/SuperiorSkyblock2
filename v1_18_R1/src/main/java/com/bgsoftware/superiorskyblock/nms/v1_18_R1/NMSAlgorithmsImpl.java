@@ -58,9 +58,18 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public int getCombinedId(Material material, byte data) {
-        BlockData blockData = data == 0 ? new Block(CraftMagicNumbers.getBlock(material)).getBlockData() :
-                new BlockData(CraftMagicNumbers.getBlock(material, data));
-        return Block.getCombinedId(blockData);
+        BlockData blockData;
+
+        if (data == 0) {
+            Block block = Block.ofNullable(CraftMagicNumbers.getBlock(material));
+            if (block == null)
+                return -1;
+            blockData = block.getBlockData();
+        } else {
+            blockData = BlockData.ofNullable(CraftMagicNumbers.getBlock(material, data));
+        }
+
+        return blockData == null ? -1 : Block.getCombinedId(blockData);
     }
 
     @Override

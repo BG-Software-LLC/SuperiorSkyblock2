@@ -6,7 +6,7 @@ public final class GeneralBlockValuesContainer extends BlockValuesContainer {
 
     @Override
     public void loadDefaultValues(SuperiorSkyblockPlugin plugin) {
-
+        // Do nothing.
     }
 
 }

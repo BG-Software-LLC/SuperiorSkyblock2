@@ -24,7 +24,7 @@ public final class BlockLevelsContainer extends BlockValuesContainer {
         for (String key : valuesSection.getKeys(false)) {
             String value = valuesSection.getString(key);
             try {
-                setBlockValue(Key.of(key), new BigDecimal(value));
+                setBlockValue(Key.of(key.toUpperCase()), new BigDecimal(value));
             } catch (Exception ex) {
                 SuperiorSkyblockPlugin.log("&cInvalid level value: " + value);
                 PluginDebugger.debug(ex);

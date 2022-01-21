@@ -9,19 +9,26 @@ import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.world.GridHandler;
+import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public final class FactoriesHandler implements FactoriesManager {
@@ -55,9 +62,13 @@ public final class FactoriesHandler implements FactoriesManager {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 
-    public Island createIsland(GridHandler grid, DatabaseResult resultSet) {
-        SIsland island = new SIsland(grid, resultSet);
-        return islandsFactory == null ? island : islandsFactory.createIsland(island);
+    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
+        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
+
+        if (!island.isPresent())
+            return island;
+
+        return islandsFactory == null ? island : island.map(islandsFactory::createIsland);
     }
 
     public Island createIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
@@ -65,9 +76,13 @@ public final class FactoriesHandler implements FactoriesManager {
         return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
-    public SuperiorPlayer createPlayer(DatabaseResult resultSet) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(resultSet);
-        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
+    public Optional<SuperiorPlayer> createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
+        Optional<SuperiorPlayer> superiorPlayer = SSuperiorPlayer.fromDatabase(databaseCache, resultSet);
+
+        if (!superiorPlayer.isPresent())
+            return superiorPlayer;
+
+        return playersFactory == null ? superiorPlayer : superiorPlayer.map(playersFactory::createPlayer);
     }
 
     public SuperiorPlayer createPlayer(UUID player) {
@@ -83,6 +98,16 @@ public final class FactoriesHandler implements FactoriesManager {
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
         return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
                 islandsFactory.createIslandCalculationAlgorithm(island);
+    }
+
+    public IslandBlocksTrackerAlgorithm createIslandBlocksTrackerAlgorithm(Island island) {
+        return islandsFactory == null ? new DefaultIslandBlocksTrackerAlgorithm(island) :
+                islandsFactory.createIslandBlocksTrackerAlgorithm(island);
+    }
+
+    public PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {
+        return playersFactory == null ? DefaultPlayerTeleportAlgorithm.getInstance() :
+                playersFactory.createPlayerTeleportAlgorithm(superiorPlayer);
     }
 
     public boolean hasCustomDatabaseBridge() {

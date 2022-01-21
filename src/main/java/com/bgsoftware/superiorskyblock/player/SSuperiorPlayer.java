@@ -2,46 +2,39 @@ package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.SpawnIsland;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.ChunkSnapshot;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -50,27 +43,27 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+    private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+
+    private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
 
     private Island playerIsland = null;
-    private String name, textureValue = "";
+    private String name;
+    private String textureValue = "";
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
 
@@ -83,7 +76,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     private boolean islandFly = plugin.getSettings().isDefaultIslandFly();
     private boolean adminSpyEnabled = false;
 
-    private SBlockPosition schematicPos1 = null, schematicPos2 = null;
+    private SBlockPosition schematicPos1 = null;
+    private SBlockPosition schematicPos2 = null;
     private int disbands;
     private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
     private long lastTimeStatus = -1;
@@ -94,35 +88,51 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(DatabaseResult resultSet) {
-        this.uuid = UUID.fromString(resultSet.getString("uuid"));
-        this.name = resultSet.getString("last_used_name");
-        this.textureValue = resultSet.getString("last_used_skin");
-        this.disbands = resultSet.getInt("disbands");
-        this.lastTimeStatus = resultSet.getLong("last_time_updated");
-
-        PlayersDeserializer.deserializeMissions(this, this.completedMissions);
-
-        PlayersDeserializer.deserializePlayerSettings(this, playerSettingsRaw -> {
-            DatabaseResult playerSettings = new DatabaseResult(playerSettingsRaw);
-            this.toggledPanel = playerSettings.getBoolean("toggled_panel");
-            this.islandFly = playerSettings.getBoolean("island_fly");
-            this.borderColor = BorderColor.safeValue(playerSettings.getString("border_color"), BorderColor.BLUE);
-            this.userLocale = PlayerLocales.getLocale(playerSettings.getString("language"));
-            this.worldBorderEnabled = playerSettings.getBoolean("toggled_border");
-        });
-
-        databaseBridge.startSavingData();
+    public SSuperiorPlayer(UUID player) {
+        this(player, Bukkit.getOfflinePlayer(player), SPlayerRole.guestRole(), plugin.getSettings().getDisbandCount(),
+                PlayerLocales.getDefaultLocale());
     }
 
-    public SSuperiorPlayer(UUID player) {
-        OfflinePlayer offlinePlayer;
-        this.uuid = player;
-        this.name = (offlinePlayer = Bukkit.getOfflinePlayer(player)) == null || offlinePlayer.getName() == null ? "null" : offlinePlayer.getName();
-        this.playerRole = SPlayerRole.guestRole();
-        this.disbands = plugin.getSettings().getDisbandCount();
-        this.userLocale = PlayerLocales.getDefaultLocale();
-        databaseBridge.startSavingData();
+    public SSuperiorPlayer(UUID uuid, @Nullable OfflinePlayer offlinePlayer, PlayerRole playerRole, int disbands,
+                           Locale userLocale) {
+        this(uuid, offlinePlayer == null ? null : offlinePlayer.getName(), playerRole, disbands, userLocale);
+    }
+
+    public SSuperiorPlayer(UUID uuid, @Nullable String name, PlayerRole playerRole, int disbands, Locale userLocale) {
+        this.uuid = uuid;
+        this.name = name == null ? "null" : name;
+        this.playerRole = playerRole;
+        this.disbands = disbands;
+        this.userLocale = userLocale;
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+    }
+
+    public static Optional<SuperiorPlayer> fromDatabase(DatabaseCache<CachedPlayerInfo> cache,
+                                                        DatabaseResult resultSet) {
+        Optional<UUID> uuid = resultSet.getUUID("uuid");
+        if (!uuid.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load player with null uuid, skipping...");
+            return Optional.empty();
+        }
+
+        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(
+                uuid.get(),
+                resultSet.getString("last_used_name").orElse(null),
+                SPlayerRole.defaultRole(),
+                resultSet.getInt("disbands").orElse(0),
+                PlayerLocales.getDefaultLocale()
+        );
+
+        superiorPlayer.textureValue = resultSet.getString("last_used_skin").orElse("");
+        superiorPlayer.lastTimeStatus = resultSet.getLong("last_time_updated")
+                .orElse(System.currentTimeMillis() / 1000);
+
+        CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(uuid.get());
+
+        if (cachedPlayerInfo != null)
+            superiorPlayer.loadFromCachedInfo(cachedPlayerInfo);
+
+        return Optional.of(superiorPlayer);
     }
 
     /*
@@ -326,13 +336,15 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Location location, @Nullable Consumer<Boolean> teleportResult) {
-        if (isOnline()) {
-            TeleportUtils.teleport(asPlayer(), location, teleportResult);
-            return;
-        }
-
-        if (teleportResult != null)
+        Player player = asPlayer();
+        if (player != null) {
+            playerTeleportAlgorithm.teleport(player, location).whenComplete((result, error) -> {
+                if (teleportResult != null)
+                    teleportResult.accept(error == null && result);
+            });
+        } else if (teleportResult != null) {
             teleportResult.accept(false);
+        }
     }
 
     @Override
@@ -341,127 +353,16 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void teleport(Island island, Consumer<Boolean> result) {
-        if (!isOnline())
-            return;
-
-        Location islandTeleportLocation = island.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
-        assert islandTeleportLocation != null;
-        Block islandTeleportBlock = islandTeleportLocation.getBlock();
-
-        if (island instanceof SpawnIsland) {
-            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(islandTeleportLocation));
-            teleport(islandTeleportLocation.add(0, 0.5, 0));
-            if (result != null)
-                result.accept(true);
-            return;
-        }
-
-        teleportIfSafe(island, islandTeleportBlock, islandTeleportLocation, 0, 0, (teleportResult, teleportLocation) -> {
-            if (teleportResult) {
-                if (result != null)
-                    result.accept(true);
-                return;
-            }
-
-            Block islandCenterBlock = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock();
-            float rotationYaw = islandTeleportLocation.getYaw();
-            float rotationPitch = islandTeleportLocation.getPitch();
-
-            teleportIfSafe(island, islandCenterBlock, null, rotationYaw, rotationPitch, (centerTeleportResult, centerTeleportLocation) -> {
-                if (centerTeleportResult) {
-                    island.setTeleportLocation(centerTeleportLocation);
-                    if (result != null)
-                        result.accept(true);
-                    return;
-                }
-
-                {
-                    Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
-                            .getHighestBlockAt(islandTeleportBlock.getLocation()).getRelative(BlockFace.UP);
-                    if (LocationUtils.isSafeBlock(teleportLocationHighestBlock)) {
-                        adjustAndTeleportPlayerToLocation(island, teleportLocationHighestBlock.getLocation(),
-                                rotationYaw, rotationPitch, result);
-                        return;
-                    }
-                }
-
-                {
-                    Block centerHighestBlock = islandCenterBlock.getWorld()
-                            .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
-                    if (LocationUtils.isSafeBlock(centerHighestBlock)) {
-                        adjustAndTeleportPlayerToLocation(island, centerHighestBlock.getLocation(), rotationYaw,
-                                rotationPitch, result);
-                        return;
-                    }
-                }
-
-                /*
-                 *   Finding a new block to teleport the player to.
-                 */
-
-                List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
-                                plugin.getSettings().getWorlds().getDefaultWorld(), true, true, null)
-                        .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
-
-                Executor.createTask().runAsync(v -> {
-                    List<Location> safeLocations = new ArrayList<>();
-
-                    for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
-                        ChunkSnapshot chunkSnapshot;
-
-                        try {
-                            chunkSnapshot = chunkToLoad.get();
-                        } catch (Exception ex) {
-                            SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                            PluginDebugger.debug(ex);
-                            continue;
-                        }
-
-                        if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
-                            continue;
-
-                        World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
-                        int worldBuildLimit = world.getMaxHeight();
-                        int worldMinLimit = plugin.getNMSWorld().getMinHeight(world);
-
-                        for (int x = 0; x < 16; x++) {
-                            for (int z = 0; z < 16; z++) {
-                                int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
-                                Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
-                                Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
-                                        y == worldMinLimit ? worldMinLimit : y - 1, z);
-
-                                Material blockType, belowType;
-
-                                try {
-                                    blockType = Material.valueOf(blockKey.getGlobalKey());
-                                    belowType = Material.valueOf(belowKey.getGlobalKey());
-                                } catch (IllegalArgumentException ex) {
-                                    continue;
-                                }
-
-                                if (blockType.isSolid() || belowType.isSolid()) {
-                                    safeLocations.add(new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                                            chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z));
-                                }
-                            }
-                        }
-                    }
-
-                    return safeLocations.stream().min(Comparator.comparingDouble(loc ->
-                            loc.distanceSquared(islandTeleportLocation))).orElse(null);
-                }).runSync(location -> {
-                    if (location != null) {
-                        adjustAndTeleportPlayerToLocation(island, location, rotationYaw, rotationPitch, result);
-                    } else if (result != null) {
-                        result.accept(false);
-                    }
-                });
-
+    public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+        Player player = asPlayer();
+        if (player != null) {
+            playerTeleportAlgorithm.teleport(player, island).whenComplete((result, error) -> {
+                if (teleportResult != null)
+                    teleportResult.accept(error == null && result);
             });
-
-        });
+        } else if (teleportResult != null) {
+            teleportResult.accept(false);
+        }
     }
 
     @Override
@@ -803,19 +704,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         return databaseBridge;
     }
 
-    private void adjustAndTeleportPlayerToLocation(Island island, Location location, float yaw, float pitch, Consumer<Boolean> result) {
-        location = location.add(0.5, 0, 0.5);
-        location.setYaw(yaw);
-        location.setPitch(pitch);
-
-        PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(location));
-
-        island.setTeleportLocation(location);
-        teleport(location.add(0, 0.5, 0));
-        if (result != null)
-            result.accept(true);
-    }
-
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
@@ -895,32 +783,12 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
                 "}";
     }
 
-    private void teleportIfSafe(Island island, Block block, Location customLocation, float yaw, float pitch,
-                                BiConsumer<Boolean, Location> teleportResult) {
-        ChunksProvider.loadChunk(ChunkPosition.of(block), chunk -> {
-            if (!LocationUtils.isSafeBlock(block)) {
-                if (teleportResult != null)
-                    teleportResult.accept(false, null);
-                return;
-            }
-
-            Location toTeleport;
-
-            if (customLocation != null) {
-                toTeleport = customLocation;
-            } else {
-                toTeleport = block.getLocation().add(0.5, 0, 0.5);
-                toTeleport.setYaw(yaw);
-                toTeleport.setPitch(pitch);
-                island.setTeleportLocation(toTeleport);
-            }
-
-            PluginDebugger.debug("Action: Teleport Player, Player: " + getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
-            teleport(toTeleport.add(0, 0.5, 0));
-
-            if (teleportResult != null)
-                teleportResult.accept(true, toTeleport);
-        });
+    private void loadFromCachedInfo(CachedPlayerInfo cachedPlayerInfo) {
+        this.toggledPanel = cachedPlayerInfo.toggledPanel;
+        this.islandFly = cachedPlayerInfo.islandFly;
+        this.borderColor = cachedPlayerInfo.borderColor;
+        this.userLocale = cachedPlayerInfo.userLocale;
+        this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
     }
 
 }

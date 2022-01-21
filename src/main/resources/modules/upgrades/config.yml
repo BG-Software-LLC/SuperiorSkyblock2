@@ -5,9 +5,32 @@
 ##                                                  ##
 ######################################################
 
-enabled: true
+# Whether crop-growth should be enabled.
+# When disabled, the plugin will not alter crop growth.
+crop-growth: true
+
+# Whether mob drops should be enabled.
+# When disabled, the plugin will not alter mob drops.
+mob-drops: true
+
+# Whether island-effects should be enabled.
+# When disabled, the plugin will not give any effects to any players.
+island-effects: true
+
+# Whether spawner-rates should be enabled.
+# When disabled, the plugin will not alter spawner rates.
+spawner-rates: true
+
+# Whether block-limits should be enabled.
+# When disabled, the plugin will not limit placement of blocks.
+block-limits: true
+
+# Whether entity-limits should be enabled.
+# When disabled, the plugin will not limit spawning of entities.
+entity-limits: true
 
 # All the upgrades of the plugin
+# https://wiki.bg-software.com/superiorskyblock/upgrades
 upgrades:
   hoppers-limit:
     '1':

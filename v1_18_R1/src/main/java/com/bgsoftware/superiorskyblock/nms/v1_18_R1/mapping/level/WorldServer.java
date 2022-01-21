@@ -217,4 +217,8 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
         return Entity.ofNullable(handle.a(targetCondition, x, y, z));
     }
 
+    public StructureManager getStructureManager() {
+        return new StructureManager(handle.a());
+    }
+
 }

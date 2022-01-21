@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.RateIslandButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -17,7 +16,6 @@ import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -104,11 +102,11 @@ public final class MenuIslandRate extends SuperiorMenu<MenuIslandRate> {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char oneStarChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                twoStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                threeStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                fourStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++],
-                fiveStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char oneStarChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char twoStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char threeStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char fourStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char fiveStarsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("rate-gui.one_star"), patternChars, oneStarChar,
                 itemsSection, commandsSection, soundsSection);

@@ -1,10 +1,14 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.StackedBlocksProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.ISkinsListener;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
@@ -63,6 +67,18 @@ public interface ProvidersManager {
     void setWorldsProvider(WorldsProvider worldsProvider);
 
     /**
+     * Get the currently used chunks-provider.
+     */
+    ChunksProvider getChunksProvider();
+
+    /**
+     * Set a custom chunks provider for the plugin.
+     *
+     * @param chunksProvider The chunks provider to set.
+     */
+    void setChunksProvider(ChunksProvider chunksProvider);
+
+    /**
      * Get the currently used bank-economy provider.
      */
     EconomyProvider getBankEconomyProvider();
@@ -75,16 +91,16 @@ public interface ProvidersManager {
     void setBankEconomyProvider(EconomyProvider economyProvider);
 
     /**
+     * Get the currently used afk providers.
+     */
+    List<AFKProvider> getAFKProviders();
+
+    /**
      * Add AFK Provider to the plugin.
      *
      * @param afkProvider The afk-provider to add.
      */
     void addAFKProvider(AFKProvider afkProvider);
-
-    /**
-     * Get the currently used afk providers.
-     */
-    List<AFKProvider> getAFKProviders();
 
     /**
      * Get the currently used menus-provider.
@@ -97,6 +113,42 @@ public interface ProvidersManager {
      * @param menuProvider The new menus-provider to use.
      */
     void setMenusProvider(MenusProvider menuProvider);
+
+    /**
+     * Get the currently used permissions-provider.
+     */
+    PermissionsProvider getPermissionsProvider();
+
+    /**
+     * Set a new permissions-provider to the plugin.
+     *
+     * @param permissionsProvider The new permissions-provider to use.
+     */
+    void setPermissionsProvider(PermissionsProvider permissionsProvider);
+
+    /**
+     * Get the currently used prices-provider.
+     */
+    PricesProvider getPricesProvider();
+
+    /**
+     * Set a new prices-provider to the plugin.
+     *
+     * @param pricesProvider The new prices-provider to use.
+     */
+    void setPricesProvider(PricesProvider pricesProvider);
+
+    /**
+     * Get the currently used vanish-provider.
+     */
+    VanishProvider getVanishProvider();
+
+    /**
+     * Set a new vanish-provider to the plugin.
+     *
+     * @param vanishProvider The new vanish-provider to use.
+     */
+    void setVanishProvider(VanishProvider vanishProvider);
 
     /**
      * Register a new skins listener.

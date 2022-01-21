@@ -71,7 +71,7 @@ public final class CmdVisit implements ISuperiorCommand {
             if (!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
+            visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
             Message.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 

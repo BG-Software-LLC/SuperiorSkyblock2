@@ -9,7 +9,8 @@ import org.bukkit.event.Cancellable;
  */
 public class IslandCoopPlayerEvent extends IslandEvent implements Cancellable {
 
-    private final SuperiorPlayer player, target;
+    private final SuperiorPlayer player;
+    private final SuperiorPlayer target;
     private boolean cancelled = false;
 
     /**

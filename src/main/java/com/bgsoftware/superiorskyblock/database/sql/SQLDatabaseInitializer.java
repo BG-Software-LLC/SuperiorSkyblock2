@@ -3,17 +3,12 @@ package com.bgsoftware.superiorskyblock.database.sql;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.io.File;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class SQLDatabaseInitializer {
 
     private static final SQLDatabaseInitializer instance = new SQLDatabaseInitializer();
-    private DatabaseType database = DatabaseType.SQLite;
     private SuperiorSkyblockPlugin plugin;
 
     private SQLDatabaseInitializer() {
@@ -27,7 +22,7 @@ public final class SQLDatabaseInitializer {
     public void init(SuperiorSkyblockPlugin plugin) throws HandlerLoadException {
         this.plugin = plugin;
 
-        this.database = DatabaseType.fromName(plugin.getSettings().getDatabase().getType());
+        DatabaseType database = DatabaseType.fromName(plugin.getSettings().getDatabase().getType());
 
         if (database == DatabaseType.SQLite)
             createSQLiteFile();
@@ -131,6 +126,11 @@ public final class SQLDatabaseInitializer {
 
     public void close() {
         SQLHelper.close();
+    }
+
+    public void setJournalMode(String jounralMode) {
+        SQLHelper.executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode), result -> {
+        });
     }
 
     private void createSQLiteFile() throws HandlerLoadException {
@@ -394,80 +394,6 @@ public final class SQLDatabaseInitializer {
 
     private boolean containsGrid() {
         return SQLHelper.doesConditionExist("SELECT * FROM {prefix}grid;");
-    }
-
-    private void addColumnIfNotExists(String column, String table, String def, String type) {
-        String defaultSection = " DEFAULT " + def;
-
-        if (database == DatabaseType.MySQL) {
-            column = "COLUMN " + column;
-            if (type.equals("TEXT") || type.equals("LONGTEXT"))
-                defaultSection = "";
-        }
-
-        String statementStr = "ALTER TABLE {prefix}" + table + " ADD " + column + " " + type + defaultSection + ";";
-
-        SQLHelper.buildStatement(statementStr, PreparedStatement::executeUpdate, ex -> {
-            if (!ex.getMessage().toLowerCase().contains("duplicate")) {
-                SuperiorSkyblockPlugin.log("&cAn error occurred while running statement: " + statementStr);
-                ex.printStackTrace();
-            }
-        });
-    }
-
-    private void editColumn(String column, String table, String newType) {
-        if (!isType(column, table, newType)) {
-            if (database == DatabaseType.SQLite) {
-                String tmpTable = "__tmp" + table;
-                SQLHelper.buildStatement("ALTER TABLE {prefix}" + table + " RENAME TO " + tmpTable + ";", preparedStatement -> {
-                    try {
-                        preparedStatement.executeUpdate();
-                    } catch (Throwable ex) {
-                        preparedStatement.executeQuery();
-                    }
-                }, Throwable::printStackTrace);
-                createIslandsTable();
-                SQLHelper.buildStatement("INSERT INTO {prefix}" + table + "  SELECT * FROM " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
-                SQLHelper.buildStatement("DROP TABLE " + tmpTable + ";", PreparedStatement::executeUpdate, Throwable::printStackTrace);
-            } else {
-                String statementStr = "ALTER TABLE {prefix}" + table + " MODIFY COLUMN " + column + " " + newType + ";";
-                SQLHelper.buildStatement(statementStr, PreparedStatement::executeUpdate, Throwable::printStackTrace);
-            }
-        }
-    }
-
-    private boolean isType(String column, String table, String type) {
-        AtomicBoolean sameType = new AtomicBoolean(false);
-        if (database == DatabaseType.SQLite) {
-            SQLHelper.buildStatement("PRAGMA table_info({prefix}" + table + ");", preparedStatement -> {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        if (column.equals(resultSet.getString(2))) {
-                            sameType.set(type.equals(resultSet.getString(3)));
-                            break;
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
-                }
-            }, Throwable::printStackTrace);
-        } else {
-            SQLHelper.buildStatement("SHOW FIELDS FROM {prefix}" + table + ";", preparedStatement -> {
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        if (column.equals(resultSet.getString("Field"))) {
-                            sameType.set(type.equals(resultSet.getString("Type")));
-                            break;
-                        }
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
-                }
-            }, Throwable::printStackTrace);
-        }
-        return sameType.get();
     }
 
     private enum DatabaseType {

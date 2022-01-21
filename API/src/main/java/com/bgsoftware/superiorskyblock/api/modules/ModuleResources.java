@@ -10,18 +10,33 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+/**
+ * Class to handle resources for a module.
+ */
 public final class ModuleResources {
 
     private final File moduleFile;
     private final File dataFolder;
     private final ClassLoader classLoader;
 
+    /**
+     * Constructor for the class.
+     *
+     * @param moduleFile  The file of the module.
+     * @param dataFolder  The data folder of the module.
+     * @param classLoader The class loader of the module.
+     */
     public ModuleResources(File moduleFile, File dataFolder, ClassLoader classLoader) {
         this.moduleFile = moduleFile;
         this.dataFolder = dataFolder;
         this.classLoader = classLoader;
     }
 
+    /**
+     * Saves the raw contents of an embedded resource within the module.
+     *
+     * @param resourcePath Path to the resource to save.
+     */
     public void saveResource(String resourcePath) {
         Preconditions.checkNotNull(resourcePath, "resourcePath cannot be null.");
         Preconditions.checkArgument(!resourcePath.isEmpty(), "resourcePath cannot be empty.");
@@ -50,6 +65,11 @@ public final class ModuleResources {
         }
     }
 
+    /**
+     * Get the raw contents of an embedded resource within the module.
+     *
+     * @param fileName The name of the resource to get contents of.
+     */
     public InputStream getResource(String fileName) {
         Preconditions.checkNotNull(fileName, "fileName cannot be null.");
 

@@ -8,6 +8,8 @@
 # If you wish to create a new language file, please copy this one.
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&lĐảo Thần | &7Thành công thêm người chơi {0} vào đảo của {1}.'
 ADMIN_ADD_PLAYER_NAME: '&e&lĐảo Thần | &7Thành công thêm người chơi {0} vào đảo {1}.'
@@ -417,6 +419,7 @@ INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
 INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'
+INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lLỗi | &7Bạn không có một hòn đảo.'
 INVALID_ISLAND_LOCATION: '&c&lLỗi | &7Không có đảo nào ở vị trí của bạn.'
 INVALID_ISLAND_OTHER: '&c&lLỗi | &7{0} không có đảo.'
@@ -522,6 +525,7 @@ ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lĐảo Thần | Cập nhật lần cuối: {0} trước'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lĐảo Thần | &7Cập nhật lần cuối: &aHiện đang hoạt động'
+ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
 ISLAND_INFO_LOCATION: '&e&lĐảo Thần | &7Nhà: {0}'
 ISLAND_INFO_NAME: '&e&lNâng cấp | &7Tên: {0}'
 ISLAND_INFO_OWNER: '&e&lĐảo Thần | &7Lãnh đạo: {0}'
@@ -815,6 +819,7 @@ WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lKhu Vực | &7Thành công cập nhập biểu tượng danh mục.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
 WARP_CATEGORY_SLOT: '&e&lKhu Vực | &7Vui lòng nhập vị trí mới (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lLỗi | &7Vị trí đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lKhu Vực | &7Thành công thay đổi danh mục tới vị trí {0}.'
@@ -829,6 +834,7 @@ WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu m�
 WARP_ICON_UPDATED: '&e&lKhu Vực | &7Thành công cập nhập biểu tượng danh mục.'
 WARP_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
 WARP_LOCATION_UPDATE: '&e&lKhu Vực | &7Đã cập nhật thành công vị trí của khu vực vào vị trí của bạn.'
+WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
 WARP_PUBLIC_UPDATE: '&e&lKhu Vực | &7Thành công mở khu vực cho công chúng.'
 WARP_PRIVATE_UPDATE: '&e&lKhu Vực | &7Thành công đóng khu vực đối với công chúng.'
 WARP_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'

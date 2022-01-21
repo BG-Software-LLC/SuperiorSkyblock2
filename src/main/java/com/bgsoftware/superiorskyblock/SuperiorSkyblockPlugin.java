@@ -15,6 +15,8 @@ import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsHandler;
 import com.bgsoftware.superiorskyblock.database.DataHandler;
+import com.bgsoftware.superiorskyblock.engine.NashornEngine;
+import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
@@ -52,22 +54,20 @@ import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
-import com.bgsoftware.superiorskyblock.engine.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContainer;
@@ -77,7 +77,6 @@ import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlocksHandler
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.DefaultStackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
-import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.DefaultIslandsPurger;
 import org.bukkit.Bukkit;
@@ -390,8 +389,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public ChunkGenerator getGenerator() {
         if (worldGenerator == null) {
             loadGeneratorFromFile();
-            if (worldGenerator == null)
-                worldGenerator = new IslandsGenerator(settingsHandler.getWorlds().getDefaultWorld());
+            if (worldGenerator == null) {
+                worldGenerator = nmsWorld.createGenerator(plugin);
+            }
         }
 
         return worldGenerator;
@@ -485,12 +485,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.syncUpgrades();
         }
 
-        schematicsHandler.loadDataWithException();
+        schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
 
         if (loadGrid) {
-            dataHandler.loadDataWithException();
+            dataHandler.loadData();
             stackedBlocksHandler.loadData();
         } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.island.container;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.island.IslandPosition;
 import com.bgsoftware.superiorskyblock.structure.SortedRegistry;
 import org.bukkit.Location;
@@ -77,7 +78,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     @Nullable
     @Override
-    public Island getIslandByOwner(UUID uuid) {
+    public Island getIslandByLeader(UUID uuid) {
         return this.sortedIslands.get(uuid);
     }
 

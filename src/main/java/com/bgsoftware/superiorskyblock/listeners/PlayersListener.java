@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
@@ -9,16 +8,19 @@ import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -26,7 +28,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -47,7 +48,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -86,12 +86,6 @@ public final class PlayersListener implements Listener {
         String fileName = plugin.getFileName().split("\\.")[0];
         String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";
         this.buildName = buildName.isEmpty() ? "" : " (Build: " + buildName + ")";
-
-        try {
-            Class.forName("org.bukkit.event.entity.EntityPotionEffectEvent");
-            Bukkit.getPluginManager().registerEvents(new EffectsListener(), plugin);
-        } catch (Throwable ignored) {
-        }
     }
 
     @EventHandler
@@ -249,7 +243,8 @@ public final class PlayersListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
@@ -295,7 +290,8 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        boolean cancelFlames = false, cancelEvent = false;
+        boolean cancelFlames = false;
+        boolean cancelEvent = false;
         Message messageToSend = null;
 
         HitActionResult hitActionResult = damagerPlayer.canHit(targetPlayer);
@@ -347,12 +343,22 @@ public final class PlayersListener implements Listener {
             }
 
             e.setCancelled(true);
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+
+            EventResult<String> eventResult = EventsCaller.callIslandChatEvent(island, superiorPlayer, e.getMessage());
+
+            if (eventResult.isCancelled())
+                return;
+
+            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(),
+                    superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
+
+            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(),
+                    superiorPlayer.getName(), eventResult.getResult());
             for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
                 if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(),
+                            superiorPlayer.getName(), eventResult.getResult());
             }
         } else {
             String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
@@ -400,7 +406,8 @@ public final class PlayersListener implements Listener {
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e) {
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockY() == to.getBlockY() || to.getBlockY() > plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5)
             return;
@@ -437,7 +444,7 @@ public final class PlayersListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
             if (island != null && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 Executor.sync(() -> TeleportUtils.teleport(e.getEntity(),
-                        island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+                        island.getIslandHome(World.Environment.NORMAL)), 5L);
             }
         }
     }
@@ -620,28 +627,6 @@ public final class PlayersListener implements Listener {
         } else {
             islandChest.updateContents();
         }
-    }
-
-    private final class EffectsListener implements Listener {
-
-        @EventHandler(ignoreCancelled = true)
-        public void onPlayerEffect(EntityPotionEffectEvent e) {
-            if (e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
-                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
-                return;
-
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-            if (island == null)
-                return;
-
-            int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
-
-            if (islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
-                e.setCancelled(true);
-            }
-        }
-
     }
 
 }

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
-public final class ItemBuilder implements Cloneable {
+public final class ItemBuilder {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -271,17 +271,13 @@ public final class ItemBuilder implements Cloneable {
         return textureValue.isEmpty() ? itemStack : HeadUtils.getPlayerHead(itemStack, textureValue);
     }
 
-    public ItemBuilder clone() {
-        try {
-            ItemBuilder itemBuilder = (ItemBuilder) super.clone();
-            itemBuilder.itemStack = itemStack.clone();
-            if (itemMeta != null)
-                itemBuilder.itemMeta = itemMeta.clone();
-            itemBuilder.textureValue = textureValue;
-            return itemBuilder;
-        } catch (Exception ex) {
-            throw new NullPointerException(ex.getMessage());
-        }
+    public ItemBuilder copy() {
+        ItemBuilder itemBuilder = new ItemBuilder(Material.AIR);
+        itemBuilder.itemStack = itemStack.clone();
+        if(itemMeta != null)
+            itemBuilder.itemMeta = itemMeta.clone();
+        itemBuilder.textureValue = textureValue;
+        return itemBuilder;
     }
 
 }

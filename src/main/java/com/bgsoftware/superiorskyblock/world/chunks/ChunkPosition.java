@@ -12,7 +12,8 @@ import java.util.Objects;
 public final class ChunkPosition {
 
     private final String worldName;
-    private final int x, z;
+    private final int x;
+    private final int z;
 
     private ChunkPosition(String worldName, int x, int z) {
         this.worldName = worldName;

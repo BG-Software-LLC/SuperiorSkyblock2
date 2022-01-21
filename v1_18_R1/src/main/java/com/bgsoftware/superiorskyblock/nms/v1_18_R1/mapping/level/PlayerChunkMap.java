@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public final class PlayerChunkMap extends MappedObject<net.minecraft.server.level.PlayerChunkMap> {
 
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
-            PlayerChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
+            net.minecraft.server.level.PlayerChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
 
     public PlayerChunkMap(net.minecraft.server.level.PlayerChunkMap handle) {
         super(handle);

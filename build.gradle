@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "1.8.2"
+version = "1.8.3"
 
 allprojects {
     apply plugin: 'java'
@@ -17,8 +17,8 @@ allprojects {
         maven { url 'https://repo.bg-software.com/repository/common/' }
         maven { url 'https://repo.bg-software.com/repository/public-libs/' }
 
-        String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
-        String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
+        String mavenUsername = System.getenv('mavenUsername') == null ? project.mavenUsername : System.getenv('mavenUsername');
+        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenUsername : System.getenv('mavenPassword');
 
         if (mavenUsername != null && mavenPassword != null) {
             maven {
@@ -51,10 +51,10 @@ dependencies {
     implementation fileTree("archive")
     implementation project(":API")
 
-    implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
+    implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.2'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
-    implementation 'com.bgsoftware.common.executors:Executors:latest'
+    implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'

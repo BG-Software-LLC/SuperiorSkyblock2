@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.world.blocks.stacked;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
@@ -21,6 +23,7 @@ import org.bukkit.block.Block;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -52,8 +55,8 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         databaseBridge.loadAllObjects("stacked_blocks", _resultSet -> {
             DatabaseResult resultSet = new DatabaseResult(_resultSet);
             loadStackedBlock(resultSet);
-            String item = resultSet.getString("block_type");
-            if (item == null || item.isEmpty())
+            Optional<String> item = resultSet.getString("block_type");
+            if (!item.isPresent() || item.get().isEmpty())
                 updateBlockKeys.set(true);
         });
 
@@ -257,15 +260,25 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {
-        String location = resultSet.getString("location");
+        Optional<BlockPosition> location = resultSet.getString("location").map(SBlockPosition::of);
+        if (!location.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
+            return;
+        }
 
-        int amount = resultSet.getInt("amount");
+        Optional<Integer> amount = resultSet.getInt("amount");
+        if (!amount.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load stacked block from null amount, skipping...");
+            return;
+        }
 
-        String item = resultSet.getString("block_type");
-        com.bgsoftware.superiorskyblock.key.Key blockKey = item == null || item.isEmpty() ? null : com.bgsoftware.superiorskyblock.key.Key.of(item);
+        Optional<String> item = resultSet.getString("block_type");
 
-        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(SBlockPosition.of(location).parse());
-        stackedBlock.setAmount(amount);
+        com.bgsoftware.superiorskyblock.key.Key blockKey = !item.isPresent() || item.get().isEmpty() ? null :
+                com.bgsoftware.superiorskyblock.key.Key.of(item.get());
+
+        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get().parse());
+        stackedBlock.setAmount(amount.get());
         stackedBlock.setBlockKey(blockKey);
     }
 
@@ -277,7 +290,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
     private void initializeDatabaseBridge() {
         databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-        databaseBridge.startSavingData();
+        databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
 }

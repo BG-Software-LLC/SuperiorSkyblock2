@@ -8,6 +8,8 @@
 # If you wish to create a new language file, please copy this one.
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&l岛屿 | &7成功将玩家 {0} 添加到 {1} 的岛屿中.'
 ADMIN_ADD_PLAYER_NAME: '&e&l岛屿 | &7成功将玩家 {0} 添加到岛屿 {1} 中.'
@@ -352,6 +354,7 @@ INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&l错误 | &7错误的实体类型 {0}.'
 INVALID_ENVIRONMENT: '&c&l错误 | &7未知世界 &b{0}.'
+INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&l错误 | &7你还没有岛屿哦！'
 INVALID_ISLAND_LOCATION: '&c&l错误 | &7他还没有岛屿.'
 INVALID_ISLAND_OTHER: '&c&l错误 | &b{0} 还没有岛屿哦.'
@@ -453,6 +456,7 @@ ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&l岛屿 | &7最后更新时间: &b{0} &7前'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&l岛屿 | &7上次更新时间: &a正在活动'
+ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
 ISLAND_INFO_LOCATION: '&e&l岛屿 | &7位置: {0}'
 ISLAND_INFO_NAME: '&e&l岛屿 | &7岛屿名: {0}'
 ISLAND_INFO_OWNER: '&e&l岛屿 | &7岛屿主: {0}'
@@ -706,6 +710,7 @@ WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to canc
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp category names.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
 WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
@@ -720,6 +725,7 @@ WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to 
 WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
 WARP_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp names.'
 WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
 WARP_PUBLIC_UPDATE: '&e&lWarps | &7Successfully opened the warp to the public.'
 WARP_PRIVATE_UPDATE: '&e&lWarps | &7Successfully closed the warp to the public.'
 WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'

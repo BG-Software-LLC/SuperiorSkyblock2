@@ -7,14 +7,14 @@ import java.math.BigDecimal;
 
 public final class EmptyUpgradeCost extends UpgradeCostAbstract {
 
-    private static final EmptyUpgradeCost instance = new EmptyUpgradeCost();
+    private static final EmptyUpgradeCost INSTANCE = new EmptyUpgradeCost();
 
     private EmptyUpgradeCost() {
         super(BigDecimal.ZERO, "Null");
     }
 
     public static EmptyUpgradeCost getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     @Override
@@ -24,6 +24,7 @@ public final class EmptyUpgradeCost extends UpgradeCostAbstract {
 
     @Override
     public void withdrawCost(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
     }
 
     @Override

@@ -1,11 +1,14 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class SBankTransaction implements BankTransaction {
@@ -25,18 +28,30 @@ public final class SBankTransaction implements BankTransaction {
         this.time = time;
         this.date = StringUtils.formatDate(time);
         this.failureReason = failureReason == null ? "" : failureReason;
-        this.amount = amount.setScale(2, BigDecimal.ROUND_HALF_EVEN);
+        this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
     }
 
-    public SBankTransaction(DatabaseResult resultSet) {
-        String player = resultSet.getString("player");
-        this.player = player == null || player.isEmpty() ? null : UUID.fromString(player);
-        this.bankAction = BankAction.valueOf(resultSet.getString("bank_action"));
-        this.position = resultSet.getInt("position");
-        this.time = resultSet.getLong("time");
-        this.date = StringUtils.formatDate(time);
-        this.failureReason = resultSet.getString("failure_reason");
-        this.amount = new BigDecimal(resultSet.getString("amount")).setScale(2, BigDecimal.ROUND_HALF_EVEN);
+    public static Optional<BankTransaction> fromDatabase(DatabaseResult resultSet) {
+        Optional<BankAction> bankAction = resultSet.getEnum("bank_action", BankAction.class);
+        if (!bankAction.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load bank transaction with invalid bank action, skipping...");
+            return Optional.empty();
+        }
+
+        Optional<BigDecimal> amount = resultSet.getBigDecimal("amount");
+        if (!amount.isPresent()) {
+            SuperiorSkyblockPlugin.log("&cCannot load bank transaction with null amount, skipping...");
+            return Optional.empty();
+        }
+
+        return Optional.of(new SBankTransaction(
+                resultSet.getUUID("player").orElse(null),
+                bankAction.get(),
+                resultSet.getInt("position").orElse(1),
+                resultSet.getLong("time").orElse(System.currentTimeMillis()),
+                resultSet.getString("failure_reason").orElse(""),
+                amount.get()
+        ));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.factory;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 
 public interface IslandsFactory {
@@ -18,5 +19,12 @@ public interface IslandsFactory {
      * @param island The island to set the algorithm to.
      */
     IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island);
+
+    /**
+     * Create a blocks-tracking algorithm for an island.
+     *
+     * @param island The island to set the algorithm to.
+     */
+    IslandBlocksTrackerAlgorithm createIslandBlocksTrackerAlgorithm(Island island);
 
 }

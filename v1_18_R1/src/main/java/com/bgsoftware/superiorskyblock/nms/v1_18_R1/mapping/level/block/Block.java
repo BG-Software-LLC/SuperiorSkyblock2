@@ -18,6 +18,10 @@ public final class Block extends MappedObject<net.minecraft.world.level.block.Bl
         super(block);
     }
 
+    public static Block ofNullable(net.minecraft.world.level.block.Block block) {
+        return block == null ? null : new Block(block);
+    }
+
     public BlockData getBlockData() {
         return new BlockData(handle.n());
     }

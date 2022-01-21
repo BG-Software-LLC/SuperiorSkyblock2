@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island.permissions;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;

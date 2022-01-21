@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -52,7 +54,16 @@ public interface GridManager {
      * @param islandName     The name of the new island.
      * @param offset         Should the island have an offset for it's values? If disabled, the bonus will be given.
      */
-    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel, Biome biome, String islandName, boolean offset);
+    void createIsland(SuperiorPlayer superiorPlayer, String schemName, BigDecimal bonusWorth, BigDecimal bonusLevel,
+                      Biome biome, String islandName, boolean offset);
+
+    /**
+     * Set the creation algorithm of islands.
+     *
+     * @param islandCreationAlgorithm The new algorithm to set.
+     *                                If null, the default one will be used.
+     */
+    void setIslandCreationAlgorithm(@Nullable IslandCreationAlgorithm islandCreationAlgorithm);
 
     /**
      * Checks if a player has an active request for creating an island.
@@ -349,6 +360,19 @@ public interface GridManager {
      * Get the location of the last island that was generated.
      */
     Location getLastIslandLocation();
+
+    /**
+     * Set the location of the last island.
+     * Warning: Do not use this method unless you know what you're doing
+     *
+     * @param location The location to set.
+     */
+    void setLastIslandLocation(Location location);
+
+    /**
+     * Get the islands container.
+     */
+    IslandsContainer getIslandsContainer();
 
     /**
      * Get the database-bridge of the grid.

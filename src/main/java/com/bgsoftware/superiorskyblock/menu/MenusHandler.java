@@ -248,7 +248,7 @@ public final class MenusHandler extends AbstractHandler implements MenusManager 
 
     @Override
     public void openIslandMissionsMenu(SuperiorPlayer superiorPlayer, boolean islandMissions) {
-
+        // Menu doesn't exist anymore.
     }
 
     @Override

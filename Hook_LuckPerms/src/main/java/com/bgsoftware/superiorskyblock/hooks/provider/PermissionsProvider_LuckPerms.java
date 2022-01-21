@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedDataManager;
 import net.luckperms.api.model.user.User;
@@ -28,7 +29,8 @@ public final class PermissionsProvider_LuckPerms implements PermissionsProvider 
     @Override
     public boolean hasPermission(Player player, String permission) {
         User user = luckPerms.getUserManager().getUser(player.getUniqueId());
-        return user != null && user.getCachedData().getPermissionData().getPermissionMap().getOrDefault(permission, false);
+        return user != null && user.getCachedData().getPermissionData().getPermissionMap()
+                .getOrDefault(permission.toLowerCase(), false);
     }
 
 }

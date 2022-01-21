@@ -186,34 +186,39 @@ public final class NMSUtils {
             return;
         }
 
-        if (plugin.getSettings().isLightsUpdate()) {
-            chunk.setType(blockPosition, blockData, true, true);
-        } else {
-            int indexY = worldServer.getSectionIndex(blockPosition.getY());
+        int indexY = worldServer.getSectionIndex(blockPosition.getY());
 
-            ChunkSection chunkSection = ChunkSection.ofNullable(chunk.getSections()[indexY]);
+        ChunkSection chunkSection = ChunkSection.ofNullable(chunk.getSections()[indexY]);
 
-            if (chunkSection == null) {
-                int yOffset = SectionPosition.getSectionCoord(blockPosition.getY());
-                //noinspection deprecation
-                chunk.getSections()[indexY] = new net.minecraft.world.level.chunk.ChunkSection(
-                        yOffset, chunk.getBiomeRegistry());
-                chunkSection = new ChunkSection(chunk.getSections()[indexY]);
-            }
-
-            int blockX = blockPosition.getX() & 15;
-            int blockY = blockPosition.getY();
-            int blockZ = blockPosition.getZ() & 15;
-
-            chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
-
-            chunk.getHeightmap(HeightMap.Type.e).setBlock(blockX, blockY, blockZ, blockData);
-            chunk.getHeightmap(HeightMap.Type.f).setBlock(blockX, blockY, blockZ, blockData);
-            chunk.getHeightmap(HeightMap.Type.d).setBlock(blockX, blockY, blockZ, blockData);
-            chunk.getHeightmap(HeightMap.Type.b).setBlock(blockX, blockY, blockZ, blockData);
-
-            chunk.setNeedsSaving(true);
+        if (chunkSection == null) {
+            int yOffset = SectionPosition.getSectionCoord(blockPosition.getY());
+            //noinspection deprecation
+            chunk.getSections()[indexY] = new net.minecraft.world.level.chunk.ChunkSection(
+                    yOffset, chunk.getBiomeRegistry());
+            chunkSection = new ChunkSection(chunk.getSections()[indexY]);
         }
+
+        int blockX = blockPosition.getX() & 15;
+        int blockY = blockPosition.getY();
+        int blockZ = blockPosition.getZ() & 15;
+
+        boolean isOriginallyChunkSectionEmpty = chunkSection.isEmpty();
+
+        chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
+
+        chunk.getHeightmap(HeightMap.Type.e).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(HeightMap.Type.f).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(HeightMap.Type.d).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(HeightMap.Type.b).setBlock(blockX, blockY, blockZ, blockData);
+
+        chunk.setNeedsSaving(true);
+
+        boolean isChunkSectionEmpty = chunkSection.isEmpty();
+
+        if (isOriginallyChunkSectionEmpty != isChunkSectionEmpty)
+            worldServer.getLightEngine().updateSectionStatus(blockPosition, isChunkSectionEmpty);
+
+        worldServer.getLightEngine().checkBlock(blockPosition);
 
         if (tileEntity != null) {
             NBTTagCompound tileEntityCompound = NBTTagCompound.ofNullable((net.minecraft.nbt.NBTTagCompound) tileEntity.toNBT());
