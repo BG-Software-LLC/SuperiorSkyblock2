@@ -68,17 +68,13 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getEntityType()))
                 return;
 
-            Key entity = Key.of(e.getEntity());
-
-            island.hasReachedEntityLimit(entity).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
                         Executor.ensureMain(() -> e.getEntity().remove());
                     } else {
                         e.getEntity().remove();
                     }
-                } else {
-                    island.getEntitiesTracker().trackEntity(entity, 1);
                 }
             });
         }
@@ -93,17 +89,11 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getEntity().getType()))
                 return;
 
-            Key entity = Key.of(e.getEntity());
-
-            island.hasReachedEntityLimit(entity).whenComplete((result, ex) -> {
-                if (e.getEntity().isValid() && !e.getEntity().isDead()) {
-                    if (result) {
-                        e.getEntity().remove();
-                        if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
-                            e.getPlayer().getInventory().addItem(asItemStack(e.getEntity()));
-                    } else {
-                        island.getEntitiesTracker().trackEntity(entity, 1);
-                    }
+            island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
+                if (result && e.getEntity().isValid() && !e.getEntity().isDead()) {
+                    e.getEntity().remove();
+                    if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
+                        e.getPlayer().getInventory().addItem(asItemStack(e.getEntity()));
                 }
             });
         }
@@ -145,19 +135,13 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getVehicle().getType()))
                 return;
 
-            Key entity = Key.of(e.getVehicle());
-
-            island.hasReachedEntityLimit(entity).whenComplete((result, ex) -> {
-                if (e.getVehicle().isValid() && !e.getVehicle().isDead()) {
-                    if (result) {
-                        Executor.sync(() -> {
-                            e.getVehicle().remove();
-                            if (placedVehicle != null)
-                                Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
-                        });
-                    } else {
-                        island.getEntitiesTracker().trackEntity(entity, 1);
-                    }
+            island.hasReachedEntityLimit(Key.of(e.getVehicle())).whenComplete((result, ex) -> {
+                if (result && e.getVehicle().isValid() && !e.getVehicle().isDead()) {
+                    Executor.sync(() -> {
+                        e.getVehicle().remove();
+                        if (placedVehicle != null)
+                            Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
+                    });
                 }
             });
         }
