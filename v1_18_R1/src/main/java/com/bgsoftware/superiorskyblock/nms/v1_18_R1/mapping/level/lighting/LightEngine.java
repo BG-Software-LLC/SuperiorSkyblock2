@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.lighting;
 
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.SectionPosition;
 import net.minecraft.world.level.EnumSkyBlock;
@@ -17,6 +18,14 @@ public final class LightEngine extends MappedObject<net.minecraft.world.level.li
 
     public void queueData(EnumSkyBlock lightLayer, SectionPosition sectionPosition, NibbleArray nibbleArray, boolean b) {
         handle.a(lightLayer, sectionPosition.getHandle(), nibbleArray, b);
+    }
+
+    public void updateSectionStatus(BlockPosition blockPosition, boolean flag) {
+        handle.a(blockPosition.getHandle(), flag);
+    }
+
+    public void checkBlock(BlockPosition blockPosition) {
+        handle.a(blockPosition.getHandle());
     }
 
     public int getMinSection() {
