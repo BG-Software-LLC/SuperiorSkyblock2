@@ -22,8 +22,11 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeser
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.ResultSetMapBridge;
-import com.bgsoftware.superiorskyblock.database.sql.SQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.StatementHolder;
+import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
@@ -44,7 +47,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
 
     private static File databaseFile;
-    private static SQLSession sqlSession;
+    private static SQLSession session;
+    private static boolean isUsingMySQL;
 
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
@@ -61,115 +65,126 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     private static boolean isDatabaseOldFormat() {
-        sqlSession = new SQLSession(plugin, false);
+        isUsingMySQL = plugin.getSettings().getDatabase().getType().equals("MySQL");
 
-        if (!sqlSession.isUsingMySQL()) {
+        if (!isUsingMySQL) {
             databaseFile = new File(plugin.getDataFolder(), "database.db");
 
             if (!databaseFile.exists())
                 return false;
         }
 
-        if (!sqlSession.createConnection()) {
+        session = isUsingMySQL ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
+
+        if (!session.createConnection()) {
             return false;
         }
 
-        if (!sqlSession.doesTableExist("stackedBlocks")) {
-            sqlSession.close();
-            return false;
-        }
+        AtomicBoolean isOldFormat = new AtomicBoolean(true);
 
-        return true;
+        session.select("stackedBlocks", "").ifFail(error -> {
+            session.closeConnection();
+            isOldFormat.set(false);
+        });
+
+        return isOldFormat.get();
     }
 
     @Override
     public void loadData() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
+        session.select("players", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedPlayers.add(loadPlayer(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedPlayers.size() + " players in the database.");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
+        session.select("islands", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedIslands.add(loadIsland(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
+        session.select("stackedBlocks", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedBlocks.add(loadStackedBlock(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
 
-        if (sqlSession.doesTableExist("bankTransactions")) {
-            sqlSession.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
-                while (resultSet.next()) {
-                    loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
-                }
-            });
+        // Ignoring errors as the bankTransactions table may not exist.
+        AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
+        session.select("bankTransactions", "").ifSuccess(resultSet -> {
+            foundBankTransaction.set(true);
+            while (resultSet.next()) {
+                loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
+            }
+        });
 
+        if (foundBankTransaction.get()) {
             SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
         }
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}grid;", resultSet -> {
+        session.select("grid", "").ifSuccess(resultSet -> {
             if (resultSet.next()) {
                 gridAttributes = new GridAttributes()
                         .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
                         .setValue(GridAttributes.Field.MAX_ISLAND_SIZE, resultSet.getString("maxIslandSize"))
                         .setValue(GridAttributes.Field.WORLD, resultSet.getString("world"));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         AtomicBoolean failedBackup = new AtomicBoolean(true);
 
-        if (!sqlSession.isUsingMySQL()) {
-            sqlSession.close();
+        if (!isUsingMySQL) {
+            session.closeConnection();
             if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackup.set(false);
             }
         }
 
         if (failedBackup.get()) {
-            if (!sqlSession.isUsingMySQL()) {
-                sqlSession = new SQLSession(plugin, false);
-                sqlSession.createConnection();
+            if (!isUsingMySQL) {
+                session = new SQLiteSession(plugin, false);
+                session.createConnection();
             }
 
             failedBackup.set(false);
 
-            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}bkp_islands", failure -> {
-                failure.printStackTrace();
+            session.renameTable("islands", "bkp_islands").ifFail(error -> {
+                error.printStackTrace();
                 failedBackup.set(true);
             });
-            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}bkp_players", failure -> {
-                failure.printStackTrace();
+
+            session.renameTable("players", "bkp_players").ifFail(error -> {
+                error.printStackTrace();
                 failedBackup.set(true);
             });
-            sqlSession.executeUpdate("RENAME TABLE {prefix}grid TO {prefix}bkp_grid", failure -> {
-                failure.printStackTrace();
+
+            session.renameTable("grid", "bkp_grid").ifFail(error -> {
+                error.printStackTrace();
                 failedBackup.set(true);
             });
-            sqlSession.executeUpdate("RENAME TABLE {prefix}stackedBlocks TO {prefix}bkp_stackedBlocks", failure -> {
-                failure.printStackTrace();
+
+            session.renameTable("stackedBlocks", "bkp_stackedBlocks").ifFail(error -> {
+                error.printStackTrace();
                 failedBackup.set(true);
             });
-            sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> {
-                failure.printStackTrace();
+
+            session.renameTable("bankTransactions", "bkp_bankTransactions").ifFail(error -> {
+                error.printStackTrace();
                 failedBackup.set(true);
             });
         }
 
-        if (sqlSession.isUsingMySQL())
-            sqlSession.close();
+        if (isUsingMySQL)
+            session.closeConnection();
 
         if (failedBackup.get()) {
             SuperiorSkyblockPlugin.log("&c[Database-Converter] Failed to create a backup for the database file.");

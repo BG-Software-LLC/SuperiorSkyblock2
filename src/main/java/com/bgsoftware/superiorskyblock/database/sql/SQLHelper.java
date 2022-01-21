@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public final class SQLHelper {
 
@@ -21,7 +24,7 @@ public final class SQLHelper {
     }
 
     public static void waitForConnection() {
-        if(isReady())
+        if (isReady())
             globalSession.waitForConnection();
     }
 
@@ -30,8 +33,15 @@ public final class SQLHelper {
     }
 
     public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
-        SQLSession session = new SQLSession(plugin, true);
-        if(session.createConnection()) {
+        SQLSession session;
+
+        if (plugin.getSettings().getDatabase().getType().equals("MySQL")) {
+            session = new MySQLSession(plugin, true);
+        } else {
+            session = new SQLiteSession(plugin, true);
+        }
+
+        if (session.createConnection()) {
             globalSession = session;
             return true;
         }
@@ -39,49 +49,48 @@ public final class SQLHelper {
         return false;
     }
 
-    public static void executeUpdate(String statement) {
-        if(isReady())
-            globalSession.executeUpdate(statement);
+    public static void createTable(String tableName, Pair<String, String>... columns) {
+        if (isReady())
+            globalSession.createTable(tableName, columns);
     }
 
-    public static void executeUpdate(String statement, Consumer<SQLException> onFailure) {
-        if(isReady())
-            globalSession.executeUpdate(statement, onFailure);
+    public static void createIndex(String indexName, String tableName, String... columns) {
+        if (isReady())
+            globalSession.createIndex(indexName, tableName, columns);
     }
 
-    public static boolean doesConditionExist(String statement) {
-        return isReady() && globalSession.doesConditionExist(statement);
+    public static void modifyColumnType(String tableName, String columnName, String newType) {
+        if (isReady())
+            globalSession.modifyColumnType(tableName, columnName, newType);
     }
 
-    public static void executeQuery(String statement, QueryConsumer<ResultSet> callback) {
-        if(isReady())
-            globalSession.executeQuery(statement, callback::accept);
+    public static QueryResult<ResultSet> select(String tableName, String filters) {
+        return isReady() ? globalSession.select(tableName, filters) : QueryResult.RESULT_SET_ERROR;
+    }
+
+    public static void setJournalMode(String jounralMode) {
+        if (isReady())
+            globalSession.setJournalMode(jounralMode);
+    }
+
+    public static QueryResult<PreparedStatement> customQuery(String query) {
+        return isReady() ? globalSession.customQuery(query) : QueryResult.PREPARED_STATEMENT_ERROR;
     }
 
     public static void close() {
-        if(isReady())
-            globalSession.close();
-    }
-
-    public static void buildStatement(String query, QueryConsumer<PreparedStatement> consumer, Consumer<SQLException> failure) {
-        if(isReady())
-            globalSession.buildStatement(query, consumer::accept, failure);
+        if (isReady())
+            globalSession.closeConnection();
     }
 
     public static void setAutoCommit(boolean autoCommit) {
-        if(isReady())
+        if (isReady())
             globalSession.setAutoCommit(autoCommit);
     }
 
-    public static void commit() throws SQLException {
-        if(isReady())
+    public static void commit() {
+        if (isReady())
             globalSession.commit();
     }
 
-    public interface QueryConsumer<T> {
-
-        void accept(T value) throws SQLException;
-
-    }
 }
 
