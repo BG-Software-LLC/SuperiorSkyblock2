@@ -39,7 +39,7 @@ public final class MySQLSession implements SQLSession {
 
     @Override
     public boolean createConnection() {
-        log("Trying to connect to MySQL database...");
+        log("Trying to connect to remote database (MySQL)...");
 
         try {
             HikariConfig config = new HikariConfig();
@@ -72,13 +72,13 @@ public final class MySQLSession implements SQLSession {
 
             dataSource = new HikariDataSource(config);
 
-            log("Successfully established connection with MySQL database!");
+            log("Successfully established connection with remote database!");
 
             ready.complete(null);
 
             return true;
         } catch (Throwable error) {
-            log("&cFailed to connect to the MySQL database:");
+            log("&cFailed to connect to the remote database:");
             error.printStackTrace();
             PluginDebugger.debug(error);
         }

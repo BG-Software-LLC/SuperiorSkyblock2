@@ -40,7 +40,7 @@ public final class SQLiteSession implements SQLSession {
 
     @Override
     public boolean createConnection() {
-        log("Trying to connect to SQLite database...");
+        log("Trying to connect to local database (SQLite)...");
 
         File file = new File(plugin.getDataFolder(), "database.db");
 
@@ -62,13 +62,13 @@ public final class SQLiteSession implements SQLSession {
 
             conn = DriverManager.getConnection(jdbcUrl);
 
-            log("Successfully established connection with SQLite database!");
+            log("Successfully established connection with local database!");
 
             ready.complete(null);
 
             return true;
         } catch (Exception error) {
-            log("&cFailed to connect to the SQLite database:");
+            log("&cFailed to connect to the local database:");
             error.printStackTrace();
             PluginDebugger.debug(error);
         }
