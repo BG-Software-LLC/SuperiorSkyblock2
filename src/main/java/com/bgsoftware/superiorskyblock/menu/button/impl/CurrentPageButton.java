@@ -18,7 +18,7 @@ public final class CurrentPageButton<M extends PagedSuperiorMenu<M, T>, T> exten
 
     @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
-
+        // Do nothing.
     }
 
     public static class Builder<M extends PagedSuperiorMenu<M, T>, T> extends

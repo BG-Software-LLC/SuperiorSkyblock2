@@ -33,27 +33,26 @@ public final class WarpCategoryManageRenameButton extends SuperiorMenuButton<Men
         PlayerChat.listen(player, message -> {
             WarpCategory warpCategory = superiorMenu.getWarpCategory();
 
-            if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null) {
-                if (!message.equalsIgnoreCase("-cancel")) {
-                    String newName = IslandUtils.getWarpName(message);
+            if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
+                    !message.equalsIgnoreCase("-cancel")) {
+                String newName = IslandUtils.getWarpName(message);
 
-                    if (warpCategory.getIsland().getWarpCategory(newName) != null) {
-                        Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(player);
-                        return true;
-                    }
-
-                    if (!IslandUtils.isWarpNameLengthValid(newName)) {
-                        Message.WARP_CATEGORY_NAME_TOO_LONG.send(player);
-                        return true;
-                    }
-
-                    warpCategory.getIsland().renameCategory(warpCategory, newName);
-
-                    Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, newName);
-
-                    if (MenuWarpCategoryManage.successUpdateSound != null)
-                        MenuWarpCategoryManage.successUpdateSound.playSound(player);
+                if (warpCategory.getIsland().getWarpCategory(newName) != null) {
+                    Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(player);
+                    return true;
                 }
+
+                if (!IslandUtils.isWarpNameLengthValid(newName)) {
+                    Message.WARP_CATEGORY_NAME_TOO_LONG.send(player);
+                    return true;
+                }
+
+                warpCategory.getIsland().renameCategory(warpCategory, newName);
+
+                Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, newName);
+
+                if (MenuWarpCategoryManage.successUpdateSound != null)
+                    MenuWarpCategoryManage.successUpdateSound.playSound(player);
             }
 
             PlayerChat.remove(player);

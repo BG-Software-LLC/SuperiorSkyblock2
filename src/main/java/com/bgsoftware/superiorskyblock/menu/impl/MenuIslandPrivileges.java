@@ -37,7 +37,9 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
 
     private static final List<IslandPrivilegeInfo> islandPrivileges = new ArrayList<>();
 
-    public static String noRolePermission = "", exactRolePermission = "", higherRolePermission = "";
+    public static String noRolePermission = "";
+    public static String exactRolePermission = "";
+    public static String higherRolePermission = "";
 
     private final Island island;
     private final Object permissionHolder;

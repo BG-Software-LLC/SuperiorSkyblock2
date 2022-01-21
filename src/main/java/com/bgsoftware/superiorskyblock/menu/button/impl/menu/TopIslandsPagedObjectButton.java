@@ -82,46 +82,44 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
         ItemMeta itemMeta = itemBuilder.getItemMeta();
 
-        if (itemMeta != null) {
-            if (itemMeta.hasLore()) {
-                List<String> lore = new ArrayList<>();
+        if (itemMeta != null && itemMeta.hasLore()) {
+            List<String> lore = new ArrayList<>();
 
-                for (String line : itemMeta.getLore()) {
-                    if (line.contains("{4}")) {
-                        List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader());
-                        String memberFormat = line.split("\\{4}:")[1];
-                        if (members.size() == 0) {
-                            lore.add(memberFormat.replace("{}", "None"));
-                        } else {
-                            members.forEach(member -> {
-                                String onlineMessage = member.isOnline() ?
-                                        Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
-                                        Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
-
-                                lore.add(PlaceholderHook.parse(member, memberFormat
-                                        .replace("{}", member.getName())
-                                        .replace("{0}", member.getName())
-                                        .replace("{1}", onlineMessage == null ? "" : onlineMessage))
-                                );
-                            });
-                        }
+            for (String line : itemMeta.getLore()) {
+                if (line.contains("{4}")) {
+                    List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader());
+                    String memberFormat = line.split("\\{4}:")[1];
+                    if (members.size() == 0) {
+                        lore.add(memberFormat.replace("{}", "None"));
                     } else {
-                        lore.add(line
-                                .replace("{0}", island.getOwner().getName())
-                                .replace("{1}", String.valueOf(place))
-                                .replace("{2}", StringUtils.format(island.getIslandLevel()))
-                                .replace("{3}", StringUtils.format(island.getWorth()))
-                                .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
-                                .replace("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
-                                .replace("{7}", StringUtils.format(island.getTotalRating()))
-                                .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
-                                .replace("{9}", StringUtils.format(island.getRatingAmount()))
-                                .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
-                    }
-                }
+                        members.forEach(member -> {
+                            String onlineMessage = member.isOnline() ?
+                                    Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
+                                    Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
 
-                itemBuilder.withLore(lore);
+                            lore.add(PlaceholderHook.parse(member, memberFormat
+                                    .replace("{}", member.getName())
+                                    .replace("{0}", member.getName())
+                                    .replace("{1}", onlineMessage == null ? "" : onlineMessage))
+                            );
+                        });
+                    }
+                } else {
+                    lore.add(line
+                            .replace("{0}", island.getOwner().getName())
+                            .replace("{1}", String.valueOf(place))
+                            .replace("{2}", StringUtils.format(island.getIslandLevel()))
+                            .replace("{3}", StringUtils.format(island.getWorth()))
+                            .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
+                            .replace("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
+                            .replace("{7}", StringUtils.format(island.getTotalRating()))
+                            .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
+                            .replace("{9}", StringUtils.format(island.getRatingAmount()))
+                            .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
+                }
             }
+
+            itemBuilder.withLore(lore);
         }
 
         return itemBuilder.build(islandOwner);

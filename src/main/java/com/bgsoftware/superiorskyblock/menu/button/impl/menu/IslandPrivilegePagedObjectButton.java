@@ -79,21 +79,19 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
                 if (previousRole == null) {
                     onFailurePermissionChange(clickedPlayer, false);
                 } else {
-                    island.setPermission(previousRole, pagedObject.getIslandPrivilege(), true);
+                    island.setPermission(previousRole, pagedObject.getIslandPrivilege());
                     onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
                             StringUtils.format(pagedObject.getIslandPrivilege().getName()));
                 }
             }
-        } else if (clickEvent.getClick().isRightClick()) {
-            if (clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
-                PlayerRole nextRole = SPlayerRole.of(currentRole.getWeight() + 1);
-                if (nextRole == null) {
-                    onFailurePermissionChange(clickedPlayer, false);
-                } else {
-                    island.setPermission(nextRole, pagedObject.getIslandPrivilege(), true);
-                    onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
-                            StringUtils.format(pagedObject.getIslandPrivilege().getName()));
-                }
+        } else if (clickEvent.getClick().isRightClick() && clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
+            PlayerRole nextRole = SPlayerRole.of(currentRole.getWeight() + 1);
+            if (nextRole == null) {
+                onFailurePermissionChange(clickedPlayer, false);
+            } else {
+                island.setPermission(nextRole, pagedObject.getIslandPrivilege());
+                onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
+                        StringUtils.format(pagedObject.getIslandPrivilege().getName()));
             }
         }
     }

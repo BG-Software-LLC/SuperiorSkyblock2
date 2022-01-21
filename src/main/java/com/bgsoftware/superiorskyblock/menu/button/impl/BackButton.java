@@ -18,7 +18,7 @@ public final class BackButton<M extends ISuperiorMenu> extends SuperiorMenuButto
 
     @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, M superiorMenu, InventoryClickEvent clickEvent) {
-
+        // Do nothing.
     }
 
     public static class Builder<M extends ISuperiorMenu> extends AbstractBuilder<Builder<M>, BackButton<M>, M> {

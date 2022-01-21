@@ -220,7 +220,8 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         Matcher matcher = COMMAND_PATTERN_ARGS.matcher(command);
 
         if (matcher.matches()) {
-            String subCommand = matcher.group(1), args = matcher.group(2).trim();
+            String subCommand = matcher.group(1);
+            String args = matcher.group(2).trim();
             handleSubCommand(plugin, subCommand, args, e, sender);
         } else if ((matcher = COMMAND_PATTERN.matcher(command)).matches()) {
             String subCommand = matcher.group(1);

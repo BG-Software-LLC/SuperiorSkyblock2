@@ -61,7 +61,7 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
     @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuValues superiorMenu,
                               InventoryClickEvent clickEvent) {
-
+        // Do nothing.
     }
 
     public static class Builder extends AbstractBuilder<Builder, ValuesButton, MenuValues> {
