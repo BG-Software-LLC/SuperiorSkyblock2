@@ -58,6 +58,9 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
         if (!canTrackEntity(key))
             return false;
 
+        PluginDebugger.debug("Action: Entity Despawn, Island: " + island.getOwner().getName() +
+                ", Entity: " + key + ", Amount: " + amount);
+
         int currentAmount = entityCounts.getOrDefault(key, -1);
 
         if (currentAmount != -1) {
