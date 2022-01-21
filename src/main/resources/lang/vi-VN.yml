@@ -9,24 +9,24 @@
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
 
-ADMIN_ADD_PLAYER: '&e&lĐảo Thần | &7Thành công thêm người chơi {0} vào đảo của {1}.'
-ADMIN_ADD_PLAYER_NAME: '&e&lĐảo Thần | &7Thành công thêm người chơi {0} vào đảo {1}.'
-ADMIN_DEPOSIT_MONEY: '&e&lNgân Hàng | &7Bạn đã gửi ${0} gửi vào ngân hàng đảo của
+ADMIN_ADD_PLAYER: '&e&lĐảo Thần | &7Thêm thành công người chơi {0} vào đảo của {1}.'
+ADMIN_ADD_PLAYER_NAME: '&e&lĐảo Thần | &7Thêm thành công người chơi {0} vào đảo {1}.'
+ADMIN_DEPOSIT_MONEY: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo của
   {1}.'
 ADMIN_DEPOSIT_MONEY_NAME: '&e&lNgân Hàng | &7Bạn đã gửi ${0} vào ngân hàng đảo tên
   {1}.'
-ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Phát Triển bởi Ome_R'
-ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách các lệnh cho admin [{0}/{1}]:'
+ADMIN_HELP_FOOTER: '&e&lSuperiorSkyblock &7Phát triển bởi Ome_R'
+ADMIN_HELP_HEADER: '&e&lSuperiorSkyblock &7Danh sách các lệnh cho quản trị viên [{0}/{1}]:'
 ADMIN_HELP_LINE: '&e/{0} &f- &7{1}'
-ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is admin {0} cho trang kế tiếp.'
+ADMIN_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is admin {0} để xem trang kế tiếp.'
 ALREADY_IN_ISLAND: '&c&lLỗi | &7Bạn đã ở trong đảo rồi.'
 ALREADY_IN_ISLAND_OTHER: '&c&lLỗi | &7Người chơi này đã là thành viên trong đảo của
   bạn.'
 BAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} vừa bị&c&n Cấm&7 trong đảo bởi {1}.'
 BAN_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể cấm người chơi có vai trò
   trong đảo thấp hơn bạn.'
-BANK_DEPOSIT_CUSTOM: '&e&lNgân Hàng | &7Nhập số lượng tiền bạn muốn thêm:'
-BANK_DEPOSIT_COMPLETED: 'Thêm tiền thành công'
+BANK_DEPOSIT_CUSTOM: '&e&lNgân Hàng | &7Nhập số lượng tiền bạn muốn gửi:'
+BANK_DEPOSIT_COMPLETED: 'Gửi tiền thành công'
 BANK_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã vượt quá giới hạn của ngân hàng.'
 BANK_WITHDRAW_CUSTOM: '&e&lNgân Hàng | &7Nhập số lượng tiền bạn muốn rút:'
 BANK_WITHDRAW_COMPLETED: 'Rút tiền thành công'
@@ -38,93 +38,82 @@ BLOCK_COUNTS_CHECK: |
 BLOCK_COUNTS_CHECK_EMPTY: '&e&lĐảo Thần | &7Đảo này không có khối được theo dõi.'
 BLOCK_COUNTS_CHECK_MATERIAL: 'x{0} {1}'
 BLOCK_LEVEL: '&e&lCấp Độ | &7Khối {0} có giá trị cấp độ là {1}.'
-BLOCK_LEVEL_WORTHLESS: '&e&lCấp Độ | &7Khối {0} là vô giá trị.'
+BLOCK_LEVEL_WORTHLESS: '&e&lCấp Độ | &7Khối {0} vô giá trị.'
 BLOCK_VALUE: '&e&lĐáng giá | &7Khối {0} được đánh giá với {1}.'
-BLOCK_VALUE_WORTHLESS: '&e&lĐáng giá | &7Khối {0} là vô giá trị.'
+BLOCK_VALUE_WORTHLESS: '&e&lĐáng giá | &7Khối {0} vô giá trị.'
 BONUS_SET_SUCCESS: '&e&lĐảo Thần | &7Cập nhật thành công phần thưởng đảo đến {0}.'
 BORDER_PLAYER_COLOR_NAME_BLUE: 'Blue'
 BORDER_PLAYER_COLOR_NAME_RED: 'Red'
 BORDER_PLAYER_COLOR_NAME_GREEN: 'Green'
-BORDER_PLAYER_COLOR_UPDATED: '&e&lBiên Giới | &7Thành công thay đổi màu biên giới
+BORDER_PLAYER_COLOR_UPDATED: '&e&lBiên Giới | &7Thành công thay đổi màu giới hạn đảo
   của bạn thành {0}.'
 BUILD_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể xây dựng ngoài phạm vi bảo vệ của
-  bạn.'
+  đảo bạn.'
 CANNOT_SET_ROLE: '&c&lLỗi | &7Bạn không thể đặt vai trò của người chơi thành {0}.'
 CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thay đổi quyền thành
   vai trò trong đảo thấp hơn vai trò của bạn.'
-
 CHANGED_BANK_LIMIT: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng đảo của {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của tất cả đảo.'
 CHANGED_BANK_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của {0}.'
-
 CHANGED_BIOME: '&e&lĐảo Thần | &7Thay đổi thành công quần xã thành {0}. Bạn có thể
   cần kết nối lại với máy chủ để xem các thay đổi.'
 CHANGED_BIOME_ALL: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho tất cả các đảo.'
 CHANGED_BIOME_NAME: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho đảo {1}.'
 CHANGED_BIOME_OTHER: '&e&lĐảo Thần | &7Thành công thay đổi quần xã thành {0} cho đảo của {1}.'
-
 CHANGED_BLOCK_AMOUNT: '&e&lKhối | &7Thành công thay đổi số lượng khối từ {0} thành {1}.'
-
-CHANGED_BLOCK_LIMIT: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
+CHANGED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Thay đổi thành công giới hạn khối {0} đảo của
   {1}.'
 CHANGED_BLOCK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp {0} giới hạn khối của tất cả các đảo.'
-CHANGED_BLOCK_LIMIT_NAME: '&e&lNâng cấp | &7Thay đổi thành công giới hạn khối {0}
+CHANGED_BLOCK_LIMIT_NAME: '&e&lNâng Cấp | &7Thay đổi thành công giới hạn khối {0}
   đảo của {1}.'
-
 CHANGED_CHEST_SIZE: '&e&lRương | &7Thành công nâng cấp số dòng của trang #{0} thành {1} cho đảo của {2}.'
 CHANGED_CHEST_SIZE_ALL: '&e&lRương | &7Thành công nâng cấp số dòng của trang #{0} thành {1} cho tất cả các đảo.'
 CHANGED_CHEST_SIZE_NAME: '&e&lRương | &7Thành công nâng cấp số dòng của trang #{0} thành {1} cho đảo {2}.'
-
 CHANGED_COOP_LIMIT: '&e&lNâng Cấp | &7Thành công nâng cấp số lượng thành viên đảo co-op của {0}.'
 CHANGED_COOP_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp số lượng thành viên đảo co-op của tất cả các đảo.'
 CHANGED_COOP_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp số lượng thành viên đảo co-op của đảo {0}.'
-
-CHANGED_CROP_GROWTH: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây trồng
+CHANGED_CROP_GROWTH: '&e&lNâng Cấp | &7Thay thành công hệ số tăng trưởng cây trồng
   của đảo {0}.'
-CHANGED_CROP_GROWTH_ALL: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây trồng
+CHANGED_CROP_GROWTH_ALL: '&e&lNâng Cấp | &7Thay thành công hệ số tăng trưởng cây trồng
   của tất cả các đảo.'
-CHANGED_CROP_GROWTH_NAME: '&e&lNâng cấp | &7Thay thành công hệ số tăng trưởng cây
+CHANGED_CROP_GROWTH_NAME: '&e&lNâng Cấp | &7Thay thành công hệ số tăng trưởng cây
   trồng của đảo {0}.'
 CHANGED_DISCORD: '&e&lĐảo Thần | &7Thay đổi thành công discord của đảo thành {0}.'
-CHANGED_ENTITY_LIMIT: '&e&lNâng cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo của {1}.'
-CHANGED_ENTITY_LIMIT_ALL: '&e&lNâng cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho tất cả các đảo.'
-CHANGED_ENTITY_LIMIT_NAME: '&e&lNâng cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo {1}.'
-
+CHANGED_ENTITY_LIMIT: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo của {1}.'
+CHANGED_ENTITY_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho tất cả các đảo.'
+CHANGED_ENTITY_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công cập nhật số lượng giới hạn của vật thể {0} cho đảo {1}.'
 CHANGED_ISLAND_EFFECT_LEVEL: '&e&lNâng Cấp | &7Thành công nâng cấp cấp độ của hiệu ứng đảo {0} cho đảo của {1}.'
-CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp cấp độ của hiệu ứng đảo {0} cho tất cả các đỏa.'
+CHANGED_ISLAND_EFFECT_LEVEL_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp cấp độ của hiệu ứng đảo {0} cho tất cả các đảo.'
 CHANGED_ISLAND_EFFECT_LEVEL_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp cấp độ của hiệu ứng đảo {0} cho đảo {1}.'
-
-CHANGED_ISLAND_SIZE: '&e&lNâng cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
-CHANGED_ISLAND_SIZE_ALL: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo của tất cả các đảo.'
-CHANGED_ISLAND_SIZE_NAME: '&e&lNâng cấp | &7Thay đổi thành công kích thước đảo {0}.'
+CHANGED_ISLAND_SIZE: '&e&lNâng Cấp | &7Nâng cấp thành công kích thước đảo của {0}.'
+CHANGED_ISLAND_SIZE_ALL: '&e&lNâng Cấp | &7Thay đổi thành công kích thước đảo của tất cả các đảo.'
+CHANGED_ISLAND_SIZE_NAME: '&e&lNâng Cấp | &7Thay đổi thành công kích thước đảo {0}.'
 CHANGED_ISLAND_SIZE_BUILD_OUTSIDE: '&7&oNgười chơi có thể xây dựng bên ngoài hòn đảo của họ, vì vậy kích thước đảo không ảnh hưởng. Bạn có thể tắt tính năng đó trong cấu hình để kích thước đảo có ảnh hưởng trở lại.'
-CHANGED_LANGUAGE: '&e&lNgôn Ngữ | &7Thành công thay đổi ngôn ngữ của bạn thành tiếng
-  Anh.'
-CHANGED_MOB_DROPS: '&e&lNâng cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật của
+CHANGED_LANGUAGE: '&e&lNgôn Ngữ | &7Thành công thay đổi ngôn ngữ của bạn thành Tiếng
+  Việt.'
+CHANGED_MOB_DROPS: '&e&lNâng Cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật của
   đảo {0}.'
-CHANGED_MOB_DROPS_ALL: '&e&lNâng cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật
+CHANGED_MOB_DROPS_ALL: '&e&lNâng Cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật
   của tất cả các đảo.'
-CHANGED_MOB_DROPS_NAME: '&e&lNâng cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật
+CHANGED_MOB_DROPS_NAME: '&e&lNâng Cấp | &7Thay đổi thành công tỉ lệ rơi đồ quái vật
   của đảo {0}.'
 CHANGED_NAME: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên đảo bạn thành {0}.'
 CHANGED_NAME_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên đảo của {0} thành {1}.'
 CHANGED_NAME_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã thay đổi tên của {0} thành {1}.'
-CHANGED_PAYPAL: '&e&lNâng cấp | &7Thay đổi thành công đảo paypal thành {0}.'
-
+CHANGED_PAYPAL: '&e&lNâng Cấp | &7Thay đổi thành công paypal của đảo thành {0}.'
 CHANGED_ROLE_LIMIT: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn của vai trò {0} cho đảo của {1}.'
 CHANGED_ROLE_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn của vai trò {0} cho tất cả các đảo.'
 CHANGED_ROLE_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn của vai trò {0} cho đảo {1}.'
-
-CHANGED_SPAWNER_RATES: '&e&lNâng cấp | &7Nâng cấp thành công tỉ lệ lồng sinh sản đảo của
+CHANGED_SPAWNER_RATES: '&e&lNâng Cấp | &7Nâng cấp thành công tỉ lệ lồng sinh sản đảo của
   {0}.'
-CHANGED_SPAWNER_RATES_ALL: '&e&lĐiều Chỉnh | &7Cập nhập thành công tỷ lệ nhân giống
+CHANGED_SPAWNER_RATES_ALL: '&e&lĐiều Chỉnh | &7Cập nhật thành công tỷ lệ nhân giống
   sinh sản của tất cả các đảo.'
-CHANGED_SPAWNER_RATES_NAME: '&e&lĐiều Chỉnh | &7Cập nhập thành công tỷ lệ nhân giống
+CHANGED_SPAWNER_RATES_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công tỷ lệ nhân giống
   sinh sản của đảo {0}.'
-CHANGED_TEAM_LIMIT: '&e&lNâng cấp | &7Nâng cấp thành công giới hạn người đảo của {0}.'
-CHANGED_TEAM_LIMIT_ALL: '&e&lNâng cấp | &7Cập nhật thành công giới hạn đội của tất
+CHANGED_TEAM_LIMIT: '&e&lNâng Cấp | &7Nâng cấp thành công giới hạn người đảo của {0}.'
+CHANGED_TEAM_LIMIT_ALL: '&e&lNâng Cấp | &7Cập nhật thành công giới hạn đội của tất
   cả các đảo.'
-CHANGED_TEAM_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhập thành công giới hạn đội của
+CHANGED_TEAM_LIMIT_NAME: '&e&lĐiều Chỉnh | &7Cập nhật thành công giới hạn đội của
   đảo {0}.'
 CHANGED_TELEPORT_LOCATION: '&e&lĐảo Thần | &7Cập nhật thành công vị trí dịch chuyển.'
 CHANGED_WARPS_LIMIT: '&e&lĐiều Chỉnh | &7Cập nhật thành công giới hạn khu vực đải
@@ -144,15 +133,15 @@ COMMAND_ARGUMENT_EMAIL: email
 COMMAND_ARGUMENT_ENTITY: vat-the
 COMMAND_ARGUMENT_ISLAND_NAME: ten-dao
 COMMAND_ARGUMENT_ISLAND_ROLE: vai-tro-dao
-COMMAND_ARGUMENT_LEADER: lang-dao
+COMMAND_ARGUMENT_LEADER: lanh-dao
 COMMAND_ARGUMENT_LEVEL: cap-do
 COMMAND_ARGUMENT_LIMIT: gioi-han
 COMMAND_ARGUMENT_MATERIAL: vat-lieu
 COMMAND_ARGUMENT_MENU: ten-giao-dien
-COMMAND_ARGUMENT_MESSAGE: tin-nha...
+COMMAND_ARGUMENT_MESSAGE: tin-nhan...
 COMMAND_ARGUMENT_MISSION_NAME: ten-nhiem-vu
 COMMAND_ARGUMENT_MODULE_NAME: ten-module
-COMMAND_ARGUMENT_MULTIPLIER: da-cap
+COMMAND_ARGUMENT_MULTIPLIER: he-so
 COMMAND_ARGUMENT_NAME: ten
 COMMAND_ARGUMENT_NEW_LEADER: lanh-dao-moi
 COMMAND_ARGUMENT_PAGE: trang
@@ -178,7 +167,6 @@ COMMAND_DESCRIPTION_ACCEPT: Chấp nhận lời mời từ người chơi.
 COMMAND_DESCRIPTION_ADMIN: Sử dụng các lệnh của admin.
 COMMAND_DESCRIPTION_ADMIN_BONUS: Cấp tiền thưởng cho người chơi.
 COMMAND_DESCRIPTION_ADMIN_ADD: Thêm người vào đảo.
-
 COMMAND_DESCRIPTION_ADMIN_ADD_BLOCK_LIMIT: 'Tăng giới hạn khối cho đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_BONUS: 'Thêm thưởng cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_ADD_COOP_LIMIT: 'Tăng giới hạn thành viên đảo co-op của người chơi khác.'
@@ -191,7 +179,6 @@ COMMAND_DESCRIPTION_ADMIN_ADD_SIZE: 'Mở rộng đảo của người chơi kh�
 COMMAND_DESCRIPTION_ADMIN_ADD_SPAWNER_RATES: 'Tăng hệ số tỷ lệ lồng sinh sản của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_TEAM_LIMIT: 'Tăng giới hạn thành viên đảo của người chơi khác.'
 COMMAND_DESCRIPTION_ADMIN_ADD_WARPS_LIMIT: 'Tăng giới hạn khu vực của một hòn đảo.'
-
 COMMAND_DESCRIPTION_ADMIN_BYPASS: Chuyển đổi chế độ bypass.
 COMMAND_DESCRIPTION_ADMIN_CHEST: 'Mở rương của hòn đảo của hòn đảo khác.'
 COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Xóa một tỷ lệ máy tạo quặng cho một hòn đảo cụ thể.
@@ -218,7 +205,7 @@ COMMAND_DESCRIPTION_ADMIN_NAME: Thay đổi tên của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_OPEN: Mở một hòn đảo cho công cộng.
 COMMAND_DESCRIPTION_ADMIN_OPEN_MENU: 'Mở một giao diện tùy chọn cho người chơi.'
 COMMAND_DESCRIPTION_ADMIN_PROMOTE: Thăng chức thành viên ở đảo của người chơi khác.
-COMMAND_DESCRIPTION_ADMIN_PURGE: lọc đảo.
+COMMAND_DESCRIPTION_ADMIN_PURGE: Lọc bỏ số lượng lớn đảo.
 COMMAND_DESCRIPTION_ADMIN_RANKUP: Cập nhật mức độ nâng cấp cho hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RECALC: Tính lại giá trị của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_RELOAD: Tải lại tất cả các config và tác vụ của plugin.
@@ -274,7 +261,7 @@ COMMAND_DESCRIPTION_BALANCE: 'Kiểm tra số tiền bên trong ngân hàng củ
 COMMAND_DESCRIPTION_BAN: Cấm một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_BANK: 'Mở ngân hàng đảo.'
 COMMAND_DESCRIPTION_BIOME: Thẩy đổi quần xã của hòn đảo.
-COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đỏa.
+COMMAND_DESCRIPTION_BORDER: Thay đổi màu bo của hòn đảo.
 COMMAND_DESCRIPTION_CHEST: 'Mở rương đảo.'
 COMMAND_DESCRIPTION_CLOSE: Đóng đảo thành công cộng.
 COMMAND_DESCRIPTION_COOP: Thêm thành viên co-op cho đảo bạn.
@@ -287,24 +274,24 @@ COMMAND_DESCRIPTION_DEPOSIT: Gửi tiền từ tài khoản cá nhân của bạ
   đảo.
 COMMAND_DESCRIPTION_DISBAND: Giải tán hòn đảo của bạn vĩnh viễn.
 COMMAND_DESCRIPTION_EXPEL: Kick một vị khách từ đảo của bạn.
-COMMAND_DESCRIPTION_FLY: Chuyển chế độ cho đảo.
+COMMAND_DESCRIPTION_FLY: Chuyển chế độ bay cho đảo.
 COMMAND_DESCRIPTION_HELP: Danh sách tất cả các lệnh.
 COMMAND_DESCRIPTION_INVITE: Mời một người chơi đến đảo của bạn.
 COMMAND_DESCRIPTION_KICK: Kick một người chơi từ đảo của bạn.
 COMMAND_DESCRIPTION_LANG: Thay đổi ngôn ngữ cá nhân của bạn.
 COMMAND_DESCRIPTION_LEAVE: Rời khỏi hòn đảo của bạn.
 COMMAND_DESCRIPTION_MEMBERS: Mở menu thành viên.
-COMMAND_DESCRIPTION_MISSION: Hoàn thành nhiệm.
+COMMAND_DESCRIPTION_MISSION: Hoàn thành nhiệm vụ.
 COMMAND_DESCRIPTION_MISSIONS: Mở menu nhiệm vụ.
 COMMAND_DESCRIPTION_NAME: Thay đảo tên đảo của bạn.
 COMMAND_DESCRIPTION_OPEN: Mở đảo cho công cộng.
 COMMAND_DESCRIPTION_PANEL: Mở bảng điều khiển của đảo.
 COMMAND_DESCRIPTION_PARDON: Bỏ cấm một người chơi từ đảo của bạn.
-COMMAND_DESCRIPTION_PERMISSIONS: Nhận tất cả các quyền cho vai trò đảo.
+COMMAND_DESCRIPTION_PERMISSIONS: Xem tất cả các quyền cho vai trò đảo.
 COMMAND_DESCRIPTION_PROMOTE: Thăng chức một thành viên trong hòn đảo của bạn.
 COMMAND_DESCRIPTION_RANKUP: Tăng cấp một bản nâng cấp.
-COMMAND_DESCRIPTION_RATE: Đáng giá một hòn đảo.
-COMMAND_DESCRIPTION_RATINGS: Hiện thị tất cả đánh giá đỏa.
+COMMAND_DESCRIPTION_RATE: Đánh giá một hòn đảo.
+COMMAND_DESCRIPTION_RATINGS: Hiện thị tất cả đánh giá đảo.
 COMMAND_DESCRIPTION_SETTINGS: Mở menu cài đặt đảo.
 COMMAND_DESCRIPTION_RECALC: Tính lại giá trị đảo.
 COMMAND_DESCRIPTION_SET_DISCORD: Đặt discord của đảo đối với các khoản thanh toán
@@ -314,9 +301,9 @@ COMMAND_DESCRIPTION_SET_PAYPAL: Đặt email paypal của đảo cho các khoả
 COMMAND_DESCRIPTION_SET_ROLE: Thay đổi vai trò của một người chơi trong hòn đảo của
   bạn.
 COMMAND_DESCRIPTION_SET_TELEPORT: Thay đổi vị trí dịch chuyển trên đảo của bạn.
-COMMAND_DESCRIPTION_SET_WARP: Tạo một đảo mới.
-COMMAND_DESCRIPTION_SHOW: Nhận thông tin về một hòn đảo.
-COMMAND_DESCRIPTION_TEAM: Nhận thông tin về tình trạng thành viên đảo.
+COMMAND_DESCRIPTION_SET_WARP: Tạo một khu vực đảo mới.
+COMMAND_DESCRIPTION_SHOW: Xem thông tin về một hòn đảo.
+COMMAND_DESCRIPTION_TEAM: Xem thông tin về tình trạng thành viên đảo.
 COMMAND_DESCRIPTION_TEAM_CHAT: Chuyển đổi chế độ trò chuyện nhóm.
 COMMAND_DESCRIPTION_TELEPORT: Dịch chuyển đến đảo của bạn.
 COMMAND_DESCRIPTION_TOGGLE: Chuyển đổi biên giới đảo và vị trí khối xếp chồng lên
@@ -325,36 +312,36 @@ COMMAND_DESCRIPTION_TOP: Mở bảng đảo hàng đầu.
 COMMAND_DESCRIPTION_TRANSFER: Chuyển lãnh đạo đảo của bạn.
 COMMAND_DESCRIPTION_UNCOOP: Loại bỏ người chơi thành viên co-op trong đảo bạn.
 COMMAND_DESCRIPTION_UPGRADE: Mở bảng nâng cấp.
-COMMAND_DESCRIPTION_VALUE: Nhận giá trị giá trị của một khối.
+COMMAND_DESCRIPTION_VALUE: Xem giá trị giá trị của một khối.
 COMMAND_DESCRIPTION_VALUES: Mở menu giá trị.
 COMMAND_DESCRIPTION_VISIT: Dịch chuyển đến vị trí của du khách trên đảo.
 COMMAND_DESCRIPTION_VISITORS: Mở menu khách.
-COMMAND_DESCRIPTION_WARP: Warp đến một đảo khu vực.
+COMMAND_DESCRIPTION_WARP: Dịch chuyển đến một khu vực đảo.
 COMMAND_DESCRIPTION_WARPS: Mở menu khu vực.
-COMMAND_DESCRIPTION_WITHDRAW: Rút tiền từ ngân hàng đảo của bạn vào tài khoản cá nhân
+COMMAND_DESCRIPTION_WITHDRAW: Rút tiền từ ngân hàng đảo vào tài khoản cá nhân
   của bạn.
-COMMAND_USAGE: '&cSử dụng: /{0}'
-COOP_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thêm {1} là thành viên co-op.'
-COOP_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này bị cấm từ đảo và không thể    được
-  co-op.'
-COOP_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã đạt số lượng tối đa người chơi co-op mà hòn đảo có thể có.'
+COMMAND_USAGE: '&cCách dùng: /{0}'
+COOP_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thêm {1} với tư cách thành viên co-op.'
+COOP_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này đang bị cấm khỏi đảo và không thể trở thành
+  thành viên co-op.'
+COOP_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã đạt số lượng người chơi co-op tối đa mà hòn đảo có thể có.'
 CREATE_ISLAND: '&e&lĐảo Thần | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo đảo của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
 DEBUG_MODE_DISABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &cTẮT&7.'
 DEBUG_MODE_ENABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &aBẬT&7.'
 DEBUG_MODE_FILTER: '&e&lGỡ Lỗi | &7Đã cập nhật thành công bộ lọc gỡ lỗi!'
 DELETE_WARP: '&e&lĐảo Thần | &7Bạn đã xóa khu vực {0}.'
-DELETE_WARP_SIGN_BROKE: '&7&oChỗ đó từng có một bản hiệu khu vực, nhưng nó đã hư...'
+DELETE_WARP_SIGN_BROKE: '&7&oChỗ đó từng có một bản hiệu khu vực, nhưng nó đã bị hỏng...'
 DEMOTE_LEADER: '&c&lLỗi | &7Bạn không thể hạ cấp lãnh đạo đảo.'
-DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể hạ cấp người chơi với
+DEMOTE_PLAYERS_WITH_LOWER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể hạ cấp người chơi có
   vai trò đảo thấp hơn của bạn.'
 DEMOTED_MEMBER: '&e&lĐảo Thần | &7Bạn đã hạ cấp {0} thành {1} trong đảo của họ.'
 DEPOSIT_ANNOUNCEMENT: '&e&lNgân Hàng | &7{0} đã gửi {1}$ vào ngân hàng đảo!'
 DEPOSIT_ERROR: '&c&lLỗi | &7{0}.'
 DESTROY_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể phá hủy bên ngoài phạm vi bảo vệ
-  của bạn.'
+  của đảo bạn.'
 DISBAND_ANNOUNCEMENT: '&e&lĐảo Thần | &7Đảo của bạn đã bị giải tán bởi {0}.'
-DISBAND_GIVE: '&e&lĐảo Thần | &7Bạn đã nhận được {0} giải tán.'
+DISBAND_GIVE: '&e&lĐảo Thần | &7Bạn đã nhận được {0} lượt giải tán.'
 DISBAND_GIVE_ALL: '&e&lĐảo Thần | &7Bạn đã đưa số lần {0} tạo lại đảo cho tất cả người chơi.'
 DISBAND_GIVE_OTHER: '&e&lĐảo Thần | &7Bạn đã cho {0} giải tán đến {1}.'
 DISBAND_ISLAND_BALANCE_REFUND: '&7&oHòn đảo của bạn đã bị giải tán và ${0} tiền đã được hoàn trả vào tài khoản của bạn từ ngân hàng đảo.'
@@ -365,7 +352,7 @@ DISBANDED_ISLAND: '&e&lĐảo Thần | &7Bạn đã giải tán hòn đảo củ
 DISBANDED_ISLAND_OTHER: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo của {0}.'
 DISBANDED_ISLAND_OTHER_NAME: '&e&lĐiều Chỉnh | &7Bạn đã giải tán đảo {0}.'
 ENTER_PVP_ISLAND: '&7&oBạn đã được dịch chuyển đến một hòn đảo có bật PVP. Bạn được
-  miễn dịch với PVP trong 10 giây tiếp theo...'
+  miễn sát thương với PVP trong 10 giây tiếp theo...'
 EXPELLED_PLAYER: '&e&lĐảo Thần | &7{0} đã bị trục xuất khỏi đảo.'
 FORMAT_QUAD: 'Q'
 FORMAT_TRILLION: 'T'
@@ -376,8 +363,8 @@ FORMAT_SECONDS_NAME: giây
 FORMAT_SECOND_NAME: giây
 FORMAT_MINUTES_NAME: phút
 FORMAT_MINUTE_NAME: phút
-FORMAT_HOURS_NAME: tiếng
-FORMAT_HOUR_NAME: tiếng
+FORMAT_HOURS_NAME: giờ
+FORMAT_HOUR_NAME: giờ
 FORMAT_DAYS_NAME: ngày
 FORMAT_DAY_NAME: ngày
 GENERATOR_CLEARED: '&e&lĐảo Thần | &7Xóa thành công số lượng máy tạo quặng cho đảo của {0}.'
@@ -392,25 +379,25 @@ GLOBAL_MESSAGE_SENT: '&e&lĐảo Thần | &7Gửi thành công tin nhắn đến
   đảo của {0}!'
 GLOBAL_MESSAGE_SENT_NAME: '&e&lĐảo Thần | &7Gửi thành công tin nhắn đến thành
   viên của đảo {0}!'
-GLOBAL_TITLE_SENT: '&e&lĐảo thần | &7Thành công gửi title cho thành viên đảo của {0}!'
-GLOBAL_TITLE_SENT_NAME: '&e&lĐảo thần | &7Thành công gửi title cho thành viên đảo {0}!'
-GOT_BANNED: '&e&lĐảo Thần | &7Bạn đã được &cCẤM&7 từ đảo của {0}.'
+GLOBAL_TITLE_SENT: '&e&lĐảo Thần | &7Gửi title cho thành viên đảo của {0} thành công!'
+GLOBAL_TITLE_SENT_NAME: '&e&lĐảo Thần | &7Gửi title cho thành viên đảo {0} thành công!'
+GOT_BANNED: '&e&lĐảo Thần | &7Bạn đã bị &cCẤM&7 khỏi đảo của {0}.'
 GOT_DEMOTED: '&e&lĐảo Thần | &7Bạn đã bị hạ cấp xuống thành {0} trong đảo của bạn.'
 GOT_EXPELLED: '&e&lĐảo Thần | &7&oBạn đã bị trục xuất khỏi đảo bởi {0}...'
 GOT_INVITE: '&e&lĐảo Thần | &7{0} mời bạn đến đảo của họ.'
 GOT_INVITE_TOOLTIP: '&7Nhấp vào tin nhắn để chấp nhận lời mời.'
-GOT_KICKED: '&e&lĐảo Thần | &7Bạn đã bị kick từ đảo của bạn bởi {0}.'
+GOT_KICKED: '&e&lĐảo Thần | &7Bạn đã bị kick khỏi đảo của bạn bởi {0}.'
 GOT_PROMOTED: '&e&lĐảo Thần | &7Bạn đã được thăng chức {0} trong đảo của bạn.'
 GOT_REVOKED: '&e&lĐảo Thần | &7{0} đã thu hồi lời mời bạn đến đảo của họ.'
-GOT_UNBANNED: '&e&lĐảo Thần | &7Bạn đã được unban từ đảo của {0}.'
+GOT_UNBANNED: '&e&lĐảo Thần | &7Bạn đã được dỡ bỏ lệnh cấm khỏi đảo của {0}.'
 HIT_ISLAND_MEMBER: '&c&lLỗi| &7Bạn không thể đánh thành viên đảo của bạn.'
 HIT_PLAYER_IN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh người chơi trong đảo.'
-IGNORED_ISLAND: '&e&lNâng cấp | &7Đảo của {0} bây giờ bị bỏ qua trong các đảo hàng
-  đầu.'
-IGNORED_ISLAND_NAME: '&e&lNâng cấp | &7Đảo {0} bây giờ bị bỏ qua trong các đảo hàng
-  đầu.'
-INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài sự bảo vệ phạm
-  vi   đảo của bạn.'
+IGNORED_ISLAND: '&e&lNâng Cấp | &7Đảo của {0} bây giờ không còn hiển thị trong
+  danh sách đảo hàng đầu.'
+IGNORED_ISLAND_NAME: '&e&lNâng Cấp | &7Đảo {0} bây giờ không còn hiển thị trong
+  danh sách đảo hàng đầu.'
+INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài phạm vi bảo
+  vệ của đảo bạn.'
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
@@ -430,17 +417,17 @@ INVALID_MATERIAL: '&c&lLỗi | &7Vật liệu không hợp lệ {0}.'
 INVALID_MATERIAL_DATA: '&c&lLỗi | &7Dữ liệu-vật liệu không hợp lệ {0}.'
 INVALID_MISSION: '&c&lLỗi | &7Nhiệm vụ không hợp lệ {0}.'
 INVALID_MODULE: '&c&lLỗi | &7Module không hợp lệ {0}.'
-INVALID_MULTIPLIER: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
+INVALID_MULTIPLIER: '&c&lLỗi | &7Hệ số không hợp lệ {0}.'
 INVALID_PAGE: '&c&lLỗi | &7Trang không hợp lệ {0}.'
 INVALID_PERCENTAGE: '&c&lLỗi | &7Tỷ lệ phần trăm phải nằm trong khoảng từ 0 đến 100.'
-INVALID_PLAYER: '&c&lLỗi | &7Không thể tìm thấy một người chơi được gọi là {0}'
+INVALID_PLAYER: '&c&lLỗi | &7Không thể tìm thấy người chơi tên {0}'
 INVALID_RATE: |
   &c&lLỗi | &7Không thể tìm thấy một đánh giá với tên {0}.
-  &c&lLỗi | &7Các đánh giá đỏa: {1}
+  &c&lLỗi | &7Các đánh giá đảo: {1}
 INVALID_ROWS: '&c&lLỗi | &7Số lượng dòng không hợp lệ: {0}'
 INVALID_ROLE: |
   &c&lLỗi | &7Không thể tìm thấy vai trò đảo {0}.
-  &c&lLỗi | &7Các vai trò của đảo : {1}
+  &c&lLỗi | &7Các vai trò của đảo: {1}
 INVALID_SCHEMATIC: '&c&lLỗi | &7không thể tìm thấy schematic với tên {0}.'
 INVALID_SETTINGS: |
   &c&lLỗi | &7Không thể tìm thấy cài đặt đảo {0}.
@@ -482,52 +469,52 @@ ISLAND_HELP_LINE: '&e/{0} &f- &7{1}'
 ISLAND_HELP_NEXT_PAGE: '&e&lSuperiorSkyblock &7Dùng /is help {0} cho trang tiếp theo.'
 ISLAND_INFO_ADMIN_BANK_LIMIT: '&e&lĐảo Thần | &7Giới Hạn Ngân Hàng: {0}'
 ISLAND_INFO_ADMIN_BLOCKS_LIMITS: |
-  &e&lNâng cấp | &7Giới Hạn Các Khối:
+  &e&lNâng Cấp | &7Giới Hạn Các Khối:
   {0}
-ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lNâng cấp | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE: '&e&lNâng Cấp | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_COOP_LIMIT: '&e&lĐảo Thần | &7Giới Hạn Co-op: {0}'
 ISLAND_INFO_ADMIN_ISLAND_EFFECTS: |
-  &e&lĐảo thần | &7Các hiệu ứng đảo:
+  &e&lĐảo Thần | &7Các hiệu ứng đảo:
   {0}
-ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lĐảo thần | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE: '&e&lĐảo Thần | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS: |
   &e&lĐảo Thần | &7Giới hạn các vật thể:
   {0}
 ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE: '&e&lĐảo Thần | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lNâng cấp | &7Cây trồng đa cấp: {0}'
-ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lNâng cấp | &7Drops đa cấp: {0}'
+ISLAND_INFO_ADMIN_CROPS_MULTIPLIER: '&e&lNâng Cấp | &7Cây trồng đa cấp: {0}'
+ISLAND_INFO_ADMIN_DROPS_MULTIPLIER: '&e&lNâng Cấp | &7Drops đa cấp: {0}'
 ISLAND_INFO_ADMIN_GENERATOR_RATES: |
   &e&lĐảo Thần | &7Tỉ lệ máy tạo quặng ({1}):
   {0}
-ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng cấp | &7  {0}: {1}% ({2})'
+ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE: '&e&lNâng Cấp | &7  {0}: {1}% ({2})'
 ISLAND_INFO_ADMIN_ROLE_LIMITS: |
   &e&lĐảo Thần | &7Giới Hạn Vai Trò:
   {0}
 ISLAND_INFO_ADMIN_ROLE_LIMITS_LINE: '&e&lĐảo Thần | &7  {0}: {1}'
-ISLAND_INFO_ADMIN_SIZE: '&e&lNâng cấp | &7Kích thước bo: {0}'
-ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lNâng cấp | &7Lồng sinh sản đa cấp: {0}'
-ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lNâng cấp | &7Giới hạn đội: {0}'
+ISLAND_INFO_ADMIN_SIZE: '&e&lNâng Cấp | &7Kích thước bo: {0}'
+ISLAND_INFO_ADMIN_SPAWNERS_MULTIPLIER: '&e&lNâng Cấp | &7Lồng sinh sản đa cấp: {0}'
+ISLAND_INFO_ADMIN_TEAM_LIMIT: '&e&lNâng Cấp | &7Giới hạn đội: {0}'
 ISLAND_INFO_ADMIN_UPGRADES: |
-  &e&lNâng cấp | &7Các Nâng Cấp:
+  &e&lNâng Cấp | &7Các Nâng Cấp:
   {0}
-ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lNâng cấp | &7  {0}: {1}'
+ISLAND_INFO_ADMIN_UPGRADE_LINE: '&e&lNâng Cấp | &7  {0}: {1}'
 ISLAND_INFO_ADMIN_VALUE_SYNCED: '&a∞'
-ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lĐảo thần | &7Giới Hạn Khu Vực: {0}'
+ISLAND_INFO_ADMIN_WARPS_LIMIT: '&e&lĐảo Thần | &7Giới Hạn Khu Vực: {0}'
 ISLAND_INFO_BANK: '&e&lĐảo Thần | &7Ngân hàng: {0}'
 ISLAND_INFO_BONUS: '&e&lĐảo Thần | &7Giá trị đi kèm: {0}'
 ISLAND_INFO_BONUS_LEVEL: '&e&lĐảo Thần | &7Cấp độ đi kèm: {0}'
-ISLAND_INFO_CREATION_TIME: '&e&lĐảo Thần | &7Thời gian sáng tạo: {0}'
+ISLAND_INFO_CREATION_TIME: '&e&lĐảo Thần | &7Thời gian tạo đảo: {0}'
 ISLAND_INFO_DISCORD: '&e&lĐảo Thần | &7Discord: {0}'
 ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lĐảo Thần | Cập nhật lần cuối: {0} trước'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lĐảo Thần | &7Cập nhật lần cuối: &aHiện đang hoạt động'
 ISLAND_INFO_LOCATION: '&e&lĐảo Thần | &7Nhà: {0}'
-ISLAND_INFO_NAME: '&e&lNâng cấp | &7Tên: {0}'
+ISLAND_INFO_NAME: '&e&lNâng Cấp | &7Tên: {0}'
 ISLAND_INFO_OWNER: '&e&lĐảo Thần | &7Lãnh đạo: {0}'
 ISLAND_INFO_PAYPAL: '&e&lĐảo Thần | &7Paypal: {0}'
 ISLAND_INFO_PLAYER_LINE: '&e&lĐảo Thần | &7 - {0}'
-ISLAND_INFO_RATE: '&e&lĐảo Thần | &7Đáng Giá: {0} &7({1}/5) - tất cả {2} đánh giá.'
+ISLAND_INFO_RATE: '&e&lĐảo Thần | &7Đánh Giá: {0} &7({1}/5) - tất cả {2} đánh giá.'
 ISLAND_INFO_RATE_EMPTY_SYMBOL: '&f✧'
 ISLAND_INFO_RATE_SYMBOL: ✦
 ISLAND_INFO_RATE_ONE_COLOR: '&4'
@@ -536,7 +523,7 @@ ISLAND_INFO_RATE_THREE_COLOR: '&e'
 ISLAND_INFO_RATE_FOUR_COLOR: '&a'
 ISLAND_INFO_RATE_FIVE_COLOR: '&2'
 ISLAND_INFO_ROLES: |
-  &e&lNâng cấp | &7{0}s:
+  &e&lNâng Cấp | &7{0}s:
   {1}
 ISLAND_INFO_VISITORS_COUNT: '&e&lĐảo Thần | &7Số lượt khách: {0}'
 ISLAND_INFO_WORTH: '&e&lĐảo Thần | &7Đáng giá: {0}'
@@ -554,12 +541,12 @@ ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lĐảo Thần | &7Thành viên đảo của {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Ngoại tuyến)'
 ISLAND_TEAM_STATUS_ONLINE: '&a(Trực tuyến)'
-ISLAND_TEAM_STATUS_ROLES: '&e&lNâng cấp | &7 * [{0}] {1} {2} &7({3})'
+ISLAND_TEAM_STATUS_ROLES: '&e&lNâng Cấp | &7 * [{0}] {1} {2} &7({3})'
 ISLAND_TOP_STATUS_OFFLINE: '&c(Ngoại Tuyến)'
 ISLAND_TOP_STATUS_ONLINE: '&a(Trực Tuyến)'
 ISLAND_WARP_PUBLIC: ''
 ISLAND_WARP_PRIVATE: '&c[Riêng Tư]'
-ISLAND_WAS_CLOSED: '&e&lNâng cấp | &7&oHòn đảo bạn đang ở đã bị đóng cửa và bạn sẽ
+ISLAND_WAS_CLOSED: '&e&lNâng Cấp | &7&oHòn đảo bạn đang ở đã bị đóng cửa và bạn sẽ
   dịch chuyển trở lại spawn...'
 ISLAND_WORTH_ERROR: '&c&lError | &7An unexpected error occurred while calculating your island. Contact administrators if the issue persists.'
 ISLAND_WORTH_RESULT: '&e&lĐảo Thần | &7Giá trị đảo của bạn là {0} [Cấp độ {1}]'
@@ -569,9 +556,9 @@ JOIN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã gia nhập đảo của bạn
 JOIN_FULL_ISLAND: '&c&lLỗi | &7Hòn đảo này đạt số lượng thành viên tối đa được phép.'
 JOIN_WHILE_IN_ISLAND: '&c&lLỗi | &7Bạn đã ở trong một hòn đảo rồi.'
 JOINED_ISLAND: '&e&lĐảo Thần | &7Bạn đã tham gia đảo của {0}.'
-JOINED_ISLAND_NAME: '&e&lĐảo thần | &7Bạn đã vào đảo {0}.'
-JOINED_ISLAND_AS_COOP: '&e&lĐảo thần | &7Bây giờ bạn là thành viên co-op đảo của {0}.'
-JOINED_ISLAND_AS_COOP_NAME: '&e&lĐảo thần | &7Bây giờ bạn là thành viên co-op đảo
+JOINED_ISLAND_NAME: '&e&lĐảo Thần | &7Bạn đã vào đảo {0}.'
+JOINED_ISLAND_AS_COOP: '&e&lĐảo Thần | &7Bây giờ bạn là thành viên co-op đảo của {0}.'
+JOINED_ISLAND_AS_COOP_NAME: '&e&lĐảo Thần | &7Bây giờ bạn là thành viên co-op đảo
   {0}.'
 KICK_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã bị kick khỏi đảo bởi {1}.'
 KICK_ISLAND_LEADER: '&c&lLỗi | &7Bạn không thể đá người chủ đảo, thay vào đó sử dụng /is admin disband.'
@@ -613,7 +600,7 @@ MODULE_UNLOADED_SUCCESS: '&e&lModule | &7Successfully unloaded the module.'
 MODULES_LIST: '&fModules ({0}): {1}'
 MODULES_LIST_MODULE_NAME: '&a{0}'
 MODULES_LIST_SEPARATOR: '&f, '
-NAME_ANNOUNCEMENT: '&e&lNâng cấp | &7{0} đã thay đổi tên đảo của anh/cô ấy thành {1}.'
+NAME_ANNOUNCEMENT: '&e&lNâng Cấp | &7{0} đã thay đổi tên đảo của anh/cô ấy thành {1}.'
 NAME_BLACKLISTED: '&c&lLỗi | &7Bạn không thể sử dụng tên này.'
 NAME_CHAT_FORMAT: '&8[&e{0}&8] &r'
 NAME_SAME_AS_PLAYER: '&c&lLỗi | &7Bạn không thể dùng tên người chơi là tên đảo.'
@@ -623,8 +610,8 @@ NO_BAN_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để cấm ngư�
 NO_CLOSE_BYPASS: '&c&lLỗi | &7Hòn đảo này không mở cửa cho công cộng.'
 NO_CLOSE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để đóng đảo với công cộng.'
 NO_COMMAND_PERMISSION: '&fLệnh không xác định. Nhấn "/help" để được trợ giúp.'
-NO_COOP_PERMISSION: '&c&lLỗi | &7Bạn phải ít nhất {0} để thêm người chơi    là thành
-  viên co-op.'
+NO_COOP_PERMISSION: '&c&lLỗi | &7Bạn phải là {0} hoặc cao hơn để thêm người chơi
+  với tư cách là thành viên co-op.'
 NO_DELETE_WARP_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để xóa khu vực.'
 NO_DEMOTE_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để hạ cấp người chơi.'
 NO_DEPOSIT_PERMISSION: '&c&lLỗi | &7Bạn phải có quyền {0} để gửi tiền vào ngân hàng
@@ -673,15 +660,15 @@ NOT_ENOUGH_MONEY_TO_UPGRADE: '&c&lLỗi | &7Bạn không có đủ tiền để 
 NOT_ENOUGH_MONEY_TO_WARP: '&c&lLỗi | &7Bạn không có đủ tiền để dùng các khu vực đảo.'
 OPEN_MENU_WHILE_SLEEPING: '&7&oBạn quá mệt mỏi để tương tác với các menu, bạn không nghĩ vậy sao?'
 PANEL_TOGGLE_OFF: |-
-  &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo : &cTẮT&7.
+  &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo: &cTẮT&7.
   &e&lBảng điều khiển | &7Xài /is sẽ dịch chuyển bạn về đảo.'
 PANEL_TOGGLE_ON: |-
-  &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo : &aBẬT&7.
+  &e&lBảng điều khiển | &7Chuyển đổi chế độ bảng điều khiển đảo: &aBẬT&7.
   &e&lBảng điều khiển | &7Dùng /is sẽ mở bảng điều khiển cho bạn.
-PERMISSION_CHANGED: '&e&lNâng cấp | &7Thay đổi thành công quyền {0} đảo của {1}.'
+PERMISSION_CHANGED: '&e&lNâng Cấp | &7Thay đổi thành công quyền {0} đảo của {1}.'
 PERMISSION_CHANGED_NAME: '&e&lQuyền Lợi | &7Thay đổi thành công quyền {0} cho đảo
   {1}.'
-PERMISSION_CHANGED_ALL: '&e&lNâng cấp | &7Thay đổi thành công quyền {0} cho tất cả
+PERMISSION_CHANGED_ALL: '&e&lNâng Cấp | &7Thay đổi thành công quyền {0} cho tất cả
   các đảo.'
 PERMISSIONS_RESET_PLAYER: '&e&lĐảo Thần | &7Thành công đặt lại tất cả các quyền cho {0} thành giá trị mặc định!'
 PERMISSIONS_RESET_ROLES: '&e&lĐảo Thần | &7Thành công đặt lại tất cả các quyền của hòn đảo thành giá trị mặc định!'
@@ -712,10 +699,10 @@ RATE_OWN_ISLAND: '&c&lLỗi | &7Bạn không thể đánh giả đảo của b�
 RATE_REMOVE_ALL: '&e&lĐánh giá | &7Thành công xóa bỏ tất cả đánh giá của đảo {0}.'
 RATE_REMOVE_ALL_ISLANDS: '&e&lĐảo Thần | &7Thành công xóa bỏ tất cả đánh giá của tất cả các đảo.'
 RATE_SUCCESS: '&e&lĐánh giá | &7Bạn đánh giả đảo này với {0} sao!'
-REACHED_BLOCK_LIMIT: '&e&lNâng cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
+REACHED_BLOCK_LIMIT: '&e&lNâng Cấp | &7Bạn đã đạt giới hạn {0} khối của đảo.'
 RECALC_ALREADY_RUNNING: '&c&lLỗi | &7Đảo của bạn đang được tính toán lại, vui lòng chờ.'
 RECALC_ALREADY_RUNNING_OTHER: '&c&lLỗi | &7Hòn đảo này đang được tính toán lại, vui lòng chờ.'
-RECALC_ALL_ISLANDS: '&e&lNâng cấp | &7Recalculating all islands...'
+RECALC_ALL_ISLANDS: '&e&lNâng Cấp | &7Recalculating all islands...'
 RECALC_ALL_ISLANDS_DONE: '&e&lĐảo Thần | &7Thành công tính toán lại tất cả các đảo.'
 RECALC_PROCCESS_REQUEST: '&e&lĐảo Thần | &7Đang xử lý yêu cầu của bạn...'
 RELOAD_COMPLETED: '&e&lĐảo Thần | &7Tải lại xong!'
@@ -725,7 +712,7 @@ REVOKE_INVITE_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} thu hồi lời mời c�
 RESET_WORLD_SUCCEED: '&e&lĐảo Thần | &7Thành công đặt lại thế giới {0} cho đảo của {1}.'
 RESET_WORLD_SUCCEED_ALL: '&e&lĐảo Thần | &7Thành công đặt lại thế giới {0} cho tất cả các đảo.'
 RESET_WORLD_SUCCEED_NAME: '&e&lĐảo Thần | &7Thành công đặt lại thế giới {0} cho đảo {1}.'
-SAME_NAME_CHANGE: '&c&lLỗi | &7Bạn phải nhập một tên khác với tên đảo hiện tại   của
+SAME_NAME_CHANGE: '&c&lLỗi | &7Bạn phải nhập một tên khác với tên đảo hiện tại của
   bạn.'
 SCHEMATIC_LEFT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #2 ({0})'
 SCHEMATIC_NOT_READY: '&c&lLỗi | &7Bạn chưa chọn hai vị trí.'
@@ -736,9 +723,9 @@ SCHEMATIC_READY_TO_CREATE: |
 SCHEMATIC_RIGHT_SELECT: '&e&lSchematics | &7Đã chọn vị trí #1 ({0})'
 SCHEMATIC_SAVED: '&e&lSchematics | &7Lưu thành công schematic!'
 SELF_ROLE_CHANGE: '&c&lLỗi | &7Bạn không thể thay đổi vai trò của chính mình.'
-SET_UPGRADE_LEVEL: '&e&lNâng cấp | &7Nâng cấp thành công cấp độ của {0} cho đảo của
+SET_UPGRADE_LEVEL: '&e&lNâng Cấp | &7Nâng cấp thành công cấp độ của {0} cho đảo của
   {1}.'
-SET_UPGRADE_LEVEL_NAME: '&e&lNâng cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
+SET_UPGRADE_LEVEL_NAME: '&e&lNâng Cấp | &7Thay đổi thành công cấp độ {0} cho đảo {1}.'
 SET_WARP: '&e&lĐảo Thần | &7Tạo thành công một khu vực mới tại {0}.'
 SET_WARP_OUTSIDE: '&c&lLỗi | &7Bạn không thể đặt khu vực bên ngoài hòn đảo của bạn.'
 SETTINGS_UPDATED: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh {0} cho đảo của
@@ -751,9 +738,9 @@ SIZE_BIGGER_MAX: '&c&lLỗi | &7Bạn không thể đặt kích thước lớn h
 SPAWN_TELEPORT_SUCCESS: '&e&lTrung Tâm | &7Dịch chuyển thành công {0} đến trung tâm.'
 SPAWN_SET_SUCCESS: '&e&lTrung Tâm | &7Cập nhật thành công vị trí trung tâm thành {0}.'
 SPY_TEAM_CHAT_FORMAT: '&7[Bí Mật] &e[{0}] {1}&f: &7{2}'
-SYNC_UPGRADES: '&e&lNâng cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp đảo của {0}.'
-SYNC_UPGRADES_ALL: '&e&lNâng cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp cho tất cả các đảo.'
-SYNC_UPGRADES_NAME: '&e&lNâng cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp của đảo {0}.'
+SYNC_UPGRADES: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp đảo của {0}.'
+SYNC_UPGRADES_ALL: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp cho tất cả các đảo.'
+SYNC_UPGRADES_NAME: '&e&lNâng Cấp | &7Đã đồng bộ hóa thành công tất cả các giá trị nâng cấp của đảo {0}.'
 TEAM_CHAT_FORMAT: '&e[{0}] {1}&f: &7{2}'
 TELEPORT_LOCATION_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không ở trong đảo của bạn.'
 TELEPORT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể dịch chuyển ra ngoài phạm vi bảo vệ đảo của bạn.'
@@ -761,39 +748,39 @@ TELEPORT_WARMUP: '&7&oBạn sẽ được dịch chuyển trong {0}... Đừng d
 TELEPORT_WARMUP_CANCEL: '&7&oBạn đã di chuyển và do đó dịch chuyển tức thời đã bị
   hủy.'
 TITLE_SENT: '&e&lĐảo Thần | &7Thành công gửi người chơi {0} title!'
-TELEPORTED_FAILED: '&e&lNâng cấp | &7Có vẻ như hòn đảo này không có khối an toàn.
-  Xin vui lòng   liên lạc với nhân viên.'
+TELEPORTED_FAILED: '&e&lNâng Cấp | &7Có vẻ như hòn đảo này không có vị trí nào an toàn.
+  Xin vui lòng liên lạc với ban quản trị.'
 TELEPORTED_SUCCESS: '&e&lĐảo Thần | &7Bạn đã được dịch chuyển đến hòn đảo của bạn.'
 TELEPORTED_TO_WARP: '&e&lĐảo Thần | &7Dịch chuyển thành công đến khu vực của hòn đảo
   này.'
 TELEPORTED_TO_WARP_ANNOUNCEMENT: '&e&lĐảo Thần | &7Người chơi {0} đã dịch chuyển đến khu vực đảo {1}.'
-TOGGLED_BYPASS_OFF: '&e&lBypass | &7TChuyển đổi chế độ bypass : &cTẮT&7.'
-TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass : &aBẬT&7.'
-TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo : &cTẮT&7.'
-TOGGLED_FLY_ON: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo : &aBẬT&7.'
-TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Chuyển đổi chế độ schematic : &cTẮT&7.'
+TOGGLED_BYPASS_OFF: '&e&lBypass | &7Chuyển đổi chế độ bypass: &cTẮT&7.'
+TOGGLED_BYPASS_ON: '&e&lBypass | &7Chuyển đổi chế độ bypass: &aBẬT&7.'
+TOGGLED_FLY_OFF: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &cTẮT&7.'
+TOGGLED_FLY_ON: '&e&lBay | &7Chuyển đổi chế độ bay trong đảo: &aBẬT&7.'
+TOGGLED_SCHEMATIC_OFF: '&e&lSchematics | &7Chuyển đổi chế độ schematic: &cTẮT&7.'
 TOGGLED_SCHEMATIC_ON: |-
-  &e&lSchematics | &7Chuyển đổi chế độ schematic : &aBẬT&7.
+  &e&lSchematics | &7Chuyển đổi chế độ schematic: &aBẬT&7.
   &e&lSchematics | &7Chọn một khu vực bằng rìu vàng (golden axe).
 TOGGLED_SPY_OFF: '&e&lBí Mật | &7Chế độ nói chuyện bí mật: &cTẮT&7.'
 TOGGLED_SPY_ON: '&e&lBí Mật | &7Chế độ nói chuyện bí mật: &aBẬT&7.'
 TOGGLED_STACKED_BLOCKS_OFF: '&e&lStacker | &7Chuyển đổi chế độ stack khối: &cTẮT&7.'
 TOGGLED_STACKED_BLOCKS_ON: '&e&lStacker | &7Chuyển đổi chế độ stack khối: &aBẬT&7.'
 TOGGLED_TEAM_CHAT_OFF: '&e&lTrò chuyện | &7Chuyển đổi chế độ trò chuyện đôi &cTẮT&7.'
-TOGGLED_TEAM_CHAT_ON: '&e&lTrò chuyện | &7Chuyển đổi chế độ trò chuyện đội : &aBẬT&7.'
-TOGGLED_WORLD_BORDER_OFF: '&e&lBiên giới | &7Chuyển đổi chế độ biên giới : &cTẮT&7.'
-TOGGLED_WORLD_BORDER_ON: '&e&lBiên giới | &7Chuyển đổi chế độ biên giới : &aBẬT&7.'
-TRANSFER_ADMIN: '&e&lĐảo Thần | &7Bạn đã chuyển người lãnh đạo {0} thành {1}.'
+TOGGLED_TEAM_CHAT_ON: '&e&lTrò chuyện | &7Chuyển đổi chế độ trò chuyện đội: &aBẬT&7.'
+TOGGLED_WORLD_BORDER_OFF: '&e&lBiên giới | &7Chuyển đổi chế độ biên giới: &cTẮT&7.'
+TOGGLED_WORLD_BORDER_ON: '&e&lBiên giới | &7Chuyển đổi chế độ biên giới: &aBẬT&7.'
+TRANSFER_ADMIN: '&e&lĐảo Thần | &7Bạn đã chuyển vai trò lãnh đạo {0} cho {1}.'
 TRANSFER_ADMIN_ALREADY_LEADER: '&c&lLỗi | &7{0} đã là người lãnh đạo hòn đảo của họ.'
 TRANSFER_ADMIN_DIFFERENT_ISLAND: '&c&lLỗi | &7Những người chơi này không ở cùng một
   hòn đảo.'
 TRANSFER_ADMIN_NOT_LEADER: '&c&lLỗi | &7Người chơi này không phải là một người lãnh
   đạo của bất kỳ hòn đảo nào.'
 TRANSFER_ALREADY_LEADER: '&cBạn đã là người lãnh đạo của hòn đảo này.'
-TRANSFER_BROADCAST: '&e&lĐảo Thần | &7Lãnh đạo của hòn đảo đã được chuyển đến {0}.'
-UNBAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã được unban trong đảo bởi {1}.'
-UNCOOP_ANNOUNCEMENT: '&e&lĐiều Chỉnh | &7{0} Xóa bỏ {1} từ việc trở thành một thành
-  viên co-op.'
+TRANSFER_BROADCAST: '&e&lĐảo Thần | &7Lãnh đạo của hòn đảo đã được chuyển cho {0}.'
+UNBAN_ANNOUNCEMENT: '&e&lĐảo Thần | &7{0} đã được dỡ bỏ lệnh cấm trong đảo bởi {1}.'
+UNCOOP_ANNOUNCEMENT: '&e&lĐiều Chỉnh | &7{0} đã huỷ bỏ tư cách thành viên coop
+  của {1}'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lĐiều Chỉnh | &7{0} đã thoát khỏi trò chơi và không
   còn là một thành viên co-op.'
 UNIGNORED_ISLAND: '&e&lĐiều Chỉnh | &7Đảo của {0} bây giờ không được bỏ qua từ các
@@ -802,18 +789,18 @@ UNIGNORED_ISLAND_NAME: '&e&lĐiều Chỉnh | &7Đảo {0} bây giờ không đ�
   đảo hàng đầu.'
 UNLOCK_WORLD_ANNOUNCEMENT: '&e&lThế Giới | &7Thế giới {0} của bạn hiện đã được mở khóa!'
 UNSAFE_WARP: '&e&lĐảo Thần | &7&oCó vẻ như khu vực này không an toàn. Vui lòng thử
-  khu vực khác.'
-UPDATED_PERMISSION: '&e&lĐảo Thần | &7Cập nhập quyền cho {0}.'
+  lại với khu vực khác.'
+UPDATED_PERMISSION: '&e&lĐảo Thần | &7Đã cập nhật quyền cho {0}.'
 UPDATED_SETTINGS: '&e&lĐiều Chỉnh | &7Thay đổi thành công điều chỉnh của đảo {0}.'
 UPGRADE_COOLDOWN_FORMAT: '&c&lLỗi | &77Bạn có thể nâng cấp lại trong {0}.'
 VISITOR_BLOCK_COMMAND: '&c&lLỗi | &7Bạn không thể sử dụng lệnh này trên đảo khác.'
 WARP_ALREADY_EXIST: '&c&lLỗi | &7Đã có một khu vực đã được đặt với tên này.'
 WARP_CATEGORY_ICON_NEW_LORE: |
-  &e&lKhu Vực | &7Hãy nhập dòng(lore) mới (Nhập "-cancel" để hủy):
+  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
   &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
 WARP_CATEGORY_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
-WARP_CATEGORY_ICON_UPDATED: '&e&lKhu Vực | &7Thành công cập nhập biểu tượng danh mục.'
+WARP_CATEGORY_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
 WARP_CATEGORY_SLOT: '&e&lKhu Vực | &7Vui lòng nhập vị trí mới (Nhập "-cancel" để hủy):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lLỗi | &7Vị trí đã được dùng bởi một danh mục khu vực khác.'
@@ -822,11 +809,11 @@ WARP_CATEGORY_RENAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel"
 WARP_CATEGORY_RENAME_ALREADY_EXIST: '&c&lLỗi | &7Tên này đã được dùng bởi một danh mục khu vực khác.'
 WARP_CATEGORY_RENAME_SUCCESS: '&e&lKhu Vực | &7Thành công đổi tên danh mục thành {0}.'
 WARP_ICON_NEW_LORE: |
-  &e&lKhu Vực | &7Hãy nhập dòng(lore) mới (Nhập "-cancel" để hủy):
-  &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm chữ "\n".
+  &e&lKhu Vực | &7Hãy nhập mô tả mới (Nhập "-cancel" để hủy):
+  &e&lKhu Vực | &7Bạn có thể xuống dòng bằng cách thêm ký tự "\n".
 WARP_ICON_NEW_NAME: '&e&lKhu Vực | &7Vui lòng nhập tên (Nhập "-cancel" để hủy):'
 WARP_ICON_NEW_TYPE: '&e&lKhu Vực | &7Vui lòng nhập một nguyên liệu mới (Nhập "-cancel" để hủy):'
-WARP_ICON_UPDATED: '&e&lKhu Vực | &7Thành công cập nhập biểu tượng danh mục.'
+WARP_ICON_UPDATED: '&e&lKhu Vực | &7Cập nhật thành công biểu tượng danh mục.'
 WARP_ILLEGAL_NAME: '&c&lLỗi | &7Bạn chỉ có thể sử dụng các chữ cái theo thứ tự bảng chữ cái, số và ''_'' cho tên danh mục khu vực.'
 WARP_LOCATION_UPDATE: '&e&lKhu Vực | &7Đã cập nhật thành công vị trí của khu vực vào vị trí của bạn.'
 WARP_PUBLIC_UPDATE: '&e&lKhu Vực | &7Thành công mở khu vực cho công chúng.'
