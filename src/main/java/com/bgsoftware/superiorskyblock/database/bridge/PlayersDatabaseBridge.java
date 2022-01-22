@@ -134,9 +134,10 @@ public final class PlayersDatabaseBridge {
     }
 
     public static void deletePlayer(SuperiorPlayer superiorPlayer) {
+        DatabaseFilter playerFilter = createFilter("player", superiorPlayer);
         superiorPlayer.getDatabaseBridge().deleteObject("players", createFilter("uuid", superiorPlayer));
-        superiorPlayer.getDatabaseBridge().deleteObject("players_settings", createFilter("player", superiorPlayer));
-        superiorPlayer.getDatabaseBridge().deleteObject("players_missions", createFilter("player", superiorPlayer));
+        superiorPlayer.getDatabaseBridge().deleteObject("players_settings", playerFilter);
+        superiorPlayer.getDatabaseBridge().deleteObject("players_missions", playerFilter);
     }
 
     private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
