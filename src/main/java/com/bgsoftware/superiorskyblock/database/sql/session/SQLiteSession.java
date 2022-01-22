@@ -45,10 +45,7 @@ public final class SQLiteSession implements SQLSession {
         File file = new File(plugin.getDataFolder(), "database.db");
 
         if (!file.exists()) {
-            if (!file.getParentFile().mkdirs()) {
-                log("&cFailed to create parent folder directories.");
-                return false;
-            }
+            file.getParentFile().mkdirs();
             try {
                 if (!file.createNewFile()) {
                     log("&cFailed to create database file.");
