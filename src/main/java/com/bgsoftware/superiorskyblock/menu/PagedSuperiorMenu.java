@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -57,11 +58,17 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
         if (!(menuButton instanceof PagedObjectButton))
             return true;
 
+        SuperiorMenuPattern<M> menuPattern = getMenuPattern();
+
+        if (!(menuPattern instanceof PagedMenuPattern))
+            return false;
+
         PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) menuButton;
 
         objects = requestObjects();
+        int objectsPerPage = ((PagedMenuPattern<M, T>) menuPattern).getObjectsPerPage();
 
-        int objectIndex = pagedObjectButton.getObjectIndex() + (objects.size() * (currentPage - 1));
+        int objectIndex = pagedObjectButton.getObjectIndex() + (objectsPerPage * (currentPage - 1));
 
         if (objectIndex >= objects.size()) {
             return acceptNull;
