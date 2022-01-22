@@ -118,9 +118,12 @@ public final class SQLDatabaseInitializer {
                 new Pair<>("generated_schematics", "INTEGER"),
                 new Pair<>("unlocked_worlds", "INTEGER"),
                 new Pair<>("last_time_updated", "BIGINT"),
-                new Pair<>("dirty_chunks", "TEXT"),
-                new Pair<>("block_counts", "TEXT")
+                new Pair<>("dirty_chunks", "LONGTEXT"),
+                new Pair<>("block_counts", "LONGTEXT")
         );
+
+        SQLHelper.modifyColumnType("islands", "dirty_chunks", "LONGTEXT");
+        SQLHelper.modifyColumnType("islands", "block_counts", "LONGTEXT");
 
         SQLHelper.createTable("islands_banks",
                 new Pair<>("island", "UUID PRIMARY KEY"),
