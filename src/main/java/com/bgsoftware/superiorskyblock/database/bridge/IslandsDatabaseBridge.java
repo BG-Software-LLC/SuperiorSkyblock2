@@ -590,28 +590,30 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void deleteIsland(Island island) {
+        DatabaseFilter islandFilter = createFilter("island", island);
+
         island.getDatabaseBridge().deleteObject("islands", createFilter("uuid", island));
-        island.getDatabaseBridge().deleteObject("islands_banks", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_bans", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_block_limits", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_chests", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_effects", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_entity_limits", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_flags", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_generators", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_homes", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_members", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_missions", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_player_permissions", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_ratings", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_role_limits", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_role_permissions", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_settings", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_upgrades", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_visitor_homes", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_visitors", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_warp_categories", createFilter("island", island));
-        island.getDatabaseBridge().deleteObject("islands_warps", createFilter("island", island));
+        island.getDatabaseBridge().deleteObject("islands_banks", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_bans", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_block_limits", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_chests", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_effects", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_entity_limits", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_flags", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_generators", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_homes", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_members", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_missions", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_player_permissions", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_ratings", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_role_limits", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_role_permissions", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_settings", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_upgrades", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_visitor_homes", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_visitors", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_warp_categories", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_warps", islandFilter);
     }
 
     public static void markIslandChestsToBeSaved(Island island, IslandChest islandChest) {

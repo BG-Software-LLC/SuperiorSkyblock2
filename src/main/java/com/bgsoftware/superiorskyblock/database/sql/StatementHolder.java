@@ -12,10 +12,6 @@ import java.util.Optional;
 
 public final class StatementHolder {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final String prefix = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL") ?
-            plugin.getSettings().getDatabase().getPrefix() : "";
-
     private final List<Map<Integer, Object>> batches = new ArrayList<>();
 
     private final Map<Integer, Object> values = new HashMap<>();
@@ -27,7 +23,7 @@ public final class StatementHolder {
     }
 
     public void setQuery(String query) {
-        this.query = query.replace("{prefix}", prefix);
+        this.query = query;
     }
 
     public void addBatch() {
@@ -62,7 +58,7 @@ public final class StatementHolder {
 
             synchronized (mutex.get()) {
                 PluginDebugger.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.buildStatement(query, preparedStatement -> {
+                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
 
                     for (Map<Integer, Object> values : batches) {
@@ -80,9 +76,9 @@ public final class StatementHolder {
                     }
 
                     SQLHelper.setAutoCommit(true);
-                }, ex -> {
+                }).ifFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-                    ex.printStackTrace();
+                    error.printStackTrace();
                 });
             }
         } finally {
@@ -111,15 +107,15 @@ public final class StatementHolder {
 
             synchronized (mutex.get()) {
                 PluginDebugger.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.buildStatement(query, preparedStatement -> {
+                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());
                         errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                     }
                     preparedStatement.executeUpdate();
-                }, ex -> {
+                }).ifFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-                    ex.printStackTrace();
+                    error.printStackTrace();
                 });
             }
         } finally {
