@@ -111,6 +111,12 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount) {
+
+        return depositAdminLogMoney(commandSender, amount, true);
+    }
+
+    @Override
+    public BankTransaction depositAdminLogMoney(CommandSender commandSender, BigDecimal amount, boolean save) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         SuperiorSkyblockPlugin.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
@@ -121,11 +127,11 @@ public final class SIslandBank implements IslandBank {
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, BankAction.DEPOSIT_COMPLETED, position, System.currentTimeMillis(), "", amount);
         increaseBalance(amount);
-
-        addTransaction(bankTransaction, true);
-
-        plugin.getMenus().refreshBankLogs(island);
-        plugin.getMenus().refreshBankLogs(island);
+        if(save) {
+            addTransaction(bankTransaction, true);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
+        }
 
         return bankTransaction;
     }
