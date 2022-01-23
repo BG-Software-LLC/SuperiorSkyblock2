@@ -116,6 +116,11 @@ public final class SIslandBank implements IslandBank {
 
     @Override
     public BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount) {
+        return depositAdminLogMoney(commandSender, amount, true);
+    }
+
+    @Override
+    public BankTransaction depositAdminLogMoney(CommandSender commandSender, BigDecimal amount, boolean save) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " +
@@ -133,13 +138,14 @@ public final class SIslandBank implements IslandBank {
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, bankAction, position,
                 System.currentTimeMillis(), eventResult.getResult(), amount);
 
-        addTransaction(bankTransaction, true);
-
         if (!eventResult.isCancelled())
             increaseBalance(amount);
 
-        plugin.getMenus().refreshBankLogs(island);
-        plugin.getMenus().refreshBankLogs(island);
+        if (save) {
+            addTransaction(bankTransaction, true);
+            plugin.getMenus().refreshBankLogs(island);
+            plugin.getMenus().refreshBankLogs(island);
+        }
 
         return bankTransaction;
     }

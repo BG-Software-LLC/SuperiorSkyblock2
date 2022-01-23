@@ -39,6 +39,16 @@ public interface IslandBank {
     BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount);
 
     /**
+     * Deposit money into the bank, without taking money from any player.
+     *
+     * @param commandSender The player that deposited the money.
+     * @param amount        The amount to deposit.
+     * @param save          Whenever to log the transaction or not.
+     * @return The transaction details.
+     */
+    BankTransaction depositAdminLogMoney(CommandSender commandSender, BigDecimal amount, boolean save);
+
+    /**
      * Withdraw money from the bank.
      *
      * @param superiorPlayer    The player that withdrawn the money.
