@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -89,7 +90,7 @@ public final class NMSUtils {
                             chunkLoader.a(worldServer, loadedChunk);
                         } catch (Exception ex) {
                             ex.printStackTrace();
-                            SuperiorSkyblockPlugin.debug(ex);
+                            PluginDebugger.debug(ex);
                         }
                     }
                 }
@@ -98,7 +99,7 @@ public final class NMSUtils {
                     onFinish.run();
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         });
     }

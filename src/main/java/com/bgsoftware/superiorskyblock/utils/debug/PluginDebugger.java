@@ -2,100 +2,42 @@ package com.bgsoftware.superiorskyblock.utils.debug;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Pattern;
 
 public final class PluginDebugger {
 
-    private static final long TIMER_WRITE_DELAY = TimeUnit.SECONDS.toMillis(1);
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final File debugFile;
-    private final AtomicBoolean debuggedMessage = new AtomicBoolean(false);
+    private static boolean debugMode = false;
+    private static Pattern debugFilter = null;
 
-    private StringBuilder debugLines = new StringBuilder();
-    private Timer writeDebugTimer;
+    private PluginDebugger() {
 
-    public PluginDebugger(File debugFile) {
-        if (debugFile.exists())
-            debugFile.delete();
-
-        try {
-            debugFile.getParentFile().mkdirs();
-            debugFile.createNewFile();
-        } catch (IOException error) {
-            SuperiorSkyblockPlugin.log("&cError occurred while creating debug file. Disabling debugs...");
-            debugFile = null;
-        }
-
-        this.debugFile = debugFile;
-        this.writeDebugTimer = createWriteTimer();
     }
 
-    public void debug(String message) {
-        String formattedMessage = "[" + dateFormat.format(new Date()) + "]: " + message;
-        if (this.debugFile != null) {
-            debuggedMessage.set(true);
-            synchronized (PluginDebugger.this) {
-                this.debugLines.append(formattedMessage).append(System.lineSeparator());
-            }
-        }
+    public static void debug(String message) {
+        if (debugMode && (debugFilter == null || debugFilter.matcher(message.toUpperCase()).find()))
+            plugin.getLogger().info("[DEBUG] " + message);
     }
 
-    public void debug(Throwable error) {
-        StringWriter stringWriter = new StringWriter();
-        error.printStackTrace(new PrintWriter(stringWriter));
-        debug(stringWriter.toString());
+    public static void debug(Throwable error) {
+        //plugin.pluginDebugger.debug(error);
     }
 
-    public void cancel() {
-        if (this.writeDebugTimer != null) {
-            this.writeDebugTimer.cancel();
-            this.writeDebugTimer = null;
-        }
+    public static boolean isDebugMode() {
+        return debugMode;
     }
 
-    private Timer createWriteTimer() {
-        Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(new WriteDebugMessages(), TIMER_WRITE_DELAY, TIMER_WRITE_DELAY);
-        return timer;
+    public static void toggleDebugMode() {
+        debugMode = !debugMode;
     }
 
-    private void writeDebugMessages() {
-        if (!debuggedMessage.get())
-            return;
-
-        try (RandomAccessFile randomAccessFile = new RandomAccessFile(PluginDebugger.this.debugFile, "rw")) {
-            randomAccessFile.seek(randomAccessFile.length());
-
-            byte[] debugLines;
-            synchronized (PluginDebugger.this) {
-                debugLines = PluginDebugger.this.debugLines.toString().getBytes(StandardCharsets.UTF_8);
-                PluginDebugger.this.debugLines = new StringBuilder();
-            }
-
-            randomAccessFile.write(debugLines);
-            debuggedMessage.set(false);
-        } catch (IOException ignored) {
-        }
+    public static void setDebugFilter(String debugFilter) {
+        if (debugFilter.isEmpty())
+            PluginDebugger.debugFilter = null;
+        else
+            PluginDebugger.debugFilter = Pattern.compile(debugFilter.toUpperCase());
     }
 
-    private class WriteDebugMessages extends TimerTask {
-
-        @Override
-        public void run() {
-            writeDebugMessages();
-        }
-    }
 
 }

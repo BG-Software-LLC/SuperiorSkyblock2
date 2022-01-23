@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -27,12 +27,12 @@ public final class CmdAdmin implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin [" + Locale.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
+        return "admin [" + Message.COMMAND_ARGUMENT_PAGE.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN.getMessage(locale);
     }
 
     @Override
@@ -52,23 +52,23 @@ public final class CmdAdmin implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        java.util.Locale locale = LocaleUtils.getLocale(sender);
+        java.util.Locale locale = PlayerLocales.getLocale(sender);
 
         if (args.length > 1 && !isNumber(args[1])) {
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
                 if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
-                    Locale.sendMessage(sender, "&cCan be executed only by players!", true);
+                    Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
                     return;
                 }
 
                 if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                    Locale.NO_COMMAND_PERMISSION.send(sender, locale);
+                    Message.NO_COMMAND_PERMISSION.send(sender, locale);
                     return;
                 }
 
                 if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                    Locale.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + command.getUsage(locale));
+                    Message.COMMAND_USAGE.send(sender, locale, plugin.getCommands().getLabel() + " " + command.getUsage(locale));
                     return;
                 }
 
@@ -87,7 +87,7 @@ public final class CmdAdmin implements ISuperiorCommand {
         }
 
         if (page <= 0) {
-            Locale.INVALID_AMOUNT.send(sender, locale, page);
+            Message.INVALID_AMOUNT.send(sender, locale, page);
             return;
         }
 
@@ -96,7 +96,7 @@ public final class CmdAdmin implements ISuperiorCommand {
                 .collect(Collectors.toList());
 
         if (subCommands.isEmpty()) {
-            Locale.NO_COMMAND_PERMISSION.send(sender, locale);
+            Message.NO_COMMAND_PERMISSION.send(sender, locale);
             return;
         }
 
@@ -104,27 +104,27 @@ public final class CmdAdmin implements ISuperiorCommand {
         if (subCommands.size() % 7 != 0) lastPage++;
 
         if (page > lastPage) {
-            Locale.INVALID_AMOUNT.send(sender, locale, page);
+            Message.INVALID_AMOUNT.send(sender, locale, page);
             return;
         }
 
         subCommands = subCommands.subList((page - 1) * 7, Math.min(subCommands.size(), page * 7));
 
-        Locale.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
+        Message.ADMIN_HELP_HEADER.send(sender, locale, page, lastPage);
 
         for (SuperiorCommand _subCommand : subCommands) {
             if (_subCommand.displayCommand() && (_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission()))) {
                 String description = _subCommand.getDescription(locale);
                 if (description == null)
                     new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Locale.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description);
+                Message.ADMIN_HELP_LINE.send(sender, locale, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description);
             }
         }
 
         if (page != lastPage)
-            Locale.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1);
+            Message.ADMIN_HELP_NEXT_PAGE.send(sender, locale, page + 1);
         else
-            Locale.ADMIN_HELP_FOOTER.send(sender, locale);
+            Message.ADMIN_HELP_FOOTER.send(sender, locale);
     }
 
     @Override

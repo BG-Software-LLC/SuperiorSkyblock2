@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.entity.Player;
@@ -33,7 +33,7 @@ public final class PlayersLogic {
         Island island = superiorPlayer.getIsland();
 
         if (island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Message.PLAYER_JOIN_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
             island.updateLastTime();
             island.setCurrentlyActive();
         }
@@ -45,7 +45,7 @@ public final class PlayersLogic {
         Island island = superiorPlayer.getIsland();
 
         if (island != null) {
-            IslandUtils.sendMessage(island, Locale.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+            IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
             boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
                     !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) && _superiorPlayer.isOnline());
             if (!anyOnline)
@@ -106,7 +106,7 @@ public final class PlayersLogic {
         if (superiorPlayer.hasIslandFlyEnabled() && (toIsland == null || toIsland.isSpawn()) && !superiorPlayer.hasFlyGamemode()) {
             player.setAllowFlight(false);
             player.setFlying(false);
-            Locale.ISLAND_FLY_DISABLED.send(player);
+            Message.ISLAND_FLY_DISABLED.send(player);
         }
 
         if (toIsland == null)
@@ -133,7 +133,7 @@ public final class PlayersLogic {
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
-            Locale.BANNED_FROM_ISLAND.send(superiorPlayer);
+            Message.BANNED_FROM_ISLAND.send(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             return;
         }
@@ -143,7 +143,7 @@ public final class PlayersLogic {
             EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
-            Locale.NO_CLOSE_BYPASS.send(superiorPlayer);
+            Message.NO_CLOSE_BYPASS.send(superiorPlayer);
             superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             return;
         }
@@ -183,7 +183,7 @@ public final class PlayersLogic {
         toIsland.setPlayerInside(superiorPlayer, true);
 
         if (!toIsland.isMember(superiorPlayer) && toIsland.hasSettingsEnabled(IslandFlags.PVP)) {
-            Locale.ENTER_PVP_ISLAND.send(superiorPlayer);
+            Message.ENTER_PVP_ISLAND.send(superiorPlayer);
             if (plugin.getSettings().isImmuneToPvPWhenTeleport()) {
                 superiorPlayer.setImmunedToPvP(true);
                 Executor.sync(() -> superiorPlayer.setImmunedToPvP(false), 200L);

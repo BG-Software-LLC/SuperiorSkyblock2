@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
@@ -30,12 +30,12 @@ public final class CmdWithdraw implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "withdraw <" + Locale.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
+        return "withdraw <" + Message.COMMAND_ARGUMENT_AMOUNT.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_WITHDRAW.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_WITHDRAW.getMessage(locale);
     }
 
     @Override
@@ -74,7 +74,8 @@ public final class CmdWithdraw implements ISuperiorCommand {
         }
 
         BankTransaction transaction = island.getIslandBank().withdrawMoney(superiorPlayer, amount, null);
-        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction, -1, amount);
+        MenuIslandBank.handleWithdraw(superiorPlayer, island, null, transaction,
+                null, null, amount);
     }
 
     @Override

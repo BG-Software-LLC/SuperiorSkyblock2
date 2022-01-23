@@ -6,11 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.BlockDoubleStep;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -154,7 +155,7 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.world.blocks.BlockData> blockDataList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
@@ -163,11 +164,9 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlock(Location location, Material material, byte data) {
+    public void setBlock(Location location, int combinedId) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        //noinspection deprecation
-        int combinedId = material.getId() + (data << 12);
         NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null);
 
         NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
@@ -260,15 +259,20 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-
+        // Not implemented - only needed for Paper 1.16+
     }
 
     @Override
     public void playGeneratorSound(Location location) {
         net.minecraft.server.v1_12_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
-        double x = location.getX(), y = location.getY(), z = location.getZ();
+
+        double x = location.getX();
+        double y = location.getY();
+        double z = location.getZ();
+
         BlockPosition blockPosition = new BlockPosition(x, y, z);
-        world.a(null, blockPosition, SoundEffects.dE, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+        world.a(null, blockPosition, SoundEffects.dE, SoundCategory.BLOCKS, 0.5F,
+                2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
 
         for (int i = 0; i < 8; i++)
             world.addParticle(EnumParticle.SMOKE_LARGE, x + Math.random(), y + 1.2D, z + Math.random(), 0.0D, 0.0D, 0.0D);
@@ -289,5 +293,19 @@ public final class NMSWorldImpl implements NMSWorld {
         world.a(null, blockPosition, soundeffecttype.e(), SoundCategory.BLOCKS, (soundeffecttype.a() + 1.0F) / 2.0F, soundeffecttype.b() * 0.8F);
     }
 
+    @Override
+    public int getMinHeight(World world) {
+        return 0;
+    }
+
+    @Override
+    public void removeAntiXray(World world) {
+        // Doesn't exist in this version.
+    }
+
+    @Override
+    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
+        return new IslandsGeneratorImpl(plugin);
+    }
 
 }

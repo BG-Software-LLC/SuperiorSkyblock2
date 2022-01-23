@@ -21,8 +21,12 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserial
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
-import com.bgsoftware.superiorskyblock.database.sql.SQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.ResultSetMapBridge;
 import com.bgsoftware.superiorskyblock.database.sql.StatementHolder;
+import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
@@ -30,8 +34,6 @@ import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +47,8 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
 
     private static File databaseFile;
-    private static SQLSession sqlSession;
+    private static SQLSession session;
+    private static boolean isRemoteDatabase;
 
     private final List<PlayerAttributes> loadedPlayers = new ArrayList<>();
     private final List<IslandAttributes> loadedIslands = new ArrayList<>();
@@ -61,99 +64,101 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
             dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
     }
 
-    private static boolean isDatabaseOldFormat() {
-        sqlSession = new SQLSession(plugin, false);
-
-        if (!sqlSession.isUsingMySQL()) {
-            databaseFile = new File(plugin.getDataFolder(), "database.db");
-
-            if (!databaseFile.exists())
-                return false;
-        }
-
-        if (!sqlSession.createConnection()) {
-            return false;
-        }
-
-        if (!sqlSession.doesTableExist("stackedBlocks")) {
-            sqlSession.close();
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
     public void loadData() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}players;", resultSet -> {
+        session.select("players", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
-                loadedPlayers.add(loadPlayer(resultSet));
+                loadedPlayers.add(loadPlayer(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedPlayers.size() + " players in the database.");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}islands;", resultSet -> {
+        session.select("islands", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
-                loadedIslands.add(loadIsland(resultSet));
+                loadedIslands.add(loadIsland(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}stackedBlocks;", resultSet -> {
+        session.select("stackedBlocks", "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
-                loadedBlocks.add(loadStackedBlock(resultSet));
+                loadedBlocks.add(loadStackedBlock(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}bankTransactions;", resultSet -> {
+        // Ignoring errors as the bankTransactions table may not exist.
+        AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
+        session.select("bankTransactions", "").ifSuccess(resultSet -> {
+            foundBankTransaction.set(true);
             while (resultSet.next()) {
-                loadedBankTransactions.add(loadBankTransaction(resultSet));
+                loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
             }
         });
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
+        if (foundBankTransaction.get()) {
+            SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
+        }
 
-        sqlSession.executeQuery("SELECT * FROM {prefix}grid;", resultSet -> {
+        session.select("grid", "").ifSuccess(resultSet -> {
             if (resultSet.next()) {
                 gridAttributes = new GridAttributes()
                         .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
                         .setValue(GridAttributes.Field.MAX_ISLAND_SIZE, resultSet.getString("maxIslandSize"))
                         .setValue(GridAttributes.Field.WORLD, resultSet.getString("world"));
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
 
         AtomicBoolean failedBackup = new AtomicBoolean(true);
 
-        if (!sqlSession.isUsingMySQL()) {
-            sqlSession.close();
+        if (!isRemoteDatabase) {
+            session.closeConnection();
             if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
                 failedBackup.set(false);
             }
         }
 
         if (failedBackup.get()) {
-            if (!sqlSession.isUsingMySQL()) {
-                sqlSession = new SQLSession(plugin, false);
-                sqlSession.createConnection();
+            if (!isRemoteDatabase) {
+                session = new SQLiteSession(plugin, false);
+                session.createConnection();
             }
 
             failedBackup.set(false);
 
-            sqlSession.executeUpdate("RENAME TABLE {prefix}islands TO {prefix}bkp_islands", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}players TO {prefix}bkp_players", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}grid TO {prefix}bkp_grid", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}stackedBlocks TO {prefix}bkp_stackedBlocks", failure -> failedBackup.set(true));
-            sqlSession.executeUpdate("RENAME TABLE {prefix}bankTransactions TO {prefix}bkp_bankTransactions", failure -> failedBackup.set(true));
+            session.renameTable("islands", "bkp_islands").ifFail(error -> {
+                error.printStackTrace();
+                failedBackup.set(true);
+            });
+
+            session.renameTable("players", "bkp_players").ifFail(error -> {
+                error.printStackTrace();
+                failedBackup.set(true);
+            });
+
+            session.renameTable("grid", "bkp_grid").ifFail(error -> {
+                error.printStackTrace();
+                failedBackup.set(true);
+            });
+
+            session.renameTable("stackedBlocks", "bkp_stackedBlocks").ifFail(error -> {
+                error.printStackTrace();
+                failedBackup.set(true);
+            });
+
+            session.renameTable("bankTransactions", "bkp_bankTransactions").ifFail(error -> {
+                error.printStackTrace();
+                failedBackup.set(true);
+            });
         }
 
-        if (sqlSession.isUsingMySQL())
-            sqlSession.close();
+        if (isRemoteDatabase)
+            session.closeConnection();
 
         if (failedBackup.get()) {
             SuperiorSkyblockPlugin.log("&c[Database-Converter] Failed to create a backup for the database file.");
@@ -169,6 +174,43 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         saveStackedBlocks();
         saveBankTransactions();
         saveGrid();
+    }
+
+    private static boolean isDatabaseOldFormat() {
+        isRemoteDatabase = isRemoteDatabase();
+
+        if (!isRemoteDatabase) {
+            databaseFile = new File(plugin.getDataFolder(), "database.db");
+
+            if (!databaseFile.exists())
+                return false;
+        }
+
+        session = isRemoteDatabase ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
+
+        if (!session.createConnection()) {
+            return false;
+        }
+
+        AtomicBoolean isOldFormat = new AtomicBoolean(true);
+
+        session.select("stackedBlocks", "").ifFail(error -> {
+            session.closeConnection();
+            isOldFormat.set(false);
+        });
+
+        return isOldFormat.get();
+    }
+
+    private static boolean isRemoteDatabase() {
+        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+            case "MYSQL":
+            case "MARIADB":
+            case "POSTGRESQL":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void savePlayers() {
@@ -489,37 +531,39 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
     }
 
-    private PlayerAttributes loadPlayer(ResultSet resultSet) throws SQLException {
+    private PlayerAttributes loadPlayer(ResultSetMapBridge resultSet) {
         PlayerRole playerRole;
 
         try {
-            playerRole = SPlayerRole.fromId(Integer.parseInt(resultSet.getString("islandRole")));
+            playerRole = SPlayerRole.fromId(Integer.parseInt(resultSet.get("islandRole", "-1")));
         } catch (Exception ex) {
-            playerRole = SPlayerRole.of(resultSet.getString("islandRole"));
+            playerRole = SPlayerRole.of((String) resultSet.get("islandRole"));
         }
 
+        long currentTime = System.currentTimeMillis();
+
         return new PlayerAttributes()
-                .setValue(PlayerAttributes.Field.UUID, resultSet.getString("player"))
-                .setValue(PlayerAttributes.Field.ISLAND_LEADER, resultSet.getString("teamLeader"))
-                .setValue(PlayerAttributes.Field.LAST_USED_NAME, resultSet.getString("name"))
-                .setValue(PlayerAttributes.Field.LAST_USED_SKIN, resultSet.getString("textureValue"))
+                .setValue(PlayerAttributes.Field.UUID, resultSet.get("player"))
+                .setValue(PlayerAttributes.Field.ISLAND_LEADER, resultSet.get("teamLeader", resultSet.get("player")))
+                .setValue(PlayerAttributes.Field.LAST_USED_NAME, resultSet.get("name", "null"))
+                .setValue(PlayerAttributes.Field.LAST_USED_SKIN, resultSet.get("textureValue", ""))
                 .setValue(PlayerAttributes.Field.ISLAND_ROLE, playerRole)
-                .setValue(PlayerAttributes.Field.DISBANDS, resultSet.getInt("disbands"))
-                .setValue(PlayerAttributes.Field.LAST_TIME_UPDATED, resultSet.getLong("lastTimeStatus"))
-                .setValue(PlayerAttributes.Field.COMPLETED_MISSIONS, deserializer.deserializeMissions(resultSet.getString("missions")))
-                .setValue(PlayerAttributes.Field.TOGGLED_PANEL, resultSet.getBoolean("toggledPanel"))
-                .setValue(PlayerAttributes.Field.ISLAND_FLY, resultSet.getBoolean("islandFly"))
-                .setValue(PlayerAttributes.Field.BORDER_COLOR, BorderColor.valueOf(resultSet.getString("borderColor")))
-                .setValue(PlayerAttributes.Field.LANGUAGE, resultSet.getString("language"))
-                .setValue(PlayerAttributes.Field.TOGGLED_BORDER, resultSet.getBoolean("toggledBorder")
+                .setValue(PlayerAttributes.Field.DISBANDS, resultSet.get("disbands", plugin.getSettings().getDisbandCount()))
+                .setValue(PlayerAttributes.Field.LAST_TIME_UPDATED, resultSet.get("lastTimeStatus", currentTime / 1000))
+                .setValue(PlayerAttributes.Field.COMPLETED_MISSIONS, deserializer.deserializeMissions(resultSet.get("missions", "")))
+                .setValue(PlayerAttributes.Field.TOGGLED_PANEL, resultSet.get("toggledPanel", plugin.getSettings().isDefaultToggledPanel()))
+                .setValue(PlayerAttributes.Field.ISLAND_FLY, resultSet.get("islandFly", plugin.getSettings().isDefaultIslandFly()))
+                .setValue(PlayerAttributes.Field.BORDER_COLOR, BorderColor.valueOf(resultSet.get("borderColor", plugin.getSettings().getDefaultBorderColor())))
+                .setValue(PlayerAttributes.Field.LANGUAGE, resultSet.get("language", plugin.getSettings().getDefaultLanguage()))
+                .setValue(PlayerAttributes.Field.TOGGLED_BORDER, resultSet.get("toggledBorder", plugin.getSettings().isDefaultWorldBorder())
                 );
     }
 
-    private IslandAttributes loadIsland(ResultSet resultSet) throws SQLException {
-        UUID ownerUUID = UUID.fromString(resultSet.getString("owner"));
+    private IslandAttributes loadIsland(ResultSetMapBridge resultSet) {
+        UUID ownerUUID = UUID.fromString((String) resultSet.get("owner"));
         UUID islandUUID;
 
-        String uuidRaw = resultSet.getString("uuid");
+        String uuidRaw = resultSet.get("uuid", null);
         if (uuidRaw == null || uuidRaw.isEmpty()) {
             islandUUID = ownerUUID;
         } else {
@@ -527,7 +571,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
 
         int generatedSchematics = 0;
-        String generatedSchematicsRaw = resultSet.getString("generatedSchematics");
+        String generatedSchematicsRaw = resultSet.get("generatedSchematics", "0");
         try {
             generatedSchematics = Integer.parseInt(generatedSchematicsRaw);
         } catch (Exception ex) {
@@ -540,7 +584,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         }
 
         int unlockedWorlds = 0;
-        String unlockedWorldsRaw = resultSet.getString("unlockedWorlds");
+        String unlockedWorldsRaw = resultSet.get("unlockedWorlds", "0");
         try {
             unlockedWorlds = Integer.parseInt(unlockedWorldsRaw);
         } catch (Exception ex) {
@@ -550,63 +594,65 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 unlockedWorlds |= 2;
         }
 
+        long currentTime = System.currentTimeMillis();
+
         return new IslandAttributes()
                 .setValue(IslandAttributes.Field.UUID, islandUUID.toString())
                 .setValue(IslandAttributes.Field.OWNER, ownerUUID.toString())
-                .setValue(IslandAttributes.Field.CENTER, resultSet.getString("center"))
-                .setValue(IslandAttributes.Field.CREATION_TIME, resultSet.getLong("creationTime"))
-                .setValue(IslandAttributes.Field.ISLAND_TYPE, resultSet.getString("schemName"))
-                .setValue(IslandAttributes.Field.DISCORD, resultSet.getString("discord"))
-                .setValue(IslandAttributes.Field.PAYPAL, resultSet.getString("paypal"))
-                .setValue(IslandAttributes.Field.WORTH_BONUS, resultSet.getString("bonusWorth"))
-                .setValue(IslandAttributes.Field.LEVELS_BONUS, resultSet.getString("bonusLevel"))
-                .setValue(IslandAttributes.Field.LOCKED, resultSet.getBoolean("locked"))
-                .setValue(IslandAttributes.Field.IGNORED, resultSet.getBoolean("ignored"))
-                .setValue(IslandAttributes.Field.NAME, resultSet.getString("name"))
-                .setValue(IslandAttributes.Field.DESCRIPTION, resultSet.getString("description"))
+                .setValue(IslandAttributes.Field.CENTER, (String) resultSet.get("center"))
+                .setValue(IslandAttributes.Field.CREATION_TIME, resultSet.get("creationTime", currentTime / 1000))
+                .setValue(IslandAttributes.Field.ISLAND_TYPE, resultSet.get("schemName", ""))
+                .setValue(IslandAttributes.Field.DISCORD, resultSet.get("discord", "None"))
+                .setValue(IslandAttributes.Field.PAYPAL, resultSet.get("paypal", "None"))
+                .setValue(IslandAttributes.Field.WORTH_BONUS, resultSet.get("bonusWorth", ""))
+                .setValue(IslandAttributes.Field.LEVELS_BONUS, resultSet.get("bonusLevel", ""))
+                .setValue(IslandAttributes.Field.LOCKED, resultSet.get("locked", false))
+                .setValue(IslandAttributes.Field.IGNORED, resultSet.get("ignored", false))
+                .setValue(IslandAttributes.Field.NAME, resultSet.get("name", ""))
+                .setValue(IslandAttributes.Field.DESCRIPTION, resultSet.get("description", ""))
                 .setValue(IslandAttributes.Field.GENERATED_SCHEMATICS, generatedSchematics)
                 .setValue(IslandAttributes.Field.UNLOCKED_WORLDS, unlockedWorlds)
-                .setValue(IslandAttributes.Field.LAST_TIME_UPDATED, resultSet.getLong("lastTimeUpdate"))
-                .setValue(IslandAttributes.Field.DIRTY_CHUNKS, resultSet.getString("dirtyChunks"))
-                .setValue(IslandAttributes.Field.BLOCK_COUNTS, resultSet.getString("blockCounts"))
-                .setValue(IslandAttributes.Field.HOMES, deserializer.deserializeHomes(resultSet.getString("teleportLocation")))
-                .setValue(IslandAttributes.Field.MEMBERS, deserializer.deserializePlayers(resultSet.getString("members")))
-                .setValue(IslandAttributes.Field.BANS, deserializer.deserializePlayers(resultSet.getString("banned")))
-                .setValue(IslandAttributes.Field.PLAYER_PERMISSIONS, deserializer.deserializePlayerPerms(resultSet.getString("permissionNodes")))
-                .setValue(IslandAttributes.Field.ROLE_PERMISSIONS, deserializer.deserializeRolePerms(resultSet.getString("permissionNodes")))
-                .setValue(IslandAttributes.Field.UPGRADES, deserializer.deserializeUpgrades(resultSet.getString("upgrades")))
-                .setValue(IslandAttributes.Field.WARPS, deserializer.deserializeWarps(resultSet.getString("warps")))
-                .setValue(IslandAttributes.Field.BLOCK_LIMITS, deserializer.deserializeBlockLimits(resultSet.getString("blockLimits")))
-                .setValue(IslandAttributes.Field.RATINGS, deserializer.deserializeRatings(resultSet.getString("ratings")))
-                .setValue(IslandAttributes.Field.MISSIONS, deserializer.deserializeMissions(resultSet.getString("missions")))
-                .setValue(IslandAttributes.Field.ISLAND_FLAGS, deserializer.deserializeIslandFlags(resultSet.getString("settings")))
-                .setValue(IslandAttributes.Field.GENERATORS, deserializer.deserializeGenerators(resultSet.getString("generator")))
-                .setValue(IslandAttributes.Field.VISITORS, deserializer.deserializeVisitors(resultSet.getString("uniqueVisitors")))
-                .setValue(IslandAttributes.Field.ENTITY_LIMITS, deserializer.deserializeEntityLimits(resultSet.getString("entityLimits")))
-                .setValue(IslandAttributes.Field.EFFECTS, deserializer.deserializeEffects(resultSet.getString("islandEffects")))
-                .setValue(IslandAttributes.Field.ISLAND_CHESTS, deserializer.deserializeIslandChests(resultSet.getString("islandChest")))
-                .setValue(IslandAttributes.Field.ROLE_LIMITS, deserializer.deserializeRoleLimits(resultSet.getString("roleLimits")))
-                .setValue(IslandAttributes.Field.WARP_CATEGORIES, deserializer.deserializeWarpCategories(resultSet.getString("warpCategories")))
-                .setValue(IslandAttributes.Field.BANK_BALANCE, resultSet.getString("islandBank"))
-                .setValue(IslandAttributes.Field.BANK_LAST_INTEREST, resultSet.getLong("lastInterest"))
-                .setValue(IslandAttributes.Field.VISITOR_HOMES, resultSet.getString("visitorsLocation"))
-                .setValue(IslandAttributes.Field.ISLAND_SIZE, resultSet.getInt("islandSize"))
-                .setValue(IslandAttributes.Field.TEAM_LIMIT, resultSet.getInt("teamLimit"))
-                .setValue(IslandAttributes.Field.WARPS_LIMIT, resultSet.getInt("warpsLimit"))
-                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, resultSet.getDouble("cropGrowth"))
-                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, resultSet.getDouble("spawnerRates"))
-                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.getDouble("mobDrops"))
-                .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.getInt("coopLimit"))
-                .setValue(IslandAttributes.Field.BANK_LIMIT, resultSet.getString("bankLimit"));
+                .setValue(IslandAttributes.Field.LAST_TIME_UPDATED, resultSet.get("lastTimeUpdate", currentTime / 1000))
+                .setValue(IslandAttributes.Field.DIRTY_CHUNKS, deserializer.deserializeDirtyChunks(resultSet.get("dirtyChunks", "")))
+                .setValue(IslandAttributes.Field.BLOCK_COUNTS, deserializer.deserializeBlockCounts(resultSet.get("blockCounts", "")))
+                .setValue(IslandAttributes.Field.HOMES, deserializer.deserializeHomes(resultSet.get("teleportLocation", "")))
+                .setValue(IslandAttributes.Field.MEMBERS, deserializer.deserializePlayers(resultSet.get("members", "")))
+                .setValue(IslandAttributes.Field.BANS, deserializer.deserializePlayers(resultSet.get("banned", "")))
+                .setValue(IslandAttributes.Field.PLAYER_PERMISSIONS, deserializer.deserializePlayerPerms(resultSet.get("permissionNodes", "")))
+                .setValue(IslandAttributes.Field.ROLE_PERMISSIONS, deserializer.deserializeRolePerms(resultSet.get("permissionNodes", "")))
+                .setValue(IslandAttributes.Field.UPGRADES, deserializer.deserializeUpgrades(resultSet.get("upgrades", "")))
+                .setValue(IslandAttributes.Field.WARPS, deserializer.deserializeWarps(resultSet.get("warps", "")))
+                .setValue(IslandAttributes.Field.BLOCK_LIMITS, deserializer.deserializeBlockLimits(resultSet.get("blockLimits", "")))
+                .setValue(IslandAttributes.Field.RATINGS, deserializer.deserializeRatings(resultSet.get("ratings", "")))
+                .setValue(IslandAttributes.Field.MISSIONS, deserializer.deserializeMissions(resultSet.get("missions", "")))
+                .setValue(IslandAttributes.Field.ISLAND_FLAGS, deserializer.deserializeIslandFlags(resultSet.get("settings", "")))
+                .setValue(IslandAttributes.Field.GENERATORS, deserializer.deserializeGenerators(resultSet.get("generator", "")))
+                .setValue(IslandAttributes.Field.VISITORS, deserializer.deserializeVisitors(resultSet.get("uniqueVisitors", "")))
+                .setValue(IslandAttributes.Field.ENTITY_LIMITS, deserializer.deserializeEntityLimits(resultSet.get("entityLimits", "")))
+                .setValue(IslandAttributes.Field.EFFECTS, deserializer.deserializeEffects(resultSet.get("islandEffects", "")))
+                .setValue(IslandAttributes.Field.ISLAND_CHESTS, deserializer.deserializeIslandChests(resultSet.get("islandChest", "")))
+                .setValue(IslandAttributes.Field.ROLE_LIMITS, deserializer.deserializeRoleLimits(resultSet.get("roleLimits", "")))
+                .setValue(IslandAttributes.Field.WARP_CATEGORIES, deserializer.deserializeWarpCategories(resultSet.get("warpCategories", "")))
+                .setValue(IslandAttributes.Field.BANK_BALANCE, resultSet.get("islandBank", ""))
+                .setValue(IslandAttributes.Field.BANK_LAST_INTEREST, resultSet.get("lastInterest", currentTime / 1000))
+                .setValue(IslandAttributes.Field.VISITOR_HOMES, resultSet.get("visitorsLocation", ""))
+                .setValue(IslandAttributes.Field.ISLAND_SIZE, resultSet.get("islandSize", -1))
+                .setValue(IslandAttributes.Field.TEAM_LIMIT, resultSet.get("teamLimit", -1))
+                .setValue(IslandAttributes.Field.WARPS_LIMIT, resultSet.get("warpsLimit", -1))
+                .setValue(IslandAttributes.Field.CROP_GROWTH_MULTIPLIER, resultSet.get("cropGrowth", -1D))
+                .setValue(IslandAttributes.Field.SPAWNER_RATES_MULTIPLIER, resultSet.get("spawnerRates", -1D))
+                .setValue(IslandAttributes.Field.MOB_DROPS_MULTIPLIER, resultSet.get("mobDrops", -1D))
+                .setValue(IslandAttributes.Field.COOP_LIMIT, resultSet.get("coopLimit", -1))
+                .setValue(IslandAttributes.Field.BANK_LIMIT, resultSet.get("bankLimit", "-2"));
     }
 
-    private StackedBlockAttributes loadStackedBlock(ResultSet resultSet) throws SQLException {
-        String world = resultSet.getString("world");
-        int x = resultSet.getInt("x");
-        int y = resultSet.getInt("y");
-        int z = resultSet.getInt("z");
-        String amount = resultSet.getString("amount");
-        String blockType = resultSet.getString("item");
+    private StackedBlockAttributes loadStackedBlock(ResultSetMapBridge resultSet) {
+        String world = (String) resultSet.get("world");
+        int x = (int) resultSet.get("x");
+        int y = (int) resultSet.get("y");
+        int z = (int) resultSet.get("z");
+        String amount = (String) resultSet.get("amount");
+        String blockType = (String) resultSet.get("item");
 
         return new StackedBlockAttributes()
                 .setValue(StackedBlockAttributes.Field.LOCATION, world + ", " + x + ", " + y + ", " + z)
@@ -614,15 +660,15 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .setValue(StackedBlockAttributes.Field.AMOUNT, amount);
     }
 
-    private BankTransactionsAttributes loadBankTransaction(ResultSet resultSet) throws SQLException {
+    private BankTransactionsAttributes loadBankTransaction(ResultSetMapBridge resultSet) {
         return new BankTransactionsAttributes()
-                .setValue(BankTransactionsAttributes.Field.ISLAND, resultSet.getString("island"))
-                .setValue(BankTransactionsAttributes.Field.PLAYER, resultSet.getString("player"))
-                .setValue(BankTransactionsAttributes.Field.BANK_ACTION, resultSet.getString("bankAction"))
-                .setValue(BankTransactionsAttributes.Field.POSITION, resultSet.getInt("position"))
-                .setValue(BankTransactionsAttributes.Field.TIME, resultSet.getString("time"))
-                .setValue(BankTransactionsAttributes.Field.FAILURE_REASON, resultSet.getString("failureReason"))
-                .setValue(BankTransactionsAttributes.Field.AMOUNT, resultSet.getString("amount"));
+                .setValue(BankTransactionsAttributes.Field.ISLAND, resultSet.get("island"))
+                .setValue(BankTransactionsAttributes.Field.PLAYER, resultSet.get("player"))
+                .setValue(BankTransactionsAttributes.Field.BANK_ACTION, resultSet.get("bankAction"))
+                .setValue(BankTransactionsAttributes.Field.POSITION, resultSet.get("position"))
+                .setValue(BankTransactionsAttributes.Field.TIME, resultSet.get("time"))
+                .setValue(BankTransactionsAttributes.Field.FAILURE_REASON, resultSet.get("failureReason"))
+                .setValue(BankTransactionsAttributes.Field.AMOUNT, resultSet.get("amount"));
     }
 
     public PlayerAttributes getPlayerAttributes(String uuid) {

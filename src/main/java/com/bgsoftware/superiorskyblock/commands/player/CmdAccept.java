@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -30,13 +30,13 @@ public final class CmdAccept implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "accept <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ACCEPT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ACCEPT.getMessage(locale);
     }
 
     @Override
@@ -62,23 +62,23 @@ public final class CmdAccept implements ISuperiorCommand {
 
         if (targetPlayer == null) {
             if ((island = plugin.getGrid().getIsland(args[1])) == null || !island.isInvited(superiorPlayer)) {
-                Locale.NO_ISLAND_INVITE.send(superiorPlayer);
+                Message.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
         } else {
             if ((island = plugin.getGrid().getIsland(targetPlayer)) == null || !island.isInvited(superiorPlayer)) {
-                Locale.NO_ISLAND_INVITE.send(superiorPlayer);
+                Message.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
         }
 
         if (superiorPlayer.getIsland() != null) {
-            Locale.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
+            Message.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
             return;
         }
 
         if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
-            Locale.JOIN_FULL_ISLAND.send(superiorPlayer);
+            Message.JOIN_FULL_ISLAND.send(superiorPlayer);
             island.revokeInvite(superiorPlayer);
             return;
         }
@@ -86,15 +86,15 @@ public final class CmdAccept implements ISuperiorCommand {
         if (!EventsCaller.callIslandJoinEvent(superiorPlayer, island))
             return;
 
-        IslandUtils.sendMessage(island, Locale.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+        IslandUtils.sendMessage(island, Message.JOIN_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
         island.revokeInvite(superiorPlayer);
         island.addMember(superiorPlayer, SPlayerRole.defaultRole());
 
         if (targetPlayer == null)
-            Locale.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
+            Message.JOINED_ISLAND_NAME.send(superiorPlayer, island.getName());
         else
-            Locale.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
+            Message.JOINED_ISLAND.send(superiorPlayer, targetPlayer.getName());
 
         if (plugin.getSettings().isTeleportOnJoin())
             superiorPlayer.teleport(island);

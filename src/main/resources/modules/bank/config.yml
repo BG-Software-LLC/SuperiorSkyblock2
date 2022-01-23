@@ -20,6 +20,12 @@ disband-refund: 0
 # Warning: There may be a lot of transactions, and can increase database.
 bank-logs: true
 
+# If bank-logs is enabled, whether to cache all logs to ram or not.
+# When set to true, all bank logs will be loaded when server starts and be cached on ram (Improved runtime performance).
+# When set to false, bank logs will be loaded only when needed, and get cached for 10 minutes before removed from
+# ram. May drop performance a little, however should help when there are a lot of logged bank transactions.
+cache-logs: true
+
 # All settings related to bank interest.
 # This feature is a money-generator for the islands.
 # As long as the island members are online, they will earn money.

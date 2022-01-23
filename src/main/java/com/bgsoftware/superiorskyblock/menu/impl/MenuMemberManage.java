@@ -2,62 +2,64 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.MemberManageButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
-public final class MenuMemberManage extends SuperiorMenu {
+public final class MenuMemberManage extends SuperiorMenu<MenuMemberManage> {
 
-    private static List<Integer> rolesSlot, banSlot, kickSlot;
-
-    private final SuperiorPlayer targetPlayer;
+    private static RegularMenuPattern<MenuMemberManage> menuPattern;
 
     private MenuMemberManage(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer) {
-        super("menuMemberManage", superiorPlayer);
-        this.targetPlayer = targetPlayer;
+        super(menuPattern, superiorPlayer);
         updateTargetPlayer(targetPlayer);
     }
 
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, targetPlayer);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName()));
+    }
+
     public static void init() {
-        MenuMemberManage menuMemberManage = new MenuMemberManage(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/member-manage.yml");
+        RegularMenuPattern.Builder<MenuMemberManage> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/member-manage.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "member-manage.yml", MenuMemberManage::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMemberManage, "member-manage.yml", cfg);
-
-        rolesSlot = getSlots(cfg, "roles", menuPatternSlots);
-        banSlot = getSlots(cfg, "ban", menuPatternSlots);
-        kickSlot = getSlots(cfg, "kick", menuPatternSlots);
-
-        menuMemberManage.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "roles", menuPatternSlots), new MemberManageButton.Builder()
+                        .setManageAction(MemberManageButton.ManageAction.SET_ROLE))
+                .mapButtons(getSlots(cfg, "ban", menuPatternSlots), new MemberManageButton.Builder()
+                        .setManageAction(MemberManageButton.ManageAction.BAN_MEMBER))
+                .mapButtons(getSlots(cfg, "kick", menuPatternSlots), new MemberManageButton.Builder()
+                        .setManageAction(MemberManageButton.ManageAction.KICK_MEMBER))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, SuperiorPlayer targetPlayer) {
@@ -68,7 +70,7 @@ public final class MenuMemberManage extends SuperiorMenu {
         destroyMenus(MenuMemberManage.class, menuMemberManage -> menuMemberManage.targetPlayer.equals(targetPlayer));
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if (!oldFile.exists())
@@ -95,7 +97,9 @@ public final class MenuMemberManage extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char rolesChar = itemChars[charCounter++], banChar = itemChars[charCounter++], kickChar = itemChars[charCounter++];
+        char rolesChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char banChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char kickChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("players-panel.roles"), patternChars, rolesChar,
                 itemsSection, commandsSection, soundsSection);
@@ -108,49 +112,10 @@ public final class MenuMemberManage extends SuperiorMenu {
         newMenu.set("ban", banChar + "");
         newMenu.set("kick", kickChar + "");
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    public Inventory getInventory() {
-        return buildInventory(title -> PlaceholderHook.parse(targetPlayer.asOfflinePlayer(), title.replace("{}", targetPlayer.getName())));
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        if (rolesSlot.contains(e.getRawSlot())) {
-            previousMove = false;
-            plugin.getMenus().openMemberRole(superiorPlayer, this, targetPlayer);
-        } else if (banSlot.contains(e.getRawSlot())) {
-            if (plugin.getSettings().isBanConfirm()) {
-                Island island = superiorPlayer.getIsland();
-                if (IslandUtils.checkBanRestrictions(superiorPlayer, island, targetPlayer)) {
-                    previousMove = false;
-                    plugin.getMenus().openConfirmBan(superiorPlayer, this, island, targetPlayer);
-                }
-            } else {
-                plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "ban", targetPlayer.getName());
-            }
-        } else if (kickSlot.contains(e.getRawSlot())) {
-            if (plugin.getSettings().isKickConfirm()) {
-                Island island = superiorPlayer.getIsland();
-                if (island == null)
-                    return;
-                if (IslandUtils.checkKickRestrictions(superiorPlayer, island, targetPlayer)) {
-                    previousMove = false;
-                    plugin.getMenus().openConfirmKick(superiorPlayer, this, island, targetPlayer);
-                }
-            } else {
-                plugin.getCommands().dispatchSubCommand(e.getWhoClicked(), "kick", targetPlayer.getName());
-            }
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetPlayer);
     }
 
 }

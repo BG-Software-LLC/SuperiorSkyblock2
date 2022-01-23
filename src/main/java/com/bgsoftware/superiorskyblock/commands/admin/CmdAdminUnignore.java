@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -25,13 +25,13 @@ public final class CmdAdminUnignore implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin unignore <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_UNIGNORE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_UNIGNORE.getMessage(locale);
     }
 
     @Override
@@ -59,9 +59,9 @@ public final class CmdAdminUnignore implements IAdminIslandCommand {
         island.setIgnored(false);
 
         if (targetPlayer == null)
-            Locale.UNIGNORED_ISLAND_NAME.send(sender, island.getName());
+            Message.UNIGNORED_ISLAND_NAME.send(sender, island.getName());
         else
-            Locale.UNIGNORED_ISLAND.send(sender, targetPlayer.getName());
+            Message.UNIGNORED_ISLAND.send(sender, targetPlayer.getName());
     }
 
 }

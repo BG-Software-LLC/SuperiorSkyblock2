@@ -9,7 +9,8 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Suppliers;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBed;
@@ -117,7 +118,7 @@ public final class NMSUtils {
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             });
         }).runSync(v -> {
@@ -190,38 +191,43 @@ public final class NMSUtils {
             return;
         }
 
-        if (plugin.getSettings().isLightsUpdate()) {
-            chunk.setType(blockPosition, blockData, true, true);
-        } else {
-            int indexY = blockPosition.getY() >> 4;
+        int indexY = blockPosition.getY() >> 4;
 
-            ChunkSection chunkSection = chunk.getSections()[indexY];
+        ChunkSection chunkSection = chunk.getSections()[indexY];
 
-            if (chunkSection == null) {
-                try {
-                    // Paper's constructor for ChunkSection for more optimized chunk sections.
-                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
-                } catch (Throwable ex) {
-                    // Spigot's constructor for ChunkSection
-                    // noinspection deprecation
-                    chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
-                }
+        if (chunkSection == null) {
+            try {
+                // Paper's constructor for ChunkSection for more optimized chunk sections.
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4, chunk, chunk.world, true);
+            } catch (Throwable ex) {
+                // Spigot's constructor for ChunkSection
+                // noinspection deprecation
+                chunkSection = chunk.getSections()[indexY] = new ChunkSection(indexY << 4);
             }
-
-            int blockX = blockPosition.getX() & 15;
-            int blockY = blockPosition.getY();
-            int blockZ = blockPosition.getZ() & 15;
-
-            chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
-
-            chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING).a(blockX, blockY, blockZ, blockData);
-            chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING_NO_LEAVES).a(blockX, blockY, blockZ, blockData);
-            chunk.heightMap.get(HeightMap.Type.OCEAN_FLOOR).a(blockX, blockY, blockZ, blockData);
-            chunk.heightMap.get(HeightMap.Type.WORLD_SURFACE).a(blockX, blockY, blockZ, blockData);
-
-            chunk.markDirty();
-            chunk.setNeedsSaving(true);
         }
+
+        int blockX = blockPosition.getX() & 15;
+        int blockY = blockPosition.getY();
+        int blockZ = blockPosition.getZ() & 15;
+
+        boolean isOriginallyChunkSectionEmpty = chunkSection.c();
+
+        chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
+
+        chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING).a(blockX, blockY, blockZ, blockData);
+        chunk.heightMap.get(HeightMap.Type.MOTION_BLOCKING_NO_LEAVES).a(blockX, blockY, blockZ, blockData);
+        chunk.heightMap.get(HeightMap.Type.OCEAN_FLOOR).a(blockX, blockY, blockZ, blockData);
+        chunk.heightMap.get(HeightMap.Type.WORLD_SURFACE).a(blockX, blockY, blockZ, blockData);
+
+        chunk.markDirty();
+        chunk.setNeedsSaving(true);
+
+        boolean isChunkSectionEmpty = chunkSection.c();
+
+        if (isOriginallyChunkSectionEmpty != isChunkSectionEmpty)
+            chunk.getWorld().e().a(blockPosition, isChunkSectionEmpty);
+
+        chunk.getWorld().e().a(blockPosition);
 
         if (tileEntity != null) {
             NBTTagCompound tileEntityCompound = (NBTTagCompound) tileEntity.toNBT();

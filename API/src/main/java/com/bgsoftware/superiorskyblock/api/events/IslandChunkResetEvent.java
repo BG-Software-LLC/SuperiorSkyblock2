@@ -9,7 +9,8 @@ import org.bukkit.World;
 public class IslandChunkResetEvent extends IslandEvent {
 
     private final World world;
-    private final int chunkX, chunkZ;
+    private final int chunkX;
+    private final int chunkZ;
 
     /**
      * The constructor of the event.

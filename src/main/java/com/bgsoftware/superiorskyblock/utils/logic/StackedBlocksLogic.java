@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.CoreProtectHook;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -32,6 +32,11 @@ public final class StackedBlocksLogic {
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return false;
 
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
+
+        if (!superiorPlayer.hasBlocksStackerEnabled())
+            return false;
+
         if (plugin.getSettings().getStackedBlocks().getDisabledWorlds().contains(againstBlock.getWorld().getName()))
             return false;
 
@@ -58,13 +63,8 @@ public final class StackedBlocksLogic {
         if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(againstBlock)))
             return false;
 
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
-
-        if (!superiorPlayer.hasBlocksStackerEnabled() || (!superiorPlayer.hasPermission("superior.island.stacker.*") &&
-                !superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType())))
-            return false;
-
-        return true;
+        return superiorPlayer.hasPermission("superior.island.stacker.*") ||
+                superiorPlayer.hasPermission("superior.island.stacker." + placeItem.getType());
     }
 
     public static boolean tryStack(Player player, ItemStack itemToDeposit, Location stackedBlock, Event event) {
@@ -135,7 +135,7 @@ public final class StackedBlocksLogic {
             island.handleBlockPlace(block, amount);
         }
 
-        CoreProtectHook.recordBlockChange(player, block, true);
+        plugin.getProviders().notifyStackedBlocksListeners(player, block, IStackedBlocksListener.Action.BLOCK_PLACE);
 
         depositedAmount.accept(amount);
 
@@ -149,7 +149,7 @@ public final class StackedBlocksLogic {
             return false;
 
         // When sneaking, you'll break 64 from the stack. Otherwise, 1.
-        int amount = player == null || !player.isSneaking() ? 1 : 64, leftAmount;
+        int amount = player == null || !player.isSneaking() ? 1 : 64;
 
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
@@ -159,11 +159,12 @@ public final class StackedBlocksLogic {
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
 
+        int leftAmount;
         boolean stackedBlockSuccess = plugin.getStackedBlocks().setStackedBlock(block, (leftAmount = blockAmount - amount));
 
         plugin.getNMSWorld().playBreakAnimation(block);
 
-        CoreProtectHook.recordBlockChange(player, block, false);
+        plugin.getProviders().notifyStackedBlocksListeners(player, block, IStackedBlocksListener.Action.BLOCK_BREAK);
 
         if (!stackedBlockSuccess) {
             if (island != null)

@@ -38,6 +38,7 @@ loadbefore:
   - Multiverse-Core
   - Slimefun
   - My_Worlds
+  - Citizens
 
 permissions:
   superior.*:

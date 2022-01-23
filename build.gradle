@@ -5,25 +5,34 @@ plugins {
 }
 
 group 'SuperiorSkyblock'
-version = "1.8.2"
+version = "1.8.3"
 
-subprojects {
+allprojects {
     apply plugin: 'java'
     apply plugin: 'com.github.johnrengelman.shadow'
 
     repositories {
         maven { url 'https://repo.bg-software.com/repository/nms/' }
+        maven { url 'https://repo.bg-software.com/repository/api/' }
         maven { url 'https://repo.bg-software.com/repository/common/' }
         maven { url 'https://repo.bg-software.com/repository/public-libs/' }
+
+        String mavenUsername = System.getenv('mavenUsername') == null ? project.mavenUsername : System.getenv('mavenUsername');
+        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenUsername : System.getenv('mavenPassword');
+
+        if (mavenUsername != null && mavenPassword != null) {
+            maven {
+                url 'https://repo.bg-software.com/repository/private-libs/'
+                credentials {
+                    username mavenUsername
+                    password mavenPassword
+                }
+            }
+        }
     }
 
     dependencies {
         compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:latest"
-    }
-
-    shadowJar {
-        archiveFileName = "${project.name}.jar"
-        destinationDirectory = file("../archive/")
     }
 
     build {
@@ -31,35 +40,21 @@ subprojects {
     }
 }
 
-repositories {
-    maven { url 'https://repo.bg-software.com/repository/nms/' }
-    maven { url 'https://repo.bg-software.com/repository/api/' }
-    maven { url 'https://repo.bg-software.com/repository/common/' }
-    maven { url 'https://repo.bg-software.com/repository/public-libs/' }
-
-    String mavenUsername = project.hasProperty('mavenUsername') ? project.mavenUsername : System.getenv('mavenUsername');
-    String mavenPassword = project.hasProperty('mavenPassword') ? project.mavenPassword : System.getenv('mavenPassword');
-
-    if (mavenUsername != null && mavenPassword != null) {
-        maven {
-            url 'https://repo.bg-software.com/repository/private-libs/'
-            credentials {
-                username mavenUsername
-                password mavenPassword
-            }
-        }
+subprojects {
+    shadowJar {
+        archiveFileName = "${project.name}.jar"
+        destinationDirectory = file("../archive/")
     }
-
 }
 
 dependencies {
     implementation fileTree("archive")
     implementation project(":API")
 
-    implementation 'com.bgsoftware.common.config:CommentedConfiguration:latest'
+    implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:latest'
-    implementation 'com.bgsoftware.common.executors:Executors:latest'
+    implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'
@@ -69,35 +64,7 @@ dependencies {
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
 
     // Plugin hooks
-    compileOnly 'gcspawners:AdvancedSpawners:latest'
-    compileOnly 'com.github.games647:ChangeSkin:latest'
-    compileOnly 'com.zrips:CMI:latest'
-    compileOnly 'net.coreprotect:CoreProtect-6:latest'
-    compileOnly 'com.songoda:EpicSpawners-6:latest'
-    compileOnly 'com.earth2me:Essentials-2.16:latest'
     compileOnly 'com.boydti:FastAsyncWorldEdit:latest'
-    compileOnly 'me.jet315:JetsMinions:latest'
-    compileOnly 'me.robin:LeaderHeads:latest'
-    compileOnly 'net.luckperms:LuckPerms:latest'
-    compileOnly 'net.luckperms:LuckPerms:latest'
-    compileOnly 'com.vk2gpz:MergedSpawner:latest'
-    compileOnly 'be.maximvdw:MVdWPlaceholderAPI:latest'
-    compileOnly 'me.clip:PlaceholderAPI:latest'
-    compileOnly 'skyblock.hassan:PvpingSpawners:latest'
-    compileOnly 'dev.rosewood:RoseStacker:latest'
-    compileOnly 'net.brcdev:ShopGUIPlus-1.20:latest'
-    compileOnly 'de.candc:SilkSpawners:latest'
-    compileOnly 'net.skinsrestorer:SkinsRestorer:latest'
-    compileOnly 'net.skinsrestorer:SkinsRestorer14:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
-    compileOnly 'de.myzelyam:SuperVanish:latest'
-    compileOnly 'com.songoda:UltimateStacker:2.1.7'
-    compileOnly 'org.kitteh:VanishNoPacket:latest'
-    compileOnly 'net.milkbowl:Vault:latest'
-    compileOnly 'com.bgsoftware:WildStackerAPI:latest'
-    compileOnly 'com.grinderwolf:SlimeWorldManager:latest'
 }
 
 jar {

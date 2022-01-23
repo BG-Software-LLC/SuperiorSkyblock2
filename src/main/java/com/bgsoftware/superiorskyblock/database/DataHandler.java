@@ -6,20 +6,25 @@ import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
+import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseInitializer;
+import com.bgsoftware.superiorskyblock.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
 public final class DataHandler extends AbstractHandler {
@@ -31,12 +36,7 @@ public final class DataHandler extends AbstractHandler {
     }
 
     @Override
-    public void loadData() {
-        throw new UnsupportedOperationException("Not supported for DataHandler.");
-    }
-
-    @Override
-    public void loadDataWithException() throws HandlerLoadException {
+    public void loadData() throws HandlerLoadException {
         loadDatabaseLoaders();
 
         for (DatabaseLoader databaseLoader : databaseLoaders) {
@@ -61,12 +61,16 @@ public final class DataHandler extends AbstractHandler {
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().createIndexes();
+            SQLHelper.setJournalMode("MEMORY");
         }
 
         loadPlayers();
         loadIslands();
         loadGrid();
-        loadBankTransactions();
+
+        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
+            SQLHelper.setJournalMode("DELETE");
+        }
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -96,7 +100,7 @@ public final class DataHandler extends AbstractHandler {
             GridDatabaseBridge.insertGrid(plugin.getGrid());
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -115,10 +119,21 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
-        playersLoader.loadAllObjects("players", resultSet ->
-                plugin.getPlayers().loadPlayer(new DatabaseResult(resultSet)));
+        DatabaseCache<CachedPlayerInfo> databaseCache = new DatabaseCache<>();
+        AtomicInteger playersCount = new AtomicInteger();
+        long startTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("Finished players!");
+        PlayersDeserializer.deserializeMissions(playersLoader, databaseCache);
+        PlayersDeserializer.deserializePlayerSettings(playersLoader, databaseCache);
+
+        playersLoader.loadAllObjects("players", resultSet -> {
+            plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet));
+            playersCount.incrementAndGet();
+        });
+
+        long endTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("Finished loading " + playersCount.get() + " players (Took " + (endTime - startTime) + "ms)");
     }
 
     private void loadIslands() {
@@ -126,11 +141,43 @@ public final class DataHandler extends AbstractHandler {
 
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
-        islandsLoader.loadAllObjects("islands", resultSet ->
-                plugin.getGrid().createIsland(new DatabaseResult(resultSet)));
+        DatabaseCache<CachedIslandInfo> databaseCache = new DatabaseCache<>();
+        AtomicInteger islandsCount = new AtomicInteger();
+        long startTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("Finished islands!");
+        IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeMembers(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBanned(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializePlayerPermissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRolePermissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeUpgrades(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeWarps(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBlockLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRatings(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeMissions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandFlags(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeGenerators(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeVisitors(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeEntityLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeEffects(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandChest(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeRoleLimits(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeWarpCategories(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandBank(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeVisitorHomes(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeIslandSettings(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializeBankTransactions(islandsLoader, databaseCache);
+
+        islandsLoader.loadAllObjects("islands", resultSet -> {
+            plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
+            islandsCount.incrementAndGet();
+        });
+
+        long endTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
     }
+
 
     private void loadGrid() {
         SuperiorSkyblockPlugin.log("Starting to load grid...");
@@ -141,29 +188,6 @@ public final class DataHandler extends AbstractHandler {
                 resultSet -> plugin.getGrid().loadGrid(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished grid!");
-    }
-
-    private void loadBankTransactions() {
-        if (BuiltinModules.BANK.bankLogs) {
-            SuperiorSkyblockPlugin.log("Starting to load bank transactions...");
-
-            DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
-
-            islandsLoader.loadAllObjects("bank_transactions", _resultSet -> {
-                DatabaseResult resultSet = new DatabaseResult(_resultSet);
-                try {
-                    Island island = plugin.getGrid().getIslandByUUID(UUID.fromString(resultSet.getString("island")));
-                    if (island != null)
-                        island.getIslandBank().loadTransaction(new SBankTransaction(resultSet));
-                } catch (Exception error) {
-                    SuperiorSkyblockPlugin.log("&cError occurred while loading bank transaction:");
-                    error.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(error);
-                }
-            });
-
-            SuperiorSkyblockPlugin.log("Finished bank transactions!");
-        }
     }
 
 }

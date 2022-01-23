@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -28,15 +28,15 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin cleargenerator <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> [" +
-                Locale.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ALL_ISLANDS.getMessage(locale) + "> [" +
+                Message.COMMAND_ARGUMENT_WORLD.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR.getMessage(locale);
     }
 
     @Override
@@ -70,11 +70,11 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.clearGeneratorAmounts(environment)));
 
         if (islands.size() != 1)
-            Locale.GENERATOR_CLEARED_ALL.send(sender);
+            Message.GENERATOR_CLEARED_ALL.send(sender);
         else if (targetPlayer == null)
-            Locale.GENERATOR_CLEARED_NAME.send(sender, islands.get(0).getName());
+            Message.GENERATOR_CLEARED_NAME.send(sender, islands.get(0).getName());
         else
-            Locale.GENERATOR_CLEARED.send(sender, targetPlayer.getName());
+            Message.GENERATOR_CLEARED.send(sender, targetPlayer.getName());
     }
 
 }

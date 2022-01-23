@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenuSettings;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuSettings;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public final class CmdAdminSettings implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SETTINGS.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SETTINGS.getMessage(locale);
     }
 
     @Override

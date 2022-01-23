@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.structure;
 
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;

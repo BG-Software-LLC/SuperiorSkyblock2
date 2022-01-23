@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.tag;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
+import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;

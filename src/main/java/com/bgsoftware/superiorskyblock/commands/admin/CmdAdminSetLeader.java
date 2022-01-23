@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -28,13 +28,13 @@ public final class CmdAdminSetLeader implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setleader <" +
-                Locale.COMMAND_ARGUMENT_LEADER.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_NEW_LEADER.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_LEADER.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_NEW_LEADER.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_LEADER.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_LEADER.getMessage(locale);
     }
 
     @Override
@@ -70,24 +70,27 @@ public final class CmdAdminSetLeader implements IAdminPlayerCommand {
             return;
 
         Island island = leader.getIsland();
+
+        assert island != null; // requireIsland is true
+
         if (!island.getOwner().getUniqueId().equals(leader.getUniqueId())) {
-            Locale.TRANSFER_ADMIN_NOT_LEADER.send(sender);
+            Message.TRANSFER_ADMIN_NOT_LEADER.send(sender);
             return;
         }
 
         if (leader.getUniqueId().equals(newLeader.getUniqueId())) {
-            Locale.TRANSFER_ADMIN_ALREADY_LEADER.send(sender, newLeader.getName());
+            Message.TRANSFER_ADMIN_ALREADY_LEADER.send(sender, newLeader.getName());
             return;
         }
 
         if (!island.isMember(newLeader)) {
-            Locale.TRANSFER_ADMIN_DIFFERENT_ISLAND.send(sender);
+            Message.TRANSFER_ADMIN_DIFFERENT_ISLAND.send(sender);
             return;
         }
 
         if (island.transferIsland(newLeader)) {
-            Locale.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
-            IslandUtils.sendMessage(island, Locale.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
+            Message.TRANSFER_ADMIN.send(sender, leader.getName(), newLeader.getName());
+            IslandUtils.sendMessage(island, Message.TRANSFER_BROADCAST, new ArrayList<>(), newLeader.getName());
         }
     }
 

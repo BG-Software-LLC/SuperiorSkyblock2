@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenuCustom;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuCustom;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -27,13 +27,13 @@ public final class CmdAdminOpenMenu implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin openmenu <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_MENU.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_MENU.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_OPEN_MENU.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_OPEN_MENU.getMessage(locale);
     }
 
     @Override

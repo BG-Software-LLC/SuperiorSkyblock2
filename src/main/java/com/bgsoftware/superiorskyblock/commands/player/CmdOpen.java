@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +30,7 @@ public final class CmdOpen implements IPermissibleCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_OPEN.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_OPEN.getMessage(locale);
     }
 
     @Override
@@ -54,14 +54,14 @@ public final class CmdOpen implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_OPEN_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_OPEN_PERMISSION;
     }
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         island.setLocked(false);
-        Locale.ISLAND_OPENED.send(superiorPlayer);
+        Message.ISLAND_OPENED.send(superiorPlayer);
     }
 
 }

@@ -9,27 +9,27 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
     @Override
     public void startDragonBattle(Island island, Location location) {
-
+        // Do nothing.
     }
 
     @Override
     public void removeDragonBattle(Island island) {
-
+        // Do nothing.
     }
 
     @Override
     public void tickBattles() {
-
+        // Do nothing.
     }
 
     @Override
     public void setDragonPhase(EnderDragon enderDragon, Object phase) {
-
+        // Do nothing.
     }
 
     @Override
     public void awardTheEndAchievement(Player player) {
-
+        // Do nothing.
     }
 
 }

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
@@ -111,7 +111,7 @@ public class RolePermissionNode extends PermissionNodeAbstract {
 
         @Override
         public void setPermission(IslandPrivilege permission, boolean value) {
-
+            // Do nothing.
         }
 
     }

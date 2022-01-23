@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -32,7 +32,7 @@ public final class CmdUpgrade implements ISuperiorCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_UPGRADE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_UPGRADE.getMessage(locale);
     }
 
     @Override

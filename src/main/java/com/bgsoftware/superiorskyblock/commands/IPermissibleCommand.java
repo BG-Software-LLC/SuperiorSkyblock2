@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -54,7 +54,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
 
     IslandPrivilege getPrivilege();
 
-    Locale getPermissionLackMessage();
+    Message getPermissionLackMessage();
 
     void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args);
 

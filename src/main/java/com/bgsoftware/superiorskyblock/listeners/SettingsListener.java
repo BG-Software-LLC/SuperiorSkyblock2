@@ -1,18 +1,21 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandFlags;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +27,7 @@ import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
+import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wither;
@@ -44,11 +48,27 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
+import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("unused")
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 public final class SettingsListener implements Listener {
 
-    private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK = new ReflectMethod<>(ProjectileHitEvent.class, "getHitBlock");
+    private static final ReflectMethod<Block> PROJECTILE_HIT_EVENT_TARGET_BLOCK =
+            new ReflectMethod<>(ProjectileHitEvent.class, "getHitBlock");
+
+    private static final LoadingCache<UUID, Optional<ProjectileSource>> originalFireballsDamager = CacheBuilder.newBuilder()
+            .expireAfterWrite(2, TimeUnit.SECONDS)
+            .build(new CacheLoader<UUID, Optional<ProjectileSource>>() {
+                @Override
+                public Optional<ProjectileSource> load(@NotNull UUID uuid) {
+                    return Optional.empty();
+                }
+            });
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -221,7 +241,7 @@ public final class SettingsListener implements Listener {
             ICachedBlock cachedBlock = plugin.getNMSWorld().cacheBlock(hitBlock);
             hitBlock.setType(Material.AIR);
 
-            Locale.sendProtectionMessage(damagerPlayer);
+            PlayerLocales.sendProtectionMessage(damagerPlayer);
 
             Executor.sync(() -> cachedBlock.setBlock(hitBlock.getLocation()), 1L);
         }
@@ -252,18 +272,37 @@ public final class SettingsListener implements Listener {
             e.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onFireballDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntity() instanceof Fireball) {
+            originalFireballsDamager.put(e.getEntity().getUniqueId(),
+                    Optional.of(((Fireball) e.getEntity()).getShooter()));
+        }
+    }
+
     private boolean handleEntityExplode(Entity source, Location explodeLocation) {
         Island island = plugin.getGrid().getIslandAt(explodeLocation);
-        if (island != null && (plugin.getSettings().getSpawn().isProtected() || !island.isSpawn())) {
-            if ((source instanceof Creeper && !island.hasSettingsEnabled(IslandFlags.CREEPER_EXPLOSION)) ||
-                    (source instanceof TNTPrimed && !island.hasSettingsEnabled(IslandFlags.TNT_EXPLOSION)) ||
-                    ((source instanceof Wither || source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.WITHER_EXPLOSION)) ||
-                    (source instanceof Fireball && !(source instanceof WitherSkull) && !island.hasSettingsEnabled(IslandFlags.GHAST_FIREBALL))) {
-                return true;
+
+        if (island == null || (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn()))
+            return false;
+
+        IslandFlag targetFlagCheck = null;
+
+        if (source instanceof Creeper) {
+            targetFlagCheck = IslandFlags.CREEPER_EXPLOSION;
+        } else if (source instanceof TNTPrimed) {
+            targetFlagCheck = IslandFlags.TNT_EXPLOSION;
+        } else if (source instanceof Wither || source instanceof WitherSkull) {
+            targetFlagCheck = IslandFlags.WITHER_EXPLOSION;
+        } else if (source instanceof Fireball) {
+            ProjectileSource projectileSource = originalFireballsDamager.getUnchecked(source.getUniqueId())
+                    .orElse(((Fireball) source).getShooter());
+            if (projectileSource instanceof Ghast) {
+                targetFlagCheck = IslandFlags.GHAST_FIREBALL;
             }
         }
 
-        return false;
+        return targetFlagCheck != null && !island.hasSettingsEnabled(targetFlagCheck);
     }
 
     private boolean shouldBlockEntitySpawn(Location location, CreatureSpawnEvent.SpawnReason spawnReason, EntityType entityType) {

@@ -151,9 +151,16 @@ public final class WorldsProvider_Default implements WorldsProvider {
                     "- Your level-name property in server.properties is set to " + worldName + ".");
         }
 
-        World world = WorldCreator.name(worldName).type(WorldType.FLAT).environment(environment).generator(plugin.getGenerator()).createWorld();
+        World world = WorldCreator.name(worldName)
+                .type(WorldType.FLAT)
+                .environment(environment)
+                .generator(plugin.getGenerator())
+                .createWorld();
+
         world.setDifficulty(difficulty);
         islandWorlds.put(environment, world);
+
+        plugin.getNMSWorld().removeAntiXray(world);
 
         if (Bukkit.getPluginManager().isPluginEnabled("Multiverse-Core")) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminAddGen
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminClearGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.event.Listener;
 
 import java.io.File;
@@ -38,7 +39,7 @@ public final class GeneratorsModule extends BuiltinModule {
                 config.save(configFile);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -46,10 +47,12 @@ public final class GeneratorsModule extends BuiltinModule {
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
     }
 
     @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
     }
 
     @Override

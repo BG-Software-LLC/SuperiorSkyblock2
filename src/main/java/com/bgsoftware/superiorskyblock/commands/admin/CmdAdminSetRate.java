@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -29,15 +29,15 @@ public final class CmdAdminSetRate implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin setrate <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_RATING.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_RATING.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_SET_RATE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_SET_RATE.getMessage(locale);
     }
 
     @Override
@@ -74,7 +74,7 @@ public final class CmdAdminSetRate implements IAdminIslandCommand {
 
         island.setRating(targetPlayer, rating);
 
-        Locale.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), StringUtils.format(rating.name()));
+        Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), StringUtils.format(rating.name()));
     }
 
     @Override

@@ -4,15 +4,18 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.menu.impl.MenuMissions;
+import com.bgsoftware.superiorskyblock.menu.impl.MenuMembers;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -92,7 +95,7 @@ public final class MissionsModule extends BuiltinModule {
             config.syncWithConfig(file, FileUtils.getResource("modules/missions/config.yml"), getIgnoredSections());
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
         updateConfig(plugin);
@@ -208,12 +211,12 @@ public final class MissionsModule extends BuiltinModule {
             } catch (InvalidConfigurationException ex) {
                 SuperiorSkyblockPlugin.log("&cError occurred while parsing mission file " + missionFile.getName() + ":");
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 continue;
             } catch (IOException ex) {
                 SuperiorSkyblockPlugin.log("&cError occurred while opening mission file " + missionFile.getName() + ":");
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 continue;
             }
 
@@ -238,15 +241,6 @@ public final class MissionsModule extends BuiltinModule {
         return true;
     }
 
-    private YamlConfiguration loadMissionsMenuFile(SuperiorSkyblockPlugin plugin) {
-        File missionsMenuFile = new File(plugin.getDataFolder(), "menus/missions.yml");
-
-        if (!missionsMenuFile.exists())
-            FileUtils.saveResource("menus/missions.yml");
-
-        return CommentedConfiguration.loadConfiguration(missionsMenuFile);
-    }
-
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void convertNonCategorizedMissions(SuperiorSkyblockPlugin plugin, File file, YamlConfiguration config) {
         ConfigurationSection missionsSection = config.getConfigurationSection("missions");
@@ -255,8 +249,15 @@ public final class MissionsModule extends BuiltinModule {
             return;
 
         ConfigurationSection categoriesSection = config.createSection("categories");
-        YamlConfiguration missionsMenuConfig = loadMissionsMenuFile(plugin);
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(MenuMissions.createEmptyInstance(), "missions.yml", missionsMenuConfig);
+
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(
+                new RegularMenuPattern.Builder<MenuMembers>(), "missions.yml", null);
+
+        if (menuLoadResult == null)
+            return;
+
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration missionsMenuConfig = menuLoadResult.getValue();
 
         int islandsCategorySlot = menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", ""));
         if (islandsCategorySlot != -1) {
@@ -290,7 +291,7 @@ public final class MissionsModule extends BuiltinModule {
                 missionFile.createNewFile();
             } catch (IOException error) {
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
                 continue;
             }
 
@@ -301,7 +302,7 @@ public final class MissionsModule extends BuiltinModule {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
                 error.printStackTrace();
-                SuperiorSkyblockPlugin.debug(error);
+                PluginDebugger.debug(error);
             }
         }
 
@@ -311,7 +312,7 @@ public final class MissionsModule extends BuiltinModule {
             config.save(file);
         } catch (Exception error) {
             error.printStackTrace();
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
 
         copyOldMissionsMenuFile(plugin);
@@ -331,7 +332,7 @@ public final class MissionsModule extends BuiltinModule {
                     config.save(file);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
 
                 oldMissionsFile.delete();
@@ -362,7 +363,7 @@ public final class MissionsModule extends BuiltinModule {
             Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
             SuperiorSkyblockPlugin.log("&cError occurred while copying old missions-menu to the new format, skipping...");
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
             return;
         }
 
@@ -372,7 +373,7 @@ public final class MissionsModule extends BuiltinModule {
         try {
             newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
         } catch (IOException error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
     }
 

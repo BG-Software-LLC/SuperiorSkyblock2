@@ -14,7 +14,8 @@ public final class SPlayerRole implements PlayerRole {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String name;
-    private final int id, weight;
+    private final int id;
+    private final int weight;
     private final RolePermissionNode defaultPermissions;
 
     public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole) {

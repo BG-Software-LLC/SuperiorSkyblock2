@@ -2,38 +2,39 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.MissionsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
-import org.bukkit.Material;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.configuration.ConfigurationSection;
 
-import java.io.File;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
+public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCategory, Mission<?>> {
 
-    private static boolean sortByCompletion, removeCompleted;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static PagedMenuPattern<MenuMissionsCategory, Mission<?>> menuPattern;
+
+    private static boolean sortByCompletion;
+    private static boolean removeCompleted;
 
     private final MissionCategory missionCategory;
     private List<Mission<?>> missions;
 
     private MenuMissionsCategory(SuperiorPlayer superiorPlayer, MissionCategory missionCategory) {
-        super("menuMissionsCategory", superiorPlayer);
+        super(menuPattern, superiorPlayer);
 
         this.missionCategory = missionCategory;
 
@@ -41,41 +42,75 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
             this.missions = missionCategory.getMissions().stream()
                     .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
                     .collect(Collectors.toList());
-            if (sortByCompletion && superiorPlayer.getIsland() != null)
+            if (sortByCompletion)
                 this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
         }
     }
 
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, missionCategory);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return title.replace("{0}", missionCategory.getName());
+    }
+
+    @Override
+    protected List<Mission<?>> requestObjects() {
+        return missions;
+    }
+
+    private int getCompletionStatus(Mission<?> mission) {
+        IMissionsHolder missionsHolder = mission.getIslandMission() ? inventoryViewer.getIsland() : inventoryViewer;
+        return missionsHolder == null ? 0 :
+                !missionsHolder.canCompleteMissionAgain(mission) ? 2 :
+                        plugin.getMissions().canComplete(inventoryViewer, mission) ? 1 : 0;
+    }
+
     public static void init() {
-        MenuMissionsCategory menuMissionsCategory = new MenuMissionsCategory(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/missions-category.yml");
+        PagedMenuPattern.Builder<MenuMissionsCategory, Mission<?>> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/missions-category.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "missions-category.yml", null);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
+
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
         sortByCompletion = cfg.getBoolean("sort-by-completion", false);
         removeCompleted = cfg.getBoolean("remove-completed", false);
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuMissionsCategory, "missions-category.yml", cfg);
+        ConfigurationSection soundsSection = cfg.getConfigurationSection("sounds");
 
-        char slotsChar = cfg.getString("slots", " ").charAt(0);
+        if (soundsSection != null) {
+            for (char slotChar : cfg.getString("slots", "").toCharArray()) {
+                ConfigurationSection soundSection = soundsSection.getConfigurationSection(slotChar + "");
 
-        if (cfg.contains("sounds." + slotsChar + ".completed"))
-            menuMissionsCategory.addData("sound-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".completed")));
-        if (cfg.contains("sounds." + slotsChar + ".not-completed"))
-            menuMissionsCategory.addData("sound-not-completed", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".not-completed")));
-        if (cfg.contains("sounds." + slotsChar + ".can-complete"))
-            menuMissionsCategory.addData("sound-can-complete", FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".can-complete")));
+                if (soundSection == null)
+                    continue;
 
-        menuMissionsCategory.setPreviousSlot(getSlots(cfg, "previous-page", menuPatternSlots));
-        menuMissionsCategory.setCurrentSlot(getSlots(cfg, "current-page", menuPatternSlots));
-        menuMissionsCategory.setNextSlot(getSlots(cfg, "next-page", menuPatternSlots));
-        menuMissionsCategory.setSlots(getSlots(cfg, "slots", menuPatternSlots));
+                SoundWrapper completedSound = FileUtils.getSound(soundSection.getConfigurationSection("completed"));
+                SoundWrapper notCompletedSound = FileUtils.getSound(soundSection.getConfigurationSection("not-completed"));
+                SoundWrapper canCompleteSound = FileUtils.getSound(soundSection.getConfigurationSection("can-complete"));
 
-        menuMissionsCategory.markCompleted();
+                patternBuilder.setPagedObjectSlots(menuPatternSlots.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
+                        .setCompletedSound(completedSound)
+                        .setNotCompletedSound(notCompletedSound)
+                        .setCanCompleteSound(canCompleteSound));
+            }
+        }
+
+        menuPattern = patternBuilder
+                .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))
+                .setCurrentPageSlots(getSlots(cfg, "current-page", menuPatternSlots))
+                .setNextPageSlots(getSlots(cfg, "next-page", menuPatternSlots))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, MissionCategory missionCategory) {
@@ -84,96 +119,6 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<Mission<?>> {
 
     public static void refreshMenus(MissionCategory missionCategory) {
         refreshMenus(MenuMissionsCategory.class, superiorMenu -> missionCategory.equals(superiorMenu.missionCategory));
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, missionCategory);
-    }
-
-    @Override
-    protected Inventory buildInventory(Function<String, String> titleReplacer) {
-        return super.buildInventory(title -> title.replace("{0}", missionCategory.getName()));
-    }
-
-    @Override
-    protected void onPlayerClick(InventoryClickEvent event, Mission<?> mission) {
-        Island island = superiorPlayer.getIsland();
-
-        if (island == null)
-            return;
-
-        boolean completed = !island.canCompleteMissionAgain(mission);
-        boolean canComplete = plugin.getMissions().canComplete(superiorPlayer, mission);
-
-        SoundWrapper sound = (SoundWrapper) getData(completed ? "sound-completed" : canComplete ? "sound-can-complete" : "sound-not-completed");
-        if (sound != null)
-            sound.playSound(event.getWhoClicked());
-
-        if (canComplete && plugin.getMissions().hasAllRequiredMissions(superiorPlayer, mission)) {
-            plugin.getMissions().rewardMission(mission, superiorPlayer, false, false, result -> {
-                if (result) {
-                    previousMove = false;
-                    openInventory(superiorPlayer, previousMenu, missionCategory);
-                }
-            });
-        }
-    }
-
-    @Override
-    protected ItemStack getObjectItem(ItemStack clickedItem, Mission<?> mission) {
-        try {
-            Optional<MissionData> missionDataOptional = plugin.getMissions().getMissionData(mission);
-
-            if (!missionDataOptional.isPresent())
-                return clickedItem;
-
-            MissionData missionData = missionDataOptional.get();
-            IMissionsHolder missionsHolder = mission.getIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
-
-            if (missionsHolder == null)
-                return new ItemStack(Material.AIR);
-
-            boolean completed = !missionsHolder.canCompleteMissionAgain(mission);
-            int percentage = getPercentage(mission.getProgress(superiorPlayer));
-            int progressValue = mission.getProgressValue(superiorPlayer);
-            int amountCompleted = missionsHolder.getAmountMissionCompleted(mission);
-
-            ItemStack itemStack = completed ? missionData.getCompleted().build(superiorPlayer) :
-                    plugin.getMissions().canComplete(superiorPlayer, mission) ?
-                            missionData.getCanComplete()
-                                    .replaceAll("{0}", percentage + "")
-                                    .replaceAll("{1}", progressValue + "")
-                                    .replaceAll("{2}", amountCompleted + "").build(superiorPlayer) :
-                            missionData.getNotCompleted()
-                                    .replaceAll("{0}", percentage + "")
-                                    .replaceAll("{1}", progressValue + "")
-                                    .replaceAll("{2}", amountCompleted + "").build(superiorPlayer);
-
-            mission.formatItem(superiorPlayer, itemStack);
-
-            return itemStack;
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Failed to load menu because of mission: " + mission.getName());
-            SuperiorSkyblockPlugin.debug(ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected List<Mission<?>> requestObjects() {
-        return missions;
-    }
-
-    private int getPercentage(double progress) {
-        progress = Math.min(1.0, progress);
-        return Math.round((float) progress * 100);
-    }
-
-    private int getCompletionStatus(Mission<?> mission) {
-        return superiorPlayer.getIsland() == null ? 0 :
-                !superiorPlayer.getIsland().canCompleteMissionAgain(mission) ? 2 :
-                        plugin.getMissions().canComplete(superiorPlayer, mission) ? 1 : 0;
     }
 
 }

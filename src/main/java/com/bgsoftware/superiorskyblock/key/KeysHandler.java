@@ -19,7 +19,7 @@ public final class KeysHandler extends AbstractHandler implements KeysManager {
 
     @Override
     public void loadData() {
-
+        // No data to be loaded.
     }
 
     @Override

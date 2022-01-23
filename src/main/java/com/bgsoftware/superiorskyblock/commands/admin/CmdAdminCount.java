@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,14 +35,14 @@ public final class CmdAdminCount implements IAdminIslandCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin count <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [" +
-                Locale.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + "> [" +
+                Message.COMMAND_ARGUMENT_MATERIAL.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_COUNT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_COUNT.getMessage(locale);
     }
 
     @Override
@@ -102,7 +102,7 @@ public final class CmdAdminCount implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         if (args.length == 3) {
             if (!(sender instanceof Player)) {
-                Locale.sendMessage(sender, "&cYou must be a player in order to open the counts menu.", true);
+                Message.CUSTOM.send(sender, "&cYou must be a player in order to open the counts menu.", true);
                 return;
             }
 
@@ -116,19 +116,19 @@ public final class CmdAdminCount implements IAdminIslandCommand {
         if (materialName.equals("*")) {
             StringBuilder materialsBuilder = new StringBuilder();
 
-            java.util.Locale locale = LocaleUtils.getLocale(sender);
+            java.util.Locale locale = PlayerLocales.getLocale(sender);
 
-            if (!Locale.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)) {
+            if (!Message.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)) {
                 for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()) {
-                    materialsBuilder.append(", ").append(Locale.BLOCK_COUNTS_CHECK_MATERIAL
+                    materialsBuilder.append(", ").append(Message.BLOCK_COUNTS_CHECK_MATERIAL
                             .getMessage(locale, StringUtils.format(entry.getValue()), StringUtils.format(entry.getKey().toString())));
                 }
             }
 
             if (materialsBuilder.length() == 0) {
-                Locale.BLOCK_COUNTS_CHECK_EMPTY.send(sender);
+                Message.BLOCK_COUNTS_CHECK_EMPTY.send(sender);
             } else {
-                Locale.BLOCK_COUNTS_CHECK.send(sender, materialsBuilder.substring(1));
+                Message.BLOCK_COUNTS_CHECK.send(sender, materialsBuilder.substring(1));
             }
         } else {
             Material material = CommandArguments.getMaterial(sender, materialName);
@@ -141,7 +141,7 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             if (blockCount.compareTo(BigInteger.ONE) > 0)
                 materialName = materialName + "s";
 
-            Locale.BLOCK_COUNT_CHECK.send(sender, StringUtils.format(blockCount), StringUtils.format(materialName));
+            Message.BLOCK_COUNT_CHECK.send(sender, StringUtils.format(blockCount), StringUtils.format(materialName));
         }
     }
 }

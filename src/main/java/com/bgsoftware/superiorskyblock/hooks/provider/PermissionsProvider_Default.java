@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
+import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import org.bukkit.entity.Player;
 
 public final class PermissionsProvider_Default implements PermissionsProvider {

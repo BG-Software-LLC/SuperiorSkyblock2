@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -184,7 +185,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -213,24 +214,24 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
         @Override
         public boolean execute(CommandSender sender, String label, String[] args) {
-            java.util.Locale locale = LocaleUtils.getLocale(sender);
+            java.util.Locale locale = PlayerLocales.getLocale(sender);
 
             if (args.length > 0) {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
                     if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
-                        Locale.sendMessage(sender, "&cCan be executed only by players!", true);
+                        Message.CUSTOM.send(sender, "&cCan be executed only by players!", true);
                         return false;
                     }
 
                     if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                        SuperiorSkyblockPlugin.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
-                        Locale.NO_COMMAND_PERMISSION.send(sender, locale);
+                        PluginDebugger.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
+                        Message.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }
 
                     if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
-                        Locale.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
+                        Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
                         return false;
                     }
 
@@ -245,7 +246,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                         long timeNow = System.currentTimeMillis();
 
                         if (timeNow < timeToExecute) {
-                            Locale.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
+                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
                                     StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
                             return false;
                         }
@@ -283,7 +284,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                 }
             }
 
-            Locale.NO_COMMAND_PERMISSION.send(sender, locale);
+            Message.NO_COMMAND_PERMISSION.send(sender, locale);
 
             return false;
         }

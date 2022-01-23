@@ -6,9 +6,6 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
-import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
@@ -18,11 +15,16 @@ import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsHandler;
 import com.bgsoftware.superiorskyblock.database.DataHandler;
+import com.bgsoftware.superiorskyblock.engine.NashornEngine;
+import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
+import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.KeysHandler;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.listeners.BlocksListener;
 import com.bgsoftware.superiorskyblock.listeners.ChunksListener;
 import com.bgsoftware.superiorskyblock.listeners.CustomEventsListener;
@@ -52,34 +54,29 @@ import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
-import com.bgsoftware.superiorskyblock.scripts.NashornEngine;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradesHandler;
 import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContainer;
 import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.values.container.BlockWorthValuesContainer;
 import com.bgsoftware.superiorskyblock.values.container.GeneralBlockValuesContainer;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
-import com.bgsoftware.superiorskyblock.world.blocks.StackedBlocksHandler;
-import com.bgsoftware.superiorskyblock.world.blocks.container.DefaultStackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlocksHandler;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.DefaultStackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
-import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.bgsoftware.superiorskyblock.world.preview.DefaultIslandPreviews;
 import com.bgsoftware.superiorskyblock.world.purge.DefaultIslandsPurger;
 import org.bukkit.Bukkit;
@@ -102,9 +99,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static final Pattern LISTENER_REGISTER_FAILURE =
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
+
     private static SuperiorSkyblockPlugin plugin;
     private final Updater updater = new Updater(this, "superiorskyblock2");
-    private final PluginDebugger pluginDebugger = new PluginDebugger(new File(getDataFolder(), ".session_logs"));
+
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this,
@@ -136,6 +134,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler = null;
     private IScriptEngine scriptEngine = NashornEngine.getInstance();
     private WorldEventsManager worldEventsManager = new WorldEventsManagerImpl(this);
+
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -144,29 +143,19 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private NMSPlayers nmsPlayers;
     private NMSTags nmsTags;
     private NMSWorld nmsWorld;
+
     private ChunkGenerator worldGenerator = null;
+
     private boolean shouldEnable = true;
-    private boolean debugMode = false;
-    private Pattern debugFilter = null;
     private String listenerRegisterFailure = "";
 
     public static void log(String message) {
-        plugin.pluginDebugger.debug(ChatColor.stripColor(message));
+        //plugin.pluginDebugger.debug(ChatColor.stripColor(message));
         message = StringUtils.translateColors(message);
         if (message.contains(ChatColor.COLOR_CHAR + ""))
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
         else
             plugin.getLogger().info(message);
-    }
-
-    public static void debug(String message) {
-        plugin.pluginDebugger.debug(message);
-        if (plugin.debugMode && (plugin.debugFilter == null || plugin.debugFilter.matcher(message.toUpperCase()).find()))
-            plugin.getLogger().info("[DEBUG] " + message);
-    }
-
-    public static void debug(Throwable error) {
-        plugin.pluginDebugger.debug(error);
     }
 
     public static SuperiorSkyblockPlugin getPlugin() {
@@ -223,13 +212,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             });
         } catch (Exception ex) {
             ex.printStackTrace();
-            debug(ex);
+            PluginDebugger.debug(ex);
         } finally {
             CalcTask.cancelTask();
             Executor.close();
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
 
-            pluginDebugger.cancel();
+            //pluginDebugger.cancel();
             dataHandler.closeConnection();
         }
     }
@@ -244,9 +233,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             Executor.init(this);
 
-            loadSortingTypes();
-            loadIslandFlags();
-            loadIslandPrivileges();
+            IslandPrivileges.registerPrivileges();
+            SortingTypes.registerSortingTypes();
+            IslandFlags.registerFlags();
             loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();
@@ -267,12 +256,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
             try {
-                providersHandler.prepareWorlds();
+                providersHandler.getWorldsProvider().prepareWorlds();
             } catch (RuntimeException ex) {
                 HandlerLoadException handlerError = new HandlerLoadException(ex.getMessage(), HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 shouldEnable = false;
                 handlerError.printStackTrace();
-                debug(handlerError);
+                PluginDebugger.debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -300,7 +289,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         HandlerLoadException.ErrorLevel.CONTINUE);
                 shouldEnable = false;
                 handlerError.printStackTrace();
-                debug(handlerError);
+                PluginDebugger.debug(handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -340,7 +329,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         } catch (Throwable ex) {
             shouldEnable = false;
             ex.printStackTrace();
-            debug(ex);
+            PluginDebugger.debug(ex);
             Bukkit.shutdown();
         }
     }
@@ -383,8 +372,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             nmsWorld = loadNMSClass("NMSWorldImpl", version);
             return true;
         } catch (Exception ex) {
-            log("SuperiorSkyblock doesn't support " + version + " - shutting down...");
-            debug(ex);
+            new HandlerLoadException(
+                    "The plugin doesn't support your minecraft version.\n" +
+                            "Please try a different version.",
+                    HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+            PluginDebugger.debug(ex);
             return false;
         }
     }
@@ -397,8 +389,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     public ChunkGenerator getGenerator() {
         if (worldGenerator == null) {
             loadGeneratorFromFile();
-            if (worldGenerator == null)
-                worldGenerator = new IslandsGenerator(settingsHandler.getWorlds().getDefaultWorld());
+            if (worldGenerator == null) {
+                worldGenerator = nmsWorld.createGenerator(plugin);
+            }
         }
 
         return worldGenerator;
@@ -439,7 +432,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             } catch (Exception ex) {
                 log("An error occurred while loading the generator:");
                 ex.printStackTrace();
-                debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }
@@ -482,7 +475,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         upgradesHandler.loadData();
         rolesHandler.loadData();
 
-        Locale.reload();
+        Message.reload();
 
         if (loadGrid) {
             playersHandler.loadData();
@@ -492,12 +485,12 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             gridHandler.syncUpgrades();
         }
 
-        schematicsHandler.loadDataWithException();
+        schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
 
         if (loadGrid) {
-            dataHandler.loadDataWithException();
+            dataHandler.loadData();
             stackedBlocksHandler.loadData();
         } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
@@ -519,8 +512,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     private void unloadIslandWorlds() {
         for (World world : Bukkit.getWorlds()) {
-            if(providersHandler.isIslandsWorld(world))
-                Bukkit.unloadWorld(world, false);
+            if (providersHandler.getWorldsProvider().isIslandsWorld(world))
+                Bukkit.unloadWorld(world, true);
         }
     }
 
@@ -666,134 +659,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public String getFileName() {
         return getFile().getName();
-    }
-
-    public boolean isDebugMode() {
-        return debugMode;
-    }
-
-    public void toggleDebugMode() {
-        debugMode = !debugMode;
-    }
-
-    public void setDebugFilter(String debugFilter) {
-        if (debugFilter.isEmpty())
-            this.debugFilter = null;
-        else
-            this.debugFilter = Pattern.compile(debugFilter.toUpperCase());
-    }
-
-    private void loadSortingTypes() {
-        try {
-            SortingType.register("WORTH", SortingComparators.WORTH_COMPARATOR, false);
-        } catch (NullPointerException ignored) {
-        }
-        try {
-            SortingType.register("LEVEL", SortingComparators.LEVEL_COMPARATOR, false);
-        } catch (NullPointerException ignored) {
-        }
-        try {
-            SortingType.register("RATING", SortingComparators.RATING_COMPARATOR, false);
-        } catch (NullPointerException ignored) {
-        }
-        try {
-            SortingType.register("PLAYERS", SortingComparators.PLAYERS_COMPARATOR, false);
-        } catch (NullPointerException ignored) {
-        }
-    }
-
-    private void loadIslandFlags() {
-        IslandFlag.register("ALWAYS_DAY");
-        IslandFlag.register("ALWAYS_MIDDLE_DAY");
-        IslandFlag.register("ALWAYS_NIGHT");
-        IslandFlag.register("ALWAYS_MIDDLE_NIGHT");
-        IslandFlag.register("ALWAYS_RAIN");
-        IslandFlag.register("ALWAYS_SHINY");
-        IslandFlag.register("CREEPER_EXPLOSION");
-        IslandFlag.register("CROPS_GROWTH");
-        IslandFlag.register("EGG_LAY");
-        IslandFlag.register("ENDERMAN_GRIEF");
-        IslandFlag.register("FIRE_SPREAD");
-        IslandFlag.register("GHAST_FIREBALL");
-        IslandFlag.register("LAVA_FLOW");
-        IslandFlag.register("NATURAL_ANIMALS_SPAWN");
-        IslandFlag.register("NATURAL_MONSTER_SPAWN");
-        IslandFlag.register("PVP");
-        IslandFlag.register("SPAWNER_ANIMALS_SPAWN");
-        IslandFlag.register("SPAWNER_MONSTER_SPAWN");
-        IslandFlag.register("TNT_EXPLOSION");
-        IslandFlag.register("TREE_GROWTH");
-        IslandFlag.register("WATER_FLOW");
-        IslandFlag.register("WITHER_EXPLOSION");
-    }
-
-    private void loadIslandPrivileges() {
-        IslandPrivilege.register("ALL");
-        IslandPrivilege.register("ANIMAL_BREED");
-        IslandPrivilege.register("ANIMAL_DAMAGE");
-        IslandPrivilege.register("ANIMAL_SHEAR");
-        IslandPrivilege.register("ANIMAL_SPAWN");
-        IslandPrivilege.register("BAN_MEMBER");
-        IslandPrivilege.register("BREAK");
-        IslandPrivilege.register("BUILD");
-        IslandPrivilege.register("CHANGE_NAME");
-        IslandPrivilege.register("CHEST_ACCESS");
-        IslandPrivilege.register("CLOSE_BYPASS");
-        IslandPrivilege.register("CLOSE_ISLAND");
-        IslandPrivilege.register("COOP_MEMBER");
-        IslandPrivilege.register("DELETE_WARP");
-        IslandPrivilege.register("DEMOTE_MEMBERS");
-        IslandPrivilege.register("DEPOSIT_MONEY");
-        IslandPrivilege.register("DISBAND_ISLAND");
-        IslandPrivilege.register("DISCORD_SHOW");
-        IslandPrivilege.register("DROP_ITEMS");
-        IslandPrivilege.register("ENDER_PEARL");
-        IslandPrivilege.register("EXPEL_BYPASS");
-        IslandPrivilege.register("EXPEL_PLAYERS");
-        IslandPrivilege.register("FARM_TRAMPING");
-        IslandPrivilege.register("FERTILIZE");
-        IslandPrivilege.register("FISH");
-        IslandPrivilege.register("FLY");
-        IslandPrivilege.register("HORSE_INTERACT");
-        IslandPrivilege.register("INTERACT");
-        IslandPrivilege.register("INVITE_MEMBER");
-        IslandPrivilege.register("ISLAND_CHEST");
-        IslandPrivilege.register("ITEM_FRAME");
-        IslandPrivilege.register("KICK_MEMBER");
-        IslandPrivilege.register("LEASH");
-        IslandPrivilege.register("MINECART_DAMAGE");
-        IslandPrivilege.register("MINECART_ENTER");
-        IslandPrivilege.register("MINECART_OPEN");
-        IslandPrivilege.register("MINECART_PLACE");
-        IslandPrivilege.register("MONSTER_DAMAGE");
-        IslandPrivilege.register("MONSTER_SPAWN");
-        IslandPrivilege.register("NAME_ENTITY");
-        IslandPrivilege.register("OPEN_ISLAND");
-        IslandPrivilege.register("PAINTING");
-        IslandPrivilege.register("PAYPAL_SHOW");
-        IslandPrivilege.register("PICKUP_DROPS");
-        if (!ServerVersion.isLegacy())
-            IslandPrivilege.register("PICKUP_FISH");
-        IslandPrivilege.register("PROMOTE_MEMBERS");
-        IslandPrivilege.register("RANKUP");
-        IslandPrivilege.register("RATINGS_SHOW");
-        IslandPrivilege.register("SET_BIOME");
-        IslandPrivilege.register("SET_DISCORD");
-        IslandPrivilege.register("SET_HOME");
-        IslandPrivilege.register("SET_PAYPAL");
-        IslandPrivilege.register("SET_PERMISSION");
-        IslandPrivilege.register("SET_ROLE");
-        IslandPrivilege.register("SET_SETTINGS");
-        IslandPrivilege.register("SET_WARP");
-        IslandPrivilege.register("SIGN_INTERACT");
-        IslandPrivilege.register("SPAWNER_BREAK");
-        if (!ServerVersion.isLegacy())
-            IslandPrivilege.register("TURTLE_EGG_TRAMPING");
-        IslandPrivilege.register("UNCOOP_MEMBER");
-        IslandPrivilege.register("USE");
-        IslandPrivilege.register("VALUABLE_BREAK");
-        IslandPrivilege.register("VILLAGER_TRADING");
-        IslandPrivilege.register("WITHDRAW_MONEY");
     }
 
     private void loadUpgradeCostLoaders() {

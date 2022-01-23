@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,12 +29,12 @@ public final class CmdPromote implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "promote <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "promote <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_PROMOTE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_PROMOTE.getMessage(locale);
     }
 
     @Override
@@ -58,8 +58,8 @@ public final class CmdPromote implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_PROMOTE_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_PROMOTE_PERMISSION;
     }
 
     @Override
@@ -70,19 +70,19 @@ public final class CmdPromote implements IPermissibleCommand {
             return;
 
         if (!island.isMember(targetPlayer)) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return;
         }
 
         PlayerRole playerRole = targetPlayer.getPlayerRole();
 
         if (playerRole.isLastRole()) {
-            Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
+            Message.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
         if (!playerRole.isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
 
@@ -96,19 +96,19 @@ public final class CmdPromote implements IPermissibleCommand {
                 roleLimit >= 0 && island.getIslandMembers(nextRole).size() >= roleLimit);
 
         if (nextRole == null || nextRole.isLastRole()) {
-            Locale.LAST_ROLE_PROMOTE.send(superiorPlayer);
+            Message.LAST_ROLE_PROMOTE.send(superiorPlayer);
             return;
         }
 
         if (nextRole.isHigherThan(superiorPlayer.getPlayerRole())) {
-            Locale.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.PROMOTE_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return;
         }
 
         targetPlayer.setPlayerRole(nextRole);
 
-        Locale.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
-        Locale.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
+        Message.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());
+        Message.GOT_PROMOTED.send(targetPlayer, targetPlayer.getPlayerRole());
     }
 
     @Override

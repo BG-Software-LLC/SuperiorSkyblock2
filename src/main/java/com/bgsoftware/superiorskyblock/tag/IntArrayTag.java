@@ -36,7 +36,7 @@
 //@formatter:on
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -72,13 +72,14 @@ public final class IntArrayTag extends Tag<int[]> {
             return new IntArrayTag(value);
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
             return null;
         }
     }
 
     public static IntArrayTag fromUUID(UUID uuid) {
-        long MSB = uuid.getMostSignificantBits(), LSB = uuid.getLeastSignificantBits();
+        long MSB = uuid.getMostSignificantBits();
+        long LSB = uuid.getLeastSignificantBits();
         return new IntArrayTag(new int[]{(int) (MSB >> 32), (int) MSB, (int) (LSB >> 32), (int) LSB});
     }
 
@@ -125,21 +126,7 @@ public final class IntArrayTag extends Tag<int[]> {
      */
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!super.equals(obj)) {
-            return false;
-        }
-        if (!(obj instanceof IntArrayTag)) {
-            return false;
-        }
-        final IntArrayTag other = (IntArrayTag) obj;
-        //noinspection all
-        if (!Arrays.equals(value, other.value)) {
-            return false;
-        }
-        return true;
+        return this == obj || (obj instanceof IntArrayTag && Arrays.equals(value, ((IntArrayTag) obj).value));
     }
 
 }

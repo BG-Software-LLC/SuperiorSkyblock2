@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.mission;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -11,13 +10,15 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -166,7 +168,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
             } catch (ScriptException ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
                 return false;
             }
         });
@@ -204,7 +206,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             return;
         }
 
-        SuperiorSkyblockPlugin.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
+        PluginDebugger.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
 
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();
@@ -233,7 +235,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
                 if (checkAutoReward && !isAutoReward(mission)) {
                     if (canCompleteAgain(superiorPlayer, mission)) {
-                        Locale.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
+                        Message.MISSION_NO_AUTO_REWARD.send(superiorPlayer, mission.getName());
                         if (result != null)
                             result.accept(false);
                         return;
@@ -309,7 +311,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -325,7 +327,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             data.save(file);
         } catch (IOException ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
@@ -347,7 +349,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 file.createNewFile();
             } catch (IOException ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
 
@@ -391,10 +393,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
-                Optional<Class<?>> missionClass = FileUtils.getClasses(missionJar.toURL(), Mission.class).stream().findFirst();
-
-                if (!missionClass.isPresent())
-                    throw new NullPointerException("The mission file " + missionJar.getName() + " is not valid.");
+                Class<?> missionClass = Objects.requireNonNull(FileUtils.getClasses(missionJar.toURL(), Mission.class)
+                                .stream().findFirst().orElse(null),
+                        "The mission file " + missionJar.getName() + " is not valid.");
 
                 boolean islandMission = missionSection.getBoolean("island", false);
                 List<String> requiredMissions = missionSection.getStringList("required-missions");
@@ -403,7 +404,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 boolean onlyShowIfRequiredCompleted = missionSection.contains("only-show-if-required-completed") &&
                         missionSection.getBoolean("only-show-if-required-completed");
 
-                mission = createInstance(missionClass.get(), missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
+                mission = createInstance(missionClass, missionName, islandMission, requiredMissions, requiredChecks, onlyShowIfRequiredCompleted);
                 mission.load(plugin, missionSection);
                 this.missionsContainer.addMission(mission);
                 newMission = mission;
@@ -416,7 +417,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
             HandlerLoadException handlerError = new HandlerLoadException(ex, "Couldn't register mission " + missionName + ".",
                     HandlerLoadException.ErrorLevel.CONTINUE);
-            SuperiorSkyblockPlugin.debug(handlerError);
+            PluginDebugger.debug(handlerError);
             handlerError.printStackTrace();
         }
 

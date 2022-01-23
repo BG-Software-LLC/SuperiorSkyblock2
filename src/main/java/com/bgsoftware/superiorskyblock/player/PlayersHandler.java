@@ -4,11 +4,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.PlayersManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
+import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.player.container.PlayersContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -16,6 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -32,7 +35,7 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     @Override
     public void loadData() {
-
+        // Data is loaded by the database bridge.
     }
 
     @Override
@@ -114,6 +117,11 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         return plugin.getRoles().getRoles();
     }
 
+    @Override
+    public PlayersContainer getPlayersContainer() {
+        return this.playersContainer;
+    }
+
     public SuperiorPlayer getSuperiorPlayer(CommandSender commandSender) {
         return getSuperiorPlayer((Player) commandSender);
     }
@@ -125,9 +133,9 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
         );
     }
 
-    public void loadPlayer(DatabaseResult resultSet) {
-        SuperiorPlayer superiorPlayer = plugin.getFactory().createPlayer(resultSet);
-        this.playersContainer.addPlayer(superiorPlayer);
+    public void loadPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
+        Optional<SuperiorPlayer> superiorPlayer = plugin.getFactory().createPlayer(databaseCache, resultSet);
+        superiorPlayer.ifPresent(this.playersContainer::addPlayer);
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {

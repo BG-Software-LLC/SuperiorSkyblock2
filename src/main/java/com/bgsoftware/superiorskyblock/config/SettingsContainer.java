@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -81,14 +82,17 @@ public final class SettingsContainer {
     public final boolean normalWorldEnabled;
     public final boolean normalWorldUnlocked;
     public final boolean normalSchematicOffset;
+    public final String normalBiome;
     public final boolean netherWorldEnabled;
     public final boolean netherWorldUnlocked;
     public final String netherWorldName;
     public final boolean netherSchematicOffset;
+    public final String netherBiome;
     public final boolean endWorldEnabled;
     public final boolean endWorldUnlocked;
     public final String endWorldName;
     public final boolean endSchematicOffset;
+    public final String endBiome;
     public final boolean endDragonFight;
     public final String worldsDifficulty;
     public final String spawnLocation;
@@ -157,7 +161,6 @@ public final class SettingsContainer {
     public final boolean defaultToggledPanel;
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
-    public final boolean generators;
     public final boolean obsidianToLava;
     public final BlockValuesHandler.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
@@ -245,7 +248,8 @@ public final class SettingsContainer {
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
-        whitelistedStackedBlocks = new KeySet(config.getStringList("stacked-blocks.whitelisted"));
+        whitelistedStackedBlocks = new KeySet(config.getStringList("stacked-blocks.whitelisted")
+                .stream().map(String::toUpperCase).collect(Collectors.toList()));
         stackedBlocksName = StringUtils.translateColors(config.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = new KeyMap<>();
         config.getStringList("stacked-blocks.limits").forEach(line -> {
@@ -256,7 +260,7 @@ public final class SettingsContainer {
                 else if (sections.length == 3)
                     stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
@@ -277,16 +281,19 @@ public final class SettingsContainer {
         normalWorldEnabled = config.getBoolean("worlds.normal.enabled", true);
         normalWorldUnlocked = config.getBoolean("worlds.normal.unlock", true);
         normalSchematicOffset = config.getBoolean("worlds.normal.schematic-offset", true);
+        normalBiome = config.getString("worlds.normal.biome", "PLAINS");
         netherWorldEnabled = config.getBoolean("worlds.nether.enabled", false);
         netherWorldUnlocked = config.getBoolean("worlds.nether.unlock", true);
         String netherWorldName = config.getString("worlds.nether.name", "");
         this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
         netherSchematicOffset = config.getBoolean("worlds.nether.schematic-offset", true);
+        netherBiome = config.getString("worlds.nether.biome", "NETHER_WASTES");
         endWorldEnabled = config.getBoolean("worlds.end.enabled", false);
         endWorldUnlocked = config.getBoolean("worlds.end.unlock", false);
         String endWorldName = config.getString("worlds.end.name", "");
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = config.getBoolean("worlds.end.schematic-offset", true);
+        endBiome = config.getString("worlds.end.biome", "THE_END");
         endDragonFight = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         String defaultWorldEnvironment = config.getString("worlds.default-world");
         if (defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled) {
@@ -304,8 +311,10 @@ public final class SettingsContainer {
         worldsDifficulty = config.getString("worlds.difficulty", "EASY");
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
-        spawnSettings = config.getStringList("spawn.settings");
-        spawnPermissions = config.getStringList("spawn.permissions");
+        spawnSettings = config.getStringList("spawn.settings")
+                .stream().map(String::toUpperCase).collect(Collectors.toList());
+        spawnPermissions = config.getStringList("spawn.permissions")
+                .stream().map(String::toUpperCase).collect(Collectors.toList());
         spawnWorldBorder = config.getBoolean("spawn.world-border", false);
         spawnSize = config.getInt("spawn.size", 200);
         spawnDamage = config.getBoolean("spawn.players-damage", false);
@@ -338,7 +347,8 @@ public final class SettingsContainer {
         teleportOnKick = config.getBoolean("teleport-on-kick", false);
         clearOnJoin = config.getBoolean("clear-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
-        defaultSettings = config.getStringList("default-settings");
+        defaultSettings = config.getStringList("default-settings")
+                .stream().map(String::toUpperCase).collect(Collectors.toList());
         defaultGenerator = new KeyMap[World.Environment.values().length];
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
@@ -346,7 +356,7 @@ public final class SettingsContainer {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase());
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
                 } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         } else {
@@ -392,12 +402,12 @@ public final class SettingsContainer {
 
                             items.addTag(itemCompound);
                         } catch (Exception ex) {
-                            SuperiorSkyblockPlugin.debug(ex);
+                            PluginDebugger.debug(ex);
                         }
                     }
                 } catch (IllegalArgumentException ex) {
                     SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
         }
@@ -425,12 +435,12 @@ public final class SettingsContainer {
         defaultToggledPanel = config.getBoolean("default-toggled-panel", false);
         defaultIslandFly = config.getBoolean("default-island-fly", false);
         defaultBorderColor = config.getString("default-border-color", "BLUE");
-        generators = config.getBoolean("generators", true);
         obsidianToLava = config.getBoolean("obsidian-to-lava", false);
         syncWorth = BlockValuesHandler.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
-        disabledEvents = config.getStringList("disabled-events").stream().map(String::toLowerCase).collect(Collectors.toList());
+        disabledEvents = config.getStringList("disabled-events")
+                .stream().map(String::toLowerCase).collect(Collectors.toList());
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
         islandChestTitle = StringUtils.translateColors(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
@@ -471,7 +481,7 @@ public final class SettingsContainer {
     private void loadGenerator(List<String> lines, int index) {
         defaultGenerator[index] = new KeyMap<>();
         for (String line : lines) {
-            String[] sections = line.split(":");
+            String[] sections = line.toUpperCase().split(":");
             String globalKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];

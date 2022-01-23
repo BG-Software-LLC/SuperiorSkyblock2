@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdWithdraw;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
@@ -20,6 +21,7 @@ public final class BankModule extends BuiltinModule {
     public double bankWorthRate = 1000;
     public double disbandRefund = 0;
     public boolean bankLogs = true;
+    public boolean cacheAllLogs = false;
     public boolean bankInterestEnabled = true;
     public int bankInterestInterval = 86400;
     public int bankInterestPercentage = 10;
@@ -48,6 +50,9 @@ public final class BankModule extends BuiltinModule {
         if (syncValues("bank-logs", config))
             updatedConfig = true;
 
+        if (syncValues("cache-logs", config))
+            updatedConfig = true;
+
         if (syncValues("bank-interest", config))
             updatedConfig = true;
 
@@ -59,19 +64,19 @@ public final class BankModule extends BuiltinModule {
                 config.save(configFile);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
+                PluginDebugger.debug(ex);
             }
         }
     }
 
     @Override
     public void onEnable(SuperiorSkyblockPlugin plugin) {
-
+        // Do nothing.
     }
 
     @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
-
+        // Do nothing.
     }
 
     @Override
@@ -101,6 +106,7 @@ public final class BankModule extends BuiltinModule {
         this.bankWorthRate = bankWorthRate == 0 ? 0D : 1D / bankWorthRate;
         disbandRefund = Math.max(0, Math.min(100, config.getDouble("disband-refund"))) / 100D;
         bankLogs = config.getBoolean("bank-logs", true);
+        cacheAllLogs = config.getBoolean("cache-logs", true);
         bankInterestEnabled = config.getBoolean("bank-interest.enabled", true);
         bankInterestInterval = config.getInt("bank-interest.interval", 86400);
         bankInterestPercentage = config.getInt("bank-interest.percentage", 10);

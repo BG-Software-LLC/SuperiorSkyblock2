@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -28,17 +28,17 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "admin title <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_TITLE_FADE_IN.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_TITLE_DURATION.getMessage(locale) + "> <" +
-                Locale.COMMAND_ARGUMENT_TITLE_FADE_OUT.getMessage(locale) + "> " +
-                "-title [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "] " +
-                "-subtitle [" + Locale.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_TITLE_FADE_IN.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_TITLE_DURATION.getMessage(locale) + "> <" +
+                Message.COMMAND_ARGUMENT_TITLE_FADE_OUT.getMessage(locale) + "> " +
+                "-title [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "] " +
+                "-subtitle [" + Message.COMMAND_ARGUMENT_MESSAGE.getMessage(locale) + "]";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_ADMIN_TITLE.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_ADMIN_TITLE.getMessage(locale);
     }
 
     @Override
@@ -64,7 +64,7 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
         if (!targetPlayer.isOnline()) {
-            Locale.PLAYER_NOT_ONLINE.send(sender);
+            Message.PLAYER_NOT_ONLINE.send(sender);
             return;
         }
 
@@ -85,10 +85,11 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
 
-        String title = parsedArguments.get("title"), subtitle = parsedArguments.get("subtitle");
+        String title = parsedArguments.get("title");
+        String subtitle = parsedArguments.get("subtitle");
 
         if (title == null && subtitle == null) {
-            Locale.INVALID_TITLE.send(sender);
+            Message.INVALID_TITLE.send(sender);
             return;
         }
 
@@ -99,7 +100,7 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
                 duration.getKey(),
                 fadeOut.getKey());
 
-        Locale.TITLE_SENT.send(sender, targetPlayer.getName());
+        Message.TITLE_SENT.send(sender, targetPlayer.getName());
     }
 
 }

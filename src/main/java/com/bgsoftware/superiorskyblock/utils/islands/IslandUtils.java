@@ -1,15 +1,16 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksProvider;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -60,7 +61,7 @@ public final class IslandUtils {
         Map<World, List<ChunkPosition>> chunkCoords = new HashMap<>();
 
         {
-            if (plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+            if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
                 List<ChunkPosition> chunkPositions = getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks);
                 if (!chunkPositions.isEmpty())
@@ -68,14 +69,14 @@ public final class IslandUtils {
             }
         }
 
-        if (plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
+        if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             List<ChunkPosition> chunkPositions = getChunkCoords(island, netherWorld, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
                 chunkCoords.put(netherWorld, chunkPositions);
         }
 
-        if (plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
+        if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             List<ChunkPosition> chunkPositions = getChunkCoords(island, endWorld, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
@@ -108,18 +109,18 @@ public final class IslandUtils {
         List<CompletableFuture<Chunk>> chunkCoords = new ArrayList<>();
 
         {
-            if (plugin.getProviders().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
+            if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
                 chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
             }
         }
 
-        if (plugin.getProviders().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
+        if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }
 
-        if (plugin.getProviders().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
+        if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
             chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, onChunkLoad));
         }
@@ -136,11 +137,11 @@ public final class IslandUtils {
             if (!player.getAllowFlight() && superiorPlayer.hasIslandFlyEnabled() && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(true);
                 player.setFlying(true);
-                Locale.ISLAND_FLY_ENABLED.send(player);
+                Message.ISLAND_FLY_ENABLED.send(player);
             } else if (player.getAllowFlight() && !island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {
                 player.setAllowFlight(false);
                 player.setFlying(false);
-                Locale.ISLAND_FLY_DISABLED.send(player);
+                Message.ISLAND_FLY_DISABLED.send(player);
             }
         });
     }
@@ -161,7 +162,7 @@ public final class IslandUtils {
         });
     }
 
-    public static void sendMessage(Island island, Locale message, List<UUID> ignoredMembers, Object... args) {
+    public static void sendMessage(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
         island.getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
@@ -174,12 +175,12 @@ public final class IslandUtils {
 
     public static boolean checkKickRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         if (!island.isMember(targetPlayer)) {
-            Locale.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
+            Message.PLAYER_NOT_INSIDE_ISLAND.send(superiorPlayer);
             return false;
         }
 
         if (!targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.KICK_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
@@ -195,21 +196,21 @@ public final class IslandUtils {
 
         island.kickMember(target);
 
-        IslandUtils.sendMessage(island, Locale.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
+        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
 
-        Locale.GOT_KICKED.send(target, callerName);
+        Message.GOT_KICKED.send(target, callerName);
     }
 
     public static boolean checkBanRestrictions(SuperiorPlayer superiorPlayer, Island island, SuperiorPlayer targetPlayer) {
         Island playerIsland = superiorPlayer.getIsland();
         if (playerIsland != null && playerIsland.isMember(targetPlayer) &&
                 !targetPlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())) {
-            Locale.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
+            Message.BAN_PLAYERS_WITH_LOWER_ROLE.send(superiorPlayer);
             return false;
         }
 
         if (island.isBanned(targetPlayer)) {
-            Locale.PLAYER_ALREADY_BANNED.send(superiorPlayer);
+            Message.PLAYER_ALREADY_BANNED.send(superiorPlayer);
             return false;
         }
 
@@ -221,9 +222,9 @@ public final class IslandUtils {
 
         island.banMember(target, caller);
 
-        IslandUtils.sendMessage(island, Locale.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
+        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
 
-        Locale.GOT_BANNED.send(target, island.getOwner().getName());
+        Message.GOT_BANNED.send(target, island.getOwner().getName());
     }
 
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {

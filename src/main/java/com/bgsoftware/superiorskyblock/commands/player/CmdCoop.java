@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
 import java.util.ArrayList;
@@ -30,12 +30,12 @@ public final class CmdCoop implements IPermissibleCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "coop <" + Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
+        return "coop <" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_COOP.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_COOP.getMessage(locale);
     }
 
     @Override
@@ -59,8 +59,8 @@ public final class CmdCoop implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_COOP_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_COOP_PERMISSION;
     }
 
     @Override
@@ -71,27 +71,27 @@ public final class CmdCoop implements IPermissibleCommand {
             return;
 
         if (!targetPlayer.isOnline()) {
-            Locale.INVALID_PLAYER.send(superiorPlayer, args[1]);
+            Message.INVALID_PLAYER.send(superiorPlayer, args[1]);
             return;
         }
 
         if (island.isMember(targetPlayer)) {
-            Locale.ALREADY_IN_ISLAND_OTHER.send(superiorPlayer);
+            Message.ALREADY_IN_ISLAND_OTHER.send(superiorPlayer);
             return;
         }
 
         if (island.isCoop(targetPlayer)) {
-            Locale.PLAYER_ALREADY_COOP.send(superiorPlayer);
+            Message.PLAYER_ALREADY_COOP.send(superiorPlayer);
             return;
         }
 
         if (island.isBanned(targetPlayer)) {
-            Locale.COOP_BANNED_PLAYER.send(superiorPlayer);
+            Message.COOP_BANNED_PLAYER.send(superiorPlayer);
             return;
         }
 
         if (island.getCoopPlayers().size() >= island.getCoopLimit()) {
-            Locale.COOP_LIMIT_EXCEED.send(superiorPlayer);
+            Message.COOP_LIMIT_EXCEED.send(superiorPlayer);
             return;
         }
 
@@ -100,12 +100,12 @@ public final class CmdCoop implements IPermissibleCommand {
 
         island.addCoop(targetPlayer);
 
-        IslandUtils.sendMessage(island, Locale.COOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, Message.COOP_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), targetPlayer.getName());
 
         if (island.getName().isEmpty())
-            Locale.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());
+            Message.JOINED_ISLAND_AS_COOP.send(targetPlayer, superiorPlayer.getName());
         else
-            Locale.JOINED_ISLAND_AS_COOP_NAME.send(targetPlayer, island.getName());
+            Message.JOINED_ISLAND_AS_COOP_NAME.send(targetPlayer, island.getName());
     }
 
     @Override

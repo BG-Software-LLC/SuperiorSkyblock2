@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.player.container;
 
+import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.jetbrains.annotations.Nullable;
 

@@ -29,7 +29,8 @@ public final class CropsTickingTileEntity extends TileEntity implements ITickabl
 
     private final WeakReference<Island> island;
     private final WeakReference<Chunk> chunk;
-    private final int chunkX, chunkZ;
+    private final int chunkX;
+    private final int chunkZ;
 
     private int currentTick = 0;
 

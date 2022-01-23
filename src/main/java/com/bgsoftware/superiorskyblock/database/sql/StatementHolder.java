@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,10 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public final class StatementHolder {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final String prefix = plugin.getSettings().getDatabase().getType().equalsIgnoreCase("MySQL") ?
-            plugin.getSettings().getDatabase().getPrefix() : "";
 
     private final List<Map<Integer, Object>> batches = new ArrayList<>();
 
@@ -26,7 +23,7 @@ public final class StatementHolder {
     }
 
     public void setQuery(String query) {
-        this.query = query.replace("{prefix}", prefix);
+        this.query = query;
     }
 
     public void addBatch() {
@@ -56,12 +53,12 @@ public final class StatementHolder {
 
             Optional<Object> mutex = SQLHelper.getMutex();
 
-            if(!mutex.isPresent())
+            if (!mutex.isPresent())
                 return;
 
             synchronized (mutex.get()) {
-                SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.buildStatement(query, preparedStatement -> {
+                PluginDebugger.debug("Action: Database Execute, Query: " + query);
+                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
 
                     for (Map<Integer, Object> values : batches) {
@@ -79,9 +76,9 @@ public final class StatementHolder {
                     }
 
                     SQLHelper.setAutoCommit(true);
-                }, ex -> {
+                }).ifFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-                    ex.printStackTrace();
+                    error.printStackTrace();
                 });
             }
         } finally {
@@ -105,20 +102,20 @@ public final class StatementHolder {
 
             Optional<Object> mutex = SQLHelper.getMutex();
 
-            if(!mutex.isPresent())
+            if (!mutex.isPresent())
                 return;
 
             synchronized (mutex.get()) {
-                SuperiorSkyblockPlugin.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.buildStatement(query, preparedStatement -> {
+                PluginDebugger.debug("Action: Database Execute, Query: " + query);
+                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());
                         errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                     }
                     preparedStatement.executeUpdate();
-                }, ex -> {
+                }).ifFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
-                    ex.printStackTrace();
+                    error.printStackTrace();
                 });
             }
         } finally {

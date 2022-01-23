@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.island.permissions;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
@@ -37,7 +37,7 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
                 } catch (NullPointerException ignored) {
                     // Ignored - invalid privilege.
                 } catch (Exception error) {
-                    SuperiorSkyblockPlugin.debug(error);
+                    PluginDebugger.debug(error);
                 }
             }
         }

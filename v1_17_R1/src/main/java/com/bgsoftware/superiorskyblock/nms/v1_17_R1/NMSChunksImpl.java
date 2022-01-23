@@ -9,15 +9,15 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_17_R1.chunks.IslandsChunkGenerator;
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.utils.chunks.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
+import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
@@ -25,11 +25,13 @@ import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.LightEngineThreaded;
+import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.tags.TagsBlock;
 import net.minecraft.util.thread.ThreadedMailbox;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.biome.BiomeBase;
@@ -40,8 +42,12 @@ import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
 import net.minecraft.world.level.chunk.BiomeStorage;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkSection;
+import net.minecraft.world.level.chunk.ChunkStatus;
+import net.minecraft.world.level.chunk.NibbleArray;
 import net.minecraft.world.level.chunk.ProtoChunk;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.minecraft.world.level.lighting.LightEngineGraph;
+import net.minecraft.world.level.lighting.LightEngineLayerEventListener;
 import net.minecraft.world.phys.AxisAlignedBB;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -53,6 +59,7 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+import org.bukkit.generator.ChunkGenerator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -137,24 +144,26 @@ public final class NMSChunksImpl implements NMSChunks {
         }
 
         while (chunkEntities.hasNext()) {
-            chunkEntities.next().setRemoved(Entity.RemovalReason.b);
+            Entity entity = chunkEntities.next();
+            if (!(entity instanceof EntityHuman))
+                entity.setRemoved(Entity.RemovalReason.b);
         }
     }
 
     private static void removeBlocks(Chunk chunk) {
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
-        if (!(worldServer.generator instanceof IslandsGenerator)) {
-            IslandsChunkGenerator chunkGenerator = new IslandsChunkGenerator(worldServer);
-            ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
-            //noinspection ConstantConditions
-            chunkGenerator.buildBase(null, protoChunk);
+        ChunkGenerator bukkitGenerator = worldServer.getWorld().getGenerator();
 
-            for (int i = 0; i < 16; i++)
-                chunk.getSections()[i] = protoChunk.getSections()[i];
+        if (bukkitGenerator != null && !(bukkitGenerator instanceof IslandsGenerator)) {
+            CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer,
+                    worldServer.getChunkProvider().getChunkGenerator(),
+                    bukkitGenerator);
 
-            protoChunk.y().values().forEach(worldServer::setTileEntity);
+            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer,
+                    Collections.singletonList(chunk), ChunkStatus.f, 0);
+
+            chunkGenerator.buildBase(region, chunk);
         }
     }
 
@@ -292,7 +301,7 @@ public final class NMSChunksImpl implements NMSChunks {
                 byte yPosition = sectionCompound.getByte("Y");
                 if (sectionCompound.hasKeyOfType("Palette", 9) && sectionCompound.hasKeyOfType("BlockStates", 12)) {
                     //noinspection deprecation
-                    chunkSections[i] = new ChunkSection(yPosition << 4);
+                    chunkSections[i] = new ChunkSection(yPosition);
                     chunkSections[i].getBlocks().a(sectionCompound.getList("Palette", 10), sectionCompound.getLongArray("BlockStates"));
                 }
             }
@@ -337,12 +346,17 @@ public final class NMSChunksImpl implements NMSChunks {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         WorldServer world = (WorldServer) chunk.getWorld();
 
-        if (plugin.getSettings().isLightsUpdate()) {
-            // Update lights for the blocks.
-            // We use a delayed task to avoid null nibbles
-            Executor.sync(() -> {
+        // Update lights for the blocks.
+        // We use a delayed task to avoid null nibbles
+        Executor.sync(() -> {
+            boolean canSkyLight = bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL;
+            LightEngine lightEngine = world.k_();
+            LightEngineLayerEventListener blocksLightLayer = lightEngine.a(EnumSkyBlock.b);
+            LightEngineLayerEventListener skyLightLayer = lightEngine.a(EnumSkyBlock.a);
+
+            if (plugin.getSettings().isLightsUpdate()) {
                 if (STAR_LIGHT_INTERFACE.isValid()) {
-                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.k_();
+                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) lightEngine;
                     StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
                     ChunkProviderServer chunkProviderServer = world.getChunkProvider();
                     LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).a(() ->
@@ -355,21 +369,31 @@ public final class NMSChunksImpl implements NMSChunks {
                         BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
                         if (blockData.getBlockLightLevel() > 0) {
                             try {
-                                world.k_().a(EnumSkyBlock.b).a(blockPosition, blockData.getBlockLightLevel());
+                                blocksLightLayer.a(blockPosition, blockData.getBlockLightLevel());
                             } catch (Exception ignored) {
                             }
                         }
                         if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
                             try {
-                                SKY_LIGHT_UPDATE.invoke(world.k_().a(EnumSkyBlock.a), 9223372036854775807L,
+                                SKY_LIGHT_UPDATE.invoke(skyLightLayer, 9223372036854775807L,
                                         blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
                             } catch (Exception ignored) {
                             }
                         }
                     }
                 }
-            }, 10L);
-        }
+            } else if (canSkyLight) {
+                int sectionsAmount = chunk.getSections().length;
+                ChunkCoordIntPair chunkCoords = chunk.getPos();
+
+                for (int i = 0; i < sectionsAmount; ++i) {
+                    byte[] skyLightArray = new byte[2048];
+                    for (int j = 0; j < skyLightArray.length; j += 2)
+                        skyLightArray[j] = 15;
+                    lightEngine.a(EnumSkyBlock.a, SectionPosition.a(chunkCoords, i), new NibbleArray(skyLightArray), true);
+                }
+            }
+        }, 10L);
     }
 
     @Override

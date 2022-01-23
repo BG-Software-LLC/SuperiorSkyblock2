@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.tasks;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -41,17 +41,17 @@ public final class CalcTask extends BukkitRunnable {
     private void announceToOps(String message) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.isOp())
-                Locale.sendMessage(player, message, true);
+                Message.CUSTOM.send(player, message, true);
         }
-        Locale.sendMessage(Bukkit.getConsoleSender(), message, true);
+        Message.CUSTOM.send(Bukkit.getConsoleSender(), message, true);
     }
 
     private void announceToPlayers(boolean done) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (done) {
-                Locale.RECALC_ALL_ISLANDS_DONE.send(player);
+                Message.RECALC_ALL_ISLANDS_DONE.send(player);
             } else {
-                Locale.RECALC_ALL_ISLANDS.send(player);
+                Message.RECALC_ALL_ISLANDS.send(player);
             }
         }
     }

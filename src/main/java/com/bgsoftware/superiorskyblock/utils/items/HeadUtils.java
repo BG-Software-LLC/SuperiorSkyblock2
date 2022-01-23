@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -39,7 +40,7 @@ public final class HeadUtils {
             cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
         } catch (Exception ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
 
         for (String entityType : cfg.getConfigurationSection("").getKeys(false))

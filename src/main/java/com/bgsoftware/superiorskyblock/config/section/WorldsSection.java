@@ -66,6 +66,11 @@ public final class WorldsSection implements SettingsManager.Worlds {
         public boolean isSchematicOffset() {
             return container.normalSchematicOffset;
         }
+
+        @Override
+        public String getBiome() {
+            return container.normalBiome;
+        }
     }
 
     private class NetherSection implements Nether {
@@ -89,6 +94,11 @@ public final class WorldsSection implements SettingsManager.Worlds {
         public boolean isSchematicOffset() {
             return container.netherSchematicOffset;
         }
+
+        @Override
+        public String getBiome() {
+            return container.netherBiome;
+        }
     }
 
     private class EndSection implements End {
@@ -111,6 +121,11 @@ public final class WorldsSection implements SettingsManager.Worlds {
         @Override
         public boolean isSchematicOffset() {
             return container.endSchematicOffset;
+        }
+
+        @Override
+        public String getBiome() {
+            return container.endBiome;
         }
 
         @Override

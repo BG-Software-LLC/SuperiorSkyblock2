@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_15_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_15_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -13,9 +14,10 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.utils.blocks.ICachedBlock;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
+import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
+import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
+import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
@@ -40,13 +42,13 @@ import net.minecraft.server.v1_15_R1.TagsBlock;
 import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.TileEntityMobSpawner;
 import net.minecraft.server.v1_15_R1.TileEntitySign;
+import net.minecraft.server.v1_15_R1.World;
 import net.minecraft.server.v1_15_R1.WorldBorder;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
@@ -71,6 +73,8 @@ public final class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(BiomeStorage.class, BiomeBase[].class, "f", "g");
     private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
+    private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
+            Object.class, "chunkPacketBlockController").removeFinal();
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
@@ -114,7 +118,7 @@ public final class NMSWorldImpl implements NMSWorld {
             boolean disabled = !superiorPlayer.hasWorldBorderEnabled();
 
             Player player = superiorPlayer.asPlayer();
-            World world = superiorPlayer.getWorld();
+            org.bukkit.World world = superiorPlayer.getWorld();
 
             if (world == null || player == null)
                 return;
@@ -172,7 +176,7 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.utils.blocks.BlockData> blockDataList) {
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.world.blocks.BlockData> blockDataList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         for (BlockData blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
@@ -181,11 +185,10 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlock(Location location, Material material, byte data) {
+    public void setBlock(Location location, int combinedId) {
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition,
-                plugin.getNMSAlgorithms().getCombinedId(material, data), null, null);
+        NMSUtils.setBlock(world.getChunkAtWorldCoords(blockPosition), blockPosition, combinedId, null, null);
         NMSUtils.sendPacketToRelevantPlayers(world, blockPosition.getX() >> 4, blockPosition.getZ() >> 4,
                 new PacketPlayOutBlockChange(world, blockPosition));
     }
@@ -305,7 +308,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setSignLines(SignChangeEvent signChangeEvent, String[] lines) {
-
+        // Not implemented - only needed for Paper 1.16+
     }
 
     @Override
@@ -328,6 +331,23 @@ public final class NMSWorldImpl implements NMSWorld {
         net.minecraft.server.v1_15_R1.World world = ((CraftWorld) location.getWorld()).getHandle();
         SoundEffectType soundeffecttype = world.getType(blockPosition).r();
         world.playSound(null, blockPosition, soundeffecttype.e(), SoundCategory.BLOCKS, (soundeffecttype.a() + 1.0F) / 2.0F, soundeffecttype.b() * 0.8F);
+    }
+
+    @Override
+    public int getMinHeight(org.bukkit.World world) {
+        return 0;
+    }
+
+    @Override
+    public void removeAntiXray(org.bukkit.World bukkitWorld) {
+        World world = ((CraftWorld) bukkitWorld).getHandle();
+        if (CHUNK_PACKET_BLOCK_CONTROLLER.isValid())
+            CHUNK_PACKET_BLOCK_CONTROLLER.set(world, ChunkPacketBlockController.NO_OPERATION_INSTANCE);
+    }
+
+    @Override
+    public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
+        return new IslandsGeneratorImpl(plugin);
     }
 
 }

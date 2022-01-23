@@ -16,7 +16,8 @@ public final class EmptyCounterChunkSection extends ChunkSection {
     private static final ReflectField<NibbleArray> EMITTED_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "emittedLight");
     private static final ReflectField<NibbleArray> SKY_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "skyLight");
 
-    private int nonEmptyBlockCount, tickingBlockCount;
+    private int nonEmptyBlockCount;
+    private int tickingBlockCount;
 
     private EmptyCounterChunkSection(ChunkSection chunkSection) {
         super(chunkSection.getYPosition(), chunkSection.getSkyLightArray() != null);
@@ -34,7 +35,8 @@ public final class EmptyCounterChunkSection extends ChunkSection {
 
     @Override
     public void setType(int i, int j, int k, IBlockData iblockdata) {
-        Block currentBlock = getType(i, j, k).getBlock(), placedBlock = iblockdata.getBlock();
+        Block currentBlock = getType(i, j, k).getBlock();
+        Block placedBlock = iblockdata.getBlock();
 
         if (currentBlock != Blocks.AIR) {
             nonEmptyBlockCount--;

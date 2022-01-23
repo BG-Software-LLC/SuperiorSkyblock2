@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import org.bukkit.Location;
 
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public final class CmdSetTeleport implements IPermissibleCommand {
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_SET_TELEPORT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_SET_TELEPORT.getMessage(locale);
     }
 
     @Override
@@ -55,8 +55,8 @@ public final class CmdSetTeleport implements IPermissibleCommand {
     }
 
     @Override
-    public Locale getPermissionLackMessage() {
-        return Locale.NO_SET_HOME_PERMISSION;
+    public Message getPermissionLackMessage() {
+        return Message.NO_SET_HOME_PERMISSION;
     }
 
     @Override
@@ -64,12 +64,12 @@ public final class CmdSetTeleport implements IPermissibleCommand {
         Location newLocation = superiorPlayer.getLocation();
 
         if (!island.isInsideRange(newLocation)) {
-            Locale.TELEPORT_LOCATION_OUTSIDE_ISLAND.send(superiorPlayer);
+            Message.TELEPORT_LOCATION_OUTSIDE_ISLAND.send(superiorPlayer);
             return;
         }
 
-        island.setTeleportLocation(newLocation);
-        Locale.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
+        island.setIslandHome(newLocation);
+        Message.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
     }
 
 }

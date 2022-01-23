@@ -22,15 +22,15 @@ public final class TeleportUtils {
         Island island = plugin.getGrid().getIslandAt(location);
 
         if (island != null) {
-            plugin.getProviders().prepareTeleport(island, location.clone(),
-                    () -> _teleport(entity, location, teleportResult));
+            plugin.getProviders().getWorldsProvider().prepareTeleport(island, location.clone(),
+                    () -> teleportEntity(entity, location, teleportResult));
         } else {
-            _teleport(entity, location, teleportResult);
+            teleportEntity(entity, location, teleportResult);
         }
     }
 
-    private static void _teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {
-        plugin.getProviders().teleport(entity, location, teleportResult);
+    private static void teleportEntity(Entity entity, Location location, Consumer<Boolean> teleportResult) {
+        plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
     }
 
 }

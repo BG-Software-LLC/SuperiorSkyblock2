@@ -53,4 +53,8 @@ public interface IDeserializer {
 
     List<WarpCategoryAttributes> deserializeWarpCategories(String categories);
 
+    String deserializeBlockCounts(String blockCountsParam);
+
+    String deserializeDirtyChunks(String dirtyChunksParam);
+
 }

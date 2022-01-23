@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -29,7 +31,11 @@ public final class StringUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final double Q = 1000000000000000D, T = 1000000000000D, B = 1000000000D, M = 1000000D, K = 1000D;
+    private static final double Q = 1000000000000000D;
+    private static final double T = 1000000000000D;
+    private static final double B = 1000000000D;
+    private static final double M = 1000000D;
+    private static final double K = 1000D;
     private static final char SPACE_ASCII = 160;
 
     @SuppressWarnings("all")
@@ -74,7 +80,7 @@ public final class StringUtils {
                 island.updateDatesFormatter();
             }
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
     }
 
@@ -126,15 +132,15 @@ public final class StringUtils {
     public static String fancyFormat(BigDecimal bigDecimal, java.util.Locale locale) {
         double d = bigDecimal.doubleValue();
         if (d >= Q)
-            return format((d / Q)) + Locale.FORMAT_QUAD.getMessage(locale);
+            return format((d / Q)) + Message.FORMAT_QUAD.getMessage(locale);
         else if (d >= T)
-            return format((d / T)) + Locale.FORMAT_TRILLION.getMessage(locale);
+            return format((d / T)) + Message.FORMAT_TRILLION.getMessage(locale);
         else if (d >= B)
-            return format((d / B)) + Locale.FORMAT_BILLION.getMessage(locale);
+            return format((d / B)) + Message.FORMAT_BILLION.getMessage(locale);
         else if (d >= M)
-            return format((d / M)) + Locale.FORMAT_MILLION.getMessage(locale);
+            return format((d / M)) + Message.FORMAT_MILLION.getMessage(locale);
         else if (d >= K)
-            return format((d / K)) + Locale.FORMAT_THOUSANDS.getMessage(locale);
+            return format((d / K)) + Message.FORMAT_THOUSANDS.getMessage(locale);
         else
             return format(d);
     }
@@ -142,17 +148,17 @@ public final class StringUtils {
     public static String formatRating(java.util.Locale locale, double rating) {
         StringBuilder starsString = new StringBuilder();
         if (rating >= 1)
-            starsString.append(Locale.ISLAND_INFO_RATE_ONE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_ONE_COLOR.getMessage(locale)).append(Message.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if (rating >= 2)
-            starsString.append(Locale.ISLAND_INFO_RATE_TWO_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_TWO_COLOR.getMessage(locale)).append(Message.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if (rating >= 3)
-            starsString.append(Locale.ISLAND_INFO_RATE_THREE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_THREE_COLOR.getMessage(locale)).append(Message.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if (rating >= 4)
-            starsString.append(Locale.ISLAND_INFO_RATE_FOUR_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_FOUR_COLOR.getMessage(locale)).append(Message.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         if (rating >= 5)
-            starsString.append(Locale.ISLAND_INFO_RATE_FIVE_COLOR.getMessage(locale)).append(Locale.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_FIVE_COLOR.getMessage(locale)).append(Message.ISLAND_INFO_RATE_SYMBOL.getMessage(locale));
         for (int i = 5; i > rating && i > 0; i--)
-            starsString.append(Locale.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage(locale));
+            starsString.append(Message.ISLAND_INFO_RATE_EMPTY_SYMBOL.getMessage(locale));
 
         return starsString.toString();
     }
@@ -182,18 +188,18 @@ public final class StringUtils {
     private static String formatTimeFromMilliseconds(java.util.Locale locale, long millis) {
         Duration duration = Duration.ofMillis(millis);
         StringBuilder timeBuilder = new StringBuilder();
-        boolean RTL = LocaleUtils.isRightToLeft(locale);
+        boolean RTL = PlayerLocales.isRightToLeft(locale);
 
         {
             long days = duration.toDays();
 
             if (days > 0) {
                 if (RTL) {
-                    timeBuilder.insert(0, days).insert(0, " ").insert(0, days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
+                    timeBuilder.insert(0, days).insert(0, " ").insert(0, days == 1 ? Message.FORMAT_DAY_NAME.getMessage(locale) :
+                            Message.FORMAT_DAYS_NAME.getMessage(locale)).insert(0, ", ");
                 } else {
-                    timeBuilder.append(days).append(" ").append(days == 1 ? Locale.FORMAT_DAY_NAME.getMessage(locale) :
-                            Locale.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
+                    timeBuilder.append(days).append(" ").append(days == 1 ? Message.FORMAT_DAY_NAME.getMessage(locale) :
+                            Message.FORMAT_DAYS_NAME.getMessage(locale)).append(", ");
                 }
                 duration = duration.minusDays(days);
             }
@@ -204,11 +210,11 @@ public final class StringUtils {
 
             if (hours > 0) {
                 if (RTL) {
-                    timeBuilder.insert(0, hours).insert(0, " ").insert(0, hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
+                    timeBuilder.insert(0, hours).insert(0, " ").insert(0, hours == 1 ? Message.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Message.FORMAT_HOURS_NAME.getMessage(locale)).insert(0, ", ");
                 } else {
-                    timeBuilder.append(hours).append(" ").append(hours == 1 ? Locale.FORMAT_HOUR_NAME.getMessage(locale) :
-                            Locale.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
+                    timeBuilder.append(hours).append(" ").append(hours == 1 ? Message.FORMAT_HOUR_NAME.getMessage(locale) :
+                            Message.FORMAT_HOURS_NAME.getMessage(locale)).append(", ");
                 }
 
                 duration = duration.minusHours(hours);
@@ -220,11 +226,11 @@ public final class StringUtils {
 
             if (minutes > 0) {
                 if (RTL) {
-                    timeBuilder.insert(0, minutes).insert(0, " ").insert(0, minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
+                    timeBuilder.insert(0, minutes).insert(0, " ").insert(0, minutes == 1 ? Message.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Message.FORMAT_MINUTES_NAME.getMessage(locale)).insert(0, " ,");
                 } else {
-                    timeBuilder.append(minutes).append(" ").append(minutes == 1 ? Locale.FORMAT_MINUTE_NAME.getMessage(locale) :
-                            Locale.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
+                    timeBuilder.append(minutes).append(" ").append(minutes == 1 ? Message.FORMAT_MINUTE_NAME.getMessage(locale) :
+                            Message.FORMAT_MINUTES_NAME.getMessage(locale)).append(", ");
                 }
                 duration = duration.minusMinutes(minutes);
             }
@@ -235,20 +241,20 @@ public final class StringUtils {
 
             if (seconds > 0) {
                 if (RTL) {
-                    timeBuilder.insert(0, seconds).insert(0, " ").insert(0, seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
+                    timeBuilder.insert(0, seconds).insert(0, " ").insert(0, seconds == 1 ? Message.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Message.FORMAT_SECONDS_NAME.getMessage(locale)).insert(0, " ,");
                 } else {
-                    timeBuilder.append(seconds).append(" ").append(seconds == 1 ? Locale.FORMAT_SECOND_NAME.getMessage(locale) :
-                            Locale.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
+                    timeBuilder.append(seconds).append(" ").append(seconds == 1 ? Message.FORMAT_SECOND_NAME.getMessage(locale) :
+                            Message.FORMAT_SECONDS_NAME.getMessage(locale)).append(", ");
                 }
             }
         }
 
         if (timeBuilder.length() == 0) {
             if (RTL) {
-                timeBuilder.insert(0, "1 ").append(Locale.FORMAT_SECOND_NAME.getMessage(locale)).insert(0, " ,");
+                timeBuilder.insert(0, "1 ").append(Message.FORMAT_SECOND_NAME.getMessage(locale)).insert(0, " ,");
             } else {
-                timeBuilder.append("1 ").append(Locale.FORMAT_SECOND_NAME.getMessage(locale)).append(", ");
+                timeBuilder.append("1 ").append(Message.FORMAT_SECOND_NAME.getMessage(locale)).append(", ");
             }
         }
 
@@ -304,33 +310,33 @@ public final class StringUtils {
                 StringUtils.stripColors(coloredName) : islandName;
 
         if (strippedName.length() > plugin.getSettings().getIslandNames().getMaxLength()) {
-            Locale.NAME_TOO_LONG.send(sender);
+            Message.NAME_TOO_LONG.send(sender);
             return false;
         }
 
         if (strippedName.length() < plugin.getSettings().getIslandNames().getMinLength()) {
-            Locale.NAME_TOO_SHORT.send(sender);
+            Message.NAME_TOO_SHORT.send(sender);
             return false;
         }
 
         if (plugin.getSettings().getIslandNames().isPreventPlayerNames() && plugin.getPlayers().getSuperiorPlayer(strippedName) != null) {
-            Locale.NAME_SAME_AS_PLAYER.send(sender);
+            Message.NAME_SAME_AS_PLAYER.send(sender);
             return false;
         }
 
         if (plugin.getSettings().getIslandNames().getFilteredNames().stream()
                 .anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))) {
-            Locale.NAME_BLACKLISTED.send(sender);
+            Message.NAME_BLACKLISTED.send(sender);
             return false;
         }
 
         if (currentIsland != null && currentIsland.getName().equalsIgnoreCase(islandName)) {
-            Locale.SAME_NAME_CHANGE.send(sender);
+            Message.SAME_NAME_CHANGE.send(sender);
             return false;
         }
 
         if (plugin.getGrid().getIsland(islandName) != null) {
-            Locale.ISLAND_ALREADY_EXIST.send(sender);
+            Message.ISLAND_ALREADY_EXIST.send(sender);
             return false;
         }
 
@@ -356,11 +362,11 @@ public final class StringUtils {
     public static String format(java.util.Locale userLocale, BorderColor borderColor) {
         switch (borderColor) {
             case RED:
-                return Locale.BORDER_PLAYER_COLOR_NAME_RED.getMessage(userLocale);
+                return Message.BORDER_PLAYER_COLOR_NAME_RED.getMessage(userLocale);
             case BLUE:
-                return Locale.BORDER_PLAYER_COLOR_NAME_BLUE.getMessage(userLocale);
+                return Message.BORDER_PLAYER_COLOR_NAME_BLUE.getMessage(userLocale);
             case GREEN:
-                return Locale.BORDER_PLAYER_COLOR_NAME_GREEN.getMessage(userLocale);
+                return Message.BORDER_PLAYER_COLOR_NAME_GREEN.getMessage(userLocale);
         }
 
         throw new IllegalArgumentException("Invalid border color: " + borderColor.name());

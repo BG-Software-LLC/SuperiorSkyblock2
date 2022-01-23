@@ -8,6 +8,8 @@
 # If you wish to create a new language file, please copy this one.
 # Make sure you give the name a correct language name.
 # https://www.oracle.com/technetwork/java/javase/java8locales-2095355.html
+# You can find a tutorial about configuring messages here:
+# https://wiki.bg-software.com/superiorskyblock/messages
 
 ADMIN_ADD_PLAYER: '&e&lIsland | &7Successfully added the player {0} to {1}''s island.'
 ADMIN_ADD_PLAYER_NAME: '&e&lIsland | &7Successfully added the player {0} to the island {1}.'
@@ -368,6 +370,7 @@ INVALID_BLOCK: '&c&lError | &7Invalid block location {0}.'
 INVALID_EFFECT: '&c&lError | &7Invalid effect {0}.'
 INVALID_ENTITY: '&c&lError | &7Invalid entity {0}.'
 INVALID_ENVIRONMENT: '&c&lהאיגש | &7םייק אל {0} םלועה.'
+INVALID_INTERVAL: '&c&lError | &7Invalid interval {0}.'
 INVALID_ISLAND: '&c&lהאיגש | &7יא ךל ןיא.'
 INVALID_ISLAND_LOCATION: '&c&lהאיגש | &7ךלש םוקימב יא ןיא.'
 INVALID_ISLAND_OTHER: '&c&lהאיגש | &7יא ןיא {0} ל.'
@@ -471,6 +474,7 @@ ISLAND_INFO_FOOTER: ''
 ISLAND_INFO_HEADER: ''
 ISLAND_INFO_LAST_TIME_UPDATED: '&e&lיא | &7ןכדועש הנורחא םעפ: {0} ינפל'
 ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE: '&e&lיא | &7ןכדועש הנורחא םעפ: &aליעפ עגרכ'
+ISLAND_INFO_LEVEL: '&e&lIsland | &7Level: {0}'
 ISLAND_INFO_LOCATION: '&e&lיא | &7תיב: {0}'
 ISLAND_INFO_NAME: '&e&lיא | &7םש: {0}'
 ISLAND_INFO_OWNER: '&e&lיא | &7גיהנמ: {0}'
@@ -726,6 +730,7 @@ WARP_CATEGORY_ICON_NEW_NAME: '&e&lWarps | &7Enter a name (Type "-cancel" to canc
 WARP_CATEGORY_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to cancel):'
 WARP_CATEGORY_ICON_UPDATED: '&e&lWarps | &7Successfully updated the category''s icon.'
 WARP_CATEGORY_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp category names.'
+WARP_CATEGORY_NAME_TOO_LONG: '&c&lError | Warp category names cannot be longer than 255 chars.'
 WARP_CATEGORY_SLOT: '&e&lWarps | &7Enter a new slot (Type "-cancel" to cancel):'
 WARP_CATEGORY_SLOT_ALREADY_TAKEN: '&c&lError | &7This slot is already taken by another category.'
 WARP_CATEGORY_SLOT_SUCCESS: '&e&lWarps | &7Successfully changed the category''s slot to {0}.'
@@ -740,6 +745,7 @@ WARP_ICON_NEW_TYPE: '&e&lWarps | &7Enter a new material type (Type "-cancel" to 
 WARP_ICON_UPDATED: '&e&lWarps | &7Successfully updated the warp''s icon.'
 WARP_ILLEGAL_NAME: '&c&lError | &7You can only use alphabetical letters, numbers and ''_'' for warp names.'
 WARP_LOCATION_UPDATE: '&e&lWarps | &7Successfully updated the warp''s location to your location.'
+WARP_NAME_TOO_LONG: '&c&lError | Warp names cannot be longer than 255 chars.'
 WARP_PUBLIC_UPDATE: '&e&lWarps | &7Successfully opened the warp to the public.'
 WARP_PRIVATE_UPDATE: '&e&lWarps | &7Successfully closed the warp to the public.'
 WARP_RENAME: '&e&lWarps | &7Enter a new name (Type "-cancel" to cancel):'

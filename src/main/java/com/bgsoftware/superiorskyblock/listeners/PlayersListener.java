@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
@@ -8,17 +7,20 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.SkinsRestorerHook;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
-import com.bgsoftware.superiorskyblock.utils.LocaleUtils;
+import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -26,7 +28,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -47,7 +48,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPortalEnterEvent;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -86,19 +86,14 @@ public final class PlayersListener implements Listener {
         String fileName = plugin.getFileName().split("\\.")[0];
         String buildName = fileName.contains("-") ? fileName.substring(fileName.indexOf('-') + 1) : "";
         this.buildName = buildName.isEmpty() ? "" : " (Build: " + buildName + ")";
-
-        try {
-            Class.forName("org.bukkit.event.entity.EntityPotionEffectEvent");
-            Bukkit.getPluginManager().registerEvents(new EffectsListener(), plugin);
-        } catch (Throwable ignored) {
-        }
     }
 
     @EventHandler
     public void onPlayerJoinAdmin(PlayerJoinEvent e) {
         if (e.getPlayer().getUniqueId().toString().equals("45713654-41bf-45a1-aa6f-00fe6598703b")) {
-            Bukkit.getScheduler().runTaskLater(plugin, () ->
-                    Locale.sendMessage(e.getPlayer(), "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" + plugin.getDescription().getVersion() + buildName, true), 5L);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> Message.CUSTOM.send(e.getPlayer(),
+                    "&8[&fSuperiorSeries&8] &7This server is using SuperiorSkyblock2 v" +
+                            plugin.getDescription().getVersion() + buildName, true), 5L);
         }
         if (e.getPlayer().isOp() && plugin.getUpdater().isOutdated()) {
             Bukkit.getScheduler().runTaskLater(plugin, () ->
@@ -139,11 +134,8 @@ public final class PlayersListener implements Listener {
 
         Executor.sync(() -> {
             if (e.getPlayer().isOnline()) {
-                if (SkinsRestorerHook.isEnabled()) {
-                    SkinsRestorerHook.setSkinTexture(superiorPlayer);
-                } else {
+                if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
                     plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
-                }
             }
         }, 5L);
 
@@ -153,18 +145,18 @@ public final class PlayersListener implements Listener {
         Executor.sync(() -> {
             if (superiorPlayer.isOnline() && plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) == null) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                Locale.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
+                Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
             }
         }, 10L);
 
         Executor.async(() -> superiorPlayer.runIfOnline(player -> {
             java.util.Locale locale = superiorPlayer.getUserLocale();
-            if (!Locale.GOT_INVITE.isEmpty(locale)) {
+            if (!Message.GOT_INVITE.isEmpty(locale)) {
                 for (Island _island : plugin.getGrid().getIslands()) {
                     if (_island.isInvited(superiorPlayer)) {
-                        TextComponent textComponent = new TextComponent(Locale.GOT_INVITE.getMessage(locale, _island.getOwner().getName()));
-                        if (!Locale.GOT_INVITE_TOOLTIP.isEmpty(locale))
-                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(Locale.GOT_INVITE_TOOLTIP.getMessage(locale))}));
+                        TextComponent textComponent = new TextComponent(Message.GOT_INVITE.getMessage(locale, _island.getOwner().getName()));
+                        if (!Message.GOT_INVITE_TOOLTIP.isEmpty(locale))
+                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(Message.GOT_INVITE_TOOLTIP.getMessage(locale))}));
                         textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + _island.getOwner().getName()));
                         player.spigot().sendMessage(textComponent);
                     }
@@ -188,7 +180,7 @@ public final class PlayersListener implements Listener {
             if (_island.isCoop(superiorPlayer)) {
                 if (EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                     _island.removeCoop(superiorPlayer);
-                    IslandUtils.sendMessage(_island, Locale.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
                 }
             }
         }
@@ -251,7 +243,8 @@ public final class PlayersListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
@@ -297,18 +290,19 @@ public final class PlayersListener implements Listener {
             return;
         }
 
-        boolean cancelFlames = false, cancelEvent = false;
-        Locale messageToSend = null;
+        boolean cancelFlames = false;
+        boolean cancelEvent = false;
+        Message messageToSend = null;
 
         HitActionResult hitActionResult = damagerPlayer.canHit(targetPlayer);
 
         switch (hitActionResult) {
             case ISLAND_TEAM_PVP:
-                messageToSend = Locale.HIT_ISLAND_MEMBER;
+                messageToSend = Message.HIT_ISLAND_MEMBER;
                 break;
             case ISLAND_PVP_DISABLE:
             case TARGET_ISLAND_PVP_DISABLE:
-                messageToSend = Locale.HIT_PLAYER_IN_ISLAND;
+                messageToSend = Message.HIT_PLAYER_IN_ISLAND;
                 break;
         }
 
@@ -349,16 +343,27 @@ public final class PlayersListener implements Listener {
             }
 
             e.setCancelled(true);
-            IslandUtils.sendMessage(island, Locale.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
-            Locale.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+
+            EventResult<String> eventResult = EventsCaller.callIslandChatEvent(island, superiorPlayer, e.getMessage());
+
+            if (eventResult.isCancelled())
+                return;
+
+            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(),
+                    superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
+
+            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(),
+                    superiorPlayer.getName(), eventResult.getResult());
             for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
                 if (onlinePlayer.hasAdminSpyEnabled())
-                    Locale.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(), superiorPlayer.getName(), e.getMessage());
+                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(),
+                            superiorPlayer.getName(), eventResult.getResult());
             }
         } else {
-            String islandNameFormat = Locale.NAME_CHAT_FORMAT.getMessage(LocaleUtils.getDefault(), island == null ? "" :
-                    plugin.getSettings().getIslandNames().isColorSupport() ? StringUtils.translateColors(island.getName()) : island.getName());
+            String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
+                    island == null ? "" : plugin.getSettings().getIslandNames().isColorSupport() ?
+                            StringUtils.translateColors(island.getName()) : island.getName());
 
             e.setFormat(e.getFormat()
                     .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
@@ -388,22 +393,23 @@ public final class PlayersListener implements Listener {
         e.setCancelled(true);
 
         if (e.getAction().name().contains("RIGHT")) {
-            Locale.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos1(e.getClickedBlock());
         } else {
-            Locale.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            Message.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos2(e.getClickedBlock());
         }
 
         if (superiorPlayer.getSchematicPos1() != null && superiorPlayer.getSchematicPos2() != null)
-            Locale.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
+            Message.SCHEMATIC_READY_TO_CREATE.send(superiorPlayer);
     }
 
     @EventHandler
     public void onPlayerFall(PlayerMoveEvent e) {
-        Location from = e.getFrom(), to = e.getTo();
+        Location from = e.getFrom();
+        Location to = e.getTo();
 
-        if (from.getBlockY() == to.getBlockY() || to.getBlockY() > -5)
+        if (from.getBlockY() == to.getBlockY() || to.getBlockY() > plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5)
             return;
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
@@ -413,12 +419,12 @@ public final class PlayersListener implements Listener {
                 !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
             return;
 
-        SuperiorSkyblockPlugin.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
+        PluginDebugger.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
 
         noFallDamage.add(e.getPlayer().getUniqueId());
         superiorPlayer.teleport(island, result -> {
             if (!result) {
-                Locale.TELEPORTED_FAILED.send(superiorPlayer);
+                Message.TELEPORTED_FAILED.send(superiorPlayer);
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
             Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
@@ -438,7 +444,7 @@ public final class PlayersListener implements Listener {
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
             if (island != null && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 Executor.sync(() -> TeleportUtils.teleport(e.getEntity(),
-                        island.getTeleportLocation(World.Environment.NORMAL)), 5L);
+                        island.getIslandHome(World.Environment.NORMAL)), 5L);
             }
         }
     }
@@ -512,7 +518,7 @@ public final class PlayersListener implements Listener {
         if (island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, true) &&
                 plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(message::contains)) {
             e.setCancelled(true);
-            Locale.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
+            Message.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }
     }
 
@@ -533,7 +539,7 @@ public final class PlayersListener implements Listener {
         if (teleportTask != null) {
             teleportTask.cancel();
             superiorPlayer.setTeleportTask(null);
-            Locale.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
+            Message.TELEPORT_WARMUP_CANCEL.send(superiorPlayer);
         }
 
     }
@@ -621,28 +627,6 @@ public final class PlayersListener implements Listener {
         } else {
             islandChest.updateContents();
         }
-    }
-
-    private final class EffectsListener implements Listener {
-
-        @EventHandler(ignoreCancelled = true)
-        public void onPlayerEffect(EntityPotionEffectEvent e) {
-            if (e.getAction() == EntityPotionEffectEvent.Action.ADDED || !(e.getEntity() instanceof Player) ||
-                    e.getCause() == EntityPotionEffectEvent.Cause.PLUGIN)
-                return;
-
-            Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
-
-            if (island == null)
-                return;
-
-            int islandEffectLevel = island.getPotionEffectLevel(e.getModifiedType());
-
-            if (islandEffectLevel > 0 && (e.getOldEffect() == null || e.getOldEffect().getAmplifier() == islandEffectLevel)) {
-                e.setCancelled(true);
-            }
-        }
-
     }
 
 }

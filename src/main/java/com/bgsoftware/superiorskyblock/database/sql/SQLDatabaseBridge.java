@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -11,7 +13,7 @@ import java.util.function.Consumer;
 public final class SQLDatabaseBridge implements DatabaseBridge {
 
     private static final SQLDatabaseBridge INSTANCE = new SQLDatabaseBridge();
-    private boolean shouldSaveData = false;
+    private DatabaseBridgeMode databaseBridgeMode = DatabaseBridgeMode.IDLE;
     private StatementHolder batchStatementHolder;
 
     private SQLDatabaseBridge() {
@@ -38,21 +40,16 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
-        SQLHelper.executeQuery("SELECT * FROM {prefix}" + table + ";", resultSet -> {
+        SQLHelper.select(table, "").ifSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
-        });
-    }
-
-    @Override
-    public void startSavingData() {
-        shouldSaveData = true;
+        }).ifFail(QueryResult.PRINT_ERROR);
     }
 
     @Override
@@ -67,7 +64,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void updateObject(String table, DatabaseFilter filter, Pair<String, Object>[] columns) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         StringBuilder columnsBuilder = new StringBuilder();
@@ -97,7 +94,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void insertObject(String table, Pair<String, Object>... columns) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         StringBuilder columnsBuilder = new StringBuilder();
@@ -124,7 +121,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void deleteObject(String table, DatabaseFilter filter) {
-        if (!shouldSaveData)
+        if (databaseBridgeMode != DatabaseBridgeMode.SAVE_DATA)
             return;
 
         String columnFilter = getColumnFilter(filter);
@@ -148,16 +145,21 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     String.format("'%s'", filterPair.getValue()) : filterPair.getValue().toString());
         }
 
-        SQLHelper.executeQuery(String.format("SELECT * FROM {prefix}%s%s;", table, columnFilter), resultSet -> {
+        SQLHelper.select(table, columnFilter).ifSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    SuperiorSkyblockPlugin.debug(ex);
+                    PluginDebugger.debug(ex);
                 }
             }
-        });
+        }).ifFail(QueryResult.PRINT_ERROR);
+    }
+
+    @Override
+    public void setDatabaseBridgeMode(DatabaseBridgeMode databaseBridgeMode) {
+        this.databaseBridgeMode = databaseBridgeMode;
     }
 
     private StatementHolder buildStatementHolder(String query) {

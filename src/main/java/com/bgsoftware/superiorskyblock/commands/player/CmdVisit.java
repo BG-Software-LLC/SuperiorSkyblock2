@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 
@@ -30,13 +30,13 @@ public final class CmdVisit implements ISuperiorCommand {
     @Override
     public String getUsage(java.util.Locale locale) {
         return "visit <" +
-                Locale.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
-                Locale.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
+                Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "/" +
+                Message.COMMAND_ARGUMENT_ISLAND_NAME.getMessage(locale) + ">";
     }
 
     @Override
     public String getDescription(java.util.Locale locale) {
-        return Locale.COMMAND_DESCRIPTION_VISIT.getMessage(locale);
+        return Message.COMMAND_DESCRIPTION_VISIT.getMessage(locale);
     }
 
     @Override
@@ -66,17 +66,17 @@ public final class CmdVisit implements ISuperiorCommand {
         Location visitLocation = targetIsland.getVisitorsLocation();
 
         if (visitLocation == null) {
-            Locale.INVALID_VISIT_LOCATION.send(sender);
+            Message.INVALID_VISIT_LOCATION.send(sender);
 
             if (!superiorPlayer.hasBypassModeEnabled())
                 return;
 
-            visitLocation = targetIsland.getTeleportLocation(plugin.getSettings().getWorlds().getDefaultWorld());
-            Locale.INVALID_VISIT_LOCATION_BYPASS.send(sender);
+            visitLocation = targetIsland.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
+            Message.INVALID_VISIT_LOCATION_BYPASS.send(sender);
         }
 
         if (targetIsland.isLocked() && !targetIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            Locale.NO_CLOSE_BYPASS.send(sender);
+            Message.NO_CLOSE_BYPASS.send(sender);
             return;
         }
 

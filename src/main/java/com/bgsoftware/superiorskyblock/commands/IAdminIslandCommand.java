@@ -52,11 +52,11 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
     boolean supportMultipleIslands();
 
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-
+        // Not all commands should implement this method.
     }
 
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-
+        // Not all commands should implement this method.
     }
 
     default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {

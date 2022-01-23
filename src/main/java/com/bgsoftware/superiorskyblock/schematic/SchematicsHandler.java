@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematic;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.schematic.parser.DefaultSchematicParser;
 import com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -22,7 +23,8 @@ import com.bgsoftware.superiorskyblock.tag.TagBuilder;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.wrappers.SchematicPosition;
+import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -59,12 +61,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         this.schematicsContainer = schematicsContainer;
     }
 
-    @Override
-    public void loadData() {
-        throw new UnsupportedOperationException("Not supported for SchematicsHandler.");
-    }
-
-    public void loadDataWithException() throws HandlerLoadException {
+    public void loadData() throws HandlerLoadException {
         File schematicsFolder = new File(plugin.getDataFolder(), "schematics");
 
         if (!schematicsFolder.exists()) {
@@ -136,13 +133,18 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        Location pos1 = superiorPlayer.getSchematicPos1().parse(), pos2 = superiorPlayer.getSchematicPos2().parse();
-        Location min = new Location(pos1.getWorld(), Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
+        Location pos1 = superiorPlayer.getSchematicPos1().parse();
+        Location pos2 = superiorPlayer.getSchematicPos2().parse();
+        Location min = new Location(pos1.getWorld(),
+                Math.min(pos1.getX(), pos2.getX()),
+                Math.min(pos1.getY(), pos2.getY()),
+                Math.min(pos1.getZ(), pos2.getZ())
+        );
         Location offset = superiorPlayer.getLocation().clone().subtract(min.clone().add(0, 1, 0));
 
         saveSchematic(superiorPlayer.getSchematicPos1().parse(), superiorPlayer.getSchematicPos2().parse(),
                 offset.getBlockX(), offset.getBlockY(), offset.getBlockZ(), offset.getYaw(), offset.getPitch(), schematicName, () ->
-                        Locale.SCHEMATIC_SAVED.send(superiorPlayer));
+                        Message.SCHEMATIC_SAVED.send(superiorPlayer));
 
         superiorPlayer.setSchematicPos1(null);
         superiorPlayer.setSchematicPos2(null);
@@ -178,7 +180,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        SuperiorSkyblockPlugin.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
+        PluginDebugger.debug("Action: Save Schematic, Pos #1: " + LocationUtils.getLocation(pos1) +
                 ", Pos #2: " + LocationUtils.getLocation(pos2) + ", OffsetX: " + offsetX + ", OffsetY: " + offsetY +
                 ", OffsetZ: " + offsetZ + ", Yaw: " + yaw + ", Pitch: " + pitch + ", Name: " + schematicName);
 
@@ -190,13 +192,13 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         int ySize = max.getBlockY() - min.getBlockY();
         int zSize = max.getBlockZ() - min.getBlockZ();
 
-        List<Tag<?>> blocks = new ArrayList<>(), entities = new ArrayList<>();
+        List<Tag<?>> blocks = new ArrayList<>();
+        List<Tag<?>> entities = new ArrayList<>();
 
         for (int x = 0; x <= xSize; x++) {
             for (int z = 0; z <= zSize; z++) {
                 for (int y = 0; y <= ySize; y++) {
-                    int _x = x + min.getBlockX(), _y = y + min.getBlockY(), _z = z + min.getBlockZ();
-                    Block block = world.getBlockAt(_x, _y, _z);
+                    Block block = world.getBlockAt(x + min.getBlockX(), y + min.getBlockY(), z + min.getBlockZ());
                     Material blockType = block.getType();
                     Location blockLocation = block.getLocation();
 
@@ -263,7 +265,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         } catch (Exception error) {
             SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
             error.printStackTrace();
-            SuperiorSkyblockPlugin.debug(error);
+            PluginDebugger.debug(error);
         }
 
         return null;
@@ -311,14 +313,15 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
             }
         } catch (IOException ex) {
             ex.printStackTrace();
-            SuperiorSkyblockPlugin.debug(ex);
+            PluginDebugger.debug(ex);
         }
     }
 
     private List<Entity> getEntities(Location min, Location max) {
         List<Entity> livingEntities = new ArrayList<>();
 
-        Chunk minChunk = min.getChunk(), maxChunk = max.getChunk();
+        Chunk minChunk = min.getChunk();
+        Chunk maxChunk = max.getChunk();
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
                 Chunk currentChunk = min.getWorld().getChunkAt(x, z);

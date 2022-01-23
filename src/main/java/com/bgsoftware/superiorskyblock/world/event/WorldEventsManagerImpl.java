@@ -3,7 +3,9 @@ package com.bgsoftware.superiorskyblock.world.event;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -39,7 +41,8 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
 
         plugin.getNMSChunks().injectChunkSections(chunk);
 
-        if (island.isInsideRange(chunk))
+        boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+        if (cropGrowthEnabled && island.isInsideRange(chunk))
             plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
@@ -69,7 +72,8 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
         if (island == null)
             return;
 
-        plugin.getNMSChunks().startTickingChunk(island, chunk, true);
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class))
+            plugin.getNMSChunks().startTickingChunk(island, chunk, true);
 
         if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
             ChunksTracker.markDirty(island, chunk, true);

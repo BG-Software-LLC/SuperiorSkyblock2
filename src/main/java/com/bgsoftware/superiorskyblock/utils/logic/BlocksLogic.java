@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.Locale;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
@@ -8,9 +8,9 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.threads.Executor;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -119,7 +119,7 @@ public final class BlocksLogic {
                                               String[] signLines, boolean sendMessage) {
         if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
             if (sendMessage)
-                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                Message.NO_MORE_WARPS.send(superiorPlayer);
             for (int i = 0; i < 4; i++)
                 signLines[i] = "";
             return true;
@@ -132,15 +132,15 @@ public final class BlocksLogic {
 
         if (warpName.isEmpty()) {
             if (sendMessage)
-                Locale.WARP_ILLEGAL_NAME.send(superiorPlayer);
+                Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
             creationFailed = true;
         } else if (island.getWarp(warpName) != null) {
             if (sendMessage)
-                Locale.WARP_ALREADY_EXIST.send(superiorPlayer);
+                Message.WARP_ALREADY_EXIST.send(superiorPlayer);
             creationFailed = true;
         } else if (!IslandUtils.isWarpNameLengthValid(warpName)) {
             if (sendMessage)
-                Locale.WARP_NAME_TOO_LONG.send(superiorPlayer);
+                Message.WARP_NAME_TOO_LONG.send(superiorPlayer);
             creationFailed = true;
         }
 
@@ -157,7 +157,7 @@ public final class BlocksLogic {
             IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
             islandWarp.setPrivateFlag(privateFlag);
             if (sendMessage)
-                Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+                Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
         }
 
         return true;
@@ -167,7 +167,7 @@ public final class BlocksLogic {
                                                   String[] warpLines, boolean sendMessage) {
         if (island.getIslandWarps().size() >= island.getWarpsLimit()) {
             if (sendMessage)
-                Locale.NO_MORE_WARPS.send(superiorPlayer);
+                Message.NO_MORE_WARPS.send(superiorPlayer);
             for (int i = 0; i < 4; i++)
                 warpLines[i] = "";
             return true;
@@ -199,7 +199,7 @@ public final class BlocksLogic {
         island.setDescription(description);
 
         if (sendMessage)
-            Locale.SET_WARP.send(superiorPlayer, SBlockPosition.of(visitorsLocation));
+            Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(visitorsLocation));
 
         return true;
     }

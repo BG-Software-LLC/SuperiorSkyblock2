@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
@@ -13,7 +12,7 @@ import java.util.Map;
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
     protected final SuperiorPlayer superiorPlayer;
-    protected final Island island;
+    protected Island island;
 
     public PlayerPermissionNode(SuperiorPlayer superiorPlayer, Island island) {
         this.superiorPlayer = superiorPlayer;
@@ -30,6 +29,10 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         super(privileges);
 
         this.superiorPlayer = superiorPlayer;
+        this.island = island;
+    }
+
+    public void setIsland(Island island) {
         this.island = island;
     }
 
@@ -94,8 +97,9 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
 
         @Override
         public void setPermission(IslandPrivilege permission, boolean value) {
-
+            // Do nothing.
         }
+
     }
 
 }

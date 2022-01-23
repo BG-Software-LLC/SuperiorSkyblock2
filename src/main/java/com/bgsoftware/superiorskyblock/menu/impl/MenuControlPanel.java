@@ -1,68 +1,76 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.Locale;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ControlPanelButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
-public final class MenuControlPanel extends SuperiorMenu {
+public final class MenuControlPanel extends SuperiorMenu<MenuControlPanel> {
 
-    private static List<Integer> membersSlot, settingsSlot, visitorsSlot;
+    private static RegularMenuPattern<MenuControlPanel> menuPattern;
 
     private final Island targetIsland;
 
     private MenuControlPanel(SuperiorPlayer superiorPlayer, Island targetIsland) {
-        super("menuControlPanel", superiorPlayer);
+        super(menuPattern, superiorPlayer);
         this.targetIsland = targetIsland;
     }
 
+    public Island getTargetIsland() {
+        return targetIsland;
+    }
+
+    @Override
+    public void cloneAndOpen(ISuperiorMenu previousMenu) {
+        openInventory(inventoryViewer, previousMenu, targetIsland);
+    }
+
     public static void init() {
-        MenuControlPanel menuControlPanel = new MenuControlPanel(null, null);
+        menuPattern = null;
 
-        File file = new File(plugin.getDataFolder(), "menus/control-panel.yml");
+        RegularMenuPattern.Builder<MenuControlPanel> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        if (!file.exists())
-            FileUtils.saveResource("menus/control-panel.yml");
+        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
+                "control-panel.yml", MenuControlPanel::convertOldGUI);
 
-        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+        if (menuLoadResult == null)
+            return;
 
-        if (convertOldGUI(cfg)) {
-            try {
-                cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                SuperiorSkyblockPlugin.debug(ex);
-            }
-        }
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
+        CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        MenuPatternSlots menuPatternSlots = FileUtils.loadGUI(menuControlPanel, "control-panel.yml", cfg);
-
-        membersSlot = getSlots(cfg, "members", menuPatternSlots);
-        settingsSlot = getSlots(cfg, "settings", menuPatternSlots);
-        visitorsSlot = getSlots(cfg, "visitors", menuPatternSlots);
-
-        menuControlPanel.markCompleted();
+        menuPattern = patternBuilder
+                .mapButtons(getSlots(cfg, "members", menuPatternSlots),
+                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_MEMBERS))
+                .mapButtons(getSlots(cfg, "settings", menuPatternSlots),
+                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_SETTINGS))
+                .mapButtons(getSlots(cfg, "visitors", menuPatternSlots),
+                        new ControlPanelButton.Builder().setAction(ControlPanelButton.ControlPanelAction.OPEN_VISITORS))
+                .build();
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, Island targetIsland) {
         new MenuControlPanel(superiorPlayer, targetIsland).open(previousMenu);
     }
 
-    private static boolean convertOldGUI(YamlConfiguration newMenu) {
+    private static boolean convertOldGUI(SuperiorSkyblockPlugin plugin, YamlConfiguration newMenu) {
         File oldFile = new File(plugin.getDataFolder(), "guis/panel-gui.yml");
 
         if (!oldFile.exists())
@@ -89,7 +97,9 @@ public final class MenuControlPanel extends SuperiorMenu {
                     charCounter, patternChars, itemsSection, commandsSection, soundsSection);
         }
 
-        char membersChar = itemChars[charCounter++], settingsChar = itemChars[charCounter++], visitorsChar = itemChars[charCounter++];
+        char membersChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char settingsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
+        char visitorsChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
 
         MenuConverter.convertItem(cfg.getConfigurationSection("main-panel.members"), patternChars, membersChar,
                 itemsSection, commandsSection, soundsSection);
@@ -102,32 +112,10 @@ public final class MenuControlPanel extends SuperiorMenu {
         newMenu.set("settings", settingsChar + "");
         newMenu.set("visitors", visitorsChar + "");
 
-        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars, itemChars[charCounter]));
+        newMenu.set("pattern", MenuConverter.buildPattern(size, patternChars,
+                SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter]));
 
         return true;
-    }
-
-    @Override
-    public void onPlayerClick(InventoryClickEvent e) {
-        if (membersSlot.contains(e.getRawSlot())) {
-            plugin.getMenus().openMembers(superiorPlayer, this, targetIsland);
-        } else if (settingsSlot.contains(e.getRawSlot())) {
-            if (superiorPlayer.hasPermission("superior.island.settings")) {
-                if (!superiorPlayer.hasPermission(IslandPrivileges.SET_SETTINGS)) {
-                    Locale.NO_SET_SETTINGS_PERMISSION.send(superiorPlayer, targetIsland.getRequiredPlayerRole(IslandPrivileges.SET_SETTINGS));
-                    return;
-                }
-
-                plugin.getMenus().openSettings(superiorPlayer, this, targetIsland);
-            }
-        } else if (visitorsSlot.contains(e.getRawSlot())) {
-            plugin.getMenus().openVisitors(superiorPlayer, this, targetIsland);
-        }
-    }
-
-    @Override
-    public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, targetIsland);
     }
 
 }

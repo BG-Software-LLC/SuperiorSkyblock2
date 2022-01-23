@@ -11,7 +11,8 @@ import javax.annotation.Nullable;
  */
 public class IslandUncoopPlayerEvent extends IslandEvent implements Cancellable {
 
-    private final SuperiorPlayer player, target;
+    private final SuperiorPlayer player;
+    private final SuperiorPlayer target;
     private final UncoopReason uncoopReason;
     private boolean cancelled = false;
 
