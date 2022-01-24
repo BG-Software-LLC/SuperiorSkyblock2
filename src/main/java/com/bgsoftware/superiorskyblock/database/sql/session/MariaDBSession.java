@@ -13,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public final class MariaDBSession implements SQLSession {
 
@@ -145,15 +144,13 @@ public final class MariaDBSession implements SQLSession {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
 
         return executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s%s (%s);",
-                        prefix, tableName, columnsSection.substring(1)),
-                QueryResult.VOID, QueryResult::ofFail);
+                prefix, tableName, columnsSection.substring(1)));
     }
 
     @Override
     public QueryResult<Void> renameTable(String tableName, String newName) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeUpdate(String.format("RENAME TABLE %s%s TO %s%s;", prefix, tableName, prefix, newName),
-                QueryResult.VOID, QueryResult::ofFail);
+        return executeUpdate(String.format("RENAME TABLE %s%s TO %s%s;", prefix, tableName, prefix, newName));
     }
 
     @Override
@@ -166,21 +163,20 @@ public final class MariaDBSession implements SQLSession {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
 
         return executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s%s (%s);", indexName, prefix, tableName,
-                columnsSection.substring(1)), QueryResult.VOID, QueryResult::ofFail);
+                columnsSection.substring(1)));
     }
 
     @Override
     public QueryResult<Void> modifyColumnType(String tableName, String columnName, String newType) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeUpdate(String.format("ALTER TABLE %s%s MODIFY COLUMN %s %s;", prefix, tableName,
-                columnName, newType), QueryResult.VOID, QueryResult::ofFail);
+        return executeUpdate(String.format("ALTER TABLE %s%s MODIFY COLUMN %s %s;",
+                prefix, tableName, columnName, newType));
     }
 
     @Override
     public QueryResult<ResultSet> select(String tableName, String filters) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
-        return executeQuery(String.format("SELECT * FROM %s%s%s;", prefix, tableName, filters),
-                QueryResult::ofSuccess, QueryResult::ofFail);
+        return executeQuery(String.format("SELECT * FROM %s%s%s;", prefix, tableName, filters));
     }
 
     @Override
@@ -219,7 +215,7 @@ public final class MariaDBSession implements SQLSession {
             SuperiorSkyblockPlugin.log(message);
     }
 
-    private <T> T executeUpdate(String statement, T success, Function<SQLException, T> onFailure) {
+    private QueryResult<Void> executeUpdate(String statement) {
         Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
 
         String query = statement
@@ -232,24 +228,51 @@ public final class MariaDBSession implements SQLSession {
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            return QueryResult.ofFail(error);
         }
 
-        return success;
+        return QueryResult.VOID;
     }
 
-    private <T> T executeQuery(String statement, Function<ResultSet, T> callback, Function<SQLException, T> onFailure) {
+    private QueryResult<ResultSet> executeQuery(String statement) {
         Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
 
-        String prefix = plugin.getSettings().getDatabase().getPrefix();
-        String query = statement.replace("{prefix}", prefix);
+        String query = statement.replace("{prefix}", "");
 
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            return callback.apply(resultSet);
+        try {
+            Connection conn = this.dataSource.getConnection();
+            try {
+                PreparedStatement preparedStatement = conn.prepareStatement(query);
+                try {
+                    return QueryResult.ofSuccess(preparedStatement.executeQuery()).onFinish(resultSet -> {
+                        try {
+                            resultSet.close();
+                            preparedStatement.close();
+                            conn.close();
+                        } catch (SQLException ignored) {
+                        }
+                    });
+                } catch (SQLException error) {
+                    QueryResult<ResultSet> queryResult = QueryResult.ofFail(error);
+                    return queryResult.onFinish(v -> {
+                        try {
+                            preparedStatement.close();
+                            conn.close();
+                        } catch (SQLException ignored) {
+                        }
+                    });
+                }
+            } catch (SQLException error) {
+                QueryResult<ResultSet> queryResult = QueryResult.ofFail(error);
+                return queryResult.onFinish(v -> {
+                    try {
+                        conn.close();
+                    } catch (SQLException ignored) {
+                    }
+                });
+            }
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            return QueryResult.ofFail(error);
         }
     }
 

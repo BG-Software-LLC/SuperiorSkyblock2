@@ -14,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public final class SQLiteSession implements SQLSession {
 
@@ -141,14 +140,12 @@ public final class SQLiteSession implements SQLSession {
         }
 
         return executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s (%s);",
-                        tableName, columnsSection.substring(1)),
-                QueryResult.VOID, QueryResult::ofFail);
+                tableName, columnsSection.substring(1)));
     }
 
     @Override
     public QueryResult<Void> renameTable(String tableName, String newName) {
-        return executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName),
-                QueryResult.VOID, QueryResult::ofFail);
+        return executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName));
     }
 
     @Override
@@ -159,25 +156,22 @@ public final class SQLiteSession implements SQLSession {
         }
 
         return executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s (%s);", indexName, tableName,
-                columnsSection.substring(1)), QueryResult.VOID, QueryResult::ofFail);
+                columnsSection.substring(1)));
     }
 
     @Override
     public QueryResult<Void> modifyColumnType(String tableName, String columnName, String newType) {
-        return executeUpdate(String.format("ALTER TABLE %s MODIFY COLUMN %s %s;", tableName,
-                columnName, newType), QueryResult.VOID, QueryResult::ofFail);
+        return executeUpdate(String.format("ALTER TABLE %s MODIFY COLUMN %s %s;", tableName, columnName, newType));
     }
 
     @Override
     public QueryResult<ResultSet> select(String tableName, String filters) {
-        return executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters),
-                QueryResult::ofSuccess, QueryResult::ofFail);
+        return executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters));
     }
 
     @Override
     public QueryResult<ResultSet> setJournalMode(String jounralMode) {
-        return executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode),
-                QueryResult::ofSuccess, QueryResult::ofFail);
+        return executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode));
     }
 
     @Override
@@ -202,7 +196,7 @@ public final class SQLiteSession implements SQLSession {
             SuperiorSkyblockPlugin.log(message);
     }
 
-    private <T> T executeUpdate(String statement, T success, Function<SQLException, T> onFailure) {
+    private QueryResult<Void> executeUpdate(String statement) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
         String query = statement
@@ -214,22 +208,38 @@ public final class SQLiteSession implements SQLSession {
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            return QueryResult.ofFail(error);
         }
 
-        return success;
+        return QueryResult.VOID;
     }
 
-    private <T> T executeQuery(String statement, Function<ResultSet, T> callback, Function<SQLException, T> onFailure) {
+    private QueryResult<ResultSet> executeQuery(String statement) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
         String query = statement.replace("{prefix}", "");
 
-        try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            return callback.apply(resultSet);
+        try {
+            PreparedStatement preparedStatement = this.conn.prepareStatement(query);
+            try {
+                return QueryResult.ofSuccess(preparedStatement.executeQuery()).onFinish(resultSet -> {
+                    try {
+                        resultSet.close();
+                        preparedStatement.close();
+                    } catch (SQLException ignored) {
+                    }
+                });
+            } catch (SQLException error) {
+                QueryResult<ResultSet> queryResult = QueryResult.ofFail(error);
+                return queryResult.onFinish(v -> {
+                    try {
+                        preparedStatement.close();
+                    } catch (SQLException ignored) {
+                    }
+                });
+            }
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            return QueryResult.ofFail(error);
         }
     }
 
