@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -65,8 +66,16 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        World.Environment environment = args.length == 4 ? World.Environment.valueOf(args[3].toUpperCase()) :
-                plugin.getSettings().getWorlds().getDefaultWorld();
+        World.Environment environment;
+
+        if (args.length != 4) {
+            environment = plugin.getSettings().getWorlds().getDefaultWorld();
+        } else {
+            environment = CommandArguments.getEnvironment(sender, args[3]);
+            if (environment == null)
+                return;
+        }
+
 
         if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
             if (!island.wasSchematicGenerated(environment)) {
