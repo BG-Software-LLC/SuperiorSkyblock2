@@ -59,7 +59,6 @@ public final class StatementHolder {
                 return;
 
             synchronized (mutex.get()) {
-                PluginDebugger.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.customQuery(query, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
 
@@ -108,7 +107,6 @@ public final class StatementHolder {
                 return;
 
             synchronized (mutex.get()) {
-                PluginDebugger.debug("Action: Database Execute, Query: " + query);
                 SQLHelper.customQuery(query, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());

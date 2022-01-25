@@ -202,6 +202,8 @@ public final class SQLiteSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
             queryResult.complete(null);
@@ -212,6 +214,8 @@ public final class SQLiteSession implements SQLSession {
 
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
+
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {

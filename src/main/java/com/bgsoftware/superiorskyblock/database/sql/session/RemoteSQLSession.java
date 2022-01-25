@@ -163,6 +163,8 @@ public abstract class RemoteSQLSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
@@ -174,6 +176,8 @@ public abstract class RemoteSQLSession implements SQLSession {
 
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
+
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query);
