@@ -3,7 +3,7 @@ group 'Hook_Slimefun'
 dependencies {
     compileOnly 'me.mrcookieslime:Slimefun4:latest'
     compileOnly 'me.mrcookieslime:Slimefun4-Dev:latest'
-    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:latest'
+    compileOnly 'me.mrcookieslime:Slimefun4-Relocations:b999'
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly project(":API")
     compileOnly parent
