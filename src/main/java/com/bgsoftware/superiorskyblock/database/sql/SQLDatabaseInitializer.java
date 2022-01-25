@@ -3,7 +3,10 @@ package com.bgsoftware.superiorskyblock.database.sql;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+
+import java.sql.ResultSet;
 
 public final class SQLDatabaseInitializer {
 
@@ -29,8 +32,8 @@ public final class SQLDatabaseInitializer {
         createBankTransactionsTable();
         createStackedBlocksTable();
 
-        SQLHelper.select("grid", "")
-                .ifFail(error -> GridDatabaseBridge.insertGrid(plugin.getGrid()));
+        SQLHelper.select("grid", "", new QueryResult<ResultSet>()
+                .onFail(error -> GridDatabaseBridge.insertGrid(plugin.getGrid())));
     }
 
     public void createIndexes() {

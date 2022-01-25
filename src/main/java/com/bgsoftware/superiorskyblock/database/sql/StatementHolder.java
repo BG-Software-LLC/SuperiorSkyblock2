@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +60,7 @@ public final class StatementHolder {
 
             synchronized (mutex.get()) {
                 PluginDebugger.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
+                SQLHelper.customQuery(query, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
                     SQLHelper.setAutoCommit(false);
 
                     for (Map<Integer, Object> values : batches) {
@@ -76,10 +78,10 @@ public final class StatementHolder {
                     }
 
                     SQLHelper.setAutoCommit(true);
-                }).ifFail(error -> {
+                }).onFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
                     error.printStackTrace();
-                });
+                }));
             }
         } finally {
             values.clear();
@@ -107,16 +109,16 @@ public final class StatementHolder {
 
             synchronized (mutex.get()) {
                 PluginDebugger.debug("Action: Database Execute, Query: " + query);
-                SQLHelper.customQuery(query).ifSuccess(preparedStatement -> {
+                SQLHelper.customQuery(query, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
                     for (Map.Entry<Integer, Object> entry : values.entrySet()) {
                         preparedStatement.setObject(entry.getKey(), entry.getValue());
                         errorQuery.value = errorQuery.value.replaceFirst("\\?", entry.getValue() + "");
                     }
                     preparedStatement.executeUpdate();
-                }).ifFail(error -> {
+                }).onFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
                     error.printStackTrace();
-                });
+                }));
             }
         } finally {
             values.clear();
