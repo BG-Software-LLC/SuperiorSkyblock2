@@ -98,7 +98,11 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
             for (String key : permissionsSection.getKeys(false)) {
                 if (permissionsSection.getBoolean(key + ".display-menu", true)) {
                     String permission = key.toLowerCase();
-                    updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
+                    try {
+                        updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
+                    } catch (NullPointerException error) {
+                        SuperiorSkyblockPlugin.log("&cThe island-privilege '" + permission + "' is not a valid privilege, skipping...");
+                    }
                 }
             }
         }
