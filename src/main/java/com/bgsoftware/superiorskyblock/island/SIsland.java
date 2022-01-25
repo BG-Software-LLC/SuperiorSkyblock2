@@ -1461,6 +1461,11 @@ public final class SIsland implements Island {
 
     @Override
     public Biome getBiome() {
+        if(biome == null) {
+            // Loads the chunk and gets the biome on the first block.
+            // This may be called if a placeholder is called before the island is loaded, for example.
+            biome = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock().getBiome();
+        }
         return biome;
     }
 
@@ -1469,6 +1474,7 @@ public final class SIsland implements Island {
         setBiome(biome, true);
     }
 
+    @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
 
