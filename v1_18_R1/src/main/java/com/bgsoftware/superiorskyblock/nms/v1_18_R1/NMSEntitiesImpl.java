@@ -16,7 +16,7 @@ import java.lang.reflect.Modifier;
 public final class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
-            Entity.class, int.class, Modifier.PUBLIC, 4);
+            net.minecraft.world.entity.Entity.class, int.class, Modifier.PROTECTED, 2);
 
     @Override
     public ItemStack[] getEquipment(EntityEquipment entityEquipment) {
