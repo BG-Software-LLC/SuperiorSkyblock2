@@ -612,7 +612,7 @@ public final class IslandsDeserializer {
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
 
             while (index.get() > cachedIslandInfo.islandChests.size()) {
-                cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize()]);
+                cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize() * 9]);
             }
 
             cachedIslandInfo.islandChests.add(contents.get());
