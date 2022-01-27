@@ -30,7 +30,7 @@ public final class BorderColorToggleButton extends SuperiorMenuButton<MenuBorder
     public ItemStack getButtonItem(MenuBorderColor superiorMenu) {
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         ItemBuilder buttonItem = inventoryViewer.hasWorldBorderEnabled() ? enabledItem : disabledItem;
-        return buttonItem.build(inventoryViewer);
+        return buttonItem.copy().build(inventoryViewer);
     }
 
     @Override
