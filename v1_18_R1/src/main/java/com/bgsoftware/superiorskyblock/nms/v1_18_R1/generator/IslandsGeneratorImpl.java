@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.generator;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.NMSUtils;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -11,9 +12,7 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Random;
 
@@ -21,42 +20,9 @@ import java.util.Random;
 public final class IslandsGeneratorImpl extends IslandsGenerator {
 
     private final SuperiorSkyblockPlugin plugin;
-    private final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
 
     public IslandsGeneratorImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-
-        {
-            Biome targetBiome;
-            try {
-                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome().toUpperCase());
-            } catch (IllegalArgumentException error) {
-                targetBiome = Biome.PLAINS;
-            }
-            
-            biomeEnumMap.put(World.Environment.NORMAL, targetBiome == Biome.CUSTOM ? Biome.PLAINS : targetBiome);
-        }
-
-        {
-            Biome targetBiome;
-            try {
-                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
-            } catch (IllegalArgumentException error) {
-                targetBiome = Biome.NETHER_WASTES;
-            }
-            biomeEnumMap.put(World.Environment.NETHER, targetBiome == Biome.CUSTOM ? Biome.NETHER_WASTES : targetBiome);
-        }
-
-        {
-            Biome targetBiome;
-            try {
-                targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
-            } catch (IllegalArgumentException error) {
-                targetBiome = Biome.THE_END;
-            }
-            biomeEnumMap.put(World.Environment.THE_END, targetBiome == Biome.CUSTOM ? Biome.THE_END : targetBiome);
-        }
-
     }
 
     @Override
@@ -73,12 +39,12 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
         return new BiomeProvider() {
             @Override
             public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
-                return biomeEnumMap.getOrDefault(worldInfo.getEnvironment(), Biome.PLAINS);
+                return NMSUtils.getWorldBiome(worldInfo.getEnvironment());
             }
 
             @Override
             public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
-                return new ArrayList<>(biomeEnumMap.values());
+                return NMSUtils.getAllBiomes();
             }
 
         };
