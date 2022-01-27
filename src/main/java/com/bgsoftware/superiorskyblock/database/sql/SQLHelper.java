@@ -2,12 +2,12 @@ package com.bgsoftware.superiorskyblock.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.database.sql.session.MariaDBSession;
-import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
-import com.bgsoftware.superiorskyblock.database.sql.session.PostgreSQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
-import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.MariaDBSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.PostgreSQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.SQLiteSession;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,30 +62,32 @@ public final class SQLHelper {
 
     public static void createTable(String tableName, Pair<String, String>... columns) {
         if (isReady())
-            globalSession.createTable(tableName, columns);
+            globalSession.createTable(tableName, columns, QueryResult.EMPTY_VOID_QUERY_RESULT);
     }
 
     public static void createIndex(String indexName, String tableName, String... columns) {
         if (isReady())
-            globalSession.createIndex(indexName, tableName, columns);
+            globalSession.createIndex(indexName, tableName, columns, QueryResult.EMPTY_VOID_QUERY_RESULT);
     }
 
     public static void modifyColumnType(String tableName, String columnName, String newType) {
         if (isReady())
-            globalSession.modifyColumnType(tableName, columnName, newType);
+            globalSession.modifyColumnType(tableName, columnName, newType, QueryResult.EMPTY_VOID_QUERY_RESULT);
     }
 
-    public static QueryResult<ResultSet> select(String tableName, String filters) {
-        return isReady() ? globalSession.select(tableName, filters) : QueryResult.RESULT_SET_ERROR;
-    }
-
-    public static void setJournalMode(String jounralMode) {
+    public static void select(String tableName, String filters, QueryResult<ResultSet> queryResult) {
         if (isReady())
-            globalSession.setJournalMode(jounralMode);
+            globalSession.select(tableName, filters, queryResult);
     }
 
-    public static QueryResult<PreparedStatement> customQuery(String query) {
-        return isReady() ? globalSession.customQuery(query) : QueryResult.PREPARED_STATEMENT_ERROR;
+    public static void setJournalMode(String jounralMode, QueryResult<ResultSet> queryResult) {
+        if (isReady())
+            globalSession.setJournalMode(jounralMode, queryResult);
+    }
+
+    public static void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
+        if (isReady())
+            globalSession.customQuery(query, queryResult);
     }
 
     public static void close() {

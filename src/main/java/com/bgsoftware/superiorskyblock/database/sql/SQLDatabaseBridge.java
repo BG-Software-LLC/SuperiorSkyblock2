@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
+import java.sql.ResultSet;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -40,7 +41,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadAllObjects(String table, Consumer<Map<String, Object>> resultConsumer) {
-        SQLHelper.select(table, "").ifSuccess(resultSet -> {
+        SQLHelper.select(table, "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
@@ -49,7 +50,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     PluginDebugger.debug(ex);
                 }
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
     }
 
     @Override
@@ -145,7 +146,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     String.format("'%s'", filterPair.getValue()) : filterPair.getValue().toString());
         }
 
-        SQLHelper.select(table, columnFilter).ifSuccess(resultSet -> {
+        SQLHelper.select(table, columnFilter, new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
@@ -154,7 +155,7 @@ public final class SQLDatabaseBridge implements DatabaseBridge {
                     PluginDebugger.debug(ex);
                 }
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
     }
 
     @Override

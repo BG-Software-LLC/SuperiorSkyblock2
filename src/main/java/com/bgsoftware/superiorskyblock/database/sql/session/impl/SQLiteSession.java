@@ -1,7 +1,9 @@
-package com.bgsoftware.superiorskyblock.database.sql.session;
+package com.bgsoftware.superiorskyblock.database.sql.session.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
+import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
@@ -14,10 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 public final class SQLiteSession implements SQLSession {
-
 
     private final CompletableFuture<Void> ready = new CompletableFuture<>();
     private final Object mutex = new Object();
@@ -45,12 +45,15 @@ public final class SQLiteSession implements SQLSession {
         File file = new File(plugin.getDataFolder(), "database.db");
 
         if (!file.exists()) {
-            if (!file.getParentFile().mkdirs())
-                return false;
+            file.getParentFile().mkdirs();
             try {
-                if (!file.createNewFile())
+                if (!file.createNewFile()) {
+                    log("&cFailed to create database file.");
                     return false;
+                }
             } catch (IOException error) {
+                log("&cAn unexpected error occurred while creating the database file:");
+                error.printStackTrace();
                 return false;
             }
         }
@@ -128,7 +131,7 @@ public final class SQLiteSession implements SQLSession {
     }
 
     @Override
-    public QueryResult<Void> createTable(String tableName, Pair<String, String>... columns) {
+    public void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (Pair<String, String> column : columns) {
             columnsSection.append(",")
@@ -137,60 +140,51 @@ public final class SQLiteSession implements SQLSession {
                     .append(column.getValue());
         }
 
-        return executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s (%s);",
-                        tableName, columnsSection.substring(1)),
-                QueryResult.VOID, QueryResult::ofFail);
+        executeUpdate(String.format("CREATE TABLE IF NOT EXISTS %s (%s);",
+                tableName, columnsSection.substring(1)), queryResult);
     }
 
     @Override
-    public QueryResult<Void> renameTable(String tableName, String newName) {
-        return executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName),
-                QueryResult.VOID, QueryResult::ofFail);
+    public void renameTable(String tableName, String newName, QueryResult<Void> queryResult) {
+        executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName), queryResult);
     }
 
     @Override
-    public QueryResult<Void> createIndex(String indexName, String tableName, String... columns) {
+    public void createIndex(String indexName, String tableName, String[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (String column : columns) {
             columnsSection.append(",").append(column);
         }
 
-        return executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s (%s);", indexName, tableName,
-                columnsSection.substring(1)), QueryResult.VOID, QueryResult::ofFail);
+        executeUpdate(String.format("CREATE UNIQUE INDEX %s ON %s (%s);",
+                indexName, tableName, columnsSection.substring(1)), queryResult);
     }
 
     @Override
-    public QueryResult<Void> modifyColumnType(String tableName, String columnName, String newType) {
-        return executeUpdate(String.format("ALTER TABLE %s MODIFY COLUMN %s %s;", tableName,
-                columnName, newType), QueryResult.VOID, QueryResult::ofFail);
+    public void modifyColumnType(String tableName, String columnName, String newType, QueryResult<Void> queryResult) {
+        executeUpdate(String.format("ALTER TABLE %s MODIFY COLUMN %s %s;",
+                tableName, columnName, newType), queryResult);
     }
 
     @Override
-    public QueryResult<ResultSet> select(String tableName, String filters) {
-        return executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters),
-                QueryResult::ofSuccess, QueryResult::ofFail);
+    public void select(String tableName, String filters, QueryResult<ResultSet> queryResult) {
+        executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters), queryResult);
     }
 
     @Override
-    public QueryResult<ResultSet> setJournalMode(String jounralMode) {
-        return executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode),
-                QueryResult::ofSuccess, QueryResult::ofFail);
+    public void setJournalMode(String jounralMode, QueryResult<ResultSet> queryResult) {
+        executeQuery(String.format("PRAGMA journal_mode=%s;", jounralMode), queryResult);
     }
 
     @Override
-    public QueryResult<PreparedStatement> customQuery(String query) {
+    public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        try {
-            return QueryResult.ofSuccess(this.conn.prepareStatement(query.replace("{prefix}", "")))
-                    .onFinish(preparedStatement -> {
-                        try {
-                            preparedStatement.close();
-                        } catch (SQLException ignored) {
-                        }
-                    });
+        try (PreparedStatement preparedStatement =
+                     this.conn.prepareStatement(query.replace("{prefix}", ""))) {
+            queryResult.complete(preparedStatement);
         } catch (SQLException error) {
-            return QueryResult.ofFail(error);
+            queryResult.fail(error);
         }
     }
 
@@ -199,7 +193,7 @@ public final class SQLiteSession implements SQLSession {
             SuperiorSkyblockPlugin.log(message);
     }
 
-    private <T> T executeUpdate(String statement, T success, Function<SQLException, T> onFailure) {
+    private void executeUpdate(String statement, QueryResult<Void> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
         String query = statement
@@ -208,25 +202,26 @@ public final class SQLiteSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
+            queryResult.complete(null);
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            queryResult.fail(error);
         }
-
-        return success;
     }
 
-    private <T> T executeQuery(String statement, Function<ResultSet, T> callback, Function<SQLException, T> onFailure) {
+    private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        String query = statement.replace("{prefix}", "");
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            return callback.apply(resultSet);
+            queryResult.complete(resultSet);
         } catch (SQLException error) {
-            return onFailure.apply(error);
+            queryResult.fail(error);
         }
     }
 

@@ -32,20 +32,47 @@ import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkConverter;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.HeightMap;
+import org.bukkit.World;
+import org.bukkit.block.Biome;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
+
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, 1, Packet.class, boolean.class);
+
+    static {
+        try {
+            biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds()
+                    .getNormal().getBiome().toUpperCase()));
+        } catch (IllegalArgumentException error) {
+            biomeEnumMap.put(World.Environment.NORMAL, Biome.PLAINS);
+        }
+        try {
+            biomeEnumMap.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds()
+                    .getNether().getBiome().toUpperCase()));
+        } catch (IllegalArgumentException error) {
+            biomeEnumMap.put(World.Environment.NETHER, Biome.NETHER_WASTES);
+        }
+        try {
+            biomeEnumMap.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds()
+                    .getEnd().getBiome().toUpperCase()));
+        } catch (IllegalArgumentException error) {
+            biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
+        }
+    }
 
     private NMSUtils() {
 
@@ -231,6 +258,14 @@ public final class NMSUtils {
                     worldTileEntity.load(tileEntityCompound);
             }
         }
+    }
+
+    public static Biome getWorldBiome(World.Environment environment) {
+        return Objects.requireNonNull(biomeEnumMap.get(environment));
+    }
+
+    public static List<Biome> getAllBiomes() {
+        return new ArrayList<>(biomeEnumMap.values());
     }
 
     public record UnloadedChunkCompound(NBTTagCompound chunkCompound, ChunkCoordIntPair chunkCoords) {

@@ -1461,6 +1461,11 @@ public final class SIsland implements Island {
 
     @Override
     public Biome getBiome() {
+        if (biome == null) {
+            // Loads the chunk and gets the biome on the first block.
+            // This may be called if a placeholder is called before the island is loaded, for example.
+            biome = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock().getBiome();
+        }
         return biome;
     }
 
@@ -1469,6 +1474,7 @@ public final class SIsland implements Island {
         setBiome(biome, true);
     }
 
+    @Override
     public void setBiome(Biome biome, boolean updateBlocks) {
         Preconditions.checkNotNull(biome, "biome parameter cannot be null.");
 
@@ -1489,15 +1495,29 @@ public final class SIsland implements Island {
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            Biome netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
-                    ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
+            Biome netherBiome;
+
+            try {
+                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+            } catch (IllegalArgumentException error) {
+                netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
+                        ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
+            }
+
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            Biome endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
+            Biome endBiome;
+
+            try {
+                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+            } catch (IllegalArgumentException error) {
+                endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
+            }
+
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
         }

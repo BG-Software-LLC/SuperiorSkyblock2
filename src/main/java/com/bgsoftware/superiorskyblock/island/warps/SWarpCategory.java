@@ -17,7 +17,7 @@ import java.util.List;
 
 public final class SWarpCategory implements WarpCategory {
 
-    private static final ItemStack DEFAULT_WARP_ICON = new ItemBuilder(Material.BOOK)
+    public static final ItemStack DEFAULT_WARP_ICON = new ItemBuilder(Material.BOOK)
             .withName("&6{0}").build();
 
     private final List<IslandWarp> islandWarps = new ArrayList<>();

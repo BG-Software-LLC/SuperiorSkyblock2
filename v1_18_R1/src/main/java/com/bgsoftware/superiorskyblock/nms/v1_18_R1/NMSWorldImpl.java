@@ -177,6 +177,10 @@ public final class NMSWorldImpl implements NMSWorld {
         if (chunk == null)
             return;
 
+        setBiome(chunk, biome);
+    }
+
+    private void setBiome(ChunkAccess chunk, Biome biome) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(chunk.getBiomeRegistry(), biome);
 
         net.minecraft.world.level.chunk.ChunkSection[] chunkSections = chunk.getSections();
@@ -204,6 +208,7 @@ public final class NMSWorldImpl implements NMSWorld {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
         });
+        setBiome(chunk, NMSUtils.getWorldBiome(bukkitChunk.getWorld().getEnvironment()));
     }
 
     @Override

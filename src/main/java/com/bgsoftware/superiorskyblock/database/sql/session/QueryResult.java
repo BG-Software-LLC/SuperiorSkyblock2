@@ -1,64 +1,42 @@
 package com.bgsoftware.superiorskyblock.database.sql.session;
 
 import javax.annotation.Nullable;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.function.Consumer;
 
 public final class QueryResult<T> {
 
-    public static final QueryResult<Void> VOID = QueryResult.ofSuccess(null);
-    public static final QueryResult<ResultSet> RESULT_SET_ERROR = QueryResult.ofFail(new Exception("Session was not initialized."));
-    public static final QueryResult<PreparedStatement> PREPARED_STATEMENT_ERROR = QueryResult.ofFail(new Exception("Session was not initialized."));
-
     public static final Consumer<Throwable> PRINT_ERROR = Throwable::printStackTrace;
+    public static final QueryResult<ResultSet> EMPTY_QUERY_RESULT = new QueryResult<>();
+    public static final QueryResult<Void> EMPTY_VOID_QUERY_RESULT = new QueryResult<>();
 
     @Nullable
-    private final T successValue;
-    private final Throwable error;
-    @Nullable
-    private Consumer<T> onFinish;
+    private QueryConsumer<T> onSuccess;
+    private Consumer<Throwable> onFail;
 
-    private QueryResult(@Nullable T value, Throwable error) {
-        this.successValue = value;
-        this.error = error;
+    public QueryResult() {
+
     }
 
-    public QueryResult<T> ifSuccess(QueryConsumer<T> consumer) {
-        try {
-            if (error == null) {
-                try {
-                    consumer.accept(successValue);
-                } catch (SQLException error) {
-                    return QueryResult.ofFail(error);
-                }
-            }
-        } finally {
-            if (onFinish != null)
-                onFinish.accept(successValue);
-        }
+    public QueryResult<T> onSuccess(QueryConsumer<T> onSuccess) {
+        this.onSuccess = onSuccess;
         return this;
     }
 
-    public QueryResult<T> ifFail(Consumer<Throwable> consumer) {
-        if (error != null)
-            consumer.accept(error);
-
+    public QueryResult<T> onFail(Consumer<Throwable> onFail) {
+        this.onFail = onFail;
         return this;
     }
 
-    public QueryResult<T> onFinish(Consumer<T> onFinish) {
-        this.onFinish = onFinish;
-        return this;
+    public void complete(T success) throws SQLException {
+        if (onSuccess != null)
+            onSuccess.accept(success);
     }
 
-    public static <T> QueryResult<T> ofSuccess(T value) {
-        return new QueryResult<>(value, null);
-    }
-
-    public static <T> QueryResult<T> ofFail(Throwable error) {
-        return new QueryResult<>(null, error);
+    public void fail(Throwable error) {
+        if (onFail != null)
+            onFail.accept(error);
     }
 
     public interface QueryConsumer<T> {

@@ -21,18 +21,18 @@ public interface SQLSession {
 
     void commit();
 
-    QueryResult<Void> createTable(String tableName, Pair<String, String>... columns);
+    void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult);
 
-    QueryResult<Void> renameTable(String tableName, String newName);
+    void renameTable(String tableName, String newName, QueryResult<Void> queryResult);
 
-    QueryResult<Void> createIndex(String indexName, String tableName, String... columns);
+    void createIndex(String indexName, String tableName, String[] columns, QueryResult<Void> queryResult);
 
-    QueryResult<Void> modifyColumnType(String tableName, String columnName, String newType);
+    void modifyColumnType(String tableName, String columnName, String newType, QueryResult<Void> queryResult);
 
-    QueryResult<ResultSet> select(String tableName, String filters);
+    void select(String tableName, String filters, QueryResult<ResultSet> queryResult);
 
-    QueryResult<ResultSet> setJournalMode(String jounralMode);
+    void setJournalMode(String jounralMode, QueryResult<ResultSet> queryResult);
 
-    QueryResult<PreparedStatement> customQuery(String query);
+    void customQuery(String query, QueryResult<PreparedStatement> queryResult);
 
 }

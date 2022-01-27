@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -8,25 +9,28 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.cscorelib2.config.Config;
 import me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public final class SlimefunHook {
@@ -151,6 +155,10 @@ public final class SlimefunHook {
     private static final class Slimefun4RelocationsProtectionModule implements
             io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule {
 
+        private static final ReflectMethod<Void> OLD_REGISTER_MODULE = new ReflectMethod<>(
+                io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionManager.class,
+                "registerModule", Server.class, String.class, Function.class);
+
         @Override
         public void load() {
             // Do nothing.
@@ -169,7 +177,13 @@ public final class SlimefunHook {
 
         public void register() {
             Executor.sync(() -> {
-                Slimefun.getProtectionManager().registerModule(Bukkit.getServer(), plugin.getName(), pl -> this);
+                if (OLD_REGISTER_MODULE.isValid()) {
+                    OLD_REGISTER_MODULE.invoke(Slimefun.getProtectionManager(), Bukkit.getServer(), plugin.getName(),
+                            (Function<Plugin, ProtectionModule>) pl -> this);
+                } else {
+                    Slimefun.getProtectionManager().registerModule(Bukkit.getServer().getPluginManager(),
+                            plugin.getName(), pl -> this);
+                }
             }, 2L);
         }
 

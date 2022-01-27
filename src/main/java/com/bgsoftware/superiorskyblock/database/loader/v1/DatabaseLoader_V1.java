@@ -23,10 +23,10 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleD
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.ResultSetMapBridge;
 import com.bgsoftware.superiorskyblock.database.sql.StatementHolder;
-import com.bgsoftware.superiorskyblock.database.sql.session.MySQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.database.sql.session.SQLSession;
-import com.bgsoftware.superiorskyblock.database.sql.session.SQLiteSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.MySQLSession;
+import com.bgsoftware.superiorskyblock.database.sql.session.impl.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
@@ -34,6 +34,7 @@ import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,51 +69,51 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     public void loadData() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
 
-        session.select("players", "").ifSuccess(resultSet -> {
+        session.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedPlayers.add(loadPlayer(new ResultSetMapBridge(resultSet)));
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedPlayers.size() + " players in the database.");
 
-        session.select("islands", "").ifSuccess(resultSet -> {
+        session.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedIslands.add(loadIsland(new ResultSetMapBridge(resultSet)));
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
 
-        session.select("stackedBlocks", "").ifSuccess(resultSet -> {
+        session.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 loadedBlocks.add(loadStackedBlock(new ResultSetMapBridge(resultSet)));
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
 
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
 
         // Ignoring errors as the bankTransactions table may not exist.
         AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
-        session.select("bankTransactions", "").ifSuccess(resultSet -> {
+        session.select("bankTransactions", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             foundBankTransaction.set(true);
             while (resultSet.next()) {
                 loadedBankTransactions.add(loadBankTransaction(new ResultSetMapBridge(resultSet)));
             }
-        });
+        }));
 
         if (foundBankTransaction.get()) {
             SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
         }
 
-        session.select("grid", "").ifSuccess(resultSet -> {
+        session.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             if (resultSet.next()) {
                 gridAttributes = new GridAttributes()
                         .setValue(GridAttributes.Field.LAST_ISLAND, resultSet.getString("lastIsland"))
                         .setValue(GridAttributes.Field.MAX_ISLAND_SIZE, resultSet.getString("maxIslandSize"))
                         .setValue(GridAttributes.Field.WORLD, resultSet.getString("world"));
             }
-        }).ifFail(QueryResult.PRINT_ERROR);
+        }).onFail(QueryResult.PRINT_ERROR));
 
         AtomicBoolean failedBackup = new AtomicBoolean(true);
 
@@ -131,30 +132,30 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
             failedBackup.set(false);
 
-            session.renameTable("islands", "bkp_islands").ifFail(error -> {
+            session.renameTable("islands", "bkp_islands", new QueryResult<Void>().onFail(error -> {
                 error.printStackTrace();
                 failedBackup.set(true);
-            });
+            }));
 
-            session.renameTable("players", "bkp_players").ifFail(error -> {
+            session.renameTable("players", "bkp_players", new QueryResult<Void>().onFail(error -> {
                 error.printStackTrace();
                 failedBackup.set(true);
-            });
+            }));
 
-            session.renameTable("grid", "bkp_grid").ifFail(error -> {
+            session.renameTable("grid", "bkp_grid", new QueryResult<Void>().onFail(error -> {
                 error.printStackTrace();
                 failedBackup.set(true);
-            });
+            }));
 
-            session.renameTable("stackedBlocks", "bkp_stackedBlocks").ifFail(error -> {
+            session.renameTable("stackedBlocks", "bkp_stackedBlocks", new QueryResult<Void>().onFail(error -> {
                 error.printStackTrace();
                 failedBackup.set(true);
-            });
+            }));
 
-            session.renameTable("bankTransactions", "bkp_bankTransactions").ifFail(error -> {
+            session.renameTable("bankTransactions", "bkp_bankTransactions", new QueryResult<Void>().onFail(error -> {
                 error.printStackTrace();
                 failedBackup.set(true);
-            });
+            }));
         }
 
         if (isRemoteDatabase)
@@ -194,10 +195,10 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
 
         AtomicBoolean isOldFormat = new AtomicBoolean(true);
 
-        session.select("stackedBlocks", "").ifFail(error -> {
+        session.select("stackedBlocks", "", new QueryResult<ResultSet>().onFail(error -> {
             session.closeConnection();
             isOldFormat.set(false);
-        });
+        }));
 
         return isOldFormat.get();
     }

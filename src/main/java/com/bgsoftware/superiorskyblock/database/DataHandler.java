@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserialize
 import com.bgsoftware.superiorskyblock.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.database.sql.SQLHelper;
+import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -61,7 +62,7 @@ public final class DataHandler extends AbstractHandler {
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
             SQLDatabaseInitializer.getInstance().createIndexes();
-            SQLHelper.setJournalMode("MEMORY");
+            SQLHelper.setJournalMode("MEMORY", QueryResult.EMPTY_QUERY_RESULT);
         }
 
         loadPlayers();
@@ -69,7 +70,7 @@ public final class DataHandler extends AbstractHandler {
         loadGrid();
 
         if (!plugin.getFactory().hasCustomDatabaseBridge()) {
-            SQLHelper.setJournalMode("DELETE");
+            SQLHelper.setJournalMode("DELETE", QueryResult.EMPTY_QUERY_RESULT);
         }
 
         /*

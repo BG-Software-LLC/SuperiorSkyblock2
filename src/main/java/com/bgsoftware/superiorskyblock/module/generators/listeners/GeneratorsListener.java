@@ -13,8 +13,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,6 +26,10 @@ public final class GeneratorsListener implements Listener {
     private static final BlockFace[] nearbyFaces = new BlockFace[]{
             BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
     };
+    private static final Material BLUE_ICE_MATERIAL = getMaterialSafe("BLUE_ICE");
+    private static final Material SOUL_SOIL_MATERIAL = getMaterialSafe("SOUL_SOIL");
+    private static final Material BASALT_MATERIAL = getMaterialSafe("BASALT");
+    private static final Material LAVA_MATERIAL = getMaterialSafe("LAVA");
 
     private final SuperiorSkyblockPlugin plugin;
     private final GeneratorsModule module;
@@ -34,7 +40,24 @@ public final class GeneratorsListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onBlockFormEvent(BlockFromToEvent e) {
+    public void onBlockFormEvent(BlockFormEvent e) {
+        if (!module.isEnabled())
+            return;
+
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if (island == null)
+            return;
+
+        if (e.getBlock().getType() != LAVA_MATERIAL || e.getNewState().getType() != BASALT_MATERIAL)
+            return;
+
+        if (performBlockGeneration(e.getBlock(), island))
+            e.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBlockFromToEvent(BlockFromToEvent e) {
         if (!module.isEnabled())
             return;
 
@@ -45,7 +68,7 @@ public final class GeneratorsListener implements Listener {
         if (island == null)
             return;
 
-        if (!e.getBlock().getType().name().contains("LAVA") || !hasWaterNearby(block))
+        if (e.getBlock().getType() != LAVA_MATERIAL || !canGenerateBlock(block))
             return;
 
         // Should fix solid blocks from generating custom blocks
@@ -53,13 +76,18 @@ public final class GeneratorsListener implements Listener {
         if (block.getType().isSolid())
             return;
 
+        if (performBlockGeneration(block, island))
+            e.setCancelled(true);
+    }
+
+    private boolean performBlockGeneration(Block block, Island island) {
         World.Environment environment = block.getWorld().getEnvironment();
         Map<String, Integer> generatorAmounts = island.getGeneratorAmounts(environment);
 
         int totalGeneratorAmounts = island.getGeneratorTotalAmount(environment);
 
         if (totalGeneratorAmounts == 0)
-            return;
+            return false;
 
         String newState = "COBBLESTONE";
 
@@ -83,9 +111,7 @@ public final class GeneratorsListener implements Listener {
             island.handleBlockPlace(Key.of(newState), 1); */
 
         if (typeSections[0].contains("COBBLESTONE"))
-            return;
-
-        e.setCancelled(true);
+            return false;
 
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         island.handleBlockPlace(Key.of(newState), 1);
@@ -94,7 +120,7 @@ public final class GeneratorsListener implements Listener {
         byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
         int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
 
-        if(combinedId == -1) {
+        if (combinedId == -1) {
             SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
             generateBlockType = Material.COBBLESTONE;
             blockData = 0;
@@ -107,13 +133,16 @@ public final class GeneratorsListener implements Listener {
         plugin.getNMSWorld().setBlock(block.getLocation(), combinedId);
 
         plugin.getNMSWorld().playGeneratorSound(block.getLocation());
+
+        return true;
     }
 
-    private boolean hasWaterNearby(Block block) {
+    private boolean canGenerateBlock(Block block) {
         if (ServerVersion.isAtLeast(ServerVersion.v1_16) &&
                 block.getWorld().getEnvironment() == World.Environment.NETHER) {
             for (BlockFace blockFace : nearbyFaces) {
-                if (block.getRelative(blockFace).getType().name().equals("BLUE_ICE"))
+                if (block.getRelative(blockFace).getType() == BLUE_ICE_MATERIAL &&
+                        block.getRelative(BlockFace.DOWN).getType() == SOUL_SOIL_MATERIAL)
                     return true;
             }
         } else {
@@ -124,6 +153,15 @@ public final class GeneratorsListener implements Listener {
         }
 
         return false;
+    }
+
+    @Nullable
+    private static Material getMaterialSafe(String material) {
+        try {
+            return Material.valueOf(material);
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
     }
 
 
