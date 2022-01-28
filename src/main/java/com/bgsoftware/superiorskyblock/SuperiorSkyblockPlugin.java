@@ -492,8 +492,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-        } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+        } else {
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }
 
