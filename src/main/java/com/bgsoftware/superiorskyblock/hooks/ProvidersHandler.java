@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.EntityProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
@@ -23,6 +24,7 @@ import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider;
 import com.bgsoftware.superiorskyblock.hooks.provider.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.hooks.provider.EntityProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
@@ -72,6 +74,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private WorldsProvider worldsProvider;
     private ChunksProvider chunksProvider = new ChunksProvider_Default();
     private MenusProvider menusProvider;
+    private EntityProvider entityProvider = new EntityProvider_Default();
     private boolean listenToSpawnerChanges = true;
 
     private final List<ISkinsListener> skinsListeners = new ArrayList<>();
@@ -98,6 +101,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             registerEconomyProviders();
             registerPlaceholdersProvider();
             registerChunksProvider();
+            registerEntityProvider();
         });
     }
 
@@ -217,6 +221,17 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     @Override
     public void setVanishProvider(VanishProvider vanishProvider) {
         this.vanishProvider = vanishProvider;
+    }
+
+    @Override
+    public EntityProvider getEntityProvider() {
+        return this.entityProvider;
+    }
+
+    @Override
+    public void setEntityProvider(EntityProvider entityProvider) {
+        Preconditions.checkNotNull(entityProvider, "entityProvider parameter cannot be null.");
+        this.entityProvider = entityProvider;
     }
 
     @Override
@@ -549,6 +564,20 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
                 }
             });
         }
+    }
+
+    private void registerEntityProvider() {
+        Optional<EntityProvider> entityProvider = Optional.empty();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {
+            entityProvider = createInstance("EntityProvider_WildStacker");
+        } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker")) {
+            entityProvider = createInstance("EntityProvider_RoseStacker");
+        } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker")) {
+            entityProvider = createInstance("EntityProvider_UltimateStacker");
+        }
+
+        entityProvider.ifPresent(this::setEntityProvider);
     }
 
     private void registerHook(String className) {
