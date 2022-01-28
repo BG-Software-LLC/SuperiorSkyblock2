@@ -55,7 +55,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
         if (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
             buttonItem = super.getButtonItem(superiorMenu);
         } else if (lackPermissionItem != null) {
-            buttonItem = lackPermissionItem.build(inventoryViewer);
+            buttonItem = lackPermissionItem.copy().build(inventoryViewer);
         }
 
         if (buttonItem == null || !MenuBiomes.currentBiomeGlow)

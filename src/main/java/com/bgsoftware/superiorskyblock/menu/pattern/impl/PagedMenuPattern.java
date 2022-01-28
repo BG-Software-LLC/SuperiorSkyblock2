@@ -62,6 +62,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
                 buttonItem = button.getButtonItem(superiorMenu);
             } catch (Exception error) {
                 SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
+                error.printStackTrace();
                 PluginDebugger.debug(error);
                 return;
             }

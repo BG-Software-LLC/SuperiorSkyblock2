@@ -30,12 +30,12 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
 
     @Nullable
     public ItemStack getButtonItem(M superiorMenu) {
-        return buttonItem == null ? null : buttonItem.build(superiorMenu.getInventoryViewer());
+        return buttonItem == null ? null : buttonItem.copy().build(superiorMenu.getInventoryViewer());
     }
 
     @Nullable
     public ItemStack getRawButtonItem() {
-        return buttonItem == null ? null : buttonItem.build();
+        return buttonItem == null ? null : buttonItem.copy().build();
     }
 
     @Nullable
