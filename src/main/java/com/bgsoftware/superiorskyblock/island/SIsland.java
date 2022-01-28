@@ -2247,7 +2247,7 @@ public final class SIsland implements Island {
         if (entityLimit <= IslandUtils.NO_LIMIT.get())
             return CompletableFuture.completedFuture(false);
 
-        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) >= entityLimit);
+        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) + amount >= entityLimit);
     }
 
     @Override
