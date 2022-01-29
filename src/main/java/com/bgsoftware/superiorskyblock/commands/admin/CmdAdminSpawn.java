@@ -27,7 +27,7 @@ public final class CmdAdminSpawn implements ISuperiorCommand {
 
     @Override
     public String getUsage(java.util.Locale locale) {
-        return "admin spawn [player-name]";
+        return "admin spawn [" + Message.COMMAND_ARGUMENT_PLAYER_NAME.getMessage(locale) + "]";
     }
 
     @Override
