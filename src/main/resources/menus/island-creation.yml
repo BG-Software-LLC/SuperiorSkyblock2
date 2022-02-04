@@ -16,7 +16,6 @@ pattern:
 items:
   '@':
     schematic: 'normal'
-    required-permission: ''
     biome: PLAINS
     access:
       type: SKULL_ITEM
@@ -38,7 +37,6 @@ items:
         - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '^':
     schematic: 'mycel'
-    required-permission: ''
     biome: MUSHROOM_ISLAND
     access:
       type: SKULL_ITEM
@@ -60,7 +58,6 @@ items:
         - '&7&o(( &f&oRight-Click &7&oto preview the island. ))'
   '$':
     schematic: 'desert'
-    required-permission: ''
     biome: DESERT
     access:
       type: SKULL_ITEM
