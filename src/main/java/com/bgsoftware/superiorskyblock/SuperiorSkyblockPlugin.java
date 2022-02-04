@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -96,7 +95,6 @@ import java.util.regex.Pattern;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
-    private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static final Pattern LISTENER_REGISTER_FAILURE =
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
 
@@ -169,13 +167,23 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         initCustomFilter();
 
-        PLUGIN.set(null, this);
+        try {
+            SuperiorSkyblockAPI.setPluginInstance(this);
+        } catch (UnsupportedOperationException error) {
+            log("&cThe API instance was already initialized. " +
+                    "This can be caused by a reload or another plugin initializing it.");
+            shouldEnable = false;
+        }
 
         if (!loadNMSAdapter()) {
             shouldEnable = false;
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
+
+        IslandPrivileges.registerPrivileges();
+        SortingTypes.registerSortingTypes();
+        IslandFlags.registerFlags();
     }
 
     @Override
@@ -233,9 +241,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             Executor.init(this);
 
-            IslandPrivileges.registerPrivileges();
-            SortingTypes.registerSortingTypes();
-            IslandFlags.registerFlags();
             loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();

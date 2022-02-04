@@ -28,6 +28,20 @@ public final class SuperiorSkyblockAPI {
      */
 
     /**
+     * Set the plugin's instance for the API.
+     * Do not use this method on your own, as it may cause an undefined behavior when using the API.
+     *
+     * @param plugin The instance of the plugin to set to the API.
+     */
+    public static void setPluginInstance(SuperiorSkyblock plugin) {
+        if (SuperiorSkyblockAPI.plugin != null) {
+            throw new UnsupportedOperationException("You cannot initialize the plugin instance after it was initialized.");
+        }
+
+        SuperiorSkyblockAPI.plugin = plugin;
+    }
+
+    /**
      * Get the superior player object from a player instance.
      */
     public static SuperiorPlayer getPlayer(Player player) {
