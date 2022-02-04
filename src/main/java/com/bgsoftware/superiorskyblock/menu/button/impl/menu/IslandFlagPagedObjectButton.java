@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,9 +17,9 @@ import java.util.List;
 
 public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIslandFlags, MenuIslandFlags.IslandFlagInfo> {
 
-    private IslandFlagPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private IslandFlagPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                         String requiredPermission, SoundWrapper lackPermissionSound,
-                                        ItemBuilder nullItem, int objectIndex) {
+                                        TemplateItem nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 

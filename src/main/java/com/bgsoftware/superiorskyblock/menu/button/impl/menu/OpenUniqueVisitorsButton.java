@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuVisitors;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -13,7 +13,7 @@ import java.util.List;
 
 public final class OpenUniqueVisitorsButton extends SuperiorMenuButton<MenuVisitors> {
 
-    private OpenUniqueVisitorsButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private OpenUniqueVisitorsButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }

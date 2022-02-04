@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 
 public final class MenuWarpIconEdit extends SuperiorMenuIconEdit<MenuWarpIconEdit, IslandWarp> {
 
@@ -24,7 +25,7 @@ public final class MenuWarpIconEdit extends SuperiorMenuIconEdit<MenuWarpIconEdi
 
     private MenuWarpIconEdit(SuperiorPlayer superiorPlayer, IslandWarp islandWarp) {
         super(menuPattern, superiorPlayer, islandWarp, islandWarp == null ? null : islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon()));
+                SIslandWarp.DEFAULT_WARP_ICON : new TemplateItem(new ItemBuilder(islandWarp.getRawIcon())));
     }
 
     @Override

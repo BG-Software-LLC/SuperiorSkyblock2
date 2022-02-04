@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public final class WarpCategoryButton extends SuperiorMenuButton<MenuWarpCategor
 
     private final WarpCategory warpCategory;
 
-    private WarpCategoryButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpCategoryButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound,
                                WarpCategory warpCategory) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);

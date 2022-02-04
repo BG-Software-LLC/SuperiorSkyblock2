@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ import java.util.List;
 
 public final class WarpManageIconButton extends SuperiorMenuButton<MenuWarpManage> {
 
-    private WarpManageIconButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpManageIconButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                  String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }
@@ -36,7 +37,7 @@ public final class WarpManageIconButton extends SuperiorMenuButton<MenuWarpManag
         IslandWarp islandWarp = superiorMenu.getIslandWarp();
 
         ItemBuilder itemBuilder = islandWarp.getRawIcon() == null ?
-                SIslandWarp.DEFAULT_WARP_ICON.copy() : new ItemBuilder(islandWarp.getRawIcon());
+                SIslandWarp.DEFAULT_WARP_ICON.getBuilder() : new ItemBuilder(islandWarp.getRawIcon());
 
         ItemStack buttonItem = super.getButtonItem(superiorMenu);
 

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -19,7 +19,7 @@ public final class BankDepositButton extends SuperiorMenuButton<MenuIslandBank> 
     private final SoundWrapper failSound;
     private final BigDecimal depositPercentage;
 
-    private BankDepositButton(ItemBuilder buttonItem, List<String> commands,
+    private BankDepositButton(TemplateItem buttonItem, List<String> commands,
                               String requiredPermission, SoundWrapper lackPermissionSound,
                               SoundWrapper successSound, SoundWrapper failSound, double depositPercentage) {
         super(buttonItem, null, commands, requiredPermission, lackPermissionSound);

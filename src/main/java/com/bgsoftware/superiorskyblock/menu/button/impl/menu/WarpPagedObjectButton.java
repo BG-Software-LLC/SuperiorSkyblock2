@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,9 +18,9 @@ import java.util.List;
 
 public final class WarpPagedObjectButton extends PagedObjectButton<MenuWarps, IslandWarp> {
 
-    private WarpPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                   String requiredPermission, SoundWrapper lackPermissionSound,
-                                  ItemBuilder nullItem, int objectIndex) {
+                                  TemplateItem nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 

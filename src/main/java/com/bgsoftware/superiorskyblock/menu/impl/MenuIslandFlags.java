@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -113,8 +114,8 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
     public static void updateSettings(IslandFlag islandFlag, YamlConfiguration cfg, int position) {
         islandFlags.removeIf(islandFlagInfo -> islandFlagInfo.getIslandFlag() == islandFlag);
 
-        ItemBuilder enabledIslandFlagItem = null;
-        ItemBuilder disabledIslandFlagItem = null;
+        TemplateItem enabledIslandFlagItem = null;
+        TemplateItem disabledIslandFlagItem = null;
 
         ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
                 islandFlag.getName().toLowerCase());
@@ -177,12 +178,12 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
     public static class IslandFlagInfo implements Comparable<IslandFlagInfo> {
 
         private final IslandFlag islandFlag;
-        private final ItemBuilder enabledIslandFlagItem;
-        private final ItemBuilder disabledIslandFlagItem;
+        private final TemplateItem enabledIslandFlagItem;
+        private final TemplateItem disabledIslandFlagItem;
         private final int position;
 
-        public IslandFlagInfo(IslandFlag islandFlag, ItemBuilder enabledIslandFlagItem,
-                              ItemBuilder disabledIslandFlagItem, int position) {
+        public IslandFlagInfo(IslandFlag islandFlag, TemplateItem enabledIslandFlagItem,
+                              TemplateItem disabledIslandFlagItem, int position) {
             this.islandFlag = islandFlag;
             this.enabledIslandFlagItem = enabledIslandFlagItem;
             this.disabledIslandFlagItem = disabledIslandFlagItem;
@@ -194,11 +195,11 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         }
 
         public ItemBuilder getEnabledIslandFlagItem() {
-            return enabledIslandFlagItem.copy();
+            return enabledIslandFlagItem.getBuilder();
         }
 
         public ItemBuilder getDisabledIslandFlagItem() {
-            return disabledIslandFlagItem.copy();
+            return disabledIslandFlagItem.getBuilder();
         }
 
         @Override

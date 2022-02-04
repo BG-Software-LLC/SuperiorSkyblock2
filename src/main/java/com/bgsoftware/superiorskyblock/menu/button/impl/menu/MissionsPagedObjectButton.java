@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMissionsCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,8 +25,8 @@ public final class MissionsPagedObjectButton extends PagedObjectButton<MenuMissi
     private final SoundWrapper notCompletedSound;
     private final SoundWrapper canCompleteSound;
 
-    private MissionsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper completedSound, List<String> commands,
-                                      String requiredPermission, SoundWrapper lackPermissionSound, ItemBuilder nullItem,
+    private MissionsPagedObjectButton(TemplateItem buttonItem, SoundWrapper completedSound, List<String> commands,
+                                      String requiredPermission, SoundWrapper lackPermissionSound, TemplateItem nullItem,
                                       SoundWrapper notCompletedSound, SoundWrapper canCompleteSound, int objectIndex) {
         super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
         this.completedSound = completedSound;

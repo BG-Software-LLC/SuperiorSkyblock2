@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
@@ -25,13 +26,13 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
 
     private final SoundWrapper accessSound;
     private final List<String> accessCommands;
-    private final ItemBuilder lackPermissionItem;
+    private final TemplateItem lackPermissionItem;
     private final List<String> lackPermissionCommands;
     private final Biome biome;
 
-    private BiomeButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private BiomeButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                         String requiredPermission, SoundWrapper lackPermissionSound,
-                        ItemBuilder lackPermissionItem, List<String> lackPermissionCommands, Biome biome) {
+                        TemplateItem lackPermissionItem, List<String> lackPermissionCommands, Biome biome) {
         super(buttonItem, null, null, requiredPermission, lackPermissionSound);
         this.accessSound = clickSound;
         this.accessCommands = commands == null ? Collections.emptyList() : Collections.unmodifiableList(commands);
@@ -55,7 +56,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
         if (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission)) {
             buttonItem = super.getButtonItem(superiorMenu);
         } else if (lackPermissionItem != null) {
-            buttonItem = lackPermissionItem.copy().build(inventoryViewer);
+            buttonItem = lackPermissionItem.build(inventoryViewer);
         }
 
         if (buttonItem == null || !MenuBiomes.currentBiomeGlow)
@@ -97,19 +98,19 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
     public static class Builder extends AbstractBuilder<Builder, BiomeButton, MenuBiomes> {
 
         private final Biome biome;
-        private ItemBuilder noAccessItem = null;
+        private TemplateItem noAccessItem = null;
         private List<String> noAccessCommands = null;
 
         public Builder(Biome biome) {
             this.biome = biome;
         }
 
-        public Builder setAccessItem(ItemBuilder accessItem) {
+        public Builder setAccessItem(TemplateItem accessItem) {
             this.buttonItem = accessItem;
             return this;
         }
 
-        public Builder setNoAccessItem(ItemBuilder noAccessItem) {
+        public Builder setNoAccessItem(TemplateItem noAccessItem) {
             this.noAccessItem = noAccessItem;
             return this;
         }

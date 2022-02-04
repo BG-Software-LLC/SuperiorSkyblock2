@@ -11,9 +11,9 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -27,8 +27,8 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final ItemBuilder islandItem;
-    private final ItemBuilder noIslandItem;
+    private final TemplateItem islandItem;
+    private final TemplateItem noIslandItem;
     private final SoundWrapper islandSound;
     private final SoundWrapper noIslandSound;
     private final List<String> islandCommands;
@@ -36,15 +36,16 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     private final boolean isSelfPlayerIsland;
 
     private TopIslandsPagedObjectButton(String requiredPermission, SoundWrapper lackPermissionSound,
-                                        ItemBuilder islandItem, SoundWrapper islandSound, List<String> islandCommands,
-                                        ItemBuilder noIslandItem, SoundWrapper noIslandSound,
+                                        TemplateItem islandItem, SoundWrapper islandSound, List<String> islandCommands,
+                                        TemplateItem noIslandItem, SoundWrapper noIslandSound,
                                         List<String> noIslandCommands, boolean isSelfPlayerIsland, int objectIndex) {
         super(null, null, null, requiredPermission, lackPermissionSound, null,
                 objectIndex);
         this.islandItem = islandItem;
         this.islandSound = islandSound;
         this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
-        this.noIslandItem = noIslandItem == null ? new ItemBuilder(Material.AIR) : noIslandItem.asSkullOf((SuperiorPlayer) null);
+        this.noIslandItem = noIslandItem == null ? TemplateItem.AIR : noIslandItem;
+        this.noIslandItem.getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         this.noIslandSound = noIslandSound;
         this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
         this.isSelfPlayerIsland = isSelfPlayerIsland;
@@ -62,7 +63,7 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
         SuperiorPlayer islandOwner = island.getOwner();
         int place = plugin.getGrid().getIslandPosition(island, superiorMenu.getSortingType()) + 1;
-        ItemBuilder itemBuilder = islandItem.copy().asSkullOf(islandOwner);
+        ItemBuilder itemBuilder = islandItem.getBuilder().asSkullOf(islandOwner);
 
         String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
                 island.getName().isEmpty() ? islandOwner.getName() :
@@ -126,7 +127,7 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     }
 
     @Override
-    public ItemBuilder getNullItem() {
+    public TemplateItem getNullItem() {
         return noIslandItem;
     }
 
@@ -172,17 +173,17 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
     public static class Builder extends PagedObjectBuilder<Builder, TopIslandsPagedObjectButton, MenuTopIslands> {
 
-        private ItemBuilder noIslandItem;
+        private TemplateItem noIslandItem;
         private SoundWrapper noIslandSound;
         private List<String> noIslandCommands;
         private boolean isPlayerSelfIsland;
 
-        public Builder setIslandItem(ItemBuilder islandItem) {
+        public Builder setIslandItem(TemplateItem islandItem) {
             this.buttonItem = islandItem;
             return this;
         }
 
-        public Builder setNoIslandItem(ItemBuilder noIslandItem) {
+        public Builder setNoIslandItem(TemplateItem noIslandItem) {
             this.noIslandItem = noIslandItem;
             return this;
         }

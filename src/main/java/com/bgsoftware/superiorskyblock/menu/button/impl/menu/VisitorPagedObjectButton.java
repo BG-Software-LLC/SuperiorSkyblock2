@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuVisitors;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -14,9 +15,9 @@ import java.util.List;
 
 public final class VisitorPagedObjectButton extends PagedObjectButton<MenuVisitors, SuperiorPlayer> {
 
-    private VisitorPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private VisitorPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound,
-                                     ItemBuilder nullItem, int objectIndex) {
+                                     TemplateItem nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 

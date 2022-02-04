@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -52,7 +53,7 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static ItemBuilder getItemStack(String fileName, ConfigurationSection section) {
+    public static TemplateItem getItemStack(String fileName, ConfigurationSection section) {
         if (section == null || !section.contains("type"))
             return null;
 
@@ -145,7 +146,7 @@ public final class FileUtils {
             itemBuilder.withCustomModel(section.getInt("customModel"));
         }
 
-        return itemBuilder;
+        return new TemplateItem(itemBuilder);
     }
 
     @Nullable

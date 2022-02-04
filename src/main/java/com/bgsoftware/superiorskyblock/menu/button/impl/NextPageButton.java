@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class NextPageButton<M extends PagedSuperiorMenu<M, T>, T> extends SuperiorMenuButton<M> {
 
-    private NextPageButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private NextPageButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                            String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }

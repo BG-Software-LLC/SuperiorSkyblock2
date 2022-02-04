@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpIconEdit;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 public final class WarpIconEditConfirmButton extends SuperiorMenuButton<MenuWarpIconEdit> {
 
-    private WarpIconEditConfirmButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpIconEditConfirmButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                       String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }
@@ -23,7 +23,7 @@ public final class WarpIconEditConfirmButton extends SuperiorMenuButton<MenuWarp
 
         Message.WARP_ICON_UPDATED.send(clickEvent.getWhoClicked());
 
-        superiorMenu.getIconProvider().setIcon(superiorMenu.getIconBuilder().build());
+        superiorMenu.getIconProvider().setIcon(superiorMenu.getIconTemplate().build());
     }
 
     public static class Builder extends AbstractBuilder<Builder, WarpIconEditConfirmButton, MenuWarpIconEdit> {

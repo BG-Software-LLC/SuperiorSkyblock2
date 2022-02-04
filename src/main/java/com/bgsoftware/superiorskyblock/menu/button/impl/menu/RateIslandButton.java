@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRate;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -20,7 +20,7 @@ public final class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
 
     private final Rating rating;
 
-    private RateIslandButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private RateIslandButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                              String requiredPermission, SoundWrapper lackPermissionSound, Rating rating) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.rating = rating;

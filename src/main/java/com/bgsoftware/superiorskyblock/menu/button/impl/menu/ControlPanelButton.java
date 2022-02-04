@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuControlPanel;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -18,7 +18,7 @@ public final class ControlPanelButton extends SuperiorMenuButton<MenuControlPane
 
     private final ControlPanelAction controlPanelAction;
 
-    private ControlPanelButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private ControlPanelButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound,
                                ControlPanelAction controlPanelAction) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);

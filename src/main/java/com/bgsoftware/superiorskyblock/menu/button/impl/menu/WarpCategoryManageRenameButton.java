@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public final class WarpCategoryManageRenameButton extends SuperiorMenuButton<MenuWarpCategoryManage> {
 
-    private WarpCategoryManageRenameButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpCategoryManageRenameButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                            String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }

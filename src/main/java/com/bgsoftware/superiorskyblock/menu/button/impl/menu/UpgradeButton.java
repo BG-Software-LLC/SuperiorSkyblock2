@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
 
-    private static final ItemBuilder INVALID_ITEM = new ItemBuilder(Material.BEDROCK).withName("&c&lInvalid Item");
+    private static final TemplateItem INVALID_ITEM = new TemplateItem(new ItemBuilder(Material.BEDROCK).withName("&c&lInvalid Item"));
 
     private final Upgrade upgrade;
 
@@ -47,9 +48,9 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
         boolean nextLevel = levelCost.hasEnoughBalance(inventoryViewer) &&
                 (permission.isEmpty() || inventoryViewer.hasPermission(permission)) && requirements.isEmpty();
 
-        ItemBuilder buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
+        TemplateItem buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
 
-        return (buttonItem == null ? INVALID_ITEM : buttonItem).copy().build(inventoryViewer);
+        return (buttonItem == null ? INVALID_ITEM : buttonItem).build(inventoryViewer);
     }
 
     @Override

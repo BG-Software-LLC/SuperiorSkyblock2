@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandBank;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -20,7 +20,7 @@ public final class BankWithdrawButton extends SuperiorMenuButton<MenuIslandBank>
     private final BigDecimal withdrawValue;
     private final List<String> withdrawCommands;
 
-    private BankWithdrawButton(ItemBuilder buttonItem, List<String> commands, String requiredPermission,
+    private BankWithdrawButton(TemplateItem buttonItem, List<String> commands, String requiredPermission,
                                SoundWrapper lackPermissionSound, SoundWrapper successSound, SoundWrapper failSound,
                                double withdrawValue, List<String> withdrawCommands) {
         super(buttonItem, null, commands, requiredPermission, lackPermissionSound);

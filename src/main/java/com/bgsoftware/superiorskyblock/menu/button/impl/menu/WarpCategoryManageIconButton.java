@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public final class WarpCategoryManageIconButton extends SuperiorMenuButton<MenuWarpCategoryManage> {
 
-    private WarpCategoryManageIconButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private WarpCategoryManageIconButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                          String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }

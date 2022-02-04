@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -15,7 +15,7 @@ public final class BankLogsSortButton extends SuperiorMenuButton<MenuBankLogs> {
 
     private final SortType sortType;
 
-    private BankLogsSortButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private BankLogsSortButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound, SortType sortType) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.sortType = sortType;

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuPlayerLanguage;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -16,7 +16,7 @@ public final class LanguageButton extends SuperiorMenuButton<MenuPlayerLanguage>
 
     private final java.util.Locale language;
 
-    private LanguageButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private LanguageButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                            String requiredPermission, SoundWrapper lackPermissionSound, java.util.Locale language) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.language = language;
