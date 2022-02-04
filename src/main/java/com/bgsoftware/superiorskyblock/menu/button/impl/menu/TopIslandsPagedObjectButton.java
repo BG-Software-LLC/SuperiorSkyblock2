@@ -62,7 +62,7 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
         SuperiorPlayer islandOwner = island.getOwner();
         int place = plugin.getGrid().getIslandPosition(island, superiorMenu.getSortingType()) + 1;
-        ItemBuilder itemBuilder = islandItem.copy();
+        ItemBuilder itemBuilder = islandItem.copy().asSkullOf(islandOwner);
 
         String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
                 island.getName().isEmpty() ? islandOwner.getName() :
