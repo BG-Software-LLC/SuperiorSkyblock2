@@ -238,12 +238,13 @@ public final class SQLDatabaseInitializer {
         );
 
         SQLHelper.createTable("islands_upgrades",
-                new Pair<>("island", "UUID PRIMARY KEY"),
+                new Pair<>("island", "UUID"),
                 new Pair<>("upgrade", "LONG_UNIQUE_TEXT"),
                 new Pair<>("level", "INTEGER")
         );
 
         SQLHelper.modifyColumnType("islands_upgrades", "upgrade", "LONG_UNIQUE_TEXT");
+        SQLHelper.removePrimaryKey("islands_upgrades", "island");
 
         SQLHelper.createTable("islands_visitor_homes",
                 new Pair<>("island", "UUID"),

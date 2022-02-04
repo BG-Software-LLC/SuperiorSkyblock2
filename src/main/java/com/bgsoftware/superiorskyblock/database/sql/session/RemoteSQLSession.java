@@ -124,6 +124,12 @@ public abstract class RemoteSQLSession implements SQLSession {
     }
 
     @Override
+    public void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult) {
+        String prefix = plugin.getSettings().getDatabase().getPrefix();
+        executeUpdate(String.format("ALTER TABLE %s%s DROP PRIMARY KEY;", prefix, tableName), queryResult);
+    }
+
+    @Override
     public void select(String tableName, String filters, QueryResult<ResultSet> queryResult) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         executeQuery(String.format("SELECT * FROM %s%s%s;", prefix, tableName, filters), queryResult);

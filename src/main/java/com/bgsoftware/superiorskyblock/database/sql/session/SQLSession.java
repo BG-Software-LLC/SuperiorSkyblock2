@@ -29,6 +29,8 @@ public interface SQLSession {
 
     void modifyColumnType(String tableName, String columnName, String newType, QueryResult<Void> queryResult);
 
+    void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult);
+
     void select(String tableName, String filters, QueryResult<ResultSet> queryResult);
 
     void setJournalMode(String jounralMode, QueryResult<ResultSet> queryResult);
