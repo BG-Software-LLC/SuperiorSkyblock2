@@ -31,12 +31,16 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
         ImmutableMap.Builder<String, BigDecimal> mapBuilder = new ImmutableMap.Builder<>();
         mapBuilder.put("", BigDecimal.ZERO);
 
-        for (int i = 0; i <= 10; ++i) {
+        for (int i = 0; i < 10; ++i) {
             mapBuilder.put(i + "", BigDecimal.valueOf(i));
-            if (i != 0) {
-                mapBuilder.put((i * 100) + "", BigDecimal.valueOf(i * 100));
-                mapBuilder.put((i * 1000) + "", BigDecimal.valueOf(i * 1000));
-            }
+        }
+
+        for (int i = 10; i < 100; i *= 10) {
+            mapBuilder.put(i + "", BigDecimal.valueOf(i));
+        }
+
+        for (int i = 100; i <= 1000; i *= 100) {
+            mapBuilder.put(i + "", BigDecimal.valueOf(i));
         }
 
         CACHED_BIG_DECIMALS = mapBuilder.build();
