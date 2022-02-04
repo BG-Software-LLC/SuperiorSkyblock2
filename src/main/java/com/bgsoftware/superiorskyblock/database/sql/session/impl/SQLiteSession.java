@@ -180,6 +180,8 @@ public final class SQLiteSession implements SQLSession {
     public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+
         try (PreparedStatement preparedStatement =
                      this.conn.prepareStatement(query.replace("{prefix}", ""))) {
             queryResult.complete(preparedStatement);

@@ -141,6 +141,8 @@ public abstract class RemoteSQLSession implements SQLSession {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         String query = statement.replace("{prefix}", prefix);
 
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
             queryResult.complete(preparedStatement);
