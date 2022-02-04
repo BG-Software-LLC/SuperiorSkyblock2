@@ -89,6 +89,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -163,6 +164,11 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void onLoad() {
         plugin = this;
+
+        // Setting the default locale to English will fix issues related to using upper case in Turkish.
+        // https://stackoverflow.com/questions/11063102/using-locales-with-javas-tolowercase-and-touppercase
+        Locale.setDefault(Locale.ENGLISH);
+
         new Metrics(this);
 
         initCustomFilter();
