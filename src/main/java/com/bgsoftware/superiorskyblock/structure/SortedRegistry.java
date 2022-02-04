@@ -54,6 +54,12 @@ public final class SortedRegistry<K, V, Z extends Comparator<V>> {
     }
 
     public void sort(Z sortingType, Predicate<V> predicate, Runnable onFinish) {
+        if (innerMap.size() <= 1) {
+            if (onFinish != null)
+                onFinish.run();
+            return;
+        }
+
         if (Bukkit.isPrimaryThread()) {
             Executor.async(() -> sort(sortingType, predicate, onFinish));
             return;
