@@ -51,6 +51,7 @@ public final class FileUtils {
 
     }
 
+    @Nullable
     public static ItemBuilder getItemStack(String fileName, ConfigurationSection section) {
         if (section == null || !section.contains("type"))
             return null;

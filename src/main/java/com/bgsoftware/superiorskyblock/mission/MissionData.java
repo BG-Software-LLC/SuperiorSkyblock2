@@ -37,9 +37,12 @@ public final class MissionData {
 
         if (section.contains("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                ItemStack itemStack = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key)).build();
-                itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
-                this.itemRewards.add(itemStack);
+                ItemBuilder itemBuilder = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                if(itemBuilder != null) {
+                    ItemStack itemStack = itemBuilder.build();
+                    itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
+                    this.itemRewards.add(itemStack);
+                }
             }
         }
 
