@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.database.sql;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +60,8 @@ public final class StatementHolder {
 
             synchronized (mutex.get()) {
                 SQLHelper.customQuery(query, new QueryResult<PreparedStatement>().onSuccess(preparedStatement -> {
-                    SQLHelper.setAutoCommit(false);
+                    Connection connection = preparedStatement.getConnection();
+                    connection.setAutoCommit(false);
 
                     for (Map<Integer, Object> values : batches) {
                         for (Map.Entry<Integer, Object> entry : values.entrySet()) {
@@ -71,12 +72,13 @@ public final class StatementHolder {
                     }
 
                     preparedStatement.executeBatch();
+
                     try {
-                        SQLHelper.commit();
+                        connection.commit();
                     } catch (Throwable ignored) {
                     }
 
-                    SQLHelper.setAutoCommit(true);
+                    connection.setAutoCommit(true);
                 }).onFail(error -> {
                     SuperiorSkyblockPlugin.log("&cFailed to execute query " + errorQuery);
                     error.printStackTrace();

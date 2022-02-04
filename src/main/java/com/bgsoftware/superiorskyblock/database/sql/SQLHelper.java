@@ -100,15 +100,5 @@ public final class SQLHelper {
             globalSession.closeConnection();
     }
 
-    public static void setAutoCommit(boolean autoCommit) {
-        if (isReady())
-            globalSession.setAutoCommit(autoCommit);
-    }
-
-    public static void commit() {
-        if (isReady())
-            globalSession.commit();
-    }
-
 }
 

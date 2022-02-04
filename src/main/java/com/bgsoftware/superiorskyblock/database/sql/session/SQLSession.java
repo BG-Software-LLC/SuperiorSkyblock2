@@ -17,10 +17,6 @@ public interface SQLSession {
 
     Object getMutex();
 
-    void setAutoCommit(boolean autoCommit);
-
-    void commit();
-
     void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult);
 
     void renameTable(String tableName, String newName, QueryResult<Void> queryResult);

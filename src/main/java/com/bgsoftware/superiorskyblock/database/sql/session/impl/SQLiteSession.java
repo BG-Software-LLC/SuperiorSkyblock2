@@ -107,30 +107,6 @@ public final class SQLiteSession implements SQLSession {
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) {
-        Preconditions.checkNotNull(this.conn, "Session was not initialized.");
-
-        try {
-            this.conn.setAutoCommit(autoCommit);
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
-    public void commit() {
-        Preconditions.checkNotNull(this.conn, "Session was not initialized.");
-
-        try {
-            this.conn.commit();
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
     public void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (Pair<String, String> column : columns) {

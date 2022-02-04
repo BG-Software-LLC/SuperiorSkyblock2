@@ -58,30 +58,6 @@ public abstract class RemoteSQLSession implements SQLSession {
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) {
-        Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
-
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(autoCommit);
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
-    public void commit() {
-        Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
-
-        try (Connection conn = dataSource.getConnection()) {
-            conn.commit();
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
     public void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (Pair<String, String> column : columns) {
