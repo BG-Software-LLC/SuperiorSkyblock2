@@ -193,51 +193,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     }
 
     @Override
-    public void onDisable() {
-        if (!shouldEnable)
-            return;
-
-        ChunksProvider.stop();
-        Executor.syncDatabaseCalls();
-        unloadIslandWorlds();
-
-        try {
-            dataHandler.saveDatabase(false);
-
-            gridHandler.disablePlugin();
-
-            for (Island island : gridHandler.getIslandsToPurge())
-                island.disbandIsland();
-
-            playersHandler.savePlayers();
-            gridHandler.saveIslands();
-            stackedBlocksHandler.saveStackedBlocks();
-
-            modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
-
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                player.closeInventory();
-                superiorPlayer.updateWorldBorder(null);
-                if (superiorPlayer.hasIslandFlyEnabled()) {
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                }
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-        } finally {
-            CalcTask.cancelTask();
-            Executor.close();
-            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
-
-            //pluginDebugger.cancel();
-            dataHandler.closeConnection();
-        }
-    }
-
-    @Override
     public void onEnable() {
         try {
             if (!shouldEnable) {
@@ -342,6 +297,51 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             ex.printStackTrace();
             PluginDebugger.debug(ex);
             Bukkit.shutdown();
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (!shouldEnable)
+            return;
+
+        ChunksProvider.stop();
+        Executor.syncDatabaseCalls();
+        unloadIslandWorlds();
+
+        try {
+            dataHandler.saveDatabase(false);
+
+            gridHandler.disablePlugin();
+
+            for (Island island : gridHandler.getIslandsToPurge())
+                island.disbandIsland();
+
+            playersHandler.savePlayers();
+            gridHandler.saveIslands();
+            stackedBlocksHandler.saveStackedBlocks();
+
+            modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
+
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                player.closeInventory();
+                superiorPlayer.updateWorldBorder(null);
+                if (superiorPlayer.hasIslandFlyEnabled()) {
+                    player.setAllowFlight(false);
+                    player.setFlying(false);
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            PluginDebugger.debug(ex);
+        } finally {
+            CalcTask.cancelTask();
+            Executor.close();
+            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
+
+            //pluginDebugger.cancel();
+            dataHandler.closeConnection();
         }
     }
 
