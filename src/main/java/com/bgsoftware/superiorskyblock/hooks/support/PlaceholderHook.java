@@ -172,6 +172,34 @@ public abstract class PlaceholderHook {
                             StringUtils.fancyFormat(island.getBankLimit(), superiorPlayer.getUserLocale()))
                     .build();
 
+    private static final Map<SortingType, BiFunction<Island, SuperiorPlayer, String>> TOP_VALUE_FORMAT_FUNCTIONS =
+            new ImmutableMap.Builder<SortingType, BiFunction<Island, SuperiorPlayer, String>>()
+                    .put(SortingTypes.BY_WORTH, (targetIsland, superiorPlayer) ->
+                            StringUtils.fancyFormat(targetIsland.getWorth(), superiorPlayer.getUserLocale()))
+                    .put(SortingTypes.BY_LEVEL, (targetIsland, superiorPlayer) ->
+                            StringUtils.fancyFormat(targetIsland.getIslandLevel(), superiorPlayer.getUserLocale()))
+                    .put(SortingTypes.BY_RATING, (targetIsland, superiorPlayer) ->
+                            StringUtils.format(targetIsland.getTotalRating()))
+                    .put(SortingTypes.BY_PLAYERS, (targetIsland, superiorPlayer) ->
+                            StringUtils.format(targetIsland.getAllPlayersInside().size()))
+                    .build();
+
+    private static final Map<SortingType, Function<Island, String>> TOP_VALUE_RAW_FUNCTIONS =
+            new ImmutableMap.Builder<SortingType, Function<Island, String>>()
+                    .put(SortingTypes.BY_WORTH, targetIsland -> targetIsland.getWorth().toString())
+                    .put(SortingTypes.BY_LEVEL, targetIsland -> targetIsland.getIslandLevel().toString())
+                    .put(SortingTypes.BY_RATING, targetIsland -> targetIsland.getTotalRating() + "")
+                    .put(SortingTypes.BY_PLAYERS, targetIsland -> targetIsland.getAllPlayersInside().size() + "")
+                    .build();
+
+    private static final Map<SortingType, Function<Island, String>> TOP_VALUE_FUNCTIONS =
+            new ImmutableMap.Builder<SortingType, Function<Island, String>>()
+                    .put(SortingTypes.BY_WORTH, targetIsland -> StringUtils.format(targetIsland.getWorth()))
+                    .put(SortingTypes.BY_LEVEL, targetIsland -> StringUtils.format(targetIsland.getIslandLevel()))
+                    .put(SortingTypes.BY_RATING, targetIsland -> StringUtils.format(targetIsland.getTotalRating()))
+                    .put(SortingTypes.BY_PLAYERS, targetIsland -> StringUtils.format(targetIsland.getAllPlayersInside().size()))
+                    .build();
+
     private static List<PlaceholdersProvider> placeholdersProviders;
 
     protected PlaceholderHook() {
@@ -299,18 +327,21 @@ public abstract class PlaceholderHook {
         Function<Island, String> getValueFunction;
 
         if ((matcher = TOP_VALUE_FORMAT_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = targetIsland -> StringUtils.fancyFormat(targetIsland.getWorth(),
-                    superiorPlayer.getUserLocale());
+            getValueFunction = Optional.ofNullable(TOP_VALUE_FORMAT_FUNCTIONS.get(sortingType)).map(function ->
+                    (Function<Island, String>) targetIsland -> function.apply(targetIsland, superiorPlayer)).orElse(null);
         } else if ((matcher = TOP_VALUE_RAW_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = targetIsland -> targetIsland.getWorth().toString();
+            getValueFunction = TOP_VALUE_RAW_FUNCTIONS.get(sortingType);
         } else if ((matcher = TOP_VALUE_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
-            getValueFunction = targetIsland -> StringUtils.format(targetIsland.getWorth());
+            getValueFunction = TOP_VALUE_FUNCTIONS.get(sortingType);
         } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             getValueFunction = targetIsland -> targetIsland.getOwner().getName();
         } else {
             getValueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();
         }
+
+        if (getValueFunction == null)
+            return Optional.empty();
 
         int targetPosition;
 
