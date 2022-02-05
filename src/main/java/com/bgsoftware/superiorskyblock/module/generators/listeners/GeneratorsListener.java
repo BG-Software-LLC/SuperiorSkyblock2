@@ -29,7 +29,7 @@ public final class GeneratorsListener implements Listener {
     private static final Material BLUE_ICE_MATERIAL = getMaterialSafe("BLUE_ICE");
     private static final Material SOUL_SOIL_MATERIAL = getMaterialSafe("SOUL_SOIL");
     private static final Material BASALT_MATERIAL = getMaterialSafe("BASALT");
-    private static final Material LAVA_MATERIAL = getMaterialSafe("LAVA");
+    private static final Material LAVA_MATERIAL = getMaterialSafe("STATIONARY_LAVA", "LAVA");
 
     private final SuperiorSkyblockPlugin plugin;
     private final GeneratorsModule module;
@@ -161,6 +161,14 @@ public final class GeneratorsListener implements Listener {
             return Material.valueOf(material);
         } catch (IllegalArgumentException error) {
             return null;
+        }
+    }
+
+    private static Material getMaterialSafe(String material, String defaultMaterial) {
+        try {
+            return Material.valueOf(material);
+        } catch (IllegalArgumentException error) {
+            return Material.valueOf(defaultMaterial);
         }
     }
 
