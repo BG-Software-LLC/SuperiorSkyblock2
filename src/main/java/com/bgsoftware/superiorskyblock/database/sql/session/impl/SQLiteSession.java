@@ -147,6 +147,8 @@ public final class SQLiteSession implements SQLSession {
         executeQuery(String.format("PRAGMA table_info('%s')", tableName), new QueryResult<ResultSet>()
                 .onSuccess(resultSet -> {
                     if (resultSet.next() && resultSet.getInt("pk") == 1) {
+                        resultSet.close();
+                        executeUpdate(String.format("DROP TABLE %s_copy;", tableName), QueryResult.EMPTY_VOID_QUERY_RESULT);
                         executeUpdate(String.format("CREATE TABLE %s_copy AS SELECT * FROM %s;", tableName, tableName), queryResult);
                         executeUpdate(String.format("DROP TABLE %s;", tableName), queryResult);
                         renameTable(tableName + "_copy", tableName, queryResult);
