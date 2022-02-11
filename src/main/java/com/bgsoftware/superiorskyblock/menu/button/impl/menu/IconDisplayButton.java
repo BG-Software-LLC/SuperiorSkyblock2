@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public final class IconDisplayButton<M extends SuperiorMenuIconEdit<M, T>, T> extends SuperiorMenuButton<M> {
 
-    private IconDisplayButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private IconDisplayButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                               String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }
@@ -26,8 +26,8 @@ public final class IconDisplayButton<M extends SuperiorMenuIconEdit<M, T>, T> ex
     @Nullable
     @Override
     public ItemStack getButtonItem(M superiorMenu) {
-        ItemBuilder iconBuilder = superiorMenu.getIconBuilder();
-        return iconBuilder == null ? null : iconBuilder.copy().build();
+        TemplateItem iconTemplate = superiorMenu.getIconTemplate();
+        return iconTemplate == null ? null : iconTemplate.build();
     }
 
     public static class Builder<M extends SuperiorMenuIconEdit<M, T>, T> extends

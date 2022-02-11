@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.mission;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,9 +22,9 @@ public final class MissionData {
     private final boolean islandMission;
     private final boolean disbandReset;
     private final boolean leaveReset;
-    private final ItemBuilder notCompleted;
-    private final ItemBuilder canComplete;
-    private final ItemBuilder completed;
+    private final TemplateItem notCompleted;
+    private final TemplateItem canComplete;
+    private final TemplateItem completed;
     private final int resetAmount;
 
     MissionData(Mission<?> mission, ConfigurationSection section) {
@@ -37,9 +38,12 @@ public final class MissionData {
 
         if (section.contains("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                ItemStack itemStack = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key)).build();
-                itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
-                this.itemRewards.add(itemStack);
+                TemplateItem templateItem = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                if (templateItem != null) {
+                    ItemStack itemStack = templateItem.build();
+                    itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
+                    this.itemRewards.add(itemStack);
+                }
             }
         }
 
@@ -87,15 +91,15 @@ public final class MissionData {
     }
 
     public ItemBuilder getCompleted() {
-        return completed.copy();
+        return completed.getBuilder();
     }
 
     public ItemBuilder getCanComplete() {
-        return canComplete.copy();
+        return canComplete.getBuilder();
     }
 
     public ItemBuilder getNotCompleted() {
-        return notCompleted.copy();
+        return notCompleted.getBuilder();
     }
 
     @Override

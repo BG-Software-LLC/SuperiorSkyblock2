@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmLeave;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -20,7 +20,7 @@ public final class LeaveButton extends SuperiorMenuButton<MenuConfirmLeave> {
 
     private final boolean leaveIsland;
 
-    private LeaveButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private LeaveButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                         String requiredPermission, SoundWrapper lackPermissionSound, boolean leaveIsland) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.leaveIsland = leaveIsland;

@@ -20,6 +20,7 @@ import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.server.level.PlayerChunkMap;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.World;
 import net.minecraft.world.level.block.BlockBed;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.state.IBlockData;
@@ -157,6 +158,9 @@ public final class NMSUtils {
 
     public static void setBlock(net.minecraft.world.level.chunk.Chunk chunk, BlockPosition blockPosition,
                                 int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
+        if (!isValidPosition(chunk.getWorld(), blockPosition))
+            return;
+
         IBlockData blockData = net.minecraft.world.level.block.Block.getByCombinedId(combinedId);
 
         if (statesTag != null) {
@@ -240,6 +244,12 @@ public final class NMSUtils {
                     worldTileEntity.load(tileEntityCompound);
             }
         }
+    }
+
+    private static boolean isValidPosition(World world, BlockPosition blockPosition) {
+        return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
+                blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
+                blockPosition.getY() >= world.getMinBuildHeight() && blockPosition.getY() < world.getMaxBuildHeight();
     }
 
 }

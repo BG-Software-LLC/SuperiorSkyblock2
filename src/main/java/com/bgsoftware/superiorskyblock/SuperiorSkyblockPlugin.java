@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
@@ -91,13 +91,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
 
-    private static final ReflectField<SuperiorSkyblock> PLUGIN = new ReflectField<>(SuperiorSkyblockAPI.class, SuperiorSkyblock.class, "plugin");
     private static final Pattern LISTENER_REGISTER_FAILURE =
             Pattern.compile("Plugin SuperiorSkyblock2 v(.*) has failed to register events for (.*) because (.*) does not exist\\.");
 
@@ -166,62 +166,32 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void onLoad() {
         plugin = this;
+
+        // Setting the default locale to English will fix issues related to using upper case in Turkish.
+        // https://stackoverflow.com/questions/11063102/using-locales-with-javas-tolowercase-and-touppercase
+        Locale.setDefault(Locale.ENGLISH);
+
         new Metrics(this);
 
         initCustomFilter();
 
-        PLUGIN.set(null, this);
+        try {
+            SuperiorSkyblockAPI.setPluginInstance(this);
+        } catch (UnsupportedOperationException error) {
+            log("&cThe API instance was already initialized. " +
+                    "This can be caused by a reload or another plugin initializing it.");
+            shouldEnable = false;
+        }
 
         if (!loadNMSAdapter()) {
             shouldEnable = false;
         }
 
         Runtime.getRuntime().addShutdownHook(new ShutdownTask(this));
-    }
 
-    @Override
-    public void onDisable() {
-        if (!shouldEnable)
-            return;
-
-        ChunksProvider.stop();
-        Executor.syncDatabaseCalls();
-        unloadIslandWorlds();
-
-        try {
-            dataHandler.saveDatabase(false);
-
-            gridHandler.disablePlugin();
-
-            for (Island island : gridHandler.getIslandsToPurge())
-                island.disbandIsland();
-
-            playersHandler.savePlayers();
-            gridHandler.saveIslands();
-            stackedBlocksHandler.saveStackedBlocks();
-
-            modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
-
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                player.closeInventory();
-                superiorPlayer.updateWorldBorder(null);
-                if (superiorPlayer.hasIslandFlyEnabled()) {
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                }
-            });
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-        } finally {
-            CalcTask.cancelTask();
-            Executor.close();
-            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
-
-            //pluginDebugger.cancel();
-            dataHandler.closeConnection();
-        }
+        IslandPrivileges.registerPrivileges();
+        SortingTypes.registerSortingTypes();
+        IslandFlags.registerFlags();
     }
 
     @Override
@@ -234,9 +204,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             Executor.init(this);
 
-            IslandPrivileges.registerPrivileges();
-            SortingTypes.registerSortingTypes();
-            IslandFlags.registerFlags();
             loadUpgradeCostLoaders();
 
             EnchantsUtils.registerGlowEnchantment();
@@ -333,6 +300,51 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             ex.printStackTrace();
             PluginDebugger.debug(ex);
             Bukkit.shutdown();
+        }
+    }
+
+    @Override
+    public void onDisable() {
+        if (!shouldEnable)
+            return;
+
+        ChunksProvider.stop();
+        Executor.syncDatabaseCalls();
+        unloadIslandWorlds();
+
+        try {
+            dataHandler.saveDatabase(false);
+
+            gridHandler.disablePlugin();
+
+            for (Island island : gridHandler.getIslandsToPurge())
+                island.disbandIsland();
+
+            playersHandler.savePlayers();
+            gridHandler.saveIslands();
+            stackedBlocksHandler.saveStackedBlocks();
+
+            modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
+
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                player.closeInventory();
+                superiorPlayer.updateWorldBorder(null);
+                if (superiorPlayer.hasIslandFlyEnabled()) {
+                    player.setAllowFlight(false);
+                    player.setFlying(false);
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            PluginDebugger.debug(ex);
+        } finally {
+            CalcTask.cancelTask();
+            Executor.close();
+            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
+
+            //pluginDebugger.cancel();
+            dataHandler.closeConnection();
         }
     }
 
@@ -494,8 +506,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-        } else {
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+            SortingType.values().forEach(gridHandler::sortIslands);
+        } else {
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }
 

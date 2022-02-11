@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,7 +16,7 @@ public final class IconEditLoreButton<M extends SuperiorMenuIconEdit<M, T>, T> e
 
     private final Message newLoreMessage;
 
-    private IconEditLoreButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private IconEditLoreButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound, Message newLoreMessage) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.newLoreMessage = newLoreMessage;
@@ -32,7 +32,7 @@ public final class IconEditLoreButton<M extends SuperiorMenuIconEdit<M, T>, T> e
 
         PlayerChat.listen(player, message -> {
             if (!message.equalsIgnoreCase("-cancel")) {
-                superiorMenu.getIconBuilder().withLore(message.split("\\\\n"));
+                superiorMenu.getIconTemplate().getEditableBuilder().withLore(message.split("\\\\n"));
             }
 
             PlayerChat.remove(player);

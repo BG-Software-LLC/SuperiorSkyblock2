@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuValues;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -24,7 +24,7 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
 
     private final Key block;
 
-    private ValuesButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private ValuesButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                          String requiredPermission, SoundWrapper lackPermissionSound, Key block) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.block = block;
@@ -45,7 +45,7 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
         BigDecimal blockWorth = plugin.getBlockValues().getBlockWorth(block);
         BigDecimal blockLevel = plugin.getBlockValues().getBlockLevel(block);
 
-        ItemStack itemStack = buttonItem.copy()
+        ItemStack itemStack = buttonItem.getBuilder()
                 .replaceAll("{0}", amount + "")
                 .replaceAll("{1}", StringUtils.format(blockWorth.multiply(amount)))
                 .replaceAll("{2}", StringUtils.format(blockLevel.multiply(amount)))

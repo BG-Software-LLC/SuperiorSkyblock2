@@ -10,12 +10,12 @@ import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -101,18 +101,19 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
                 .setInventoryType(InventoryType.CHEST)
                 .setRowsSize(6)
                 .setButton(47, new DummyButton.Builder<SuperiorMenuSettings>()
-                        .setButtonItem(new ItemBuilder(Material.PAPER).withName("{0}Previous Page")))
+                        .setButtonItem(new TemplateItem(new ItemBuilder(Material.PAPER).withName("{0}Previous Page"))))
                 .setPreviousPageSlots(Collections.singletonList(47))
                 .setButton(49, new DummyButton.Builder<SuperiorMenuSettings>()
-                        .setButtonItem(new ItemBuilder(Materials.SUNFLOWER.toBukkitType()).withName("&aCurrent Page").withLore("&7Page {0}")))
+                        .setButtonItem(new TemplateItem(new ItemBuilder(Materials.SUNFLOWER.toBukkitType())
+                                .withName("&aCurrent Page").withLore("&7Page {0}"))))
                 .setCurrentPageSlots(Collections.singletonList(49))
                 .setButton(51, new DummyButton.Builder<SuperiorMenuSettings>()
-                        .setButtonItem(new ItemBuilder(Material.PAPER).withName("{0}Next Page")))
+                        .setButtonItem(new TemplateItem(new ItemBuilder(Material.PAPER).withName("{0}Next Page"))))
                 .setNextPageSlots(Collections.singletonList(51))
                 .setPagedObjectSlots(IntStream.range(0, 36).boxed().collect(Collectors.toList()),
                         new SuperiorSettingsPagedObjectButton.Builder())
                 .setButtons(IntStream.range(36, 45).boxed().collect(Collectors.toList()), new DummyButton.Builder<SuperiorMenuSettings>()
-                        .setButtonItem(new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.toBukkitItem()).withName(" ")))
+                        .setButtonItem(new TemplateItem(new ItemBuilder(Materials.BLACK_STAINED_GLASS_PANE.toBukkitItem()).withName(" "))))
                 .setButton(40, new SaveButton.Builder())
                 .build();
     }
@@ -270,7 +271,7 @@ public final class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSe
     private static final class SaveButton extends SuperiorMenuButton<SuperiorMenuSettings> {
 
         private SaveButton() {
-            super(new ItemBuilder(Material.EMERALD).withName("&aSave Changes"),
+            super(new TemplateItem(new ItemBuilder(Material.EMERALD).withName("&aSave Changes")),
                     null, null, null, null);
         }
 

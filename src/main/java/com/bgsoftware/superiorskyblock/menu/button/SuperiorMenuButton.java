@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.menu.button;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -13,13 +13,13 @@ import java.util.List;
 
 public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
 
-    protected final ItemBuilder buttonItem;
+    protected final TemplateItem buttonItem;
     protected final SoundWrapper clickSound;
     protected final List<String> commands;
     protected final String requiredPermission;
     protected final SoundWrapper lackPermissionSound;
 
-    protected SuperiorMenuButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    protected SuperiorMenuButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                  String requiredPermission, SoundWrapper lackPermissionSound) {
         this.buttonItem = buttonItem;
         this.clickSound = clickSound;
@@ -30,12 +30,12 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
 
     @Nullable
     public ItemStack getButtonItem(M superiorMenu) {
-        return buttonItem == null ? null : buttonItem.copy().build(superiorMenu.getInventoryViewer());
+        return buttonItem == null ? null : buttonItem.getBuilder().build(superiorMenu.getInventoryViewer());
     }
 
     @Nullable
     public ItemStack getRawButtonItem() {
-        return buttonItem == null ? null : buttonItem.copy().build();
+        return buttonItem == null ? null : buttonItem.getBuilder().build();
     }
 
     @Nullable
@@ -74,7 +74,7 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
     public static abstract class AbstractBuilder<B extends AbstractBuilder<B, T, M>,
             T extends SuperiorMenuButton<M>, M extends ISuperiorMenu> {
 
-        protected ItemBuilder buttonItem = null;
+        protected TemplateItem buttonItem = null;
         protected SoundWrapper clickSound = null;
         protected List<String> commands = null;
         protected String requiredPermission = null;
@@ -84,7 +84,7 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
 
         }
 
-        public B setButtonItem(ItemBuilder buttonItem) {
+        public B setButtonItem(TemplateItem buttonItem) {
             this.buttonItem = buttonItem;
             return (B) this;
         }

@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -147,9 +148,9 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
     public static void updatePermission(IslandPrivilege islandPrivilege, YamlConfiguration cfg, int position) {
         islandPrivileges.removeIf(islandPrivilegeInfo -> islandPrivilegeInfo.getIslandPrivilege() == islandPrivilege);
 
-        ItemBuilder enabledIslandPrivilegeItem = null;
-        ItemBuilder disabledIslandPrivilegeItem = null;
-        ItemBuilder rolePrivilegeItem = null;
+        TemplateItem enabledIslandPrivilegeItem = null;
+        TemplateItem disabledIslandPrivilegeItem = null;
+        TemplateItem rolePrivilegeItem = null;
         SoundWrapper accessSound = null;
         SoundWrapper noAccessSound = null;
         List<String> accessCommands = null;
@@ -224,17 +225,17 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
     public static class IslandPrivilegeInfo implements Comparable<IslandPrivilegeInfo> {
 
         private final IslandPrivilege islandPrivilege;
-        private final ItemBuilder enabledIslandPrivilegeItem;
-        private final ItemBuilder disabledIslandPrivilegeItem;
-        private final ItemBuilder roleIslandPrivilegeItem;
+        private final TemplateItem enabledIslandPrivilegeItem;
+        private final TemplateItem disabledIslandPrivilegeItem;
+        private final TemplateItem roleIslandPrivilegeItem;
         private final SoundWrapper accessSound;
         private final SoundWrapper noAccessSound;
         private final List<String> accessCommands;
         private final List<String> noAccessCommands;
         private final int position;
 
-        public IslandPrivilegeInfo(IslandPrivilege islandPrivilege, ItemBuilder enabledIslandPrivilegeItem,
-                                   ItemBuilder disabledIslandPrivilegeItem, ItemBuilder roleIslandPrivilegeItem,
+        public IslandPrivilegeInfo(IslandPrivilege islandPrivilege, TemplateItem enabledIslandPrivilegeItem,
+                                   TemplateItem disabledIslandPrivilegeItem, TemplateItem roleIslandPrivilegeItem,
                                    SoundWrapper accessSound, SoundWrapper noAccessSound, List<String> accessCommands,
                                    List<String> noAccessCommands, int position) {
             this.islandPrivilege = islandPrivilege;
@@ -253,16 +254,16 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         }
 
         public ItemBuilder getEnabledIslandPrivilegeItem() {
-            return enabledIslandPrivilegeItem.copy();
+            return enabledIslandPrivilegeItem.getBuilder();
         }
 
         public ItemBuilder getDisabledIslandPrivilegeItem() {
-            return disabledIslandPrivilegeItem.copy();
+            return disabledIslandPrivilegeItem.getBuilder();
         }
 
         @Nullable
         public ItemBuilder getRoleIslandPrivilegeItem() {
-            return roleIslandPrivilegeItem == null ? null : roleIslandPrivilegeItem.copy();
+            return roleIslandPrivilegeItem == null ? null : roleIslandPrivilegeItem.getBuilder();
         }
 
         @Nullable

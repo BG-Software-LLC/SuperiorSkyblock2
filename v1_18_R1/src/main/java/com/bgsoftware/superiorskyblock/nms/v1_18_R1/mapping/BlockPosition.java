@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping;
 
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.EnumDirection;
 import net.minecraft.world.phys.Vec3D;
@@ -66,6 +67,10 @@ public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPo
         return handle.a(position, maxDistance);
     }
 
+    public boolean isValidLocation(WorldServer worldServer) {
+        return handle.isInsideBuildHeightAndWorldBoundsHorizontal(worldServer.getHandle());
+    }
+
     public static Iterable<BlockPosition> allBlocksBetween(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         Iterator<net.minecraft.core.BlockPosition> iterable = net.minecraft.core.BlockPosition.b(minX, minY, minZ, maxX, maxY, maxZ).iterator();
         return () -> {
@@ -74,13 +79,12 @@ public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPo
 
                 @Override
                 protected BlockPosition computeNext() {
-                    if(!iterable.hasNext())
+                    if (!iterable.hasNext())
                         return this.endOfData();
 
-                    if(iterablePosition == null) {
+                    if (iterablePosition == null) {
                         iterablePosition = new BlockPosition(iterable.next());
-                    }
-                    else {
+                    } else {
                         iterablePosition.setHandle(iterable.next());
                     }
 

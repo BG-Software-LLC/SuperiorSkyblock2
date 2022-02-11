@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRatings;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -16,9 +17,9 @@ public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIsland
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private RatingsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private RatingsPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                      String requiredPermission, SoundWrapper lackPermissionSound,
-                                     ItemBuilder nullItem, int objectIndex) {
+                                     TemplateItem nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 

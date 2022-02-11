@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ public final class IconEditTypeButton<M extends SuperiorMenuIconEdit<M, T>, T> e
 
     private final Message newTypeMessage;
 
-    private IconEditTypeButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private IconEditTypeButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                String requiredPermission, SoundWrapper lackPermissionSound, Message newTypeMessage) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.newTypeMessage = newTypeMessage;
@@ -58,8 +58,7 @@ public final class IconEditTypeButton<M extends SuperiorMenuIconEdit<M, T>, T> e
                     return true;
                 }
 
-                superiorMenu.getIconBuilder()
-                        .withType(material).withDurablity(data);
+                superiorMenu.getIconTemplate().getEditableBuilder().withType(material).withDurablity(data);
             }
 
             PlayerChat.remove(player);

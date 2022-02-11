@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -23,7 +23,7 @@ public final class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> 
 
     private final boolean disbandIsland;
 
-    private DisbandButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private DisbandButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                           String requiredPermission, SoundWrapper lackPermissionSound, boolean disbandIsland) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.disbandIsland = disbandIsland;

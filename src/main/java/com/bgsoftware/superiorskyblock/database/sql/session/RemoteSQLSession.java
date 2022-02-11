@@ -58,30 +58,6 @@ public abstract class RemoteSQLSession implements SQLSession {
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) {
-        Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
-
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(autoCommit);
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
-    public void commit() {
-        Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
-
-        try (Connection conn = dataSource.getConnection()) {
-            conn.commit();
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
     public void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (Pair<String, String> column : columns) {
@@ -124,6 +100,12 @@ public abstract class RemoteSQLSession implements SQLSession {
     }
 
     @Override
+    public void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult) {
+        String prefix = plugin.getSettings().getDatabase().getPrefix();
+        executeUpdate(String.format("ALTER TABLE %s%s DROP PRIMARY KEY;", prefix, tableName), queryResult);
+    }
+
+    @Override
     public void select(String tableName, String filters, QueryResult<ResultSet> queryResult) {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         executeQuery(String.format("SELECT * FROM %s%s%s;", prefix, tableName, filters), queryResult);
@@ -140,6 +122,8 @@ public abstract class RemoteSQLSession implements SQLSession {
 
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         String query = statement.replace("{prefix}", prefix);
+
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {

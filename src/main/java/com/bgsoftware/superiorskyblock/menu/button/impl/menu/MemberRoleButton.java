@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMemberRole;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -15,7 +15,7 @@ public final class MemberRoleButton extends SuperiorMenuButton<MenuMemberRole> {
 
     private final PlayerRole playerRole;
 
-    private MemberRoleButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private MemberRoleButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                              String requiredPermission, SoundWrapper lackPermissionSound,
                              PlayerRole playerRole) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);

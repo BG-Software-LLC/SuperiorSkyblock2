@@ -107,30 +107,6 @@ public final class SQLiteSession implements SQLSession {
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) {
-        Preconditions.checkNotNull(this.conn, "Session was not initialized.");
-
-        try {
-            this.conn.setAutoCommit(autoCommit);
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
-    public void commit() {
-        Preconditions.checkNotNull(this.conn, "Session was not initialized.");
-
-        try {
-            this.conn.commit();
-        } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
-        }
-    }
-
-    @Override
     public void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult) {
         StringBuilder columnsSection = new StringBuilder();
         for (Pair<String, String> column : columns) {
@@ -146,7 +122,7 @@ public final class SQLiteSession implements SQLSession {
 
     @Override
     public void renameTable(String tableName, String newName, QueryResult<Void> queryResult) {
-        executeUpdate(String.format("RENAME TABLE %s TO %s;", tableName, newName), queryResult);
+        executeUpdate(String.format("ALTER TABLE %s RENAME TO %s;", tableName, newName), queryResult);
     }
 
     @Override
@@ -167,6 +143,20 @@ public final class SQLiteSession implements SQLSession {
     }
 
     @Override
+    public void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult) {
+        executeQuery(String.format("PRAGMA table_info('%s')", tableName), new QueryResult<ResultSet>()
+                .onSuccess(resultSet -> {
+                    if (resultSet.next() && resultSet.getInt("pk") == 1) {
+                        resultSet.close();
+                        executeUpdate(String.format("DROP TABLE %s_copy;", tableName), QueryResult.EMPTY_VOID_QUERY_RESULT);
+                        executeUpdate(String.format("CREATE TABLE %s_copy AS SELECT * FROM %s;", tableName, tableName), queryResult);
+                        executeUpdate(String.format("DROP TABLE %s;", tableName), queryResult);
+                        renameTable(tableName + "_copy", tableName, queryResult);
+                    }
+                }).onFail(queryResult::fail));
+    }
+
+    @Override
     public void select(String tableName, String filters, QueryResult<ResultSet> queryResult) {
         executeQuery(String.format("SELECT * FROM %s%s;", tableName, filters), queryResult);
     }
@@ -179,6 +169,8 @@ public final class SQLiteSession implements SQLSession {
     @Override
     public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
+
+        PluginDebugger.debug("Action: Database Execute, Query: " + query);
 
         try (PreparedStatement preparedStatement =
                      this.conn.prepareStatement(query.replace("{prefix}", ""))) {

@@ -24,7 +24,6 @@ items:
     name: '&f'
   '!':
     biome: PLAINS
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -41,7 +40,6 @@ items:
         - '&7Change your island biome to plains.'
   '@':
     biome: JUNGLE
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -58,7 +56,6 @@ items:
         - '&7Change your island biome to jungle.'
   '%':
     biome: TAIGA
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -75,7 +72,6 @@ items:
         - '&7Change your island biome to taiga.'
   '^':
     biome: DESERT
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -94,7 +90,6 @@ items:
         - '&cWarning ice and snow must go!'
   '&':
     biome: HELL
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -113,7 +108,6 @@ items:
         - '&cWarning ice snow, and water must go!'
   '*':
     biome: SWAMPLAND
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3
@@ -130,7 +124,6 @@ items:
         - '&7Change your island biome to swamp.'
   '~':
     biome: MESA
-    required-permission: ''
     access:
       type: SKULL_ITEM
       data: 3

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandCreation;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -25,7 +25,7 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
 
     private final SoundWrapper accessSound;
     private final List<String> accessCommands;
-    private final ItemBuilder lackPermissionItem;
+    private final TemplateItem lackPermissionItem;
     private final List<String> lackPermissionCommands;
     private final Biome biome;
     private final BigDecimal bonusWorth;
@@ -34,9 +34,9 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
     private final Schematic schematic;
 
     private IslandCreationButton(String requiredPermission, SoundWrapper lackPermissionSound, SoundWrapper accessSound,
-                                 List<String> accessCommands, ItemBuilder lackPermissionItem,
+                                 List<String> accessCommands, TemplateItem lackPermissionItem,
                                  List<String> lackPermissionCommands, Biome biome, BigDecimal bonusWorth,
-                                 BigDecimal bonusLevel, boolean isOffset, ItemBuilder accessItem, Schematic schematic) {
+                                 BigDecimal bonusLevel, boolean isOffset, TemplateItem accessItem, Schematic schematic) {
         super(accessItem, null, null, requiredPermission, lackPermissionSound);
         this.accessSound = accessSound;
         this.accessCommands = accessCommands == null ? Collections.emptyList() : accessCommands;
@@ -62,7 +62,7 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
     public ItemStack getButtonItem(MenuIslandCreation superiorMenu) {
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         return (requiredPermission == null || inventoryViewer.hasPermission(requiredPermission) ?
-                buttonItem : lackPermissionItem).copy().build(inventoryViewer);
+                buttonItem : lackPermissionItem).build(inventoryViewer);
     }
 
     @Override
@@ -108,7 +108,7 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
     public static class Builder extends AbstractBuilder<Builder, IslandCreationButton, MenuIslandCreation> {
 
         private final Schematic schematic;
-        private ItemBuilder noAccessItem = null;
+        private TemplateItem noAccessItem = null;
         private List<String> noAccessCommands = null;
         private Biome biome;
         private BigDecimal bonusWorth;
@@ -119,12 +119,12 @@ public final class IslandCreationButton extends SuperiorMenuButton<MenuIslandCre
             this.schematic = schematic;
         }
 
-        public Builder setAccessItem(ItemBuilder accessItem) {
+        public Builder setAccessItem(TemplateItem accessItem) {
             this.buttonItem = accessItem;
             return this;
         }
 
-        public Builder setNoAccessItem(ItemBuilder noAccessItem) {
+        public Builder setNoAccessItem(TemplateItem noAccessItem) {
             this.noAccessItem = noAccessItem;
             return this;
         }

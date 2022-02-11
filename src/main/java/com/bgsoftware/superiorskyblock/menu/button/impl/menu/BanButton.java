@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmBan;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -16,7 +16,7 @@ public final class BanButton extends SuperiorMenuButton<MenuConfirmBan> {
 
     private final boolean banPlayer;
 
-    private BanButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private BanButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                       String requiredPermission, SoundWrapper lackPermissionSound, boolean banPlayer) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.banPlayer = banPlayer;

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -34,14 +35,22 @@ public final class SuperiorMenuBlank extends SuperiorMenu<SuperiorMenuBlank> {
     }
 
     public static void init() {
+        Sound sound;
+
+        try {
+            sound = Sound.valueOf("BLOCK_ANVIL_PLACE");
+        } catch (Throwable error) {
+            sound = Sound.ANVIL_LAND;
+        }
+
         menuPattern = new RegularMenuPattern.Builder<SuperiorMenuBlank>()
                 .setTitle("" + ChatColor.RED + ChatColor.BOLD + "ERROR")
                 .setRowsSize(3)
                 .setButton(13, new DummyButton.Builder<SuperiorMenuBlank>()
-                        .setButtonItem(new ItemBuilder(Material.BEDROCK).withName("&cUnloaded Menu")
+                        .setButtonItem(new TemplateItem(new ItemBuilder(Material.BEDROCK).withName("&cUnloaded Menu")
                                 .withLore(Arrays.asList("&7There was an issue with loading the menu.",
-                                        "&7Contact administrator to fix the issue.")))
-                        .setClickSound(new SoundWrapper(Sound.valueOf("BLOCK_ANVIL_PLACE"), 0.2f, 0.2f)))
+                                        "&7Contact administrator to fix the issue."))))
+                        .setClickSound(new SoundWrapper(sound, 0.2f, 0.2f)))
                 .build();
     }
 

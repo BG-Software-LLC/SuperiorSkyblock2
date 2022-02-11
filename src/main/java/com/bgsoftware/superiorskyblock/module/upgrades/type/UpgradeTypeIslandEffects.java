@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEffect;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +27,7 @@ public final class UpgradeTypeIslandEffects implements IUpgradeType {
 
     @Override
     public Listener getListener() {
-        return new IslandEffectsListener();
+        return ServerVersion.isAtLeast(ServerVersion.v1_15) ? new IslandEffectsListener() : null;
     }
 
     @Override

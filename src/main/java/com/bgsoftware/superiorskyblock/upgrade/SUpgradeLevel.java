@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.World;
@@ -315,7 +315,9 @@ public class SUpgradeLevel implements UpgradeLevel {
                 ));
     }
 
-    public void setItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
+    public void setItemData(TemplateItem hasNextLevel, TemplateItem noNextLevel,
+                            SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound,
+                            List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
         this.itemData = new ItemData(hasNextLevel, noNextLevel, hasNextLevelSound, noNextLevelSound, hasNextLevelCommands, noNextLevelCommands);
     }
 
@@ -325,14 +327,16 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     public static class ItemData {
 
-        public ItemBuilder hasNextLevel;
-        public ItemBuilder noNextLevel;
+        public TemplateItem hasNextLevel;
+        public TemplateItem noNextLevel;
         public SoundWrapper hasNextLevelSound;
         public SoundWrapper noNextLevelSound;
         public List<String> hasNextLevelCommands;
         public List<String> noNextLevelCommands;
 
-        public ItemData(ItemBuilder hasNextLevel, ItemBuilder noNextLevel, SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound, List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
+        public ItemData(TemplateItem hasNextLevel, TemplateItem noNextLevel,
+                        SoundWrapper hasNextLevelSound, SoundWrapper noNextLevelSound,
+                        List<String> hasNextLevelCommands, List<String> noNextLevelCommands) {
             this.hasNextLevel = hasNextLevel;
             this.noNextLevel = noNextLevel;
             this.hasNextLevelSound = hasNextLevelSound;

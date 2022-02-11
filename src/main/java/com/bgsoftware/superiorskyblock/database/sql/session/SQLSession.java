@@ -17,10 +17,6 @@ public interface SQLSession {
 
     Object getMutex();
 
-    void setAutoCommit(boolean autoCommit);
-
-    void commit();
-
     void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult);
 
     void renameTable(String tableName, String newName, QueryResult<Void> queryResult);
@@ -28,6 +24,8 @@ public interface SQLSession {
     void createIndex(String indexName, String tableName, String[] columns, QueryResult<Void> queryResult);
 
     void modifyColumnType(String tableName, String columnName, String newType, QueryResult<Void> queryResult);
+
+    void removePrimaryKey(String tableName, String columnName, QueryResult<Void> queryResult);
 
     void select(String tableName, String filters, QueryResult<ResultSet> queryResult);
 

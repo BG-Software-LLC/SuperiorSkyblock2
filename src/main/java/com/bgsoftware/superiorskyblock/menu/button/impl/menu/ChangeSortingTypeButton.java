@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +18,7 @@ public final class ChangeSortingTypeButton extends SuperiorMenuButton<MenuTopIsl
 
     private final SortingType sortingType;
 
-    private ChangeSortingTypeButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private ChangeSortingTypeButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                     String requiredPermission, SoundWrapper lackPermissionSound, SortingType sortingType) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.sortingType = sortingType;
@@ -28,7 +29,7 @@ public final class ChangeSortingTypeButton extends SuperiorMenuButton<MenuTopIsl
     public ItemStack getButtonItem(MenuTopIslands superiorMenu) {
         ItemStack buttonItem = super.getButtonItem(superiorMenu);
 
-        if(buttonItem == null || !MenuTopIslands.sortGlowWhenSelected || superiorMenu.getSortingType() != sortingType)
+        if (buttonItem == null || !MenuTopIslands.sortGlowWhenSelected || superiorMenu.getSortingType() != sortingType)
             return buttonItem;
 
         return new ItemBuilder(buttonItem).withEnchant(EnchantsUtils.getGlowEnchant(), 1).build();

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.collect.ImmutableMap;
@@ -147,9 +148,9 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
             .put("ZOMBIE_WALL_HEAD", "ZOMBIE_HEAD")
             .build();
 
-    private CountsPagedObjectButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private CountsPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                                     String requiredPermission, SoundWrapper lackPermissionSound,
-                                    ItemBuilder nullItem, int objectIndex) {
+                                    TemplateItem nullItem, int objectIndex) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +24,27 @@ import java.util.Collection;
 import java.util.Map;
 
 public final class BlockValuesHandler extends AbstractHandler implements BlockValuesManager {
+
+    private static final Map<String, BigDecimal> CACHED_BIG_DECIMALS;
+
+    static {
+        ImmutableMap.Builder<String, BigDecimal> mapBuilder = new ImmutableMap.Builder<>();
+        mapBuilder.put("", BigDecimal.ZERO);
+
+        for (int i = 0; i < 10; ++i) {
+            mapBuilder.put(i + "", BigDecimal.valueOf(i));
+        }
+
+        for (int i = 10; i < 100; i *= 10) {
+            mapBuilder.put(i + "", BigDecimal.valueOf(i));
+        }
+
+        for (int i = 100; i <= 1000; i *= 100) {
+            mapBuilder.put(i + "", BigDecimal.valueOf(i));
+        }
+
+        CACHED_BIG_DECIMALS = mapBuilder.build();
+    }
 
     private static final Bindings bindings = createBindings();
 
@@ -231,15 +253,22 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     }
 
     public BigDecimal convertValueToLevel(BigDecimal value) {
+        // If the formula contains no mathematical operations or the placeholder for the worth value,
+        // we can directly create the BigDecimal instance from it.
         try {
-            Object obj = plugin.getScriptEngine().eval(plugin.getSettings().getIslandLevelFormula()
+            return fastBigDecimalFromString(plugin.getSettings().getIslandLevelFormula());
+        } catch (NumberFormatException ignored) {
+        }
+
+        try {
+            Object evaluated = plugin.getScriptEngine().eval(plugin.getSettings().getIslandLevelFormula()
                     .replace("{}", value.toString()), bindings);
 
             // Checking for division by 0
-            if (obj.equals(Double.POSITIVE_INFINITY) || obj.equals(Double.NEGATIVE_INFINITY))
-                obj = 0D;
+            if (evaluated.equals(Double.POSITIVE_INFINITY) || evaluated.equals(Double.NEGATIVE_INFINITY))
+                return BigDecimal.ZERO;
 
-            return new BigDecimal(obj.toString());
+            return fastBigDecimalFromString(evaluated.toString());
         } catch (ScriptException ex) {
             ex.printStackTrace();
             PluginDebugger.debug(ex);
@@ -253,6 +282,10 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
                 blockLevels.setBlockValue(entry.getKey(), convertValueToLevel(entry.getValue()));
             }
         }
+    }
+
+    private static BigDecimal fastBigDecimalFromString(String value) {
+        return CACHED_BIG_DECIMALS.getOrDefault(value, new BigDecimal(value));
     }
 
 }

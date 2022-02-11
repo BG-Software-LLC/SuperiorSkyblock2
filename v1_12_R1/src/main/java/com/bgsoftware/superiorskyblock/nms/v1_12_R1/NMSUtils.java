@@ -120,6 +120,9 @@ public final class NMSUtils {
     }
 
     public static void setBlock(Chunk chunk, BlockPosition blockPosition, int combinedId, CompoundTag tileEntity) {
+        if (!isValidPosition(chunk.world, blockPosition))
+            return;
+
         IBlockData blockData = Block.getByCombinedId(combinedId);
 
         if (blockData.getMaterial().isLiquid() && plugin.getSettings().isLiquidUpdate()) {
@@ -165,6 +168,12 @@ public final class NMSUtils {
                 }
             }
         }
+    }
+
+    private static boolean isValidPosition(World world, BlockPosition blockPosition) {
+        return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
+                blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
+                blockPosition.getY() >= 0 && blockPosition.getY() < world.getHeight();
     }
 
 }

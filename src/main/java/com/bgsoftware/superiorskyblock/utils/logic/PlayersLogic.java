@@ -97,16 +97,16 @@ public final class PlayersLogic {
         fromIsland.setPlayerInside(superiorPlayer, false);
 
         Player player = superiorPlayer.asPlayer();
-        assert player != null;
+        if (player != null) {
+            player.resetPlayerTime();
+            player.resetPlayerWeather();
+            fromIsland.removeEffects(superiorPlayer);
 
-        player.resetPlayerTime();
-        player.resetPlayerWeather();
-        fromIsland.removeEffects(superiorPlayer);
-
-        if (superiorPlayer.hasIslandFlyEnabled() && (toIsland == null || toIsland.isSpawn()) && !superiorPlayer.hasFlyGamemode()) {
-            player.setAllowFlight(false);
-            player.setFlying(false);
-            Message.ISLAND_FLY_DISABLED.send(player);
+            if (superiorPlayer.hasIslandFlyEnabled() && (toIsland == null || toIsland.isSpawn()) && !superiorPlayer.hasFlyGamemode()) {
+                player.setAllowFlight(false);
+                player.setFlying(false);
+                Message.ISLAND_FLY_DISABLED.send(player);
+            }
         }
 
         if (toIsland == null)
@@ -152,8 +152,6 @@ public final class PlayersLogic {
         boolean toInsideRange = toIsland.isInsideRange(toLocation);
         boolean fromInsideRange = fromLocation != null && fromIsland != null && fromIsland.isInsideRange(fromLocation);
         boolean equalWorlds = fromLocation != null && toLocation.getWorld().equals(fromLocation.getWorld());
-        Player player = superiorPlayer.asPlayer();
-        assert player != null;
 
         if (toInsideRange && (!equalIslands || !fromInsideRange)) {
             if (!EventsCaller.callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
@@ -193,7 +191,8 @@ public final class PlayersLogic {
         superiorPlayer.setImmunedToPortals(true);
         Executor.sync(() -> superiorPlayer.setImmunedToPortals(false), 100L);
 
-        if (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn()) {
+        Player player = superiorPlayer.asPlayer();
+        if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
             if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
                 player.setPlayerTime(0, false);
             } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
@@ -215,7 +214,7 @@ public final class PlayersLogic {
 
         if (superiorPlayer.hasIslandFlyEnabled() && !superiorPlayer.hasFlyGamemode()) {
             Executor.sync(() -> {
-                if (player.isOnline())
+                if (player != null)
                     toIsland.updateIslandFly(superiorPlayer);
             }, 5L);
         }

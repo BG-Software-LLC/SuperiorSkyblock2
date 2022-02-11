@@ -178,6 +178,9 @@ public final class NMSUtils {
 
     public static void setBlock(ChunkAccess chunk, BlockPosition blockPosition,
                                 int combinedId, CompoundTag statesTag, CompoundTag tileEntity) {
+        if (!isValidPosition(chunk.getWorld(), blockPosition))
+            return;
+
         BlockData blockData = Block.getByCombinedId(combinedId);
 
         if (statesTag != null) {
@@ -290,6 +293,12 @@ public final class NMSUtils {
             return chunkCoords;
         }
 
+    }
+
+    private static boolean isValidPosition(WorldServer world, BlockPosition blockPosition) {
+        return blockPosition.getX() >= -30000000 && blockPosition.getZ() >= -30000000 &&
+                blockPosition.getX() < 30000000 && blockPosition.getZ() < 30000000 &&
+                blockPosition.getY() >= world.getWorld().getMinHeight() && blockPosition.getY() < world.getWorld().getMaxHeight();
     }
 
 }

@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -15,11 +15,12 @@ import java.util.List;
 
 public final class BorderColorToggleButton extends SuperiorMenuButton<MenuBorderColor> {
 
-    private final ItemBuilder enabledItem;
-    private final ItemBuilder disabledItem;
+    private final TemplateItem enabledItem;
+    private final TemplateItem disabledItem;
 
-    private BorderColorToggleButton(ItemBuilder enabledItem, SoundWrapper clickSound, List<String> commands,
-                                    String requiredPermission, SoundWrapper lackPermissionSound, ItemBuilder disabledItem) {
+    private BorderColorToggleButton(TemplateItem enabledItem, SoundWrapper clickSound, List<String> commands,
+                                    String requiredPermission, SoundWrapper lackPermissionSound,
+                                    TemplateItem disabledItem) {
         super(null, clickSound, commands, requiredPermission, lackPermissionSound);
         this.enabledItem = enabledItem;
         this.disabledItem = disabledItem;
@@ -29,8 +30,8 @@ public final class BorderColorToggleButton extends SuperiorMenuButton<MenuBorder
     @Override
     public ItemStack getButtonItem(MenuBorderColor superiorMenu) {
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
-        ItemBuilder buttonItem = inventoryViewer.hasWorldBorderEnabled() ? enabledItem : disabledItem;
-        return buttonItem.copy().build(inventoryViewer);
+        TemplateItem buttonItem = inventoryViewer.hasWorldBorderEnabled() ? enabledItem : disabledItem;
+        return buttonItem.build(inventoryViewer);
     }
 
     @Override
@@ -41,14 +42,14 @@ public final class BorderColorToggleButton extends SuperiorMenuButton<MenuBorder
 
     public static class Builder extends AbstractBuilder<Builder, BorderColorToggleButton, MenuBorderColor> {
 
-        private ItemBuilder disabledItem;
+        private TemplateItem disabledItem;
 
-        public Builder setEnabledItem(ItemBuilder enabledItem) {
+        public Builder setEnabledItem(TemplateItem enabledItem) {
             this.buttonItem = enabledItem;
             return this;
         }
 
-        public Builder setDisabledItem(ItemBuilder disabledItem) {
+        public Builder setDisabledItem(TemplateItem disabledItem) {
             this.disabledItem = disabledItem;
             return this;
         }

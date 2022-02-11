@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.menu.button.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
@@ -14,7 +14,7 @@ public final class DummyButton<M extends ISuperiorMenu> extends SuperiorMenuButt
     @SuppressWarnings("rawtypes")
     public static final DummyButton EMPTY_BUTTON = new Builder().build();
 
-    private DummyButton(ItemBuilder buttonItem, SoundWrapper clickSound, List<String> commands,
+    private DummyButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                         String requiredPermission, SoundWrapper lackPermissionSound) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
     }

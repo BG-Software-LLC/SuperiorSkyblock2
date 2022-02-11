@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -393,7 +394,12 @@ public final class SettingsContainer {
                     for (String slot : containerSection.getKeys(false)) {
                         try {
                             // Reading the item from the config
-                            ItemStack itemStack = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot)).build();
+                            TemplateItem templateItem = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
+
+                            if (templateItem == null)
+                                continue;
+
+                            ItemStack itemStack = templateItem.build();
                             itemStack.setAmount(containerSection.getInt(slot + ".amount", 1));
 
                             // Parsing it into compound tag
