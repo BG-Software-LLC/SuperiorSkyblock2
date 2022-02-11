@@ -8,8 +8,10 @@ import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.EntityStackEvent;
 import com.bgsoftware.wildstacker.api.events.EntityUnstackEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -30,7 +32,11 @@ public final class EntityProvider_WildStacker implements EntityProvider {
 
     @Override
     public int getEntityAmount(Entity entity) {
-        return entity instanceof LivingEntity ? WildStackerAPI.getEntityAmount((LivingEntity) entity) : 1;
+        return isValidStackedEntity(entity) ? WildStackerAPI.getEntityAmount((LivingEntity) entity) : 1;
+    }
+
+    private static boolean isValidStackedEntity(Entity entity) {
+        return entity instanceof LivingEntity && !(entity instanceof Player) && !(entity instanceof ArmorStand);
     }
 
     private final class StackingListener implements Listener {
