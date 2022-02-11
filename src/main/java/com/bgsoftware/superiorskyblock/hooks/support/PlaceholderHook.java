@@ -38,6 +38,7 @@ public abstract class PlaceholderHook {
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
+    private static final Pattern ENTITY_COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_count_(.+)");
     private static final Pattern BLOCK_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_block_limit_(.+)");
     private static final Pattern ENTITY_LIMIT_PLACEHOLDER_PATTERN = Pattern.compile("island_entity_limit_(.+)");
     private static final Pattern TOP_PLACEHOLDER_PATTERN = Pattern.compile("island_top_(.+)");
@@ -256,6 +257,10 @@ public abstract class PlaceholderHook {
             } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String keyName = matcher.group(1).toUpperCase();
                 placeholderResult = Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
+            } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String keyName = matcher.group(1).toUpperCase();
+                placeholderResult = Optional.of(StringUtils.format(island.getEntitiesTracker()
+                        .getEntityCount(Key.of(keyName))));
             } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 placeholderResult = handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
             } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
