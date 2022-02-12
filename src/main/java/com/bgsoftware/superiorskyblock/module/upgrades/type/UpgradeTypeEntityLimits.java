@@ -88,8 +88,6 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     e.setCancelled(true);
-                    if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
-                        e.getPlayer().getInventory().addItem(asItemStack(e.getEntity()));
                 }
             });
         }
