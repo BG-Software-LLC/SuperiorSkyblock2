@@ -19,7 +19,7 @@ public final class TemplateItem {
     }
 
     public ItemBuilder getEditableBuilder() {
-        return itemBuilder.copy();
+        return itemBuilder;
     }
 
     public ItemStack build() {
