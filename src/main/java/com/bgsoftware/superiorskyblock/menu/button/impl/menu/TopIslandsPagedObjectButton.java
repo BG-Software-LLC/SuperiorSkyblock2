@@ -28,7 +28,6 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final TemplateItem islandItem;
-    private final TemplateItem noIslandItem;
     private final SoundWrapper islandSound;
     private final SoundWrapper noIslandSound;
     private final List<String> islandCommands;
@@ -39,16 +38,15 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                                         TemplateItem islandItem, SoundWrapper islandSound, List<String> islandCommands,
                                         TemplateItem noIslandItem, SoundWrapper noIslandSound,
                                         List<String> noIslandCommands, boolean isSelfPlayerIsland, int objectIndex) {
-        super(null, null, null, requiredPermission, lackPermissionSound, null,
+        super(null, null, null, requiredPermission, lackPermissionSound, noIslandItem,
                 objectIndex);
         this.islandItem = islandItem;
         this.islandSound = islandSound;
         this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
-        this.noIslandItem = noIslandItem == null ? TemplateItem.AIR : noIslandItem;
-        this.noIslandItem.getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         this.noIslandSound = noIslandSound;
         this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
         this.isSelfPlayerIsland = isSelfPlayerIsland;
+        this.getNullItem().getEditableBuilder().asSkullOf((SuperiorPlayer) null);
     }
 
     @Override
@@ -124,11 +122,6 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
         }
 
         return itemBuilder.build(islandOwner);
-    }
-
-    @Override
-    public TemplateItem getNullItem() {
-        return noIslandItem;
     }
 
     @Override
