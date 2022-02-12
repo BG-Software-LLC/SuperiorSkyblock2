@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +23,11 @@ public final class MissionData {
     private final boolean islandMission;
     private final boolean disbandReset;
     private final boolean leaveReset;
+    @Nullable
     private final TemplateItem notCompleted;
+    @Nullable
     private final TemplateItem canComplete;
+    @Nullable
     private final TemplateItem completed;
     private final int resetAmount;
 
@@ -91,15 +95,15 @@ public final class MissionData {
     }
 
     public ItemBuilder getCompleted() {
-        return completed.getBuilder();
+        return (completed == null ? TemplateItem.AIR : completed).getBuilder();
     }
 
     public ItemBuilder getCanComplete() {
-        return canComplete.getBuilder();
+        return (canComplete == null ? TemplateItem.AIR : canComplete).getBuilder();
     }
 
     public ItemBuilder getNotCompleted() {
-        return notCompleted.getBuilder();
+        return (notCompleted == null ? TemplateItem.AIR : notCompleted).getBuilder();
     }
 
     @Override
