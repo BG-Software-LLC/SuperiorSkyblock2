@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
-import com.bgsoftware.superiorskyblock.api.hooks.EntityProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.MenusProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
@@ -150,18 +149,6 @@ public interface ProvidersManager {
      * @param vanishProvider The new vanish-provider to use.
      */
     void setVanishProvider(VanishProvider vanishProvider);
-
-    /**
-     * Get the currently used entity-provider.
-     */
-    EntityProvider getEntityProvider();
-
-    /**
-     * Set a new entity-provider to the plugin.
-     *
-     * @param entityProvider The new entity-provider to use.
-     */
-    void setEntityProvider(EntityProvider entityProvider);
 
     /**
      * Register a new skins listener.

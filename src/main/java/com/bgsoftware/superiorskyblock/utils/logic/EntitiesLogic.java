@@ -28,9 +28,7 @@ public final class EntitiesLogic {
         if (!EntityUtils.canHaveLimit(entity.getType()))
             return;
 
-        int entityAmount = Math.max(1, plugin.getProviders().getEntityProvider().getEntityAmount(entity));
-
-        island.getEntitiesTracker().trackEntity(Key.of(entity), entityAmount);
+        island.getEntitiesTracker().trackEntity(Key.of(entity), 1);
     }
 
     public static void handleDespawn(Entity entity) {
@@ -45,9 +43,7 @@ public final class EntitiesLogic {
         if (!EntityUtils.canHaveLimit(entity.getType()))
             return;
 
-        int entityAmount = Math.max(1, plugin.getProviders().getEntityProvider().getEntityAmount(entity));
-
-        island.getEntitiesTracker().untrackEntity(Key.of(entity), entityAmount);
+        island.getEntitiesTracker().untrackEntity(Key.of(entity), 1);
     }
 
 }

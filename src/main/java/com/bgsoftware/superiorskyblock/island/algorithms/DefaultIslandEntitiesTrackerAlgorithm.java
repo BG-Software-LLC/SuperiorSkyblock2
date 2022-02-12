@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.island.algorithms;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -19,8 +18,6 @@ import java.util.Collections;
 import java.util.Map;
 
 public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final KeyMap<Integer> entityCounts = new KeyMap<>();
 
@@ -116,10 +113,8 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
                         if (!canTrackEntity(key))
                             continue;
 
-                        int entityAmount = Math.max(1, plugin.getProviders().getEntityProvider().getEntityAmount(entity));
-
                         int currentEntityAmount = recalculatedEntityCounts.getOrDefault(key, 0);
-                        recalculatedEntityCounts.put(key, currentEntityAmount + entityAmount);
+                        recalculatedEntityCounts.put(key, currentEntityAmount + 1);
                     }
                 }));
             } catch (Exception ignored) {
