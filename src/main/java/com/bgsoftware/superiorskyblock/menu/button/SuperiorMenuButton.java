@@ -57,6 +57,10 @@ public abstract class SuperiorMenuButton<M extends ISuperiorMenu> {
         return lackPermissionSound;
     }
 
+    public boolean ignorePagedButton() {
+        return false;
+    }
+
     public <T extends AbstractBuilder<T, ?, M>> T applyToBuilder(AbstractBuilder<T, ?, M> buttonBuilder) {
         if (buttonBuilder.buttonItem == null)
             buttonBuilder.setButtonItem(this.buttonItem);

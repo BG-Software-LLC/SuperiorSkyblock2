@@ -7,9 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ChangeSortingTypeButton;
@@ -80,9 +77,6 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
 
         sortGlowWhenSelected = cfg.getBoolean("sort-glow-when-selected", false);
 
-        patternBuilder.mapButtons(getSlots(cfg, "player-island", menuPatternSlots), new TopIslandsPagedObjectButton.Builder()
-                .setPlayerSelfIsland(true));
-
         patternBuilder.mapButtons(getSlots(cfg, "worth-sort", menuPatternSlots),
                 new ChangeSortingTypeButton.Builder().setSortingType(SortingTypes.BY_WORTH));
 
@@ -115,19 +109,29 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
         }
 
         if (cfg.isString("slots")) {
+            boolean configuredSelfPlayerButton = false;
+
             for (char slotsChar : cfg.getString("slots", "").toCharArray()) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + slotsChar);
 
                 if (itemsSection == null)
                     continue;
 
-                patternBuilder.mapButtons(menuPatternSlots.getSlots(slotsChar), new TopIslandsPagedObjectButton.Builder()
+                TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder()
                         .setIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")))
                         .setNoIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")))
                         .setIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")))
                         .setNoIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")))
                         .setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"))
-                        .setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island")));
+                        .setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
+
+                patternBuilder.mapButtons(menuPatternSlots.getSlots(slotsChar), slotsBuilder);
+
+                if (!configuredSelfPlayerButton) {
+                    configuredSelfPlayerButton = true;
+                    patternBuilder.mapButtons(getSlots(cfg, "player-island", menuPatternSlots),
+                            slotsBuilder.copy().setPlayerSelfIsland(true));
+                }
             }
         }
 

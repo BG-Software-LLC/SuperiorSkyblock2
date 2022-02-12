@@ -56,8 +56,11 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
 
-        if (isSelfPlayerIsland && inventoryViewer.getIsland() != null)
+        if (isSelfPlayerIsland) {
             island = inventoryViewer.getIsland();
+            if (island == null)
+                return getNullItem().build();
+        }
 
         SuperiorPlayer islandOwner = island.getOwner();
         int place = plugin.getGrid().getIslandPosition(island, superiorMenu.getSortingType()) + 1;
@@ -164,6 +167,11 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                     command.replace("PLAYER:", "").replace("%player%", clickedPlayer.getName())));
     }
 
+    @Override
+    public boolean ignorePagedButton() {
+        return this.isSelfPlayerIsland;
+    }
+
     public static class Builder extends PagedObjectBuilder<Builder, TopIslandsPagedObjectButton, MenuTopIslands> {
 
         private TemplateItem noIslandItem;
@@ -211,6 +219,20 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
             return new TopIslandsPagedObjectButton(requiredPermission, lackPermissionSound, buttonItem,
                     clickSound, commands, noIslandItem, noIslandSound, noIslandCommands, isPlayerSelfIsland,
                     getObjectIndex());
+        }
+
+        public Builder copy() {
+            Builder cloned = new Builder();
+            cloned.requiredPermission = requiredPermission;
+            cloned.lackPermissionSound = lackPermissionSound == null ? null : lackPermissionSound.copy();
+            cloned.buttonItem = buttonItem == null ? null : buttonItem.copy();
+            cloned.clickSound = clickSound == null ? null : clickSound.copy();
+            cloned.commands = commands == null ? null : new ArrayList<>(commands);
+            cloned.noIslandItem = noIslandItem == null ? null : noIslandItem.copy();
+            cloned.noIslandSound = noIslandSound == null ? null : noIslandSound.copy();
+            cloned.noIslandCommands = noIslandCommands == null ? null : new ArrayList<>(noIslandCommands);
+            cloned.isPlayerSelfIsland = isPlayerSelfIsland;
+            return cloned;
         }
 
     }

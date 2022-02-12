@@ -30,4 +30,8 @@ public final class TemplateItem {
         return getBuilder().build(superiorPlayer);
     }
 
+    public TemplateItem copy() {
+        return new TemplateItem(this.itemBuilder.copy());
+    }
+
 }
