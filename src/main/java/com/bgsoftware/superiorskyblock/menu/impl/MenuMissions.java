@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.OpenMissionCategoryButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 
 public final class MenuMissions extends SuperiorMenu<MenuMissions> {
@@ -37,12 +38,14 @@ public final class MenuMissions extends SuperiorMenu<MenuMissions> {
         if (menuLoadResult == null)
             return;
 
-        plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
-            patternBuilder.mapButton(missionCategory.getSlot(), new OpenMissionCategoryButton.Builder()
-                    .setMissionsCategory(missionCategory));
-        });
+        Executor.sync(() -> {
+            plugin.getMissions().getMissionCategories().forEach(missionCategory -> {
+                patternBuilder.mapButton(missionCategory.getSlot(), new OpenMissionCategoryButton.Builder()
+                        .setMissionsCategory(missionCategory));
+            });
 
-        menuPattern = patternBuilder.build();
+            menuPattern = patternBuilder.build();
+        }, 1L);
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
