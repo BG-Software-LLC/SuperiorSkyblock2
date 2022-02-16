@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.utils.events;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
-
 import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
 import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBanEvent;
