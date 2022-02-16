@@ -15,7 +15,6 @@ public class PluginInitializedEvent extends Event {
 
     /**
      * The constructor for the event.
-     * You cannot use handlers in this time, as none of them is set up.
      */
     public PluginInitializedEvent(SuperiorSkyblock plugin) {
         this.plugin = plugin;
