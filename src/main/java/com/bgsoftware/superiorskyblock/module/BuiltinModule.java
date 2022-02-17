@@ -34,7 +34,9 @@ public abstract class BuiltinModule extends PluginModule {
         onDisable((SuperiorSkyblockPlugin) plugin);
     }
 
-    public abstract void loadData(SuperiorSkyblock plugin);
+    public void loadData(SuperiorSkyblock plugin) {
+        loadData((SuperiorSkyblockPlugin) plugin);
+    }
 
     @Override
     public Listener[] getModuleListeners(SuperiorSkyblock plugin) {
@@ -84,6 +86,8 @@ public abstract class BuiltinModule extends PluginModule {
     public abstract void onEnable(SuperiorSkyblockPlugin plugin);
 
     public abstract void onDisable(SuperiorSkyblockPlugin plugin);
+
+    public abstract void loadData(SuperiorSkyblockPlugin plugin);
 
     public abstract Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin);
 

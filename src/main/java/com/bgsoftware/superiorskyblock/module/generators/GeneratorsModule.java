@@ -56,6 +56,11 @@ public final class GeneratorsModule extends BuiltinModule {
     }
 
     @Override
+    public void loadData(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
+    }
+
+    @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return !enabled ? null : new Listener[]{new GeneratorsListener(plugin, this)};
     }

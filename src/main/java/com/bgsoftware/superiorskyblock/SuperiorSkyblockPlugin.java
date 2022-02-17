@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
-import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -511,7 +510,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
             SortingType.values().forEach(gridHandler::sortIslands);
-            modulesHandler.getModules().forEach(PluginModule::loadData);
+            modulesHandler.getModules().forEach(pluginModule -> pluginModule.loadData(this));
         } else {
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }

@@ -71,6 +71,11 @@ public final class UpgradesModule extends BuiltinModule {
     }
 
     @Override
+    public void loadData(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
+    }
+
+    @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return !isEnabled() ? null : enabledUpgrades.stream()
                 .map(IUpgradeType::getListener)

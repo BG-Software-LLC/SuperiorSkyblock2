@@ -80,6 +80,11 @@ public final class BankModule extends BuiltinModule {
     }
 
     @Override
+    public void loadData(SuperiorSkyblockPlugin plugin) {
+        // Do nothing.
+    }
+
+    @Override
     public Listener[] getModuleListeners(SuperiorSkyblockPlugin plugin) {
         return null;
     }
