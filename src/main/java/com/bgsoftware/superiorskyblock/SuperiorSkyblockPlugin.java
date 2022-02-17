@@ -474,6 +474,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             settingsHandler = new SettingsHandler(this);
         } else {
             commandsHandler.loadData();
+            modulesHandler.enableModules(ModuleLoadTime.NORMAL);
         }
 
         if (!checkScriptEngine()) {
@@ -508,7 +509,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-            modulesHandler.enableModules(ModuleLoadTime.NORMAL);
             SortingType.values().forEach(gridHandler::sortIslands);
         } else {
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
