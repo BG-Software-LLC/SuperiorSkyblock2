@@ -498,7 +498,8 @@ public final class PlayersListener implements Listener {
         inHandItem.setAmount(inHandItem.getAmount() - 1);
         ItemUtils.setItem(inHandItem.getAmount() == 0 ? new ItemStack(Material.AIR) : inHandItem, e, e.getPlayer());
 
-        e.getPlayer().getInventory().addItem(new ItemStack(Material.LAVA_BUCKET));
+        ItemUtils.addItem(new ItemStack(Material.LAVA_BUCKET), e.getPlayer().getInventory(),
+                e.getPlayer().getLocation());
 
         island.handleBlockBreak(ConstantKeys.OBSIDIAN, 1);
 
