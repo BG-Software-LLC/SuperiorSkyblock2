@@ -17,10 +17,10 @@ import java.util.List;
 
 public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIslandFlags, MenuIslandFlags.IslandFlagInfo> {
 
-    private IslandFlagPagedObjectButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
+    private IslandFlagPagedObjectButton(TemplateItem buttonItem, List<String> commands,
                                         String requiredPermission, SoundWrapper lackPermissionSound,
                                         TemplateItem nullItem, int objectIndex) {
-        super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
+        super(buttonItem, null, commands, requiredPermission, lackPermissionSound, nullItem, objectIndex);
     }
 
     @Override
@@ -48,6 +48,10 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
             island.enableSettings(islandFlag);
         }
 
+        SoundWrapper clickSound = pagedObject.getClickSound();
+        if (clickSound != null)
+            clickSound.playSound(clickEvent.getWhoClicked());
+
         Message.UPDATED_SETTINGS.send(clickedPlayer, StringUtils.format(islandFlag.getName()));
 
         superiorMenu.refreshPage();
@@ -57,7 +61,7 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
 
         @Override
         public IslandFlagPagedObjectButton build() {
-            return new IslandFlagPagedObjectButton(buttonItem, clickSound, commands, requiredPermission,
+            return new IslandFlagPagedObjectButton(buttonItem, commands, requiredPermission,
                     lackPermissionSound, nullItem, getObjectIndex());
         }
 

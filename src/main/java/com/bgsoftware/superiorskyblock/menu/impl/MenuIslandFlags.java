@@ -17,6 +17,7 @@ import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
+import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -116,6 +117,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         TemplateItem enabledIslandFlagItem = null;
         TemplateItem disabledIslandFlagItem = null;
+        SoundWrapper clickSound = null;
 
         ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
                 islandFlag.getName().toLowerCase());
@@ -125,9 +127,11 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
                     itemFlagSection.getConfigurationSection("settings-enabled"));
             disabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
                     itemFlagSection.getConfigurationSection("settings-disabled"));
+            clickSound = FileUtils.getSound(itemFlagSection.getConfigurationSection("sound"));
         }
 
-        islandFlags.add(new IslandFlagInfo(islandFlag, enabledIslandFlagItem, disabledIslandFlagItem, position));
+        islandFlags.add(new IslandFlagInfo(islandFlag, enabledIslandFlagItem,
+                disabledIslandFlagItem, clickSound, position));
         Collections.sort(islandFlags);
     }
 
@@ -180,13 +184,15 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         private final IslandFlag islandFlag;
         private final TemplateItem enabledIslandFlagItem;
         private final TemplateItem disabledIslandFlagItem;
+        private final SoundWrapper clickSound;
         private final int position;
 
         public IslandFlagInfo(IslandFlag islandFlag, TemplateItem enabledIslandFlagItem,
-                              TemplateItem disabledIslandFlagItem, int position) {
+                              TemplateItem disabledIslandFlagItem, SoundWrapper clickSound, int position) {
             this.islandFlag = islandFlag;
             this.enabledIslandFlagItem = enabledIslandFlagItem;
             this.disabledIslandFlagItem = disabledIslandFlagItem;
+            this.clickSound = clickSound;
             this.position = position;
         }
 
@@ -200,6 +206,10 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         public ItemBuilder getDisabledIslandFlagItem() {
             return disabledIslandFlagItem.getBuilder();
+        }
+
+        public SoundWrapper getClickSound() {
+            return clickSound;
         }
 
         @Override
