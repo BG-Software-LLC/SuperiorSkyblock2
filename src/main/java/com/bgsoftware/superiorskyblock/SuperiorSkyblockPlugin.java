@@ -295,6 +295,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
+
+            EventsCaller.callPluginInitializedEvent(this);
+
         } catch (Throwable ex) {
             shouldEnable = false;
             ex.printStackTrace();

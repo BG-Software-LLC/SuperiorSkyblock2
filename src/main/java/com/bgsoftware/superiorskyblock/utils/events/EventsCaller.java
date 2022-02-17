@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
+import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
@@ -266,6 +267,10 @@ public final class EventsCaller {
 
     public static void callPluginInitializeEvent(SuperiorSkyblock plugin) {
         Bukkit.getPluginManager().callEvent(new PluginInitializeEvent(plugin));
+    }
+
+    public static void callPluginInitializedEvent(SuperiorSkyblock plugin) {
+        Bukkit.getPluginManager().callEvent(new PluginInitializedEvent(plugin));
     }
 
     public static boolean callIslandCoopPlayerEvent(Island island, SuperiorPlayer player, SuperiorPlayer target) {
