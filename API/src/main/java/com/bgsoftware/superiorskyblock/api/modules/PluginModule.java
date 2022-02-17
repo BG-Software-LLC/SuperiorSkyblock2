@@ -62,6 +62,17 @@ public abstract class PluginModule {
     public abstract void onDisable(SuperiorSkyblock plugin);
 
     /**
+     * Called when the module can load data about players.
+     * It's called after the plugin's data is loaded.
+     * <p>
+     * This is similar to load data when {@link com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent}
+     * is fired.
+     */
+    public void loadData() {
+
+    }
+
+    /**
      * Called when the module initialized for the first time.
      *
      * @param plugin Instance of the plugin.
