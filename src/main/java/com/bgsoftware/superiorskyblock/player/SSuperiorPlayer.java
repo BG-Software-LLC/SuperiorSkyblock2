@@ -789,6 +789,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.borderColor = cachedPlayerInfo.borderColor;
         this.userLocale = cachedPlayerInfo.userLocale;
         this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
+        this.completedMissions.putAll(cachedPlayerInfo.completedMissions);
     }
 
 }
