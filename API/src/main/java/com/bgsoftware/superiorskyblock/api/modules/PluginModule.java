@@ -67,8 +67,10 @@ public abstract class PluginModule {
      * <p>
      * This is similar to load data when {@link com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent}
      * is fired.
+     *
+     * @param plugin Instance of the plugin.
      */
-    public void loadData() {
+    public void loadData(SuperiorSkyblock plugin) {
 
     }
 
