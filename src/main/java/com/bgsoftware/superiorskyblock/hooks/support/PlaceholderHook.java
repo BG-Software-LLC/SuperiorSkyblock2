@@ -49,6 +49,7 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
+    private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
@@ -238,45 +239,52 @@ public abstract class PlaceholderHook {
 
             subPlaceholder = subPlaceholder.replace("location_", "");
 
-            if (island == null) {
-                placeholderResult = subPlaceholder.equals("exists") ? Optional.of("No") : Optional.empty();
-            } else if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                placeholderResult = handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
-            } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                String upgradeName = matcher.group(1);
-                placeholderResult = Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
-                        .getUpgrade(upgradeName)).getLevel() + "");
-            } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                String keyName = matcher.group(1).toUpperCase();
-                placeholderResult = Optional.of(StringUtils.format(island
-                        .getBlockCountAsBigInteger(Key.of(keyName))));
-            } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                String keyName = matcher.group(1).toUpperCase();
-                placeholderResult = Optional.of(island.getBlockLimit(Key.of(keyName)) + "");
-            } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                String keyName = matcher.group(1).toUpperCase();
-                placeholderResult = Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
-            } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                placeholderResult = handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
-            } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                placeholderResult = handleMembersPlaceholder(island, matcher.group(1));
-            } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                String visitorName = matcher.group(1);
-                placeholderResult = Optional.of(island.getUniqueVisitorsWithTimes().stream()
-                        .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
-                        .findFirst()
-                        .map(Pair::getValue).map(StringUtils::formatDate)
-                        .orElse("Haven't Joined"));
-            } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-                placeholderResult = handleIslandFlagsPlaceholder(island, matcher.group(1));
-            } else {
-                placeholderResult = Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
-                        .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
-            }
+            placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer, placeholder, subPlaceholder);
         }
 
         return placeholderResult.orElse(plugin.getSettings().getDefaultPlaceholders()
                 .getOrDefault(placeholder, ""));
+    }
+
+    private static Optional<String> parsePlaceholdersForIsland(Island island, SuperiorPlayer superiorPlayer,
+                                                               String placeholder, String subPlaceholder) {
+        Matcher matcher;
+
+        if (island == null) {
+            return subPlaceholder.equals("exists") ? Optional.of("No") : Optional.empty();
+        } else if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
+        } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            String upgradeName = matcher.group(1);
+            return Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
+                    .getUpgrade(upgradeName)).getLevel() + "");
+        } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            String keyName = matcher.group(1).toUpperCase();
+            return Optional.of(StringUtils.format(island
+                    .getBlockCountAsBigInteger(Key.of(keyName))));
+        } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            String keyName = matcher.group(1).toUpperCase();
+            return Optional.of(island.getBlockLimit(Key.of(keyName)) + "");
+        } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            String keyName = matcher.group(1).toUpperCase();
+            return Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
+        } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
+        } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            return handleMembersPlaceholder(island, matcher.group(1));
+        } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            String visitorName = matcher.group(1);
+            return Optional.of(island.getUniqueVisitorsWithTimes().stream()
+                    .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
+                    .findFirst()
+                    .map(Pair::getValue).map(StringUtils::formatDate)
+                    .orElse("Haven't Joined"));
+        } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+            return handleIslandFlagsPlaceholder(island, matcher.group(1));
+        } else {
+            return Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
+                    .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
+        }
     }
 
     private static Optional<String> handlePermissionsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
@@ -299,20 +307,20 @@ public abstract class PlaceholderHook {
     }
 
     private static Optional<String> handleTopIslandsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
-                                                                String placeholder) {
+                                                                String subPlaceholder) {
         Matcher matcher;
         SortingType sortingType;
 
-        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_WORTH;
-        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_LEVEL;
-        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_RATING;
-        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_PLAYERS;
         } else {
-            String sortingTypeName = placeholder.split("_")[0];
+            String sortingTypeName = subPlaceholder.split("_")[0];
             sortingType = SortingType.getByName(sortingTypeName);
         }
 
@@ -335,6 +343,11 @@ public abstract class PlaceholderHook {
             getValueFunction = TOP_VALUE_FUNCTIONS.get(sortingType);
         } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             getValueFunction = targetIsland -> targetIsland.getOwner().getName();
+        } else if ((matcher = TOP_CUSTOM_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+            String customPlaceholder = matcher.group(2);
+            getValueFunction = targetIsland -> parsePlaceholdersForIsland(targetIsland, superiorPlayer,
+                    "superior_island_" + customPlaceholder,
+                    customPlaceholder).orElse(null);
         } else {
             getValueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();
