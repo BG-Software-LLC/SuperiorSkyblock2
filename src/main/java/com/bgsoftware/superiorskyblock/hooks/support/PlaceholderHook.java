@@ -149,6 +149,7 @@ public abstract class PlaceholderHook {
                     .put("is_member", (island, superiorPlayer) -> island.isMember(superiorPlayer) ? "Yes" : "No")
                     .put("is_coop", (island, superiorPlayer) -> island.isCoop(superiorPlayer) ? "Yes" : "No")
                     .put("rating", (island, superiorPlayer) -> StringUtils.format(island.getTotalRating()))
+                    .put("rating_amount", (island, superiorPlayer) -> StringUtils.format(island.getRatingAmount()))
                     .put("rating_stars", (island, superiorPlayer) ->
                             StringUtils.formatRating(superiorPlayer.getUserLocale(), island.getTotalRating()))
                     .put("warps_limit", (island, superiorPlayer) -> island.getWarpsLimit() + "")
