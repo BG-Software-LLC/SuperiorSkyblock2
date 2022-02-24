@@ -52,7 +52,7 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
-    private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
+    private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
