@@ -690,6 +690,8 @@ island-chests:
   # You can set this value to 0 to not have any pages by default.
   default-pages: 0
   # Default size for the pages.
+  # This is the default number of rows for the chests.
+  # This number must be between 1 and 6.
   default-size: 3
 
 # Custom aliases for plugin's commands.
