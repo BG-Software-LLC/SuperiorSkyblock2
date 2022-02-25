@@ -31,4 +31,8 @@ public final class SmartLocation extends Location {
             worldName = null;
     }
 
+    public String getWorldName() {
+        return worldName;
+    }
+
 }

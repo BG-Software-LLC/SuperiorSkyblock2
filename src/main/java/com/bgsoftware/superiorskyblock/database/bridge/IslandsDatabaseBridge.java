@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -448,6 +449,12 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().updateObject("islands",
                 createFilter("uuid", island),
                 new Pair<>("dirty_chunks", ChunksTracker.serialize(island)));
+    }
+
+    public static void saveDirtyChunks(Island island, Set<ChunkPosition> dirtyChunks) {
+        island.getDatabaseBridge().updateObject("islands",
+                createFilter("uuid", island),
+                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks)));
     }
 
     public static void saveBlockCounts(Island island) {

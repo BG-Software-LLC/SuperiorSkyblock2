@@ -5,14 +5,13 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.StackedBlocksContainer;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
@@ -260,9 +259,15 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {
-        Optional<BlockPosition> location = resultSet.getString("location").map(SBlockPosition::of);
+        Optional<SBlockPosition> location = resultSet.getString("location").map(SBlockPosition::of);
         if (!location.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
+            return;
+        }
+
+        if (location.get().getWorld() == null) {
+            SuperiorSkyblockPlugin.log(String.format("&cCannot load stacked block with invalid world %s, skipping...",
+                    location.get().getWorldName()));
             return;
         }
 

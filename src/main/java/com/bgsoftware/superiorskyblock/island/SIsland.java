@@ -58,6 +58,7 @@ import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -251,6 +252,13 @@ public final class SIsland implements Island {
         Optional<Location> center = resultSet.getString("center").map(LocationUtils::getLocation);
         if (!center.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
+            return Optional.empty();
+        }
+
+        if (center.get().getWorld() == null) {
+            SuperiorSkyblockPlugin.log(
+                    String.format("&cCannot load island invalid world %s for %s, skipping...",
+                            ((SmartLocation) center.get()).getWorldName(), uuid.get()));
             return Optional.empty();
         }
 

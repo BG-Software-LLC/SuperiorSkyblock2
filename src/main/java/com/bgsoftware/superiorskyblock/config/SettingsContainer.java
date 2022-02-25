@@ -450,7 +450,7 @@ public final class SettingsContainer {
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
         islandChestTitle = StringUtils.translateColors(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
-        islandChestsDefaultSize = config.getInt("island-chests.default-size", 3);
+        islandChestsDefaultSize = Math.min(6, Math.max(1, config.getInt("island-chests.default-size", 3)));
         commandAliases = new HashMap<>();
         if (config.isConfigurationSection("command-aliases")) {
             for (String label : config.getConfigurationSection("command-aliases").getKeys(false)) {

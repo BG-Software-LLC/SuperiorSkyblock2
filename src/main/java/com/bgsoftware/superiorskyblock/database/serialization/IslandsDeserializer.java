@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -268,6 +269,13 @@ public final class IslandsDeserializer {
                 return;
             }
 
+            if (location.get().getWorld() == null) {
+                SuperiorSkyblockPlugin.log(
+                        String.format("&cCannot load warps with invalid world %s for %s, skipping...",
+                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
+                return;
+            }
+
             CachedWarpInfo cachedWarpInfo = new CachedWarpInfo();
             cachedWarpInfo.name = name.get();
             cachedWarpInfo.category = islandWarp.getString("category").orElse("");
@@ -403,10 +411,17 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Mission<?>> mission = missions.getString("name").map(plugin.getMissions()::getMission);
+            Optional<String> missionName = missions.getString("name");
+            Optional<Mission<?>> mission = missionName.map(plugin.getMissions()::getMission);
             if (!mission.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island missions with invalid missions for %s, skipping...", uuid.get()));
+                if (!missionName.isPresent()) {
+                    SuperiorSkyblockPlugin.log(
+                            String.format("&cCannot load island missions with invalid missions for %s, skipping...", uuid.get()));
+                } else {
+                    SuperiorSkyblockPlugin.log(
+                            String.format("&cCannot load island missions with invalid mission %s for %s, skipping...",
+                                    missionName.get(), uuid.get()));
+                }
                 return;
             }
 
@@ -520,6 +535,13 @@ public final class IslandsDeserializer {
                 return;
             }
 
+            if (location.get().getWorld() == null) {
+                SuperiorSkyblockPlugin.log(
+                        String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
+                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
+                return;
+            }
+
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.islandHomes[environment.get()] = location.get();
         });
@@ -547,6 +569,13 @@ public final class IslandsDeserializer {
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
+                return;
+            }
+
+            if (location.get().getWorld() == null) {
+                SuperiorSkyblockPlugin.log(
+                        String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
+                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
                 return;
             }
 
@@ -609,6 +638,27 @@ public final class IslandsDeserializer {
                 return;
             }
 
+            int contentsLength = contents.get().length;
+            ItemStack[] chestContents;
+
+            if(contentsLength % 9 != 0) {
+                int amountOfRows = Math.min(1, Math.max(6, (contentsLength / 9) + 1));
+                chestContents = new ItemStack[amountOfRows * 9];
+                int amountOfContentsToCopy = Math.min(contentsLength, chestContents.length);
+                System.arraycopy(contents.get(), 0, chestContents, 0, amountOfContentsToCopy);
+            }
+            else if(contentsLength > 54) {
+                chestContents = new ItemStack[54];
+                System.arraycopy(contents.get(), 0, chestContents, 0, 54);
+            }
+            else if(contentsLength < 9) {
+                chestContents = new ItemStack[9];
+                System.arraycopy(contents.get(), 0, chestContents, 0, contentsLength);
+            }
+            else {
+                chestContents = contents.get();
+            }
+
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
 
             if (index.get() >= cachedIslandInfo.islandChests.size()) {
@@ -616,9 +666,9 @@ public final class IslandsDeserializer {
                     cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize() * 9]);
                 }
 
-                cachedIslandInfo.islandChests.add(contents.get());
+                cachedIslandInfo.islandChests.add(chestContents);
             } else {
-                cachedIslandInfo.islandChests.set(index.get(), contents.get());
+                cachedIslandInfo.islandChests.set(index.get(), chestContents);
             }
         });
     }
