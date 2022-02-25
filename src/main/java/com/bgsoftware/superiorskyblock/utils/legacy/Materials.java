@@ -4,6 +4,8 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
+
 public enum Materials {
 
     CLOCK("WATCH"),
@@ -22,6 +24,7 @@ public enum Materials {
     Materials(String bukkitType) {
         this(bukkitType, 0);
     }
+
     Materials(String bukkitType, int bukkitData) {
         this.bukkitType = bukkitType;
         this.bukkitData = (short) bukkitData;
@@ -41,6 +44,23 @@ public enum Materials {
 
     public ItemStack toBukkitItem(int amount) {
         return ServerVersion.isLegacy() ? new ItemStack(toBukkitType(), amount, bukkitData) : new ItemStack(toBukkitType(), amount);
+    }
+
+    @Nullable
+    public static Material getMaterialSafe(String material) {
+        try {
+            return Material.valueOf(material);
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
+    }
+
+    public static Material getMaterialSafe(String material, String defaultMaterial) {
+        try {
+            return Material.valueOf(material);
+        } catch (IllegalArgumentException error) {
+            return Material.valueOf(defaultMaterial);
+        }
     }
 
 }

@@ -263,6 +263,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 return;
             }
 
+            modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
+
             if (updater.isOutdated()) {
                 log("");
                 log("A new version is available (v" + updater.getLatestVersion() + ")!");
@@ -295,6 +297,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                         island.setPlayerInside(superiorPlayer, true);
                 }
             }, 1L);
+
+            EventsCaller.callPluginInitializedEvent(this);
+
         } catch (Throwable ex) {
             shouldEnable = false;
             ex.printStackTrace();
@@ -506,8 +511,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         if (loadGrid) {
             dataHandler.loadData();
             stackedBlocksHandler.loadData();
-            modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
             SortingType.values().forEach(gridHandler::sortIslands);
+            modulesHandler.getModules().forEach(pluginModule -> pluginModule.loadData(this));
         } else {
             modulesHandler.getModules().forEach(pluginModule -> pluginModule.onReload(this));
         }

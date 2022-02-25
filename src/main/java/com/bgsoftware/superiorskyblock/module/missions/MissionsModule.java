@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.module.missions.commands.CmdAdminMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -34,6 +33,8 @@ import java.util.Map;
 public final class MissionsModule extends BuiltinModule {
 
     private static final int MAX_MISSIONS_NAME_LENGTH = 255;
+
+    private final List<Mission<?>> missionsToLoad = new ArrayList<>();
 
     private boolean enabled = true;
 
@@ -106,8 +107,6 @@ public final class MissionsModule extends BuiltinModule {
         if (!enabled)
             return;
 
-        List<Mission<?>> missionsToLoad = new ArrayList<>();
-
         ConfigurationSection categoriesSection = config.getConfigurationSection("categories");
 
         if (categoriesSection != null) {
@@ -131,18 +130,20 @@ public final class MissionsModule extends BuiltinModule {
                 missionsToLoad.addAll(categoryMissions);
             }
         }
-
-        if (!missionsToLoad.isEmpty()) {
-            // Should be running in 1-tick delay so players and their islands will be loaded
-            // before loading data of missions, as they depend on this data.
-            Executor.sync(() -> plugin.getMissions().loadMissionsData(missionsToLoad), 1L);
-        }
     }
 
     @Override
     public void onDisable(SuperiorSkyblockPlugin plugin) {
         if (enabled)
             plugin.getMissions().saveMissionsData();
+    }
+
+    @Override
+    public void loadData(SuperiorSkyblockPlugin plugin) {
+        if (!missionsToLoad.isEmpty()) {
+            plugin.getMissions().loadMissionsData(missionsToLoad);
+            missionsToLoad.clear();
+        }
     }
 
     @Override

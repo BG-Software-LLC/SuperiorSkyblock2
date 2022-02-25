@@ -28,7 +28,6 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final TemplateItem islandItem;
-    private final TemplateItem noIslandItem;
     private final SoundWrapper islandSound;
     private final SoundWrapper noIslandSound;
     private final List<String> islandCommands;
@@ -39,16 +38,15 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                                         TemplateItem islandItem, SoundWrapper islandSound, List<String> islandCommands,
                                         TemplateItem noIslandItem, SoundWrapper noIslandSound,
                                         List<String> noIslandCommands, boolean isSelfPlayerIsland, int objectIndex) {
-        super(null, null, null, requiredPermission, lackPermissionSound, null,
+        super(null, null, null, requiredPermission, lackPermissionSound, noIslandItem,
                 objectIndex);
         this.islandItem = islandItem;
         this.islandSound = islandSound;
         this.islandCommands = islandCommands == null ? Collections.emptyList() : islandCommands;
-        this.noIslandItem = noIslandItem == null ? TemplateItem.AIR : noIslandItem;
-        this.noIslandItem.getEditableBuilder().asSkullOf((SuperiorPlayer) null);
         this.noIslandSound = noIslandSound;
         this.noIslandCommands = noIslandCommands == null ? Collections.emptyList() : noIslandCommands;
         this.isSelfPlayerIsland = isSelfPlayerIsland;
+        this.getNullItem().getEditableBuilder().asSkullOf((SuperiorPlayer) null);
     }
 
     @Override
@@ -58,8 +56,11 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
 
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
 
-        if (isSelfPlayerIsland && inventoryViewer.getIsland() != null)
+        if (isSelfPlayerIsland) {
             island = inventoryViewer.getIsland();
+            if (island == null)
+                return getNullItem().build();
+        }
 
         SuperiorPlayer islandOwner = island.getOwner();
         int place = plugin.getGrid().getIslandPosition(island, superiorMenu.getSortingType()) + 1;
@@ -127,11 +128,6 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     }
 
     @Override
-    public TemplateItem getNullItem() {
-        return noIslandItem;
-    }
-
-    @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuTopIslands superiorMenu,
                               InventoryClickEvent clickEvent) {
         Player player = (Player) clickEvent.getWhoClicked();
@@ -169,6 +165,11 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
         if (noIslandCommands != null)
             noIslandCommands.forEach(command -> Bukkit.dispatchCommand(command.startsWith("PLAYER:") ? player : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", clickedPlayer.getName())));
+    }
+
+    @Override
+    public boolean ignorePagedButton() {
+        return this.isSelfPlayerIsland;
     }
 
     public static class Builder extends PagedObjectBuilder<Builder, TopIslandsPagedObjectButton, MenuTopIslands> {
@@ -218,6 +219,20 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
             return new TopIslandsPagedObjectButton(requiredPermission, lackPermissionSound, buttonItem,
                     clickSound, commands, noIslandItem, noIslandSound, noIslandCommands, isPlayerSelfIsland,
                     getObjectIndex());
+        }
+
+        public Builder copy() {
+            Builder cloned = new Builder();
+            cloned.requiredPermission = requiredPermission;
+            cloned.lackPermissionSound = lackPermissionSound == null ? null : lackPermissionSound.copy();
+            cloned.buttonItem = buttonItem == null ? null : buttonItem.copy();
+            cloned.clickSound = clickSound == null ? null : clickSound.copy();
+            cloned.commands = commands == null ? null : new ArrayList<>(commands);
+            cloned.noIslandItem = noIslandItem == null ? null : noIslandItem.copy();
+            cloned.noIslandSound = noIslandSound == null ? null : noIslandSound.copy();
+            cloned.noIslandCommands = noIslandCommands == null ? null : new ArrayList<>(noIslandCommands);
+            cloned.isPlayerSelfIsland = isPlayerSelfIsland;
+            return cloned;
         }
 
     }

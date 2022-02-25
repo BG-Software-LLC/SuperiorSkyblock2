@@ -19,7 +19,7 @@ public final class TemplateItem {
     }
 
     public ItemBuilder getEditableBuilder() {
-        return itemBuilder.copy();
+        return itemBuilder;
     }
 
     public ItemStack build() {
@@ -28,6 +28,10 @@ public final class TemplateItem {
 
     public ItemStack build(SuperiorPlayer superiorPlayer) {
         return getBuilder().build(superiorPlayer);
+    }
+
+    public TemplateItem copy() {
+        return new TemplateItem(this.itemBuilder.copy());
     }
 
 }

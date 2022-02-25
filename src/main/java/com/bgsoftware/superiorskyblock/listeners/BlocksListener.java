@@ -6,11 +6,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
@@ -55,6 +56,7 @@ import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +65,10 @@ public final class BlocksListener implements Listener {
 
     private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
             PlayerInteractEvent.class, "getHand");
+
+    @Nullable
+    private static final Material COPPER_BLOCK = Materials.getMaterialSafe("COPPER_BLOCK");
+    private static final Material HONEYCOMB = Materials.getMaterialSafe("HONEYCOMB");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -296,17 +302,29 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockStack(PlayerInteractEvent e) {
-        if (e.getClickedBlock() != null && e.getClickedBlock().getType() == Material.DRAGON_EGG) {
-            if (plugin.getStackedBlocks().getStackedBlockAmount(e.getClickedBlock()) > 1) {
+        Block clickedBlock = e.getClickedBlock();
+
+        if (clickedBlock == null)
+            return;
+
+        ItemStack inHand = e.getItem();
+
+        Material clickedBlockType = clickedBlock.getType();
+
+        if (clickedBlockType == Material.DRAGON_EGG) {
+            if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
                 e.setCancelled(true);
-                if (e.getItem() == null)
-                    StackedBlocksLogic.tryUnstack(e.getPlayer(), e.getClickedBlock(), plugin);
+                if (inHand == null)
+                    StackedBlocksLogic.tryUnstack(e.getPlayer(), clickedBlock, plugin);
             }
 
-            if (e.getItem() != null && StackedBlocksLogic.canStackBlocks(e.getPlayer(), e.getItem(), e.getClickedBlock(), null) &&
-                    StackedBlocksLogic.tryStack(e.getPlayer(), e.getItem(), e.getClickedBlock().getLocation(), e)) {
+            if (inHand != null && StackedBlocksLogic.canStackBlocks(e.getPlayer(), inHand, clickedBlock, null) &&
+                    StackedBlocksLogic.tryStack(e.getPlayer(), inHand, clickedBlock.getLocation(), e)) {
                 e.setCancelled(true);
             }
+        } else if (clickedBlockType == COPPER_BLOCK && inHand != null && inHand.getType() == HONEYCOMB &&
+                plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
+            e.setCancelled(true);
         }
     }
 

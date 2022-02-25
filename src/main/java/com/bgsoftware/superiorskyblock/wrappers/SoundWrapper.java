@@ -35,4 +35,9 @@ public final class SoundWrapper {
     public float getPitch() {
         return pitch;
     }
+
+    public SoundWrapper copy() {
+        return new SoundWrapper(this.sound, this.volume, this.pitch);
+    }
+
 }

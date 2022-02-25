@@ -573,7 +573,8 @@ public final class ProtectionListener implements Listener {
         }
 
         if (e.isCancelled() && e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.getPlayer().getInventory().addItem(new ItemStack(Material.ENDER_PEARL));
+            ItemUtils.addItem(new ItemStack(Material.ENDER_PEARL), e.getPlayer().getInventory(),
+                    e.getPlayer().getLocation());
         }
     }
 

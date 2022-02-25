@@ -50,9 +50,10 @@ public abstract class PlaceholderHook {
     private static final Pattern TOP_VALUE_RAW_PLACEHOLDER_PATTERN = Pattern.compile("value_raw_(.+)");
     private static final Pattern TOP_VALUE_PLACEHOLDER_PATTERN = Pattern.compile("value_(.+)");
     private static final Pattern TOP_LEADER_PLACEHOLDER_PATTERN = Pattern.compile("leader_(.+)");
+    private static final Pattern TOP_CUSTOM_PLACEHOLDER_PATTERN = Pattern.compile("(\\d+)_(.+)");
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
-    private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("island_flag_(.+)");
+    private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -149,6 +150,7 @@ public abstract class PlaceholderHook {
                     .put("is_member", (island, superiorPlayer) -> island.isMember(superiorPlayer) ? "Yes" : "No")
                     .put("is_coop", (island, superiorPlayer) -> island.isCoop(superiorPlayer) ? "Yes" : "No")
                     .put("rating", (island, superiorPlayer) -> StringUtils.format(island.getTotalRating()))
+                    .put("rating_amount", (island, superiorPlayer) -> StringUtils.format(island.getRatingAmount()))
                     .put("rating_stars", (island, superiorPlayer) ->
                             StringUtils.formatRating(superiorPlayer.getUserLocale(), island.getTotalRating()))
                     .put("warps_limit", (island, superiorPlayer) -> island.getWarpsLimit() + "")
@@ -280,10 +282,6 @@ public abstract class PlaceholderHook {
             }
         }
 
-        return placeholderResult.orElse(plugin.getSettings().getDefaultPlaceholders()
-                .getOrDefault(placeholder, ""));
-    }
-
     private static Optional<String> handlePermissionsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
                                                                  String placeholder) {
         try {
@@ -304,20 +302,20 @@ public abstract class PlaceholderHook {
     }
 
     private static Optional<String> handleTopIslandsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
-                                                                String placeholder) {
+                                                                String subPlaceholder) {
         Matcher matcher;
         SortingType sortingType;
 
-        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        if ((matcher = TOP_WORTH_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_WORTH;
-        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_LEVEL_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_LEVEL;
-        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_RATING_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_RATING;
-        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+        } else if ((matcher = TOP_PLAYERS_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
             sortingType = SortingTypes.BY_PLAYERS;
         } else {
-            String sortingTypeName = placeholder.split("_")[0];
+            String sortingTypeName = subPlaceholder.split("_")[0];
             sortingType = SortingType.getByName(sortingTypeName);
         }
 
@@ -340,6 +338,11 @@ public abstract class PlaceholderHook {
             getValueFunction = TOP_VALUE_FUNCTIONS.get(sortingType);
         } else if ((matcher = TOP_LEADER_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
             getValueFunction = targetIsland -> targetIsland.getOwner().getName();
+        } else if ((matcher = TOP_CUSTOM_PLACEHOLDER_PATTERN.matcher(placeholderValue)).matches()) {
+            String customPlaceholder = matcher.group(2);
+            getValueFunction = targetIsland -> parsePlaceholdersForIsland(targetIsland, superiorPlayer,
+                    "superior_island_" + customPlaceholder,
+                    customPlaceholder).orElse(null);
         } else {
             getValueFunction = targetIsland -> targetIsland.getName().isEmpty() ?
                     targetIsland.getOwner().getName() : targetIsland.getName();

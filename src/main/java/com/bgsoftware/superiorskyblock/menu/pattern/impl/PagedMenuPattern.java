@@ -42,7 +42,7 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
         for (int slot = 0; slot < this.buttons.length; ++slot) {
             SuperiorMenuButton<M> button = this.buttons[slot];
 
-            if (button instanceof PagedObjectButton) {
+            if (button instanceof PagedObjectButton && !button.ignorePagedButton()) {
                 PagedObjectButton<M, T> pagedObjectButton = (PagedObjectButton<M, T>) button;
                 int objectIndex = pagedObjectSlot + (objectsPerPage * (currentPage - 1));
 

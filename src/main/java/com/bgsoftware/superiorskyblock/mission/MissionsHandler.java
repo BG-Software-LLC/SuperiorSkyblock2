@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -284,7 +285,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                                 playerIsland.getOwner() == null ? "" : playerIsland.getOwner().getName() : playerIsland.getName())
                         .build();
                 toGive.setAmount(itemStack.getAmount());
-                superiorPlayer.runIfOnline(player -> player.getInventory().addItem(toGive));
+                Executor.ensureMain(() -> superiorPlayer.runIfOnline(player ->
+                        ItemUtils.addItem(toGive, player.getInventory(), player.getLocation())));
             }
 
             Executor.sync(() -> {

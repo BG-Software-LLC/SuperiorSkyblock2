@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,6 +17,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Hanging;
 import org.bukkit.entity.Minecart;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -133,8 +135,11 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
                 if (result) {
                     Executor.sync(() -> {
                         e.getVehicle().remove();
-                        if (placedVehicle != null)
-                            Bukkit.getPlayer(placedVehicle).getInventory().addItem(asItemStack(e.getVehicle()));
+                        if (placedVehicle != null) {
+                            Player player = Bukkit.getPlayer(placedVehicle);
+                            if (player != null)
+                                ItemUtils.addItem(asItemStack(e.getVehicle()), player.getInventory(), player.getLocation());
+                        }
                     });
                 }
             });

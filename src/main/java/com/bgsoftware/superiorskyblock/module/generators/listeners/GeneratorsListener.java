@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -26,10 +27,10 @@ public final class GeneratorsListener implements Listener {
     private static final BlockFace[] nearbyFaces = new BlockFace[]{
             BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH
     };
-    private static final Material BLUE_ICE_MATERIAL = getMaterialSafe("BLUE_ICE");
-    private static final Material SOUL_SOIL_MATERIAL = getMaterialSafe("SOUL_SOIL");
-    private static final Material BASALT_MATERIAL = getMaterialSafe("BASALT");
-    private static final Material LAVA_MATERIAL = getMaterialSafe("STATIONARY_LAVA", "LAVA");
+    private static final Material BLUE_ICE_MATERIAL = Materials.getMaterialSafe("BLUE_ICE");
+    private static final Material SOUL_SOIL_MATERIAL = Materials.getMaterialSafe("SOUL_SOIL");
+    private static final Material BASALT_MATERIAL = Materials.getMaterialSafe("BASALT");
+    private static final Material LAVA_MATERIAL = Materials.getMaterialSafe("STATIONARY_LAVA", "LAVA");
 
     private final SuperiorSkyblockPlugin plugin;
     private final GeneratorsModule module;
@@ -153,23 +154,6 @@ public final class GeneratorsListener implements Listener {
         }
 
         return false;
-    }
-
-    @Nullable
-    private static Material getMaterialSafe(String material) {
-        try {
-            return Material.valueOf(material);
-        } catch (IllegalArgumentException error) {
-            return null;
-        }
-    }
-
-    private static Material getMaterialSafe(String material, String defaultMaterial) {
-        try {
-            return Material.valueOf(material);
-        } catch (IllegalArgumentException error) {
-            return Material.valueOf(defaultMaterial);
-        }
     }
 
 
