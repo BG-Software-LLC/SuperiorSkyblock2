@@ -638,6 +638,27 @@ public final class IslandsDeserializer {
                 return;
             }
 
+            int contentsLength = contents.get().length;
+            ItemStack[] chestContents;
+
+            if(contentsLength % 9 != 0) {
+                int amountOfRows = Math.min(1, Math.max(6, (contentsLength / 9) + 1));
+                chestContents = new ItemStack[amountOfRows * 9];
+                int amountOfContentsToCopy = Math.min(contentsLength, chestContents.length);
+                System.arraycopy(contents.get(), 0, chestContents, 0, amountOfContentsToCopy);
+            }
+            else if(contentsLength > 54) {
+                chestContents = new ItemStack[54];
+                System.arraycopy(contents.get(), 0, chestContents, 0, 54);
+            }
+            else if(contentsLength < 9) {
+                chestContents = new ItemStack[9];
+                System.arraycopy(contents.get(), 0, chestContents, 0, contentsLength);
+            }
+            else {
+                chestContents = contents.get();
+            }
+
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
 
             if (index.get() >= cachedIslandInfo.islandChests.size()) {
@@ -645,9 +666,9 @@ public final class IslandsDeserializer {
                     cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize() * 9]);
                 }
 
-                cachedIslandInfo.islandChests.add(contents.get());
+                cachedIslandInfo.islandChests.add(chestContents);
             } else {
-                cachedIslandInfo.islandChests.set(index.get(), contents.get());
+                cachedIslandInfo.islandChests.set(index.get(), chestContents);
             }
         });
     }
