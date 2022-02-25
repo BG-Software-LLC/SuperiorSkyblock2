@@ -153,16 +153,20 @@ public final class ChunksTracker {
         if (island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        if (dirtyChunks.containsKey(island) && dirtyChunks.get(island).remove(chunkPosition) && save)
-            IslandsDatabaseBridge.saveDirtyChunks(island);
+        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.get(island);
+
+        if (dirtyChunks != null && dirtyChunks.remove(chunkPosition) && save)
+            IslandsDatabaseBridge.saveDirtyChunks(island, dirtyChunks);
     }
 
     public static void markDirty(Island island, ChunkPosition chunkPosition, boolean save) {
         if (island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        if (dirtyChunks.computeIfAbsent(island, s -> new HashSet<>()).add(chunkPosition) && save && !island.isSpawn())
-            IslandsDatabaseBridge.saveDirtyChunks(island);
+        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.computeIfAbsent(island, s -> new HashSet<>());
+
+        if (dirtyChunks.add(chunkPosition) && save && !island.isSpawn())
+            IslandsDatabaseBridge.saveDirtyChunks(island, dirtyChunks);
     }
 
 }
