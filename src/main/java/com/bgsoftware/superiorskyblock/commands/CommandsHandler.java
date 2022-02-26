@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.lang.Message;
@@ -245,26 +246,30 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
                     String commandLabel = command.getAliases().get(0);
 
-                    if (sender instanceof Player && plugin.getSettings().getCommandsCooldown().containsKey(commandLabel)) {
+                    if (sender instanceof Player) {
                         UUID uuid = ((Player) sender).getUniqueId();
+                        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
+                        if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
+                            Pair<Integer, String> commandCooldown = plugin.getSettings().getCommandsCooldown().get(commandLabel);
+                            if (commandCooldown != null) {
+                                Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
+                                long timeNow = System.currentTimeMillis();
 
-                        long timeToExecute = commandsCooldown.containsKey(uuid) && commandsCooldown.get(uuid).containsKey(commandLabel) ?
-                                commandsCooldown.get(uuid).get(commandLabel) : -1;
+                                if (playerCooldowns != null) {
+                                    Long timeToExecute = playerCooldowns.get(commandLabel);
+                                    if (timeToExecute != null) {
+                                        if (timeNow < timeToExecute) {
+                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
+                                                    StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
+                                            return false;
+                                        }
+                                    }
+                                }
 
-                        long timeNow = System.currentTimeMillis();
-
-                        if (timeNow < timeToExecute) {
-                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
-                                    StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
-                            return false;
+                                commandsCooldown.computeIfAbsent(uuid, u -> new HashMap<>()).put(commandLabel,
+                                        timeNow + commandCooldown.getKey());
+                            }
                         }
-
-                        if (!commandsCooldown.containsKey(uuid)) {
-                            commandsCooldown.put(uuid, new HashMap<>());
-                        }
-
-                        commandsCooldown.get(uuid).put(commandLabel,
-                                timeNow + plugin.getSettings().getCommandsCooldown().get(commandLabel).getKey());
                     }
 
                     command.execute(plugin, sender, args);
