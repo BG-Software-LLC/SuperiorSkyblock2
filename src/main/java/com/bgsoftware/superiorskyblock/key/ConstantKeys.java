@@ -21,6 +21,8 @@ public final class ConstantKeys {
     public static final Key END_PORTAL_FRAME_WITH_EYE = Key.of(Materials.END_PORTAL_FRAME.toBukkitType(), (short) 7);
     public static final Key END_PORTAL_FRAME = Key.of(Materials.END_PORTAL_FRAME.toBukkitType().name());
     public static final Key WET_SPONGE = Key.of("WET_SPONGE");
+    public static final Key COBBLESTONE = Key.of("COBBLESTONE");
+
     private ConstantKeys() {
 
     }

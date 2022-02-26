@@ -1364,6 +1364,12 @@ public final class SpawnIsland implements Island {
         // Do nothing.
     }
 
+    @Nullable
+    @Override
+    public Key generateBlock(Location location, boolean optimizeCobblestone) {
+        return null;
+    }
+
     @Override
     public boolean wasSchematicGenerated(World.Environment environment) {
         return true;
