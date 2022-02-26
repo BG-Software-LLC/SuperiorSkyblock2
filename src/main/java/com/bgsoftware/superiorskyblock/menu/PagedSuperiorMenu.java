@@ -31,14 +31,18 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
     }
 
     public int getCurrentPage() {
-        return currentPage;
+        return this.currentPage;
     }
 
     public List<T> getPagedObjects() {
-        if (objects == null)
-            objects = requestObjects();
+        if (this.objects == null)
+            updatePagedObjects();
 
-        return Collections.unmodifiableList(objects);
+        return Collections.unmodifiableList(this.objects);
+    }
+
+    public void updatePagedObjects() {
+        this.objects = requestObjects();
     }
 
     public void movePage(int newPage) {
