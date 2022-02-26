@@ -6,12 +6,11 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Maps;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -51,7 +50,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
         RegularMenuPattern.Builder<SuperiorMenuCustom> patternBuilder = new RegularMenuPattern.Builder<>();
 
         Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                fileName, null);
+                fileName, true, null);
 
         if (menuLoadResult == null)
             return;
@@ -83,7 +82,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
 
     public static void openInventory(SuperiorPlayer superiorPlayer, String fileName, ISuperiorMenu previousMenu) {
         RegularMenuPattern<SuperiorMenuCustom> menuPattern = customMenus.get(fileName.toLowerCase());
-        if(menuPattern != null)
+        if (menuPattern != null)
             new SuperiorMenuCustom(menuPattern, superiorPlayer, fileName).open(previousMenu);
     }
 
