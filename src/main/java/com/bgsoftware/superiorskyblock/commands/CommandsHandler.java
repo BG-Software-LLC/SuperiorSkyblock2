@@ -133,10 +133,18 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public void dispatchSubCommand(CommandSender sender, String subCommand, String args) {
-        String[] argsSplit = args.split(" ");
-        String[] commandArguments = new String[argsSplit.length + 1];
-        commandArguments[0] = subCommand;
-        System.arraycopy(argsSplit, 0, commandArguments, 1, argsSplit.length);
+        String[] commandArguments;
+
+        if (!args.contains(" ")) {
+            commandArguments = new String[1];
+            commandArguments[0] = subCommand;
+        } else {
+            String[] argsSplit = args.split(" ");
+            commandArguments = new String[argsSplit.length + 1];
+            commandArguments[0] = subCommand;
+            System.arraycopy(argsSplit, 0, commandArguments, 1, argsSplit.length);
+        }
+
         pluginCommand.execute(sender, "", commandArguments);
     }
 
