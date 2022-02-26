@@ -325,6 +325,9 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             if (previousMenu != null)
                 previousMenu.setPreviousMove(false);
 
+            if (currentMenu != null && previousMenu != currentMenu)
+                currentMenu.setPreviousMove(false);
+
             player.openInventory(inventory);
 
             SoundWrapper openingSound = this.menuPattern.getOpeningSound();
