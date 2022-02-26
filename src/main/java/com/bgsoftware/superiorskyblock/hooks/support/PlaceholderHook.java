@@ -166,8 +166,7 @@ public abstract class PlaceholderHook {
                     .put("nether_unlocked", (island, superiorPlayer) -> island.isNetherEnabled() ? "Yes" : "No")
                     .put("end_unlocked", (island, superiorPlayer) -> island.isEndEnabled() ? "Yes" : "No")
                     .put("visitors_count", (island, superiorPlayer) -> {
-                        return island.getAllPlayersInside().stream().filter(visitor ->
-                                island.isVisitor(visitor, false)).count() + "";
+                        return island.getIslandVisitors(false).size() + "";
                     })
                     .put("bank_limit", (island, superiorPlayer) -> StringUtils.format(island.getBankLimit()))
                     .put("bank_limit_format", (island, superiorPlayer) ->
