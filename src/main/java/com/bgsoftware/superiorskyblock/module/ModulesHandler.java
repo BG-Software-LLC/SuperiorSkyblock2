@@ -98,46 +98,79 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     public void enableModule(PluginModule pluginModule) {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
 
+        long startTime = System.currentTimeMillis();
+
+        SuperiorSkyblockPlugin.log("&aEnabling the module " + pluginModule.getName() + "...");
+
         try {
-            long startTime = System.currentTimeMillis();
-
-            SuperiorSkyblockPlugin.log("&aEnabling the module " + pluginModule.getName() + "...");
-
             pluginModule.onEnable(plugin);
-
-            Listener[] listeners = pluginModule.getModuleListeners(plugin);
-            SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
-            SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
-
-            if (listeners != null || commands != null || adminCommands != null)
-                this.modulesContainer.addModuleData(pluginModule, new ModuleData(listeners, commands, adminCommands));
-
-            if (listeners != null)
-                Arrays.stream(listeners).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, plugin));
-
-            if (commands != null)
-                Arrays.stream(commands).forEach(plugin.getCommands()::registerCommand);
-
-            if (adminCommands != null)
-                Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
-
-            SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
-                    " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("&cAn error occurred while enabling the module " + pluginModule.getName() + ":");
-            ex.printStackTrace();
             SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+
+            ex.printStackTrace();
             PluginDebugger.debug(ex);
 
-            // Calling onDisable so the plugin can unregister its data if needed
-            pluginModule.onDisable(plugin);
+            try {
+                // Calling onDisable so the plugin can unregister its data if needed
+                pluginModule.onDisable(plugin);
+            } catch (Throwable error) {
+                SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
+                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+                error.printStackTrace();
+            }
+
+            return;
         }
+
+        Listener[] listeners = pluginModule.getModuleListeners(plugin);
+        SuperiorCommand[] commands = pluginModule.getSuperiorCommands(plugin);
+        SuperiorCommand[] adminCommands = pluginModule.getSuperiorAdminCommands(plugin);
+
+        if (listeners != null || commands != null || adminCommands != null)
+            this.modulesContainer.addModuleData(pluginModule, new ModuleData(listeners, commands, adminCommands));
+
+        if (listeners != null)
+            Arrays.stream(listeners).forEach(listener -> Bukkit.getPluginManager().registerEvents(listener, plugin));
+
+        if (commands != null)
+            Arrays.stream(commands).forEach(plugin.getCommands()::registerCommand);
+
+        if (adminCommands != null)
+            Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
+
+        SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
+                " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
     @Override
     public void enableModules(ModuleLoadTime moduleLoadTime) {
         Preconditions.checkNotNull(moduleLoadTime, "moduleLoadTime parameter cannot be null.");
         filterModules(moduleLoadTime).forEach(this::enableModule);
+    }
+
+    public void reloadModules(SuperiorSkyblockPlugin plugin) {
+        getModules().forEach(pluginModule -> {
+            try {
+                pluginModule.onReload(plugin);
+            } catch (Throwable error) {
+                SuperiorSkyblockPlugin.log("&cAn error occurred while reloading the module " + pluginModule.getName() + ":");
+                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+                error.printStackTrace();
+            }
+        });
+    }
+
+    public void loadModulesData(SuperiorSkyblockPlugin plugin) {
+        getModules().forEach(pluginModule -> {
+            try {
+                pluginModule.loadData(plugin);
+            } catch (Throwable error) {
+                SuperiorSkyblockPlugin.log("&cAn error occurred while loading data for the module " + pluginModule.getName() + ":");
+                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+                error.printStackTrace();
+            }
+        });
     }
 
     private void registerExternalModules() {
