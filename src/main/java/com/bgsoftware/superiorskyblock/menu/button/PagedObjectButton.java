@@ -35,6 +35,10 @@ public abstract class PagedObjectButton<M extends ISuperiorMenu, T> extends Supe
         return objectIndex;
     }
 
+    public boolean countTowardsPageObjects() {
+        return true;
+    }
+
     @Nullable
     @Override
     public ItemStack getButtonItem(M superiorMenu) {

@@ -50,6 +50,11 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
     }
 
     @Override
+    public boolean countTowardsPageObjects() {
+        return !this.isSelfPlayerIsland;
+    }
+
+    @Override
     public ItemStack modifyButtonItem(ItemStack buttonItem, MenuTopIslands superiorMenu, Island island) {
         if (islandItem == null)
             return null;
