@@ -67,6 +67,7 @@ import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -100,6 +101,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -2925,6 +2927,68 @@ public final class SIsland implements Island {
             cobbleGeneratorValues.clear();
             IslandsDatabaseBridge.clearGeneratorRates(this, environment);
         }
+    }
+
+    @Override
+    public Key generateBlock(Location location, boolean optimizeCobblestone) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+
+        World.Environment environment = location.getWorld().getEnvironment();
+
+        int totalGeneratorAmounts = getGeneratorTotalAmount(environment);
+
+        if (totalGeneratorAmounts == 0)
+            return null;
+
+        Map<String, Integer> generatorAmounts = getGeneratorAmounts(environment);
+
+        String newState = "COBBLESTONE";
+
+        if (totalGeneratorAmounts == 1) {
+            newState = generatorAmounts.keySet().iterator().next();
+        } else {
+            int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
+            int currentIndex = 0;
+            for (Map.Entry<String, Integer> entry : generatorAmounts.entrySet()) {
+                currentIndex += entry.getValue();
+                if (generatedIndex < currentIndex) {
+                    newState = entry.getKey();
+                    break;
+                }
+            }
+        }
+
+        Key generatedBlock = Key.of(newState);
+
+        String[] typeSections = newState.split(":");
+
+        if (optimizeCobblestone && typeSections[0].contains("COBBLESTONE"))
+            /* Block is being counted in BlocksListener#onBlockFromToMonitor */
+            return generatedBlock;
+
+        // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
+        handleBlockPlace(generatedBlock, 1);
+
+        Material generateBlockType = Material.valueOf(typeSections[0]);
+        byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
+        int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+
+        if (combinedId == -1) {
+            SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
+            generateBlockType = Material.COBBLESTONE;
+            blockData = 0;
+            combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+        }
+
+        PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() +
+                ", Block: " + generateBlockType + ":" + blockData);
+
+        plugin.getNMSWorld().setBlock(location, combinedId);
+
+        plugin.getNMSWorld().playGeneratorSound(location);
+
+        return generatedBlock;
     }
 
     /*

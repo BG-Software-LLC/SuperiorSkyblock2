@@ -154,9 +154,20 @@ public final class FileUtils {
             SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
             String fileName,
             @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
-        File file = new File(plugin.getDataFolder(), "menus/" + fileName);
+        return loadMenu(menuPattern, fileName, false, convertOldMenu);
+    }
 
-        if (!file.exists())
+    @Nullable
+    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+            SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
+            String fileName,
+            boolean customMenu,
+            @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
+        String menuPath = customMenu ? "custom/" : "";
+
+        File file = new File(plugin.getDataFolder(), "menus/" + menuPath + fileName);
+
+        if (!file.exists() && !customMenu)
             FileUtils.saveResource("menus/" + fileName);
 
         CommentedConfiguration cfg = new CommentedConfiguration();

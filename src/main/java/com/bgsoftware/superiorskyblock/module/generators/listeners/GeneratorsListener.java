@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.module.generators.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -16,10 +16,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
-
-import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
 public final class GeneratorsListener implements Listener {
@@ -53,7 +49,9 @@ public final class GeneratorsListener implements Listener {
         if (e.getBlock().getType() != LAVA_MATERIAL || e.getNewState().getType() != BASALT_MATERIAL)
             return;
 
-        if (performBlockGeneration(e.getBlock(), island))
+        Key generatedBlock = island.generateBlock(e.getBlock().getLocation(), true);
+
+        if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);
     }
 
@@ -77,65 +75,10 @@ public final class GeneratorsListener implements Listener {
         if (block.getType().isSolid())
             return;
 
-        if (performBlockGeneration(block, island))
+        Key generatedBlock = island.generateBlock(block.getLocation(), true);
+
+        if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);
-    }
-
-    private boolean performBlockGeneration(Block block, Island island) {
-        World.Environment environment = block.getWorld().getEnvironment();
-        Map<String, Integer> generatorAmounts = island.getGeneratorAmounts(environment);
-
-        int totalGeneratorAmounts = island.getGeneratorTotalAmount(environment);
-
-        if (totalGeneratorAmounts == 0)
-            return false;
-
-        String newState = "COBBLESTONE";
-
-        if (totalGeneratorAmounts == 1) {
-            newState = generatorAmounts.keySet().iterator().next();
-        } else {
-            int generatedIndex = ThreadLocalRandom.current().nextInt(totalGeneratorAmounts);
-            int currentIndex = 0;
-            for (Map.Entry<String, Integer> entry : generatorAmounts.entrySet()) {
-                currentIndex += entry.getValue();
-                if (generatedIndex < currentIndex) {
-                    newState = entry.getKey();
-                    break;
-                }
-            }
-        }
-
-        String[] typeSections = newState.split(":");
-
-        /* Block is being placed in BlocksListener#onBlockFromToMonitor
-            island.handleBlockPlace(Key.of(newState), 1); */
-
-        if (typeSections[0].contains("COBBLESTONE"))
-            return false;
-
-        // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
-        island.handleBlockPlace(Key.of(newState), 1);
-
-        Material generateBlockType = Material.valueOf(typeSections[0]);
-        byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
-        int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
-
-        if (combinedId == -1) {
-            SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
-            generateBlockType = Material.COBBLESTONE;
-            blockData = 0;
-            combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
-        }
-
-        PluginDebugger.debug("Action: Generate Block, Island: " + island.getOwner().getName() +
-                ", Block: " + generateBlockType + ":" + blockData);
-
-        plugin.getNMSWorld().setBlock(block.getLocation(), combinedId);
-
-        plugin.getNMSWorld().playGeneratorSound(block.getLocation());
-
-        return true;
     }
 
     private boolean canGenerateBlock(Block block) {

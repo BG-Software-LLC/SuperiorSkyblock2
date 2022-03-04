@@ -1685,6 +1685,22 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      */
     void clearGeneratorAmounts(World.Environment environment);
 
+    /**
+     * Generate a block at a specified location.
+     * The method calculates a block to generate from {@link #getGeneratorAmounts(World.Environment)}.
+     * It doesn't look for any conditions for generating it - lava, water, etc are not required.
+     * The method will fail if there are no valid generator rates for the environment.
+     *
+     * @param location            The location to generate block at.
+     * @param optimizeCobblestone When set to true and cobblestone needs to be generated, the plugin will
+     *                            not play effects, count the block towards the block counts or set the block.
+     *                            This is useful when calling the method from BlockFromToEvent, and instead of letting
+     *                            the player do the logic of vanilla, the plugin lets the game do it.
+     * @return The block type that was generated, null if failed.
+     */
+    @Nullable
+    Key generateBlock(Location location, boolean optimizeCobblestone);
+
     /*
      *  Schematic methods
      */

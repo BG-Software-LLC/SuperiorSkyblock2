@@ -28,7 +28,14 @@ public final class DefaultModulesContainer implements ModulesContainer {
 
         File dataFolder = new File(modulesFolder, pluginModule.getName());
 
-        pluginModule.initModule(plugin, dataFolder);
+        try {
+            pluginModule.initModule(plugin, dataFolder);
+        } catch (Throwable error) {
+            SuperiorSkyblockPlugin.log("&cAn error occurred while initializing the module " + pluginModule.getName() + ":");
+            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+            error.printStackTrace();
+            return;
+        }
 
         modulesMap.put(moduleName, pluginModule);
     }
@@ -41,7 +48,13 @@ public final class DefaultModulesContainer implements ModulesContainer {
 
         SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
 
-        pluginModule.onDisable(plugin);
+        try {
+            pluginModule.onDisable(plugin);
+        } catch (Throwable error) {
+            SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
+            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+            error.printStackTrace();
+        }
 
         ModuleData moduleData = modulesData.remove(pluginModule);
 

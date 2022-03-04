@@ -48,6 +48,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
 
     public boolean setSortingType(SortingType sortingType) {
         this.sortingType = sortingType;
+        this.updatePagedObjects();
         return this.alreadySorted.add(sortingType);
     }
 
