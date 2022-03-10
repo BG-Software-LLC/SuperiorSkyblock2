@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 
 @SuppressWarnings("unused")
 public final class NMSHologramsImpl implements NMSHolograms {
@@ -24,6 +25,11 @@ public final class NMSHologramsImpl implements NMSHolograms {
         EntityHologram entityHologram = new EntityHologram(world, location.getX(), location.getY(), location.getZ());
         world.addEntity(entityHologram);
         return entityHologram;
+    }
+
+    @Override
+    public boolean isHologram(Entity entity) {
+        return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
     private static final class EntityHologram extends EntityArmorStand implements Hologram {

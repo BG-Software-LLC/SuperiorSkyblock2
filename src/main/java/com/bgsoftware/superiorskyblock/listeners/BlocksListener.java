@@ -285,7 +285,8 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntitySpawn(CreatureSpawnEvent e) {
-        if (!plugin.getSettings().getAFKIntegrations().isDisableSpawning())
+        if (!plugin.getSettings().getAFKIntegrations().isDisableSpawning() ||
+                plugin.getNMSHolograms().isHologram(e.getEntity()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
