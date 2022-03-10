@@ -1,7 +1,6 @@
 group 'Hook_PaperMC'
 
 dependencies {
-    compileOnly 'com.songoda:EpicSpawners-7:latest'
     compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
     compileOnly project(":API")
     compileOnly parent
