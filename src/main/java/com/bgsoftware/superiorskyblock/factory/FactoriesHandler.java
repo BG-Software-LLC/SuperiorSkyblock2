@@ -32,6 +32,7 @@ import org.bukkit.Location;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 public final class FactoriesHandler implements FactoriesManager {
 
@@ -92,8 +93,8 @@ public final class FactoriesHandler implements FactoriesManager {
         return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
 
-    public IslandBank createIslandBank(Island island) {
-        SIslandBank islandBank = new SIslandBank(island);
+    public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {
+        SIslandBank islandBank = new SIslandBank(island, isGiveInterestFailed);
         return banksFactory == null ? islandBank : banksFactory.createIslandBank(island, islandBank);
     }
 

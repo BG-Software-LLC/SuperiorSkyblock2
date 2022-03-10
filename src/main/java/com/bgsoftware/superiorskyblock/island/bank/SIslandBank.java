@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 public final class SIslandBank implements IslandBank {
 
@@ -40,10 +41,12 @@ public final class SIslandBank implements IslandBank {
 
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
     private final Island island;
+    private final Supplier<Boolean> isGiveInterestFailed;
     private final IBankLogs bankLogs;
 
-    public SIslandBank(Island island) {
+    public SIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {
         this.island = island;
+        this.isGiveInterestFailed = isGiveInterestFailed;
         this.bankLogs = BuiltinModules.BANK.cacheAllLogs ? new CacheBankLogs() : new DatabaseBankLogs(island);
     }
 
@@ -55,6 +58,10 @@ public final class SIslandBank implements IslandBank {
     @Override
     public void setBalance(BigDecimal balance) {
         this.balance.set(balance.setScale(2, RoundingMode.HALF_DOWN));
+
+        // Trying to give interest again if the last one failed.
+        if (isGiveInterestFailed.get())
+            island.giveInterest(false);
     }
 
     @Override

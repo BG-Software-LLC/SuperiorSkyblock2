@@ -118,7 +118,7 @@ public final class SIsland implements Island {
     private static int blocksUpdateCounter = 0;
 
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-    private final IslandBank islandBank = plugin.getFactory().createIslandBank(this);
+    private final IslandBank islandBank = plugin.getFactory().createIslandBank(this, this::hasGiveInterestFailed);
     private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
     private final IslandBlocksTrackerAlgorithm blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
     private final IslandEntitiesTrackerAlgorithm entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
@@ -145,6 +145,7 @@ public final class SIsland implements Island {
     private volatile long lastTimeUpdate = -1;
     private volatile long lastInterest = -1L;
     private volatile long lastUpgradeTime = -1L;
+    private volatile boolean giveInterestFailed = false;
 
     /*
      * Island Upgrade Values
@@ -1659,6 +1660,10 @@ public final class SIsland implements Island {
 
         this.bankLimit = new UpgradeValue<>(bankLimit, i -> i.compareTo(new BigDecimal(-1)) < 0);
 
+        // Trying to give interest again if the last one failed.
+        if(hasGiveInterestFailed())
+            giveInterest(false);
+
         IslandsDatabaseBridge.saveBankLimit(this);
     }
 
@@ -1679,10 +1684,18 @@ public final class SIsland implements Island {
                 currentTime - owner.getLastTimeStatus() > BuiltinModules.BANK.bankInterestRecentActive)
             return false;
 
-        PluginDebugger.debug("Action: Give Bank Interest, Island: " + owner.getName());
-
         BigDecimal balance = islandBank.getBalance().max(BigDecimal.ONE);
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
+
+        // If the money that will be given exceeds limit, we want to give money later.
+        if(balanceToGive.add(balance).compareTo(getBankLimit()) > 0) {
+            giveInterestFailed = true;
+            return false;
+        }
+
+        giveInterestFailed = false;
+
+        PluginDebugger.debug("Action: Give Bank Interest, Island: " + owner.getName());
 
         islandBank.depositAdminMoney(Bukkit.getConsoleSender(), balanceToGive);
         plugin.getMenus().refreshIslandBank(this);
@@ -1690,6 +1703,11 @@ public final class SIsland implements Island {
         setLastInterestTime(currentTime);
 
         return true;
+    }
+
+
+    private boolean hasGiveInterestFailed() {
+        return this.giveInterestFailed;
     }
 
     @Override

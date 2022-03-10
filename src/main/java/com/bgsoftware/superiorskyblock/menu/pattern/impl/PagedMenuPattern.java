@@ -25,7 +25,8 @@ public final class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extend
     private PagedMenuPattern(String title, InventoryType inventoryType, SuperiorMenuButton<M>[] buttons,
                              SoundWrapper openingSound, boolean isPreviousMoveAllowed) {
         super(title, inventoryType, buttons, openingSound, isPreviousMoveAllowed);
-        objectsPerPage = (int) Arrays.stream(buttons).filter(button -> button instanceof PagedObjectButton).count();
+        objectsPerPage = (int) Arrays.stream(buttons).filter(button -> button instanceof PagedObjectButton &&
+                ((PagedObjectButton<?, ?>) button).countTowardsPageObjects()).count();
     }
 
     public int getObjectsPerPage() {
