@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -72,10 +71,17 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
     private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(ProjectileHitEvent.class, "getHitEntity");
+    private static final Material FARMLAND = Materials.getMaterialSafe("FARMLAND", "SOIL");
+    @Nullable
+    private static final Material TURTLE_EGG = Materials.getMaterialSafe("TURTLE_EGG");
+    @Nullable
+    private static final Material SWEET_BERRY_BUSH = Materials.getMaterialSafe("SWEET_BERRY_BUSH");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -135,17 +141,16 @@ public final class ProtectionListener implements Listener {
 
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
-        String blockTypeName = blockType.name();
 
         if (Materials.isChest(blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
         else if (blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
         else if (blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
         else if (blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
-        else if (blockTypeName.equals("SOIL") || blockTypeName.equals("FARMLAND"))
+        else if (blockType == FARMLAND)
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-        else if (blockTypeName.equals("TURTLE_EGG"))
+        else if (TURTLE_EGG != null && blockType == TURTLE_EGG)
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if (blockTypeName.equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        else if (SWEET_BERRY_BUSH != null && blockType == SWEET_BERRY_BUSH && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
         else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1)
             requiredPrivilege = IslandPrivileges.BREAK;
