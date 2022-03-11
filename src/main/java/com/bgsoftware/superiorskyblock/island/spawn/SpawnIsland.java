@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -31,6 +32,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandCalculationAlgorithm;
+import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -1107,6 +1109,11 @@ public final class SpawnIsland implements Island {
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
         return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public IslandEntitiesTrackerAlgorithm getEntitiesTracker() {
+        return SpawnIslandEntitiesTrackerAlgorithm.getInstance();
     }
 
     @Override

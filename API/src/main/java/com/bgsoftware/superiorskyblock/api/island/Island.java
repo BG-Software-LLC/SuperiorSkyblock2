@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -1321,6 +1322,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * @param key    The key of the entity to check.
      */
     CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount);
+
+    /**
+     * Get the entities tracker used by the island.
+     */
+    IslandEntitiesTrackerAlgorithm getEntitiesTracker();
 
     /**
      * Get the team limit of the island.

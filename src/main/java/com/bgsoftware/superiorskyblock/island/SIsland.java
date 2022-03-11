@@ -54,7 +54,6 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
@@ -218,6 +217,7 @@ public final class SIsland implements Island {
         updateDatesFormatter();
         assignIslandChest();
         updateUpgrades();
+        this.entitiesTracker.recalculateEntityCounts();
 
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
@@ -2275,29 +2275,12 @@ public final class SIsland implements Island {
         if (entityLimit <= IslandUtils.NO_LIMIT.get())
             return CompletableFuture.completedFuture(false);
 
-        AtomicInteger amountOfEntities = new AtomicInteger(0);
+        return CompletableFuture.completedFuture(this.entitiesTracker.getEntityCount(key) + amount > entityLimit);
+    }
 
-        for (World.Environment environment : World.Environment.values()) {
-            try {
-                chunks.addAll(getAllChunksAsync(environment, true, true, chunk ->
-                        amountOfEntities.set(amountOfEntities.get() + (int) Arrays.stream(chunk.getEntities())
-                                .filter(entity -> key.equals(EntityUtils.getLimitEntityType(entity)) &&
-                                        !EntityUtils.canBypassEntityLimit(entity)).count())));
-            } catch (Exception ignored) {
-            }
-        }
-
-        CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
-
-        Executor.async(() -> {
-            //Waiting for all the chunks to load
-            chunks.forEachCompleted(chunk -> {
-            }, error -> {
-            });
-            completableFuture.complete(amountOfEntities.get() + amount - 1 > entityLimit);
-        });
-
-        return completableFuture;
+    @Override
+    public IslandEntitiesTrackerAlgorithm getEntitiesTracker() {
+        return this.entitiesTracker;
     }
 
     @Override
