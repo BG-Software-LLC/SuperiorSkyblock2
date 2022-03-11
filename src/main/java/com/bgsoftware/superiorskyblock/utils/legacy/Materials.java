@@ -5,6 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.function.Predicate;
 
 public enum Materials {
 
@@ -17,6 +20,9 @@ public enum Materials {
     BONE_MEAL("INK_SACK", 15),
     NETHER_PORTAL("PORTAL"),
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
+
+
+    private static final EnumSet<Material> SLAB_MATERIALS = allOf(material -> material.name().contains("SLAB"));
 
     private final String bukkitType;
     private final short bukkitData;
@@ -61,6 +67,18 @@ public enum Materials {
         } catch (IllegalArgumentException error) {
             return Material.valueOf(defaultMaterial);
         }
+    }
+
+    public static boolean isSlab(Material material) {
+        return SLAB_MATERIALS.contains(material);
+    }
+
+    private static EnumSet<Material> allOf(Predicate<Material> predicate) {
+        EnumSet<Material> enumSet = EnumSet.noneOf(Material.class);
+        Arrays.stream(Material.values())
+                .filter(material -> material.name().contains("SLAB"))
+                .forEach(enumSet::add);
+        return enumSet;
     }
 
 }

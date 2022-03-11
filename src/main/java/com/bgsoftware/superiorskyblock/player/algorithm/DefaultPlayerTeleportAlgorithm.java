@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgori
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
@@ -182,14 +183,17 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
     private void adjustAndTeleportPlayerToLocation(Player player, Island island, Location location, float yaw,
                                                    float pitch, Consumer<Boolean> result) {
-        location = location.add(0.5, 0, 0.5);
-        location.setYaw(yaw);
-        location.setPitch(pitch);
+        double yAdjustment = Materials.isSlab(location.getBlock().getType()) ? -0.5 : 0;
+
+        Location homeLocation = location.add(0.5, yAdjustment, 0.5);
+        homeLocation.setYaw(yaw);
+        homeLocation.setPitch(pitch);
+
 
         PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(location));
 
-        island.setIslandHome(location);
-        teleport(player, location.add(0, 0.5, 0));
+        island.setIslandHome(homeLocation);
+        teleport(player, homeLocation.add(0, 0.5, 0));
         if (result != null)
             result.accept(true);
     }
