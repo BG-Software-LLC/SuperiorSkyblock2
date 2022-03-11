@@ -315,7 +315,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
         ChunksProvider.stop();
         Executor.syncDatabaseCalls();
-        unloadIslandWorlds();
 
         try {
             dataHandler.saveDatabase(false);
@@ -344,6 +343,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             ex.printStackTrace();
             PluginDebugger.debug(ex);
         } finally {
+            unloadIslandWorlds();
+
             CalcTask.cancelTask();
             Executor.close();
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
