@@ -349,14 +349,24 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island) {
-        teleport(island, null);
+        this.teleport(island, (Consumer<Boolean>) null);
+    }
+
+    @Override
+    public void teleport(Island island, World.Environment environment) {
+        this.teleport(island, environment, null);
     }
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+        this.teleport(island, plugin.getSettings().getWorlds().getDefaultWorld(), teleportResult);
+    }
+
+    @Override
+    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
         Player player = asPlayer();
         if (player != null) {
-            playerTeleportAlgorithm.teleport(player, island).whenComplete((result, error) -> {
+            playerTeleportAlgorithm.teleport(player, island, environment).whenComplete((result, error) -> {
                 if (teleportResult != null)
                     teleportResult.accept(error == null && result);
             });

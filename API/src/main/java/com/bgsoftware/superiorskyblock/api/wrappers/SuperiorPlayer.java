@@ -188,10 +188,27 @@ public interface SuperiorPlayer extends IMissionsHolder {
     /**
      * Teleport the player to an island.
      *
+     * @param island      The island to teleport the player to.
+     * @param environment The environment to teleport the player to.
+     */
+    void teleport(Island island, World.Environment environment);
+
+    /**
+     * Teleport the player to an island.
+     *
      * @param island         The island to teleport the player to.
      * @param teleportResult Consumer that will be ran when task is finished.
      */
     void teleport(Island island, @Nullable Consumer<Boolean> teleportResult);
+
+    /**
+     * Teleport the player to an island.
+     *
+     * @param island         The island to teleport the player to.
+     * @param environment    The environment to teleport the player to.
+     * @param teleportResult Consumer that will be ran when task is finished.
+     */
+    void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult);
 
     /**
      * Check whether or not the player is inside their island.

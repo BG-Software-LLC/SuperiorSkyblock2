@@ -52,7 +52,12 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
     @Override
     public CompletableFuture<Boolean> teleport(Player player, Island island) {
-        Location homeLocation = island.getIslandHome(plugin.getSettings().getWorlds().getDefaultWorld());
+        return this.teleport(player, island, plugin.getSettings().getWorlds().getDefaultWorld());
+    }
+
+    @Override
+    public CompletableFuture<Boolean> teleport(Player player, Island island, World.Environment environment) {
+        Location homeLocation = island.getIslandHome(environment);
 
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
@@ -72,7 +77,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                 return;
             }
 
-            Block islandCenterBlock = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock();
+            Block islandCenterBlock = island.getCenter(environment).getBlock();
             float rotationYaw = homeLocation.getYaw();
             float rotationPitch = homeLocation.getPitch();
 
@@ -108,8 +113,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                          *   Finding a new block to teleport the player to.
                          */
 
-                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(
-                                        plugin.getSettings().getWorlds().getDefaultWorld(), true, true, null)
+                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(environment,
+                                        true, true, null)
                                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
                         Executor.createTask().runAsync(v -> {
