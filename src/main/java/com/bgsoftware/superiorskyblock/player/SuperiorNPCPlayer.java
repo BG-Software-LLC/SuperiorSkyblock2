@@ -24,9 +24,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -159,11 +157,22 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
 
     @Override
     public void teleport(Island island) {
-        teleport(island, null);
+        this.teleport(island, (Consumer<Boolean>) null);
+    }
+
+    @Override
+    public void teleport(Island island, World.Environment environment) {
+        this.teleport(island, environment, null);
     }
 
     @Override
     public void teleport(Island island, @Nullable Consumer<Boolean> teleportResult) {
+        if (teleportResult != null)
+            teleportResult.accept(false);
+    }
+
+    @Override
+    public void teleport(Island island, World.Environment environment, @Nullable Consumer<Boolean> teleportResult) {
         if (teleportResult != null)
             teleportResult.accept(false);
     }

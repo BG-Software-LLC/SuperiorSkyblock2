@@ -32,7 +32,7 @@ public final class WarpCategoryManageIconButton extends SuperiorMenuButton<MenuW
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         WarpCategory warpCategory = superiorMenu.getWarpCategory();
 
-        if (clickEvent.getClick().name().contains("RIGHT")) {
+        if (clickEvent.getClick().isRightClick()) {
             superiorMenu.setPreviousMove(false);
             plugin.getMenus().openWarpCategoryIconEdit(clickedPlayer, superiorMenu, warpCategory);
             return;

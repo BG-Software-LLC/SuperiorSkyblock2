@@ -45,7 +45,7 @@ public final class LocationUtils {
         Block underBlock = block.getRelative(BlockFace.DOWN);
         Block upperBlock = block.getRelative(BlockFace.UP);
         return !upperBlock.getType().isOccluding() && !block.getType().isOccluding() &&
-                (underBlock.getType().isSolid() || underBlock.getRelative(BlockFace.DOWN).getType().isSolid());
+                (underBlock.getType().isOccluding() || underBlock.getRelative(BlockFace.DOWN).getType().isOccluding());
     }
 
     public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot) {

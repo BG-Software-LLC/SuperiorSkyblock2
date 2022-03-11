@@ -3,12 +3,16 @@ package com.bgsoftware.superiorskyblock.utils.logic;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,10 +22,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class StackedBlocksLogic {
+
+    @Nullable
+    private static final Material CAULDRON_ITEM = Materials.getMaterialSafe("CAULDRON_ITEM");
+
+    @SuppressWarnings("unchecked")
+    private static final Map<Material, Material> AGAINST_BLOCK_CHANGE_MATERIAL = buildImmutableMap(
+            new Pair<>(Materials.getMaterialSafe("GLOWING_REDSTONE_ORE"), Material.REDSTONE_ORE)
+    );
+    private static final Set<Material> DATA_REMOVAL_MATERIALS = buildImmutableSet(
+            Materials.END_PORTAL_FRAME.toBukkitType(),
+            Materials.getMaterialSafe("PRISMARINE_BRICKS"),
+            Materials.getMaterialSafe("DARK_PRISMARINE")
+    );
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -43,17 +63,20 @@ public final class StackedBlocksLogic {
         if (placeItem.hasItemMeta() && (placeItem.getItemMeta().hasDisplayName() || placeItem.getItemMeta().hasLore()))
             return false;
 
-        if (againstBlock.getType().name().equals("GLOWING_REDSTONE_ORE"))
-            againstBlock.setType(Material.REDSTONE_ORE);
+        Material newAgainstBlockType = AGAINST_BLOCK_CHANGE_MATERIAL.get(againstBlock.getType());
+        if (newAgainstBlockType != null)
+            againstBlock.setType(newAgainstBlockType);
 
         //noinspection deprecation
         byte blockData = againstBlock.getData();
         Material blockType = againstBlock.getType();
 
-        if (blockType.name().contains("PORTAL_FRAME")) {
+        if (CAULDRON_ITEM != null && blockType == Material.CAULDRON && CAULDRON_ITEM == placeItem.getType()) {
+            blockType = CAULDRON_ITEM;
+        }
+
+        if (DATA_REMOVAL_MATERIALS.contains(blockType)) {
             blockData = 0;
-        } else if (blockType == Material.CAULDRON && placeItem.getType().name().equals("CAULDRON_ITEM")) {
-            blockType = Material.valueOf("CAULDRON_ITEM");
         }
 
         if (blockType != placeItem.getType() || blockData != placeItem.getDurability() ||
@@ -176,10 +199,12 @@ public final class StackedBlocksLogic {
         ItemStack blockItem = ServerVersion.isLegacy() ? block.getState().getData().toItemStack(amount) :
                 new ItemStack(block.getType(), amount);
 
-        if (blockItem.getType().name().equals("GLOWING_REDSTONE_ORE")) {
-            blockItem.setType(Material.REDSTONE_ORE);
-        } else if (ServerVersion.isLegacy() && blockItem.getType().name().equals("CAULDRON")) {
-            blockItem.setType(Material.valueOf("CAULDRON_ITEM"));
+        Material newAgainstBlockType = AGAINST_BLOCK_CHANGE_MATERIAL.get(blockItem.getType());
+        if (newAgainstBlockType != null)
+            blockItem.setType(newAgainstBlockType);
+
+        if (CAULDRON_ITEM != null && CAULDRON_ITEM == blockItem.getType()) {
+            blockItem.setType(CAULDRON_ITEM);
         }
 
         if (island != null) {
@@ -199,6 +224,24 @@ public final class StackedBlocksLogic {
         }
 
         return true;
+    }
+
+    private static Map<Material, Material> buildImmutableMap(Pair<Material, Material>... materials) {
+        ImmutableMap.Builder<Material, Material> builder = new ImmutableMap.Builder<>();
+        for (Pair<Material, Material> material : materials) {
+            if (material.getKey() != null && material.getValue() != null)
+                builder.put(material.getKey(), material.getValue());
+        }
+        return builder.build();
+    }
+
+    private static Set<Material> buildImmutableSet(Material... materials) {
+        ImmutableSet.Builder<Material> builder = new ImmutableSet.Builder<>();
+        for (Material material : materials) {
+            if (material != null)
+                builder.add(material);
+        }
+        return builder.build();
     }
 
 }

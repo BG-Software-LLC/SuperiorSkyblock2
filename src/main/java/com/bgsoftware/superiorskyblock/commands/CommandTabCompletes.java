@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuCustom;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
@@ -119,7 +119,8 @@ public final class CommandTabCompletes {
 
     public static List<String> getIslandWarps(Island island, String argument) {
         String lowerArgument = argument.toLowerCase();
-        return island.getIslandWarps().keySet().stream().filter(warpName -> warpName.toLowerCase().contains(lowerArgument))
+        return island.getIslandWarps().keySet().stream()
+                .filter(warpName -> warpName.toLowerCase().contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 
@@ -155,15 +156,17 @@ public final class CommandTabCompletes {
     public static List<String> getUpgrades(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase();
         return plugin.getUpgrades().getUpgrades().stream()
-                .filter(upgrade -> upgrade.getName().toLowerCase().contains(lowerArgument))
-                .map(Upgrade::getName).collect(Collectors.toList());
+                .map(Upgrade::getName)
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase();
         return plugin.getRoles().getRoles().stream()
-                .filter(playerRole -> playerRole.toString().toLowerCase().contains(lowerArgument))
-                .map(PlayerRole::toString).collect(Collectors.toList());
+                .map(PlayerRole::toString)
+                .filter(playerRoleName -> playerRoleName.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getPlayerRoles(SuperiorSkyblockPlugin plugin, String argument, Predicate<PlayerRole> predicate) {
@@ -175,8 +178,10 @@ public final class CommandTabCompletes {
 
     public static List<String> getMaterials(String argument) {
         String lowerArgument = argument.toLowerCase();
-        return Stream.of(Material.values()).filter(material -> material.isBlock() && !material.name().startsWith("LEGACY_") &&
-                        material.name().toLowerCase().contains(lowerArgument)).map(material -> material.name().toLowerCase())
+        return Materials.getBlocksNonLegacy().stream()
+                .filter(material -> material.isBlock() && !Materials.isLegacy(material))
+                .map(material -> material.name().toLowerCase())
+                .filter(materialName -> materialName.contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 
@@ -193,15 +198,18 @@ public final class CommandTabCompletes {
 
     public static List<String> getEntitiesForLimit(String argument) {
         String lowerArgument = argument.toLowerCase();
-        return Stream.of(EntityType.values()).filter(entityType -> EntityUtils.canHaveLimit(entityType) &&
-                        entityType.name().toLowerCase().contains(lowerArgument)).map(entityType -> entityType.name().toLowerCase())
+        return Stream.of(EntityType.values())
+                .filter(EntityUtils::canHaveLimit)
+                .map(entityType -> entityType.name().toLowerCase())
+                .filter(entityTypeName -> entityTypeName.contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 
     public static List<String> getMaterialsForGenerators(String argument) {
         String lowerArgument = argument.toLowerCase();
-        return Stream.of(Material.values()).filter(material -> material.isSolid() &&
-                        material.name().toLowerCase().contains(lowerArgument)).map(material -> material.name().toLowerCase())
+        return Materials.getSolids().stream()
+                .map(material -> material.name().toLowerCase())
+                .filter(materialName -> materialName.contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 
@@ -212,8 +220,9 @@ public final class CommandTabCompletes {
     public static List<String> getMissions(SuperiorSkyblockPlugin plugin, String argument) {
         String lowerArgument = argument.toLowerCase();
         return plugin.getMissions().getAllMissions().stream()
-                .filter(mission -> mission.getName().toLowerCase().contains(lowerArgument))
-                .map(Mission::getName).collect(Collectors.toList());
+                .map(Mission::getName)
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getMenus(String argument) {
@@ -225,55 +234,66 @@ public final class CommandTabCompletes {
 
     public static List<String> getBiomes(String argument) {
         String lowerArgument = argument.toLowerCase();
-        return Stream.of(Biome.values()).filter(biome -> biome.name().toLowerCase().contains(lowerArgument))
-                .map(material -> material.name().toLowerCase()).collect(Collectors.toList());
+        return Stream.of(Biome.values())
+                .map(biome -> biome.name().toLowerCase())
+                .filter(biomeName -> biomeName.contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getWorlds(String argument) {
         String lowerArgument = argument.toLowerCase();
-        return Bukkit.getWorlds().stream().filter(world -> world.getName().toLowerCase().contains(lowerArgument))
-                .map(World::getName).collect(Collectors.toList());
+        return Bukkit.getWorlds().stream()
+                .map(World::getName)
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getIslandPrivileges(String argument) {
         String lowerArgument = argument.toLowerCase();
         return IslandPrivilege.values().stream()
-                .filter(islandPrivilege -> islandPrivilege.getName().toLowerCase().contains(lowerArgument))
-                .map(islandPrivilege -> islandPrivilege.getName().toLowerCase()).collect(Collectors.toList());
+                .map(islandPrivilege -> islandPrivilege.getName().toLowerCase())
+                .filter(islandPrivilegeName -> islandPrivilegeName.contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getRatedPlayers(SuperiorSkyblockPlugin plugin, Island island, String argument) {
         String lowerArgument = argument.toLowerCase();
-        return island.getRatings().keySet().stream().map(plugin.getPlayers()::getSuperiorPlayer)
-                .filter(ratePlayer -> ratePlayer.getName().toLowerCase().contains(lowerArgument))
-                .map(SuperiorPlayer::getName).collect(Collectors.toList());
+        return island.getRatings().keySet().stream()
+                .map(playerUUID -> plugin.getPlayers().getSuperiorPlayer(playerUUID).getName())
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getRatings(String argument) {
         String lowerArgument = argument.toLowerCase();
         return IslandPrivilege.values().stream()
-                .filter(islandPrivilege -> islandPrivilege.getName().toLowerCase().contains(lowerArgument))
-                .map(IslandPrivilege::getName).collect(Collectors.toList());
+                .map(IslandPrivilege::getName)
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getIslandFlags(String argument) {
         String lowerArgument = argument.toLowerCase();
         return IslandFlag.values().stream()
-                .filter(islandFlag -> islandFlag.getName().toLowerCase().contains(lowerArgument))
-                .map(islandFlag -> islandFlag.getName().toLowerCase()).collect(Collectors.toList());
+                .map(islandFlag -> islandFlag.getName().toLowerCase())
+                .filter(islandFlagName -> islandFlagName.contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     public static List<String> getEnvironments(String argument) {
         String lowerArgument = argument.toLowerCase();
         return Arrays.stream(World.Environment.values())
-                .filter(environment -> environment.name().toLowerCase().contains(lowerArgument))
-                .map(environment -> environment.name().toLowerCase()).collect(Collectors.toList());
+                .map(environment -> environment.name().toLowerCase())
+                .filter(environmentName -> environmentName.contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     private static List<String> getPlayers(Collection<SuperiorPlayer> players, String argument) {
         String lowerArgument = argument.toLowerCase();
-        return players.stream().filter(player -> player.getName().toLowerCase().contains(lowerArgument))
-                .map(SuperiorPlayer::getName).collect(Collectors.toList());
+        return players.stream()
+                .map(SuperiorPlayer::getName)
+                .filter(name -> name.toLowerCase().contains(lowerArgument))
+                .collect(Collectors.toList());
     }
 
     private static List<String> getPlayers(Collection<SuperiorPlayer> players, String argument, Predicate<SuperiorPlayer> predicate) {

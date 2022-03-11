@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -62,8 +63,8 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
         @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
         public void onCartPlace(PlayerInteractEvent e) {
             if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                    !e.getClickedBlock().getType().name().contains("RAIL") ||
-                    !e.getItem().getType().name().contains("MINECART"))
+                    !Materials.isRail(e.getClickedBlock().getType()) ||
+                    !Materials.isMinecart(e.getItem().getType()))
                 return;
 
             if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)

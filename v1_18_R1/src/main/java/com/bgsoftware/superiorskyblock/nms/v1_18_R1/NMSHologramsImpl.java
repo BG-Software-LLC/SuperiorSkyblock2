@@ -36,6 +36,11 @@ public final class NMSHologramsImpl implements NMSHolograms {
         return entityHologram;
     }
 
+    @Override
+    public boolean isHologram(org.bukkit.entity.Entity entity) {
+        return ((CraftEntity) entity).getHandle() instanceof Hologram;
+    }
+
     private static final class EntityHologram extends EntityArmorStand implements Hologram {
 
         private static final AxisAlignedBB EMPTY_BOUND = new AxisAlignedBB(0D, 0D, 0D, 0D, 0D, 0D);

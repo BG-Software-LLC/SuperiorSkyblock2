@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -54,11 +54,9 @@ public final class PortalsLogic {
         }
 
         try {
-            Location destinationLocation = island.getIslandHome(destinationEnvironment);
-
             // If schematic was already generated, simply teleport player to destination location.
             if (island.wasSchematicGenerated(destinationEnvironment)) {
-                superiorPlayer.teleport(destinationLocation);
+                superiorPlayer.teleport(island, destinationEnvironment);
                 return;
             }
 
@@ -91,6 +89,8 @@ public final class PortalsLogic {
                     island.setBonusWorth(island.getBonusWorth().subtract(schematicWorth));
                     island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
                 }
+
+                Location destinationLocation = island.getIslandHome(destinationEnvironment);
 
                 if (destinationEnvironment == World.Environment.THE_END) {
                     plugin.getNMSDragonFight().awardTheEndAchievement(player);

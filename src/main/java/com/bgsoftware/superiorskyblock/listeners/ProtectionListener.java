@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -28,7 +27,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fish;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.LeashHitch;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Painting;
 import org.bukkit.entity.Player;
@@ -65,6 +63,7 @@ import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.Inventory;
@@ -72,10 +71,17 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("unused")
 public final class ProtectionListener implements Listener {
 
     private static final ReflectMethod<Entity> PROJECTILE_HIT_TARGET_ENTITY = new ReflectMethod<>(ProjectileHitEvent.class, "getHitEntity");
+    private static final Material FARMLAND = Materials.getMaterialSafe("FARMLAND", "SOIL");
+    @Nullable
+    private static final Material TURTLE_EGG = Materials.getMaterialSafe("TURTLE_EGG");
+    @Nullable
+    private static final Material SWEET_BERRY_BUSH = Materials.getMaterialSafe("SWEET_BERRY_BUSH");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -135,17 +141,16 @@ public final class ProtectionListener implements Listener {
 
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
-        String blockTypeName = blockType.name();
 
-        if (isChest(blockState, blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
+        if (Materials.isChest(blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
         else if (blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
         else if (blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
         else if (blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
-        else if (blockTypeName.equals("SOIL") || blockTypeName.equals("FARMLAND"))
+        else if (blockType == FARMLAND)
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-        else if (blockTypeName.equals("TURTLE_EGG"))
+        else if (TURTLE_EGG != null && blockType == TURTLE_EGG)
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if (blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        else if (SWEET_BERRY_BUSH != null && blockType == SWEET_BERRY_BUSH && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
         else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1)
             requiredPrivilege = IslandPrivileges.BREAK;
@@ -162,10 +167,6 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
-    }
-
-    private boolean isChest(BlockState blockState, Material type) {
-        return blockState instanceof Chest || type.name().contains("SHULKER_BOX") || type.name().contains("BARREL") || type == Material.ENDER_CHEST;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -395,12 +396,9 @@ public final class ProtectionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onUnleashEntity(PlayerInteractAtEntityEvent e) {
-        if (!(e.getRightClicked() instanceof LeashHitch))
-            return;
-
+    public void onPlayerUnleash(PlayerUnleashEntityEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-        Island island = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+        Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
             e.setCancelled(true);
@@ -483,10 +481,10 @@ public final class ProtectionListener implements Listener {
         if (e.getClickedBlock() == null || e.getItem() == null)
             return;
 
-        if (!e.getItem().getType().name().contains("MINECART") && !e.getItem().getType().name().contains("BOAT"))
+        if (!Materials.isMinecart(e.getItem().getType()) && !Materials.isBoat(e.getItem().getType()))
             return;
 
-        if (e.getItem().getType().name().contains("MINECART") && !e.getClickedBlock().getType().name().contains("RAIL"))
+        if (Materials.isMinecart(e.getItem().getType()) && !Materials.isRail(e.getClickedBlock().getType()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());

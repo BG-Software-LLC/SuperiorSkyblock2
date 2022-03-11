@@ -8,12 +8,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -74,9 +76,10 @@ public final class BlocksLogic {
 
         if (island != null) {
             if (oldBlockState != null) {
-                if (oldBlockState.getType().name().contains("LAVA"))
+                Material blockStateType = oldBlockState.getType();
+                if (Materials.isLava(blockStateType))
                     island.handleBlockBreak(ConstantKeys.LAVA, 1);
-                else if (oldBlockState.getType().name().contains("WATER"))
+                else if (Materials.isWater(blockStateType))
                     island.handleBlockBreak(ConstantKeys.WATER, 1);
             }
 
@@ -189,7 +192,7 @@ public final class BlocksLogic {
             warpLines[i] = StringUtils.translateColors(warpLines[i]);
 
         Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
-        if (oldWelcomeSignBlock != null && oldWelcomeSignBlock.getType().name().contains("SIGN")) {
+        if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
             Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
             oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());
             oldWelcomeSign.update();

@@ -44,8 +44,8 @@ public final class UniqueVisitorPagedObjectButton extends
     @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuUniqueVisitors superiorMenu,
                               InventoryClickEvent clickEvent) {
-        String subCommandToExecute = clickEvent.getClick().name().contains("RIGHT") ? "invite" :
-                clickEvent.getClick().name().contains("LEFT") ? "expel" : null;
+        String subCommandToExecute = clickEvent.getClick().isRightClick() ? "invite" :
+                clickEvent.getClick().isLeftClick() ? "expel" : null;
 
         if (subCommandToExecute == null)
             return;

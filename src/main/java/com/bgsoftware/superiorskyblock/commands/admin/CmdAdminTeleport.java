@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -86,8 +85,7 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
             }
         }
 
-        Location homeLocation = island.getIslandHome(environment);
-        superiorPlayer.teleport(homeLocation);
+        superiorPlayer.teleport(island, environment, null);
     }
 
     @Override
