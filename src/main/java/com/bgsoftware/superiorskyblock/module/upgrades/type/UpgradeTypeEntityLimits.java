@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -100,8 +101,8 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
         public void onVehicleSpawn(PlayerInteractEvent e) {
             if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
                     e.getPlayer().getGameMode() == GameMode.CREATIVE ||
-                    !e.getClickedBlock().getType().name().contains("RAIL") ||
-                    !e.getItem().getType().name().contains("MINECART"))
+                    !Materials.isRail(e.getClickedBlock().getType()) ||
+                    !Materials.isMinecart(e.getItem().getType()))
                 return;
 
             if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)

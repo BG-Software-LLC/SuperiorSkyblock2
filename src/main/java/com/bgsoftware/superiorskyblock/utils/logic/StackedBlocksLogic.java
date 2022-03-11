@@ -22,12 +22,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public final class StackedBlocksLogic {
+
+    @Nullable
+    private static final Material CAULDRON_ITEM = Materials.getMaterialSafe("CAULDRON_ITEM");
 
     @SuppressWarnings("unchecked")
     private static final Map<Material, Material> AGAINST_BLOCK_CHANGE_MATERIAL = buildImmutableMap(
@@ -67,8 +71,8 @@ public final class StackedBlocksLogic {
         byte blockData = againstBlock.getData();
         Material blockType = againstBlock.getType();
 
-        if (blockType == Material.CAULDRON && placeItem.getType().name().equals("CAULDRON_ITEM")) {
-            blockType = Material.valueOf("CAULDRON_ITEM");
+        if (CAULDRON_ITEM != null && blockType == Material.CAULDRON && CAULDRON_ITEM == placeItem.getType()) {
+            blockType = CAULDRON_ITEM;
         }
 
         if (DATA_REMOVAL_MATERIALS.contains(blockType)) {
@@ -195,10 +199,12 @@ public final class StackedBlocksLogic {
         ItemStack blockItem = ServerVersion.isLegacy() ? block.getState().getData().toItemStack(amount) :
                 new ItemStack(block.getType(), amount);
 
-        if (blockItem.getType().name().equals("GLOWING_REDSTONE_ORE")) {
-            blockItem.setType(Material.REDSTONE_ORE);
-        } else if (ServerVersion.isLegacy() && blockItem.getType().name().equals("CAULDRON")) {
-            blockItem.setType(Material.valueOf("CAULDRON_ITEM"));
+        Material newAgainstBlockType = AGAINST_BLOCK_CHANGE_MATERIAL.get(blockItem.getType());
+        if (newAgainstBlockType != null)
+            blockItem.setType(newAgainstBlockType);
+
+        if (CAULDRON_ITEM != null && CAULDRON_ITEM == blockItem.getType()) {
+            blockItem.setType(CAULDRON_ITEM);
         }
 
         if (island != null) {

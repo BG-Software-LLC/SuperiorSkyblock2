@@ -1,14 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -81,10 +82,10 @@ public final class CmdAdminCount implements IAdminIslandCommand {
 
             if (island != null) {
                 String materialArgument = args[3].toLowerCase();
-                for (Material material : Material.values()) {
-                    if (material.isBlock() && !material.name().startsWith("LEGACY_") && material.name().toLowerCase().contains(materialArgument))
-                        list.add(material.name().toLowerCase());
-                }
+                Materials.getBlocksNonLegacy().stream()
+                        .map(material -> material.name().toLowerCase())
+                        .filter(materialName -> materialName.contains(materialArgument))
+                        .forEach(list::add);
                 if ("*".contains(materialArgument))
                     list.add("*");
             }

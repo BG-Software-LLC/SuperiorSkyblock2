@@ -132,7 +132,7 @@ public final class BlocksListener implements Listener {
         Material blockType = e.getBlockClicked().getType();
         boolean isWaterLogged = plugin.getNMSWorld().isWaterLogged(e.getBlockClicked());
 
-        if (!blockType.name().contains("WATER") && !blockType.name().contains("LAVA") && !isWaterLogged)
+        if (!e.getBlockClicked().isLiquid() && !isWaterLogged)
             return;
 
         Key blockKey = isWaterLogged ? ConstantKeys.WATER : Key.of(e.getBlockClicked());
@@ -429,7 +429,9 @@ public final class BlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onGolemCreate(CreatureSpawnEvent e) {
-        if (!e.getSpawnReason().name().contains("BUILD"))
+        if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.BUILD_SNOWMAN &&
+                e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.BUILD_IRONGOLEM &&
+                e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.BUILD_WITHER)
             return;
 
         List<Location> blocksToCheck = new ArrayList<>();
@@ -474,8 +476,8 @@ public final class BlocksListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCartPlaceMonitor(PlayerInteractEvent e) {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || e.getItem() == null ||
-                !e.getClickedBlock().getType().name().contains("RAIL") ||
-                !e.getItem().getType().name().contains("MINECART"))
+                !Materials.isRail(e.getClickedBlock().getType()) ||
+                !Materials.isMinecart(e.getItem().getType()))
             return;
 
         if (INTERACT_GET_HAND.isValid() && INTERACT_GET_HAND.invoke(e) != EquipmentSlot.HAND)

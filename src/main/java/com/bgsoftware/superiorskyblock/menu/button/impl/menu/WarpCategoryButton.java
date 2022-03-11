@@ -29,7 +29,7 @@ public final class WarpCategoryButton extends SuperiorMenuButton<MenuWarpCategor
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuWarpCategories superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
-        if (superiorMenu.hasManagePerms() && clickEvent.getClick().name().contains("RIGHT")) {
+        if (superiorMenu.hasManagePerms() && clickEvent.getClick().isRightClick()) {
             superiorMenu.setPreviousMove(false);
             plugin.getMenus().openWarpCategoryManage(clickedPlayer, superiorMenu, warpCategory);
         } else {

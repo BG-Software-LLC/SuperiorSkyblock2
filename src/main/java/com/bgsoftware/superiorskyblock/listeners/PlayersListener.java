@@ -392,7 +392,7 @@ public final class PlayersListener implements Listener {
 
         e.setCancelled(true);
 
-        if (e.getAction().name().contains("RIGHT")) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
             Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos1(e.getClickedBlock());
         } else {

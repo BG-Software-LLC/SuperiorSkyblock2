@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
@@ -97,7 +98,7 @@ public final class SettingsListener implements Listener {
             if (!plugin.getSettings().getSpawn().isProtected() && island.isSpawn())
                 return;
 
-            if (!island.hasSettingsEnabled(e.getBlock().getType().name().contains("WATER") ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW))
+            if (!island.hasSettingsEnabled(Materials.isWater(e.getBlock().getType()) ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW))
                 e.setCancelled(true);
         }
     }

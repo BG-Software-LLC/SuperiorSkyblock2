@@ -137,7 +137,7 @@ public final class ProtectionListener implements Listener {
         Material blockType = clickedBlock.getType();
         String blockTypeName = blockType.name();
 
-        if (isChest(blockState, blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
+        if (Materials.isChest(blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
         else if (blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
         else if (blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
         else if (blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
@@ -145,7 +145,7 @@ public final class ProtectionListener implements Listener {
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
         else if (blockTypeName.equals("TURTLE_EGG"))
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if (blockType.name().equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        else if (blockTypeName.equals("SWEET_BERRY_BUSH") && e.getAction() == Action.RIGHT_CLICK_BLOCK)
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
         else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1)
             requiredPrivilege = IslandPrivileges.BREAK;
@@ -162,10 +162,6 @@ public final class ProtectionListener implements Listener {
             e.setCancelled(true);
             Message.INTERACT_OUTSIDE_ISLAND.send(superiorPlayer);
         }
-    }
-
-    private boolean isChest(BlockState blockState, Material type) {
-        return blockState instanceof Chest || type.name().contains("SHULKER_BOX") || type.name().contains("BARREL") || type == Material.ENDER_CHEST;
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
@@ -480,10 +476,10 @@ public final class ProtectionListener implements Listener {
         if (e.getClickedBlock() == null || e.getItem() == null)
             return;
 
-        if (!e.getItem().getType().name().contains("MINECART") && !e.getItem().getType().name().contains("BOAT"))
+        if (!Materials.isMinecart(e.getItem().getType()) && !Materials.isBoat(e.getItem().getType()))
             return;
 
-        if (e.getItem().getType().name().contains("MINECART") && !e.getClickedBlock().getType().name().contains("RAIL"))
+        if (Materials.isMinecart(e.getItem().getType()) && !Materials.isRail(e.getClickedBlock().getType()))
             return;
 
         Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());

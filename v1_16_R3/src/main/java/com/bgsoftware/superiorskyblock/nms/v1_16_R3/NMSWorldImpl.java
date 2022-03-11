@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
@@ -269,7 +270,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public boolean isWaterLogged(org.bukkit.block.Block block) {
-        if (block.getType().name().contains("WATER"))
+        if (Materials.isWater(block.getType()))
             return true;
 
         org.bukkit.block.data.BlockData blockData = block.getBlockData();
