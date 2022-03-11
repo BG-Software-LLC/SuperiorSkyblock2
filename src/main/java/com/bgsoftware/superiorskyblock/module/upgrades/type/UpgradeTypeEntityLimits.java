@@ -71,13 +71,8 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
                 return;
 
             island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
-                if (result) {
-                    if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                        Executor.ensureMain(() -> e.getEntity().remove());
-                    } else {
-                        e.getEntity().remove();
-                    }
-                }
+                if (result)
+                    removeEntity(e.getEntity());
             });
         }
 
@@ -93,7 +88,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
             island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result && e.getEntity().isValid() && !e.getEntity().isDead()) {
-                    e.getEntity().remove();
+                    removeEntity(e.getEntity());
                     if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
                         ItemUtils.addItem(asItemStack(e.getEntity()), e.getPlayer().getInventory(),
                                 e.getPlayer().getLocation());
@@ -141,7 +136,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             island.hasReachedEntityLimit(Key.of(e.getVehicle())).whenComplete((result, ex) -> {
                 if (result && e.getVehicle().isValid() && !e.getVehicle().isDead()) {
                     Executor.sync(() -> {
-                        e.getVehicle().remove();
+                        removeEntity(e.getVehicle());
                         if (placedVehicle != null) {
                             Player player = Bukkit.getPlayer(placedVehicle);
                             if (player != null)
@@ -181,6 +176,14 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             }
 
             throw new IllegalArgumentException("Cannot find an item for " + entity.getType());
+        }
+
+        private void removeEntity(Entity entity) {
+            if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
+                Executor.ensureMain(entity::remove);
+            } else {
+                entity.remove();
+            }
         }
 
     }
