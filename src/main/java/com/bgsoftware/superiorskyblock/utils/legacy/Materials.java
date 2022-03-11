@@ -25,10 +25,9 @@ public enum Materials {
     END_PORTAL_FRAME("ENDER_PORTAL_FRAME");
 
 
+    private static final EnumMap<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
     private static final EnumSet<Material> BLOCK_NON_LEGACY_MATERIALS = allOf(material -> material.isBlock() && !isLegacy(material));
     private static final EnumSet<Material> SOLID_MATERIALS = allOf(Material::isSolid);
-
-    private static final EnumMap<Material, MaterialTag> MATERIAL_TAGS = setupMaterialTags();
 
     private final String bukkitType;
     private final short bukkitData;
@@ -117,6 +116,10 @@ public enum Materials {
 
     public static Set<Material> getSolids() {
         return ImmutableSet.copyOf(SOLID_MATERIALS);
+    }
+
+    public static void init() {
+
     }
 
     private static EnumSet<Material> allOf(Predicate<Material> predicate) {
