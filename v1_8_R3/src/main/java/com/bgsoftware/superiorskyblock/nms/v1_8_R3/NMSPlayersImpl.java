@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -24,6 +25,8 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R3.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Optional;
 
 public final class NMSPlayersImpl implements NMSPlayers {
@@ -101,6 +104,16 @@ public final class NMSPlayersImpl implements NMSPlayers {
     public boolean wasThrownByPlayer(org.bukkit.entity.Item item, Player player) {
         Entity entity = ((CraftItem) item).getHandle();
         return entity instanceof EntityItem && player.getName().equals(((EntityItem) entity).n());
+    }
+
+    @Nullable
+    @Override
+    public Locale getPlayerLocale(Player player) {
+        try {
+            return PlayerLocales.getLocale(player.spigot().getLocale());
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
     }
 
 }

@@ -182,6 +182,7 @@ public final class SettingsContainer {
     public final double chargeOnWarp;
     public final boolean publicWarps;
     public final long recalcTaskTimeout;
+    public final boolean autoLanguageDetection;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
         databaseType = config.getString("database.type");
@@ -471,6 +472,7 @@ public final class SettingsContainer {
         chargeOnWarp = config.getDouble("charge-on-warp", 0D);
         publicWarps = config.getBoolean("public-warps");
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
+        autoLanguageDetection = config.getBoolean("auto-language-detection", true);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

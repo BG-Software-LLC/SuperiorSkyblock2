@@ -513,6 +513,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         return this.container.recalcTaskTimeout;
     }
 
+    @Override
+    public boolean isAutoLanguageDetection() {
+        return this.container.autoLanguageDetection;
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");

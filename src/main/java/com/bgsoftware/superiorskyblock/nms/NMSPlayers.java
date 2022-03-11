@@ -6,6 +6,9 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+import java.util.Locale;
+
 public interface NMSPlayers {
 
     void clearInventory(OfflinePlayer offlinePlayer);
@@ -19,5 +22,8 @@ public interface NMSPlayers {
     void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut);
 
     boolean wasThrownByPlayer(Item item, Player player);
+
+    @Nullable
+    Locale getPlayerLocale(Player player);
 
 }

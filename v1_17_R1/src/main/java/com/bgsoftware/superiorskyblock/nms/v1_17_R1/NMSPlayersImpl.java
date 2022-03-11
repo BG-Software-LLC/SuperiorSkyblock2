@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
@@ -23,10 +25,13 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Optional;
 
 public final class NMSPlayersImpl implements NMSPlayers {
 
+    private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(Player.class, "locale");
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @Override
@@ -89,6 +94,19 @@ public final class NMSPlayersImpl implements NMSPlayers {
     public boolean wasThrownByPlayer(Item item, Player player) {
         Entity entity = ((CraftItem) item).getHandle();
         return entity instanceof EntityItem && player.getUniqueId().equals(((EntityItem) entity).getThrower());
+    }
+
+    @Nullable
+    @Override
+    public Locale getPlayerLocale(Player player) {
+        if (PLAYER_LOCALE.isValid()) {
+            return player.locale();
+        } else try {
+            //noinspection deprecation
+            return PlayerLocales.getLocale(player.getLocale());
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
     }
 
 }

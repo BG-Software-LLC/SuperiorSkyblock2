@@ -19,7 +19,7 @@ public final class PlayerLocales {
 
     private static final Pattern RTL_LOCALE_PATTERN = Pattern.compile(
             "^(ar|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Arab|Hebr|Thaa|Nkoo|Tfng))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)");
-    private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-z]{2}[_|-][A-Z]{2}$");
+    private static final Pattern LOCALE_PATTERN = Pattern.compile("^[a-zA-Z]{2}[_|-][a-zA-Z]{2}$");
 
     private static final Set<Locale> locales = new HashSet<>();
     private static final Set<UUID> noInteractMessages = new HashSet<>();

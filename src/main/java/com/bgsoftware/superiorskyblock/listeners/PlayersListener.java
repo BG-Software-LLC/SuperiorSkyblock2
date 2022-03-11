@@ -70,6 +70,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -148,6 +149,15 @@ public final class PlayersListener implements Listener {
                 Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
             }
         }, 10L);
+
+        if (plugin.getSettings().isAutoLanguageDetection() && !e.getPlayer().hasPlayedBefore()) {
+            Executor.sync(() -> superiorPlayer.runIfOnline(player -> {
+                Locale playerLocale = plugin.getNMSPlayers().getPlayerLocale(player);
+                if (playerLocale != null && PlayerLocales.isValidLocale(playerLocale)) {
+                    superiorPlayer.setUserLocale(playerLocale);
+                }
+            }), 2L);
+        }
 
         Executor.async(() -> superiorPlayer.runIfOnline(player -> {
             java.util.Locale locale = superiorPlayer.getUserLocale();

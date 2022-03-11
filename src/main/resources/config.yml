@@ -739,3 +739,8 @@ public-warps: false
 # Timeout for the recalculate task, in seconds.
 # If you want to disable the timeout, set this to 0 or below.
 recalc-task-timeout: 10
+
+# Detect the player's language automatically when he first joins the server.
+# The language will only get changed if there is a valid translation available,
+# otherwise the default language will be chosen for the player.
+auto-language-detection: true

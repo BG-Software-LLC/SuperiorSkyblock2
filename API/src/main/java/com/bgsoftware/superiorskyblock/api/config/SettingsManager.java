@@ -543,6 +543,11 @@ public interface SettingsManager {
      */
     long getRecalcTaskTimeout();
 
+    /**
+     * Whether to detect the player's language automatically when he first joins the server.
+     * Config-path: auto-language-detection
+     */
+    boolean isAutoLanguageDetection();
 
     interface Database {
 
