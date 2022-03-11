@@ -378,6 +378,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
         if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
             registerHook("SlimeWorldManagerHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
+            registerHook("ProtocolLibHook");
     }
 
     private void registerSpawnersProvider() {

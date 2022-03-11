@@ -153,7 +153,8 @@ public final class PlayersListener implements Listener {
         if (plugin.getSettings().isAutoLanguageDetection() && !e.getPlayer().hasPlayedBefore()) {
             Executor.sync(() -> superiorPlayer.runIfOnline(player -> {
                 Locale playerLocale = plugin.getNMSPlayers().getPlayerLocale(player);
-                if (playerLocale != null && PlayerLocales.isValidLocale(playerLocale)) {
+                if (playerLocale != null && PlayerLocales.isValidLocale(playerLocale) &&
+                        !superiorPlayer.getUserLocale().equals(playerLocale)) {
                     superiorPlayer.setUserLocale(playerLocale);
                 }
             }), 2L);

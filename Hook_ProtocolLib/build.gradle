@@ -1,0 +1,18 @@
+group 'Hook_ProtocolLib'
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.dmulloy2.net/repository/public/" }
+}
+
+dependencies {
+    compileOnly "com.comphenix.protocol:ProtocolLib:4.8.0"
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_protocollib') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_protocollib").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}

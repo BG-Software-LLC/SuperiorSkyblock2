@@ -21,6 +21,7 @@ softdepend:
   - MVdWPlaceholderAPI
   - MergedSpawner
   - PlaceholderAPI
+  - ProtocolLib
   - PvpingSpawners
   - RoseStacker
   - ShopGUIPlus
