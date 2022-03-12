@@ -10,11 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 public final class ChunkSection extends MappedObject<net.minecraft.world.level.chunk.ChunkSection> {
 
-    public ChunkSection(int chunkPos, DataPaletteBlock<IBlockData> blockStateContainer,
-                        DataPaletteBlock<Holder<BiomeBase>> biomeContainer) {
-        this(new net.minecraft.world.level.chunk.ChunkSection(chunkPos, blockStateContainer, biomeContainer));
-    }
-
     public ChunkSection(net.minecraft.world.level.chunk.ChunkSection handle) {
         super(handle);
     }

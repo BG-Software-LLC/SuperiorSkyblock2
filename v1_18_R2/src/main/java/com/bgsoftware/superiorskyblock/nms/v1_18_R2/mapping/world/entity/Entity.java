@@ -6,13 +6,12 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.dimension.end.EnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.pathfinder.PathEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.pathfinder.PathPoint;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.PlayerConnection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.chat.ChatBaseComponent;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.boss.enderdragon.phases.DragonControllerManager;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.phys.AxisAlignedBB;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityLiving;
@@ -22,6 +21,7 @@ import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.pathfinder.PathPoint;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.entity.LivingEntity;
@@ -88,12 +88,8 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
         return handle.Y();
     }
 
-    public ChatBaseComponent getScoreboardDisplayName() {
-        return new ChatBaseComponent(handle.C_());
-    }
-
-    public Entity getEntity(WorldServer worldServer, UUID uuid) {
-        return new Entity(worldServer.getHandle().a(uuid));
+    public IChatBaseComponent getScoreboardDisplayName() {
+        return handle.C_();
     }
 
     public BlockPosition getChunkCoordinates() {
@@ -134,7 +130,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
     }
 
     public PathEntity findPath(int from, int to, @Nullable PathPoint pathNode) {
-        return new PathEntity(((EntityEnderDragon) handle).a(from, to, pathNode == null ? null : pathNode.getHandle()));
+        return new PathEntity(((EntityEnderDragon) handle).a(from, to, pathNode));
     }
 
     public boolean isInvisible() {

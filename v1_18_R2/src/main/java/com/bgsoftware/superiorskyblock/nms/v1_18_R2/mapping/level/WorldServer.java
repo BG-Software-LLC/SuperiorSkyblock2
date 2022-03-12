@@ -76,10 +76,6 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
         return Entity.ofNullable(handle.a(uuid));
     }
 
-    public void setTileEntity(TileEntity tileEntity) {
-        handle.a(tileEntity.getHandle());
-    }
-
     public void setTickingBlockEntity(TickingBlockEntity tickingBlockEntity) {
         handle.a(tickingBlockEntity);
     }

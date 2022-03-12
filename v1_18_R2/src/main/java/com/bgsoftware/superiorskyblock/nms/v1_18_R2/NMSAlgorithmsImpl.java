@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.RegistryBlocks;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.BlockData;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.chat.ChatBaseComponent;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.chat.ChatSerializer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.item.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,7 +40,7 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public String parseSignLine(String original) {
-        return ChatBaseComponent.ChatSerializer.toJson(CraftChatMessage.fromString(original)[0]);
+        return ChatSerializer.toJson(CraftChatMessage.fromString(original)[0]);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level;
 
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.chat.ChatBaseComponent;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.level.EntityPlayer;
 
 import java.util.Collection;
@@ -34,8 +34,8 @@ public final class BossBattleServer extends MappedObject<net.minecraft.server.le
         handle.a((EntityPlayer) entity.getHandle());
     }
 
-    public void setName(ChatBaseComponent component) {
-        handle.a(component.getHandle());
+    public void setName(IChatBaseComponent component) {
+        handle.a(component);
     }
 
 }

@@ -30,10 +30,6 @@ public final class Block extends MappedObject<net.minecraft.world.level.block.Bl
         return handle.e_(blockData.getHandle());
     }
 
-    public TileEntity createTile(BlockPosition blockPosition, BlockData blockData) {
-        return TileEntity.ofNullable(((ITileEntity) handle).a(blockPosition.getHandle(), blockData.getHandle()));
-    }
-
     public static int getCombinedId(BlockData blockData) {
         return net.minecraft.world.level.block.Block.i(blockData.getHandle());
     }

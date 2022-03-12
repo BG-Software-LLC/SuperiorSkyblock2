@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.entity.T
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.pathfinder.PathEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.pathfinder.PathPoint;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagList;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
@@ -58,6 +57,7 @@ import net.minecraft.world.level.dimension.end.EnumDragonRespawn;
 import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 import net.minecraft.world.level.levelgen.feature.configurations.WorldGenFeatureConfiguration;
+import net.minecraft.world.level.pathfinder.PathPoint;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -904,7 +904,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
                 PathPoint pathPoint = new PathPoint(highestBlock.getX(), highestBlock.getY(), highestBlock.getZ());
 
                 if (DRAGON_FIND_PATH.isValid()) {
-                    currentPath = PathEntity.ofNullable(DRAGON_FIND_PATH.invoke(this.a, closestNode, closestNode1, pathPoint.getHandle()));
+                    currentPath = PathEntity.ofNullable(DRAGON_FIND_PATH.invoke(this.a, closestNode, closestNode1, pathPoint));
                 } else {
                     currentPath = entityEnderDragon.findPath(closestNode, closestNode1, pathPoint);
                 }

@@ -55,10 +55,6 @@ public final class BlockData extends MappedObject<IBlockData> {
         return new SoundEffectType(handle.q());
     }
 
-    public boolean isTileEntity() {
-        return handle.n();
-    }
-
     public void randomTick(WorldServer worldServer, BlockPosition blockPosition, Random random) {
         handle.b(worldServer.getHandle(), blockPosition.getHandle(), random);
     }

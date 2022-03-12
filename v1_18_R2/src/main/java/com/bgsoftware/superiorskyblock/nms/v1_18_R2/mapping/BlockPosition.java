@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.google.common.collect.AbstractIterator;
 import net.minecraft.core.EnumDirection;
 import net.minecraft.world.phys.Vec3D;
@@ -65,10 +64,6 @@ public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPo
 
     public boolean closerThan(Vec3D position, double maxDistance) {
         return handle.a(position, maxDistance);
-    }
-
-    public boolean isValidLocation(WorldServer worldServer) {
-        return handle.isInsideBuildHeightAndWorldBoundsHorizontal(worldServer.getHandle());
     }
 
     public static Iterable<BlockPosition> allBlocksBetween(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {

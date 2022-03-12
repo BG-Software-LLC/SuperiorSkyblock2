@@ -2,11 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk;
 
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.ChunkCoordIntPair;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.Holder;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
 import net.minecraft.core.IRegistry;
 import net.minecraft.core.Registry;
@@ -58,20 +56,8 @@ public final class ChunkAccess extends MappedObject<IChunkAccess> {
         return ((Chunk) handle).B();
     }
 
-    public void setType(BlockPosition blockPosition, BlockData blockData, boolean flag, boolean flag2) {
-        ((Chunk) handle).setBlockState(blockPosition.getHandle(), blockData.getHandle(), flag, flag2);
-    }
-
     public void setNeedsSaving(boolean needsSaving) {
         handle.a(needsSaving);
-    }
-
-    public void setTileEntity(TileEntity tileEntity) {
-        handle.a(tileEntity.getHandle());
-    }
-
-    public Holder<BiomeBase> getNoiseBiome(int x, int y, int z) {
-        return Holder.ofNullable(handle.getNoiseBiome(x, y, z));
     }
 
     public IRegistry<BiomeBase> getBiomeRegistry() {
