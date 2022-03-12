@@ -40,7 +40,7 @@ public final class CoreProtectHook {
                     coreProtectAPI.logPlacement(offlinePlayer.getName(), block.getLocation(), block.getType(), block.getData());
                     break;
             }
-        } else if (coreProtectAPI.APIVersion() == 6) {
+        } else if (coreProtectAPI.APIVersion() <= 9) {
             switch (action) {
                 case BLOCK_BREAK:
                     coreProtectAPI.logRemoval(offlinePlayer.getName(), block.getLocation(), block.getType(),
