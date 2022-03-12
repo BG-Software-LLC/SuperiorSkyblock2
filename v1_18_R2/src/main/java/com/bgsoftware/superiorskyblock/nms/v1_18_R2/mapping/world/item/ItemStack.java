@@ -11,7 +11,7 @@ public final class ItemStack extends MappedObject<net.minecraft.world.item.ItemS
     }
 
     public NBTTagCompound getOrCreateTag() {
-        return new NBTTagCompound(handle.t());
+        return new NBTTagCompound(handle.u());
     }
 
     public NBTTagCompound save(NBTTagCompound nbtTagCompound) {
