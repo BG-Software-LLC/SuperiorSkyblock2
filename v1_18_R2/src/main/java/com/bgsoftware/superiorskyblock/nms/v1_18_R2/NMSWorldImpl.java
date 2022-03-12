@@ -193,7 +193,7 @@ public final class NMSWorldImpl implements NMSWorld {
             if (currentSection != null) {
                 DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.getBlocks();
                 DataPaletteBlock<Holder<BiomeBase>> biomesDataPalette = new DataPaletteBlock<>(biomesRegistryHolder,
-                        biomeBase, DataPaletteBlock.e.e, null);
+                        biomeBase, DataPaletteBlock.e.e);
                 chunkSections[i] = new net.minecraft.world.level.chunk.ChunkSection(
                         currentSection.getYPosition() >> 4, dataPaletteBlock, biomesDataPalette);
             }
