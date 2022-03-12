@@ -142,9 +142,13 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                 for (int x = 0; x < 16; x++) {
                                     for (int z = 0; z < 16; z++) {
                                         int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
+
+                                        if (y < worldMinLimit)
+                                            continue;
+
                                         Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
                                         Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
-                                                y == worldMinLimit ? worldMinLimit : y - 1, z);
+                                                y <= worldMinLimit ? worldMinLimit : y - 1, z);
 
                                         Material blockType;
                                         Material belowType;
