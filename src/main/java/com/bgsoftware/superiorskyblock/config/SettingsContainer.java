@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.config;
 
+import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,8 +25,10 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,6 +110,7 @@ public final class SettingsContainer {
     public final boolean voidTeleportMembers;
     public final boolean voidTeleportVisitors;
     public final List<String> interactables;
+    public final KeySet safeBlocks;
     public final boolean visitorsDamage;
     public final boolean coopDamage;
     public final int disbandCount;
@@ -323,6 +328,7 @@ public final class SettingsContainer {
         voidTeleportMembers = config.getBoolean("void-teleport.members", true);
         voidTeleportVisitors = config.getBoolean("void-teleport.visitors", true);
         interactables = loadInteractables(plugin);
+        safeBlocks = loadSafeBlocks(plugin);
         visitorsDamage = config.getBoolean("visitors-damage", false);
         coopDamage = config.getBoolean("coop-damage", true);
         disbandCount = config.getInt("disband-count", 5);
@@ -484,6 +490,37 @@ public final class SettingsContainer {
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
         return cfg.getStringList("interactables");
+    }
+
+    private KeySet loadSafeBlocks(SuperiorSkyblockPlugin plugin) {
+        File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
+
+        if (!file.exists())
+            FileUtils.saveResource("safe_blocks.yml");
+
+        CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
+
+        List<String> safeBlocks = cfg.getStringList("safe-blocks");
+
+        if (!safeBlocks.isEmpty())
+            return new KeySet(safeBlocks);
+
+        SuperiorSkyblockPlugin.log("&c[safe_blocks.yml] There are no valid safe blocks! Generating default ones...");
+
+        List<String> safeBlocksDefaults = Arrays.stream(Material.values())
+                .filter(Material::isSolid)
+                .map(Material::name)
+                .sorted()
+                .collect(Collectors.toList());
+
+        try {
+            cfg.set("safe-blocks", safeBlocksDefaults);
+            cfg.save(file);
+        } catch (IOException error) {
+            PluginDebugger.debug(error);
+        }
+
+        return new KeySet(safeBlocksDefaults);
     }
 
     private void loadGenerator(List<String> lines, int index) {

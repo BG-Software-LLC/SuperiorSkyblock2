@@ -2,21 +2,17 @@ package com.bgsoftware.superiorskyblock.player.algorithm;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -118,6 +114,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                         true, true, null)
                                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
+                        World islandsWorld = plugin.getGrid().getIslandsWorld(island, environment);
+
                         Executor.createTask().runAsync(v -> {
                             List<Location> safeLocations = new ArrayList<>();
 
@@ -135,34 +133,19 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                 if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
                                     continue;
 
-                                World world = Bukkit.getWorld(chunkSnapshot.getWorldName());
-                                int worldBuildLimit = world.getMaxHeight() - 1;
-                                int worldMinLimit = plugin.getNMSWorld().getMinHeight(world);
+                                int worldBuildLimit = islandsWorld.getMaxHeight() - 1;
+                                int worldMinLimit = plugin.getNMSWorld().getMinHeight(islandsWorld);
 
                                 for (int x = 0; x < 16; x++) {
                                     for (int z = 0; z < 16; z++) {
-                                        int y = Math.min(chunkSnapshot.getHighestBlockYAt(x, z), worldBuildLimit);
+                                        int y = chunkSnapshot.getHighestBlockYAt(x, z);
 
-                                        if (y < worldMinLimit)
+                                        if (y < worldMinLimit || y + 2 > worldBuildLimit)
                                             continue;
 
-                                        Key blockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
-                                        Key belowKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x,
-                                                y <= worldMinLimit ? worldMinLimit : y - 1, z);
-
-                                        Material blockType;
-                                        Material belowType;
-
-                                        try {
-                                            blockType = Material.valueOf(blockKey.getGlobalKey());
-                                            belowType = Material.valueOf(belowKey.getGlobalKey());
-                                        } catch (IllegalArgumentException ex) {
-                                            continue;
-                                        }
-
-                                        if (blockType.isSolid() || belowType.isSolid()) {
-                                            safeLocations.add(new Location(Bukkit.getWorld(chunkSnapshot.getWorldName()),
-                                                    chunkSnapshot.getX() * 16 + x, y, chunkSnapshot.getZ() * 16 + z));
+                                        if (LocationUtils.isSafeBlock(chunkSnapshot, x, y, z)) {
+                                            safeLocations.add(new Location(islandsWorld,
+                                                    chunkSnapshot.getX() * 16 + x, y + 1, chunkSnapshot.getZ() * 16 + z));
                                         }
                                     }
                                 }
@@ -187,9 +170,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
     private void adjustAndTeleportPlayerToLocation(Player player, Island island, Location location, float yaw,
                                                    float pitch, Consumer<Boolean> result) {
-        double yAdjustment = Materials.isSlab(location.getBlock().getType()) ? -0.5 : 0;
-
-        Location homeLocation = location.add(0.5, yAdjustment, 0.5);
+        Location homeLocation = location.add(0.5, 0, 0.5);
         homeLocation.setYaw(yaw);
         homeLocation.setPitch(pitch);
 

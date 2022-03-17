@@ -2,15 +2,19 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 public final class LocationUtils {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private LocationUtils() {
 
@@ -42,10 +46,29 @@ public final class LocationUtils {
     }
 
     public static boolean isSafeBlock(Block block) {
-        Block underBlock = block.getRelative(BlockFace.DOWN);
-        Block upperBlock = block.getRelative(BlockFace.UP);
-        return !upperBlock.getType().isOccluding() && !block.getType().isOccluding() &&
-                (underBlock.getType().isOccluding() || underBlock.getRelative(BlockFace.DOWN).getType().isOccluding());
+        Block feetBlock = block.getRelative(BlockFace.UP);
+        Block headBlock = feetBlock.getRelative(BlockFace.UP);
+
+        if (feetBlock.getType().isSolid() || headBlock.getType().isSolid())
+            return false;
+
+        return plugin.getSettings().getSafeBlocks().contains(Key.of(block));
+    }
+
+    public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
+        Key feetBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y + 1, z);
+        Key headBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y + 2, z);
+
+        try {
+            if (Material.valueOf(feetBlockKey.getGlobalKey()).isSolid() ||
+                    Material.valueOf(headBlockKey.getGlobalKey()).isSolid())
+                return false;
+        } catch (IllegalArgumentException error) {
+            return false;
+        }
+
+        Key standingBlockKey = plugin.getNMSWorld().getBlockKey(chunkSnapshot, x, y, z);
+        return plugin.getSettings().getSafeBlocks().contains(standingBlockKey);
     }
 
     public static boolean isChunkEmpty(Island island, ChunkSnapshot chunkSnapshot) {

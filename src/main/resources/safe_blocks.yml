@@ -1,0 +1,10 @@
+######################################################
+##                                                  ##
+##                SuperiorSkyblock 2                ##
+##                Developed by Ome_R                ##
+##                                                  ##
+######################################################
+
+# A list of safe blocks.
+# Players can only get teleported (when teleporting to islands) on blocks from this list.
+safe-blocks: [ ]

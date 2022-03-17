@@ -26,6 +26,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     @Override
     public List<String> getInteractables() {
         return this.container.interactables;
+    }
+
+    @Override
+    public Collection<Key> getSafeBlocks() {
+        return this.container.safeBlocks;
     }
 
     @Override

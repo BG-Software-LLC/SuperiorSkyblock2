@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -129,6 +130,11 @@ public interface SettingsManager {
      * Get all the interactable blocks.
      */
     List<String> getInteractables();
+
+    /**
+     * Get all the safe blocks.
+     */
+    Collection<Key> getSafeBlocks();
 
     /**
      * Whether visitors should take damage on islands or not.
