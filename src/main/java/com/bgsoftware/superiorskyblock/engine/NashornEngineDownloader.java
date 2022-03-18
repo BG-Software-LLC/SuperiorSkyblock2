@@ -26,6 +26,7 @@ public final class NashornEngineDownloader {
     public static boolean downloadEngine(SuperiorSkyblockPlugin plugin) {
         try {
             SuperiorSkyblockPlugin.log("&cSeems like you are missing a nashorn engine. Attempting to download one remotely...");
+            deleteExistingModule(plugin);
             JsonObject apiResponse = readJenkinsJsonAPI();
             JsonObject artifact = apiResponse.getAsJsonArray("artifacts").get(0).getAsJsonObject();
             String fileName = artifact.get("fileName").getAsString();
@@ -38,6 +39,20 @@ public final class NashornEngineDownloader {
             SuperiorSkyblockPlugin.log("&cFailed to download the nashorn engine.");
             PluginDebugger.debug(error);
             return false;
+        }
+    }
+
+    private static void deleteExistingModule(SuperiorSkyblockPlugin plugin) {
+        PluginModule nashornEngineModule = plugin.getModules().getModule("nashorn-engine");
+
+        if (nashornEngineModule == null)
+            return;
+
+        plugin.getModules().unregisterModule(nashornEngineModule);
+
+        try {
+            nashornEngineModule.getModuleFile().delete();
+        } catch (Exception ignored) {
         }
     }
 
