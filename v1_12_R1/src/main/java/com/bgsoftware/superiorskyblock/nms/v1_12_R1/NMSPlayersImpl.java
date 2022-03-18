@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
@@ -17,6 +18,8 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
@@ -80,6 +83,13 @@ public final class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
+    public BossBar createBossBar(Player player, String message, BossBar.Color color) {
+        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()));
+        bossBar.addPlayer(player);
+        return bossBar;
+    }
+
+    @Override
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
         player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
     }
@@ -98,6 +108,36 @@ public final class NMSPlayersImpl implements NMSPlayers {
         } catch (IllegalArgumentException error) {
             return null;
         }
+    }
+
+    private static final class BossBarImpl implements BossBar {
+
+        private final org.bukkit.boss.BossBar bossBar;
+
+        public BossBarImpl(String message, BarColor color) {
+            bossBar = Bukkit.createBossBar(message, color, BarStyle.SOLID);
+        }
+
+        @Override
+        public void addPlayer(Player player) {
+            this.bossBar.addPlayer(player);
+        }
+
+        @Override
+        public void removeAll() {
+            this.bossBar.removeAll();
+        }
+
+        @Override
+        public void setProgress(double progress) {
+            this.bossBar.setProgress(progress);
+        }
+
+        @Override
+        public double getProgress() {
+            return this.bossBar.getProgress();
+        }
+
     }
 
 }

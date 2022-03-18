@@ -1,7 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.bossbar.EmptyBossBar;
 import com.mojang.authlib.properties.Property;
+import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -18,6 +21,8 @@ public interface NMSPlayers {
     void setSkinTexture(SuperiorPlayer superiorPlayer, Property property);
 
     void sendActionBar(Player player, String message);
+
+    BossBar createBossBar(Player player, String message, BossBar.Color color);
 
     void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut);
 

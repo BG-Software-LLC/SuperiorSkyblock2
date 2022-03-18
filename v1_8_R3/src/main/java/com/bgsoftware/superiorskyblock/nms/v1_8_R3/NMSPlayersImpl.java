@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.bossbar.EmptyBossBar;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
@@ -79,6 +81,11 @@ public final class NMSPlayersImpl implements NMSPlayers {
     public void sendActionBar(Player player, String message) {
         PacketPlayOutChat packetPlayOutChat = new PacketPlayOutChat(CraftChatMessage.fromString(message)[0], (byte) 2);
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutChat);
+    }
+
+    @Override
+    public BossBar createBossBar(Player player, String message, BossBar.Color color) {
+        return EmptyBossBar.getInstance();
     }
 
     @Override
