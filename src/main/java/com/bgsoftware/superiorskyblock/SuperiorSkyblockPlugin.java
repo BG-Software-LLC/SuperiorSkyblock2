@@ -337,15 +337,19 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             modulesHandler.getModules().forEach(modulesHandler::unregisterModule);
 
-            Bukkit.getOnlinePlayers().forEach(player -> {
-                SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
-                player.closeInventory();
-                superiorPlayer.updateWorldBorder(null);
-                if (superiorPlayer.hasIslandFlyEnabled()) {
-                    player.setAllowFlight(false);
-                    player.setFlying(false);
-                }
-            });
+            // Shutdown task is running from another thread, causing closing of inventories to cause errors.
+            // This check should prevent it.
+            if (Bukkit.isPrimaryThread()) {
+                Bukkit.getOnlinePlayers().forEach(player -> {
+                    SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
+                    player.closeInventory();
+                    superiorPlayer.updateWorldBorder(null);
+                    if (superiorPlayer.hasIslandFlyEnabled()) {
+                        player.setAllowFlight(false);
+                        player.setFlying(false);
+                    }
+                });
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             PluginDebugger.debug(ex);
