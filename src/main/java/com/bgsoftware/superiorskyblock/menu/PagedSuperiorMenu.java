@@ -75,6 +75,8 @@ public abstract class PagedSuperiorMenu<M extends PagedSuperiorMenu<M, T>, T> ex
         int objectIndex = pagedObjectButton.getObjectIndex() + (objectsPerPage * (currentPage - 1));
 
         if (objectIndex >= objects.size()) {
+            if (acceptNull)
+                pagedObjectButton.updateObject(null);
             return acceptNull;
         }
 
