@@ -18,7 +18,8 @@ public interface Hologram {
 
     /**
      * Get the actual armor stand entity for this hologram.
-     * This is a custom armor stand for the hologram
+     * This is a custom armor stand for the hologram, and therefore it may not function
+     * similar to Bukkit's regular entities.
      */
     ArmorStand getHandle();
 
