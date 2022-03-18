@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.world.blocks.stacked;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.hologram.Hologram;
+import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Location;
@@ -68,7 +68,7 @@ public final class StackedBlock {
             }
 
             if (hologram == null)
-                hologram = plugin.getNMSHolograms().createHologram(getLocation().add(0.5, 1, 0.5));
+                hologram = plugin.getServices().getHologramsService().createHologram(getLocation().add(0.5, 1, 0.5));
 
             hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                     .replace("{0}", String.valueOf(amount))
