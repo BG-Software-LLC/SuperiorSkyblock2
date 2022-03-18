@@ -1,30 +1,36 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("unused")
-public final class PlaceholdersProvider_PlaceholderAPI extends PlaceholderHook implements PlaceholdersProvider {
+public final class PlaceholdersProvider_PlaceholderAPI implements PlaceholdersProvider {
 
     private final SuperiorSkyblockPlugin plugin;
 
     public PlaceholdersProvider_PlaceholderAPI(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        new EZPlaceholder().register();
+        new EZPlaceholder((PlaceholdersServiceImpl) plugin.getServices().getPlaceholdersService()).register();
 
         SuperiorSkyblockPlugin.log("Using PlaceholderAPI for placeholders support.");
     }
 
     @Override
-    public String parsePlaceholder(OfflinePlayer offlinePlayer, String value) {
+    public String parsePlaceholders(OfflinePlayer offlinePlayer, String value) {
         return PlaceholderAPI.setPlaceholders(offlinePlayer, value);
     }
 
     private class EZPlaceholder extends PlaceholderExpansion {
+
+        private final PlaceholdersServiceImpl placeholdersService;
+
+        public EZPlaceholder(PlaceholdersServiceImpl placeholdersService) {
+            this.placeholdersService = placeholdersService;
+        }
 
         @Override
         public String getIdentifier() {
@@ -48,7 +54,7 @@ public final class PlaceholdersProvider_PlaceholderAPI extends PlaceholderHook i
 
         @Override
         public String onRequest(OfflinePlayer player, String placeholder) {
-            return handlePluginPlaceholder(player, placeholder);
+            return placeholdersService.handlePluginPlaceholder(player, placeholder);
         }
 
         @Override

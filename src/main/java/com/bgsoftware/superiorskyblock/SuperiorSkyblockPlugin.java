@@ -55,6 +55,8 @@ import com.bgsoftware.superiorskyblock.role.RolesHandler;
 import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
+import com.bgsoftware.superiorskyblock.service.ServicesHandler;
+import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
 import com.bgsoftware.superiorskyblock.tasks.ShutdownTask;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -130,6 +132,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             new PlayerCommandsMap(this), new AdminCommandsMap(this));
     private final ModulesHandler modulesHandler = new ModulesHandler(this,
             new DefaultModulesContainer());
+    private final ServicesHandler servicesHandler = new ServicesHandler(this);
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
     private SettingsHandler settingsHandler = null;
@@ -192,6 +195,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivileges.registerPrivileges();
         SortingTypes.registerSortingTypes();
         IslandFlags.registerFlags();
+
+        this.servicesHandler.registerPlaceholdersService(new PlaceholdersServiceImpl());
     }
 
     @Override
@@ -611,6 +616,10 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public ModulesHandler getModules() {
         return modulesHandler;
+    }
+
+    public ServicesHandler getServices() {
+        return servicesHandler;
     }
 
     @Override
