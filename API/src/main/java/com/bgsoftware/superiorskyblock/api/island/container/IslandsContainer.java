@@ -83,11 +83,22 @@ public interface IslandsContainer {
 
     /**
      * Sort islands for the top-islands.
+     * The islands will not get sorted if only one island exists.
      *
      * @param sortingType The type of sorting to use.
-     * @param onFinish Callback method
+     * @param onFinish    Callback method
      */
     void sortIslands(SortingType sortingType, @Nullable Runnable onFinish);
+
+    /**
+     * Sort islands for the top-islands.
+     *
+     * @param sortingType The type of sorting to use.
+     * @param forceSort   Whether to force-sort the islands.
+     *                    When true, islands will get sorted even if only one island exists.
+     * @param onFinish    Callback method
+     */
+    void sortIslands(SortingType sortingType, boolean forceSort, @Nullable Runnable onFinish);
 
     /**
      * Get all islands sorted by a specific sorting-type.
@@ -105,7 +116,7 @@ public interface IslandsContainer {
      * Add a new sorting-type.
      *
      * @param sortingType The sorting-type to add.
-     * @param sort Whether to sort the islands or not when the sorting-type is added.
+     * @param sort        Whether to sort the islands or not when the sorting-type is added.
      */
     void addSortingType(SortingType sortingType, boolean sort);
 
