@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.service.hologram;
 
+import org.bukkit.entity.ArmorStand;
+
 public interface Hologram {
 
     /**
@@ -13,5 +15,11 @@ public interface Hologram {
      * Remove the hologram from existence.
      */
     void removeHologram();
+
+    /**
+     * Get the actual armor stand entity for this hologram.
+     * This is a custom armor stand for the hologram
+     */
+    ArmorStand getHandle();
 
 }

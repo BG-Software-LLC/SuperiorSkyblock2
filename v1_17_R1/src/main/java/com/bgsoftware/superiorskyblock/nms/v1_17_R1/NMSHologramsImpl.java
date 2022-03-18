@@ -23,6 +23,7 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArmorStand;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
+import org.bukkit.entity.ArmorStand;
 
 import javax.annotation.Nullable;
 
@@ -71,6 +72,11 @@ public final class NMSHologramsImpl implements NMSHolograms {
         @Override
         public void removeHologram() {
             super.a(Entity.RemovalReason.b);
+        }
+
+        @Override
+        public ArmorStand getHandle() {
+            return this.getBukkitEntity();
         }
 
         @Override
@@ -129,11 +135,11 @@ public final class NMSHologramsImpl implements NMSHolograms {
         }
 
         @Override
-        public CraftEntity getBukkitEntity() {
+        public CraftArmorStand getBukkitEntity() {
             if (bukkitEntity == null) {
                 bukkitEntity = new CraftArmorStand((CraftServer) Bukkit.getServer(), this);
             }
-            return bukkitEntity;
+            return (CraftArmorStand) bukkitEntity;
         }
 
         @Override
