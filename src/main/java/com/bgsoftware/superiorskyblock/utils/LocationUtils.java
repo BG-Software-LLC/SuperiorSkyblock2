@@ -46,6 +46,10 @@ public final class LocationUtils {
     }
 
     public static boolean isSafeBlock(Block block) {
+        return _isSafeBlock(block) || _isSafeBlock(block.getRelative(BlockFace.DOWN));
+    }
+
+    private static boolean _isSafeBlock(Block block) {
         Block feetBlock = block.getRelative(BlockFace.UP);
         Block headBlock = feetBlock.getRelative(BlockFace.UP);
 
