@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.lang.component.impl;
 
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.apache.logging.log4j.util.Strings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public final class ComplexMessageComponent implements IMessageComponent {
     private final TextComponent textComponent;
 
     public static IMessageComponent of(@Nullable TextComponent textComponent) {
-        return textComponent == null || Strings.isBlank(textComponent.getText()) ?
+        return textComponent == null || StringUtils.isBlank(textComponent.getText()) ?
                 EmptyMessageComponent.getInstance() : new ComplexMessageComponent(textComponent);
     }
 

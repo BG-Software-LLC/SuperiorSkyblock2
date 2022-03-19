@@ -4,7 +4,7 @@ package com.bgsoftware.superiorskyblock.lang.component.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
-import org.apache.logging.log4j.util.Strings;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -22,7 +22,7 @@ public final class TitleComponent implements IMessageComponent {
 
     public static IMessageComponent of(@Nullable String titleMessage, @Nullable String subtitleMessage,
                                        int fadeIn, int duration, int fadeOut) {
-        return duration <= 0 || (Strings.isBlank(titleMessage) && Strings.isBlank(subtitleMessage)) ?
+        return duration <= 0 || (StringUtils.isBlank(titleMessage) && StringUtils.isBlank(subtitleMessage)) ?
                 EmptyMessageComponent.getInstance() : new TitleComponent(titleMessage, subtitleMessage, fadeIn, duration, fadeOut);
     }
 

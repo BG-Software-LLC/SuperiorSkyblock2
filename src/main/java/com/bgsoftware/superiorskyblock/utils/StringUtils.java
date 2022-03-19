@@ -274,8 +274,12 @@ public final class StringUtils {
         return locale.getLanguage() + "-" + locale.getCountry();
     }
 
+    public static boolean isBlank(@Nullable String string) {
+        return string == null || string.isEmpty();
+    }
+
     public static String translateColors(@Nullable String string) {
-        if(string == null || string.length() <= 1)
+        if (string == null || string.length() <= 1)
             return "";
 
         String output = ChatColor.translateAlternateColorCodes('&', string);
