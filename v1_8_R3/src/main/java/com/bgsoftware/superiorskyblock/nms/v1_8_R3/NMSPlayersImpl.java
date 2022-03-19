@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.bossbar.EmptyBossBar;
+import com.bgsoftware.superiorskyblock.service.bossbar.EmptyBossBar;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;

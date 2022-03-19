@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.bossbar;
+package com.bgsoftware.superiorskyblock.service.bossbar;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
