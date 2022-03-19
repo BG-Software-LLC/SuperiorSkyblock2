@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
@@ -117,12 +117,15 @@ public final class CmdRankup implements IPermissibleCommand {
                     hasNextLevel = false;
 
                 } else {
+                    PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
                     upgradeCost.withdrawCost(superiorPlayer);
 
                     for (String command : event.getResult().getKey()) {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), PlaceholderHook.parse(superiorPlayer, command
-                                .replace("%player%", superiorPlayer.getName())
-                                .replace("%leader%", island.getOwner().getName()))
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                placeholdersService.parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
+                                        .replace("%player%", superiorPlayer.getName())
+                                        .replace("%leader%", island.getOwner().getName()))
                         );
                     }
 

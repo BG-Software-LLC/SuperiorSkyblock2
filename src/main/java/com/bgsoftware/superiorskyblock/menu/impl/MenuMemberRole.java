@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.MemberRoleButton;
@@ -38,7 +38,7 @@ public final class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
 
     @Override
     protected String replaceTitle(String title) {
-        return PlaceholderHook.parse(targetPlayer, title.replace("{}", targetPlayer.getName()));
+        return title.replace("{}", targetPlayer.getName());
     }
 
     public static void init() {

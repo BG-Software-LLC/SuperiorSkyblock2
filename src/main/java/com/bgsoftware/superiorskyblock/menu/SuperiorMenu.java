@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.menu;
 
-import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
@@ -234,10 +233,12 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             closeButton = true;
             e.getWhoClicked().closeInventory();
         } else {
+            PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
             if (targetPlayer != null)
-                command = PlaceholderHook.parse(targetPlayer, command);
+                command = placeholdersService.parsePlaceholders(targetPlayer.asOfflinePlayer(), command);
             else if (sender instanceof Player)
-                command = PlaceholderHook.parse(plugin.getPlayers().getSuperiorPlayer(sender), command);
+                command = placeholdersService.parsePlaceholders((Player) sender, command);
 
             Bukkit.dispatchCommand(sender instanceof Player || command.startsWith("PLAYER:") ? e.getWhoClicked() : Bukkit.getConsoleSender(),
                     command.replace("PLAYER:", "").replace("%player%", e.getWhoClicked().getName()));

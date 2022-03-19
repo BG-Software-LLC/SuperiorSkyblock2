@@ -4,16 +4,17 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.potion.PotionEffectType;
@@ -107,13 +108,18 @@ public class SUpgradeLevel implements UpgradeLevel {
     public String checkRequirements(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
-        for (Pair<String, String> requirement : requirements) {
-            String check = PlaceholderHook.parse(superiorPlayer, requirement.getKey());
-            try {
-                if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
-                    return requirement.getValue();
-            } catch (ScriptException error) {
-                PluginDebugger.debug(error);
+        OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
+        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
+        if (offlinePlayer != null) {
+            for (Pair<String, String> requirement : requirements) {
+                String check = placeholdersService.parsePlaceholders(offlinePlayer, requirement.getKey());
+                try {
+                    if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
+                        return requirement.getValue();
+                } catch (ScriptException error) {
+                    PluginDebugger.debug(error);
+                }
             }
         }
 

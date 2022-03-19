@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.upgrade.cost;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
@@ -11,13 +12,17 @@ import java.util.List;
 
 public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private final String placeholder;
     private final List<String> withdrawCommands;
+    private final PlaceholdersService placeholdersService;
 
     public PlaceholdersUpgradeCost(BigDecimal cost, String placeholder, List<String> withdrawCommands) {
         super(cost, "placeholders");
         this.placeholder = placeholder;
         this.withdrawCommands = Collections.unmodifiableList(withdrawCommands);
+        this.placeholdersService = plugin.getServices().getPlaceholdersService();
     }
 
     @Override
@@ -25,7 +30,7 @@ public final class PlaceholdersUpgradeCost extends UpgradeCostAbstract {
         BigDecimal currentBalance = BigDecimal.ZERO;
 
         try {
-            currentBalance = new BigDecimal(PlaceholderHook.parse(superiorPlayer, placeholder));
+            currentBalance = new BigDecimal(placeholdersService.parsePlaceholders(superiorPlayer.asOfflinePlayer(), placeholder));
         } catch (Exception ignored) {
         }
 
