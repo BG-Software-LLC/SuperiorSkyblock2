@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
+import com.bgsoftware.superiorskyblock.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
+import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -32,6 +34,18 @@ public final class MultipleComponents implements IMessageComponent {
                         section.getInt(key + ".duration"),
                         section.getInt(key + ".fade-out")
                 ));
+            } else if (key.equals("bossbar")) {
+                BossBar.Color color;
+
+                try {
+                    color = BossBar.Color.valueOf(section.getString(key + ".color").toUpperCase());
+                } catch (Exception error) {
+                    color = BossBar.Color.PINK;
+                }
+
+                messageComponents.add(BossBarComponent.of(
+                        StringUtils.translateColors(section.getString(key + ".message")),
+                        color, section.getInt(key + ".ticks")));
             } else {
                 TextComponent textComponent = new TextComponent(StringUtils.translateColors(section.getString(key + ".text")));
 
