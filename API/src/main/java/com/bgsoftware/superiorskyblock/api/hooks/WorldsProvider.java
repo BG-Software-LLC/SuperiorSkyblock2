@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import javax.annotation.Nullable;
 import java.util.UUID;
 
 public interface WorldsProvider {
@@ -20,6 +21,7 @@ public interface WorldsProvider {
      * @param environment The world environment.
      * @param island      The island to check.
      */
+    @Nullable
     World getIslandsWorld(Island island, World.Environment environment);
 
     /**

@@ -223,6 +223,7 @@ public interface GridManager {
      * @param environment The world environment.
      * @param island      The island to check.
      */
+    @Nullable
     World getIslandsWorld(Island island, World.Environment environment);
 
     /**
