@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -273,7 +274,10 @@ public final class StringUtils {
         return locale.getLanguage() + "-" + locale.getCountry();
     }
 
-    public static String translateColors(String string) {
+    public static String translateColors(@Nullable String string) {
+        if(string == null || string.length() <= 1)
+            return "";
+
         String output = ChatColor.translateAlternateColorCodes('&', string);
 
         if (ServerVersion.isLessThan(ServerVersion.v1_16))
