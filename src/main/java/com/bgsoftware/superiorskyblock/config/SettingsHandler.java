@@ -524,6 +524,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         return this.container.autoLanguageDetection;
     }
 
+    @Override
+    public int getBossbarLimit() {
+        return this.container.bossBarLimit;
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");

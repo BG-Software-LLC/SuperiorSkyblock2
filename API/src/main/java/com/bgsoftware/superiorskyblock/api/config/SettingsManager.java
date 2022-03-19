@@ -555,6 +555,11 @@ public interface SettingsManager {
      */
     boolean isAutoLanguageDetection();
 
+    /**
+     * Limit of the amount of bossbar tasks each player can have at the same time.
+     */
+    int getBossbarLimit();
+
     interface Database {
 
         /**

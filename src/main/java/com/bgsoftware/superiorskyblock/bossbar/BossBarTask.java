@@ -1,21 +1,26 @@
 package com.bgsoftware.superiorskyblock.bossbar;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
 
 public final class BossBarTask extends BukkitRunnable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private static final BossBarTask EMPTY_TASK = new BossBarTask(EmptyBossBar.getInstance(), 0);
+    private static final Map<UUID, Queue<BossBarTask>> PLAYERS_RUNNING_TASKS = new HashMap<>();
 
     private final BossBar bossBar;
     private final double progressToRemovePerTick;
     private boolean reachedEndTask = false;
 
-    private BossBarTask(BossBar bossBar, double ticksToRun) {
+    public BossBarTask(BossBar bossBar, double ticksToRun) {
         this.bossBar = bossBar;
         this.progressToRemovePerTick = this.bossBar.getProgress() / ticksToRun;
         if (progressToRemovePerTick > 0) {
@@ -26,7 +31,6 @@ public final class BossBarTask extends BukkitRunnable {
     @Override
     public void run() {
         if (reachedEndTask) {
-            this.bossBar.removeAll();
             cancel();
         } else {
             this.bossBar.setProgress(Math.max(0D, this.bossBar.getProgress() - progressToRemovePerTick));
@@ -34,12 +38,31 @@ public final class BossBarTask extends BukkitRunnable {
         }
     }
 
-    public static BossBarTask of(BossBar bossBar, long time, TimeUnit timeUnit) {
-        if (bossBar == EmptyBossBar.getInstance())
-            return EMPTY_TASK;
+    @Override
+    public synchronized void cancel() throws IllegalStateException {
+        this.bossBar.removeAll();
+        super.cancel();
+    }
 
-        double ticksToRun = Math.ceil(timeUnit.toSeconds(time) * 20D);
-        return ticksToRun <= 0 ? EMPTY_TASK : new BossBarTask(bossBar, ticksToRun);
+    public void registerTask(Player player) {
+        Queue<BossBarTask> bossBarTasks = PLAYERS_RUNNING_TASKS.computeIfAbsent(player.getUniqueId(), s -> new LinkedList<>());
+
+        if (bossBarTasks.size() >= plugin.getSettings().getBossbarLimit()) {
+            BossBarTask lastRunningTask = bossBarTasks.poll();
+            if (lastRunningTask != null)
+                lastRunningTask.cancel();
+        }
+
+        bossBarTasks.add(this);
+    }
+
+    public void unregisterTask(Player player) {
+        Queue<BossBarTask> bossBarTasks = PLAYERS_RUNNING_TASKS.get(player.getUniqueId());
+
+        if (bossBarTasks == null)
+            return;
+
+        bossBarTasks.remove(this);
     }
 
 }

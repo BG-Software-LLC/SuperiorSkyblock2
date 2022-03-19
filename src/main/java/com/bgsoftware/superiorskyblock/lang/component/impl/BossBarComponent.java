@@ -19,7 +19,7 @@ public final class BossBarComponent implements IMessageComponent {
 
     private final String message;
     private final BossBar.Color color;
-    private final int millisecondsToRun;
+    private final int ticksToRun;
 
     public static IMessageComponent of(@Nullable String message, BossBar.Color color, int ticks) {
         return ticks <= 0 || Strings.isBlank(message) ? EmptyMessageComponent.getInstance() : new BossBarComponent(message, color, ticks);
@@ -28,7 +28,7 @@ public final class BossBarComponent implements IMessageComponent {
     private BossBarComponent(String message, BossBar.Color color, int ticks) {
         this.message = message;
         this.color = color;
-        this.millisecondsToRun = ticks * 50;
+        this.ticksToRun = ticks;
     }
 
     @Override
@@ -40,8 +40,7 @@ public final class BossBarComponent implements IMessageComponent {
     public void sendMessage(CommandSender sender, Object... objects) {
         if (sender instanceof Player) {
             IMessageComponent.replaceArgs(this.message, objects).ifPresent(message -> {
-                BossBar bossBar = plugin.getNMSPlayers().createBossBar((Player) sender, message, this.color);
-                BossBarTask.of(bossBar, this.millisecondsToRun, TimeUnit.MILLISECONDS);
+                plugin.getNMSPlayers().createBossBar((Player) sender, message, this.color, this.ticksToRun);
             });
         }
     }

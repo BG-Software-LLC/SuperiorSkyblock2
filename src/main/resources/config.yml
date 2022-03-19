@@ -744,3 +744,7 @@ recalc-task-timeout: 10
 # The language will only get changed if there is a valid translation available,
 # otherwise the default language will be chosen for the player.
 auto-language-detection: true
+
+# Limit of the amount of bossbar tasks each player can have at the same time.
+# Once the limit is reached, the old ones will get removed.
+bossbar-limit: 1

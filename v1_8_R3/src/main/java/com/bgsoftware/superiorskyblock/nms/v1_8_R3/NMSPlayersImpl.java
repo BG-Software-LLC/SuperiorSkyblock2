@@ -84,7 +84,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public BossBar createBossBar(Player player, String message, BossBar.Color color) {
+    public BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun) {
         return EmptyBossBar.getInstance();
     }
 

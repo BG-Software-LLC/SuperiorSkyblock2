@@ -4,6 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.bossbar.BossBarTask;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
@@ -89,8 +90,8 @@ public final class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
-    public BossBar createBossBar(Player player, String message, BossBar.Color color) {
-        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()));
+    public BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun) {
+        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()), ticksToRun);
         bossBar.addPlayer(player);
         return bossBar;
     }
@@ -123,19 +124,23 @@ public final class NMSPlayersImpl implements NMSPlayers {
     private static final class BossBarImpl implements BossBar {
 
         private final org.bukkit.boss.BossBar bossBar;
+        private final BossBarTask bossBarTask;
 
-        public BossBarImpl(String message, BarColor color) {
+        public BossBarImpl(String message, BarColor color, double ticksToRun) {
             bossBar = Bukkit.createBossBar(message, color, BarStyle.SOLID);
+            this.bossBarTask = new BossBarTask(this, ticksToRun);
         }
 
         @Override
         public void addPlayer(Player player) {
             this.bossBar.addPlayer(player);
+            this.bossBarTask.registerTask(player);
         }
 
         @Override
         public void removeAll() {
             this.bossBar.removeAll();
+            this.bossBar.getPlayers().forEach(this.bossBarTask::unregisterTask);
         }
 
         @Override
