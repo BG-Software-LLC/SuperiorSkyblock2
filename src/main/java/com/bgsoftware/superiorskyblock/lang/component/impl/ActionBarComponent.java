@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.lang.component.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
-import org.apache.logging.log4j.util.Strings;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,7 +16,7 @@ public final class ActionBarComponent implements IMessageComponent {
     private final String message;
 
     public static IMessageComponent of(@Nullable String message) {
-        return Strings.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
+        return StringUtils.isBlank(message) ? EmptyMessageComponent.getInstance() : new ActionBarComponent(message);
     }
 
     private ActionBarComponent(String message) {

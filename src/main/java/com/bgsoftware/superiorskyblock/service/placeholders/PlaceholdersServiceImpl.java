@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.hooks.support;
+package com.bgsoftware.superiorskyblock.service.placeholders;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -6,6 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.IslandPlaceholderParser;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
@@ -19,6 +22,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,7 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SuppressWarnings("WeakerAccess")
-public abstract class PlaceholderHook {
+public final class PlaceholdersServiceImpl implements PlaceholdersService {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -74,6 +79,7 @@ public abstract class PlaceholderHook {
                     .put("missions_completed", superiorPlayer -> superiorPlayer.getCompletedMissions().size() + "")
                     .build();
 
+    @SuppressWarnings("ConstantConditions")
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
             new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
@@ -202,49 +208,70 @@ public abstract class PlaceholderHook {
                     .put(SortingTypes.BY_PLAYERS, targetIsland -> StringUtils.format(targetIsland.getAllPlayersInside().size()))
                     .build();
 
-    private static List<PlaceholdersProvider> placeholdersProviders;
+    private final Map<String, IslandPlaceholderParser> CUSTOM_ISLAND_PARSERS = new HashMap<>();
+    private final Map<String, PlayerPlaceholderParser> CUSTOM_PLAYER_PARSERS = new HashMap<>();
 
-    protected PlaceholderHook() {
+    private final List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
+
+    public PlaceholdersServiceImpl() {
     }
 
-    public static void register(List<PlaceholdersProvider> placeholdersProviders) {
-        PlaceholderHook.placeholdersProviders = placeholdersProviders;
+    public void register(List<PlaceholdersProvider> placeholdersProviders) {
+        this.placeholdersProviders.addAll(placeholdersProviders);
     }
 
-    public static String parse(SuperiorPlayer superiorPlayer, String str) {
-        return parse(superiorPlayer.asOfflinePlayer(), str);
-    }
-
-    public static String parse(OfflinePlayer offlinePlayer, String str) {
+    public String parsePlaceholders(OfflinePlayer offlinePlayer, String str) {
         for (PlaceholdersProvider placeholdersProvider : placeholdersProviders)
-            str = placeholdersProvider.parsePlaceholder(offlinePlayer, str);
+            str = placeholdersProvider.parsePlaceholders(offlinePlayer, str);
 
         return str;
     }
 
-    protected final String handlePluginPlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
+    public String handlePluginPlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
         Player player = offlinePlayer.getPlayer();
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
 
         Optional<String> placeholderResult = Optional.empty();
-        Matcher matcher;
 
-        if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            placeholderResult = Optional.ofNullable(PLAYER_PARSES.get(matcher.group(1)))
-                    .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
-        } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String subPlaceholder = matcher.group(1).toLowerCase();
+        PlayerPlaceholderParser customPlayerParser = CUSTOM_PLAYER_PARSERS.get(placeholder);
+        if (customPlayerParser != null) {
+            placeholderResult = Optional.ofNullable(customPlayerParser.apply(superiorPlayer));
+        } else {
+            IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(placeholder);
+            if (customIslandParser != null)
+                placeholderResult = Optional.ofNullable(customIslandParser.apply(superiorPlayer.getIsland(), superiorPlayer));
+        }
 
-            Island island = subPlaceholder.startsWith("location_") && player != null ?
-                    plugin.getGrid().getIslandAt(player.getLocation()) : superiorPlayer.getIsland();
+        if (!placeholderResult.isPresent()) {
+            Matcher matcher;
 
-            subPlaceholder = subPlaceholder.replace("location_", "");
+            if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                placeholderResult = Optional.ofNullable(PLAYER_PARSES.get(matcher.group(1)))
+                        .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
+            } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String subPlaceholder = matcher.group(1).toLowerCase();
 
-            placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer, placeholder, subPlaceholder);
+                Island island = subPlaceholder.startsWith("location_") && player != null ?
+                        plugin.getGrid().getIslandAt(player.getLocation()) : superiorPlayer.getIsland();
+
+                subPlaceholder = subPlaceholder.replace("location_", "");
+
+                placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer, placeholder, subPlaceholder);
+            }
         }
 
         return placeholderResult.orElse(plugin.getSettings().getDefaultPlaceholders()
                 .getOrDefault(placeholder, ""));
+    }
+
+    @Override
+    public void registerPlaceholder(String placeholderName, PlayerPlaceholderParser placeholderFunction) {
+        CUSTOM_PLAYER_PARSERS.put(placeholderName, placeholderFunction);
+    }
+
+    @Override
+    public void registerPlaceholder(String placeholderName, IslandPlaceholderParser placeholderFunction) {
+        CUSTOM_ISLAND_PARSERS.put(placeholderName, placeholderFunction);
     }
 
     private static Optional<String> parsePlaceholdersForIsland(Island island, SuperiorPlayer superiorPlayer,
@@ -387,14 +414,6 @@ public abstract class PlaceholderHook {
             return Optional.empty();
 
         return Optional.of(members.get(targetMemberIndex).getName());
-    }
-
-    private interface PlayerPlaceholderParser extends Function<SuperiorPlayer, String> {
-
-    }
-
-    private interface IslandPlaceholderParser extends BiFunction<Island, SuperiorPlayer, String> {
-
     }
 
 }

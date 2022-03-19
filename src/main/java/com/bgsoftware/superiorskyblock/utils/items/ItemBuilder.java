@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -250,13 +250,17 @@ public final class ItemBuilder {
     public ItemStack build(SuperiorPlayer superiorPlayer) {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
 
+        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
         if (itemMeta != null) {
             if (itemMeta.hasDisplayName()) {
-                withName(PlaceholderHook.parse(offlinePlayer, itemMeta.getDisplayName()));
+                withName(placeholdersService.parsePlaceholders(offlinePlayer, itemMeta.getDisplayName()));
             }
 
             if (itemMeta.hasLore()) {
-                withLore(itemMeta.getLore().stream().map(line -> PlaceholderHook.parse(offlinePlayer, line)).collect(Collectors.toList()));
+                withLore(itemMeta.getLore().stream()
+                        .map(line -> placeholdersService.parsePlaceholders(offlinePlayer, line))
+                        .collect(Collectors.toList()));
             }
         }
 
@@ -274,7 +278,7 @@ public final class ItemBuilder {
     public ItemBuilder copy() {
         ItemBuilder itemBuilder = new ItemBuilder(Material.AIR);
         itemBuilder.itemStack = itemStack.clone();
-        if(itemMeta != null)
+        if (itemMeta != null)
             itemBuilder.itemMeta = itemMeta.clone();
         itemBuilder.textureValue = textureValue;
         return itemBuilder;

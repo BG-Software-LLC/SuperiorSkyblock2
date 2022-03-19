@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
@@ -99,12 +99,14 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                     if (members.size() == 0) {
                         lore.add(memberFormat.replace("{}", "None"));
                     } else {
+                        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
                         members.forEach(member -> {
                             String onlineMessage = member.isOnline() ?
                                     Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
                                     Message.ISLAND_TOP_STATUS_OFFLINE.getMessage(inventoryViewer.getUserLocale());
 
-                            lore.add(PlaceholderHook.parse(member, memberFormat
+                            lore.add(placeholdersService.parsePlaceholders(member.asOfflinePlayer(), memberFormat
                                     .replace("{}", member.getName())
                                     .replace("{0}", member.getName())
                                     .replace("{1}", onlineMessage == null ? "" : onlineMessage))

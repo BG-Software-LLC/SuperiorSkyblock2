@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.menu.pattern;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
+import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -69,11 +69,12 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
     }
 
     public Inventory buildInventory(M superiorMenu, Function<String, String> titleReplacer) {
-
         String title = titleReplacer.apply(this.title);
 
-        Inventory inventory = createInventory(superiorMenu,
-                PlaceholderHook.parse(superiorMenu.getInventoryViewer(), title));
+        PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
+        Inventory inventory = createInventory(superiorMenu, placeholdersService
+                .parsePlaceholders(superiorMenu.getInventoryViewer().asOfflinePlayer(), title));
 
         setupInventory(inventory, superiorMenu);
 

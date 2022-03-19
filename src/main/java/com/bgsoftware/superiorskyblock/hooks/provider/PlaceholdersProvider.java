@@ -4,6 +4,6 @@ import org.bukkit.OfflinePlayer;
 
 public interface PlaceholdersProvider {
 
-    String parsePlaceholder(OfflinePlayer offlinePlayer, String value);
+    String parsePlaceholders(OfflinePlayer offlinePlayer, String value);
 
 }

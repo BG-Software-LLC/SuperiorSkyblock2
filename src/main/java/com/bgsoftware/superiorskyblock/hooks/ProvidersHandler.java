@@ -32,9 +32,9 @@ import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
+import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -535,7 +535,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             placeholdersProvider.ifPresent(placeholdersProviders::add);
         }
 
-        PlaceholderHook.register(placeholdersProviders);
+        ((PlaceholdersServiceImpl) plugin.getServices().getPlaceholdersService()).register(placeholdersProviders);
     }
 
     private void registerChunksProvider() {

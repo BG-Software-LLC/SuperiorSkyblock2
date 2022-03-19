@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.hooks.support.PlaceholderHook;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -22,6 +21,7 @@ import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -164,8 +164,11 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     public boolean canPassAllChecks(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        return mission.getRequiredChecks().stream().allMatch(check -> {
-            check = PlaceholderHook.parse(superiorPlayer, check);
+
+        OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
+
+        return offlinePlayer != null && mission.getRequiredChecks().stream().allMatch(check -> {
+            check = plugin.getServices().getPlaceholdersService().parsePlaceholders(offlinePlayer, check);
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
             } catch (ScriptException ex) {
