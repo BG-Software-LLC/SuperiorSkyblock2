@@ -3,22 +3,17 @@ package com.bgsoftware.superiorskyblock.lang;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
+import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -715,7 +710,7 @@ public enum Message {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String defaultMessage;
-    private final Map<java.util.Locale, MessageContainer> messages = new HashMap<>();
+    private final Map<java.util.Locale, IMessageComponent> messages = new HashMap<>();
 
     Message() {
         this(null);
@@ -778,9 +773,9 @@ public enum Message {
 
             for (Message locale : values()) {
                 if (cfg.isConfigurationSection(locale.name())) {
-                    locale.setMessage(fileLocale, new ComplexMessage(locale.name(), cfg.getConfigurationSection(locale.name())));
+                    locale.setMessage(fileLocale, MultipleComponents.parseSection(cfg.getConfigurationSection(locale.name())));
                 } else {
-                    locale.setMessage(fileLocale, new RawMessage(locale.name(), StringUtils.translateColors(cfg.getString(locale.name(), ""))));
+                    locale.setMessage(fileLocale, RawMessageComponent.of(StringUtils.translateColors(cfg.getString(locale.name(), ""))));
                 }
 
                 if (countMessages)
@@ -795,7 +790,7 @@ public enum Message {
     }
 
     public boolean isEmpty(java.util.Locale locale) {
-        MessageContainer messageContainer = messages.get(locale);
+        IMessageComponent messageContainer = messages.get(locale);
         return messageContainer == null || messageContainer.getMessage().isEmpty();
     }
 
@@ -812,13 +807,13 @@ public enum Message {
     }
 
     public void send(CommandSender sender, java.util.Locale locale, Object... objects) {
-        MessageContainer messageContainer = messages.get(locale);
-        if (messageContainer != null)
-            messageContainer.sendMessage(sender, objects);
+        IMessageComponent messageComponent = messages.get(locale);
+        if (messageComponent != null)
+            messageComponent.sendMessage(sender, objects);
     }
 
-    private void setMessage(java.util.Locale locale, MessageContainer messageContainer) {
-        messages.put(locale, messageContainer);
+    private void setMessage(java.util.Locale locale, IMessageComponent messageComponent) {
+        messages.put(locale, messageComponent);
     }
 
     private static String replaceArgs(String msg, Object... objects) {
@@ -842,144 +837,6 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
-    }
-
-    private static abstract class MessageContainer {
-
-        protected final String name;
-
-        MessageContainer(String name) {
-            this.name = name;
-        }
-
-        abstract String getMessage();
-
-        abstract void sendMessage(CommandSender sender, Object... objects);
-
-    }
-
-    private static final class RawMessage extends MessageContainer {
-
-        private final String message;
-
-        RawMessage(String name, String message) {
-            super(name);
-            this.message = message;
-        }
-
-        @Override
-        String getMessage() {
-            return message;
-        }
-
-        @Override
-        void sendMessage(CommandSender sender, Object... objects) {
-            if (message != null && !message.isEmpty())
-                sender.sendMessage(replaceArgs(message, objects));
-        }
-    }
-
-    private static final class ComplexMessage extends MessageContainer {
-
-        private final TextComponent[] textComponents;
-        private final String rawMessage;
-        private final String actionBarMessage;
-        private final String titleMessage;
-        private final String subtitleMessage;
-        private final int fadeIn;
-        private final int duration;
-        private final int fadeOut;
-
-        ComplexMessage(String name, ConfigurationSection section) {
-            super(name);
-
-            List<TextComponent> textComponents = new ArrayList<>();
-            StringBuilder stringBuilder = new StringBuilder();
-            String actionBarMessage = "";
-            String titleMessage = null;
-            String subtitleMessage = null;
-            int fadeIn = -1;
-            int fadeOut = -1;
-            int duration = -1;
-
-            for (String key : section.getKeys(false)) {
-                if (key.equals("action-bar")) {
-                    actionBarMessage = StringUtils.translateColors(section.getString(key + ".text"));
-                } else if (key.equals("title")) {
-                    titleMessage = StringUtils.translateColors(section.getString(key + ".title"));
-                    subtitleMessage = StringUtils.translateColors(section.getString(key + ".sub-title"));
-                    fadeIn = section.getInt(key + ".fade-in");
-                    duration = section.getInt(key + ".duration");
-                    fadeOut = section.getInt(key + ".fade-out");
-                } else {
-                    String message = StringUtils.translateColors(section.getString(key + ".text"));
-                    stringBuilder.append(message);
-
-                    TextComponent textComponent = new TextComponent(message);
-                    textComponents.add(textComponent);
-
-                    String toolTipMessage = section.getString(key + ".tooltip");
-                    if (toolTipMessage != null) {
-                        textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                                new BaseComponent[]{new TextComponent(StringUtils.translateColors(toolTipMessage))}));
-                    }
-
-                    String commandMessage = section.getString(key + ".command");
-                    if (commandMessage != null)
-                        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
-                }
-            }
-
-            this.textComponents = textComponents.toArray(new TextComponent[0]);
-            this.rawMessage = stringBuilder.toString();
-            this.actionBarMessage = actionBarMessage;
-            this.titleMessage = titleMessage;
-            this.subtitleMessage = subtitleMessage;
-            this.fadeIn = fadeIn;
-            this.duration = duration;
-            this.fadeOut = fadeOut;
-        }
-
-        private static BaseComponent[] replaceArgs(BaseComponent[] textComponents, Object... objects) {
-            BaseComponent[] duplicate = new BaseComponent[textComponents.length];
-
-            for (int i = 0; i < textComponents.length; i++) {
-                duplicate[i] = textComponents[i].duplicate();
-                if (duplicate[i] instanceof TextComponent) {
-                    TextComponent textComponent = (TextComponent) duplicate[i];
-                    textComponent.setText(Message.replaceArgs(textComponent.getText(), objects));
-                }
-                HoverEvent hoverEvent = duplicate[i].getHoverEvent();
-                if (hoverEvent != null)
-                    duplicate[i].setHoverEvent(new HoverEvent(hoverEvent.getAction(), replaceArgs(hoverEvent.getValue(), objects)));
-            }
-
-            return duplicate;
-        }
-
-        @Override
-        public String getMessage() {
-            return rawMessage;
-        }
-
-        @Override
-        void sendMessage(CommandSender sender, Object... objects) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(rawMessage);
-            } else {
-                BaseComponent[] duplicate = replaceArgs(textComponents, objects);
-
-                if (duplicate.length > 0)
-                    ((Player) sender).spigot().sendMessage(duplicate);
-
-                if (actionBarMessage != null)
-                    plugin.getNMSPlayers().sendActionBar((Player) sender, Message.replaceArgs(actionBarMessage, objects));
-
-                plugin.getNMSPlayers().sendTitle((Player) sender, Message.replaceArgs(titleMessage, objects),
-                        Message.replaceArgs(subtitleMessage, objects), fadeIn, duration, fadeOut);
-            }
-        }
-
     }
 
 }

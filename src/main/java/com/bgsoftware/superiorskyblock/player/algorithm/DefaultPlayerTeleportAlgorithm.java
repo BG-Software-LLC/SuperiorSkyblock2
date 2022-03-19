@@ -15,7 +15,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -88,7 +87,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
                         {
                             Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
-                                    .getHighestBlockAt(islandTeleportBlock.getLocation()).getRelative(BlockFace.UP);
+                                    .getHighestBlockAt(islandTeleportBlock.getLocation());
                             if (LocationUtils.isSafeBlock(teleportLocationHighestBlock)) {
                                 adjustAndTeleportPlayerToLocation(player, island, teleportLocationHighestBlock.getLocation(),
                                         rotationYaw, rotationPitch, completableFuture::complete);
@@ -97,8 +96,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                         }
 
                         {
-                            Block centerHighestBlock = islandCenterBlock.getWorld()
-                                    .getHighestBlockAt(islandCenterBlock.getLocation()).getRelative(BlockFace.UP);
+                            Block centerHighestBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation());
                             if (LocationUtils.isSafeBlock(centerHighestBlock)) {
                                 adjustAndTeleportPlayerToLocation(player, island, centerHighestBlock.getLocation(), rotationYaw,
                                         rotationPitch, completableFuture::complete);
@@ -143,9 +141,16 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                         if (y < worldMinLimit || y + 2 > worldBuildLimit)
                                             continue;
 
+                                        int worldX = chunkSnapshot.getX() * 16 + x;
+                                        int worldZ = chunkSnapshot.getZ() * 16 + z;
+
+                                        // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
+                                        // one block above the actual highest block. Therefore, the check is on the
+                                        // returned block and the block below it.
                                         if (LocationUtils.isSafeBlock(chunkSnapshot, x, y, z)) {
-                                            safeLocations.add(new Location(islandsWorld,
-                                                    chunkSnapshot.getX() * 16 + x, y + 1, chunkSnapshot.getZ() * 16 + z));
+                                            safeLocations.add(new Location(islandsWorld, worldX, y, worldZ));
+                                        } else if (y - 1 >= worldMinLimit && LocationUtils.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
+                                            safeLocations.add(new Location(islandsWorld, worldX, y - 1, worldZ));
                                         }
                                     }
                                 }
@@ -178,7 +183,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(location));
 
         island.setIslandHome(homeLocation);
-        teleport(player, homeLocation.add(0, 0.5, 0));
+        teleport(player, homeLocation.add(0, 1.5, 0));
         if (result != null)
             result.accept(true);
     }
@@ -204,7 +209,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
             }
 
             PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
-            teleport(player, toTeleport.add(0, 0.5, 0));
+            teleport(player, toTeleport.add(0, 1.5, 0));
 
             if (teleportResult != null)
                 teleportResult.accept(true, toTeleport);

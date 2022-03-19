@@ -1570,6 +1570,7 @@ public final class SIsland implements Island {
     public void setIgnored(boolean ignored) {
         PluginDebugger.debug("Action: Set Ignored, Island: " + owner.getName() + ", Ignored: " + ignored);
         this.isTopIslandsIgnored = ignored;
+        plugin.getGrid().setForceSort(true); // We want top islands to get sorted again even if only 1 island exists
         IslandsDatabaseBridge.saveIgnoredStatus(this);
     }
 
@@ -1661,7 +1662,7 @@ public final class SIsland implements Island {
         this.bankLimit = new UpgradeValue<>(bankLimit, i -> i.compareTo(new BigDecimal(-1)) < 0);
 
         // Trying to give interest again if the last one failed.
-        if(hasGiveInterestFailed())
+        if (hasGiveInterestFailed())
             giveInterest(false);
 
         IslandsDatabaseBridge.saveBankLimit(this);
@@ -1688,7 +1689,7 @@ public final class SIsland implements Island {
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
-        if(balanceToGive.add(balance).compareTo(getBankLimit()) > 0) {
+        if (balanceToGive.add(balance).compareTo(getBankLimit()) > 0) {
             giveInterestFailed = true;
             return false;
         }

@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,11 +15,18 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class SortedRegistry<K, V, Z extends Comparator<V>> {
 
     private final Map<Z, Set<V>> sortedValues = new ConcurrentHashMap<>();
     private final Map<K, V> innerMap = new ConcurrentHashMap<>();
+    @Nullable
+    private final Predicate<V> valuesPredicate;
+
+    public SortedRegistry(@Nullable Predicate<V> valuesPredicate) {
+        this.valuesPredicate = valuesPredicate;
+    }
 
     public V get(K key) {
         return innerMap.get(key);
@@ -35,8 +43,10 @@ public final class SortedRegistry<K, V, Z extends Comparator<V>> {
     }
 
     public V put(K key, V value) {
-        for (Set<V> sortedTree : sortedValues.values())
-            sortedTree.add(value);
+        if (canAddValue(value)) {
+            for (Set<V> sortedTree : sortedValues.values())
+                sortedTree.add(value);
+        }
         return innerMap.put(key, value);
     }
 
@@ -53,15 +63,15 @@ public final class SortedRegistry<K, V, Z extends Comparator<V>> {
         return Collections.unmodifiableList(new ArrayList<>(this.sortedValues.get(sortingType)));
     }
 
-    public void sort(Z sortingType, Predicate<V> predicate, Runnable onFinish) {
-        if (innerMap.size() <= 1) {
+    public void sort(Z sortingType, boolean forceSort, Runnable onFinish) {
+        if (!forceSort && innerMap.size() <= 1) {
             if (onFinish != null)
                 onFinish.run();
             return;
         }
 
         if (Bukkit.isPrimaryThread()) {
-            Executor.async(() -> sort(sortingType, predicate, onFinish));
+            Executor.async(() -> sort(sortingType, forceSort, onFinish));
             return;
         }
 
@@ -70,7 +80,7 @@ public final class SortedRegistry<K, V, Z extends Comparator<V>> {
         Set<V> newSortedTree = new ConcurrentSkipListSet<>(sortingType);
 
         for (V element : innerMap.values()) {
-            if (predicate == null || predicate.test(element))
+            if (canAddValue(element))
                 newSortedTree.add(element);
         }
 
@@ -80,19 +90,23 @@ public final class SortedRegistry<K, V, Z extends Comparator<V>> {
             onFinish.run();
     }
 
-    public void registerSortingType(Z sortingType, boolean sort, Predicate<V> predicate) {
+    public void registerSortingType(Z sortingType, boolean sort) {
         Preconditions.checkArgument(!sortedValues.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
 
         Set<V> sortedIslands = new ConcurrentSkipListSet<>(sortingType);
-        sortedIslands.addAll(innerMap.values());
+        sortedIslands.addAll(innerMap.values().stream().filter(this::canAddValue).collect(Collectors.toList()));
         sortedValues.put(sortingType, sortedIslands);
 
         if (sort)
-            sort(sortingType, predicate, null);
+            sort(sortingType, false, null);
     }
 
     private void ensureType(Z sortingType) {
         Preconditions.checkState(sortedValues.containsKey(sortingType), "The sorting-type " + sortingType + " doesn't exist in the database. Please contact author!");
+    }
+
+    private boolean canAddValue(V value) {
+        return valuesPredicate == null || valuesPredicate.test(value);
     }
 
 }

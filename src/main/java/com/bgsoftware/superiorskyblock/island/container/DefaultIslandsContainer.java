@@ -23,7 +23,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     private static final Predicate<Island> ISLANDS_PREDICATE = island -> !island.isIgnored();
 
-    private final SortedRegistry<UUID, Island, SortingType> sortedIslands = new SortedRegistry<>();
+    private final SortedRegistry<UUID, Island, SortingType> sortedIslands = new SortedRegistry<>(ISLANDS_PREDICATE);
     private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
 
@@ -114,7 +114,12 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
-        this.sortedIslands.sort(sortingType, ISLANDS_PREDICATE, onFinish);
+        this.sortIslands(sortingType, false, onFinish);
+    }
+
+    @Override
+    public void sortIslands(SortingType sortingType, boolean forceSort, Runnable onFinish) {
+        this.sortedIslands.sort(sortingType, forceSort, onFinish);
     }
 
     @Override
@@ -129,7 +134,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public void addSortingType(SortingType sortingType, boolean sort) {
-        this.sortedIslands.registerSortingType(sortingType, sort, ISLANDS_PREDICATE);
+        this.sortedIslands.registerSortingType(sortingType, sort);
     }
 
     private void runWithCustomWorld(Location islandLocation, Island island, World.Environment environment, Consumer<Location> onSuccess) {

@@ -78,6 +78,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     private boolean pluginDisable = false;
 
+    private boolean forceSort = false;
+
     public GridHandler(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews,
                        IslandsContainer islandsContainer) {
         super(plugin);
@@ -412,11 +414,17 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         PluginDebugger.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
 
-        this.islandsContainer.sortIslands(sortingType, () -> {
+        this.islandsContainer.sortIslands(sortingType, forceSort, () -> {
             plugin.getMenus().refreshTopIslands(sortingType);
             if (onFinish != null)
                 onFinish.run();
         });
+
+        forceSort = false;
+    }
+
+    public void setForceSort(boolean forceSort) {
+        this.forceSort = forceSort;
     }
 
     @Override
