@@ -89,7 +89,11 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
             }
         }
 
-        superiorPlayer.teleport(island, environment, null);
+        superiorPlayer.teleport(island, environment, result -> {
+            if (!result) {
+                superiorPlayer.teleport(island.getIslandHome(environment));
+            }
+        });
     }
 
     @Override
