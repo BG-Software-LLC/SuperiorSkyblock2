@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.bossbar;
 
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import org.bukkit.entity.Player;
 
 public final class EmptyBossBar implements BossBar {

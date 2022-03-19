@@ -2,8 +2,7 @@
 package com.bgsoftware.superiorskyblock.lang.component.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.bossbar.BossBarTask;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
 import org.apache.logging.log4j.util.Strings;
@@ -11,7 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.TimeUnit;
 
 public final class BossBarComponent implements IMessageComponent {
 
@@ -40,7 +38,7 @@ public final class BossBarComponent implements IMessageComponent {
     public void sendMessage(CommandSender sender, Object... objects) {
         if (sender instanceof Player) {
             IMessageComponent.replaceArgs(this.message, objects).ifPresent(message -> {
-                plugin.getNMSPlayers().createBossBar((Player) sender, message, this.color, this.ticksToRun);
+                plugin.getServices().getBossBarsService().createBossBar((Player) sender, message, this.color, this.ticksToRun);
             });
         }
     }

@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.bossbar.BossBar;
-import com.bgsoftware.superiorskyblock.bossbar.EmptyBossBar;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.mojang.authlib.properties.Property;
-import org.bukkit.Color;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;

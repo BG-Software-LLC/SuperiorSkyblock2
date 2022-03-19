@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
-import com.bgsoftware.superiorskyblock.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;

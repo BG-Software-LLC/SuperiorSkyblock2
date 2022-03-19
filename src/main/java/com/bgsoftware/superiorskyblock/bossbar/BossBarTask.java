@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.bossbar;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -14,13 +15,19 @@ public final class BossBarTask extends BukkitRunnable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private static final BossBarTask EMPTY_TASK = new BossBarTask(EmptyBossBar.getInstance(), 0);
+
     private static final Map<UUID, Queue<BossBarTask>> PLAYERS_RUNNING_TASKS = new HashMap<>();
 
     private final BossBar bossBar;
     private final double progressToRemovePerTick;
     private boolean reachedEndTask = false;
 
-    public BossBarTask(BossBar bossBar, double ticksToRun) {
+    public static BossBarTask create(BossBar bossBar, double ticksToRun) {
+        return ticksToRun <= 0 ? EMPTY_TASK : new BossBarTask(bossBar, ticksToRun);
+    }
+
+    private BossBarTask(BossBar bossBar, double ticksToRun) {
         this.bossBar = bossBar;
         this.progressToRemovePerTick = this.bossBar.getProgress() / ticksToRun;
         if (progressToRemovePerTick > 0) {

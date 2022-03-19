@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.bossbar.BossBarTask;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
@@ -128,7 +128,7 @@ public final class NMSPlayersImpl implements NMSPlayers {
 
         public BossBarImpl(String message, BarColor color, double ticksToRun) {
             bossBar = Bukkit.createBossBar(message, color, BarStyle.SOLID);
-            this.bossBarTask = new BossBarTask(this, ticksToRun);
+            this.bossBarTask = BossBarTask.create(this, ticksToRun);
         }
 
         @Override
