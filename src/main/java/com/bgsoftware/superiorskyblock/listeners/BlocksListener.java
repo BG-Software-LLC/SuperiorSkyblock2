@@ -35,6 +35,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
@@ -196,6 +197,14 @@ public final class BlocksListener implements Listener {
                 }
             });
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockGrow(BlockGrowEvent e) {
+        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+        if (island != null)
+            island.handleBlockPlace(Key.of(e.getNewState()), 1);
     }
 
     //Checking for chorus flower spread outside island.
