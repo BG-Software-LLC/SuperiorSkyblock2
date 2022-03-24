@@ -188,7 +188,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
                         IslandsDatabaseBridge.insertIsland(island);
 
-                        superiorPlayer.runIfOnline(player -> {
+                        Executor.sync(() -> superiorPlayer.runIfOnline(player -> {
                             Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation),
                                     System.currentTimeMillis() - startTime);
                             if (teleportPlayer) {
@@ -205,7 +205,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                                     }
                                 });
                             }
-                        });
+                        }), 1L);
                     } else {
                         error.printStackTrace();
                         PluginDebugger.debug(error);
