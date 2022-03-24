@@ -21,7 +21,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagList;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.boss.enderdragon.phases.DragonController;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.boss.enderdragon.phases.DragonControllerManager;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.level.block.state.pattern.ShapeDetectorBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.phys.AxisAlignedBB;
 import net.minecraft.advancements.CriterionTriggers;
@@ -42,6 +41,7 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerFly;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerHold;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLanding;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLandingFly;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
 import net.minecraft.world.entity.player.EntityHuman;
@@ -140,7 +140,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
         if (!(entity.getHandle() instanceof IslandEntityEnderDragon entityEnderDragon))
             return;
 
-        DragonControllerManager dragonControllerManager = entity.getDragonControllerManager();
+        DragonControllerManager dragonControllerManager = entity.getDragonControllerManager().getHandle();
 
         switch (phase) {
             case DYING -> DRAGON_PHASE.set(dragonControllerManager, new IslandDragonControllerDying(entityEnderDragon));
