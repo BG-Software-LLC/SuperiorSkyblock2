@@ -145,6 +145,7 @@ public final class SuperiorSkyblockAPI {
     /**
      * Get the world of an island by the world's environment.
      */
+    @Nullable
     public static World getIslandsWorld(Island island, World.Environment environment) {
         return plugin.getGrid().getIslandsWorld(island, environment);
     }

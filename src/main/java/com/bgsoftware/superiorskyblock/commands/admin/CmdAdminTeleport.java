@@ -75,6 +75,10 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
                 return;
         }
 
+        if (plugin.getGrid().getIslandsWorld(island, environment) == null) {
+            Message.WORLD_NOT_ENABLED.send(sender);
+            return;
+        }
 
         if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
             if (!island.wasSchematicGenerated(environment)) {
@@ -85,7 +89,11 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
             }
         }
 
-        superiorPlayer.teleport(island, environment, null);
+        superiorPlayer.teleport(island, environment, result -> {
+            if (!result) {
+                superiorPlayer.teleport(island.getIslandHome(environment));
+            }
+        });
     }
 
     @Override

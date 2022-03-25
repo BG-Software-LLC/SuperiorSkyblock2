@@ -738,4 +738,5 @@ WITHDRAW_ANNOUNCEMENT: '&e&l岛屿银行 | &b{0} &7从岛屿银行取出了 &e&l
 WITHDRAW_ERROR: '&c&lError | &7{0}.'
 WITHDRAWN_MONEY: '&e&l岛屿银行 | &7你从 &b{1} &7的岛屿银行取出了 &e&l${0} &7游戏币！'
 WITHDRAWN_MONEY_NAME: '&e&l岛屿银行 | &7你从 &b{1} &7岛屿银行取出了 &e&l${0} &7游戏币！'
+WORLD_NOT_ENABLED: '&e&lWorlds | &7This world is not enabled on the server.'
 WORLD_NOT_UNLOCKED: '&e&l岛屿维度 | &7你的岛屿还未解锁这个世界维度！'

@@ -10,15 +10,19 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -118,6 +122,34 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
                 e.setCancelled(true);
                 Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
             }
+        }
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onBlockGrow(BlockGrowEvent e) {
+            Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+
+            if (island == null)
+                return;
+
+            Key blockKey = Key.of(e.getNewState());
+
+            if (island.hasReachedBlockLimit(blockKey))
+                e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onStructureGrow(StructureGrowEvent e) {
+            Island island = plugin.getGrid().getIslandAt(e.getLocation());
+
+            if (island == null)
+                return;
+
+            List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
+
+            blockStates.forEach(blockState -> {
+                if (island.hasReachedBlockLimit(Key.of(blockState)))
+                    e.getBlocks().remove(blockState);
+            });
         }
 
     }
