@@ -2,7 +2,9 @@ package com.bgsoftware.superiorskyblock.lang.component;
 
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -32,6 +34,8 @@ public final class MultipleComponents implements IMessageComponent {
                         section.getInt(key + ".duration"),
                         section.getInt(key + ".fade-out")
                 ));
+            } else if (key.equals("sound")) {
+                messageComponents.add(SoundComponent.of(FileUtils.getSound(section.getConfigurationSection("sound"))));
             } else {
                 TextComponent textComponent = new TextComponent(StringUtils.translateColors(section.getString(key + ".text")));
 
