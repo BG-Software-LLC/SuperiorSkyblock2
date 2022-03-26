@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPosition> {
 
+    public static final BlockPosition ZERO = new BlockPosition(1000, 100, 1000);
+
     public BlockPosition(int x, int y, int z) {
         this(new net.minecraft.core.BlockPosition(x, y, z));
     }
