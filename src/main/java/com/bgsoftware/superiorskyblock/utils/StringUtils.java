@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.utils;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.ChatColor;
@@ -279,7 +279,7 @@ public final class StringUtils {
     }
 
     public static String translateColors(@Nullable String string) {
-        if (string == null || string.length() <= 1)
+        if (isBlank(string))
             return "";
 
         String output = ChatColor.translateAlternateColorCodes('&', string);
