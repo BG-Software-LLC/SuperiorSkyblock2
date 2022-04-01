@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -100,6 +101,9 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                         lore.add(memberFormat.replace("{}", "None"));
                     } else {
                         PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
+
+                        if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
+                            members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());
 
                         members.forEach(member -> {
                             String onlineMessage = member.isOnline() ?

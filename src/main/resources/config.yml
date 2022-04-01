@@ -744,3 +744,9 @@ recalc-task-timeout: 10
 # The language will only get changed if there is a valid translation available,
 # otherwise the default language will be chosen for the player.
 auto-language-detection: true
+
+# The way members of islands will be sorted in top islands when using the {4} placeholder.
+# The followings are available:
+# NAMES - Sort members by their names.
+# ROLES - Sort members by their island roles.
+island-top-members-sorting: NAMES

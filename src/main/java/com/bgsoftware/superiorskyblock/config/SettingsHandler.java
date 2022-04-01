@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.config;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -522,6 +523,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     @Override
     public boolean isAutoLanguageDetection() {
         return this.container.autoLanguageDetection;
+    }
+
+    @Override
+    public TopIslandMembersSorting getTopIslandMembersSorting() {
+        return this.container.islandTopMembersSorting;
     }
 
     public void updateValue(String path, Object value) throws IOException {
