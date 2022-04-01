@@ -65,6 +65,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
 
     @Override
     public void b() {
+        // doServerTick
+
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::b);
         if (++currentTick >= 20) {
             updateBattlePlayers();
@@ -75,25 +77,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     @Nullable
     @Override
     public ShapeDetector.ShapeDetectorCollection j() {
-        return this.findExitPortal();
-    }
+        // findExitPortal
 
-    @Override
-    public void f() {
-        DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::f);
-    }
-
-    public void removeBattlePlayers() {
-        for (Entity entity : bossBattleServer.getPlayers())
-            bossBattleServer.removePlayer(entity);
-    }
-
-    public void killEnderDragon() {
-        this.entityEnderDragon.getBukkitEntity().remove();
-    }
-
-    @Nullable
-    private ShapeDetector.ShapeDetectorCollection findExitPortal() {
         int chunkX = this.islandBlockPosition.getX() >> 4;
         int chunkZ = this.islandBlockPosition.getZ() >> 4;
 
@@ -136,6 +121,22 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         }
 
         return null;
+    }
+
+    @Override
+    public void f() {
+        // resetSpikeCrystals
+
+        DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::f);
+    }
+
+    public void removeBattlePlayers() {
+        for (Entity entity : bossBattleServer.getPlayers())
+            bossBattleServer.removePlayer(entity);
+    }
+
+    public void killEnderDragon() {
+        this.entityEnderDragon.getBukkitEntity().remove();
     }
 
     private void updateBattlePlayers() {
