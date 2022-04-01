@@ -78,6 +78,11 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         return this.findExitPortal();
     }
 
+    @Override
+    public void f() {
+        DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::f);
+    }
+
     public void removeBattlePlayers() {
         for (Entity entity : bossBattleServer.getPlayers())
             bossBattleServer.removePlayer(entity);
