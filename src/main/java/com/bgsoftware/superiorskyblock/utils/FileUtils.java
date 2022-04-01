@@ -146,6 +146,19 @@ public final class FileUtils {
             itemBuilder.withCustomModel(section.getInt("customModel"));
         }
 
+        if (section.contains("leatherColor")) {
+            String leatherColor = section.getString("leatherColor");
+            if (leatherColor.startsWith("#"))
+                leatherColor = leatherColor.substring(1);
+
+            try {
+                itemBuilder.withLeatherColor(Integer.parseInt(leatherColor, 16));
+            } catch (IllegalArgumentException error) {
+                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + leatherColor + " into a color, skipping...");
+                PluginDebugger.debug(error);
+            }
+        }
+
         return new TemplateItem(itemBuilder);
     }
 

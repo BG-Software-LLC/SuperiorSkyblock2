@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,6 +16,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.potion.PotionEffect;
@@ -239,6 +241,14 @@ public final class ItemBuilder {
 
     public ItemBuilder withCustomModel(int customModel) {
         plugin.getNMSAlgorithms().setCustomModel(itemMeta, customModel);
+        return this;
+    }
+
+    public ItemBuilder withLeatherColor(int leatherColor) {
+        if (itemMeta instanceof LeatherArmorMeta) {
+            LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemMeta;
+            leatherArmorMeta.setColor(Color.fromRGB(leatherColor));
+        }
         return this;
     }
 
