@@ -19,7 +19,9 @@ public final class SpikesCacheLoader extends CacheLoader<Long, List<WorldGenEnde
     @Override
     public @NotNull List<WorldGenEnder.Spike> load(@NotNull Long key) {
         BlockPosition islandBlockPosition = DragonUtils.getCurrentSpikesLookupPosition();
-        Preconditions.checkNotNull(islandBlockPosition, "Suspicious spikes call!");
+
+        int positionX = islandBlockPosition == null ? 0 : islandBlockPosition.getX();
+        int positionZ = islandBlockPosition == null ? 0 : islandBlockPosition.getZ();
 
         List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());
 
@@ -34,8 +36,8 @@ public final class SpikesCacheLoader extends CacheLoader<Long, List<WorldGenEnde
             int height = 76 + l * 3;
             boolean guarded = l == 1 || l == 2;
 
-            spikesList.add(new WorldGenEnder.Spike(spikeX + islandBlockPosition.getX(),
-                    spikeZ + islandBlockPosition.getZ(), radius, height, guarded));
+            spikesList.add(new WorldGenEnder.Spike(spikeX + positionX, spikeZ + positionZ,
+                    radius, height, guarded));
         }
 
         return spikesList;
