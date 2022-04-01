@@ -5,9 +5,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEnderDragonBattle;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.SpikesCacheLoader;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.levelgen.feature.WorldGenEnder;
@@ -21,7 +20,6 @@ import org.bukkit.entity.Player;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings({"unused"})
 public final class NMSDragonFightImpl implements NMSDragonFight {
@@ -43,7 +41,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         if (firstWorldPreparation) {
             firstWorldPreparation = false;
-            SPIKE_CACHE.set(null, CacheBuilder.newBuilder().expireAfterWrite(5L, TimeUnit.MINUTES).build(new SpikesCacheLoader()));
+            SPIKE_CACHE.set(null, SpikesCache.getInstance());
         }
     }
 

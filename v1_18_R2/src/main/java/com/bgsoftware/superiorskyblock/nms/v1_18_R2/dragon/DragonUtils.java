@@ -4,7 +4,6 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
 import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 
-import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 
 public final class DragonUtils {
@@ -14,7 +13,7 @@ public final class DragonUtils {
             Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL, 1)
             .removeFinal();
 
-    private static BlockPosition currentSpikesLookupPosition;
+    private static BlockPosition currentPodiumPosition;
 
     private DragonUtils() {
 
@@ -23,17 +22,16 @@ public final class DragonUtils {
     public static void runWithPodiumPosition(BlockPosition podiumPosition, Runnable runnable) {
         try {
             END_PODIUM_LOCATION.set(null, podiumPosition.getHandle());
-            currentSpikesLookupPosition = podiumPosition;
+            currentPodiumPosition = podiumPosition;
             runnable.run();
         } finally {
             END_PODIUM_LOCATION.set(null, BlockPosition.ZERO.getHandle());
-            currentSpikesLookupPosition = null;
+            currentPodiumPosition = BlockPosition.ZERO;
         }
     }
 
-    @Nullable
-    public static BlockPosition getCurrentSpikesLookupPosition() {
-        return currentSpikesLookupPosition;
+    public static BlockPosition getCurrentPodiumPosition() {
+        return currentPodiumPosition;
     }
 
 }
