@@ -363,12 +363,12 @@ public final class PlayersListener implements Listener {
             IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(),
                     superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
 
-            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(),
+            Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),
                     superiorPlayer.getName(), eventResult.getResult());
             for (Player _onlinePlayer : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(_onlinePlayer);
                 if (onlinePlayer.hasAdminSpyEnabled())
-                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole(),
+                    Message.SPY_TEAM_CHAT_FORMAT.send(onlinePlayer, superiorPlayer.getPlayerRole().getDisplayName(),
                             superiorPlayer.getName(), eventResult.getResult());
             }
         } else {
@@ -382,6 +382,7 @@ public final class PlayersListener implements Listener {
                     .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
                     .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
                     .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
+                    .replace("{island-role}", superiorPlayer.getPlayerRole().getDisplayName())
                     .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
                     .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")
                     .replace("{island-position-rating}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_RATING) + 1) + "")
