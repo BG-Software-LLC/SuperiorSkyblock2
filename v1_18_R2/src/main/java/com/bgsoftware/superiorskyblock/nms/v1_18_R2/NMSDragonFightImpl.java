@@ -217,8 +217,8 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         @Nullable
         private ShapeDetector.ShapeDetectorCollection findExitPortal() {
-            int chunkZ = this.islandBlockPosition.getZ() >> 4;
             int chunkX = this.islandBlockPosition.getX() >> 4;
+            int chunkZ = this.islandBlockPosition.getZ() >> 4;
 
             for (int x = -8; x <= 8; ++x) {
                 for (int z = -8; z <= 8; ++z) {
