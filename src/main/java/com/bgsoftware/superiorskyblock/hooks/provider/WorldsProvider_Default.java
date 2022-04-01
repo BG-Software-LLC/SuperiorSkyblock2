@@ -35,8 +35,11 @@ public final class WorldsProvider_Default implements WorldsProvider {
             loadWorld(plugin.getSettings().getWorlds().getWorldName(), difficulty, World.Environment.NORMAL);
         if (plugin.getSettings().getWorlds().getNether().isEnabled())
             loadWorld(plugin.getSettings().getWorlds().getNether().getName(), difficulty, World.Environment.NETHER);
-        if (plugin.getSettings().getWorlds().getEnd().isEnabled())
-            loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
+        if (plugin.getSettings().getWorlds().getEnd().isEnabled()) {
+            World endWorld = loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
+            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
+                plugin.getNMSDragonFight().prepareEndWorld(endWorld);
+        }
     }
 
     @Override
@@ -144,7 +147,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
         }
     }
 
-    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
+    private World loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
         if (Bukkit.getWorld(worldName) != null) {
             throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
                     "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
@@ -166,6 +169,8 @@ public final class WorldsProvider_Default implements WorldsProvider {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
         }
+
+        return world;
     }
 
 }
