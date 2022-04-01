@@ -143,6 +143,7 @@ public abstract class RemoteSQLSession implements SQLSession {
 
         String query = statement
                 .replace("BIG_DECIMAL", "TEXT")
+                .replace("DECIMAL", "DECIMAL(10, 2)")
                 .replace("UUID", "VARCHAR(36)")
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");

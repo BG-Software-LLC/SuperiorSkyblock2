@@ -237,6 +237,10 @@ public final class SQLDatabaseInitializer {
                 new Pair<>("mob_drops_multiplier", "DECIMAL")
         );
 
+        SQLHelper.modifyColumnType("islands_settings", "crop_growth_multiplier", "DECIMAL");
+        SQLHelper.modifyColumnType("islands_settings", "spawner_rates_multiplier", "DECIMAL");
+        SQLHelper.modifyColumnType("islands_settings", "mob_drops_multiplier", "DECIMAL");
+
         SQLHelper.createTable("islands_upgrades",
                 new Pair<>("island", "UUID"),
                 new Pair<>("upgrade", "LONG_UNIQUE_TEXT"),
