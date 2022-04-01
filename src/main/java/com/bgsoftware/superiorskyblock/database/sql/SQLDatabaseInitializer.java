@@ -237,6 +237,10 @@ public final class SQLDatabaseInitializer {
                 new Pair<>("mob_drops_multiplier", "DECIMAL")
         );
 
+        // Up to 1.9.0.574, decimals would not be saved correctly in MySQL
+        // This occurred because the field type was DECIMAL(10,0) instead of DECIMAL(10,2)
+        // Updating the column types to "DECIMAL" again should fix the issue.
+        // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1021
         SQLHelper.modifyColumnType("islands_settings", "crop_growth_multiplier", "DECIMAL");
         SQLHelper.modifyColumnType("islands_settings", "spawner_rates_multiplier", "DECIMAL");
         SQLHelper.modifyColumnType("islands_settings", "mob_drops_multiplier", "DECIMAL");
