@@ -626,6 +626,9 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
         }
+        if (cfg.isBoolean("worlds.end.dragon-fight")) {
+            cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
+        }
     }
 
     private void convertInteractables(SuperiorSkyblockPlugin plugin, YamlConfiguration cfg) {

@@ -42,11 +42,10 @@ public final class DragonBattleServiceImpl implements DragonBattleService {
 
         stopEnderDragonBattle(island);
 
-        Location islandHome = island.getIslandHome(World.Environment.THE_END);
+        Location islandCenter = island.getCenter(World.Environment.THE_END);
 
-        assert islandHome != null;
-
-        plugin.getNMSDragonFight().startDragonBattle(island, islandHome);
+        plugin.getNMSDragonFight().startDragonBattle(island, plugin.getSettings().getWorlds().getEnd()
+                .getPortalOffset().applyToLocation(islandCenter));
 
         return DragonBattleResetResult.SUCCESS;
     }
