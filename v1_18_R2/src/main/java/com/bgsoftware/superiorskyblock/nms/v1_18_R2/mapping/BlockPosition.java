@@ -9,7 +9,7 @@ import java.util.Iterator;
 
 public final class BlockPosition extends MappedObject<net.minecraft.core.BlockPosition> {
 
-    public static final BlockPosition ZERO = new BlockPosition(0, 100, 0);
+    public static final BlockPosition ZERO = new BlockPosition(net.minecraft.core.BlockPosition.b);
 
     public BlockPosition(int x, int y, int z) {
         this(new net.minecraft.core.BlockPosition(x, y, z));
