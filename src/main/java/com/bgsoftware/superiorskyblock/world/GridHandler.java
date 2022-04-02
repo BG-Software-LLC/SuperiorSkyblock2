@@ -95,7 +95,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         this.lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
-        Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
 
     public void updateSpawn() {
