@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.base.Preconditions;
 import de.candc.events.SpawnerBreakEvent;
@@ -48,14 +48,14 @@ public final class SpawnersProvider_SilkSpawners implements SpawnersProvider_Aut
         public void onSpawnerPlace(SpawnerPlaceEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
-                island.handleBlockPlace(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
+                island.handleBlockPlace(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(SpawnerBreakEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
+                island.handleBlockBreak(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnedEntity() + ""), 1);
         }
 
     }

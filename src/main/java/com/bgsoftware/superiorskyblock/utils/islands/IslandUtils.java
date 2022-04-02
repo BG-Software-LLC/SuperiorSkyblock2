@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
@@ -168,7 +169,7 @@ public final class IslandUtils {
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
     }
 
-    public static double getGeneratorPercentageDecimal(Island island, com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+    public static double getGeneratorPercentageDecimal(Island island, Key key, World.Environment environment) {
         int totalAmount = island.getGeneratorTotalAmount(environment);
         return totalAmount == 0 ? 0 : (island.getGeneratorAmount(key, environment) * 100D) / totalAmount;
     }

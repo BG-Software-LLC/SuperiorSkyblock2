@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.upgrade;
 
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 import org.bukkit.World;
 
@@ -16,7 +16,7 @@ public class SUpgrade implements Upgrade {
     private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, EmptyUpgradeCost.getInstance(), new ArrayList<>(), "",
             new HashSet<>(), UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE,
             UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE,
-            new KeyMap<>(), new KeyMap<>(), new KeyMap[World.Environment.values().length], new HashMap<>(), UpgradeValue.NEGATIVE_BIG_DECIMAL,
+            KeyMap.createKeyMap(), KeyMap.createKeyMap(), new KeyMap[World.Environment.values().length], new HashMap<>(), UpgradeValue.NEGATIVE_BIG_DECIMAL,
             new HashMap<>());
 
     private final String name;

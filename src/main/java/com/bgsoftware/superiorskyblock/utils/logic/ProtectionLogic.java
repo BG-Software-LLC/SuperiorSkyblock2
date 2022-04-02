@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
@@ -89,7 +89,7 @@ public final class ProtectionLogic {
             return false;
         }
 
-        if (plugin.getSettings().getValuableBlocks().contains(Key.of(block)) &&
+        if (plugin.getSettings().getValuableBlocks().contains(KeyImpl.of(block)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
             if (sendMessages)
                 PlayerLocales.sendProtectionMessage(player);

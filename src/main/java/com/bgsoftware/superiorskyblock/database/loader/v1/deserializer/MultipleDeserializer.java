@@ -4,13 +4,13 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.potion.PotionEffectType;
 

@@ -29,7 +29,7 @@ import com.bgsoftware.superiorskyblock.database.sql.session.impl.MySQLSession;
 import com.bgsoftware.superiorskyblock.database.sql.session.impl.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -410,7 +410,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                         .setObject(CONSOLE_UUID.toString())
                         .setObject(currentTime)
                         .addBatch());
-        ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS)).forEach((key, limit) ->
+        ((KeyMapImpl<Integer>) islandAttributes.getValue(IslandAttributes.Field.BLOCK_LIMITS)).forEach((key, limit) ->
                 islandsBlockLimitsQuery.setObject(islandUUID)
                         .setObject(key.toString())
                         .setObject(limit)
@@ -425,7 +425,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                         .setObject(type.getName())
                         .setObject(level)
                         .addBatch());
-        ((KeyMap<Integer>) islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS)).forEach((entity, limit) ->
+        ((KeyMapImpl<Integer>) islandAttributes.getValue(IslandAttributes.Field.ENTITY_LIMITS)).forEach((entity, limit) ->
                 islandsEntityLimitsQuery.setObject(islandUUID)
                         .setObject(entity.toString())
                         .setObject(limit)
@@ -435,7 +435,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                         .setObject(islandFlag.getName())
                         .setObject(status)
                         .addBatch());
-        runOnEnvironments((KeyMap<Integer>[]) islandAttributes.getValue(IslandAttributes.Field.GENERATORS), (generatorRates, environment) ->
+        runOnEnvironments((KeyMapImpl<Integer>[]) islandAttributes.getValue(IslandAttributes.Field.GENERATORS), (generatorRates, environment) ->
                 generatorRates.forEach((block, rate) ->
                         islandsGeneratorsQuery.setObject(islandUUID)
                                 .setObject(environment.name())

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandChestAttributes;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttri
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -177,7 +177,7 @@ public final class JsonDeserializer implements IDeserializer {
     }
 
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = new KeyMap<>();
+        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
 
         JsonArray blockLimitsArray = gson.fromJson(blocks, JsonArray.class);
         blockLimitsArray.forEach(blockLimitElement -> {
@@ -239,7 +239,7 @@ public final class JsonDeserializer implements IDeserializer {
                     JsonObject generatorObject = generatorElement.getAsJsonObject();
                     Key blockKey = Key.of(generatorObject.get("id").getAsString());
                     int rate = generatorObject.get("rate").getAsInt();
-                    (cobbleGenerator[i] = new KeyMap<>()).put(blockKey, rate);
+                    (cobbleGenerator[i] = KeyMap.createKeyMap()).put(blockKey, rate);
                 });
             } catch (Exception error) {
                 PluginDebugger.debug(error);
@@ -269,7 +269,7 @@ public final class JsonDeserializer implements IDeserializer {
     }
 
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = new KeyMap<>();
+        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
 
         JsonArray entityLimitsArray = gson.fromJson(entities, JsonArray.class);
         entityLimitsArray.forEach(entityLimitElement -> {

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -8,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.Material;
@@ -79,7 +80,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
             return;
         }
 
-        Key material = Key.of(args[3].toUpperCase());
+        Key material = KeyImpl.of(args[3].toUpperCase());
         boolean percentage = args[4].endsWith("%");
 
         if (percentage)

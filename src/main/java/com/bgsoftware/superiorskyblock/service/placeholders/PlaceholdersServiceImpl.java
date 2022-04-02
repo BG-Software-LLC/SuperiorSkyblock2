@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.hooks.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
@@ -289,16 +289,16 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1).toUpperCase();
             return Optional.of(StringUtils.format(island
-                    .getBlockCountAsBigInteger(Key.of(keyName))));
+                    .getBlockCountAsBigInteger(KeyImpl.of(keyName))));
         } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1).toUpperCase();
-            return Optional.of(island.getBlockLimit(Key.of(keyName)) + "");
+            return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
         } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1).toUpperCase();
             return Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
         } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1).toUpperCase();
-            return Optional.of(StringUtils.format(island.getEntitiesTracker().getEntityCount(Key.of(keyName))));
+            return Optional.of(StringUtils.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
         } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
         } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {

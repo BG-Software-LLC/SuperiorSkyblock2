@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -7,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
@@ -231,7 +232,7 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     !Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.isEmpty(locale) &&
                     BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 StringBuilder entitiesString = new StringBuilder();
-                for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getEntitiesLimitsAsKeys().entrySet()) {
+                for (Map.Entry<Key, Integer> entry : island.getEntitiesLimitsAsKeys().entrySet()) {
                     entitiesString.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue()));
                     if (!island.getCustomEntitiesLimits().containsKey(entry.getKey()))
                         entitiesString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
@@ -245,7 +246,7 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     !Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.isEmpty(locale) &&
                     BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 StringBuilder blocksString = new StringBuilder();
-                for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, Integer> entry : island.getBlocksLimits().entrySet()) {
+                for (Map.Entry<Key, Integer> entry : island.getBlocksLimits().entrySet()) {
                     blocksString.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue()));
                     if (!island.getCustomBlocksLimits().containsKey(entry.getKey()))
                         blocksString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
@@ -259,11 +260,10 @@ public final class CmdAdminShow implements IAdminIslandCommand {
             // Island generator rates
             if (!Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.isEmpty(locale) && !Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.isEmpty(locale)) {
                 for (World.Environment environment : World.Environment.values()) {
-                    Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> customGeneratorValues =
-                            island.getCustomGeneratorAmounts(environment);
+                    Map<Key, Integer> customGeneratorValues = island.getCustomGeneratorAmounts(environment);
                     StringBuilder generatorString = new StringBuilder();
                     for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
-                        Key key = Key.of(entry.getKey());
+                        Key key = KeyImpl.of(entry.getKey());
                         generatorString.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
                                 StringUtils.format(entry.getKey()),
                                 StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
