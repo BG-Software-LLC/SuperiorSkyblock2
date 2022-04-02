@@ -19,10 +19,12 @@ import net.minecraft.server.v1_12_R1.EntityEnderDragon;
 import net.minecraft.server.v1_12_R1.EntityPlayer;
 import net.minecraft.server.v1_12_R1.EnumDragonRespawn;
 import net.minecraft.server.v1_12_R1.GameProfileSerializer;
+import net.minecraft.server.v1_12_R1.IDragonController;
 import net.minecraft.server.v1_12_R1.MathHelper;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagList;
+import net.minecraft.server.v1_12_R1.Vec3D;
 import net.minecraft.server.v1_12_R1.WorldGenEndGateway;
 import net.minecraft.server.v1_12_R1.WorldGenEndTrophy;
 import net.minecraft.server.v1_12_R1.WorldServer;
@@ -32,6 +34,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,6 +53,11 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
 
     private static final ReflectField<BossBattleServer> BATTLE_BOSS_SERVER = new ReflectField<>(
             EnderDragonBattle.class, BossBattleServer.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+    private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
+            EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 3);
+
+    private static final Vec3D ORIGINAL_END_PODIUM = new Vec3D(0.5, 0, 0.5);
 
     private final Island island;
     private final BlockPosition islandBlockPosition;
@@ -72,15 +80,24 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private boolean previouslyKilled = false;
 
     public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location) {
+        this(island, worldServer, new BlockPosition(location.getX(), location.getY(), location.getZ()),
+                null);
+    }
+
+    public IslandEnderDragonBattle(Island island, WorldServer worldServer, BlockPosition islandBlockPosition,
+                                   @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
         super(worldServer, new NBTTagCompound());
+        SCAN_FOR_LEGACY_PORTALS.set(this, false);
         this.island = island;
-        this.islandBlockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
+        this.islandBlockPosition = islandBlockPosition;
         this.worldServer = worldServer;
-        this.entityEnderDragon = spawnEnderDragon();
+        this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
         this.bossBattleServer = BATTLE_BOSS_SERVER.get(this);
 
         int radius = plugin.getSettings().getMaxIslandSize();
         this.borderArea = new AxisAlignedBB(islandBlockPosition.a(-radius, -radius, -radius), islandBlockPosition.a(radius, radius, radius));
+
+        DRAGON_BATTLE.set(this.entityEnderDragon, this);
     }
 
     @Override
@@ -110,6 +127,11 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     @Override
     public void b() {
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, this::doTick);
+
+        IDragonController currentController = this.entityEnderDragon.getDragonControllerManager().a();
+        if (currentController != null && ORIGINAL_END_PODIUM.equals(currentController.g())) {
+            currentController.d();
+        }
     }
 
     @Override
@@ -225,7 +247,6 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.a);
         entityEnderDragon.setPositionRotation(islandBlockPosition.getX(), 128,
                 islandBlockPosition.getZ(), this.worldServer.random.nextFloat() * 360.0F, 0.0F);
-        DRAGON_BATTLE.set(entityEnderDragon, this);
 
         this.worldServer.addEntity(entityEnderDragon, CreatureSpawnEvent.SpawnReason.NATURAL);
 

@@ -12,12 +12,14 @@ import net.minecraft.server.v1_16_R3.EnderDragonBattle;
 import net.minecraft.server.v1_16_R3.EntityEnderDragon;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.HeightMap;
+import net.minecraft.server.v1_16_R3.IDragonController;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.ShapeDetector;
 import net.minecraft.server.v1_16_R3.ShapeDetectorBlock;
 import net.minecraft.server.v1_16_R3.ShapeDetectorBuilder;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.TileEntityEnderPortal;
+import net.minecraft.server.v1_16_R3.Vec3D;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -36,6 +38,9 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
             EntityEnderDragon.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
 
+    private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
+            EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 3);
+
     private static final ShapeDetector EXIT_PORTAL_PATTERN = ShapeDetectorBuilder.a()
             .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
             .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
@@ -45,6 +50,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
             .a('#', ShapeDetectorBlock.a(BlockPredicate.a(Blocks.BEDROCK)))
             .b();
 
+    private static final Vec3D ORIGINAL_END_PODIUM = new Vec3D(0.5, 0, 0.5);
+
     private final Island island;
     private final BlockPosition islandBlockPosition;
 
@@ -53,10 +60,18 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private byte currentTick = 0;
 
     public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location) {
+        this(island, worldServer, new BlockPosition(location.getX(), location.getY(), location.getZ()),
+                null);
+    }
+
+    public IslandEnderDragonBattle(Island island, WorldServer worldServer, BlockPosition islandBlockPosition,
+                                   @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
         super(worldServer, worldServer.getSeed(), new NBTTagCompound());
+        SCAN_FOR_LEGACY_PORTALS.set(this, false);
         this.island = island;
-        this.islandBlockPosition = new BlockPosition(location.getX(), location.getY(), location.getZ());
-        this.entityEnderDragon = spawnEnderDragon();
+        this.islandBlockPosition = islandBlockPosition;
+        this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
+        DRAGON_BATTLE.set(this.entityEnderDragon, this);
     }
 
     @Override
@@ -64,6 +79,12 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         // doServerTick
 
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::b);
+
+        IDragonController currentController = this.entityEnderDragon.getDragonControllerManager().a();
+        if (currentController != null && ORIGINAL_END_PODIUM.equals(currentController.g())) {
+            currentController.d();
+        }
+
         if (++currentTick >= 20) {
             updateBattlePlayers();
             currentTick = 0;
@@ -154,7 +175,6 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         entityEnderDragon.getDragonControllerManager().setControllerPhase(DragonControllerPhase.HOLDING_PATTERN);
         entityEnderDragon.setPositionRotation(islandBlockPosition.getX(), 128,
                 islandBlockPosition.getZ(), this.world.getRandom().nextFloat() * 360.0F, 0.0F);
-        DRAGON_BATTLE.set(entityEnderDragon, this);
 
         this.world.addEntity(entityEnderDragon, CreatureSpawnEvent.SpawnReason.NATURAL);
 

@@ -5,9 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEnderDragonBattle;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.SpikesCache;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.google.common.cache.LoadingCache;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.levelgen.feature.WorldGenEnder;
 import org.bukkit.Bukkit;
@@ -26,6 +29,10 @@ import java.util.List;
 @SuppressWarnings({"unused"})
 public final class NMSDragonFightImpl implements NMSDragonFight {
 
+    private static final ReflectField<EntityTypes.b<?>> ENTITY_TYPES_BUILDER = new ReflectField<EntityTypes.b<?>>(
+            EntityTypes.class, EntityTypes.b.class, Modifier.PRIVATE | Modifier.FINAL, 1)
+            .removeFinal();
+
     private static final ReflectField<EnderDragonBattle> WORLD_DRAGON_BATTLE = new ReflectField<EnderDragonBattle>(
             net.minecraft.server.level.WorldServer.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)
             .removeFinal();
@@ -35,6 +42,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             .removeFinal();
 
     private static boolean firstWorldPreparation = true;
+
+    static {
+        ENTITY_TYPES_BUILDER.set(EntityTypes.v, (EntityTypes.b<EntityEnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
+    }
 
     @Override
     public void prepareEndWorld(org.bukkit.World bukkitWorld) {
