@@ -2,8 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
@@ -147,7 +148,7 @@ public final class NMSChunksImpl implements NMSChunks {
         }, chunk -> {
             ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
-            KeyMap<Integer> blockCounts = new KeyMap<>();
+            KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
             Set<Location> spawnersLocations = new HashSet<>();
 
             for (ChunkSection chunkSection : chunk.getSections()) {
@@ -174,7 +175,7 @@ public final class NMSChunksImpl implements NMSChunks {
 
                             Material type = CraftMagicNumbers.getMaterial(block);
                             byte data = (byte) block.toLegacyData(blockData);
-                            Key blockKey = Key.of(type, data, location);
+                            Key blockKey = KeyImpl.of(type, data, location);
                             blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                             if (type == Material.MOB_SPAWNER) {
                                 spawnersLocations.add(location);

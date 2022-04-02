@@ -2,10 +2,11 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -120,7 +121,7 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
             if (!Message.BLOCK_COUNTS_CHECK_MATERIAL.isEmpty(locale)) {
-                for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()) {
+                for (Map.Entry<Key, BigInteger> entry : island.getBlockCountsAsBigInteger().entrySet()) {
                     materialsBuilder.append(", ").append(Message.BLOCK_COUNTS_CHECK_MATERIAL
                             .getMessage(locale, StringUtils.format(entry.getValue()), StringUtils.format(entry.getKey().toString())));
                 }
@@ -137,7 +138,7 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             if (material == null)
                 return;
 
-            BigInteger blockCount = island.getBlockCountAsBigInteger(Key.of(materialName));
+            BigInteger blockCount = island.getBlockCountAsBigInteger(KeyImpl.of(materialName));
 
             if (blockCount.compareTo(BigInteger.ONE) > 0)
                 materialName = materialName + "s";

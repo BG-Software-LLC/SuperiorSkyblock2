@@ -2,8 +2,9 @@ package com.bgsoftware.superiorskyblock.schematic.impl;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -129,12 +130,12 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
         if (ADAPT.isValid() && GET_BLOCK_TYPE.isValid() && GET_INTERNAL_ID.isValid()) {
             Material material = ADAPT.invoke(null, GET_BLOCK_TYPE.invoke(baseBlock));
             int data = GET_INTERNAL_ID.invokeWithDef(baseBlock, 0);
-            key = Key.of(material, (byte) data);
+            key = KeyImpl.of(material, (byte) data);
         } else {
             int id = GET_ID.invoke(baseBlock);
             int data = GET_DATA.invoke(baseBlock);
             //noinspection deprecation
-            key = Key.of(Material.getMaterial(id), (byte) data);
+            key = KeyImpl.of(Material.getMaterial(id), (byte) data);
         }
 
         cachedCounts.put(key, cachedCounts.getRaw(key, 0) + 1);

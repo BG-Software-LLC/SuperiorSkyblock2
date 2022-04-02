@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms.CustomTileEntityHopper;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms.GlowEnchantmentFactory;
@@ -76,17 +77,17 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Key getBlockKey(int combinedId) {
         Material material = CraftMagicNumbers.getMaterial(Block.getByCombinedId(combinedId).getBlock());
-        return Key.of(material, (byte) 0);
+        return KeyImpl.of(material, (byte) 0);
     }
 
     @Override
     public Key getMinecartBlock(Minecart minecart) {
-        return Key.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
+        return KeyImpl.of(minecart.getDisplayBlockData().getMaterial(), (byte) 0);
     }
 
     @Override
     public Key getFallingBlockType(FallingBlock fallingBlock) {
-        return Key.of(fallingBlock.getBlockData().getMaterial(), (byte) 0);
+        return KeyImpl.of(fallingBlock.getBlockData().getMaterial(), (byte) 0);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 
 import java.math.BigDecimal;
@@ -24,9 +24,9 @@ public final class DefaultUpgradeLevel extends SUpgradeLevel {
                 newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getWarpsLimit()),
                 newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getCoopLimit()),
                 newSyncedIntegerValue(v -> plugin.getSettings().getDefaultValues().getIslandSize()),
-                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
-                (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
-                (KeyMap<Integer>[]) plugin.getSettings().getDefaultValues().getGenerators(),
+                (KeyMapImpl<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
+                (KeyMapImpl<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
+                (KeyMapImpl<Integer>[]) plugin.getSettings().getDefaultValues().getGenerators(),
                 new HashMap<>(),
                 newSyncedBigDecimalValue(v -> plugin.getSettings().getDefaultValues().getBankLimit()),
                 plugin.getSettings().getDefaultValues().getRoleLimits()
