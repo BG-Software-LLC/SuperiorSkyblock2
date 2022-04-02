@@ -108,7 +108,7 @@ public final class NMSChunksImpl implements NMSChunks {
                         }
 
                         Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                        Key blockKey = Key.of(type.name() + "", "", location);
+                        Key blockKey = Key.of(type.name() + "", "0", location);
                         blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                         if (type == Material.SPAWNER) {
                             spawnersLocations.add(location);
