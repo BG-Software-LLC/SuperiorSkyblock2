@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuCounts;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -175,7 +176,7 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
                 //Checking if the material is valid
                 Material.valueOf(itemType);
                 String subKey = item.length == 2 ? item[1] : "";
-                blockKey = Key.of(item[0], subKey);
+                blockKey = KeyImpl.of(item[0], subKey);
             } catch (Throwable ignored) {
             }
         }

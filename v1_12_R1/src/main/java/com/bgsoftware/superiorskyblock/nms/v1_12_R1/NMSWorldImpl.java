@@ -3,8 +3,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -71,7 +72,7 @@ public final class NMSWorldImpl implements NMSWorld {
                 (chunkSnapshot.getZ() << 4) + z
         );
 
-        return Key.of(Key.of(type, data), location);
+        return KeyImpl.of(KeyImpl.of(type, data), location);
     }
 
     @Override

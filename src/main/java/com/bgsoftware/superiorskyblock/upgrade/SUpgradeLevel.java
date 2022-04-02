@@ -3,13 +3,13 @@ package com.bgsoftware.superiorskyblock.upgrade;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -207,7 +207,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
-        return generatorRates == null ? new HashMap<>() : generatorRates.asKeyMap().entrySet().stream().collect(Collectors.toMap(
+        return generatorRates == null ? new HashMap<>() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
     }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Location;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
-public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
+public final class KeyImpl implements Key {
 
     private static final Pattern LEGACY_PATTERN = Pattern.compile("LEGACY_");
     private static final Pattern KEY_SPLITTER_PATTERN = Pattern.compile("[:;]");
@@ -26,7 +27,7 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     private final String subKey;
     private boolean apiKey = false;
 
-    private Key(String globalKey, String subKey) {
+    private KeyImpl(String globalKey, String subKey) {
         this.globalKey = globalKey;
         this.subKey = subKey;
     }
@@ -66,12 +67,12 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     public static Key of(String globalKey, String subKey) {
-        return new Key(LEGACY_PATTERN.matcher(globalKey).replaceAll(""), subKey);
+        return new KeyImpl(LEGACY_PATTERN.matcher(globalKey).replaceAll(""), subKey);
     }
 
     public static Key of(String key) {
         String[] sections = KEY_SPLITTER_PATTERN.split(key);
-        return new Key(sections[0], sections.length == 2 ? sections[1] : "");
+        return new KeyImpl(sections[0], sections.length == 2 ? sections[1] : "");
     }
 
     public static Key of(Material material, short data, Location location) {
@@ -79,7 +80,7 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     public static Key of(String globalKey, String subKey, Location location) {
-        return of(Key.of(globalKey, subKey), location);
+        return of(KeyImpl.of(globalKey, subKey), location);
     }
 
     public static Key of(Key key, Location location) {
@@ -114,7 +115,7 @@ public final class Key implements com.bgsoftware.superiorskyblock.api.key.Key {
     }
 
     @Override
-    public int compareTo(@NotNull com.bgsoftware.superiorskyblock.api.key.Key o) {
+    public int compareTo(@NotNull Key o) {
         return toString().compareTo(o.toString());
     }
 

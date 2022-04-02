@@ -4,16 +4,17 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.BiomeBase;
@@ -86,7 +87,7 @@ public final class NMSChunksImpl implements NMSChunks {
             LightEngineThreaded.class, ThreadedMailbox.class, "b");
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = new KeyMap<>();
+        KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (ChunkSection chunkSection : chunkSections) {
@@ -108,7 +109,7 @@ public final class NMSChunksImpl implements NMSChunks {
                         }
 
                         Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                        Key blockKey = Key.of(type.name() + "", "", location);
+                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
                         blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
                         if (type == Material.SPAWNER) {
                             spawnersLocations.add(location);
