@@ -3,11 +3,12 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ValuesButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -16,7 +17,6 @@ import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.configuration.ConfigurationSection;
@@ -71,18 +71,18 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        KeySet keysToUpdate = new KeySet();
+        KeySet keysToUpdate = KeySet.createKeySet();
 
-        if(cfg.isConfigurationSection("items")) {
-            for(String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
+        if (cfg.isConfigurationSection("items")) {
+            for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
                 ConfigurationSection itemsSection = cfg.getConfigurationSection("items." + itemsSectionName);
 
                 String block = itemsSection.getString("block");
 
-                if(block == null)
+                if (block == null)
                     continue;
 
-                Key blockKey = Key.of(block);
+                Key blockKey = KeyImpl.of(block);
                 keysToUpdate.add(blockKey);
 
                 patternBuilder.mapButton(menuPatternSlots.getSlot(itemsSectionName), new ValuesButton.Builder(blockKey));

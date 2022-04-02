@@ -2,11 +2,11 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
-import com.bgsoftware.superiorskyblock.key.dataset.KeySet;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -207,7 +207,7 @@ public final class SettingsContainer {
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
-        defaultBlockLimits = new KeyMap<>();
+        defaultBlockLimits = KeyMap.createKeyMap();
         for (String line : config.getStringList("default-values.block-limits")) {
             String[] sections = line.split(":");
 
@@ -223,7 +223,7 @@ public final class SettingsContainer {
             defaultBlockLimits.put(key, Integer.parseInt(limit));
             plugin.getBlockValues().addCustomBlockKey(key);
         }
-        defaultEntityLimits = new KeyMap<>();
+        defaultEntityLimits = KeyMap.createKeyMap();
         for (String line : config.getStringList("default-values.entity-limits")) {
             String[] sections = line.split(":");
 
@@ -256,10 +256,10 @@ public final class SettingsContainer {
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
-        whitelistedStackedBlocks = new KeySet(config.getStringList("stacked-blocks.whitelisted")
-                .stream().map(String::toUpperCase).collect(Collectors.toList()));
+        whitelistedStackedBlocks = KeySet.createKeySet(config.getStringList("stacked-blocks.whitelisted")
+                .stream().map(string -> Key.of(string.toUpperCase())).collect(Collectors.toList()));
         stackedBlocksName = StringUtils.translateColors(config.getString("stacked-blocks.custom-name"));
-        stackedBlocksLimits = new KeyMap<>();
+        stackedBlocksLimits = KeyMap.createKeyMap();
         config.getStringList("stacked-blocks.limits").forEach(line -> {
             String[] sections = line.split(":");
             try {
@@ -465,7 +465,8 @@ public final class SettingsContainer {
                 commandAliases.put(label.toLowerCase(), config.getStringList("command-aliases." + label));
             }
         }
-        valuableBlocks = new KeySet(config.getStringList("valuable-blocks"));
+        valuableBlocks = KeySet.createKeySet(config.getStringList("valuable-blocks").stream()
+                .map(string -> Key.of(string.toUpperCase())).collect(Collectors.toSet()));
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
@@ -504,35 +505,33 @@ public final class SettingsContainer {
 
         List<String> safeBlocks = cfg.getStringList("safe-blocks");
 
-        if (!safeBlocks.isEmpty())
-            return new KeySet(safeBlocks);
+        if (safeBlocks.isEmpty()) {
+            SuperiorSkyblockPlugin.log("&c[safe_blocks.yml] There are no valid safe blocks! Generating default ones...");
+            safeBlocks.addAll(Arrays.stream(Material.values())
+                    .filter(Material::isSolid)
+                    .map(Material::name)
+                    .sorted()
+                    .collect(Collectors.toList()));
 
-        SuperiorSkyblockPlugin.log("&c[safe_blocks.yml] There are no valid safe blocks! Generating default ones...");
-
-        List<String> safeBlocksDefaults = Arrays.stream(Material.values())
-                .filter(Material::isSolid)
-                .map(Material::name)
-                .sorted()
-                .collect(Collectors.toList());
-
-        try {
-            cfg.set("safe-blocks", safeBlocksDefaults);
-            cfg.save(file);
-        } catch (IOException error) {
-            PluginDebugger.debug(error);
+            try {
+                cfg.set("safe-blocks", safeBlocks);
+                cfg.save(file);
+            } catch (IOException error) {
+                PluginDebugger.debug(error);
+            }
         }
 
-        return new KeySet(safeBlocksDefaults);
+        return KeySet.createKeySet(safeBlocks.stream().map(string -> Key.of(string.toUpperCase())).collect(Collectors.toSet()));
     }
 
     private void loadGenerator(List<String> lines, int index) {
-        defaultGenerator[index] = new KeyMap<>();
+        defaultGenerator[index] = KeyMap.createKeyMap();
         for (String line : lines) {
             String[] sections = line.toUpperCase().split(":");
             String globalKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator[index].put(globalKey, subKey, Integer.parseInt(percentage));
+            defaultGenerator[index].put(Key.of(globalKey, subKey), Integer.parseInt(percentage));
         }
     }
 

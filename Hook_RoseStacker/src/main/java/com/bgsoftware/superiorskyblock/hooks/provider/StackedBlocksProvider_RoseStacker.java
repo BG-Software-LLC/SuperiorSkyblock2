@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
@@ -52,7 +52,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
         RoseStackerAPI.getInstance().getStackedBlocks().entrySet().stream()
                 .filter(entry -> chunkPosition.isInsideChunk(entry.getKey().getLocation()))
                 .forEach(entry -> {
-                    com.bgsoftware.superiorskyblock.api.key.Key blockKey = com.bgsoftware.superiorskyblock.key.Key.of(entry.getKey());
+                    Key blockKey = Key.of(entry.getKey());
                     blockKeys.put(blockKey, blockKeys.getOrDefault(blockKey, 0) + entry.getValue().getStackSize());
                 });
         return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());

@@ -12,6 +12,10 @@ public interface IMessageComponent {
 
     void sendMessage(CommandSender sender, Object... objects);
 
+    default boolean isEmpty() {
+        return this instanceof EmptyMessageComponent;
+    }
+
     static Optional<String> replaceArgs(String msg, Object... objects) {
         if (msg == null || msg.isEmpty())
             return Optional.empty();

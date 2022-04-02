@@ -42,7 +42,7 @@ public final class ProtocolLibHook {
                 return;
             }
 
-            SuperiorPlayer superiorPlayer = ProtocolLibHook.plugin.getPlayers().getSuperiorPlayer(event.getPlayer());
+            SuperiorPlayer superiorPlayer = ProtocolLibHook.plugin.getPlayers().getSuperiorPlayer(event.getPlayer().getUniqueId());
             if (PlayerLocales.isValidLocale(newPlayerLocale) &&
                     !superiorPlayer.getUserLocale().equals(newPlayerLocale)) {
                 superiorPlayer.setUserLocale(newPlayerLocale);

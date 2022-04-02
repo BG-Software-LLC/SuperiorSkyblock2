@@ -4,7 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -71,7 +71,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getEntityType()))
                 return;
 
-            island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     e.setCancelled(true);
                 }
@@ -88,7 +88,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getEntity().getType()))
                 return;
 
-            island.hasReachedEntityLimit(Key.of(e.getEntity())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
                 if (result) {
                     e.setCancelled(true);
                 }
@@ -132,7 +132,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (!EntityUtils.canHaveLimit(e.getVehicle().getType()))
                 return;
 
-            island.hasReachedEntityLimit(Key.of(e.getVehicle())).whenComplete((result, ex) -> {
+            island.hasReachedEntityLimit(KeyImpl.of(e.getVehicle())).whenComplete((result, ex) -> {
                 if (result) {
                     Executor.sync(() -> {
                         removeEntity(e.getVehicle());

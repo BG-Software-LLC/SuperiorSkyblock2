@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.base.Preconditions;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
@@ -65,7 +65,7 @@ public final class SpawnersProvider_MergedSpawner implements SpawnersProvider_Au
             Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
             int decreaseAmount = e.getOldCount() - e.getNewCount();
             if (island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType() + ""), decreaseAmount);
+                island.handleBlockBreak(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawnerType() + ""), decreaseAmount);
         }
 
     }
