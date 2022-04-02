@@ -200,7 +200,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                                         if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
                                             if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                                                plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
+                                                plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                                         }
                                     }
                                 });
@@ -310,7 +310,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             Executor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
         }
 
-        plugin.getNMSDragonFight().removeDragonBattle(island);
+        plugin.getServices().getDragonBattleService().stopEnderDragonBattle(island);
 
         ChunksTracker.removeIsland(island);
     }
