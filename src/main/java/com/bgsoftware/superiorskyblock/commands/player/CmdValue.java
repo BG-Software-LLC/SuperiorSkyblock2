@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
@@ -68,12 +69,12 @@ public final class CmdValue implements ISuperiorCommand {
                 inHand = new ItemStack(Material.AIR);
             }
 
-            toCheck = Key.of(inHand);
+            toCheck = KeyImpl.of(inHand);
 
             if (inHand.getType() == Materials.SPAWNER.toBukkitType())
                 keyName = StringUtils.format(toCheck.getSubKey() + "_Spawner");
         } else {
-            toCheck = Key.of(args[1].toUpperCase());
+            toCheck = KeyImpl.of(args[1].toUpperCase());
         }
 
         if (keyName.isEmpty())

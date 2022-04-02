@@ -18,6 +18,8 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrack
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -36,8 +38,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -160,9 +161,9 @@ public final class SIsland implements Island {
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
     private final Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new ConcurrentHashMap<>();
     private final KeyMap<UpgradeValue<Integer>>[] cobbleGeneratorValues = new KeyMap[World.Environment.values().length];
-    private final KeyMap<UpgradeValue<Integer>> entityLimits = new KeyMap<>();
+    private final KeyMap<UpgradeValue<Integer>> entityLimits = KeyMap.createConcurrentKeyMap();
     private final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new ConcurrentHashMap<>();
-    private final KeyMap<UpgradeValue<Integer>> blockLimits = new KeyMap<>();
+    private final KeyMap<UpgradeValue<Integer>> blockLimits = KeyMap.createConcurrentKeyMap();
 
     /*
      * Island Player-Trackers
@@ -1740,19 +1741,19 @@ public final class SIsland implements Island {
     @Override
     public void handleBlockPlace(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(Key.of(block), 1);
+        handleBlockPlace(KeyImpl.of(block), 1);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(Key.of(block), amount, true);
+        handleBlockPlace(KeyImpl.of(block), amount, true);
     }
 
     @Override
     public void handleBlockPlace(Block block, int amount, boolean save) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockPlace(Key.of(block), amount, save);
+        handleBlockPlace(KeyImpl.of(block), amount, save);
     }
 
     /*
@@ -1760,24 +1761,24 @@ public final class SIsland implements Island {
      */
 
     @Override
-    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+    public void handleBlockPlace(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockPlace(key, amount, true);
     }
 
     @Override
-    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+    public void handleBlockPlace(Key key, int amount, boolean save) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockPlace(key, BigInteger.valueOf(amount), save);
     }
 
     @Override
-    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
+    public void handleBlockPlace(Key key, BigInteger amount, boolean save) {
         handleBlockPlace(key, amount, save, true);
     }
 
     @Override
-    public void handleBlockPlace(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
+    public void handleBlockPlace(Key key, BigInteger amount, boolean save, boolean updateLastTimeStatus) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
@@ -1808,7 +1809,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void handleBlocksPlace(Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> blocks) {
+    public void handleBlocksPlace(Map<Key, Integer> blocks) {
         Preconditions.checkNotNull(blocks, "blocks parameter cannot be null.");
         blocks.forEach((blockKey, amount) ->
                 handleBlockPlace(blockKey, BigInteger.valueOf(amount), false, false));
@@ -1820,7 +1821,7 @@ public final class SIsland implements Island {
     @Override
     public void handleBlockBreak(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockBreak(Key.of(block), 1);
+        handleBlockBreak(KeyImpl.of(block), 1);
     }
 
     @Override
@@ -1832,23 +1833,23 @@ public final class SIsland implements Island {
     @Override
     public void handleBlockBreak(Block block, int amount, boolean save) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        handleBlockBreak(Key.of(block), amount, save);
+        handleBlockBreak(KeyImpl.of(block), amount, save);
     }
 
     @Override
-    public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+    public void handleBlockBreak(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockBreak(key, amount, true);
     }
 
     @Override
-    public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, boolean save) {
+    public void handleBlockBreak(Key key, int amount, boolean save) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         handleBlockBreak(key, BigInteger.valueOf(amount), save);
     }
 
     @Override
-    public void handleBlockBreak(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount, boolean save) {
+    public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
@@ -1880,17 +1881,17 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public BigInteger getBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public BigInteger getBlockCountAsBigInteger(Key key) {
         return this.blocksTracker.getBlockCount(key);
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> getBlockCountsAsBigInteger() {
+    public Map<Key, BigInteger> getBlockCountsAsBigInteger() {
         return this.blocksTracker.getBlockCounts();
     }
 
     @Override
-    public BigInteger getExactBlockCountAsBigInteger(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public BigInteger getExactBlockCountAsBigInteger(Key key) {
         return this.blocksTracker.getExactBlockCount(key);
     }
 
@@ -2118,36 +2119,35 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public int getBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public int getBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
     }
 
     @Override
-    public int getExactBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public int getExactBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return blockLimits.getRaw(key, IslandUtils.NO_LIMIT).get();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getBlockLimitKey(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public Key getBlockLimitKey(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getKey((Key) key);
+        return blockLimits.getKey((KeyImpl) key);
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getBlocksLimits() {
+    public Map<Key, Integer> getBlocksLimits() {
         return Collections.unmodifiableMap(this.blockLimits.entrySet().stream().collect(
                 KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
         ));
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomBlocksLimits() {
+    public Map<Key, Integer> getCustomBlocksLimits() {
         return Collections.unmodifiableMap(this.blockLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
-                ));
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
 
     @Override
@@ -2158,7 +2158,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void setBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
+    public void setBlockLimit(Key key, int limit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int finalLimit = Math.max(0, limit);
         PluginDebugger.debug("Action: Set Block Limit, Island: " + owner.getName() + ", Block: " + key + ", Limit: " + finalLimit);
@@ -2168,7 +2168,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void removeBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public void removeBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         PluginDebugger.debug("Action: Remove Block Limit, Island: " + owner.getName() + ", Block: " + key);
         blockLimits.remove(key);
@@ -2176,13 +2176,13 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public boolean hasReachedBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public boolean hasReachedBlockLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return hasReachedBlockLimit(key, 1);
     }
 
     @Override
-    public boolean hasReachedBlockLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+    public boolean hasReachedBlockLimit(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int blockLimit = getExactBlockLimit(key);
 
@@ -2192,7 +2192,7 @@ public final class SIsland implements Island {
                     .compareTo(BigInteger.valueOf(blockLimit)) > 0;
 
         //Getting the global key values.
-        key = Key.of(key.getGlobalKey(), "");
+        key = KeyImpl.of(key.getGlobalKey(), "");
         blockLimit = getBlockLimit(key);
 
         return blockLimit > IslandUtils.NO_LIMIT.get() && getBlockCountAsBigInteger(key)
@@ -2202,28 +2202,27 @@ public final class SIsland implements Island {
     @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return getEntityLimit(Key.of(entityType));
+        return getEntityLimit(KeyImpl.of(entityType));
     }
 
     @Override
-    public int getEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public int getEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return this.entityLimits.getOrDefault(key, IslandUtils.NO_LIMIT).get();
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getEntitiesLimitsAsKeys() {
+    public Map<Key, Integer> getEntitiesLimitsAsKeys() {
         return Collections.unmodifiableMap(this.entityLimits.entrySet().stream().collect(
                 KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
         ));
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomEntitiesLimits() {
+    public Map<Key, Integer> getCustomEntitiesLimits() {
         return Collections.unmodifiableMap(this.entityLimits.entrySet().stream()
                 .filter(entry -> !entry.getValue().isSynced())
-                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())
-                ));
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get())));
     }
 
     @Override
@@ -2236,11 +2235,11 @@ public final class SIsland implements Island {
     @Override
     public void setEntityLimit(EntityType entityType, int limit) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        setEntityLimit(Key.of(entityType), limit);
+        setEntityLimit(KeyImpl.of(entityType), limit);
     }
 
     @Override
-    public void setEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int limit) {
+    public void setEntityLimit(Key key, int limit) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         int finalLimit = Math.max(0, limit);
         PluginDebugger.debug("Action: Set Entity Limit, Island: " + owner.getName() + ", Entity: " + key + ", Limit: " + finalLimit);
@@ -2251,11 +2250,11 @@ public final class SIsland implements Island {
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(Key.of(entityType));
+        return hasReachedEntityLimit(KeyImpl.of(entityType));
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return hasReachedEntityLimit(key, 1);
     }
@@ -2263,11 +2262,11 @@ public final class SIsland implements Island {
     @Override
     public CompletableFuture<Boolean> hasReachedEntityLimit(EntityType entityType, int amount) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return hasReachedEntityLimit(Key.of(entityType), amount);
+        return hasReachedEntityLimit(KeyImpl.of(entityType), amount);
     }
 
     @Override
-    public CompletableFuture<Boolean> hasReachedEntityLimit(com.bgsoftware.superiorskyblock.api.key.Key key, int amount) {
+    public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
         CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
@@ -2829,7 +2828,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public void setGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, int percentage, World.Environment environment) {
+    public void setGeneratorPercentage(Key key, int percentage, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         PluginDebugger.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Percentage: " + percentage + ", World: " + environment);
@@ -2860,7 +2859,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public int getGeneratorPercentage(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+    public int getGeneratorPercentage(Key key, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
@@ -2876,11 +2875,11 @@ public final class SIsland implements Island {
     public Map<String, Integer> getGeneratorPercentages(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return getGeneratorAmounts(environment).keySet().stream().collect(Collectors.toMap(key -> key,
-                key -> getGeneratorAmount(Key.of(key), environment)));
+                key -> getGeneratorAmount(KeyImpl.of(key), environment)));
     }
 
     @Override
-    public void setGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, int amount, World.Environment environment) {
+    public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
@@ -2893,7 +2892,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public int getGeneratorAmount(com.bgsoftware.superiorskyblock.api.key.Key key, World.Environment environment) {
+    public int getGeneratorAmount(Key key, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
@@ -2923,7 +2922,7 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
+    public Map<Key, Integer> getCustomGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
@@ -2978,7 +2977,7 @@ public final class SIsland implements Island {
             }
         }
 
-        Key generatedBlock = Key.of(newState);
+        Key generatedBlock = KeyImpl.of(newState);
 
         String[] typeSections = newState.split(":");
 
@@ -3442,24 +3441,24 @@ public final class SIsland implements Island {
     }
 
     private void updateOldUpgradeValues() {
-        for (com.bgsoftware.superiorskyblock.api.key.Key key : blockLimits.keySet()) {
+        for (Key key : blockLimits.keySet()) {
             Integer defaultValue = plugin.getSettings().getDefaultValues().getBlockLimits().get(key);
             if (defaultValue != null && (int) blockLimits.get(key).get() == defaultValue)
                 blockLimits.put(key, new UpgradeValue<>(defaultValue, true));
         }
 
-        for (com.bgsoftware.superiorskyblock.api.key.Key key : entityLimits.keySet()) {
+        for (Key key : entityLimits.keySet()) {
             Integer defaultValue = plugin.getSettings().getDefaultValues().getEntityLimits().get(key);
             if (defaultValue != null && (int) entityLimits.get(key).get() == defaultValue)
                 entityLimits.put(key, new UpgradeValue<>(defaultValue, true));
         }
 
         for (int i = 0; i < cobbleGeneratorValues.length; i++) {
-            Map<com.bgsoftware.superiorskyblock.api.key.Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGenerators()[i];
+            Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGenerators()[i];
             if (defaultGenerator != null) {
                 if (cobbleGeneratorValues[i] == null)
-                    cobbleGeneratorValues[i] = new KeyMap<>();
-                for (com.bgsoftware.superiorskyblock.api.key.Key key : cobbleGeneratorValues[i].keySet()) {
+                    cobbleGeneratorValues[i] = KeyMap.createConcurrentKeyMap();
+                for (Key key : cobbleGeneratorValues[i].keySet()) {
                     Integer defaultValue = defaultGenerator.get(key);
                     if (defaultValue != null && (int) cobbleGeneratorValues[i].get(key).get() == defaultValue)
                         cobbleGeneratorValues[i].put(key, new UpgradeValue<>(defaultValue, true));
@@ -3581,20 +3580,20 @@ public final class SIsland implements Island {
         if ((overrideCustom || bankLimit.isSynced()) && bankLimit.get().compareTo(upgradeLevel.getBankLimit()) < 0)
             bankLimit = upgradeLevel.getBankLimitUpgradeValue();
 
-        for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
+        for (Map.Entry<Key, UpgradeValue<Integer>> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
             UpgradeValue<Integer> currentValue = blockLimits.getRaw(entry.getKey(), null);
             if (currentValue == null || entry.getValue().get() > currentValue.get())
                 blockLimits.put(entry.getKey(), entry.getValue());
         }
 
-        for (Map.Entry<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
+        for (Map.Entry<Key, UpgradeValue<Integer>> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
             UpgradeValue<Integer> currentValue = entityLimits.getRaw(entry.getKey(), null);
             if (currentValue == null || entry.getValue().get() > currentValue.get())
                 entityLimits.put(entry.getKey(), entry.getValue());
         }
 
         for (int i = 0; i < cobbleGeneratorValues.length; i++) {
-            Map<com.bgsoftware.superiorskyblock.api.key.Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+            Map<Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
             if (levelGenerator != null) {
                 KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
 
@@ -3654,7 +3653,7 @@ public final class SIsland implements Island {
         KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = this.cobbleGeneratorValues[index];
 
         if (cobbleGeneratorValues == null && createNew)
-            cobbleGeneratorValues = this.cobbleGeneratorValues[index] = new KeyMap<>();
+            cobbleGeneratorValues = this.cobbleGeneratorValues[index] = KeyMap.createConcurrentKeyMap();
 
         return cobbleGeneratorValues;
     }

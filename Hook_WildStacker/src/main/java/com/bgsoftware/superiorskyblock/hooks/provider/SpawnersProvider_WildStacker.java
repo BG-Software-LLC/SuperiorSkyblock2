@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.hooks.support.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.SpawnersSnapshotProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.upgrades.listeners.WildStackerListener;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -103,7 +104,7 @@ public final class SpawnersProvider_WildStacker implements SpawnersProviderItemM
         public void onSpawnerUnstack(SpawnerUnstackEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
-                island.handleBlockBreak(Key.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + ""), e.getAmount());
+                island.handleBlockBreak(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getSpawner().getSpawnedType() + ""), e.getAmount());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

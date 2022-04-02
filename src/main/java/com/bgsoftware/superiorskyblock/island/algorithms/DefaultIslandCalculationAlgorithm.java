@@ -3,18 +3,19 @@ package com.bgsoftware.superiorskyblock.island.algorithms;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
+import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 
@@ -81,7 +82,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     if (spawnerInfo.getValue() == null) {
                         spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
                     } else {
-                        Key spawnerKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
+                        Key spawnerKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
                         blockCounts.addCounts(spawnerKey, spawnerInfo.getKey());
                     }
                 }
@@ -89,13 +90,12 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                 ChunkPosition chunkPosition = calculatedChunk.getPosition();
 
                 // Load stacked blocks
-                Collection<Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer>> stackedBlocks =
-                        plugin.getProviders().getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(),
-                                chunkPosition.getX(), chunkPosition.getZ());
+                Collection<Pair<Key, Integer>> stackedBlocks = plugin.getProviders().getStackedBlocksProvider()
+                        .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
 
                 if (stackedBlocks == null) {
                     chunksToCheck.add(calculatedChunk.getPosition());
-                } else for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : stackedBlocks) {
+                } else for (Pair<Key, Integer> pair : stackedBlocks) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
                 }
 
@@ -112,7 +112,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             for (Pair<Location, Integer> pair : spawnersToCheck) {
                 try {
                     CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                    blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", creatureSpawner.getSpawnedType() + "", pair.getKey());
+                    blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", creatureSpawner.getSpawnedType() + "", pair.getKey());
                     blockCount = pair.getValue();
 
                     if (blockCount <= 0) {
@@ -123,7 +123,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                             entityType = creatureSpawner.getSpawnedType().name();
 
                         blockCount = spawnerInfo.getKey();
-                        blockKey = Key.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, pair.getKey());
+                        blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, pair.getKey());
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
@@ -134,8 +134,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             spawnersToCheck.clear();
 
             for (ChunkPosition chunkPosition : chunksToCheck) {
-                for (Pair<com.bgsoftware.superiorskyblock.api.key.Key, Integer> pair : plugin.getProviders()
-                        .getStackedBlocksProvider().getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
+                for (Pair<Key, Integer> pair : plugin.getProviders().getStackedBlocksProvider()
+                        .getBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ())) {
                     blockCounts.addCounts(pair.getKey(), pair.getValue() - 1);
                 }
             }
@@ -150,14 +150,14 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
     private static class BlockCountsTracker implements IslandCalculationResult {
 
-        private final KeyMap<BigInteger> blockCounts = new KeyMap<>();
+        private final KeyMap<BigInteger> blockCounts = KeyMap.createConcurrentKeyMap();
 
         @Override
-        public Map<com.bgsoftware.superiorskyblock.api.key.Key, BigInteger> getBlockCounts() {
+        public Map<Key, BigInteger> getBlockCounts() {
             return blockCounts;
         }
 
-        public void addCounts(com.bgsoftware.superiorskyblock.api.key.Key blockKey, int amount) {
+        public void addCounts(Key blockKey, int amount) {
             blockCounts.put(blockKey, blockCounts.getRaw(blockKey, BigInteger.ZERO).add(BigInteger.valueOf(amount)));
         }
 

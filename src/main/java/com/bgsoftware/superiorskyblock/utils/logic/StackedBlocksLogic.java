@@ -3,9 +3,10 @@ package com.bgsoftware.superiorskyblock.utils.logic;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -83,7 +84,7 @@ public final class StackedBlocksLogic {
                 (replaceState != null && replaceState.getType() != Material.AIR))
             return false;
 
-        if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(againstBlock)))
+        if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(KeyImpl.of(againstBlock)))
             return false;
 
         return superiorPlayer.hasPermission("superior.island.stacker.*") ||
@@ -103,10 +104,10 @@ public final class StackedBlocksLogic {
     public static boolean tryStack(SuperiorSkyblockPlugin plugin, Player player, int amount, Location stackedBlock, Consumer<Integer> depositedAmount) {
         // When sneaking, you'll stack all the items in your hand. Otherwise, you'll stack only 1 block
         int blockAmount = plugin.getStackedBlocks().getStackedBlockAmount(stackedBlock);
-        Key blockKey = (Key) plugin.getStackedBlocks().getStackedBlockKey(stackedBlock);
+        Key blockKey = plugin.getStackedBlocks().getStackedBlockKey(stackedBlock);
 
         if (blockKey == null)
-            blockKey = Key.of(stackedBlock.getBlock());
+            blockKey = KeyImpl.of(stackedBlock.getBlock());
 
         int blockLimit = plugin.getSettings().getStackedBlocks().getLimits().getOrDefault(blockKey, Integer.MAX_VALUE);
 
@@ -139,7 +140,7 @@ public final class StackedBlocksLogic {
                 amount = islandBlockLimit.subtract(islandBlockCount).intValue();
             } else {
                 //Getting the global key values.
-                Key globalKey = Key.of(blockKey.getGlobalKey());
+                Key globalKey = KeyImpl.of(blockKey.getGlobalKey());
                 islandBlockLimit = BigInteger.valueOf(island.getExactBlockLimit(globalKey));
                 islandBlockCount = island.getBlockCountAsBigInteger(globalKey);
                 if (islandBlockLimit.compareTo(BigInteger.valueOf(IslandUtils.NO_LIMIT.get())) > 0 &&
@@ -191,7 +192,7 @@ public final class StackedBlocksLogic {
 
         if (!stackedBlockSuccess) {
             if (island != null)
-                island.handleBlockBreak(Key.of(block), blockAmount - 1);
+                island.handleBlockBreak(KeyImpl.of(block), blockAmount - 1);
             leftAmount = 0;
             amount = 1;
         }
@@ -208,7 +209,7 @@ public final class StackedBlocksLogic {
         }
 
         if (island != null) {
-            island.handleBlockBreak(Key.of(blockItem), amount);
+            island.handleBlockBreak(KeyImpl.of(blockItem), amount);
         }
 
         // If the amount of the stack is less than 0, it should be air.
