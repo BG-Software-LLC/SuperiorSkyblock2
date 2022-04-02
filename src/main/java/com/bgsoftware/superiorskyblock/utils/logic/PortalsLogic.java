@@ -94,8 +94,7 @@ public final class PortalsLogic {
 
                 if (destinationEnvironment == World.Environment.THE_END) {
                     plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                    if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                        plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
+                    plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                 }
 
                 superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));

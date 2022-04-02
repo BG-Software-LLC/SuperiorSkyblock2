@@ -31,6 +31,9 @@ public final class DragonBattleServiceImpl implements DragonBattleService {
 
     @Override
     public DragonBattleResetResult resetEnderDragonBattle(Island island) {
+        if (!plugin.getSettings().getWorlds().getEnd().isDragonFight())
+            return DragonBattleResetResult.DRAGON_BATTLES_DISABLED;
+
         if (!island.isEndEnabled())
             return DragonBattleResetResult.WORLD_NOT_UNLOCKED;
 
