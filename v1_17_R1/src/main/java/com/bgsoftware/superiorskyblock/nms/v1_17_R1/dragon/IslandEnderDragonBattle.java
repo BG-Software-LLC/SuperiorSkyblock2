@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLanding;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;
 import net.minecraft.world.level.block.Blocks;
@@ -41,6 +42,9 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
             EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 3);
 
+    private static final ReflectField<Vec3D> LANDING_TARGET_POSITION = new ReflectField<>(
+            DragonControllerLanding.class, Vec3D.class, Modifier.PRIVATE, 1);
+
     private static final ShapeDetector EXIT_PORTAL_PATTERN = ShapeDetectorBuilder.a()
             .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
             .a(new String[]{"       ", "       ", "       ", "   #   ", "       ", "       ", "       "})
@@ -50,10 +54,9 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
             .a('#', ShapeDetectorBlock.a(BlockPredicate.a(Blocks.z)))
             .b();
 
-    private static final Vec3D ORIGINAL_END_PODIUM = new Vec3D(0.5, 0, 0.5);
-
     private final Island island;
     private final BlockPosition islandBlockPosition;
+    private final Vec3D islandBlockVectored;
 
     private final IslandEntityEnderDragon entityEnderDragon;
 
@@ -70,6 +73,7 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
         this.island = island;
         this.islandBlockPosition = islandBlockPosition;
+        this.islandBlockVectored = Vec3D.c(islandBlockPosition);
         this.entityEnderDragon = islandEntityEnderDragon == null ? spawnEnderDragon() : islandEntityEnderDragon;
         DRAGON_BATTLE.set(this.entityEnderDragon, this);
     }
@@ -81,8 +85,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::b);
 
         IDragonController currentController = this.entityEnderDragon.getDragonControllerManager().a();
-        if (currentController != null && ORIGINAL_END_PODIUM.equals(currentController.g())) {
-            currentController.d();
+        if (currentController instanceof DragonControllerLanding && !this.islandBlockVectored.equals(currentController.g())) {
+            LANDING_TARGET_POSITION.set(currentController, this.islandBlockVectored);
         }
 
         if (++currentTick >= 20) {
