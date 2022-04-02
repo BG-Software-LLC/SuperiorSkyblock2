@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.world.chunks;
 
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import org.bukkit.Location;
 
 import java.util.Set;

@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
@@ -41,7 +42,7 @@ public final class BlocksLogic {
         if (island == null)
             return;
 
-        Key blockKey = Key.of(block);
+        Key blockKey = KeyImpl.of(block);
 
         if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
             island.handleBlockBreak(blockKey, plugin.getNMSWorld().getDefaultAmount(block));
@@ -51,7 +52,7 @@ public final class BlocksLogic {
         for (BlockFace nearbyFace : NEARBY_BLOCKS) {
             Block nearbyBlock = block.getRelative(nearbyFace);
             if (!nearbyBlock.getType().isSolid()) {
-                Key nearbyBlockKey = Key.of(nearbyBlock);
+                Key nearbyBlockKey = KeyImpl.of(nearbyBlock);
                 if (!nearbyBlockKey.getGlobalKey().equals("AIR"))
                     nearbyBlocks.put(nearbyFace, nearbyBlockKey);
             }
@@ -62,7 +63,7 @@ public final class BlocksLogic {
                 ChunksTracker.markEmpty(island, block, true);
 
             for (BlockFace nearbyFace : NEARBY_BLOCKS) {
-                Key nearbyBlock = Key.of(block.getRelative(nearbyFace));
+                Key nearbyBlock = KeyImpl.of(block.getRelative(nearbyFace));
                 Key oldNearbyBlock = nearbyBlocks.getOrDefault(nearbyFace, ConstantKeys.AIR);
                 if (oldNearbyBlock != ConstantKeys.AIR && !nearbyBlock.equals(oldNearbyBlock)) {
                     island.handleBlockBreak(oldNearbyBlock, 1);
@@ -83,7 +84,7 @@ public final class BlocksLogic {
                     island.handleBlockBreak(ConstantKeys.WATER, 1);
             }
 
-            Key blockKey = Key.of(block);
+            Key blockKey = KeyImpl.of(block);
 
             if (blockKey.equals(ConstantKeys.END_PORTAL_FRAME_WITH_EYE))
                 island.handleBlockBreak(ConstantKeys.END_PORTAL_FRAME, 1);

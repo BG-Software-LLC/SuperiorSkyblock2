@@ -95,7 +95,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     }
 
     @Override
-    public boolean setStackedBlock(Location location, com.bgsoftware.superiorskyblock.api.key.Key blockKey, int amount) {
+    public boolean setStackedBlock(Location location, Key blockKey, int amount) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
         Preconditions.checkNotNull(blockKey, "blockKey parameter cannot be null.");
@@ -279,8 +279,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         Optional<String> item = resultSet.getString("block_type");
 
-        com.bgsoftware.superiorskyblock.key.Key blockKey = !item.isPresent() || item.get().isEmpty() ? null :
-                com.bgsoftware.superiorskyblock.key.Key.of(item.get());
+        Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : Key.of(item.get());
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get().parse());
         stackedBlock.setAmount(amount.get());

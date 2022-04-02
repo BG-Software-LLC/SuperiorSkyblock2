@@ -3,9 +3,10 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -91,7 +92,7 @@ public final class BlocksListener implements Listener {
         if (island == null)
             return;
 
-        island.handleBlockPlace(Key.of(e.getBucket().name().replace("_BUCKET", "")), 1);
+        island.handleBlockPlace(KeyImpl.of(e.getBucket().name().replace("_BUCKET", "")), 1);
 
         ChunksTracker.markDirty(island, LocationUtils.getRelative(e.getBlockClicked().getLocation(), e.getBlockFace()), true);
     }
@@ -136,7 +137,7 @@ public final class BlocksListener implements Listener {
         if (!e.getBlockClicked().isLiquid() && !isWaterLogged)
             return;
 
-        Key blockKey = isWaterLogged ? ConstantKeys.WATER : Key.of(e.getBlockClicked());
+        Key blockKey = isWaterLogged ? ConstantKeys.WATER : KeyImpl.of(e.getBlockClicked());
 
         island.handleBlockBreak(blockKey, 1);
 
@@ -164,7 +165,7 @@ public final class BlocksListener implements Listener {
                     FallingBlock fallingBlock = (FallingBlock) nearby;
                     Island island = plugin.getGrid().getIslandAt(fallingBlock.getLocation());
                     if (island != null)
-                        island.handleBlockBreak(Key.of(fallingBlock.getMaterial(), (byte) 0), 1);
+                        island.handleBlockBreak(KeyImpl.of(fallingBlock.getMaterial(), (byte) 0), 1);
                     break;
                 }
             }
@@ -193,7 +194,7 @@ public final class BlocksListener implements Listener {
                 if (!island.isInsideRange(blockState.getLocation())) {
                     e.getBlocks().remove(blockState);
                 } else {
-                    island.handleBlockPlace(Key.of(blockState), 1);
+                    island.handleBlockPlace(KeyImpl.of(blockState), 1);
                 }
             });
         }
@@ -204,7 +205,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if (island != null)
-            island.handleBlockPlace(Key.of(e.getNewState()), 1);
+            island.handleBlockPlace(KeyImpl.of(e.getNewState()), 1);
     }
 
     //Checking for chorus flower spread outside island.
@@ -220,7 +221,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
 
         if (island != null)
-            island.handleBlockBreak(Key.of(e.getBlock()), 1);
+            island.handleBlockBreak(KeyImpl.of(e.getBlock()), 1);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -228,7 +229,7 @@ public final class BlocksListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getNewState().getLocation());
 
         if (island != null) {
-            Executor.async(() -> island.handleBlockPlace(Key.of(e.getNewState()), 1, false), 1L);
+            Executor.async(() -> island.handleBlockPlace(KeyImpl.of(e.getNewState()), 1, false), 1L);
         }
     }
 
@@ -271,7 +272,7 @@ public final class BlocksListener implements Listener {
             } catch (Throwable ignored) {
             }
 
-            island.handleBlockPlace(Key.of(e.getTo(), data), 1);
+            island.handleBlockPlace(KeyImpl.of(e.getTo(), data), 1);
         }
     }
 
@@ -389,7 +390,7 @@ public final class BlocksListener implements Listener {
 
         for (Block block : blockList) {
             // Check if block is stackable
-            if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(Key.of(block)))
+            if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(KeyImpl.of(block)))
                 continue;
 
             int amount = plugin.getStackedBlocks().getStackedBlockAmount(block);

@@ -4,7 +4,7 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;
@@ -20,7 +20,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
-    private static final KeyMap<Double> cachedPrices = new KeyMap<>();
+    private static final KeyMap<Double> cachedPrices = KeyMap.createConcurrentKeyMap();
 
     public PricesProvider_ShopGUIPlus() {
         SuperiorSkyblockPlugin.log("Using ShopGUIPlus as a prices provider.");
@@ -64,7 +64,7 @@ public final class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     @Override
     public Key getBlockKey(Key blockKey) {
-        return cachedPrices.getKey((com.bgsoftware.superiorskyblock.key.Key) blockKey, null);
+        return cachedPrices.getKey(blockKey, null);
     }
 
     private Collection<Shop> getShops() {

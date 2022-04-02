@@ -2,7 +2,8 @@ package com.bgsoftware.superiorskyblock.utils;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
@@ -56,7 +57,7 @@ public final class LocationUtils {
         if (feetBlock.getType().isSolid() || headBlock.getType().isSolid())
             return false;
 
-        return plugin.getSettings().getSafeBlocks().contains(Key.of(block));
+        return plugin.getSettings().getSafeBlocks().contains(KeyImpl.of(block));
     }
 
     public static boolean isSafeBlock(ChunkSnapshot chunkSnapshot, int x, int y, int z) {

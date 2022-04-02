@@ -3,9 +3,10 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -56,7 +57,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getBlock());
+            Key blockKey = KeyImpl.of(e.getBlock());
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
@@ -116,7 +117,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getBucket().name().replace("_BUCKET", ""));
+            Key blockKey = KeyImpl.of(e.getBucket().name().replace("_BUCKET", ""));
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
@@ -131,7 +132,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            Key blockKey = Key.of(e.getNewState());
+            Key blockKey = KeyImpl.of(e.getNewState());
 
             if (island.hasReachedBlockLimit(blockKey))
                 e.setCancelled(true);
@@ -147,7 +148,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
             List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
 
             blockStates.forEach(blockState -> {
-                if (island.hasReachedBlockLimit(Key.of(blockState)))
+                if (island.hasReachedBlockLimit(KeyImpl.of(blockState)))
                     e.getBlocks().remove(blockState);
             });
         }

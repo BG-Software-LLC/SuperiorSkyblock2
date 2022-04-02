@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.utils.entities;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
 import org.bukkit.entity.Ambient;
@@ -108,9 +109,9 @@ public final class EntityUtils {
     }
 
     public static Key getLimitEntityType(Entity entity) {
-        Key key = Key.of(entity.getType());
+        Key key = KeyImpl.of(entity.getType());
         return key.getGlobalKey().contains("MINECART") ?
-                Key.of("MINECART" + (key.getSubKey().isEmpty() ? "" : ":" + key.getSubKey())) : key;
+                KeyImpl.of("MINECART" + (key.getSubKey().isEmpty() ? "" : ":" + key.getSubKey())) : key;
     }
 
     public static boolean canHaveLimit(EntityType entityType) {

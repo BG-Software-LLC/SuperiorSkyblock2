@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.google.common.base.Preconditions;
@@ -18,7 +18,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final KeyMap<BigInteger> blockCounts = new KeyMap<>();
+    private final KeyMap<BigInteger> blockCounts = KeyMap.createConcurrentKeyMap();
 
     private final Island island;
     private boolean loadingDataMode = false;
@@ -88,7 +88,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
         if (decreaseAmount || hasBlockLimit || valuesMenu) {
             PluginDebugger.debug("Action: Block Break, Island: " + island.getOwner().getName() + ", Block: " + key);
 
-            com.bgsoftware.superiorskyblock.key.Key valueKey = plugin.getBlockValues().getBlockKey(key);
+            Key valueKey = plugin.getBlockValues().getBlockKey(key);
             removeCounts(valueKey, amount);
 
             Key limitKey = island.getBlockLimitKey(valueKey);
@@ -139,7 +139,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
         this.loadingDataMode = loadingDataMode;
     }
 
-    private void addCounts(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount) {
+    private void addCounts(Key key, BigInteger amount) {
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
         PluginDebugger.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
@@ -170,7 +170,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
         }
     }
 
-    private void removeCounts(com.bgsoftware.superiorskyblock.api.key.Key key, BigInteger amount) {
+    private void removeCounts(Key key, BigInteger amount) {
         PluginDebugger.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
         BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
         if (currentAmount.compareTo(amount) <= 0)

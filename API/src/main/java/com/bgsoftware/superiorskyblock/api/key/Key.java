@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.key;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
-import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -20,7 +19,6 @@ public interface Key extends Comparable<Key> {
      * @param entityType The entity type to check.
      */
     static Key of(EntityType entityType) {
-        Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(entityType);
     }
 
@@ -30,7 +28,6 @@ public interface Key extends Comparable<Key> {
      * @param entity The entity to check.
      */
     static Key of(Entity entity) {
-        Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(entity);
     }
 
@@ -40,7 +37,6 @@ public interface Key extends Comparable<Key> {
      * @param block The block to check.
      */
     static Key of(Block block) {
-        Preconditions.checkNotNull(block, "block parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(block);
     }
 
@@ -50,7 +46,6 @@ public interface Key extends Comparable<Key> {
      * @param blockState The block-state to check.
      */
     static Key of(BlockState blockState) {
-        Preconditions.checkNotNull(blockState, "blockState parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(blockState);
     }
 
@@ -60,7 +55,6 @@ public interface Key extends Comparable<Key> {
      * @param itemStack The item-stack to check.
      */
     static Key of(ItemStack itemStack) {
-        Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(itemStack);
     }
 
@@ -71,8 +65,17 @@ public interface Key extends Comparable<Key> {
      * @param data     The data to check.
      */
     static Key of(Material material, short data) {
-        Preconditions.checkNotNull(material, "material parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(material, data);
+    }
+
+    /**
+     * Get the key of a global-key and a sub-key.
+     *
+     * @param globalKey The global key
+     * @param subKey    The sub key
+     */
+    static Key of(String globalKey, String subKey) {
+        return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(globalKey, subKey);
     }
 
     /**
@@ -81,7 +84,6 @@ public interface Key extends Comparable<Key> {
      * @param key The string to check.
      */
     static Key of(String key) {
-        Preconditions.checkNotNull(key, "key parameter cannot be null.");
         return SuperiorSkyblockAPI.getSuperiorSkyblock().getKeys().getKey(key);
     }
 

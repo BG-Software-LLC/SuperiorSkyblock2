@@ -3,10 +3,11 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.CountsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
@@ -43,7 +44,7 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.B
             Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());
             int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
             return compare != 0 ? compare : o1.getKey().compareTo(o2.getKey());
-        }).map(entry -> new BlockCount(Key.of(entry.getKey().toString()), entry.getValue())).collect(Collectors.toList());
+        }).map(entry -> new BlockCount(KeyImpl.of(entry.getKey().toString()), entry.getValue())).collect(Collectors.toList());
     }
 
     public static void init() {
