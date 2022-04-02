@@ -16,8 +16,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
@@ -43,6 +45,20 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             firstWorldPreparation = false;
             SPIKE_CACHE.set(null, SpikesCache.getInstance());
         }
+    }
+
+    @Nullable
+    @Override
+    public EnderDragon getEnderDragon(Island island) {
+        WorldServer worldServer = ((CraftWorld) island.getCenter(World.Environment.THE_END).getWorld()).getHandle();
+
+        if (!(worldServer.getDragonBattle() instanceof EndWorldEnderDragonBattleHandler))
+            return null;
+
+        EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldServer.getDragonBattle();
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.getDragonBattle(island.getUniqueId());
+
+        return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
 
     @Override
@@ -74,12 +90,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             return;
 
         EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldServer.getDragonBattle();
-        EnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getUniqueId());
-
-        if (enderDragonBattle instanceof IslandEnderDragonBattle) {
-            IslandEnderDragonBattle islandEnderDragonBattle = (IslandEnderDragonBattle) enderDragonBattle;
-            islandEnderDragonBattle.removeBattlePlayers();
-            islandEnderDragonBattle.killEnderDragon();
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getUniqueId());
+        if (enderDragonBattle != null) {
+            enderDragonBattle.removeBattlePlayers();
+            enderDragonBattle.getEnderDragon().die();
         }
     }
 

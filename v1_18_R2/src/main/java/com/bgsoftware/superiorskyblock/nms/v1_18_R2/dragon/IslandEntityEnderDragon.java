@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEnderDragon;
 
 public final class IslandEntityEnderDragon extends EntityEnderDragon {
 
@@ -18,6 +19,11 @@ public final class IslandEntityEnderDragon extends EntityEnderDragon {
     @Override
     public void w_() {
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::w_);
+    }
+
+    @Override
+    public CraftEnderDragon getBukkitEntity() {
+        return (CraftEnderDragon) super.getBukkitEntity();
     }
 
     public Entity getEntity() {

@@ -16,8 +16,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
@@ -43,6 +45,18 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             firstWorldPreparation = false;
             SPIKE_CACHE.set(null, SpikesCache.getInstance());
         }
+    }
+
+    @Nullable
+    @Override
+    public EnderDragon getEnderDragon(Island island) {
+        WorldServer worldServer = ((CraftWorld) island.getCenter(World.Environment.THE_END).getWorld()).getHandle();
+
+        if (!(worldServer.getDragonBattle() instanceof EndWorldEnderDragonBattleHandler dragonBattleHandler))
+            return null;
+
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.getDragonBattle(island.getUniqueId());
+        return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
 
     @Override
@@ -76,7 +90,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
         if (enderDragonBattle instanceof IslandEnderDragonBattle islandEnderDragonBattle) {
             islandEnderDragonBattle.removeBattlePlayers();
-            islandEnderDragonBattle.killEnderDragon();
+            islandEnderDragonBattle.getEnderDragon().die();
         }
     }
 

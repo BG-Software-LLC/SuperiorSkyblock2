@@ -26,7 +26,6 @@ import net.minecraft.server.v1_12_R1.NBTTagList;
 import net.minecraft.server.v1_12_R1.WorldGenEndGateway;
 import net.minecraft.server.v1_12_R1.WorldGenEndTrophy;
 import net.minecraft.server.v1_12_R1.WorldServer;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -217,8 +216,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         this.bossBattleServer.getPlayers().forEach(this.bossBattleServer::removePlayer);
     }
 
-    public void killEnderDragon() {
-        this.entityEnderDragon.die();
+    public IslandEntityEnderDragon getEnderDragon() {
+        return this.entityEnderDragon;
     }
 
     private IslandEntityEnderDragon spawnEnderDragon() {

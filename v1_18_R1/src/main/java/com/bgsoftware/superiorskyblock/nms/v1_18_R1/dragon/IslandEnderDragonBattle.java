@@ -135,8 +135,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
             bossBattleServer.removePlayer(entity);
     }
 
-    public void killEnderDragon() {
-        this.entityEnderDragon.getBukkitEntity().remove();
+    public IslandEntityEnderDragon getEnderDragon() {
+        return this.entityEnderDragon;
     }
 
     private void updateBattlePlayers() {

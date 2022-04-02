@@ -126,8 +126,8 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
         this.k.getPlayers().forEach(this.k::removePlayer);
     }
 
-    public void killEnderDragon() {
-        this.entityEnderDragon.die();
+    public IslandEntityEnderDragon getEnderDragon() {
+        return this.entityEnderDragon;
     }
 
     private void updateBattlePlayers() {

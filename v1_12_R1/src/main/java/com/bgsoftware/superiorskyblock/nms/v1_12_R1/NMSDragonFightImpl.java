@@ -17,8 +17,10 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
 
 @SuppressWarnings({"unused"})
@@ -26,7 +28,6 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<EnderDragonBattle> WORLD_DRAGON_BATTLE = new ReflectField<>(
             WorldProviderTheEnd.class, EnderDragonBattle.class, Modifier.PRIVATE, 1);
-
 
     static {
         EntityTypes.b.a(63, new MinecraftKey("ender_dragon"), IslandEntityEnderDragon.class);
@@ -36,6 +37,22 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
     public void prepareEndWorld(World bukkitWorld) {
         WorldServer worldServer = ((CraftWorld) bukkitWorld).getHandle();
         WORLD_DRAGON_BATTLE.set(worldServer.worldProvider, new EndWorldEnderDragonBattleHandler(worldServer));
+    }
+
+    @Nullable
+    @Override
+    public EnderDragon getEnderDragon(Island island) {
+        WorldServer worldServer = ((CraftWorld) island.getCenter(World.Environment.THE_END).getWorld()).getHandle();
+
+        EnderDragonBattle worldEnderDragonBattle = ((WorldProviderTheEnd) worldServer.worldProvider).t();
+
+        if (!(worldEnderDragonBattle instanceof EndWorldEnderDragonBattleHandler))
+            return null;
+
+        EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldEnderDragonBattle;
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.getDragonBattle(island.getUniqueId());
+
+        return enderDragonBattle == null ? null : enderDragonBattle.getEnderDragon().getBukkitEntity();
     }
 
     @Override
@@ -77,12 +94,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             return;
 
         EndWorldEnderDragonBattleHandler dragonBattleHandler = (EndWorldEnderDragonBattleHandler) worldEnderDragonBattle;
-        EnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getUniqueId());
-
-        if (enderDragonBattle instanceof IslandEnderDragonBattle) {
-            IslandEnderDragonBattle islandEnderDragonBattle = (IslandEnderDragonBattle) enderDragonBattle;
-            islandEnderDragonBattle.removeBattlePlayers();
-            islandEnderDragonBattle.killEnderDragon();
+        IslandEnderDragonBattle enderDragonBattle = dragonBattleHandler.removeDragonBattle(island.getUniqueId());
+        if (enderDragonBattle != null) {
+            enderDragonBattle.removeBattlePlayers();
+            enderDragonBattle.getEnderDragon().die();
         }
     }
 

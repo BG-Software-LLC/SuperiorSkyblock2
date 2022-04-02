@@ -21,7 +21,7 @@ public final class DragonBattleServiceImpl implements DragonBattleService {
     @Nullable
     @Override
     public EnderDragon getEnderDragon(Island island) {
-        return null;
+        return plugin.getNMSDragonFight().getEnderDragon(island);
     }
 
     @Override
