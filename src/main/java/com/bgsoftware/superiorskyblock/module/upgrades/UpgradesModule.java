@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
@@ -203,17 +204,17 @@ public final class UpgradesModule extends BuiltinModule {
         UpgradeValue<Integer> coopLimit = new UpgradeValue<>(levelSection.getInt("coop-limit", -1), true);
         UpgradeValue<Integer> borderSize = new UpgradeValue<>(levelSection.getInt("border-size", -1), true);
         UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
         if (levelSection.contains("block-limits")) {
             for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
-                blockLimits.put(Key.of(block.toUpperCase()), levelSection.getInt("block-limits." + block));
-                plugin.getBlockValues().addCustomBlockKey(Key.of(block));
+                blockLimits.put(KeyImpl.of(block.toUpperCase()), levelSection.getInt("block-limits." + block));
+                plugin.getBlockValues().addCustomBlockKey(KeyImpl.of(block));
             }
         }
-        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> entityLimits = KeyMapImpl.createHashMap();
         if (levelSection.contains("entity-limits")) {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
-                entityLimits.put(Key.of(entity.toUpperCase()), levelSection.getInt("entity-limits." + entity));
+                entityLimits.put(KeyImpl.of(entity.toUpperCase()), levelSection.getInt("entity-limits." + entity));
         }
         KeyMap<Integer>[] generatorRates = new KeyMap[World.Environment.values().length];
         if (levelSection.contains("generator-rates")) {
@@ -222,13 +223,13 @@ public final class UpgradesModule extends BuiltinModule {
                     int index = World.Environment.valueOf(blockOrEnv.toUpperCase()).ordinal();
                     for (String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
                         if (generatorRates[index] == null)
-                            generatorRates[index] = KeyMap.createKeyMap();
-                        generatorRates[index].put(Key.of(block.toUpperCase()), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
+                            generatorRates[index] = KeyMapImpl.createHashMap();
+                        generatorRates[index].put(KeyImpl.of(block.toUpperCase()), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                     }
                 } catch (Exception ex) {
                     if (generatorRates[0] == null)
-                        generatorRates[0] = KeyMap.createKeyMap();
-                    generatorRates[0].put(Key.of(blockOrEnv.toUpperCase()), levelSection.getInt("generator-rates." + blockOrEnv));
+                        generatorRates[0] = KeyMapImpl.createHashMap();
+                    generatorRates[0].put(KeyImpl.of(blockOrEnv.toUpperCase()), levelSection.getInt("generator-rates." + blockOrEnv));
                 }
             }
         }

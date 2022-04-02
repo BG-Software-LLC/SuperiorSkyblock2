@@ -16,6 +16,8 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategor
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -237,13 +239,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
 
         if (blocks != null) {
             for (String limit : blocks.split(",")) {
                 try {
                     String[] sections = limit.split("=");
-                    blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    blockLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
@@ -307,13 +309,13 @@ public final class RawDeserializer implements IDeserializer {
                 String[] sections = env.split(":");
                 try {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
-                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMap.createKeyMap());
+                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMapImpl.createHashMap());
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
             }
         } else {
-            deserializeGenerators(generator, cobbleGenerator[0] = KeyMap.createKeyMap());
+            deserializeGenerators(generator, cobbleGenerator[0] = KeyMapImpl.createHashMap());
         }
 
         return cobbleGenerator;
@@ -340,13 +342,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> entityLimits = KeyMapImpl.createHashMap();
 
         if (entities != null) {
             for (String limit : entities.split(",")) {
                 try {
                     String[] sections = limit.split("=");
-                    entityLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    entityLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
@@ -438,13 +440,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeBlockCounts(String blockCountsParam) {
-        KeyMap<BigInteger> blockCounts = KeyMap.createKeyMap();
+        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
 
         if (blockCountsParam != null) {
             for (String blockCountSection : blockCountsParam.split(";")) {
                 String[] blockCountSections = blockCountSection.split("=");
                 try {
-                    blockCounts.put(Key.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
+                    blockCounts.put(KeyImpl.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
                 } catch (NumberFormatException error) {
                     PluginDebugger.debug(error);
                 }
@@ -481,7 +483,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String limit : generator.split(",")) {
             try {
                 String[] sections = limit.split("=");
-                cobbleGenerator.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                cobbleGenerator.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
             } catch (Exception error) {
                 PluginDebugger.debug(error);
             }

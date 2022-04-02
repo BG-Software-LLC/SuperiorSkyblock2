@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
@@ -49,9 +51,9 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
 
     private static final Bindings bindings = createBindings();
 
-    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMap.createKeyMap();
-    private static final KeySet valuesMenuBlocks = KeySet.createKeySet();
-    private static final KeySet customBlockKeys = KeySet.createKeySet();
+    private static final KeyMap<CustomKeyParser> customKeyParsers = KeyMapImpl.createHashMap();
+    private static final KeySet valuesMenuBlocks = KeySetImpl.createHashSet();
+    private static final KeySet customBlockKeys = KeySetImpl.createHashSet();
 
     private final BlockValuesContainer blockWorthValues;
     private final BlockValuesContainer blockLevels;

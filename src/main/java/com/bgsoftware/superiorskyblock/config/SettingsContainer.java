@@ -7,6 +7,9 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
@@ -206,7 +209,7 @@ public final class SettingsContainer {
         islandCommand = config.getString("island-command", "island,is,islands");
         maxIslandSize = config.getInt("max-island-size", 200);
         defaultIslandSize = config.getInt("default-values.island-size", 20);
-        defaultBlockLimits = KeyMap.createKeyMap();
+        defaultBlockLimits = KeyMapImpl.createHashMap();
         for (String line : config.getStringList("default-values.block-limits")) {
             String[] sections = line.split(":");
 
@@ -218,11 +221,11 @@ public final class SettingsContainer {
             String gloablKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            Key key = Key.of(gloablKey, subKey);
+            Key key = KeyImpl.of(gloablKey, subKey);
             defaultBlockLimits.put(key, Integer.parseInt(limit));
             plugin.getBlockValues().addCustomBlockKey(key);
         }
-        defaultEntityLimits = KeyMap.createKeyMap();
+        defaultEntityLimits = KeyMapImpl.createHashMap();
         for (String line : config.getStringList("default-values.entity-limits")) {
             String[] sections = line.split(":");
 
@@ -234,7 +237,7 @@ public final class SettingsContainer {
             String gloablKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String limit = sections.length == 2 ? sections[1] : sections[2];
-            defaultEntityLimits.put(Key.of(gloablKey, subKey), Integer.parseInt(limit));
+            defaultEntityLimits.put(KeyImpl.of(gloablKey, subKey), Integer.parseInt(limit));
         }
         defaultTeamLimit = config.getInt("default-values.team-limit", 4);
         defaultWarpsLimit = config.getInt("default-values.warps-limit", 3);
@@ -255,17 +258,17 @@ public final class SettingsContainer {
         worldBordersEnabled = config.getBoolean("world-borders", true);
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
-        whitelistedStackedBlocks = KeySet.createKeySet(config.getStringList("stacked-blocks.whitelisted")
-                .stream().map(string -> Key.of(string.toUpperCase())).collect(Collectors.toList()));
+        whitelistedStackedBlocks = KeySetImpl.createHashSet(config.getStringList("stacked-blocks.whitelisted")
+                .stream().map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toList()));
         stackedBlocksName = StringUtils.translateColors(config.getString("stacked-blocks.custom-name"));
-        stackedBlocksLimits = KeyMap.createKeyMap();
+        stackedBlocksLimits = KeyMapImpl.createHashMap();
         config.getStringList("stacked-blocks.limits").forEach(line -> {
             String[] sections = line.split(":");
             try {
                 if (sections.length == 2)
-                    stackedBlocksLimits.put(Key.of(sections[0], ""), Integer.parseInt(sections[1]));
+                    stackedBlocksLimits.put(KeyImpl.of(sections[0], ""), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
-                    stackedBlocksLimits.put(Key.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
+                    stackedBlocksLimits.put(KeyImpl.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
             } catch (Exception ex) {
                 PluginDebugger.debug(ex);
             }
@@ -464,8 +467,8 @@ public final class SettingsContainer {
                 commandAliases.put(label.toLowerCase(), config.getStringList("command-aliases." + label));
             }
         }
-        valuableBlocks = KeySet.createKeySet(config.getStringList("valuable-blocks").stream()
-                .map(string -> Key.of(string.toUpperCase())).collect(Collectors.toSet()));
+        valuableBlocks = KeySetImpl.createHashSet(config.getStringList("valuable-blocks").stream()
+                .map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toSet()));
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
@@ -519,17 +522,17 @@ public final class SettingsContainer {
             }
         }
 
-        return KeySet.createKeySet(safeBlocks.stream().map(string -> Key.of(string.toUpperCase())).collect(Collectors.toSet()));
+        return KeySetImpl.createHashSet(safeBlocks.stream().map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toSet()));
     }
 
     private void loadGenerator(List<String> lines, int index) {
-        defaultGenerator[index] = KeyMap.createKeyMap();
+        defaultGenerator[index] = KeyMapImpl.createHashMap();
         for (String line : lines) {
             String[] sections = line.toUpperCase().split(":");
             String globalKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];
-            defaultGenerator[index].put(Key.of(globalKey, subKey), Integer.parseInt(percentage));
+            defaultGenerator[index].put(KeyImpl.of(globalKey, subKey), Integer.parseInt(percentage));
         }
     }
 

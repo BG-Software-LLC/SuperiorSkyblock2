@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ValuesButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -71,7 +72,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
         MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
         CommentedConfiguration cfg = menuLoadResult.getValue();
 
-        KeySet keysToUpdate = KeySet.createKeySet();
+        KeySet keysToUpdate = KeySetImpl.createHashSet();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {

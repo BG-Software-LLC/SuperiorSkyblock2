@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -150,7 +151,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
     private static class BlockCountsTracker implements IslandCalculationResult {
 
-        private final KeyMap<BigInteger> blockCounts = KeyMap.createConcurrentKeyMap();
+        private final KeyMap<BigInteger> blockCounts = KeyMapImpl.createConcurrentHashMap();
 
         @Override
         public Map<Key, BigInteger> getBlockCounts() {

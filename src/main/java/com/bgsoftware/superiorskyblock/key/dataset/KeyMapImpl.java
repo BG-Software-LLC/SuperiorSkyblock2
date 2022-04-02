@@ -6,14 +6,19 @@ import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V> {
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static final KeyMapImpl EMPTY_MAP = new KeyMapImpl(() -> Collections.emptyMap());
 
     private final Map<String, V> innerMap;
 
@@ -26,6 +31,18 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
                 entry -> entry.getKey().toString(),
                 Entry::getValue
         )));
+    }
+
+    public static <V> KeyMapImpl<V> createHashMap() {
+        return create(() -> new HashMap<>());
+    }
+
+    public static <V> KeyMapImpl<V> createConcurrentHashMap() {
+        return create(() -> new ConcurrentHashMap<>());
+    }
+
+    public static <V> KeyMapImpl<V> createEmptyMap() {
+        return (KeyMapImpl<V>) EMPTY_MAP;
     }
 
     private KeyMapImpl(Supplier<Map<String, V>> mapCreator, Map<String, V> other) {
@@ -93,14 +110,14 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
         if (innerMap.containsKey(key.toString()))
             return key;
         else if (innerMap.containsKey(key.getGlobalKey()))
-            return Key.of(key.getGlobalKey(), "");
+            return KeyImpl.of(key.getGlobalKey(), "");
         else
             return def;
     }
 
     @Override
     public boolean removeIf(Predicate<Key> predicate) {
-        return innerMap.keySet().removeIf(str -> predicate.test(Key.of(str)));
+        return innerMap.keySet().removeIf(str -> predicate.test(KeyImpl.of(str)));
     }
 
     @Override
@@ -117,7 +134,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public Map<Key, V> asMap() {
-        return innerMap.entrySet().stream().collect(Collectors.toMap(entry -> Key.of(entry.getKey()), Entry::getValue, (v1, v2) -> {
+        return innerMap.entrySet().stream().collect(Collectors.toMap(entry -> KeyImpl.of(entry.getKey()), Entry::getValue, (v1, v2) -> {
             throw new IllegalStateException(String.format("Duplicate key %s", v1));
         }, HashMap::new));
     }

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
@@ -76,7 +77,7 @@ public final class NMSChunksImpl implements NMSChunks {
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
                                                   net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunkSections) {
