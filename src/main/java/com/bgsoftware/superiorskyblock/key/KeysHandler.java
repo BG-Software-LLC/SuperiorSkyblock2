@@ -2,7 +2,12 @@ package com.bgsoftware.superiorskyblock.key;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.KeysManager;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,6 +15,11 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public final class KeysHandler extends AbstractHandler implements KeysManager {
 
@@ -23,45 +33,72 @@ public final class KeysHandler extends AbstractHandler implements KeysManager {
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(EntityType entityType) {
+    public Key getKey(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return Key.of(entityType).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(entityType)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Entity entity) {
+    public Key getKey(Entity entity) {
         Preconditions.checkNotNull(entity, "entity parameter cannot be null.");
-        return Key.of(entity).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(entity)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Block block) {
+    public Key getKey(Block block) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return Key.of(block).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(block)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(BlockState blockState) {
+    public Key getKey(BlockState blockState) {
         Preconditions.checkNotNull(blockState, "blockState parameter cannot be null.");
-        return Key.of(blockState).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(blockState)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(ItemStack itemStack) {
+    public Key getKey(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "material parameter cannot be null.");
-        return Key.of(itemStack).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(itemStack)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(Material material, short data) {
+    public Key getKey(Material material, short data) {
         Preconditions.checkNotNull(material, "material parameter cannot be null.");
-        return Key.of(material, data).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(material, data)).markAPIKey();
     }
 
     @Override
-    public com.bgsoftware.superiorskyblock.api.key.Key getKey(String key) {
+    public Key getKey(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return Key.of(key).markAPIKey();
+        return ((KeyImpl) KeyImpl.of(key)).markAPIKey();
+    }
+
+    @Override
+    public Key getKey(String globalKey, String subKey) {
+        Preconditions.checkNotNull(globalKey, "globalKey parameter cannot be null.");
+        Preconditions.checkNotNull(subKey, "subKey parameter cannot be null.");
+        return ((KeyImpl) KeyImpl.of(globalKey, subKey)).markAPIKey();
+    }
+
+    @Override
+    public KeySet createKeySet(Supplier<Set<String>> setCreator) {
+        return KeySetImpl.create(setCreator);
+    }
+
+    @Override
+    public KeySet createKeySet(Supplier<Set<String>> setCreator, Collection<Key> collection) {
+        return collection instanceof KeySet ? (KeySet) collection : KeySetImpl.create(setCreator, collection);
+    }
+
+    @Override
+    public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator) {
+        return KeyMapImpl.create(mapCreator);
+    }
+
+    @Override
+    public <V> KeyMap<V> createKeyMap(Supplier<Map<String, V>> mapCreator, Map<Key, V> map) {
+        return map instanceof KeyMap ? (KeyMap<V>) map : KeyMapImpl.create(mapCreator, map);
     }
 
 }

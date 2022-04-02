@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandChestAttributes;
@@ -15,7 +16,6 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategor
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -237,7 +237,7 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = new KeyMap<>();
+        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
 
         if (blocks != null) {
             for (String limit : blocks.split(",")) {
@@ -307,13 +307,13 @@ public final class RawDeserializer implements IDeserializer {
                 String[] sections = env.split(":");
                 try {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
-                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = new KeyMap<>());
+                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMap.createKeyMap());
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
             }
         } else {
-            deserializeGenerators(generator, cobbleGenerator[0] = new KeyMap<>());
+            deserializeGenerators(generator, cobbleGenerator[0] = KeyMap.createKeyMap());
         }
 
         return cobbleGenerator;
@@ -340,7 +340,7 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = new KeyMap<>();
+        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
 
         if (entities != null) {
             for (String limit : entities.split(",")) {
@@ -438,7 +438,7 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeBlockCounts(String blockCountsParam) {
-        KeyMap<BigInteger> blockCounts = new KeyMap<>();
+        KeyMap<BigInteger> blockCounts = KeyMap.createKeyMap();
 
         if (blockCountsParam != null) {
             for (String blockCountSection : blockCountsParam.split(";")) {

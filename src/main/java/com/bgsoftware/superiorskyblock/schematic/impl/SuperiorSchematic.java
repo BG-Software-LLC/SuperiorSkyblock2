@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.schematic.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.key.Key;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;

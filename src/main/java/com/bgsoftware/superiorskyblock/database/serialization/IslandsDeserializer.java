@@ -7,6 +7,8 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -22,8 +24,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeseri
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.key.Key;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMap;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -302,7 +303,7 @@ public final class IslandsDeserializer {
 
         blockCounts.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
-            Key blockKey = Key.of(blockCountObject.get("id").getAsString());
+            Key blockKey = KeyImpl.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
             island.handleBlockPlace(blockKey, amount, false, false);
         });
@@ -318,7 +319,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Key> block = blockLimits.getString("block").map(Key::of);
+            Optional<Key> block = blockLimits.getString("block").map(KeyImpl::of);
             if (!block.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load block limits for invalid blocks for %s, skipping...", uuid.get()));
@@ -347,7 +348,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Key> entity = entityLimits.getString("entity").map(Key::of);
+            Optional<Key> entity = entityLimits.getString("entity").map(KeyImpl::of);
             if (!entity.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load entity limits for invalid entities on %s, skipping...", uuid.get()));
@@ -490,7 +491,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Key> block = generators.getString("block").map(Key::of);
+            Optional<Key> block = generators.getString("block").map(KeyImpl::of);
             if (!block.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load generator rates with invalid block for %s, skipping...", uuid.get()));
@@ -505,7 +506,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = new KeyMap<>())
+            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMap.createKeyMap())
                     .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
         });
     }
@@ -641,21 +642,18 @@ public final class IslandsDeserializer {
             int contentsLength = contents.get().length;
             ItemStack[] chestContents;
 
-            if(contentsLength % 9 != 0) {
+            if (contentsLength % 9 != 0) {
                 int amountOfRows = Math.min(1, Math.max(6, (contentsLength / 9) + 1));
                 chestContents = new ItemStack[amountOfRows * 9];
                 int amountOfContentsToCopy = Math.min(contentsLength, chestContents.length);
                 System.arraycopy(contents.get(), 0, chestContents, 0, amountOfContentsToCopy);
-            }
-            else if(contentsLength > 54) {
+            } else if (contentsLength > 54) {
                 chestContents = new ItemStack[54];
                 System.arraycopy(contents.get(), 0, chestContents, 0, 54);
-            }
-            else if(contentsLength < 9) {
+            } else if (contentsLength < 9) {
                 chestContents = new ItemStack[9];
                 System.arraycopy(contents.get(), 0, chestContents, 0, contentsLength);
-            }
-            else {
+            } else {
                 chestContents = contents.get();
             }
 
