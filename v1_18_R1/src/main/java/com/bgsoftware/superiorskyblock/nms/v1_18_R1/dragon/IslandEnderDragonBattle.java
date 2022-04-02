@@ -42,6 +42,9 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
             EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 3);
 
+    private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
+            EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 1);
+
     private static final ReflectField<Vec3D> LANDING_TARGET_POSITION = new ReflectField<>(
             DragonControllerLanding.class, Vec3D.class, Modifier.PRIVATE, 1);
 
@@ -72,6 +75,7 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
                                    @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
         super(worldServer.getHandle(), worldServer.getSeed(), new net.minecraft.nbt.NBTTagCompound());
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
+        WAS_DRAGON_KILLED.set(this, false);
         this.island = island;
         this.islandBlockPosition = islandBlockPosition;
         this.islandBlockVectored = Vec3D.c(islandBlockPosition.getHandle());

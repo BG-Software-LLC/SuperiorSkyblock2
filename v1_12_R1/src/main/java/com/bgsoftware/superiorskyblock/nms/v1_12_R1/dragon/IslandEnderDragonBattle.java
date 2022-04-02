@@ -57,6 +57,9 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private static final ReflectField<Boolean> SCAN_FOR_LEGACY_PORTALS = new ReflectField<>(
             EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 3);
 
+    private static final ReflectField<Boolean> WAS_DRAGON_KILLED = new ReflectField<>(
+            EnderDragonBattle.class, boolean.class, Modifier.PRIVATE, 1);
+
     private static final Vec3D ORIGINAL_END_PODIUM = new Vec3D(0.5, 0, 0.5);
 
     private final Island island;
@@ -88,6 +91,7 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
                                    @Nullable IslandEntityEnderDragon islandEntityEnderDragon) {
         super(worldServer, new NBTTagCompound());
         SCAN_FOR_LEGACY_PORTALS.set(this, false);
+        WAS_DRAGON_KILLED.set(this, false);
         this.island = island;
         this.islandBlockPosition = islandBlockPosition;
         this.worldServer = worldServer;
