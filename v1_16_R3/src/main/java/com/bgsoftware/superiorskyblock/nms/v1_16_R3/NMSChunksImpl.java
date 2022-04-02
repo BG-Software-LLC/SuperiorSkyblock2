@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -87,7 +88,7 @@ public final class NMSChunksImpl implements NMSChunks {
             LightEngineThreaded.class, ThreadedMailbox.class, "b");
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (ChunkSection chunkSection : chunkSections) {

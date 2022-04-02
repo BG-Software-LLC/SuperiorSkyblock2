@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.values.container;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 public abstract class BlockValuesContainer {
 
-    private final KeyMap<BigDecimal> valuesMap = KeyMap.createKeyMap();
+    private final KeyMap<BigDecimal> valuesMap = KeyMapImpl.createHashMap();
 
     public abstract void loadDefaultValues(SuperiorSkyblockPlugin plugin);
 
@@ -36,7 +37,7 @@ public abstract class BlockValuesContainer {
     }
 
     public Key getBlockValueKey(Key key) {
-        return valuesMap.getKey(key);
+        return valuesMap.getKey(key, key);
     }
 
     public Set<Map.Entry<Key, BigDecimal>> getBlockValues() {

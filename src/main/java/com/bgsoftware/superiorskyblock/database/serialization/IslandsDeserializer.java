@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
@@ -506,7 +507,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMap.createKeyMap())
+            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap())
                     .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
         });
     }

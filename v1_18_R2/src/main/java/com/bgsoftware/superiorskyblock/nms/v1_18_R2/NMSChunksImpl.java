@@ -79,7 +79,7 @@ public final class NMSChunksImpl implements NMSChunks {
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
                                                   net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunkSections) {

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.StackedBlocksContainer;
@@ -91,7 +92,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     @Override
     public boolean setStackedBlock(Block block, int amount) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return setStackedBlock(block.getLocation(), Key.of(block), amount);
+        return setStackedBlock(block.getLocation(), KeyImpl.of(block), amount);
     }
 
     @Override
@@ -279,7 +280,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         Optional<String> item = resultSet.getString("block_type");
 
-        Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : Key.of(item.get());
+        Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : KeyImpl.of(item.get());
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get().parse());
         stackedBlock.setAmount(amount.get());
@@ -288,7 +289,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
     private void updateStackedBlockKeys() {
         this.stackedBlocksContainer.getStackedBlocks().values().forEach(stackedBlock -> {
-            stackedBlock.setBlockKey(Key.of(stackedBlock.getLocation().getBlock()));
+            stackedBlock.setBlockKey(KeyImpl.of(stackedBlock.getLocation().getBlock()));
         });
     }
 

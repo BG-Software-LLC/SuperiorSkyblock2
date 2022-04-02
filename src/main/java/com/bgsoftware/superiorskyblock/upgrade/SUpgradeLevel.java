@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -161,7 +162,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return getEntityLimit(Key.of(entityType));
+        return getEntityLimit(KeyImpl.of(entityType));
     }
 
     @Override

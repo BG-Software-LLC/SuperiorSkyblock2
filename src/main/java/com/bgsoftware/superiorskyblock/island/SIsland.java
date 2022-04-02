@@ -39,6 +39,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
 import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -161,9 +162,9 @@ public final class SIsland implements Island {
     private UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(-2), true);
     private final Map<PlayerRole, UpgradeValue<Integer>> roleLimits = new ConcurrentHashMap<>();
     private final KeyMap<UpgradeValue<Integer>>[] cobbleGeneratorValues = new KeyMap[World.Environment.values().length];
-    private final KeyMap<UpgradeValue<Integer>> entityLimits = KeyMap.createConcurrentKeyMap();
+    private final KeyMap<UpgradeValue<Integer>> entityLimits = KeyMapImpl.createConcurrentHashMap();
     private final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new ConcurrentHashMap<>();
-    private final KeyMap<UpgradeValue<Integer>> blockLimits = KeyMap.createConcurrentKeyMap();
+    private final KeyMap<UpgradeValue<Integer>> blockLimits = KeyMapImpl.createConcurrentHashMap();
 
     /*
      * Island Player-Trackers
@@ -2133,7 +2134,7 @@ public final class SIsland implements Island {
     @Override
     public Key getBlockLimitKey(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
-        return blockLimits.getKey((KeyImpl) key);
+        return blockLimits.getKey(key, key);
     }
 
     @Override
@@ -3457,7 +3458,7 @@ public final class SIsland implements Island {
             Map<Key, Integer> defaultGenerator = plugin.getSettings().getDefaultValues().getGenerators()[i];
             if (defaultGenerator != null) {
                 if (cobbleGeneratorValues[i] == null)
-                    cobbleGeneratorValues[i] = KeyMap.createConcurrentKeyMap();
+                    cobbleGeneratorValues[i] = KeyMapImpl.createConcurrentHashMap();
                 for (Key key : cobbleGeneratorValues[i].keySet()) {
                     Integer defaultValue = defaultGenerator.get(key);
                     if (defaultValue != null && (int) cobbleGeneratorValues[i].get(key).get() == defaultValue)
@@ -3653,7 +3654,7 @@ public final class SIsland implements Island {
         KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = this.cobbleGeneratorValues[index];
 
         if (cobbleGeneratorValues == null && createNew)
-            cobbleGeneratorValues = this.cobbleGeneratorValues[index] = KeyMap.createConcurrentKeyMap();
+            cobbleGeneratorValues = this.cobbleGeneratorValues[index] = KeyMapImpl.createConcurrentHashMap();
 
         return cobbleGeneratorValues;
     }

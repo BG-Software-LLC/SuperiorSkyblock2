@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.schematic;
 
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 
 import java.util.Set;
@@ -11,7 +12,7 @@ public abstract class BaseSchematic implements Schematic {
 
     protected final String name;
 
-    protected final KeyMap<Integer> cachedCounts = KeyMap.createKeyMap();
+    protected final KeyMap<Integer> cachedCounts = KeyMapImpl.createHashMap();
 
     protected BaseSchematic(String name) {
         this.name = name;

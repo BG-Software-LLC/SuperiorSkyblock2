@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
 
-    private final KeyMap<Integer> entityCounts = KeyMap.createConcurrentKeyMap();
+    private final KeyMap<Integer> entityCounts = KeyMapImpl.createConcurrentHashMap();
 
     private final Island island;
 
@@ -98,7 +99,7 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
 
         clearEntityCounts();
 
-        KeyMap<Integer> recalculatedEntityCounts = KeyMap.createConcurrentKeyMap();
+        KeyMap<Integer> recalculatedEntityCounts = KeyMapImpl.createConcurrentHashMap();
         CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
 
         for (World.Environment environment : World.Environment.values()) {
