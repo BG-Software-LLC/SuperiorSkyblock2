@@ -55,7 +55,7 @@ public final class PlayersLogic {
         if (!anyOnline)
             island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
 
-        if (!island.getCoopPlayers().isEmpty()) {
+        if (plugin.getSettings().isAutoUncoopWhenAlone() && !island.getCoopPlayers().isEmpty()) {
             boolean shouldRemoveCoops = island.getIslandMembers(true).stream().noneMatch(islandMember ->
                     islandMember != superiorPlayer && island.hasPermission(islandMember, IslandPrivileges.UNCOOP_MEMBER) && islandMember.isOnline());
 

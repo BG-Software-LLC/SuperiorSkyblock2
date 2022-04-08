@@ -194,6 +194,7 @@ public final class SettingsContainer {
     public final boolean publicWarps;
     public final long recalcTaskTimeout;
     public final boolean autoLanguageDetection;
+    public final boolean autoUncoopWhenAlone;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
         databaseType = config.getString("database.type");
@@ -494,6 +495,7 @@ public final class SettingsContainer {
         publicWarps = config.getBoolean("public-warps");
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
+        autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

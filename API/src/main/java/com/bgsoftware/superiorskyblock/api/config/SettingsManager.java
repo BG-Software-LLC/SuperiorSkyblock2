@@ -556,6 +556,12 @@ public interface SettingsManager {
      */
     boolean isAutoLanguageDetection();
 
+    /**
+     * Automatically uncoop players when there are no island members left online that can remove uncoop players.
+     * Config-path: auto-uncoop-when-alone
+     */
+    boolean isAutoUncoopWhenAlone();
+
     interface Database {
 
         /**
