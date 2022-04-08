@@ -18,14 +18,18 @@ import org.bukkit.entity.Entity;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
+
+    private static final long CALCULATE_DELAY = TimeUnit.MINUTES.toMillis(5);
 
     private final KeyMap<Integer> entityCounts = KeyMapImpl.createConcurrentHashMap();
 
     private final Island island;
 
     private volatile boolean beingRecalculated = false;
+    private volatile long lastCalculateTime = 0L;
 
     public DefaultIslandEntitiesTrackerAlgorithm(Island island) {
         this.island = island;
@@ -96,7 +100,13 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
         if (beingRecalculated)
             return;
 
-        beingRecalculated = true;
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - lastCalculateTime <= CALCULATE_DELAY)
+            return;
+
+        this.beingRecalculated = true;
+        this.lastCalculateTime = currentTime;
 
         clearEntityCounts();
 
