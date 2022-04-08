@@ -46,6 +46,9 @@ public final class PortalsLogic {
 
         World.Environment destinationEnvironment = getTargetWorld(portalLocation, teleportCause);
 
+        if (plugin.getGrid().getIslandsWorld(island, destinationEnvironment) == null)
+            return;
+
         if (!isIslandWorldEnabled(destinationEnvironment, island)) {
             if (!Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
                 PlayerLocales.sendSchematicMessage(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
@@ -75,14 +78,14 @@ public final class PortalsLogic {
                 return;
             }
 
-            island.setSchematicGenerate(destinationEnvironment);
-
             Location schematicPlacementLocation = island.getCenter(destinationEnvironment).subtract(0, 1, 0);
 
             BigDecimal originalWorth = island.getRawWorth();
             BigDecimal originalLevel = island.getRawLevel();
 
             schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
+                island.setSchematicGenerate(destinationEnvironment);
+
                 if (shouldOffsetSchematic(destinationEnvironment)) {
                     BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth),
                             schematicLevel = island.getRawLevel().subtract(originalLevel);
