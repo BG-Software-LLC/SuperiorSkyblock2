@@ -37,6 +37,7 @@ public final class SIslandBank implements IslandBank {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
+    private static final BigDecimal NO_BANK_LIMIT = BigDecimal.valueOf(-1);
     private static final UUID CONSOLE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     private final AtomicReference<BigDecimal> balance = new AtomicReference<>(BigDecimal.ZERO);
@@ -88,8 +89,7 @@ public final class SIslandBank implements IslandBank {
                 failureReason = eventResult.getResult();
             } else if (playerBalance.compareTo(amount) < 0) {
                 failureReason = "Not enough money";
-            } else if (island.getBankLimit().compareTo(BigDecimal.valueOf(-1)) > 0 &&
-                    this.balance.get().add(amount).compareTo(island.getBankLimit()) > 0) {
+            } else if (!canDepositMoney(amount)) {
                 failureReason = "Exceed bank limit";
             } else {
                 EconomyProvider.EconomyResult result = plugin.getProviders()
@@ -149,6 +149,13 @@ public final class SIslandBank implements IslandBank {
         plugin.getMenus().refreshBankLogs(island);
 
         return bankTransaction;
+    }
+
+    @Override
+    public boolean canDepositMoney(BigDecimal amount) {
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
+        return this.island.getBankLimit().compareTo(NO_BANK_LIMIT) <= 0 ||
+                this.balance.get().add(amount).compareTo(this.island.getBankLimit()) > 0;
     }
 
     @Override

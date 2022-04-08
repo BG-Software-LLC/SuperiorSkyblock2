@@ -1691,7 +1691,7 @@ public final class SIsland implements Island {
         BigDecimal balanceToGive = balance.multiply(new BigDecimal(BuiltinModules.BANK.bankInterestPercentage / 100D));
 
         // If the money that will be given exceeds limit, we want to give money later.
-        if (balanceToGive.add(balance).compareTo(getBankLimit()) > 0) {
+        if (!islandBank.canDepositMoney(balanceToGive)) {
             giveInterestFailed = true;
             return false;
         }
