@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
@@ -51,7 +52,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
                     chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks)));
         } else {
-            IslandUtils.getAllChunksAsync(island, true, true, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
+            IslandUtils.getAllChunksAsync(island, true, true, ChunkLoadReason.BLOCKS_RECALCULATE,
+                    plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
                         .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk))).whenComplete(

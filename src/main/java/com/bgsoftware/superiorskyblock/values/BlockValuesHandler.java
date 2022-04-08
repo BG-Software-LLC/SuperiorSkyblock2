@@ -202,7 +202,7 @@ public final class BlockValuesHandler extends AbstractHandler implements BlockVa
     }
 
     public Key getValuesKey(Key key) {
-        return valuesMenuBlocks.getKey(key);
+        return valuesMenuBlocks.getKey(key, key);
     }
 
     public void addCustomBlockKey(Key key) {
