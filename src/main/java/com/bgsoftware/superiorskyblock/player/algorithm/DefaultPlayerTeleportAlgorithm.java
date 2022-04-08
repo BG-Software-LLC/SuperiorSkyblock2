@@ -6,7 +6,9 @@ import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgori
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.google.common.base.Preconditions;
@@ -108,8 +110,9 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                          *   Finding a new block to teleport the player to.
                          */
 
-                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = island.getAllChunksAsync(environment,
-                                        true, true, null)
+                        World world = island.getCenter(environment).getWorld();
+                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = IslandUtils.getAllChunksAsync(island, world,
+                                        true, true, ChunkLoadReason.FIND_SAFE_SPOT, (Consumer<Chunk>) null)
                                 .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
 
                         World islandsWorld = plugin.getGrid().getIslandsWorld(island, environment);
@@ -190,7 +193,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
     private void teleportIfSafe(Player player, Island island, Block block, Location customLocation, float yaw, float pitch,
                                 BiConsumer<Boolean, Location> teleportResult) {
-        ChunksProvider.loadChunk(ChunkPosition.of(block), chunk -> {
+        ChunksProvider.loadChunk(ChunkPosition.of(block), ChunkLoadReason.ENTITY_TELEPORT, chunk -> {
             if (!LocationUtils.isSafeBlock(block)) {
                 if (teleportResult != null)
                     teleportResult.accept(false, null);
