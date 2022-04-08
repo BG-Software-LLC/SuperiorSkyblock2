@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.google.common.base.Preconditions;
@@ -58,11 +59,13 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
 
         Location islandCenter = island.getCenter(chunk.getWorld().getEnvironment());
 
-        if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
-            Executor.sync(() -> {
-                if (chunk.isLoaded())
-                    island.getEntitiesTracker().recalculateEntityCounts();
-            }, 20L);
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+            if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
+                Executor.sync(() -> {
+                    if (chunk.isLoaded())
+                        island.getEntitiesTracker().recalculateEntityCounts();
+                }, 20L);
+            }
         }
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
