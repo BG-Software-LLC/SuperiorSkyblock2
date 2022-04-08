@@ -785,6 +785,7 @@ TRANSFER_BROADCAST: '&e&lĐảo | &7Lãnh đạo của hòn đảo đã được
 UNBAN_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã được dỡ bỏ lệnh cấm trong đảo bởi {1}.'
 UNCOOP_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã huỷ bỏ tư cách thành viên coop
   của {1}'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã thoát khỏi trò chơi và không
   còn là một thành viên co-op.'
 UNIGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không được bỏ qua từ các

@@ -693,6 +693,7 @@ TRANSFER_ALREADY_LEADER: '&c&l错误 | &7你已经是这个岛屿的岛屿主了
 TRANSFER_BROADCAST: '&e&l岛屿 | &7岛屿的领导权已转让给 &b{0}.'
 UNBAN_ANNOUNCEMENT: '&e&l岛屿 | &b{1} &7将 &b{0} &7从岛屿禁封列表中移除.'
 UNCOOP_ANNOUNCEMENT: '&e&l岛屿 | &b{0} &7将 &b{1} &7从岛屿临时成员列表中移除.'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&l岛屿 | &7{0} 下线了，不再是岛屿的临时成员了.'
 UNIGNORED_ISLAND: '&e&l岛屿 | &b{0} &7的岛屿现在可正常统计并排入排行榜.'
 UNIGNORED_ISLAND_NAME: '&e&l岛屿 | &7岛屿 &b{0} &7的岛屿现在可正常统计并排入排行榜.'

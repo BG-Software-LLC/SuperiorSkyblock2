@@ -691,6 +691,7 @@ TRANSFER_ALREADY_LEADER: '&c&lError | &7You''re already the leader of this islan
 TRANSFER_BROADCAST: '&e&lIsland | &7The island''s leadership has been transferred to {0}.'
 UNBAN_ANNOUNCEMENT: '&e&lIsland | &7{0} was UNBANNED from the island by {1}.'
 UNCOOP_ANNOUNCEMENT: '&e&lIsland | &7{0} removed {1} from being a co-op member.'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lIsland | &7{0} left the game and is no longer a co-op member.'
 UNIGNORED_ISLAND: '&e&lIsland | &7{0}''s island is now un-ignored from top islands.'
 UNIGNORED_ISLAND_NAME: '&e&lIsland | &7The island {0} is now un-ignored from top islands.'

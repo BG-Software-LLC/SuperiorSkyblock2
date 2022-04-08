@@ -44,13 +44,29 @@ public final class PlayersLogic {
 
         Island island = superiorPlayer.getIsland();
 
-        if (island != null) {
-            IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
-            boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(_superiorPlayer ->
-                    !_superiorPlayer.getUniqueId().equals(superiorPlayer.getUniqueId()) && _superiorPlayer.isOnline());
-            if (!anyOnline)
-                island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
+        if (island == null)
+            return;
+
+        IslandUtils.sendMessage(island, Message.PLAYER_QUIT_ANNOUNCEMENT, Collections.singletonList(superiorPlayer.getUniqueId()), superiorPlayer.getName());
+
+        boolean anyOnline = island.getIslandMembers(true).stream().anyMatch(islandMember ->
+                islandMember != superiorPlayer && islandMember.isOnline());
+
+        if (!anyOnline)
+            island.setLastTimeUpdate(System.currentTimeMillis() / 1000);
+
+        if (!island.getCoopPlayers().isEmpty()) {
+            boolean shouldRemoveCoops = island.getIslandMembers(true).stream().noneMatch(islandMember ->
+                    islandMember != superiorPlayer && island.hasPermission(islandMember, IslandPrivileges.UNCOOP_MEMBER) && islandMember.isOnline());
+
+            if (shouldRemoveCoops) {
+                for (SuperiorPlayer coopPlayer : island.getCoopPlayers()) {
+                    island.removeCoop(coopPlayer);
+                    Message.UNCOOP_AUTO_ANNOUNCEMENT.send(coopPlayer);
+                }
+            }
         }
+
     }
 
     public static boolean handlePlayerLeaveIsland(SuperiorPlayer superiorPlayer, Location fromLocation, Location toLocation,
