@@ -63,6 +63,9 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
+            if (EntityUtils.canBypassEntityLimit(e.getEntity()))
+                return;
+
             Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
             if (island == null)
@@ -80,6 +83,9 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onHangingPlace(HangingPlaceEvent e) {
+            if (EntityUtils.canBypassEntityLimit(e.getEntity()))
+                return;
+
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
             if (island == null)
@@ -119,7 +125,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onVehicleSpawn(VehicleCreateEvent e) {
-            if (!(e.getVehicle() instanceof Minecart))
+            if (!(e.getVehicle() instanceof Minecart) || EntityUtils.canBypassEntityLimit(e.getVehicle()))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
