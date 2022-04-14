@@ -26,6 +26,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -191,10 +192,10 @@ public final class UpgradesModule extends BuiltinModule {
 
         List<String> commands = levelSection.getStringList("commands");
         String permission = levelSection.getString("permission", "");
-        Set<Pair<String, String>> requirements = new HashSet<>();
+        Set<UpgradeRequirement> requirements = new HashSet<>();
         for (String line : levelSection.getStringList("required-checks")) {
             String[] sections = line.split(";");
-            requirements.add(new Pair<>(sections[0], StringUtils.translateColors(sections[1])));
+            requirements.add(new UpgradeRequirement(sections[0], StringUtils.translateColors(sections[1])));
         }
         UpgradeValue<Double> cropGrowth = new UpgradeValue<>(levelSection.getDouble("crop-growth", -1D), true);
         UpgradeValue<Double> spawnerRates = new UpgradeValue<>(levelSection.getDouble("spawner-rates", -1D), true);

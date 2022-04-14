@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
@@ -40,7 +40,7 @@ public final class CachedIslandInfo {
     public final Map<Mission<?>, Integer> completedMissions = new HashMap<>();
     public final Map<IslandFlag, Byte> islandFlags = new HashMap<>();
     public final KeyMap<UpgradeValue<Integer>>[] cobbleGeneratorValues = new KeyMap[World.Environment.values().length];
-    public final List<Pair<SuperiorPlayer, Long>> uniqueVisitors = new ArrayList<>();
+    public final List<SIsland.UniqueVisitor> uniqueVisitors = new ArrayList<>();
     public final KeyMap<UpgradeValue<Integer>> entityLimits = KeyMapImpl.createHashMap();
     public final Map<PotionEffectType, UpgradeValue<Integer>> islandEffects = new HashMap<>();
     public final List<ItemStack[]> islandChests = new ArrayList<>(plugin.getSettings().getIslandChests().getDefaultPages());

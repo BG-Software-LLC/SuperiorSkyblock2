@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
@@ -68,19 +68,19 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
             return;
         }
 
-        Pair<Integer, Boolean> fadeIn = CommandArguments.getInterval(sender, args[3]);
+        NumberArgument<Integer> fadeIn = CommandArguments.getInterval(sender, args[3]);
 
-        if (!fadeIn.getValue())
+        if (!fadeIn.isSucceed())
             return;
 
-        Pair<Integer, Boolean> duration = CommandArguments.getInterval(sender, args[4]);
+        NumberArgument<Integer> duration = CommandArguments.getInterval(sender, args[4]);
 
-        if (!duration.getValue())
+        if (!duration.isSucceed())
             return;
 
-        Pair<Integer, Boolean> fadeOut = CommandArguments.getInterval(sender, args[5]);
+        NumberArgument<Integer> fadeOut = CommandArguments.getInterval(sender, args[5]);
 
-        if (!fadeOut.getValue())
+        if (!fadeOut.isSucceed())
             return;
 
         Map<String, String> parsedArguments = CommandArguments.parseArguments(args);
@@ -96,9 +96,9 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
         plugin.getNMSPlayers().sendTitle(targetPlayer.asPlayer(),
                 title == null ? null : StringUtils.translateColors(title),
                 subtitle == null ? null : StringUtils.translateColors(subtitle),
-                fadeIn.getKey(),
-                duration.getKey(),
-                fadeOut.getKey());
+                fadeIn.getNumber(),
+                duration.getNumber(),
+                fadeOut.getNumber());
 
         Message.TITLE_SENT.send(sender, targetPlayer.getName());
     }

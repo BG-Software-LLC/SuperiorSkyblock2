@@ -173,7 +173,7 @@ public final class SIsland implements Island {
      */
     private final SyncedObject<SortedSet<SuperiorPlayer>> members = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
     private final SyncedObject<SortedSet<SuperiorPlayer>> playersInside = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<SortedSet<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
+    private final SyncedObject<SortedSet<UniqueVisitor>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
     private final Set<SuperiorPlayer> bannedPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> coopPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
@@ -410,12 +410,13 @@ public final class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(Pair::getKey).collect(Collectors.toList()));
+        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::getSuperiorPlayer).collect(Collectors.toList())
+        );
     }
 
     @Override
     public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return uniqueVisitors.readAndGet(ArrayList::new);
+        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::toPair).collect(Collectors.toList()));
     }
 
     @Override
@@ -661,15 +662,15 @@ public final class SIsland implements Island {
             return;
 
         if (!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()) {
-            Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
-                    uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
+            Optional<UniqueVisitor> uniqueVisitorOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
+                    uniqueVisitors.stream().filter(pair -> pair.getSuperiorPlayer().equals(superiorPlayer)).findFirst());
 
             long visitTime = System.currentTimeMillis();
 
-            if (playerPairOptional.isPresent()) {
-                playerPairOptional.get().setValue(visitTime);
+            if (uniqueVisitorOptional.isPresent()) {
+                uniqueVisitorOptional.get().setLastVisitTime(visitTime);
             } else {
-                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, visitTime)));
+                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new UniqueVisitor(superiorPlayer, visitTime)));
             }
 
             plugin.getMenus().refreshUniqueVisitors(this);
@@ -3116,9 +3117,9 @@ public final class SIsland implements Island {
 
     private void replaceVisitor(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         uniqueVisitors.write(uniqueVisitors -> {
-            for (Pair<SuperiorPlayer, Long> uniqueVisitorPair : uniqueVisitors) {
-                if (uniqueVisitorPair.getKey().equals(originalPlayer)) {
-                    uniqueVisitorPair.setKey(newPlayer);
+            for (UniqueVisitor uniqueVisitor : uniqueVisitors) {
+                if (uniqueVisitor.getSuperiorPlayer().equals(originalPlayer)) {
+                    uniqueVisitor.setSuperiorPlayer(newPlayer);
                 }
             }
         });
@@ -3694,6 +3695,56 @@ public final class SIsland implements Island {
             default:
                 return 0;
         }
+    }
+
+    public static final class UniqueVisitor {
+
+        private final Pair<SuperiorPlayer, Long> pair;
+
+        private SuperiorPlayer superiorPlayer;
+        private long lastVisitTime;
+
+        public UniqueVisitor(SuperiorPlayer superiorPlayer, long lastVisitTime) {
+            this.superiorPlayer = superiorPlayer;
+            this.lastVisitTime = lastVisitTime;
+            this.pair = new Pair<>(superiorPlayer, lastVisitTime);
+        }
+
+        public SuperiorPlayer getSuperiorPlayer() {
+            return superiorPlayer;
+        }
+
+        public void setSuperiorPlayer(SuperiorPlayer superiorPlayer) {
+            this.superiorPlayer = superiorPlayer;
+            this.pair.setKey(superiorPlayer);
+        }
+
+        public long getLastVisitTime() {
+            return lastVisitTime;
+        }
+
+        public void setLastVisitTime(long lastVisitTime) {
+            this.lastVisitTime = lastVisitTime;
+            this.pair.setValue(lastVisitTime);
+        }
+
+        public Pair<SuperiorPlayer, Long> toPair() {
+            return this.pair;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UniqueVisitor that = (UniqueVisitor) o;
+            return lastVisitTime == that.lastVisitTime && superiorPlayer.equals(that.superiorPlayer);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(superiorPlayer, lastVisitTime);
+        }
+
     }
 
 }

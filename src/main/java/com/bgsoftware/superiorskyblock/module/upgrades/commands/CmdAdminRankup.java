@@ -2,15 +2,13 @@ package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
-import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -77,14 +75,14 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(
-                    null, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
+            EventResult<EventsCaller.UpgradeResult> event = EventsCaller.callIslandUpgradeEvent(null,
+                    island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
 
             if (!event.isCancelled()) {
                 PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
                 SuperiorPlayer owner = island.getOwner();
 
-                for (String command : event.getResult().getKey()) {
+                for (String command : event.getResult().getCommands()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                             placeholdersService.parsePlaceholders(owner.asOfflinePlayer(), command
                                     .replace("%player%", owner.getName())

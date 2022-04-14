@@ -21,6 +21,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserial
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
@@ -132,7 +133,7 @@ public final class IslandsDeserializer {
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
             SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
-            cachedIslandInfo.uniqueVisitors.add(new Pair<>(visitorPlayer, visitTime));
+            cachedIslandInfo.uniqueVisitors.add(new SIsland.UniqueVisitor(visitorPlayer, visitTime));
         });
     }
 

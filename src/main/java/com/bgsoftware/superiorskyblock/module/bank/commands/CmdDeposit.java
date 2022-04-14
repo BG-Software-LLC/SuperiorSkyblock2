@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.module.bank.commands;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandBank;
 import org.bukkit.command.CommandSender;
 
@@ -55,14 +55,14 @@ public final class CmdDeposit implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
+        IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
 
-        Island island = arguments.getKey();
+        Island island = arguments.getIsland();
 
         if (island == null)
             return;
 
-        SuperiorPlayer superiorPlayer = arguments.getValue();
+        SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         BigDecimal moneyInBank = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
         BigDecimal amount = BigDecimal.valueOf(-1);

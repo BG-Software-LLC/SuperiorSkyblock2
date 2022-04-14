@@ -3,15 +3,14 @@ package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
@@ -105,9 +104,10 @@ public final class CmdRankup implements IPermissibleCommand {
                 Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                EventResult<Pair<List<String>, UpgradeCost>> event = EventsCaller.callIslandUpgradeEvent(
-                        superiorPlayer, island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
-                UpgradeCost upgradeCost = event.getResult().getValue();
+                EventResult<EventsCaller.UpgradeResult> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer,
+                        island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
+
+                UpgradeCost upgradeCost = event.getResult().getUpgradeCost();
 
                 if (event.isCancelled()) {
                     hasNextLevel = false;
@@ -121,7 +121,7 @@ public final class CmdRankup implements IPermissibleCommand {
 
                     upgradeCost.withdrawCost(superiorPlayer);
 
-                    for (String command : event.getResult().getKey()) {
+                    for (String command : event.getResult().getCommands()) {
                         Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                                 placeholdersService.parsePlaceholders(superiorPlayer.asOfflinePlayer(), command
                                         .replace("%player%", superiorPlayer.getName())

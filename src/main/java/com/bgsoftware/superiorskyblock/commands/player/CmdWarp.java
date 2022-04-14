@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -64,19 +64,19 @@ public final class CmdWarp implements ISuperiorCommand {
 
         switch (args.length) {
             case 1: {
-                Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
-                targetIsland = arguments.getKey();
+                IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+                targetIsland = arguments.getIsland();
                 break;
             }
             case 2: {
-                Pair<Island, SuperiorPlayer> arguments = CommandArguments.getSenderIsland(plugin, sender);
-                targetIsland = arguments.getKey();
+                IslandArgument arguments = CommandArguments.getSenderIsland(plugin, sender);
+                targetIsland = arguments.getIsland();
                 targetWarpName = args[1];
                 break;
             }
             case 3: {
-                Pair<Island, SuperiorPlayer> arguments = CommandArguments.getIsland(plugin, sender, args[1]);
-                targetIsland = arguments.getKey();
+                IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
+                targetIsland = arguments.getIsland();
                 targetWarpName = args[2];
                 break;
             }
@@ -95,8 +95,8 @@ public final class CmdWarp implements ISuperiorCommand {
                     plugin.getMenus().openWarpCategories(superiorPlayer, null, targetIsland);
                     break;
                 case 2:
-                    Pair<Island, SuperiorPlayer> arguments = CommandArguments.getIsland(plugin, sender, args[1]);
-                    targetIsland = arguments.getKey();
+                    IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[1]);
+                    targetIsland = arguments.getIsland();
                     if (targetIsland != null) {
                         plugin.getMenus().openWarpCategories(superiorPlayer, null, targetIsland);
                     }

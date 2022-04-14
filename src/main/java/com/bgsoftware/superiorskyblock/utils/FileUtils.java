@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.utils;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
@@ -150,7 +150,7 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+    public static <M extends ISuperiorMenu> MenuParseResult loadMenu(
             SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
             String fileName,
             @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
@@ -158,7 +158,7 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+    public static <M extends ISuperiorMenu> MenuParseResult loadMenu(
             SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
             String fileName,
             boolean customMenu,
@@ -239,7 +239,7 @@ public final class FileUtils {
             return null;
         }
 
-        return new Pair<>(menuPatternSlots, cfg);
+        return new MenuParseResult(menuPatternSlots, cfg);
     }
 
     public static Location toLocation(String location) {

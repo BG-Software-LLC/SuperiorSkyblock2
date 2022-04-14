@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -46,6 +45,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 public final class EventsCaller {
@@ -181,13 +181,13 @@ public final class EventsCaller {
         return !islandTransferEvent.isCancelled();
     }
 
-    public static EventResult<Pair<List<String>, UpgradeCost>> callIslandUpgradeEvent(SuperiorPlayer superiorPlayer, Island island, String upgradeName, List<String> commands, UpgradeCost cost) {
+    public static EventResult<UpgradeResult> callIslandUpgradeEvent(SuperiorPlayer superiorPlayer, Island island, String upgradeName, List<String> commands, UpgradeCost cost) {
         if (plugin.getSettings().getDisabledEvents().contains("islandupgradeevent"))
-            return EventResult.of(false, new Pair<>(commands, cost));
+            return EventResult.of(false, new UpgradeResult(commands, cost));
 
         IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands, cost);
         Bukkit.getPluginManager().callEvent(islandUpgradeEvent);
-        return EventResult.of(islandUpgradeEvent.isCancelled(), new Pair<>(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getUpgradeCost()));
+        return EventResult.of(islandUpgradeEvent.isCancelled(), new UpgradeResult(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getUpgradeCost()));
     }
 
     public static void callIslandWorthCalculatedEvent(Island island, SuperiorPlayer asker, BigDecimal islandLevel, BigDecimal islandWorth) {
@@ -204,13 +204,14 @@ public final class EventsCaller {
         }
     }
 
-    public static EventResult<Pair<List<ItemStack>, List<String>>> callMissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards) {
+    public static EventResult<MissionRewards> callMissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards) {
         if (plugin.getSettings().getDisabledEvents().contains("missioncompleteevent"))
-            return EventResult.of(false, new Pair<>(itemRewards, commandRewards));
+            return EventResult.of(false, MissionRewards.of(itemRewards, commandRewards));
 
         MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, islandMission, itemRewards, commandRewards);
         Bukkit.getPluginManager().callEvent(missionCompleteEvent);
-        return EventResult.of(missionCompleteEvent.isCancelled(), new Pair<>(missionCompleteEvent.getItemRewards(), missionCompleteEvent.getCommandRewards()));
+        return EventResult.of(missionCompleteEvent.isCancelled(),
+                MissionRewards.of(missionCompleteEvent.getItemRewards(), missionCompleteEvent.getCommandRewards()));
     }
 
     public static boolean callPreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName) {
@@ -308,6 +309,52 @@ public final class EventsCaller {
         IslandChatEvent islandChatEvent = new IslandChatEvent(island, superiorPlayer, message);
         Bukkit.getPluginManager().callEvent(islandChatEvent);
         return EventResult.of(islandChatEvent.isCancelled(), message);
+    }
+
+    public static final class MissionRewards {
+
+        private static final MissionRewards EMPTY = new MissionRewards(Collections.emptyList(), Collections.emptyList());
+
+        private final List<ItemStack> itemRewards;
+        private final List<String> commandRewards;
+
+        private static MissionRewards of(List<ItemStack> itemRewards, List<String> commandRewards) {
+            return itemRewards.isEmpty() && commandRewards.isEmpty() ? EMPTY : new MissionRewards(itemRewards, commandRewards);
+        }
+
+        private MissionRewards(List<ItemStack> itemRewards, List<String> commandRewards) {
+            this.itemRewards = itemRewards;
+            this.commandRewards = commandRewards;
+        }
+
+        public List<ItemStack> getItemRewards() {
+            return itemRewards;
+        }
+
+        public List<String> getCommandRewards() {
+            return commandRewards;
+        }
+
+    }
+
+    public static final class UpgradeResult {
+
+        private final List<String> commands;
+        private final UpgradeCost upgradeCost;
+
+        public UpgradeResult(List<String> commands, UpgradeCost upgradeCost) {
+            this.commands = commands;
+            this.upgradeCost = upgradeCost;
+        }
+
+        public List<String> getCommands() {
+            return commands;
+        }
+
+        public UpgradeCost getUpgradeCost() {
+            return upgradeCost;
+        }
+
     }
 
 }

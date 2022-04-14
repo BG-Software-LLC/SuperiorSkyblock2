@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.commands.arguments;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
@@ -35,7 +34,7 @@ public final class CommandArguments {
 
     }
 
-    public static Pair<Island, SuperiorPlayer> getIsland(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+    public static IslandArgument getIsland(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(argument) : targetPlayer.getIsland();
 
@@ -48,10 +47,10 @@ public final class CommandArguments {
                 Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
         }
 
-        return new Pair<>(island, targetPlayer);
+        return new IslandArgument(island, targetPlayer);
     }
 
-    public static Pair<List<Island>, SuperiorPlayer> getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+    public static IslandsListArgument getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         List<Island> islands = new ArrayList<>();
         SuperiorPlayer targetPlayer;
 
@@ -59,23 +58,23 @@ public final class CommandArguments {
             targetPlayer = null;
             islands = plugin.getGrid().getIslands();
         } else {
-            Pair<Island, SuperiorPlayer> arguments = getIsland(plugin, sender, argument);
-            targetPlayer = arguments.getValue();
-            if (arguments.getKey() != null)
-                islands.add(arguments.getKey());
+            IslandArgument arguments = getIsland(plugin, sender, argument);
+            targetPlayer = arguments.getSuperiorPlayer();
+            if (arguments.getIsland() != null)
+                islands.add(arguments.getIsland());
         }
 
-        return new Pair<>(islands, targetPlayer);
+        return new IslandsListArgument(islands, targetPlayer);
     }
 
-    public static Pair<Island, SuperiorPlayer> getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+    public static IslandArgument getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if (island == null)
             Message.INVALID_ISLAND.send(superiorPlayer);
 
-        return new Pair<>(island, superiorPlayer);
+        return new IslandArgument(island, superiorPlayer);
     }
 
     public static SuperiorPlayer getPlayer(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
@@ -105,10 +104,10 @@ public final class CommandArguments {
         return players;
     }
 
-    public static Pair<Island, SuperiorPlayer> getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+    public static IslandArgument getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         if (!(sender instanceof Player)) {
             Message.CUSTOM.send(sender, "&cYou must specify a player's name.", true);
-            return new Pair<>(null, null);
+            return IslandArgument.EMPTY;
         }
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
@@ -118,7 +117,7 @@ public final class CommandArguments {
         if (island == null)
             Message.INVALID_ISLAND.send(sender);
 
-        return new Pair<>(island, superiorPlayer);
+        return new IslandArgument(island, superiorPlayer);
     }
 
     public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
@@ -184,7 +183,7 @@ public final class CommandArguments {
         return playerRole;
     }
 
-    public static Pair<Integer, Boolean> getLimit(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getLimit(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_LIMIT);
     }
 
@@ -200,11 +199,11 @@ public final class CommandArguments {
         return amount;
     }
 
-    public static Pair<Integer, Boolean> getAmount(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getAmount(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_AMOUNT);
     }
 
-    public static Pair<Double, Boolean> getMultiplier(CommandSender sender, String argument) {
+    public static NumberArgument<Double> getMultiplier(CommandSender sender, String argument) {
         double multiplier = 0;
         boolean status = true;
 
@@ -217,7 +216,7 @@ public final class CommandArguments {
             status = false;
         }
 
-        return new Pair<>(multiplier, status);
+        return new NumberArgument<>(multiplier, status);
     }
 
     public static PotionEffectType getPotionEffect(CommandSender sender, String argument) {
@@ -229,7 +228,7 @@ public final class CommandArguments {
         return potionEffectType;
     }
 
-    public static Pair<Integer, Boolean> getLevel(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getLevel(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_LEVEL);
     }
 
@@ -245,7 +244,7 @@ public final class CommandArguments {
         return material;
     }
 
-    public static Pair<Integer, Boolean> getSize(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getSize(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_SIZE);
     }
 
@@ -292,11 +291,11 @@ public final class CommandArguments {
         return location;
     }
 
-    public static Pair<Integer, Boolean> getPage(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getPage(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_PAGE);
     }
 
-    public static Pair<Integer, Boolean> getRows(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getRows(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_ROWS);
     }
 
@@ -354,12 +353,12 @@ public final class CommandArguments {
         return environment;
     }
 
-    public static Pair<Integer, Boolean> getInterval(CommandSender sender, String argument) {
-        Pair<Integer, Boolean> interval = getInt(sender, argument, Message.INVALID_INTERVAL);
+    public static NumberArgument<Integer> getInterval(CommandSender sender, String argument) {
+        NumberArgument<Integer> interval = getInt(sender, argument, Message.INVALID_INTERVAL);
 
-        if (interval.getValue() && interval.getKey() < 0) {
+        if (interval.isSucceed() && interval.getNumber() < 0) {
             Message.INVALID_INTERVAL.send(sender, argument);
-            return new Pair<>(interval.getKey(), false);
+            return new NumberArgument<>(interval.getNumber(), false);
         }
 
         return interval;
@@ -390,7 +389,7 @@ public final class CommandArguments {
         return parsedArgs;
     }
 
-    private static Pair<Integer, Boolean> getInt(CommandSender sender, String argument, Message locale) {
+    private static NumberArgument<Integer> getInt(CommandSender sender, String argument, Message locale) {
         int i = 0;
         boolean status = true;
 
@@ -401,7 +400,7 @@ public final class CommandArguments {
             status = false;
         }
 
-        return new Pair<>(i, status);
+        return new NumberArgument<>(i, status);
     }
 
 }
