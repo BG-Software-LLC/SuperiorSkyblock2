@@ -142,6 +142,8 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
 
         public B setButtons(SuperiorMenuButton<M>[] buttons) {
             if (buttons != null) {
+                setRowsSize(buttons.length / 9);
+
                 for (int slot = 0; slot < this.buttons.length && slot < buttons.length; ++slot)
                     this.buttons[slot] = buttons[slot];
             }
