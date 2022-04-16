@@ -37,6 +37,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -204,7 +205,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     private static boolean isRemoteDatabase() {
-        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+        switch (plugin.getSettings().getDatabase().getType()) {
             case "MYSQL":
             case "MARIADB":
             case "POSTGRESQL":
@@ -355,7 +356,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .addBatch();
         ((Map<String, Integer>) playerAttributes.getValue(PlayerAttributes.Field.COMPLETED_MISSIONS)).forEach((missionName, finishCount) ->
                 playersMissionsQuery.setObject(playerUUID)
-                        .setObject(missionName.toLowerCase())
+                        .setObject(missionName.toLowerCase(Locale.ENGLISH))
                         .setObject(finishCount)
                         .addBatch());
         playersSettingsQuery.setObject(playerUUID)

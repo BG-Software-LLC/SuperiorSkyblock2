@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.debug;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class PluginDebugger {
@@ -16,7 +17,7 @@ public final class PluginDebugger {
     }
 
     public static void debug(String message) {
-        if (debugMode && (debugFilter == null || debugFilter.matcher(message.toUpperCase()).find()))
+        if (debugMode && (debugFilter == null || debugFilter.matcher(message.toUpperCase(Locale.ENGLISH)).find()))
             plugin.getLogger().info("[DEBUG] " + message);
     }
 
@@ -36,7 +37,7 @@ public final class PluginDebugger {
         if (debugFilter.isEmpty())
             PluginDebugger.debugFilter = null;
         else
-            PluginDebugger.debugFilter = Pattern.compile(debugFilter.toUpperCase());
+            PluginDebugger.debugFilter = Pattern.compile(debugFilter.toUpperCase(Locale.ENGLISH));
     }
 
 

@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
@@ -88,14 +89,17 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -173,7 +177,7 @@ public final class SIsland implements Island {
      */
     private final SyncedObject<SortedSet<SuperiorPlayer>> members = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
     private final SyncedObject<SortedSet<SuperiorPlayer>> playersInside = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<SortedSet<Pair<SuperiorPlayer, Long>>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
+    private final SyncedObject<SortedSet<UniqueVisitor>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
     private final Set<SuperiorPlayer> bannedPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> coopPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
@@ -241,7 +245,7 @@ public final class SIsland implements Island {
         this.center = SBlockPosition.of(location);
         this.creationTime = creationTime;
         this.islandName = islandName;
-        this.islandRawName = StringUtils.stripColors(islandName);
+        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         this.schemName = schemName;
     }
 
@@ -351,7 +355,7 @@ public final class SIsland implements Island {
 
     @Override
     public void updateDatesFormatter() {
-        this.creationTimeDate = StringUtils.formatDate(creationTime * 1000);
+        this.creationTimeDate = Formatters.DATE_FORMATTER.format(new Date(creationTime * 1000));
     }
 
     /*
@@ -410,12 +414,13 @@ public final class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(Pair::getKey).collect(Collectors.toList()));
+        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::getSuperiorPlayer).collect(Collectors.toList())
+        );
     }
 
     @Override
     public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return uniqueVisitors.readAndGet(ArrayList::new);
+        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::toPair).collect(Collectors.toList()));
     }
 
     @Override
@@ -661,15 +666,15 @@ public final class SIsland implements Island {
             return;
 
         if (!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()) {
-            Optional<Pair<SuperiorPlayer, Long>> playerPairOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
-                    uniqueVisitors.stream().filter(pair -> pair.getKey().equals(superiorPlayer)).findFirst());
+            Optional<UniqueVisitor> uniqueVisitorOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
+                    uniqueVisitors.stream().filter(pair -> pair.getSuperiorPlayer().equals(superiorPlayer)).findFirst());
 
             long visitTime = System.currentTimeMillis();
 
-            if (playerPairOptional.isPresent()) {
-                playerPairOptional.get().setValue(visitTime);
+            if (uniqueVisitorOptional.isPresent()) {
+                uniqueVisitorOptional.get().setLastVisitTime(visitTime);
             } else {
-                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new Pair<>(superiorPlayer, visitTime)));
+                uniqueVisitors.write(uniqueVisitors -> uniqueVisitors.add(new UniqueVisitor(superiorPlayer, visitTime)));
             }
 
             plugin.getMenus().refreshUniqueVisitors(this);
@@ -1207,7 +1212,7 @@ public final class SIsland implements Island {
         PluginDebugger.debug("Action: Set Name, Island: " + owner.getName() + ", Name: " + islandName);
 
         this.islandName = islandName;
-        this.islandRawName = StringUtils.stripColors(this.islandName);
+        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
 
         IslandsDatabaseBridge.saveName(this);
     }
@@ -1517,7 +1522,7 @@ public final class SIsland implements Island {
             Biome netherBiome;
 
             try {
-                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome());
             } catch (IllegalArgumentException error) {
                 netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                         ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
@@ -1532,7 +1537,7 @@ public final class SIsland implements Island {
             Biome endBiome;
 
             try {
-                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome());
             } catch (IllegalArgumentException error) {
                 endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
             }
@@ -2461,12 +2466,12 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         PluginDebugger.debug("Action: Create Warp Category, Island: " + owner.getName() + ", Name: " + name);
 
-        WarpCategory warpCategory = warpCategories.get(name.toLowerCase());
+        WarpCategory warpCategory = warpCategories.get(name.toLowerCase(Locale.ENGLISH));
 
         if (warpCategory == null) {
             List<Integer> occupiedSlots = warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
 
-            warpCategories.put(name.toLowerCase(), (warpCategory = new SWarpCategory(this, name)));
+            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(this, name)));
 
             int slot = 0;
             while (occupiedSlots.contains(slot))
@@ -2485,7 +2490,7 @@ public final class SIsland implements Island {
     @Override
     public WarpCategory getWarpCategory(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpCategories.get(name.toLowerCase());
+        return warpCategories.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -2499,8 +2504,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
 
-        warpCategories.remove(warpCategory.getName().toLowerCase());
-        warpCategories.put(newName.toLowerCase(), warpCategory);
+        warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH));
+        warpCategories.put(newName.toLowerCase(Locale.ENGLISH), warpCategory);
         warpCategory.setName(newName);
     }
 
@@ -2509,7 +2514,7 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         PluginDebugger.debug("Action: Delete Warp-Category, Island: " + owner.getName() + ", Category: " + warpCategory.getName());
 
-        boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase()) != null;
+        boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH)) != null;
         if (validWarpRemoval) {
             IslandsDatabaseBridge.removeWarpCategory(this, warpCategory);
             boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
@@ -2558,8 +2563,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
 
-        warpsByName.remove(islandWarp.getName().toLowerCase());
-        warpsByName.put(newName.toLowerCase(), islandWarp);
+        warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
+        warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
         islandWarp.setName(newName);
     }
 
@@ -2573,7 +2578,7 @@ public final class SIsland implements Island {
     @Override
     public IslandWarp getWarp(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpsByName.get(name.toLowerCase());
+        return warpsByName.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -2590,8 +2595,8 @@ public final class SIsland implements Island {
 
         if (plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Message.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    plugin.getSettings().getWarpsWarmup(), TimeUnit.MILLISECONDS));
+            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
+                    Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
         } else {
@@ -2617,7 +2622,7 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         PluginDebugger.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
 
-        IslandWarp islandWarp = warpsByName.remove(name.toLowerCase());
+        IslandWarp islandWarp = warpsByName.remove(name.toLowerCase(Locale.ENGLISH));
         WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
 
         if (islandWarp != null) {
@@ -3116,9 +3121,9 @@ public final class SIsland implements Island {
 
     private void replaceVisitor(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         uniqueVisitors.write(uniqueVisitors -> {
-            for (Pair<SuperiorPlayer, Long> uniqueVisitorPair : uniqueVisitors) {
-                if (uniqueVisitorPair.getKey().equals(originalPlayer)) {
-                    uniqueVisitorPair.setKey(newPlayer);
+            for (UniqueVisitor uniqueVisitor : uniqueVisitors) {
+                if (uniqueVisitor.getSuperiorPlayer().equals(originalPlayer)) {
+                    uniqueVisitor.setSuperiorPlayer(newPlayer);
                 }
             }
         });
@@ -3670,7 +3675,7 @@ public final class SIsland implements Island {
     private void loadIslandWarp(IslandWarp islandWarp) {
         islandWarp.getCategory().getWarps().add(islandWarp);
 
-        String warpName = islandWarp.getName().toLowerCase();
+        String warpName = islandWarp.getName().toLowerCase(Locale.ENGLISH);
 
         if (warpsByName.containsKey(warpName))
             deleteWarp(warpName);
@@ -3694,6 +3699,56 @@ public final class SIsland implements Island {
             default:
                 return 0;
         }
+    }
+
+    public static final class UniqueVisitor {
+
+        private final Pair<SuperiorPlayer, Long> pair;
+
+        private SuperiorPlayer superiorPlayer;
+        private long lastVisitTime;
+
+        public UniqueVisitor(SuperiorPlayer superiorPlayer, long lastVisitTime) {
+            this.superiorPlayer = superiorPlayer;
+            this.lastVisitTime = lastVisitTime;
+            this.pair = new Pair<>(superiorPlayer, lastVisitTime);
+        }
+
+        public SuperiorPlayer getSuperiorPlayer() {
+            return superiorPlayer;
+        }
+
+        public void setSuperiorPlayer(SuperiorPlayer superiorPlayer) {
+            this.superiorPlayer = superiorPlayer;
+            this.pair.setKey(superiorPlayer);
+        }
+
+        public long getLastVisitTime() {
+            return lastVisitTime;
+        }
+
+        public void setLastVisitTime(long lastVisitTime) {
+            this.lastVisitTime = lastVisitTime;
+            this.pair.setValue(lastVisitTime);
+        }
+
+        public Pair<SuperiorPlayer, Long> toPair() {
+            return this.pair;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            UniqueVisitor that = (UniqueVisitor) o;
+            return lastVisitTime == that.lastVisitTime && superiorPlayer.equals(that.superiorPlayer);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(superiorPlayer, lastVisitTime);
+        }
+
     }
 
 }

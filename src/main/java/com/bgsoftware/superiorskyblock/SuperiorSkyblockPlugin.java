@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.database.DataHandler;
 import com.bgsoftware.superiorskyblock.engine.NashornEngine;
 import com.bgsoftware.superiorskyblock.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.factory.FactoriesHandler;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.hooks.ProvidersHandler;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
@@ -66,7 +67,6 @@ import com.bgsoftware.superiorskyblock.upgrade.container.DefaultUpgradesContaine
 import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -94,7 +94,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -156,7 +155,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
     public static void log(String message) {
         //plugin.pluginDebugger.debug(ChatColor.stripColor(message));
-        message = StringUtils.translateColors(message);
+        message = Formatters.COLOR_FORMATTER.format(message);
         if (message.contains(ChatColor.COLOR_CHAR + ""))
             Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
         else
@@ -170,10 +169,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void onLoad() {
         plugin = this;
-
-        // Setting the default locale to English will fix issues related to using upper case in Turkish.
-        // https://stackoverflow.com/questions/11063102/using-locales-with-javas-tolowercase-and-touppercase
-        Locale.setDefault(Locale.ENGLISH);
 
         new Metrics(this);
 

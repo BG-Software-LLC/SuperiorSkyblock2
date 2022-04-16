@@ -5,9 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.RateIslandButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -15,8 +14,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -48,14 +45,14 @@ public final class MenuIslandRate extends SuperiorMenu<MenuIslandRate> {
 
         RegularMenuPattern.Builder<MenuIslandRate> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "island-rate.yml", MenuIslandRate::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-rate.yml",
+                MenuIslandRate::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         menuPattern = patternBuilder
                 .mapButtons(getSlots(cfg, "zero-stars", menuPatternSlots), new RateIslandButton.Builder()

@@ -55,20 +55,17 @@ public final class NMSUtils {
 
     static {
         try {
-            biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getNormal().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.NORMAL, Biome.PLAINS);
         }
         try {
-            biomeEnumMap.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getNether().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.NETHER, Biome.NETHER_WASTES);
         }
         try {
-            biomeEnumMap.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getEnd().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
         }

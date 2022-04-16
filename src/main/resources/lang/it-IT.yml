@@ -600,6 +600,8 @@ PERMISSION_CHANGED_NAME: '&e&lIsola | &7Aggiornata correttamente l''autorizzazio
 PERMISSION_CHANGED_ALL: '&e&lIsola | &7Aggiornata correttamente l''autorizzazione {0} di tutte le isola.'
 PERMISSIONS_RESET_PLAYER: '&e&lIsola | &7Successfully reset all the permissions for {0} to default values!'
 PERMISSIONS_RESET_ROLES: '&e&lIsola | &7Successfully reset all the permissions of the island to default values!'
+PLACEHOLDER_NO: '&c✘'
+PLACEHOLDER_YES: '&a✔'
 PLAYER_ALREADY_BANNED: '&c&lErrore | &7Questo giocatore è già stato bannato.'
 PLAYER_ALREADY_COOP: '&c&lErrore | &7Questo giocatore è già un membro coop.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lErrore | &7Questo giocatore è già all''interno di un''isola.'

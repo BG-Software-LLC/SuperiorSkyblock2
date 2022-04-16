@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
@@ -50,6 +51,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -235,7 +237,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase());
+        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase(Locale.ENGLISH));
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
@@ -347,7 +349,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        String inputName = StringUtils.stripColors(islandName);
+        String inputName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 

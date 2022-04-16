@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
@@ -81,7 +82,7 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
 
         //noinspection ConstantConditions
         for (File schemFile : schematicsFolder.listFiles()) {
-            String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase();
+            String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
             if (schematic != null) {
                 this.schematicsContainer.addSchematic(schematic);

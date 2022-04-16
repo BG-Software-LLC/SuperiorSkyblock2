@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -405,7 +406,7 @@ public final class IslandsDatabaseBridge {
     public static void saveMission(Island island, Mission<?> mission, int finishCount) {
         island.getDatabaseBridge().insertObject("islands_missions",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("name", mission.getName().toLowerCase()),
+                new Pair<>("name", mission.getName().toLowerCase(Locale.ENGLISH)),
                 new Pair<>("finish_count", finishCount)
         );
     }

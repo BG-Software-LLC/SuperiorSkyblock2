@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpA
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -73,7 +75,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String worldSection : _locationParam.split(";")) {
             try {
                 String[] locationSection = worldSection.split("=");
-                String environment = locationSection[0].toUpperCase();
+                String environment = locationSection[0].toUpperCase(Locale.ENGLISH);
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
             } catch (Exception error) {
                 PluginDebugger.debug(error);
@@ -202,7 +204,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : islandWarps.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 String category = "";
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
 
@@ -422,7 +424,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : categories.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 int slot = Integer.parseInt(sections[1]);
                 String icon = sections[2];
 

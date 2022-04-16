@@ -4,8 +4,8 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.GlobalWarpsPagedObjectButton;
@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -65,14 +64,13 @@ public final class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Is
 
         PagedMenuPattern.Builder<MenuGlobalWarps, Island> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "global-warps.yml", MenuGlobalWarps::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "global-warps.yml", MenuGlobalWarps::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 

@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -16,6 +16,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 public final class PortalsLogic {
 
@@ -52,7 +53,7 @@ public final class PortalsLogic {
         if (!isIslandWorldEnabled(destinationEnvironment, island)) {
             if (!Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
                 PlayerLocales.sendSchematicMessage(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                        superiorPlayer.getUserLocale(), StringUtils.format(destinationEnvironment.name())));
+                        superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(destinationEnvironment.name())));
             return;
         }
 
@@ -63,7 +64,7 @@ public final class PortalsLogic {
                 return;
             }
 
-            String destinationEnvironmentName = destinationEnvironment.name().toLowerCase();
+            String destinationEnvironmentName = destinationEnvironment.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
             Schematic schematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?

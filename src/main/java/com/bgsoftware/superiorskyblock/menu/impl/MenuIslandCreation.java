@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IslandCreationButton;
@@ -24,6 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Locale;
 
 public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
@@ -64,14 +64,14 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
         RegularMenuPattern.Builder<MenuIslandCreation> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "island-creation.yml", MenuIslandCreation::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-creation.yml",
+                MenuIslandCreation::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -92,7 +92,7 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 {
                     String biomeName = itemSection.getString("biome", "PLAINS");
                     try {
-                        Biome biome = Biome.valueOf(biomeName.toUpperCase());
+                        Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                         buttonBuilder.setBiome(biome);
                     } catch (IllegalArgumentException error) {
                         SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid biome name for item " + itemSectionName + ": " + biomeName);

@@ -2,8 +2,10 @@ package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
+import com.bgsoftware.superiorskyblock.commands.arguments.IslandsListArgument;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -14,13 +16,13 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
     @Override
     default void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         if (!supportMultipleIslands()) {
-            Pair<Island, SuperiorPlayer> arguments = CommandArguments.getIsland(plugin, sender, args[2]);
-            if (arguments.getKey() != null)
-                execute(plugin, sender, arguments.getValue(), arguments.getKey(), args);
+            IslandArgument arguments = CommandArguments.getIsland(plugin, sender, args[2]);
+            if (arguments.getIsland() != null)
+                execute(plugin, sender, arguments.getSuperiorPlayer(), arguments.getIsland(), args);
         } else {
-            Pair<List<Island>, SuperiorPlayer> arguments = CommandArguments.getMultipleIslands(plugin, sender, args[2]);
-            if (!arguments.getKey().isEmpty())
-                execute(plugin, sender, arguments.getValue(), arguments.getKey(), args);
+            IslandsListArgument arguments = CommandArguments.getMultipleIslands(plugin, sender, args[2]);
+            if (!arguments.getIslands().isEmpty())
+                execute(plugin, sender, arguments.getSuperiorPlayer(), arguments.getIslands(), args);
         }
     }
 

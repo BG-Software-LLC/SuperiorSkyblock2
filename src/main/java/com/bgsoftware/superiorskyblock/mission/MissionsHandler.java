@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
@@ -256,7 +255,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 commandRewards = new ArrayList<>(missionData.getCommandRewards());
             }
 
-            EventResult<Pair<List<ItemStack>, List<String>>> event = EventsCaller.callMissionCompleteEvent(
+            EventResult<EventsCaller.MissionRewards> event = EventsCaller.callMissionCompleteEvent(
                     superiorPlayer, mission, missionData.isIslandMission(), itemRewards, commandRewards);
 
             if (event.isCancelled()) {
@@ -280,7 +279,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             if (result != null)
                 result.accept(true);
 
-            for (ItemStack itemStack : event.getResult().getKey()) {
+            for (ItemStack itemStack : event.getResult().getItemRewards()) {
                 ItemStack toGive = new ItemBuilder(itemStack)
                         .replaceAll("{0}", mission.getName())
                         .replaceAll("{1}", superiorPlayer.getName())
@@ -292,8 +291,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                         ItemUtils.addItem(toGive, player.getInventory(), player.getLocation())));
             }
 
-            Executor.sync(() -> {
-                for (String command : event.getResult().getValue()) {
+            Executor.ensureMain(() -> {
+                for (String command : event.getResult().getCommandRewards()) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())

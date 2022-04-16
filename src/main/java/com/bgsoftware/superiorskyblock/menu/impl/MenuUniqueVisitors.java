@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.UniqueVisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
@@ -51,14 +51,13 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<MenuUniqueVisito
 
         PagedMenuPattern.Builder<MenuUniqueVisitors, UniqueVisitorInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "unique-visitors.yml", null);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "unique-visitors.yml", null);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         menuPattern = patternBuilder
                 .setPreviousPageSlots(getSlots(cfg, "previous-page", menuPatternSlots))

@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -61,12 +61,12 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Pair<Integer, Boolean> arguments = CommandArguments.getSize(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getSize(sender, args[3]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        int size = arguments.getKey();
+        int size = arguments.getNumber();
 
         if (size > plugin.getSettings().getMaxIslandSize()) {
             Message.SIZE_BIGGER_MAX.send(sender);

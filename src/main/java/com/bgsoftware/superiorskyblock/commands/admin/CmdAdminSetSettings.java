@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
@@ -80,11 +81,11 @@ public final class CmdAdminSetSettings implements IAdminIslandCommand {
         }));
 
         if (islands.size() != 1)
-            Message.SETTINGS_UPDATED_ALL.send(sender, StringUtils.format(islandFlag.getName()));
+            Message.SETTINGS_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()));
         else if (targetPlayer == null)
-            Message.SETTINGS_UPDATED_NAME.send(sender, StringUtils.format(islandFlag.getName()), islands.get(0).getName());
+            Message.SETTINGS_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()), islands.get(0).getName());
         else
-            Message.SETTINGS_UPDATED.send(sender, StringUtils.format(islandFlag.getName()), targetPlayer.getName());
+            Message.SETTINGS_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()), targetPlayer.getName());
     }
 
     @Override

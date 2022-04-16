@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,14 +20,14 @@ public final class DefaultPlayersContainer implements PlayersContainer {
     @Nullable
     @Override
     public SuperiorPlayer getSuperiorPlayer(String name) {
-        SuperiorPlayer superiorPlayer = this.playersByNames.get(name.toLowerCase());
+        SuperiorPlayer superiorPlayer = this.playersByNames.get(name.toLowerCase(Locale.ENGLISH));
 
         if (superiorPlayer == null) {
             superiorPlayer = players.values().stream()
                     .filter(player -> player.getName().equalsIgnoreCase(name))
                     .findFirst().orElse(null);
             if (superiorPlayer != null)
-                this.playersByNames.put(name.toLowerCase(), superiorPlayer);
+                this.playersByNames.put(name.toLowerCase(Locale.ENGLISH), superiorPlayer);
         }
 
         return superiorPlayer;
@@ -48,13 +49,13 @@ public final class DefaultPlayersContainer implements PlayersContainer {
         this.players.put(superiorPlayer.getUniqueId(), superiorPlayer);
         String playerName = superiorPlayer.getName();
         if (!playerName.equals("null"))
-            this.playersByNames.put(playerName.toLowerCase(), superiorPlayer);
+            this.playersByNames.put(playerName.toLowerCase(Locale.ENGLISH), superiorPlayer);
     }
 
     @Override
     public void removePlayer(SuperiorPlayer superiorPlayer) {
         this.players.remove(superiorPlayer.getUniqueId());
-        this.playersByNames.remove(superiorPlayer.getName().toLowerCase());
+        this.playersByNames.remove(superiorPlayer.getName().toLowerCase(Locale.ENGLISH));
     }
 
 }

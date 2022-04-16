@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.commands;
+package com.bgsoftware.superiorskyblock.commands.arguments;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
@@ -8,12 +8,11 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,8 +24,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class CommandArguments {
@@ -35,7 +36,7 @@ public final class CommandArguments {
 
     }
 
-    public static Pair<Island, SuperiorPlayer> getIsland(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+    public static IslandArgument getIsland(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(argument);
         Island island = targetPlayer == null ? plugin.getGrid().getIsland(argument) : targetPlayer.getIsland();
 
@@ -43,15 +44,15 @@ public final class CommandArguments {
             if (argument.equalsIgnoreCase(sender.getName()))
                 Message.INVALID_ISLAND.send(sender);
             else if (targetPlayer == null)
-                Message.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(argument));
+                Message.INVALID_ISLAND_OTHER_NAME.send(sender, Formatters.STRIP_COLOR_FORMATTER.format(argument));
             else
                 Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
         }
 
-        return new Pair<>(island, targetPlayer);
+        return new IslandArgument(island, targetPlayer);
     }
 
-    public static Pair<List<Island>, SuperiorPlayer> getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
+    public static IslandsListArgument getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         List<Island> islands = new ArrayList<>();
         SuperiorPlayer targetPlayer;
 
@@ -59,23 +60,23 @@ public final class CommandArguments {
             targetPlayer = null;
             islands = plugin.getGrid().getIslands();
         } else {
-            Pair<Island, SuperiorPlayer> arguments = getIsland(plugin, sender, argument);
-            targetPlayer = arguments.getValue();
-            if (arguments.getKey() != null)
-                islands.add(arguments.getKey());
+            IslandArgument arguments = getIsland(plugin, sender, argument);
+            targetPlayer = arguments.getSuperiorPlayer();
+            if (arguments.getIsland() != null)
+                islands.add(arguments.getIsland());
         }
 
-        return new Pair<>(islands, targetPlayer);
+        return new IslandsListArgument(islands, targetPlayer);
     }
 
-    public static Pair<Island, SuperiorPlayer> getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+    public static IslandArgument getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         Island island = superiorPlayer.getIsland();
 
         if (island == null)
             Message.INVALID_ISLAND.send(superiorPlayer);
 
-        return new Pair<>(island, superiorPlayer);
+        return new IslandArgument(island, superiorPlayer);
     }
 
     public static SuperiorPlayer getPlayer(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
@@ -105,10 +106,10 @@ public final class CommandArguments {
         return players;
     }
 
-    public static Pair<Island, SuperiorPlayer> getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
+    public static IslandArgument getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
         if (!(sender instanceof Player)) {
             Message.CUSTOM.send(sender, "&cYou must specify a player's name.", true);
-            return new Pair<>(null, null);
+            return IslandArgument.EMPTY;
         }
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
@@ -118,7 +119,7 @@ public final class CommandArguments {
         if (island == null)
             Message.INVALID_ISLAND.send(sender);
 
-        return new Pair<>(island, superiorPlayer);
+        return new IslandArgument(island, superiorPlayer);
     }
 
     public static Mission<?> getMission(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {
@@ -155,8 +156,10 @@ public final class CommandArguments {
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(argument);
 
-        if (upgrade == null)
-            Message.INVALID_UPGRADE.send(sender, argument, StringUtils.getUpgradesString(plugin));
+        if (upgrade == null) {
+            Message.INVALID_UPGRADE.send(sender, argument, Formatters.COMMA_FORMATTER.format(
+                    plugin.getUpgrades().getUpgrades().stream().map(Upgrade::getName)));
+        }
 
         return upgrade;
     }
@@ -167,7 +170,7 @@ public final class CommandArguments {
         for (int i = start; i < args.length; i++)
             stringBuilder.append(" ").append(args[i]);
 
-        return colorize ? StringUtils.translateColors(stringBuilder.substring(1)) : stringBuilder.substring(1);
+        return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
     public static PlayerRole getPlayerRole(CommandSender sender, String argument) {
@@ -184,7 +187,7 @@ public final class CommandArguments {
         return playerRole;
     }
 
-    public static Pair<Integer, Boolean> getLimit(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getLimit(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_LIMIT);
     }
 
@@ -200,11 +203,11 @@ public final class CommandArguments {
         return amount;
     }
 
-    public static Pair<Integer, Boolean> getAmount(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getAmount(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_AMOUNT);
     }
 
-    public static Pair<Double, Boolean> getMultiplier(CommandSender sender, String argument) {
+    public static NumberArgument<Double> getMultiplier(CommandSender sender, String argument) {
         double multiplier = 0;
         boolean status = true;
 
@@ -217,11 +220,11 @@ public final class CommandArguments {
             status = false;
         }
 
-        return new Pair<>(multiplier, status);
+        return new NumberArgument<>(multiplier, status);
     }
 
     public static PotionEffectType getPotionEffect(CommandSender sender, String argument) {
-        PotionEffectType potionEffectType = PotionEffectType.getByName(argument.toUpperCase());
+        PotionEffectType potionEffectType = PotionEffectType.getByName(argument.toUpperCase(Locale.ENGLISH));
 
         if (potionEffectType == null)
             Message.INVALID_EFFECT.send(sender, argument);
@@ -229,7 +232,7 @@ public final class CommandArguments {
         return potionEffectType;
     }
 
-    public static Pair<Integer, Boolean> getLevel(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getLevel(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_LEVEL);
     }
 
@@ -237,7 +240,7 @@ public final class CommandArguments {
         Material material = null;
 
         try {
-            material = Material.valueOf(argument.split(":")[0].toUpperCase());
+            material = Material.valueOf(argument.split(":")[0].toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_MATERIAL.send(sender, argument);
         }
@@ -245,7 +248,7 @@ public final class CommandArguments {
         return material;
     }
 
-    public static Pair<Integer, Boolean> getSize(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getSize(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_SIZE);
     }
 
@@ -263,7 +266,7 @@ public final class CommandArguments {
         Biome biome = null;
 
         try {
-            biome = Biome.valueOf(argument.toUpperCase());
+            biome = Biome.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_BIOME.send(sender, argument);
         }
@@ -292,11 +295,11 @@ public final class CommandArguments {
         return location;
     }
 
-    public static Pair<Integer, Boolean> getPage(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getPage(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_PAGE);
     }
 
-    public static Pair<Integer, Boolean> getRows(CommandSender sender, String argument) {
+    public static NumberArgument<Integer> getRows(CommandSender sender, String argument) {
         return getInt(sender, argument, Message.INVALID_ROWS);
     }
 
@@ -308,8 +311,12 @@ public final class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandPrivilege == null)
-            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, StringUtils.getPermissionsString());
+        if (islandPrivilege == null) {
+            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, Formatters.COMMA_FORMATTER.format(
+                    IslandPrivilege.values().stream()
+                            .sorted(Comparator.comparing(IslandPrivilege::getName))
+                            .map(_islandPrivilege -> _islandPrivilege.toString().toLowerCase(Locale.ENGLISH))));
+        }
 
         return islandPrivilege;
     }
@@ -318,7 +325,7 @@ public final class CommandArguments {
         Rating rating = null;
 
         try {
-            rating = Rating.valueOf(argument.toUpperCase());
+            rating = Rating.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_RATE.send(sender, argument, Rating.getValuesString());
         }
@@ -334,8 +341,11 @@ public final class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandFlag == null)
-            Message.INVALID_SETTINGS.send(sender, argument, StringUtils.getSettingsString());
+        if (islandFlag == null) {
+            Message.INVALID_SETTINGS.send(sender, argument, Formatters.COMMA_FORMATTER.format(IslandFlag.values().stream()
+                    .sorted(Comparator.comparing(IslandFlag::getName))
+                    .map(_islandFlag -> _islandFlag.getName().toLowerCase(Locale.ENGLISH))));
+        }
 
         return islandFlag;
     }
@@ -344,7 +354,7 @@ public final class CommandArguments {
         World.Environment environment = null;
 
         try {
-            environment = World.Environment.valueOf(argument.toUpperCase());
+            environment = World.Environment.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ignored) {
         }
 
@@ -354,12 +364,12 @@ public final class CommandArguments {
         return environment;
     }
 
-    public static Pair<Integer, Boolean> getInterval(CommandSender sender, String argument) {
-        Pair<Integer, Boolean> interval = getInt(sender, argument, Message.INVALID_INTERVAL);
+    public static NumberArgument<Integer> getInterval(CommandSender sender, String argument) {
+        NumberArgument<Integer> interval = getInt(sender, argument, Message.INVALID_INTERVAL);
 
-        if (interval.getValue() && interval.getKey() < 0) {
+        if (interval.isSucceed() && interval.getNumber() < 0) {
             Message.INVALID_INTERVAL.send(sender, argument);
-            return new Pair<>(interval.getKey(), false);
+            return new NumberArgument<>(interval.getNumber(), false);
         }
 
         return interval;
@@ -376,7 +386,7 @@ public final class CommandArguments {
                     parsedArgs.put(currentKey, stringBuilder.substring(1));
                 }
 
-                currentKey = arg.substring(1).toLowerCase();
+                currentKey = arg.substring(1).toLowerCase(Locale.ENGLISH);
                 stringBuilder = new StringBuilder();
             } else if (currentKey != null) {
                 stringBuilder.append(" ").append(arg);
@@ -390,7 +400,7 @@ public final class CommandArguments {
         return parsedArgs;
     }
 
-    private static Pair<Integer, Boolean> getInt(CommandSender sender, String argument, Message locale) {
+    private static NumberArgument<Integer> getInt(CommandSender sender, String argument, Message locale) {
         int i = 0;
         boolean status = true;
 
@@ -401,7 +411,7 @@ public final class CommandArguments {
             status = false;
         }
 
-        return new Pair<>(i, status);
+        return new NumberArgument<>(i, status);
     }
 
 }

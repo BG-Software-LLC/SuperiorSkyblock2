@@ -3,7 +3,8 @@ package com.bgsoftware.superiorskyblock.utils;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.DummyButton;
@@ -39,6 +40,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -72,7 +74,7 @@ public final class FileUtils {
         ItemBuilder itemBuilder = new ItemBuilder(type, data);
 
         if (section.contains("name"))
-            itemBuilder.withName(StringUtils.translateColors(section.getString("name")));
+            itemBuilder.withName(Formatters.COLOR_FORMATTER.format(section.getString("name")));
 
         if (section.contains("lore"))
             itemBuilder.withLore(section.getStringList("lore"));
@@ -135,7 +137,7 @@ public final class FileUtils {
         if (section.contains("entity")) {
             String entity = section.getString("entity");
             try {
-                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase()));
+                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
                 SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + entity + " into an entity type, skipping...");
                 PluginDebugger.debug(ex);
@@ -150,7 +152,7 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+    public static <M extends ISuperiorMenu> MenuParseResult loadMenu(
             SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
             String fileName,
             @Nullable BiFunction<SuperiorSkyblockPlugin, YamlConfiguration, Boolean> convertOldMenu) {
@@ -158,7 +160,7 @@ public final class FileUtils {
     }
 
     @Nullable
-    public static <M extends ISuperiorMenu> Pair<MenuPatternSlots, CommentedConfiguration> loadMenu(
+    public static <M extends ISuperiorMenu> MenuParseResult loadMenu(
             SuperiorMenuPattern.AbstractBuilder<?, ?, M> menuPattern,
             String fileName,
             boolean customMenu,
@@ -194,7 +196,7 @@ public final class FileUtils {
             }
         }
 
-        menuPattern.setTitle(StringUtils.translateColors(cfg.getString("title", "")))
+        menuPattern.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")))
                 .setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")))
                 .setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true))
                 .setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));
@@ -239,7 +241,7 @@ public final class FileUtils {
             return null;
         }
 
-        return new Pair<>(menuPatternSlots, cfg);
+        return new MenuParseResult(menuPatternSlots, cfg);
     }
 
     public static Location toLocation(String location) {

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
@@ -109,7 +110,7 @@ public final class SIslandBank implements IslandBank {
             addTransaction(bankTransaction, true);
 
             IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(),
-                    StringUtils.format(amount));
+                    Formatters.NUMBER_FORMATTER.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
@@ -155,7 +156,7 @@ public final class SIslandBank implements IslandBank {
     public boolean canDepositMoney(BigDecimal amount) {
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
         return this.island.getBankLimit().compareTo(NO_BANK_LIMIT) <= 0 ||
-                this.balance.get().add(amount).compareTo(this.island.getBankLimit()) > 0;
+                this.balance.get().add(amount).compareTo(this.island.getBankLimit()) <= 0;
     }
 
     @Override
@@ -204,7 +205,8 @@ public final class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(), StringUtils.format(withdrawAmount));
+            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(),
+                    Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);

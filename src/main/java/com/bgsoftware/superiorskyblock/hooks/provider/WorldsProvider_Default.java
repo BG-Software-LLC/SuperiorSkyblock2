@@ -30,7 +30,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public void prepareWorlds() {
-        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty().toUpperCase());
+        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty());
         if (plugin.getSettings().getWorlds().getNormal().isEnabled())
             loadWorld(plugin.getSettings().getWorlds().getWorldName(), difficulty, World.Environment.NORMAL);
         if (plugin.getSettings().getWorlds().getNether().isEnabled())

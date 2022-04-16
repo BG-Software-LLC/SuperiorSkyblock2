@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -69,7 +70,7 @@ public final class CmdAdminName implements IAdminIslandCommand {
         island.setName(islandName);
 
         String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                StringUtils.translateColors(islandName) : islandName;
+                Formatters.COLOR_FORMATTER.format(islandName) : islandName;
 
         for (Player player : Bukkit.getOnlinePlayers())
             Message.NAME_ANNOUNCEMENT.send(player, sender.getName(), coloredName);

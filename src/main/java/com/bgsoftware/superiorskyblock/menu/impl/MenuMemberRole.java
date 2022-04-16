@@ -4,10 +4,10 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.MemberRoleButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -46,14 +45,14 @@ public final class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
 
         RegularMenuPattern.Builder<MenuMemberRole> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "member-role.yml", MenuMemberRole::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "member-role.yml",
+                MenuMemberRole::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -128,7 +127,7 @@ public final class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
             for (String roleName : cfg.getConfigurationSection("roles-panel.roles").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("roles-panel.roles." + roleName);
                 char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-                section.set("role", StringUtils.format(roleName));
+                section.set("role", Formatters.CAPITALIZED_FORMATTER.format(roleName));
                 MenuConverter.convertItem(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }
