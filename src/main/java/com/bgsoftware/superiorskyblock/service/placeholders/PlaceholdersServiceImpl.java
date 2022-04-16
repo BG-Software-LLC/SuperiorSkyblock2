@@ -67,15 +67,15 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                     .put("texture", SuperiorPlayer::getTextureValue)
                     .put("role", superiorPlayer -> superiorPlayer.getPlayerRole().toString())
                     .put("locale", superiorPlayer -> Formatters.LOCALE_FORMATTER.format(superiorPlayer.getUserLocale()))
-                    .put("world_border", superiorPlayer -> superiorPlayer.hasWorldBorderEnabled() ? "Yes" : "No")
-                    .put("blocks_stacker", superiorPlayer -> superiorPlayer.hasBlocksStackerEnabled() ? "Yes" : "No")
-                    .put("schematics", superiorPlayer -> superiorPlayer.hasSchematicModeEnabled() ? "Yes" : "No")
-                    .put("team_chat", superiorPlayer -> superiorPlayer.hasTeamChatEnabled() ? "Yes" : "No")
-                    .put("bypass", superiorPlayer -> superiorPlayer.hasBypassModeEnabled() ? "Yes" : "No")
+                    .put("world_border", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasWorldBorderEnabled(), superiorPlayer.getUserLocale()))
+                    .put("blocks_stacker", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasBlocksStackerEnabled(), superiorPlayer.getUserLocale()))
+                    .put("schematics", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasSchematicModeEnabled(), superiorPlayer.getUserLocale()))
+                    .put("team_chat", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasTeamChatEnabled(), superiorPlayer.getUserLocale()))
+                    .put("bypass", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasBypassModeEnabled(), superiorPlayer.getUserLocale()))
                     .put("disbands", superiorPlayer -> superiorPlayer.getDisbands() + "")
-                    .put("panel", superiorPlayer -> superiorPlayer.hasToggledPanel() ? "Yes" : "No")
-                    .put("fly", superiorPlayer -> superiorPlayer.hasIslandFlyEnabled() ? "Yes" : "No")
-                    .put("chat_spy", superiorPlayer -> superiorPlayer.hasAdminSpyEnabled() ? "Yes" : "No")
+                    .put("panel", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasToggledPanel(), superiorPlayer.getUserLocale()))
+                    .put("fly", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasIslandFlyEnabled(), superiorPlayer.getUserLocale()))
+                    .put("chat_spy", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasAdminSpyEnabled(), superiorPlayer.getUserLocale()))
                     .put("border_color", superiorPlayer ->
                             Formatters.BORDER_COLOR_FORMATTER.format(superiorPlayer.getBorderColor(), superiorPlayer.getUserLocale()))
                     .put("missions_completed", superiorPlayer -> superiorPlayer.getCompletedMissions().size() + "")
@@ -142,8 +142,8 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                             island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
                     .put("discord_all", (island, superiorPlayer) -> island.getDiscord())
                     .put("paypal_all", (island, superiorPlayer) -> island.getPaypal())
-                    .put("exists", (island, superiorPlayer) -> "Yes")
-                    .put("locked", (island, superiorPlayer) -> island.isLocked() ? "Yes" : "No")
+                    .put("exists", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(true, superiorPlayer.getUserLocale()))
+                    .put("locked", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
                     .put("name", (island, superiorPlayer) -> {
                         return plugin.getSettings().getIslandNames().isColorSupport() ?
                                 Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
@@ -154,9 +154,9 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                                         Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
                     })
                     .put("is_leader", (island, superiorPlayer) ->
-                            island.getOwner().equals(superiorPlayer) ? "Yes" : "No")
-                    .put("is_member", (island, superiorPlayer) -> island.isMember(superiorPlayer) ? "Yes" : "No")
-                    .put("is_coop", (island, superiorPlayer) -> island.isCoop(superiorPlayer) ? "Yes" : "No")
+                            Formatters.BOOLEAN_FORMATTER.format(island.getOwner().equals(superiorPlayer), superiorPlayer.getUserLocale()))
+                    .put("is_member", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isMember(superiorPlayer), superiorPlayer.getUserLocale()))
+                    .put("is_coop", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isCoop(superiorPlayer), superiorPlayer.getUserLocale()))
                     .put("rating", (island, superiorPlayer) -> Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
                     .put("rating_amount", (island, superiorPlayer) -> Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
                     .put("rating_stars", (island, superiorPlayer) ->
@@ -172,8 +172,8 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                             Formatters.NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel()))
                     .put("total_level_format", (island, superiorPlayer) ->
                             Formatters.FANCY_NUMBER_FORMATTER.format(plugin.getGrid().getTotalLevel(), superiorPlayer.getUserLocale()))
-                    .put("nether_unlocked", (island, superiorPlayer) -> island.isNetherEnabled() ? "Yes" : "No")
-                    .put("end_unlocked", (island, superiorPlayer) -> island.isEndEnabled() ? "Yes" : "No")
+                    .put("nether_unlocked", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isNetherEnabled(), superiorPlayer.getUserLocale()))
+                    .put("end_unlocked", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isEndEnabled(), superiorPlayer.getUserLocale()))
                     .put("visitors_count", (island, superiorPlayer) -> {
                         return island.getIslandVisitors(false).size() + "";
                     })

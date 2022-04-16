@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.formatting;
 
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.formatting.impl.BooleanFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.BorderColorFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.CapitalizedFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.ColorFormatter;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 public final class Formatters {
 
+    public static final ILocaleFormatter<Boolean> BOOLEAN_FORMATTER = BooleanFormatter.getInstance();
     public static final ILocaleFormatter<BorderColor> BORDER_COLOR_FORMATTER = BorderColorFormatter.getInstance();
     public static final IFormatter<String> CAPITALIZED_FORMATTER = CapitalizedFormatter.getInstance();
     public static final IFormatter<String> COLOR_FORMATTER = ColorFormatter.getInstance();
