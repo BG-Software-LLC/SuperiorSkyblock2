@@ -11,13 +11,7 @@ import java.io.IOException;
 
 public final class FAWESchematicParser implements SchematicParser {
 
-    private static final FAWESchematicParser INSTANCE = new FAWESchematicParser();
-
-    public static FAWESchematicParser getInstance() {
-        return INSTANCE;
-    }
-
-    private FAWESchematicParser() {
+    public FAWESchematicParser() {
 
     }
 

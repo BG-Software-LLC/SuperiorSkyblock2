@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.schematic;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.SchematicManager;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -9,10 +8,11 @@ import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.schematic.container.SchematicsContainer;
+import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import com.bgsoftware.superiorskyblock.schematic.impl.SuperiorSchematic;
 import com.bgsoftware.superiorskyblock.schematic.parser.DefaultSchematicParser;
-import com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
 import com.bgsoftware.superiorskyblock.tag.IntTag;
@@ -23,7 +23,6 @@ import com.bgsoftware.superiorskyblock.tag.TagBuilder;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -99,8 +98,9 @@ public final class SchematicsHandler extends AbstractHandler implements Schemati
         if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             try {
                 Class.forName("com.boydti.fawe.object.schematic.Schematic");
-                this.schematicsContainer.addSchematicParser(FAWESchematicParser.getInstance());
-            } catch (ClassNotFoundException ignored) {
+                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser").newInstance();
+                this.schematicsContainer.addSchematicParser(schematicParser);
+            } catch (Exception ignored) {
             }
         }
     }

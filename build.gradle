@@ -62,9 +62,6 @@ dependencies {
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
     compileOnly 'org.spigotmc:v1_16_R3-Tuinity:latest'
-
-    // Plugin hooks
-    compileOnly 'com.boydti:FastAsyncWorldEdit:latest'
 }
 
 jar {
