@@ -25,6 +25,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -168,7 +169,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
     private static void convertType(ConfigurationSection section, String block) {
         String[] materialSections = block.split(":");
         String spawnerType = materialSections[0],
-                entityType = (materialSections.length >= 2 ? materialSections[1] : "PIG").toUpperCase();
+                entityType = (materialSections.length >= 2 ? materialSections[1] : "PIG").toUpperCase(Locale.ENGLISH);
         if (spawnerType.equals(Materials.SPAWNER.toBukkitType() + "")) {
             String texture = HeadUtils.getTexture(entityType);
             if (!texture.isEmpty()) {

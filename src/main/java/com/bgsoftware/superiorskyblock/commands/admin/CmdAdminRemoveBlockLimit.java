@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public final class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key key = KeyImpl.of(args[3].toUpperCase());
+        Key key = KeyImpl.of(args[3]);
 
         Executor.data(() -> islands.forEach(island -> island.removeBlockLimit(key)));
 

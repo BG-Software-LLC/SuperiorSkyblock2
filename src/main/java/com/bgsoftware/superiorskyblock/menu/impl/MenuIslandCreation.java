@@ -23,6 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Locale;
 
 public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
@@ -91,7 +92,7 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 {
                     String biomeName = itemSection.getString("biome", "PLAINS");
                     try {
-                        Biome biome = Biome.valueOf(biomeName.toUpperCase());
+                        Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                         buttonBuilder.setBiome(biome);
                     } catch (IllegalArgumentException error) {
                         SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid biome name for item " + itemSectionName + ": " + biomeName);

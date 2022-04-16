@@ -39,6 +39,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.List;
+import java.util.Locale;
 
 @SuppressWarnings("unused")
 public final class CustomEventsListener implements Listener {
@@ -186,7 +187,7 @@ public final class CustomEventsListener implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onIslandEvent(IslandEvent e) {
-        List<String> commands = plugin.getSettings().getEventCommands().get(e.getClass().getSimpleName().toLowerCase());
+        List<String> commands = plugin.getSettings().getEventCommands().get(e.getClass().getSimpleName().toLowerCase(Locale.ENGLISH));
 
         if (commands == null)
             return;
@@ -202,7 +203,7 @@ public final class CustomEventsListener implements Listener {
         String worth = "";
         String level = "";
 
-        switch (e.getClass().getSimpleName().toLowerCase()) {
+        switch (e.getClass().getSimpleName().toLowerCase(Locale.ENGLISH)) {
             case "islandcreateevent":
                 playerName = ((IslandCreateEvent) e).getPlayer().getName();
                 schematicName = ((IslandCreateEvent) e).getSchematic();

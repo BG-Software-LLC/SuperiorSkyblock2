@@ -74,7 +74,7 @@ public final class CmdValue implements ISuperiorCommand {
             if (inHand.getType() == Materials.SPAWNER.toBukkitType())
                 keyName = StringUtils.format(toCheck.getSubKey() + "_Spawner");
         } else {
-            toCheck = KeyImpl.of(args[1].toUpperCase());
+            toCheck = KeyImpl.of(args[1]);
         }
 
         if (keyName.isEmpty())

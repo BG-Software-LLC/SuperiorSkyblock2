@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
 
@@ -90,7 +91,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
                 command.replace("%player%", clickedPlayer.getName())));
 
         superiorMenu.getTargetIsland().setBiome(event.getResult());
-        Message.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase());
+        Message.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase(Locale.ENGLISH));
 
         Executor.sync(superiorMenu::closePage, 1L);
     }

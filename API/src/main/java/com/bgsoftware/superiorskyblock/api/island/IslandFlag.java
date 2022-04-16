@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public final class IslandFlag {
@@ -13,7 +14,7 @@ public final class IslandFlag {
     private final String name;
 
     private IslandFlag(String name) {
-        this.name = name.toUpperCase();
+        this.name = name.toUpperCase(Locale.ENGLISH);
     }
 
     /**
@@ -31,7 +32,7 @@ public final class IslandFlag {
     public static IslandFlag getByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        IslandFlag islandFlag = islandFlags.get(name.toUpperCase());
+        IslandFlag islandFlag = islandFlags.get(name.toUpperCase(Locale.ENGLISH));
 
         Preconditions.checkNotNull(islandFlag, "Couldn't find an IslandFlag with the name " + name + ".");
 
@@ -46,7 +47,7 @@ public final class IslandFlag {
     public static void register(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        name = name.toUpperCase();
+        name = name.toUpperCase(Locale.ENGLISH);
 
         Preconditions.checkState(!islandFlags.containsKey(name), "IslandFlag with the name " + name + " already exists.");
 

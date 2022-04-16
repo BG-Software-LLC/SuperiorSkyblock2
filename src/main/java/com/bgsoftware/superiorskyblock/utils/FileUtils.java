@@ -39,6 +39,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiFunction;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
@@ -135,7 +136,7 @@ public final class FileUtils {
         if (section.contains("entity")) {
             String entity = section.getString("entity");
             try {
-                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase()));
+                itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
                 SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + entity + " into an entity type, skipping...");
                 PluginDebugger.debug(ex);

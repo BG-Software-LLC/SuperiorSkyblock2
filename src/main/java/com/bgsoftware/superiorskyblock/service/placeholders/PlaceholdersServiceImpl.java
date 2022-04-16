@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -249,7 +250,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                 placeholderResult = Optional.ofNullable(PLAYER_PARSES.get(matcher.group(1)))
                         .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                String subPlaceholder = matcher.group(1).toLowerCase();
+                String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
 
                 Island island = subPlaceholder.startsWith("location_") && player != null ?
                         plugin.getGrid().getIslandAt(player.getLocation()) : superiorPlayer.getIsland();
@@ -287,17 +288,17 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
             return Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
                     .getUpgrade(upgradeName)).getLevel() + "");
         } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1).toUpperCase();
+            String keyName = matcher.group(1);
             return Optional.of(StringUtils.format(island
                     .getBlockCountAsBigInteger(KeyImpl.of(keyName))));
         } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1).toUpperCase();
+            String keyName = matcher.group(1);
             return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
         } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1).toUpperCase();
+            String keyName = matcher.group(1);
             return Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
         } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1).toUpperCase();
+            String keyName = matcher.group(1);
             return Optional.of(StringUtils.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
         } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));

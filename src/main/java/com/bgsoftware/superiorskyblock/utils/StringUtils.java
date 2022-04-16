@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,7 +100,7 @@ public final class StringUtils {
         type = type.replace(":", "_-_");
 
         for (String subKey : type.split("_"))
-            formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase()).append(subKey.substring(1).toLowerCase());
+            formattedKey.append(" ").append(subKey.substring(0, 1).toUpperCase(Locale.ENGLISH)).append(subKey.substring(1).toLowerCase(Locale.ENGLISH));
 
         return formattedKey.substring(1);
     }
@@ -166,13 +167,15 @@ public final class StringUtils {
 
     public static String getPermissionsString() {
         StringBuilder stringBuilder = new StringBuilder();
-        IslandPrivilege.values().stream().sorted(Comparator.comparing(IslandPrivilege::getName)).forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase()));
+        IslandPrivilege.values().stream().sorted(Comparator.comparing(IslandPrivilege::getName))
+                .forEach(islandPermission -> stringBuilder.append(", ").append(islandPermission.toString().toLowerCase(Locale.ENGLISH)));
         return stringBuilder.substring(2);
     }
 
     public static String getSettingsString() {
         StringBuilder stringBuilder = new StringBuilder();
-        IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName)).forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase()));
+        IslandFlag.values().stream().sorted(Comparator.comparing(IslandFlag::getName))
+                .forEach(islandFlag -> stringBuilder.append(", ").append(islandFlag.getName().toLowerCase(Locale.ENGLISH)));
         return stringBuilder.substring(2);
     }
 
@@ -332,8 +335,8 @@ public final class StringUtils {
             return false;
         }
 
-        if (plugin.getSettings().getIslandNames().getFilteredNames().stream()
-                .anyMatch(name -> islandName.toLowerCase().contains(name.toLowerCase()))) {
+        String lookupName = islandName.toLowerCase(Locale.ENGLISH);
+        if (plugin.getSettings().getIslandNames().getFilteredNames().stream().anyMatch(lookupName::contains)) {
             Message.NAME_BLACKLISTED.send(sender);
             return false;
         }

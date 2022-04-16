@@ -96,6 +96,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -1518,7 +1519,7 @@ public final class SIsland implements Island {
             Biome netherBiome;
 
             try {
-                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome());
             } catch (IllegalArgumentException error) {
                 netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
                         ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
@@ -1533,7 +1534,7 @@ public final class SIsland implements Island {
             Biome endBiome;
 
             try {
-                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome());
             } catch (IllegalArgumentException error) {
                 endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
             }
@@ -2462,12 +2463,12 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         PluginDebugger.debug("Action: Create Warp Category, Island: " + owner.getName() + ", Name: " + name);
 
-        WarpCategory warpCategory = warpCategories.get(name.toLowerCase());
+        WarpCategory warpCategory = warpCategories.get(name.toLowerCase(Locale.ENGLISH));
 
         if (warpCategory == null) {
             List<Integer> occupiedSlots = warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
 
-            warpCategories.put(name.toLowerCase(), (warpCategory = new SWarpCategory(this, name)));
+            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(this, name)));
 
             int slot = 0;
             while (occupiedSlots.contains(slot))
@@ -2486,7 +2487,7 @@ public final class SIsland implements Island {
     @Override
     public WarpCategory getWarpCategory(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpCategories.get(name.toLowerCase());
+        return warpCategories.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -2500,8 +2501,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
 
-        warpCategories.remove(warpCategory.getName().toLowerCase());
-        warpCategories.put(newName.toLowerCase(), warpCategory);
+        warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH));
+        warpCategories.put(newName.toLowerCase(Locale.ENGLISH), warpCategory);
         warpCategory.setName(newName);
     }
 
@@ -2510,7 +2511,7 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(warpCategory, "warpCategory parameter cannot be null.");
         PluginDebugger.debug("Action: Delete Warp-Category, Island: " + owner.getName() + ", Category: " + warpCategory.getName());
 
-        boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase()) != null;
+        boolean validWarpRemoval = warpCategories.remove(warpCategory.getName().toLowerCase(Locale.ENGLISH)) != null;
         if (validWarpRemoval) {
             IslandsDatabaseBridge.removeWarpCategory(this, warpCategory);
             boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
@@ -2559,8 +2560,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(islandWarp, "islandWarp parameter cannot be null.");
         Preconditions.checkNotNull(newName, "newName parameter cannot be null.");
 
-        warpsByName.remove(islandWarp.getName().toLowerCase());
-        warpsByName.put(newName.toLowerCase(), islandWarp);
+        warpsByName.remove(islandWarp.getName().toLowerCase(Locale.ENGLISH));
+        warpsByName.put(newName.toLowerCase(Locale.ENGLISH), islandWarp);
         islandWarp.setName(newName);
     }
 
@@ -2574,7 +2575,7 @@ public final class SIsland implements Island {
     @Override
     public IslandWarp getWarp(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        return warpsByName.get(name.toLowerCase());
+        return warpsByName.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -2618,7 +2619,7 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         PluginDebugger.debug("Action: Delete Warp, Island: " + owner.getName() + ", Warp: " + name);
 
-        IslandWarp islandWarp = warpsByName.remove(name.toLowerCase());
+        IslandWarp islandWarp = warpsByName.remove(name.toLowerCase(Locale.ENGLISH));
         WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
 
         if (islandWarp != null) {
@@ -3671,7 +3672,7 @@ public final class SIsland implements Island {
     private void loadIslandWarp(IslandWarp islandWarp) {
         islandWarp.getCategory().getWarps().add(islandWarp);
 
-        String warpName = islandWarp.getName().toLowerCase();
+        String warpName = islandWarp.getName().toLowerCase(Locale.ENGLISH);
 
         if (warpsByName.containsKey(warpName))
             deleteWarp(warpName);

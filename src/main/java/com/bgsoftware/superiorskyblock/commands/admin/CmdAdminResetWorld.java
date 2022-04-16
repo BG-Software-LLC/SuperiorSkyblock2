@@ -1,22 +1,23 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class CmdAdminResetWorld implements IAdminIslandCommand {
 
@@ -117,20 +118,20 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
 
         for (World.Environment environment : World.Environment.values()) {
             if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
+                boolean addEnvironment = false;
                 switch (environment) {
                     case NORMAL:
-                        if (plugin.getProviders().getWorldsProvider().isNormalEnabled())
-                            environments.add(environment.name().toLowerCase());
+                        addEnvironment = plugin.getProviders().getWorldsProvider().isNormalEnabled();
                         break;
                     case NETHER:
-                        if (plugin.getProviders().getWorldsProvider().isNetherEnabled())
-                            environments.add(environment.name().toLowerCase());
+                        addEnvironment = plugin.getProviders().getWorldsProvider().isNetherEnabled();
                         break;
                     case THE_END:
-                        if (plugin.getProviders().getWorldsProvider().isEndEnabled())
-                            environments.add(environment.name().toLowerCase());
+                        addEnvironment = plugin.getProviders().getWorldsProvider().isEndEnabled();
                         break;
                 }
+                if (addEnvironment)
+                    environments.add(environment.name().toLowerCase(Locale.ENGLISH));
             }
         }
 

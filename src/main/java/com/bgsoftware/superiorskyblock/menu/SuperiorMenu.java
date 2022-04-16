@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -246,7 +247,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     }
 
     private void handleSubCommand(SuperiorSkyblockPlugin plugin, String subCommand, String args, InventoryClickEvent e, CommandSender sender) {
-        switch (subCommand.toLowerCase()) {
+        switch (subCommand.toLowerCase(Locale.ENGLISH)) {
             case "player":
                 runCommand(plugin, args, e, e.getWhoClicked());
                 break;

@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public final class CmdAdminModules implements ISuperiorCommand {
@@ -76,7 +77,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
 
                 Message.MODULE_INFO.send(sender, pluginModule.getName(), pluginModule.getAuthor(), "");
             } else {
-                String command = args[3].toLowerCase();
+                String command = args[3].toLowerCase(Locale.ENGLISH);
 
                 switch (command) {
                     case "load":
@@ -126,7 +127,7 @@ public final class CmdAdminModules implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length != 3 ? new ArrayList<>() : plugin.getModules().getModules().stream()
                 .map(PluginModule::getName)
-                .filter(name -> name.toLowerCase().startsWith(args[2]))
+                .filter(name -> name.toLowerCase(Locale.ENGLISH).startsWith(args[2]))
                 .collect(Collectors.toList());
     }
 

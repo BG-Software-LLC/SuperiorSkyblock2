@@ -16,6 +16,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Locale;
+
 public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
@@ -32,13 +34,13 @@ public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider
     public Pair<Integer, String> getSpawner(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return !Bukkit.isPrimaryThread() ? new Pair<>(-1, null) :
-                new Pair<>(ASAPI.getSpawnerAmount(location), ASAPI.getSpawnerType(location).toUpperCase());
+                new Pair<>(ASAPI.getSpawnerAmount(location), ASAPI.getSpawnerType(location).toUpperCase(Locale.ENGLISH));
     }
 
     @Override
     public String getSpawnerType(ItemStack itemStack) {
         Preconditions.checkNotNull(itemStack, "itemStack parameter cannot be null.");
-        return ASAPI.getSpawnerType(itemStack).toUpperCase();
+        return ASAPI.getSpawnerType(itemStack).toUpperCase(Locale.ENGLISH);
     }
 
     @SuppressWarnings("unused")
@@ -53,14 +55,18 @@ public final class SpawnersProvider_AdvancedSpawners implements SpawnersProvider
             Island island = plugin.getGrid().getIslandAt(location);
 
             if (island != null)
-                island.handleBlockPlace(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountPlaced());
+                island.handleBlockPlace(
+                        KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType()),
+                        e.getCountPlaced());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerUnstack(AdvancedSpawnersBreakEvent e) {
             Island island = plugin.getGrid().getIslandAt(e.getSpawner().getLocation());
             if (island != null)
-                island.handleBlockBreak(KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType().toUpperCase()), e.getCountBroken());
+                island.handleBlockBreak(
+                        KeyImpl.of(Materials.SPAWNER.toBukkitType() + "", e.getEntityType()),
+                        e.getCountBroken());
         }
 
     }

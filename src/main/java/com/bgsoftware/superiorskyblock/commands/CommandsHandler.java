@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -184,7 +185,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
                 SuperiorCommand superiorCommand = createInstance(commandClass.get());
 
-                if (file.getName().toLowerCase().contains("admin")) {
+                if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
                     registerAdminCommand(superiorCommand);
                     SuperiorSkyblockPlugin.log("Successfully loaded external admin command: " + file.getName().split("\\.")[0]);
                 } else {
@@ -318,9 +319,9 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), new ArrayList<>()));
                     for (String _aliases : aliases) {
-                        if (_aliases.contains(args[0].toLowerCase())) {
+                        if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
                             list.add(_aliases);
                         }
                     }

@@ -50,6 +50,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -237,7 +238,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase());
+        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase(Locale.ENGLISH));
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {

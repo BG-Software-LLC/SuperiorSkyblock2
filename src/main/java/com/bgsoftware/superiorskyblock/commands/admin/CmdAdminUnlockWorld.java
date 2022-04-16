@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
@@ -101,7 +102,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
         List<String> environments = new ArrayList<>();
         for (World.Environment environment : World.Environment.values()) {
-            environments.add(environment.name().toLowerCase());
+            environments.add(environment.name().toLowerCase(Locale.ENGLISH));
         }
 
         return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));

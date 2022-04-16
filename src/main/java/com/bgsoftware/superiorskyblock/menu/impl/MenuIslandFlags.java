@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, MenuIslandFlags.IslandFlagInfo> {
 
@@ -75,7 +76,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         if (cfg.isConfigurationSection("settings")) {
             for (String settingsSectionName : cfg.getConfigurationSection("settings").getKeys(false)) {
-                updateSettings(IslandFlag.getByName(settingsSectionName.toLowerCase()), cfg, position++);
+                updateSettings(IslandFlag.getByName(settingsSectionName.toLowerCase(Locale.ENGLISH)), cfg, position++);
             }
         }
 
@@ -119,7 +120,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         SoundWrapper clickSound = null;
 
         ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
-                islandFlag.getName().toLowerCase());
+                islandFlag.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemFlagSection != null) {
             enabledIslandFlagItem = FileUtils.getItemStack("settings.yml",

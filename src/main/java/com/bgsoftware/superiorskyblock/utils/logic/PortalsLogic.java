@@ -16,6 +16,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.math.BigDecimal;
+import java.util.Locale;
 
 public final class PortalsLogic {
 
@@ -63,7 +64,7 @@ public final class PortalsLogic {
                 return;
             }
 
-            String destinationEnvironmentName = destinationEnvironment.name().toLowerCase();
+            String destinationEnvironmentName = destinationEnvironment.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
             Schematic schematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?

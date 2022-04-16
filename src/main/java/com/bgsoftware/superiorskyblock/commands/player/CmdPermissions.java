@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class CmdPermissions implements IPermissibleCommand {
 
@@ -107,7 +108,7 @@ public final class CmdPermissions implements IPermissibleCommand {
 
         switch (args.length) {
             case 2:
-                if ("reset".contains(args[1].toLowerCase()))
+                if ("reset".contains(args[1].toLowerCase(Locale.ENGLISH)))
                     tabVariables.add("reset");
                 tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
                         plugin.getSettings().isTabCompleteHideVanished()));
@@ -117,12 +118,12 @@ public final class CmdPermissions implements IPermissibleCommand {
         }
 
         if (args.length == 2) {
-            if ("reset".contains(args[1].toLowerCase()))
+            if ("reset".contains(args[1].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
             tabVariables.addAll(CommandTabCompletes.getOnlinePlayers(plugin, args[1],
                     plugin.getSettings().isTabCompleteHideVanished()));
         } else if (args.length == 3) {
-            if ("reset".contains(args[2].toLowerCase()))
+            if ("reset".contains(args[2].toLowerCase(Locale.ENGLISH)))
                 tabVariables.add("reset");
         }
 

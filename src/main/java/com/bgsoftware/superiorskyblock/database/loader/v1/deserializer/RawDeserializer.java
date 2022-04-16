@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -73,7 +74,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String worldSection : _locationParam.split(";")) {
             try {
                 String[] locationSection = worldSection.split("=");
-                String environment = locationSection[0].toUpperCase();
+                String environment = locationSection[0].toUpperCase(Locale.ENGLISH);
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
             } catch (Exception error) {
                 PluginDebugger.debug(error);

@@ -80,7 +80,7 @@ public final class CmdAdminAddGenerator implements IAdminIslandCommand {
             return;
         }
 
-        Key material = KeyImpl.of(args[3].toUpperCase());
+        Key material = KeyImpl.of(args[3]);
         boolean percentage = args[4].endsWith("%");
 
         if (percentage)

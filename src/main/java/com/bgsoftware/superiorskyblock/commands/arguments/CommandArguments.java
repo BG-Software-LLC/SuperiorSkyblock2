@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class CommandArguments {
@@ -220,7 +221,7 @@ public final class CommandArguments {
     }
 
     public static PotionEffectType getPotionEffect(CommandSender sender, String argument) {
-        PotionEffectType potionEffectType = PotionEffectType.getByName(argument.toUpperCase());
+        PotionEffectType potionEffectType = PotionEffectType.getByName(argument.toUpperCase(Locale.ENGLISH));
 
         if (potionEffectType == null)
             Message.INVALID_EFFECT.send(sender, argument);
@@ -236,7 +237,7 @@ public final class CommandArguments {
         Material material = null;
 
         try {
-            material = Material.valueOf(argument.split(":")[0].toUpperCase());
+            material = Material.valueOf(argument.split(":")[0].toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_MATERIAL.send(sender, argument);
         }
@@ -262,7 +263,7 @@ public final class CommandArguments {
         Biome biome = null;
 
         try {
-            biome = Biome.valueOf(argument.toUpperCase());
+            biome = Biome.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_BIOME.send(sender, argument);
         }
@@ -317,7 +318,7 @@ public final class CommandArguments {
         Rating rating = null;
 
         try {
-            rating = Rating.valueOf(argument.toUpperCase());
+            rating = Rating.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ex) {
             Message.INVALID_RATE.send(sender, argument, Rating.getValuesString());
         }
@@ -343,7 +344,7 @@ public final class CommandArguments {
         World.Environment environment = null;
 
         try {
-            environment = World.Environment.valueOf(argument.toUpperCase());
+            environment = World.Environment.valueOf(argument.toUpperCase(Locale.ENGLISH));
         } catch (Exception ignored) {
         }
 
@@ -375,7 +376,7 @@ public final class CommandArguments {
                     parsedArgs.put(currentKey, stringBuilder.substring(1));
                 }
 
-                currentKey = arg.substring(1).toLowerCase();
+                currentKey = arg.substring(1).toLowerCase(Locale.ENGLISH);
                 stringBuilder = new StringBuilder();
             } else if (currentKey != null) {
                 stringBuilder.append(" ").append(arg);

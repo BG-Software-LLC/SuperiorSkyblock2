@@ -75,17 +75,17 @@ public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
             plugin.getCommands().registerCommand(new CustomMenuCommand(fileName, aliases, permission, descriptions, displayCommand));
         }
 
-        customMenus.put(fileName.toLowerCase(), patternBuilder.build());
+        customMenus.put(fileName.toLowerCase(Locale.ENGLISH), patternBuilder.build());
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, String fileName, ISuperiorMenu previousMenu) {
-        RegularMenuPattern<SuperiorMenuCustom> menuPattern = customMenus.get(fileName.toLowerCase());
+        RegularMenuPattern<SuperiorMenuCustom> menuPattern = customMenus.get(fileName.toLowerCase(Locale.ENGLISH));
         if (menuPattern != null)
             new SuperiorMenuCustom(menuPattern, superiorPlayer, fileName).open(previousMenu);
     }
 
     public static boolean isValidMenu(String menuName) {
-        return customMenus.containsKey(menuName.toLowerCase());
+        return customMenus.containsKey(menuName.toLowerCase(Locale.ENGLISH));
     }
 
     public static Set<String> getCustomMenus() {

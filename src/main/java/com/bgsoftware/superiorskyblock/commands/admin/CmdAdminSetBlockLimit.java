@@ -67,7 +67,7 @@ public final class CmdAdminSetBlockLimit implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Key key = KeyImpl.of(args[3].toUpperCase());
+        Key key = KeyImpl.of(args[3]);
 
         NumberArgument<Integer> arguments = CommandArguments.getLimit(sender, args[4]);
 

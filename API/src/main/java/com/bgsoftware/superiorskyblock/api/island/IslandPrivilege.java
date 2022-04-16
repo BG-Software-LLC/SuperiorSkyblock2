@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public final class IslandPrivilege {
@@ -13,7 +14,7 @@ public final class IslandPrivilege {
     private final String name;
 
     private IslandPrivilege(String name) {
-        this.name = name.toUpperCase();
+        this.name = name.toUpperCase(Locale.ENGLISH);
     }
 
     /**
@@ -31,7 +32,7 @@ public final class IslandPrivilege {
     public static IslandPrivilege getByName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        IslandPrivilege islandPrivilege = islandPrivileges.get(name.toUpperCase());
+        IslandPrivilege islandPrivilege = islandPrivileges.get(name.toUpperCase(Locale.ENGLISH));
 
         Preconditions.checkNotNull(islandPrivilege, "Couldn't find an IslandPrivilege with the name " + name + ".");
 
@@ -46,7 +47,7 @@ public final class IslandPrivilege {
     public static void register(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
 
-        name = name.toUpperCase();
+        name = name.toUpperCase(Locale.ENGLISH);
 
         Preconditions.checkState(!islandPrivileges.containsKey(name), "IslandPrivilege with the name " + name + " already exists.");
 

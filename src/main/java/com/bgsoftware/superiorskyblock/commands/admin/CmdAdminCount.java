@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class CmdAdminCount implements IAdminIslandCommand {
@@ -67,13 +68,14 @@ public final class CmdAdminCount implements IAdminIslandCommand {
         List<String> list = new ArrayList<>();
 
         if (args.length == 3) {
+            String argument = args[2].toLowerCase(Locale.ENGLISH);
             for (Player player : Bukkit.getOnlinePlayers()) {
                 SuperiorPlayer onlinePlayer = plugin.getPlayers().getSuperiorPlayer(player);
                 Island playerIsland = onlinePlayer.getIsland();
                 if (playerIsland != null) {
-                    if (player.getName().toLowerCase().contains(args[2].toLowerCase()))
+                    if (player.getName().toLowerCase(Locale.ENGLISH).contains(argument))
                         list.add(player.getName());
-                    if (!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase().contains(args[2].toLowerCase()))
+                    if (!playerIsland.getName().isEmpty() && playerIsland.getName().toLowerCase(Locale.ENGLISH).contains(argument))
                         list.add(playerIsland.getName());
                 }
             }
@@ -82,9 +84,9 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
 
             if (island != null) {
-                String materialArgument = args[3].toLowerCase();
+                String materialArgument = args[3].toLowerCase(Locale.ENGLISH);
                 Materials.getBlocksNonLegacy().stream()
-                        .map(material -> material.name().toLowerCase())
+                        .map(material -> material.name().toLowerCase(Locale.ENGLISH))
                         .filter(materialName -> materialName.contains(materialArgument))
                         .forEach(list::add);
                 if ("*".contains(materialArgument))
@@ -113,7 +115,7 @@ public final class CmdAdminCount implements IAdminIslandCommand {
             return;
         }
 
-        String materialName = args[3].toUpperCase();
+        String materialName = args[3].toUpperCase(Locale.ENGLISH);
 
         if (materialName.equals("*")) {
             StringBuilder materialsBuilder = new StringBuilder();

@@ -23,6 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
@@ -82,7 +83,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 Biome biome;
 
                 try {
-                    biome = Biome.valueOf(biomeName.toUpperCase());
+                    biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                 } catch (IllegalArgumentException error) {
                     SuperiorSkyblockPlugin.log("&cBiome '" + biomeName + "' is not valid, skipping...");
                     continue;
@@ -160,7 +161,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
             for (String biomeName : cfg.getConfigurationSection("biomes-gui.biomes").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes." + biomeName);
                 char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-                section.set("biome", biomeName.toUpperCase());
+                section.set("biome", biomeName.toUpperCase(Locale.ENGLISH));
                 MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }

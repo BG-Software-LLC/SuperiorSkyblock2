@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges,
         MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -98,7 +99,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         if (permissionsSection != null) {
             for (String key : permissionsSection.getKeys(false)) {
                 if (permissionsSection.getBoolean(key + ".display-menu", true)) {
-                    String permission = key.toLowerCase();
+                    String permission = key.toLowerCase(Locale.ENGLISH);
                     try {
                         updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                     } catch (NullPointerException error) {
@@ -157,7 +158,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         List<String> noAccessCommands = null;
 
         ConfigurationSection itemPrivilegeSection = cfg.getConfigurationSection("permissions." +
-                islandPrivilege.getName().toLowerCase());
+                islandPrivilege.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemPrivilegeSection != null) {
             enabledIslandPrivilegeItem = FileUtils.getItemStack("permissions.yml",
