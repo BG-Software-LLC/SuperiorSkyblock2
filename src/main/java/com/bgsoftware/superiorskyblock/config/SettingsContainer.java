@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
@@ -21,6 +22,7 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -104,7 +106,8 @@ public final class SettingsContainer {
     public final String endWorldName;
     public final boolean endSchematicOffset;
     public final String endBiome;
-    public final boolean endDragonFight;
+    public final boolean endDragonFightEnabled;
+    public final BlockOffset endDragonFightPortalOffset;
     public final String worldsDifficulty;
     public final String spawnLocation;
     public final boolean spawnProtection;
@@ -307,7 +310,15 @@ public final class SettingsContainer {
         this.endWorldName = endWorldName.isEmpty() ? islandWorldName + "_the_end" : endWorldName;
         endSchematicOffset = config.getBoolean("worlds.end.schematic-offset", true);
         endBiome = config.getString("worlds.end.biome", "THE_END");
-        endDragonFight = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
+        endDragonFightEnabled = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight.enabled", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
+        BlockOffset endDragonFightPortalOffset = null;
+        if (endDragonFightEnabled) {
+            endDragonFightPortalOffset = SBlockOffset.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
+            if (endDragonFightPortalOffset == null) {
+                SuperiorSkyblockPlugin.log("&c[config.yml] Cannot parse portal-offset to a valid offset, skipping...");
+            }
+        }
+        this.endDragonFightPortalOffset = endDragonFightPortalOffset == null ? SBlockOffset.ZERO : endDragonFightPortalOffset;
         String defaultWorldEnvironment = config.getString("worlds.default-world");
         if (defaultWorldEnvironment.equalsIgnoreCase("normal") && normalWorldEnabled) {
             this.defaultWorldEnvironment = World.Environment.NORMAL;

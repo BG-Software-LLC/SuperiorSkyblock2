@@ -97,7 +97,6 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         this.lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
-        Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
 
     public void updateSpawn() {
@@ -201,8 +200,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                                         Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
                                         if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                                                plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
+                                            plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                                         }
                                     }
                                 });
@@ -312,7 +310,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             Executor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
         }
 
-        plugin.getNMSDragonFight().removeDragonBattle(island);
+        plugin.getServices().getDragonBattleService().stopEnderDragonBattle(island);
 
         ChunksTracker.removeIsland(island);
     }
