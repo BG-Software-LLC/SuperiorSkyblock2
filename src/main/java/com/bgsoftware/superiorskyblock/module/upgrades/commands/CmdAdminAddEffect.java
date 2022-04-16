@@ -7,9 +7,9 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
 
@@ -81,11 +81,11 @@ public final class CmdAdminAddEffect implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setPotionEffect(potionEffectType, island.getPotionEffectLevel(potionEffectType) + level)));
 
         if (islands.size() > 1)
-            Message.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, StringUtils.format(potionEffectType.getName()));
+            Message.CHANGED_ISLAND_EFFECT_LEVEL_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(potionEffectType.getName()));
         else if (targetPlayer == null)
-            Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, StringUtils.format(potionEffectType.getName()), islands.get(0).getName());
+            Message.CHANGED_ISLAND_EFFECT_LEVEL_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(potionEffectType.getName()), islands.get(0).getName());
         else
-            Message.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, StringUtils.format(potionEffectType.getName()), targetPlayer.getName());
+            Message.CHANGED_ISLAND_EFFECT_LEVEL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(potionEffectType.getName()), targetPlayer.getName());
     }
 
     @Override

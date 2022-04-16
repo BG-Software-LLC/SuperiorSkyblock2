@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.world.blocks.stacked;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Location;
 
 public final class StackedBlock {
@@ -73,8 +73,8 @@ public final class StackedBlock {
 
             hologram.setHologramName(plugin.getSettings().getStackedBlocks().getCustomName()
                     .replace("{0}", String.valueOf(amount))
-                    .replace("{1}", StringUtils.format(blockKey.getGlobalKey()))
-                    .replace("{2}", StringUtils.format(amount))
+                    .replace("{1}", Formatters.CAPITALIZED_FORMATTER.format(blockKey.getGlobalKey()))
+                    .replace("{2}", Formatters.NUMBER_FORMATTER.format(amount))
             );
         }
 

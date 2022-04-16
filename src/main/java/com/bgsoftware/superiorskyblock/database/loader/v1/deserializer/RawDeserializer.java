@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpA
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
@@ -203,7 +204,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : islandWarps.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 String category = "";
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
 
@@ -423,7 +424,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : categories.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 int slot = Integer.parseInt(sections[1]);
                 String icon = sections[2];
 

@@ -10,9 +10,9 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +44,7 @@ public final class CommandArguments {
             if (argument.equalsIgnoreCase(sender.getName()))
                 Message.INVALID_ISLAND.send(sender);
             else if (targetPlayer == null)
-                Message.INVALID_ISLAND_OTHER_NAME.send(sender, StringUtils.stripColors(argument));
+                Message.INVALID_ISLAND_OTHER_NAME.send(sender, Formatters.STRIP_COLOR_FORMATTER.format(argument));
             else
                 Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
         }
@@ -155,8 +156,10 @@ public final class CommandArguments {
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
         Upgrade upgrade = plugin.getUpgrades().getUpgrade(argument);
 
-        if (upgrade == null)
-            Message.INVALID_UPGRADE.send(sender, argument, StringUtils.getUpgradesString(plugin));
+        if (upgrade == null) {
+            Message.INVALID_UPGRADE.send(sender, argument, Formatters.COMMA_FORMATTER.format(
+                    plugin.getUpgrades().getUpgrades().stream().map(Upgrade::getName)));
+        }
 
         return upgrade;
     }
@@ -167,7 +170,7 @@ public final class CommandArguments {
         for (int i = start; i < args.length; i++)
             stringBuilder.append(" ").append(args[i]);
 
-        return colorize ? StringUtils.translateColors(stringBuilder.substring(1)) : stringBuilder.substring(1);
+        return colorize ? Formatters.COLOR_FORMATTER.format(stringBuilder.substring(1)) : stringBuilder.substring(1);
     }
 
     public static PlayerRole getPlayerRole(CommandSender sender, String argument) {
@@ -308,8 +311,12 @@ public final class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandPrivilege == null)
-            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, StringUtils.getPermissionsString());
+        if (islandPrivilege == null) {
+            Message.INVALID_ISLAND_PERMISSION.send(sender, argument, Formatters.COMMA_FORMATTER.format(
+                    IslandPrivilege.values().stream()
+                            .sorted(Comparator.comparing(IslandPrivilege::getName))
+                            .map(_islandPrivilege -> _islandPrivilege.toString().toLowerCase(Locale.ENGLISH))));
+        }
 
         return islandPrivilege;
     }
@@ -334,8 +341,11 @@ public final class CommandArguments {
         } catch (NullPointerException ignored) {
         }
 
-        if (islandFlag == null)
-            Message.INVALID_SETTINGS.send(sender, argument, StringUtils.getSettingsString());
+        if (islandFlag == null) {
+            Message.INVALID_SETTINGS.send(sender, argument, Formatters.COMMA_FORMATTER.format(IslandFlag.values().stream()
+                    .sorted(Comparator.comparing(IslandFlag::getName))
+                    .map(_islandFlag -> _islandFlag.getName().toLowerCase(Locale.ENGLISH))));
+        }
 
         return islandFlag;
     }

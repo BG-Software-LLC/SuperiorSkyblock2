@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
 
@@ -260,8 +260,8 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                                     Long timeToExecute = playerCooldowns.get(commandLabel);
                                     if (timeToExecute != null) {
                                         if (timeNow < timeToExecute) {
-                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
-                                                    StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
+                                            String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
+                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
                                             return false;
                                         }
                                     }

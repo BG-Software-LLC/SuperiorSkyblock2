@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -71,11 +72,11 @@ public final class CmdAdminSetBiome implements IAdminIslandCommand {
         islands.forEach(island -> island.setBiome(biome));
 
         if (islands.size() > 1)
-            Message.CHANGED_BIOME_ALL.send(sender, StringUtils.format(biome.name()));
+            Message.CHANGED_BIOME_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()));
         else if (targetPlayer == null)
-            Message.CHANGED_BIOME_NAME.send(sender, StringUtils.format(biome.name()), islands.get(0).getName());
+            Message.CHANGED_BIOME_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), islands.get(0).getName());
         else
-            Message.CHANGED_BIOME_OTHER.send(sender, StringUtils.format(biome.name()), targetPlayer.getName());
+            Message.CHANGED_BIOME_OTHER.send(sender, Formatters.CAPITALIZED_FORMATTER.format(biome.name()), targetPlayer.getName());
     }
 
     @Override

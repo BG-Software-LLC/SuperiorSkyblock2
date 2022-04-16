@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
@@ -130,10 +131,10 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         Message.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
                         break;
                     case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Not enough money":
-                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Exceed bank limit":
                         Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
@@ -168,7 +169,7 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         Message.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
                         break;
                     case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Bank is empty":
                         Message.ISLAND_BANK_EMPTY.send(superiorPlayer);

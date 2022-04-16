@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -79,11 +80,11 @@ public final class CmdAdminAddEntityLimit implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setEntityLimit(entityKey, island.getEntityLimit(entityKey) + limit)));
 
         if (islands.size() > 1)
-            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, StringUtils.format(entityKey.getGlobalKey()));
+            Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, StringUtils.format(entityKey.getGlobalKey()), islands.get(0).getName());
+            Message.CHANGED_ENTITY_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), islands.get(0).getName());
         else
-            Message.CHANGED_ENTITY_LIMIT.send(sender, StringUtils.format(entityKey.getGlobalKey()), targetPlayer.getName());
+            Message.CHANGED_ENTITY_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

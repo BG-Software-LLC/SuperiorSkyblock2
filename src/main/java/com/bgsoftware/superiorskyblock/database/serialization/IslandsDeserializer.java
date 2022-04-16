@@ -8,9 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
@@ -21,6 +19,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserial
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
@@ -30,7 +29,6 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
@@ -712,7 +710,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = warpCategory.getString("name").map(StringUtils::stripColors);
+            Optional<String> name = warpCategory.getString("name").map(Formatters.STRIP_COLOR_FORMATTER::format);
             if (!name.isPresent() || name.get().isEmpty()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load warp categories with invalid name for %s, skipping...", uuid.get()));

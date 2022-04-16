@@ -4,9 +4,9 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuValues;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -47,10 +47,10 @@ public final class ValuesButton extends SuperiorMenuButton<MenuValues> {
 
         ItemStack itemStack = buttonItem.getBuilder()
                 .replaceAll("{0}", amount + "")
-                .replaceAll("{1}", StringUtils.format(blockWorth.multiply(amount)))
-                .replaceAll("{2}", StringUtils.format(blockLevel.multiply(amount)))
-                .replaceAll("{3}", StringUtils.fancyFormat(blockWorth.multiply(amount), inventoryViewer.getUserLocale()))
-                .replaceAll("{4}", StringUtils.fancyFormat(blockLevel.multiply(amount), inventoryViewer.getUserLocale()))
+                .replaceAll("{1}", Formatters.NUMBER_FORMATTER.format(blockWorth.multiply(amount)))
+                .replaceAll("{2}", Formatters.NUMBER_FORMATTER.format(blockLevel.multiply(amount)))
+                .replaceAll("{3}", Formatters.FANCY_NUMBER_FORMATTER.format(blockWorth.multiply(amount), inventoryViewer.getUserLocale()))
+                .replaceAll("{4}", Formatters.FANCY_NUMBER_FORMATTER.format(blockLevel.multiply(amount), inventoryViewer.getUserLocale()))
                 .build();
 
         itemStack.setAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue());

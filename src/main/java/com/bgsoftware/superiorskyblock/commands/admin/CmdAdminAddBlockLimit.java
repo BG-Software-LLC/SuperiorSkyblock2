@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -84,11 +85,11 @@ public final class CmdAdminAddBlockLimit implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, island.getBlockLimit(key) + limit)));
 
         if (islands.size() > 1)
-            Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, StringUtils.format(key.getGlobalKey()));
+            Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, StringUtils.format(key.getGlobalKey()), islands.get(0).getName());
+            Message.CHANGED_BLOCK_LIMIT_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), islands.get(0).getName());
         else
-            Message.CHANGED_BLOCK_LIMIT.send(sender, StringUtils.format(key.getGlobalKey()), targetPlayer.getName());
+            Message.CHANGED_BLOCK_LIMIT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()), targetPlayer.getName());
     }
 
 }

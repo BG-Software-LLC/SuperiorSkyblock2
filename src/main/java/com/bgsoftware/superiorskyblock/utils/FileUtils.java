@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.BackButton;
@@ -73,7 +74,7 @@ public final class FileUtils {
         ItemBuilder itemBuilder = new ItemBuilder(type, data);
 
         if (section.contains("name"))
-            itemBuilder.withName(StringUtils.translateColors(section.getString("name")));
+            itemBuilder.withName(Formatters.COLOR_FORMATTER.format(section.getString("name")));
 
         if (section.contains("lore"))
             itemBuilder.withLore(section.getStringList("lore"));
@@ -195,7 +196,7 @@ public final class FileUtils {
             }
         }
 
-        menuPattern.setTitle(StringUtils.translateColors(cfg.getString("title", "")))
+        menuPattern.setTitle(Formatters.COLOR_FORMATTER.format(cfg.getString("title", "")))
                 .setInventoryType(InventoryType.valueOf(cfg.getString("type", "CHEST")))
                 .setPreviousMoveAllowed(cfg.getBoolean("previous-menu", true))
                 .setOpeningSound(FileUtils.getSound(cfg.getConfigurationSection("open-sound")));

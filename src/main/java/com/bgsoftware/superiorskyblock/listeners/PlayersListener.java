@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
@@ -374,13 +375,15 @@ public final class PlayersListener implements Listener {
         } else {
             String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
                     island == null ? "" : plugin.getSettings().getIslandNames().isColorSupport() ?
-                            StringUtils.translateColors(island.getName()) : island.getName());
+                            Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName());
 
             e.setFormat(e.getFormat()
                     .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
-                    .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale())))
+                    .replace("{island-level-format}", String.valueOf(island == null ? 0 :
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), superiorPlayer.getUserLocale())))
                     .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
-                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
+                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 :
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), superiorPlayer.getUserLocale())))
                     .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
                     .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
                     .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")

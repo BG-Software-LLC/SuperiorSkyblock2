@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
@@ -40,8 +40,8 @@ public final class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> 
             Message.DISBANDED_ISLAND.send(clickedPlayer);
 
             if (BuiltinModules.BANK.disbandRefund > 0 && targetIsland.getOwner().isOnline()) {
-                Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), StringUtils.format(targetIsland.getIslandBank()
-                        .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), Formatters.NUMBER_FORMATTER.format(
+                        targetIsland.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 
             clickedPlayer.setDisbands(clickedPlayer.getDisbands() - 1);

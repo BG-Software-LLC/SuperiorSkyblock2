@@ -1,18 +1,18 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -129,7 +129,7 @@ public final class BlocksLogic {
             return true;
         }
 
-        String warpName = IslandUtils.getWarpName(StringUtils.stripColors(signLines[1].trim()));
+        String warpName = IslandUtils.getWarpName(Formatters.STRIP_COLOR_FORMATTER.format(signLines[1].trim()));
         boolean privateFlag = signLines[2].equalsIgnoreCase("private");
 
         boolean creationFailed = false;
@@ -190,7 +190,7 @@ public final class BlocksLogic {
         warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 
         for (int i = 1; i <= 3; i++)
-            warpLines[i] = StringUtils.translateColors(warpLines[i]);
+            warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
         Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
         if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {

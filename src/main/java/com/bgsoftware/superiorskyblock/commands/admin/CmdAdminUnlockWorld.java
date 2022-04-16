@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -89,7 +89,7 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
             }
         });
 
-        Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, StringUtils.format(args[3]));
+        Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
     }
 
     @Override

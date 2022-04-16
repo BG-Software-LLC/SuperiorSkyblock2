@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
 import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
@@ -17,7 +18,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.configuration.ConfigurationSection;
@@ -55,8 +55,8 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
     @Override
     protected String replaceTitle(String title) {
         return title.replace("{0}", island.getOwner().getName())
-                .replace("{1}", StringUtils.format(island.getWorth()))
-                .replace("{2}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()));
+                .replace("{1}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
+                .replace("{2}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()));
     }
 
     public static void init() {
@@ -140,7 +140,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
             String block = materialSections.length == 2 ? materialSections[0] : materialSections[0] + ":" + materialSections[1];
             int slot = Integer.parseInt(materialSections.length == 2 ? materialSections[1] : materialSections[2]);
             copySection(blockItemSection, section, str ->
-                    str.replace("{0}", StringUtils.format(block)).replace("{1}", "{0}"));
+                    str.replace("{0}", Formatters.CAPITALIZED_FORMATTER.format(block)).replace("{1}", "{0}"));
             section.set("block", block);
             convertType(section, block);
             patternChars[slot] = itemChar;

@@ -11,19 +11,19 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public final class CmdRankup implements IPermissibleCommand {
 
@@ -94,8 +94,9 @@ public final class CmdRankup implements IPermissibleCommand {
         if (island.hasActiveUpgradeCooldown()) {
             long timeNow = System.currentTimeMillis();
             long lastUpgradeTime = island.getLastTimeUpgrade();
-            Message.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    lastUpgradeTime + plugin.getSettings().getUpgradeCooldown() - timeNow, TimeUnit.MILLISECONDS));
+            long duration = lastUpgradeTime + plugin.getSettings().getUpgradeCooldown() - timeNow;
+            Message.UPGRADE_COOLDOWN_FORMAT.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
+                    Duration.ofMillis(duration), superiorPlayer.getUserLocale()));
             hasNextLevel = false;
         } else {
             String requiredCheckFailure = nextUpgradeLevel == null ? "" : nextUpgradeLevel.checkRequirements(superiorPlayer);

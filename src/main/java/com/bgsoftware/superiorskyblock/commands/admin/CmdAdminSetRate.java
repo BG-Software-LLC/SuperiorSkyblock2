@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -74,7 +74,7 @@ public final class CmdAdminSetRate implements IAdminIslandCommand {
 
         island.setRating(targetPlayer, rating);
 
-        Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), StringUtils.format(rating.name()));
+        Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), Formatters.CAPITALIZED_FORMATTER.format(rating.name()));
     }
 
     @Override

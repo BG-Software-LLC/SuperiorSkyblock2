@@ -3,16 +3,16 @@ package com.bgsoftware.superiorskyblock.lang;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -703,7 +703,7 @@ public enum Message {
             String message = objects.length == 0 ? null : objects[0] == null ? null : objects[0].toString();
             boolean translateColors = objects.length >= 2 && objects[1] instanceof Boolean && (boolean) objects[1];
             if (message != null && !message.isEmpty())
-                sender.sendMessage(translateColors ? StringUtils.translateColors(message) : message);
+                sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
         }
 
     };
@@ -776,7 +776,7 @@ public enum Message {
                 if (cfg.isConfigurationSection(locale.name())) {
                     locale.setMessage(fileLocale, MultipleComponents.parseSection(cfg.getConfigurationSection(locale.name())));
                 } else {
-                    locale.setMessage(fileLocale, RawMessageComponent.of(StringUtils.translateColors(cfg.getString(locale.name(), ""))));
+                    locale.setMessage(fileLocale, RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(cfg.getString(locale.name(), ""))));
                 }
 
                 if (countMessages)
@@ -795,8 +795,9 @@ public enum Message {
         return messageContainer == null || messageContainer.getMessage().isEmpty();
     }
 
+    @Nullable
     public String getMessage(java.util.Locale locale, Object... objects) {
-        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects);
+        return isEmpty(locale) ? defaultMessage : IMessageComponent.replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
     public void send(SuperiorPlayer superiorPlayer, Object... objects) {
@@ -815,19 +816,6 @@ public enum Message {
 
     private void setMessage(java.util.Locale locale, IMessageComponent messageComponent) {
         messages.put(locale, messageComponent);
-    }
-
-    private static String replaceArgs(String msg, Object... objects) {
-        if (msg == null)
-            return null;
-
-        for (int i = 0; i < objects.length; i++) {
-            String objectString = objects[i] instanceof BigDecimal ?
-                    StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
-            msg = msg.replace("{" + i + "}", objectString);
-        }
-
-        return msg;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

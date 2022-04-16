@@ -6,6 +6,9 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
+import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
@@ -15,7 +18,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
@@ -261,7 +263,7 @@ public final class SettingsContainer {
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = KeySetImpl.createHashSet(config.getStringList("stacked-blocks.whitelisted")
                 .stream().map(KeyImpl::of).collect(Collectors.toList()));
-        stackedBlocksName = StringUtils.translateColors(config.getString("stacked-blocks.custom-name"));
+        stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = KeyMapImpl.createHashMap();
         config.getStringList("stacked-blocks.limits").forEach(line -> {
             String[] sections = line.split(":");
@@ -276,18 +278,18 @@ public final class SettingsContainer {
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
-        stackedBlocksMenuTitle = StringUtils.translateColors(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
+        stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
         islandTopOrder = config.getString("island-top-order", "WORTH");
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
-        signWarp = StringUtils.translateColors(config.getStringList("sign-warp"));
+        signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
         while (signWarp.size() < 4)
             signWarp.add("");
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
-        visitorsSignActive = StringUtils.translateColors(config.getString("visitors-sign.active", "&a[Welcome]"));
-        visitorsSignInactive = StringUtils.translateColors(config.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
+        visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
         normalWorldEnabled = config.getBoolean("worlds.normal.enabled", true);
         normalWorldUnlocked = config.getBoolean("worlds.normal.unlock", true);
@@ -387,9 +389,9 @@ public final class SettingsContainer {
         }
         upgradeCooldown = config.getLong("upgrade-cooldown", -1L);
         numberFormat = config.getString("number-format", "en-US");
-        StringUtils.setNumberFormatter(numberFormat);
+        NumberFormatter.setNumberFormatter(numberFormat);
         dateFormat = config.getString("date-format", "dd/MM/yyyy HH:mm:ss");
-        StringUtils.setDateFormatter(dateFormat);
+        DateFormatter.setDateFormatter(plugin, dateFormat);
         skipOneItemMenus = config.getBoolean("skip-one-item-menus", false);
         teleportOnPVPEnable = config.getBoolean("teleport-on-pvp-enable", true);
         immuneToPVPWhenTeleport = config.getBoolean("immune-to-pvp-when-teleport", true);
@@ -461,7 +463,7 @@ public final class SettingsContainer {
         disabledEvents = config.getStringList("disabled-events")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList());
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
-        islandChestTitle = StringUtils.translateColors(config.getString("island-chests.chest-title", "&4Island Chest"));
+        islandChestTitle = Formatters.COLOR_FORMATTER.format(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = Math.min(6, Math.max(1, config.getInt("island-chests.default-size", 3)));
         commandAliases = new HashMap<>();

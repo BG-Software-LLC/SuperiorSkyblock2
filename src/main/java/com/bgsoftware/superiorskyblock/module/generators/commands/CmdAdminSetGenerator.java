@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -113,11 +113,11 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         }));
 
         if (islands.size() != 1)
-            Message.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
         else
-            Message.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());
+            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

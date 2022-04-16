@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -79,11 +80,11 @@ public final class CmdAdminSetPermission implements IAdminIslandCommand {
         Executor.data(() -> islands.forEach(island -> island.setPermission(playerRole, islandPrivilege)));
 
         if (islands.size() > 1)
-            Message.PERMISSION_CHANGED_ALL.send(sender, StringUtils.format(islandPrivilege.getName()));
+            Message.PERMISSION_CHANGED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()));
         else if (targetPlayer == null)
-            Message.PERMISSION_CHANGED_NAME.send(sender, StringUtils.format(islandPrivilege.getName()), islands.get(0).getName());
+            Message.PERMISSION_CHANGED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()), islands.get(0).getName());
         else
-            Message.PERMISSION_CHANGED.send(sender, StringUtils.format(islandPrivilege.getName()), targetPlayer.getName());
+            Message.PERMISSION_CHANGED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(islandPrivilege.getName()), targetPlayer.getName());
     }
 
     @Override

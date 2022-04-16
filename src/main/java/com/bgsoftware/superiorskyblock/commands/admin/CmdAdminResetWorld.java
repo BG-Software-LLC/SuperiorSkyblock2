@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -102,11 +102,11 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
         });
 
         if (islands.size() > 1)
-            Message.RESET_WORLD_SUCCEED_ALL.send(sender, StringUtils.format(args[3]));
+            Message.RESET_WORLD_SUCCEED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
         else if (targetPlayer == null)
-            Message.RESET_WORLD_SUCCEED_NAME.send(sender, StringUtils.format(args[3]), islands.get(0).getName());
+            Message.RESET_WORLD_SUCCEED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), islands.get(0).getName());
         else
-            Message.RESET_WORLD_SUCCEED.send(sender, StringUtils.format(args[3]), targetPlayer.getName());
+            Message.RESET_WORLD_SUCCEED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]), targetPlayer.getName());
     }
 
     @Override

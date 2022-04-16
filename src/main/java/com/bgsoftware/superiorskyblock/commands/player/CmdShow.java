@@ -7,11 +7,11 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.command.CommandSender;
 
@@ -87,7 +87,8 @@ public final class CmdShow implements ISuperiorCommand {
             infoMessage.append(Message.ISLAND_INFO_CREATION_TIME.getMessage(locale, island.getCreationTimeDate())).append("\n");
         if (!Message.ISLAND_INFO_RATE.isEmpty(locale)) {
             double rating = island.getTotalRating();
-            infoMessage.append(Message.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
+            infoMessage.append(Message.ISLAND_INFO_RATE.getMessage(locale, Formatters.RATING_FORMATTER.format(rating, locale),
+                    Formatters.NUMBER_FORMATTER.format(rating), island.getRatingAmount())).append("\n");
         }
         if (BuiltinModules.BANK.isEnabled()) {
             if (!Message.ISLAND_INFO_BANK.isEmpty(locale))

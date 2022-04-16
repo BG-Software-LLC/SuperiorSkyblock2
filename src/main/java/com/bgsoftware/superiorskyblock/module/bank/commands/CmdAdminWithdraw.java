@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
@@ -86,9 +87,9 @@ public final class CmdAdminWithdraw implements IAdminIslandCommand {
         island.getIslandBank().withdrawAdminMoney(sender, amount);
 
         if (targetPlayer == null)
-            Message.WITHDRAWN_MONEY_NAME.send(sender, StringUtils.format(amount), island.getName());
+            Message.WITHDRAWN_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), island.getName());
         else
-            Message.WITHDRAWN_MONEY.send(sender, StringUtils.format(amount), targetPlayer.getName());
+            Message.WITHDRAWN_MONEY.send(sender, Formatters.NUMBER_FORMATTER.format(amount), targetPlayer.getName());
     }
 
 }

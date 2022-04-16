@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
@@ -26,7 +27,6 @@ import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -194,7 +194,7 @@ public final class UpgradesModule extends BuiltinModule {
         Set<UpgradeRequirement> requirements = new HashSet<>();
         for (String line : levelSection.getStringList("required-checks")) {
             String[] sections = line.split(";");
-            requirements.add(new UpgradeRequirement(sections[0], StringUtils.translateColors(sections[1])));
+            requirements.add(new UpgradeRequirement(sections[0], Formatters.COLOR_FORMATTER.format(sections[1])));
         }
         UpgradeValue<Double> cropGrowth = new UpgradeValue<>(levelSection.getDouble("crop-growth", -1D), true);
         UpgradeValue<Double> spawnerRates = new UpgradeValue<>(levelSection.getDouble("spawner-rates", -1D), true);

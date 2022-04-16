@@ -32,6 +32,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
@@ -88,10 +89,12 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -242,7 +245,7 @@ public final class SIsland implements Island {
         this.center = SBlockPosition.of(location);
         this.creationTime = creationTime;
         this.islandName = islandName;
-        this.islandRawName = StringUtils.stripColors(islandName);
+        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         this.schemName = schemName;
     }
 
@@ -352,7 +355,7 @@ public final class SIsland implements Island {
 
     @Override
     public void updateDatesFormatter() {
-        this.creationTimeDate = StringUtils.formatDate(creationTime * 1000);
+        this.creationTimeDate = Formatters.DATE_FORMATTER.format(new Date(creationTime * 1000));
     }
 
     /*
@@ -1209,7 +1212,7 @@ public final class SIsland implements Island {
         PluginDebugger.debug("Action: Set Name, Island: " + owner.getName() + ", Name: " + islandName);
 
         this.islandName = islandName;
-        this.islandRawName = StringUtils.stripColors(this.islandName);
+        this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(this.islandName);
 
         IslandsDatabaseBridge.saveName(this);
     }
@@ -2592,8 +2595,8 @@ public final class SIsland implements Island {
 
         if (plugin.getSettings().getWarpsWarmup() > 0 && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
-            Message.TELEPORT_WARMUP.send(superiorPlayer, StringUtils.formatTime(superiorPlayer.getUserLocale(),
-                    plugin.getSettings().getWarpsWarmup(), TimeUnit.MILLISECONDS));
+            Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
+                    Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
             superiorPlayer.setTeleportTask(Executor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
         } else {

@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandRatings;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -35,7 +35,7 @@ public final class RatingsPagedObjectButton extends PagedObjectButton<MenuIsland
 
         return new ItemBuilder(buttonItem)
                 .replaceAll("{0}", ratingPlayer.getName())
-                .replaceAll("{1}", StringUtils.formatRating(ratingPlayer.getUserLocale(), ratingInfo.getRating().getValue()))
+                .replaceAll("{1}", Formatters.RATING_FORMATTER.format(ratingInfo.getRating().getValue(), ratingPlayer.getUserLocale()))
                 .asSkullOf(ratingPlayer)
                 .build(ratingPlayer);
     }

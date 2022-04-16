@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
@@ -350,7 +351,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        String inputName = StringUtils.stripColors(islandName);
+        String inputName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 

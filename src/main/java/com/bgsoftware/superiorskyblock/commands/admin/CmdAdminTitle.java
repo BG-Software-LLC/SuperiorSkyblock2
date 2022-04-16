@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -94,8 +94,8 @@ public final class CmdAdminTitle implements IAdminPlayerCommand {
         }
 
         plugin.getNMSPlayers().sendTitle(targetPlayer.asPlayer(),
-                title == null ? null : StringUtils.translateColors(title),
-                subtitle == null ? null : StringUtils.translateColors(subtitle),
+                title == null ? null : Formatters.COLOR_FORMATTER.format(title),
+                subtitle == null ? null : Formatters.COLOR_FORMATTER.format(subtitle),
                 fadeIn.getNumber(),
                 duration.getNumber(),
                 fadeOut.getNumber());

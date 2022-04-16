@@ -7,13 +7,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,7 +22,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public final class CmdTeam implements ISuperiorCommand {
 
@@ -96,7 +96,7 @@ public final class CmdTeam implements ISuperiorCommand {
                     boolean onlinePlayer = islandMember.isOnline() && islandMember.isShownAsOnline();
                     rolesStrings.get(playerRole).append(Message.ISLAND_TEAM_STATUS_ROLES.getMessage(locale, playerRole,
                             islandMember.getName(), onlinePlayer ? onlineStatus : offlineStatus,
-                            StringUtils.formatTime(locale, time, TimeUnit.SECONDS))).append("\n");
+                            Formatters.TIME_FORMATTER.format(Duration.ofSeconds(time), locale))).append("\n");
                 });
 
                 rolesStrings.keySet().stream()
