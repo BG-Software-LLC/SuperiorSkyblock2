@@ -36,7 +36,7 @@ public final class GeneratorsListener implements Listener {
         this.module = module;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockFormEvent(BlockFormEvent e) {
         if (!module.isEnabled())
             return;
@@ -55,7 +55,7 @@ public final class GeneratorsListener implements Listener {
             e.setCancelled(true);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onBlockFromToEvent(BlockFromToEvent e) {
         if (!module.isEnabled())
             return;
