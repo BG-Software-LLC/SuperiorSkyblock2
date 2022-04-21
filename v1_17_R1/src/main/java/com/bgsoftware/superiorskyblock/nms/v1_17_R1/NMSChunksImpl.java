@@ -127,10 +127,12 @@ public final class NMSChunksImpl implements NMSChunks {
         ChunkCoordIntPair chunkCoords = chunk.getPos();
         WorldServer worldServer = (WorldServer) chunk.getWorld();
 
+        int chunkWorldCoordX = chunkCoords.b << 4;
+        int chunkWorldCoordZ = chunkCoords.c << 4;
+
         AxisAlignedBB chunkBounds = new AxisAlignedBB(
-                chunkCoords.b << 4, 0, chunkCoords.c << 4,
-                chunkCoords.b << 4 + 15, chunk.getWorld().getMaxBuildHeight(), chunkCoords.c << 4 + 15
-        );
+                chunkWorldCoordX, 0, chunkWorldCoordZ,
+                chunkWorldCoordX + 15, chunk.getWorld().getMaxBuildHeight(), chunkWorldCoordZ + 15);
 
         Iterator<Entity> chunkEntities;
 
@@ -138,10 +140,7 @@ public final class NMSChunksImpl implements NMSChunks {
             chunkEntities = chunk.entities.iterator();
         } catch (Throwable ex) {
             List<Entity> worldEntities = new ArrayList<>();
-            worldServer.getEntities().a().forEach(entity -> {
-                if (entity.getBoundingBox().c(chunkBounds))
-                    worldEntities.add(entity);
-            });
+            worldServer.getEntities().a(chunkBounds, worldEntities::add);
             chunkEntities = worldEntities.iterator();
         }
 
