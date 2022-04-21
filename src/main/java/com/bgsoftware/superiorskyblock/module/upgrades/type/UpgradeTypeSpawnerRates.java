@@ -59,8 +59,8 @@ public final class UpgradeTypeSpawnerRates implements IUpgradeType {
                 if (spawnDelay > 0) {
                     plugin.getNMSWorld().setSpawnerDelay(creatureSpawner,
                             (int) Math.round(spawnDelay / spawnerRatesMultiplier));
-                    Executor.sync(() -> alreadyTrackedSpawning.remove(island.getOwner().getUniqueId()), 10L);
                 }
+                Executor.sync(() -> alreadyTrackedSpawning.remove(island.getOwner().getUniqueId()), 10L);
             }, 5L);
         }
     }
