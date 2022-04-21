@@ -7,16 +7,22 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 public enum Message {
 
@@ -699,12 +705,49 @@ public enum Message {
     WORLD_NOT_ENABLED,
     WORLD_NOT_UNLOCKED,
 
-    CUSTOM {
+    SCHEMATICS {
+        private final Set<UUID> noSchematicMessages = new HashSet<>();
+
         @Override
         public void send(CommandSender sender, Locale locale, Object... objects) {
-            String message = objects.length == 0 ? null : objects[0] == null ? null : objects[0].toString();
-            boolean translateColors = objects.length >= 2 && objects[1] instanceof Boolean && (boolean) objects[1];
-            if (message != null && !message.isEmpty())
+            if (!(sender instanceof Player) || objects.length != 1 || !(objects[0] instanceof String))
+                return;
+
+            UUID playerUUID = ((Player) sender).getUniqueId();
+            String message = (String) objects[0];
+
+            if (!noSchematicMessages.contains(playerUUID)) {
+                noSchematicMessages.add(playerUUID);
+                Message.CUSTOM.send(sender, locale, message, false);
+                Executor.sync(() -> noSchematicMessages.remove(playerUUID), 60L);
+            }
+        }
+    },
+
+    PROTECTION {
+        private final Set<UUID> noInteractMessages = new HashSet<>();
+
+        @Override
+        public void send(CommandSender sender, Locale locale, Object... args) {
+            if (!(sender instanceof Player))
+                return;
+
+            UUID playerUUID = ((Player) sender).getUniqueId();
+
+            if (!noInteractMessages.contains(playerUUID)) {
+                noInteractMessages.add(playerUUID);
+                Message.ISLAND_PROTECTED.send(sender, locale, args);
+                Executor.sync(() -> noInteractMessages.remove(playerUUID), plugin.getSettings().getProtectedMessageDelay());
+            }
+        }
+    },
+
+    CUSTOM {
+        @Override
+        public void send(CommandSender sender, Locale locale, Object... args) {
+            String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
+            boolean translateColors = args.length >= 2 && args[1] instanceof Boolean && (boolean) args[1];
+            if (!StringUtils.isBlank(message))
                 sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
         }
 
@@ -802,11 +845,11 @@ public enum Message {
         return isEmpty(locale) ? defaultMessage : IMessageComponent.replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
-    public void send(SuperiorPlayer superiorPlayer, Object... objects) {
+    public final void send(SuperiorPlayer superiorPlayer, Object... objects) {
         superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
     }
 
-    public void send(CommandSender sender, Object... objects) {
+    public final void send(CommandSender sender, Object... objects) {
         send(sender, PlayerLocales.getLocale(sender), objects);
     }
 
