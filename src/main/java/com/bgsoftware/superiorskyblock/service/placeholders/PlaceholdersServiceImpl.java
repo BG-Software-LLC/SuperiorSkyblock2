@@ -19,7 +19,6 @@ import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import java.time.Duration;
@@ -297,7 +296,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
             return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
         } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1);
-            return Optional.of(island.getEntityLimit(EntityType.valueOf(keyName)) + "");
+            return Optional.of(island.getEntityLimit(KeyImpl.of(keyName)) + "");
         } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
             String keyName = matcher.group(1);
             return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
