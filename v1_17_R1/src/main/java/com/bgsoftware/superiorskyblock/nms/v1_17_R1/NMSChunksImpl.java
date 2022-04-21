@@ -63,6 +63,7 @@ import org.bukkit.craftbukkit.v1_17_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,6 +87,8 @@ public final class NMSChunksImpl implements NMSChunks {
             LightEngineThreaded.class, Object.class, "theLightEngine");
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
             LightEngineThreaded.class, ThreadedMailbox.class, "e");
+    private static final ReflectField<BiomeStorage> CHUNK_BIOME_STORAGE = new ReflectField<>(
+            Chunk.class, BiomeStorage.class, Modifier.PRIVATE, 1);
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
@@ -164,9 +167,27 @@ public final class NMSChunksImpl implements NMSChunks {
             RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer,
                     Collections.singletonList(chunk), ChunkStatus.f, 0);
 
-            chunkGenerator.buildBase(region, chunk);
+            try {
+                chunkGenerator.buildBase(region, chunk);
+            } catch (ClassCastException error) {
+                ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunk.getPos(), worldServer);
+                chunkGenerator.buildBase(region, protoChunk);
+
+                // Load chunk sections from proto chunk to the actual chunk
+                for (int i = 0; i < protoChunk.getSections().length && i < chunk.getSections().length; ++i) {
+                    chunk.getSections()[i] = protoChunk.getSections()[i];
+                }
+
+                // Load biomes from proto chunk to the actual chunk
+                if (protoChunk.getBiomeIndex() != null)
+                    CHUNK_BIOME_STORAGE.set(chunk, protoChunk.getBiomeIndex());
+
+                // Load tile entities from proto chunk to the actual chunk
+                protoChunk.y().forEach(((blockPosition, tileEntity) -> chunk.setTileEntity(tileEntity)));
+            }
         }
     }
+
 
     @Override
     public void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate) {
