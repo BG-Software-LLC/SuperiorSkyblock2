@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.enumerate;
+package com.bgsoftware.superiorskyblock.structure;
 
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 
@@ -22,6 +22,7 @@ public final class EnumerateMap<K extends Enumerable, V> {
     public EnumerateMap(EnumerateMap<K, V> other) {
         this.values = new ArrayList<>(other.values.size());
         this.values.addAll(other.values);
+        this.size = other.size;
     }
 
     public int size() {

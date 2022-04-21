@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.enumerate.EnumerateMap;
+import com.bgsoftware.superiorskyblock.structure.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;

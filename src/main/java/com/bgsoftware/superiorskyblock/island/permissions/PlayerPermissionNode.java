@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.enumerate.EnumerateMap;
+import com.bgsoftware.superiorskyblock.structure.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.google.common.base.Preconditions;
 

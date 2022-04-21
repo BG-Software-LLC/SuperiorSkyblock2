@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
-import com.bgsoftware.superiorskyblock.enumerate.EnumerateMap;
+import com.bgsoftware.superiorskyblock.structure.EnumerateMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
