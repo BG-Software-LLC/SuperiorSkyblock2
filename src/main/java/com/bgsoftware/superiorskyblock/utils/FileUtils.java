@@ -56,22 +56,37 @@ public final class FileUtils {
 
     @Nullable
     public static TemplateItem getItemStack(String fileName, ConfigurationSection section) {
-        if (section == null || !section.contains("type"))
+        if (section == null)
             return null;
 
-        Material type;
-        short data;
+        TemplateItem templateItem;
 
-        try {
-            type = Material.valueOf(section.getString("type"));
-            data = (short) section.getInt("data");
-        } catch (IllegalArgumentException ex) {
-            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
-            PluginDebugger.debug(ex);
-            return null;
+        String sourceItem = section.getString("source");
+        if (sourceItem != null) {
+            templateItem = getItemStack(fileName, section.getRoot().getConfigurationSection(sourceItem));
+
+            if (templateItem == null)
+                return null;
+        } else {
+            if (!section.contains("type"))
+                return null;
+
+            Material type;
+            short data;
+
+            try {
+                type = Material.valueOf(section.getString("type"));
+                data = (short) section.getInt("data");
+            } catch (IllegalArgumentException ex) {
+                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
+                PluginDebugger.debug(ex);
+                return null;
+            }
+
+            templateItem = new TemplateItem(new ItemBuilder(type, data));
         }
 
-        ItemBuilder itemBuilder = new ItemBuilder(type, data);
+        ItemBuilder itemBuilder = templateItem.getEditableBuilder();
 
         if (section.contains("name"))
             itemBuilder.withName(Formatters.COLOR_FORMATTER.format(section.getString("name")));
@@ -148,7 +163,7 @@ public final class FileUtils {
             itemBuilder.withCustomModel(section.getInt("customModel"));
         }
 
-        return new TemplateItem(itemBuilder);
+        return templateItem;
     }
 
     @Nullable
