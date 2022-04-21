@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
@@ -7,14 +8,22 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public final class IslandPrivilege {
+public final class IslandPrivilege implements Enumerable {
 
     private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
+    private static int ordinalCounter = 0;
 
     private final String name;
+    private final int ordinal;
 
     private IslandPrivilege(String name) {
         this.name = name.toUpperCase(Locale.ENGLISH);
+        this.ordinal = ordinalCounter++;
+    }
+
+    @Override
+    public int ordinal() {
+        return this.ordinal;
     }
 
     /**

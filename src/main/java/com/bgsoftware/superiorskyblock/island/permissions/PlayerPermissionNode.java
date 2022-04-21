@@ -4,10 +4,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.enumerate.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.google.common.base.Preconditions;
 
-import java.util.Map;
+import javax.annotation.Nullable;
 
 public class PlayerPermissionNode extends PermissionNodeAbstract {
 
@@ -25,9 +26,9 @@ public class PlayerPermissionNode extends PermissionNodeAbstract {
         setPermissions(permissions, false);
     }
 
-    private PlayerPermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SuperiorPlayer superiorPlayer, Island island) {
+    private PlayerPermissionNode(@Nullable EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges,
+                                 SuperiorPlayer superiorPlayer, Island island) {
         super(privileges);
-
         this.superiorPlayer = superiorPlayer;
         this.island = island;
     }
