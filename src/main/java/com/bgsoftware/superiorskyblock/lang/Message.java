@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
@@ -16,13 +16,13 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public enum Message {
 
@@ -706,7 +706,8 @@ public enum Message {
     WORLD_NOT_UNLOCKED,
 
     SCHEMATICS {
-        private final Set<UUID> noSchematicMessages = new HashSet<>();
+
+        private final Collection<UUID> noSchematicMessages = AutoRemovalCollection.newHashSet(3, TimeUnit.SECONDS);
 
         @Override
         public void send(CommandSender sender, Locale locale, Object... objects) {
@@ -716,28 +717,29 @@ public enum Message {
             UUID playerUUID = ((Player) sender).getUniqueId();
             String message = (String) objects[0];
 
-            if (!noSchematicMessages.contains(playerUUID)) {
-                noSchematicMessages.add(playerUUID);
+            if (noSchematicMessages.add(playerUUID)) {
                 Message.CUSTOM.send(sender, locale, message, false);
-                Executor.sync(() -> noSchematicMessages.remove(playerUUID), 60L);
             }
         }
     },
 
     PROTECTION {
-        private final Set<UUID> noInteractMessages = new HashSet<>();
+
+        @Nullable
+        private Collection<UUID> noInteractMessages;
 
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
             if (!(sender instanceof Player))
                 return;
 
+            if (noInteractMessages == null)
+                noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
+
             UUID playerUUID = ((Player) sender).getUniqueId();
 
-            if (!noInteractMessages.contains(playerUUID)) {
-                noInteractMessages.add(playerUUID);
+            if (noInteractMessages.add(playerUUID)) {
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
-                Executor.sync(() -> noInteractMessages.remove(playerUUID), plugin.getSettings().getProtectedMessageDelay());
             }
         }
     },

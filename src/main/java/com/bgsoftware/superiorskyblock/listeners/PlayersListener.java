@@ -15,9 +15,9 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
@@ -69,16 +69,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
 
-    private final Set<UUID> noFallDamage = new HashSet<>();
+    private final Collection<UUID> noFallDamage = AutoRemovalCollection.newHashSet(1, TimeUnit.SECONDS);
     private final SuperiorSkyblockPlugin plugin;
     private final String buildName;
 
@@ -441,7 +441,6 @@ public final class PlayersListener implements Listener {
                 Message.TELEPORTED_FAILED.send(superiorPlayer);
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
-            Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
         });
     }
 

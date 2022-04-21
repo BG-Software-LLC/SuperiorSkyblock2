@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -31,10 +32,10 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
@@ -59,7 +60,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private final class EntityLimitsListener implements Listener {
 
-        private final Map<Location, UUID> vehiclesOwners = new HashMap<>();
+        private final Map<Location, UUID> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
@@ -120,7 +121,6 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             Location blockLocation = e.getClickedBlock().getLocation();
 
             vehiclesOwners.put(blockLocation, e.getPlayer().getUniqueId());
-            Executor.sync(() -> vehiclesOwners.remove(blockLocation), 40L);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
