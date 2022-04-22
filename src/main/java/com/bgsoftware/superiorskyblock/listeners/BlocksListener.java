@@ -329,7 +329,7 @@ public final class BlocksListener implements Listener {
                     StackedBlocksLogic.tryUnstack(e.getPlayer(), clickedBlock, plugin);
             }
 
-            if (inHand != null && StackedBlocksLogic.canStackBlocks(e.getPlayer(), inHand, clickedBlock, null) &&
+            if (inHand != null && StackedBlocksLogic.canStackBlocks(e.getPlayer(), inHand, clickedBlock) &&
                     StackedBlocksLogic.tryStack(e.getPlayer(), inHand, clickedBlock.getLocation(), e)) {
                 e.setCancelled(true);
             }
@@ -344,7 +344,7 @@ public final class BlocksListener implements Listener {
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
             plugin.getStackedBlocks().setStackedBlock(e.getBlock(), 1);
 
-        if (!StackedBlocksLogic.canStackBlocks(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst(), e.getBlockReplacedState()))
+        if (!StackedBlocksLogic.canStackBlocks(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst()))
             return;
 
         if (StackedBlocksLogic.tryStack(e.getPlayer(), e.getItemInHand(), e.getBlockAgainst().getLocation(), e))
