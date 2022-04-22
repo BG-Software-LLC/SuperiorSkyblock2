@@ -519,6 +519,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             stackedBlocksHandler.loadData();
             SortingType.values().forEach(gridHandler::sortIslands);
             modulesHandler.loadModulesData(this);
+            modulesHandler.enableModules(ModuleLoadTime.AFTER_MODULE_DATA_LOAD);
         } else {
             modulesHandler.reloadModules(this);
         }
