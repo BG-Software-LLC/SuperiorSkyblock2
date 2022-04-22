@@ -14,6 +14,8 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAl
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
@@ -27,6 +29,8 @@ import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandEntitiesTr
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
+import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
@@ -63,6 +67,23 @@ public final class FactoriesHandler implements FactoriesManager {
     public void registerDatabaseBridgeFactory(DatabaseBridgeFactory databaseBridgeFactory) {
         Preconditions.checkNotNull(databaseBridgeFactory, "databaseBridgeFactory parameter cannot be null.");
         this.databaseBridgeFactory = databaseBridgeFactory;
+    }
+
+    @Override
+    public BlockOffset createBlockOffset(int offsetX, int offsetY, int offsetZ) {
+        return SBlockOffset.fromOffsets(offsetX, offsetY, offsetZ);
+    }
+
+    @Override
+    public BlockPosition createBlockPosition(String world, int blockX, int blockY, int blockZ) {
+        Preconditions.checkNotNull(world, "world cannot be null.");
+        return SBlockPosition.of(world, blockX, blockY, blockZ);
+    }
+
+    @Override
+    public BlockPosition createBlockPosition(Location location) {
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        return SBlockPosition.of(location);
     }
 
     public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {

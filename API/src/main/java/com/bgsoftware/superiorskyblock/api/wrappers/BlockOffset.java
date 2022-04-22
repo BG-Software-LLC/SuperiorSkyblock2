@@ -2,6 +2,10 @@ package com.bgsoftware.superiorskyblock.api.wrappers;
 
 import org.bukkit.Location;
 
+/**
+ * This object represents an offset from a block.
+ * You can create a new instance of this class by using {@link com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager}
+ */
 public interface BlockOffset {
 
     /**

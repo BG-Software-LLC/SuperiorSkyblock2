@@ -34,6 +34,11 @@ public final class SBlockPosition implements BlockPosition {
     }
 
     @Override
+    public String getWorldName() {
+        return world;
+    }
+
+    @Override
     public World getWorld() {
         return Bukkit.getWorld(world);
     }
@@ -66,10 +71,6 @@ public final class SBlockPosition implements BlockPosition {
     @Override
     public Location parse() {
         return new Location(getWorld(), getX(), getY(), getZ());
-    }
-
-    public String getWorldName() {
-        return world;
     }
 
     @Override
