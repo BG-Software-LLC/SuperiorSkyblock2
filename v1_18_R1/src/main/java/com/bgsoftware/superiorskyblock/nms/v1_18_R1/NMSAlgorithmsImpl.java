@@ -4,7 +4,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.algorithms.CustomTileEntityHopper;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.algorithms.GlowEnchantmentFactory;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.RegistryBlocks;
@@ -13,6 +12,11 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.network.chat.ChatBaseComponent;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.item.ItemStack;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.menu.MenuTileEntityBrewing;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.menu.MenuTileEntityDispenser;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.menu.MenuTileEntityFurnace;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.menu.MenuTileEntityHopper;
+import net.minecraft.world.IInventory;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -30,9 +34,23 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import java.util.EnumMap;
+import java.util.function.BiFunction;
+
 public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
+
+    static {
+        MENUS_HOLDER_CREATORS.put(InventoryType.DISPENSER, MenuTileEntityDispenser::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.DROPPER, MenuTileEntityDispenser::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.FURNACE, MenuTileEntityFurnace::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.BREWING, MenuTileEntityBrewing::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.HOPPER, MenuTileEntityHopper::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.BLAST_FURNACE, MenuTileEntityFurnace::new);
+        MENUS_HOLDER_CREATORS.put(InventoryType.SMOKER, MenuTileEntityFurnace::new);
+    }
 
     @Override
     public void registerCommand(BukkitCommand command) {
@@ -120,8 +138,13 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
-        return new CustomTileEntityHopper(defaultHolder, title);
+    public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
+        MenuCreator menuCreator = MENUS_HOLDER_CREATORS.get(inventoryType);
+        return menuCreator == null ? null : menuCreator.apply(defaultHolder, title);
+    }
+
+    private interface MenuCreator extends BiFunction<InventoryHolder, String, IInventory> {
+
     }
 
 }

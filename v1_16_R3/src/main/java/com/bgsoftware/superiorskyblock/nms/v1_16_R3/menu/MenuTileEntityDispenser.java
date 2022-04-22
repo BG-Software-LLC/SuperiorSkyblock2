@@ -1,14 +1,14 @@
-package com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms;
+package com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu;
 
 import net.minecraft.server.v1_16_R3.ChatMessage;
-import net.minecraft.server.v1_16_R3.TileEntityHopper;
+import net.minecraft.server.v1_16_R3.TileEntityDispenser;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class CustomTileEntityHopper extends TileEntityHopper {
+public final class MenuTileEntityDispenser extends TileEntityDispenser {
 
     private final InventoryHolder holder;
 
-    public CustomTileEntityHopper(InventoryHolder holder, String title) {
+    public MenuTileEntityDispenser(InventoryHolder holder, String title) {
         this.holder = holder;
         this.setCustomName(new ChatMessage(title));
     }
