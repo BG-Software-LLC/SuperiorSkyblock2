@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.structure;
 
 import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
+import com.google.common.base.Preconditions;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,17 +13,15 @@ import java.util.function.Function;
 
 public final class EnumerateMap<K extends Enumerable, V> {
 
-    private final ArrayList<V> values;
-
+    private Object[] values;
     private int size = 0;
 
     public EnumerateMap(Collection<K> enumerables) {
-        this.values = new ArrayList<>(enumerables.size());
+        this.values = new Object[enumerables.size()];
     }
 
     public EnumerateMap(EnumerateMap<K, V> other) {
-        this.values = new ArrayList<>(other.values.size());
-        this.values.addAll(other.values);
+        this.values = other.values.clone();
         this.size = other.size;
     }
 
@@ -39,7 +39,7 @@ public final class EnumerateMap<K extends Enumerable, V> {
 
     @Nullable
     public V get(K key) {
-        return isValidKey(key) ? this.values.get(key.ordinal()) : null;
+        return isValidKey(key) ? (V) this.values[key.ordinal()] : null;
     }
 
     public V getOrDefault(K key, V def) {
@@ -48,16 +48,13 @@ public final class EnumerateMap<K extends Enumerable, V> {
     }
 
     @Nullable
-    public V put(K key, V value) {
-        if (!isValidKey(key)) {
-            // Invalid key
-            if (key.ordinal() < 0)
-                return null;
+    public V put(K key, @NotNull V value) {
+        Preconditions.checkNotNull(value, "Cannot set values as nulls.");
 
-            this.values.ensureCapacity(key.ordinal() + 1);
-        }
+        this.ensureCapacity(key.ordinal() + 1);
 
-        V oldValue = this.values.set(key.ordinal(), value);
+        V oldValue = (V) this.values[key.ordinal()];
+        this.values[key.ordinal()] = value;
 
         if (oldValue == null)
             ++this.size;
@@ -70,8 +67,11 @@ public final class EnumerateMap<K extends Enumerable, V> {
         if (!isValidKey(key))
             return null;
 
-        V oldValue = this.values.remove(key.ordinal());
+        V oldValue = (V) this.values[key.ordinal()];
+        this.values[key.ordinal()] = null;
+
         --this.size;
+
         return oldValue;
     }
 
@@ -88,12 +88,19 @@ public final class EnumerateMap<K extends Enumerable, V> {
     }
 
     public void clear() {
-        this.values.clear();
+        this.values = new Object[this.values.length];
         this.size = 0;
     }
 
     private boolean isValidKey(K key) {
-        return key.ordinal() >= 0 && key.ordinal() < this.values.size();
+        return key.ordinal() >= 0 && key.ordinal() < this.values.length;
+    }
+
+    private void ensureCapacity(int capacity) {
+        if (capacity <= this.values.length)
+            return;
+
+        this.values = Arrays.copyOf(this.values, capacity);
     }
 
 }
