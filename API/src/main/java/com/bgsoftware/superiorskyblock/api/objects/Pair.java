@@ -2,38 +2,72 @@ package com.bgsoftware.superiorskyblock.api.objects;
 
 import java.util.Map;
 
-public final class Pair<K, V> {
+/**
+ * This class represents a pair of elements.
+ *
+ * @param <E1> First element of this pair.
+ * @param <E2> Second element of this pair.
+ */
+public final class Pair<E1, E2> {
 
-    private K key;
-    private V value;
+    private E1 firstElement;
+    private E2 secondElement;
 
-    public Pair(Map.Entry<K, V> entry) {
+    /**
+     * Create a new pair out of a {@link Map.Entry} object.
+     *
+     * @param entry The entry to create the pair from.
+     */
+    public Pair(Map.Entry<E1, E2> entry) {
         this(entry.getKey(), entry.getValue());
     }
 
-    public Pair(K key, V value) {
-        this.key = key;
-        this.value = value;
+    /**
+     * Create a new pair out of two elements.
+     *
+     * @param firstElement  The first element of this pair.
+     * @param secondElement The second element of this pair.
+     */
+    public Pair(E1 firstElement, E2 secondElement) {
+        this.firstElement = firstElement;
+        this.secondElement = secondElement;
     }
 
-    public K getKey() {
-        return key;
+    /**
+     * Get the first element of this pair.
+     */
+    public E1 getKey() {
+        return this.firstElement;
     }
 
-    public void setKey(K key) {
-        this.key = key;
+    /**
+     * Set the first element of this pair.
+     *
+     * @param element The new element to set.
+     */
+    public void setKey(E1 element) {
+        this.firstElement = element;
     }
 
-    public V getValue() {
-        return value;
+    /**
+     * Get the second element of this pair.
+     */
+    public E2 getValue() {
+        return this.secondElement;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    /**
+     * Set the second element of this pair.
+     *
+     * @param element The new element to set.
+     */
+    public void setValue(E2 element) {
+        this.secondElement = element;
     }
 
     @Override
     public String toString() {
-        return "{" + key + "=" + value + "}";
+        return "{" + this.firstElement + "=" + this.secondElement + "}";
     }
+
 }
