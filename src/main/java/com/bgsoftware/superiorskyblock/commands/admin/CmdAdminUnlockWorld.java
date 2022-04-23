@@ -75,7 +75,15 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
         boolean enable = Boolean.parseBoolean(args[4]);
 
-        islands.forEach(island -> {
+        boolean anyWorldsChanged = false;
+
+        for (Island island : islands) {
+            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, environment) :
+                    !plugin.getEventsBus().callIslandLockWorldEvent(island, environment))
+                continue;
+
+            anyWorldsChanged = true;
+
             switch (environment) {
                 case NORMAL:
                     island.setNormalEnabled(enable);
@@ -87,9 +95,10 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
                     island.setEndEnabled(enable);
                     break;
             }
-        });
+        }
 
-        Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
+        if (anyWorldsChanged)
+            Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
     }
 
     @Override

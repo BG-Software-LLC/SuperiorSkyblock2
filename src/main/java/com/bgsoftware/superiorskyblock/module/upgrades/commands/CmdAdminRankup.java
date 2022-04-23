@@ -75,8 +75,8 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(null,
-                    island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
+            EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
+                    (SuperiorPlayer) null, island, upgrade, upgradeLevel);
 
             if (!event.isCancelled()) {
                 PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();

@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
@@ -176,6 +177,11 @@ public final class BlocksLogic {
             return true;
         }
 
+        EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetVisitorHomeEvent(superiorPlayer, island, visitorsLocation);
+
+        if (eventResult.isCancelled())
+            return false;
+
         StringBuilder descriptionBuilder = new StringBuilder();
 
         for (int i = 1; i < 4; i++) {
@@ -198,8 +204,12 @@ public final class BlocksLogic {
             oldWelcomeSign.update();
         }
 
-        island.setVisitorsLocation(visitorsLocation);
-        island.setDescription(description);
+        island.setVisitorsLocation(eventResult.getResult());
+
+        EventResult<String> descriptionEventResult = plugin.getEventsBus().callIslandChangeDescriptionEvent(superiorPlayer, island, description);
+
+        if (!descriptionEventResult.isCancelled())
+            island.setDescription(descriptionEventResult.getResult());
 
         if (sendMessage)
             Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(visitorsLocation));
@@ -207,20 +217,25 @@ public final class BlocksLogic {
         return true;
     }
 
-    public static void handleSignBreak(Player player, Sign sign) {
+    public static boolean handleSignBreak(Player player, Sign sign) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
         if (island == null)
-            return;
+            return true;
 
         if (island.getWarp(sign.getLocation()) != null) {
             island.deleteWarp(superiorPlayer, sign.getLocation());
         } else {
             if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
+                if (!plugin.getEventsBus().callIslandRemoveVisitorHomeEvent(superiorPlayer, island))
+                    return false;
+
                 island.setVisitorsLocation(null);
             }
         }
+
+        return true;
     }
 
 }

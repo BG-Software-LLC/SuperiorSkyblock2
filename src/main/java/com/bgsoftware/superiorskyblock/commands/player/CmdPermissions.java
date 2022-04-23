@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -10,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,11 +93,15 @@ public final class CmdPermissions implements IPermissibleCommand {
             }
         } else {
             if (permissionHolder instanceof PlayerRole) {
-                island.resetPermissions();
-                Message.PERMISSIONS_RESET_ROLES.send(superiorPlayer);
+                if (plugin.getEventsBus().callIslandClearRolesPrivilegesEvent(island, superiorPlayer)) {
+                    island.resetPermissions();
+                    Message.PERMISSIONS_RESET_ROLES.send(superiorPlayer);
+                }
             } else {
-                island.resetPermissions((SuperiorPlayer) permissionHolder);
-                Message.PERMISSIONS_RESET_PLAYER.send(superiorPlayer, ((SuperiorPlayer) permissionHolder).getName());
+                if (plugin.getEventsBus().callIslandClearPlayerPrivilegesEvent(island, superiorPlayer, (SuperiorPlayer) permissionHolder)) {
+                    island.resetPermissions((SuperiorPlayer) permissionHolder);
+                    Message.PERMISSIONS_RESET_PLAYER.send(superiorPlayer, ((SuperiorPlayer) permissionHolder).getName());
+                }
             }
         }
     }

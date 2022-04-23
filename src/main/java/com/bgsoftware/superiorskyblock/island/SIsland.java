@@ -468,7 +468,12 @@ public final class SIsland implements Island {
         }
 
         superiorPlayer.setIsland(this);
-        superiorPlayer.setPlayerRole(playerRole);
+
+        if (plugin.getEventsBus().callPlayerChangeRoleEvent(superiorPlayer, playerRole)) {
+            superiorPlayer.setPlayerRole(playerRole);
+        } else {
+            superiorPlayer.setPlayerRole(SPlayerRole.defaultRole());
+        }
 
         plugin.getMenus().refreshMembers(this);
 

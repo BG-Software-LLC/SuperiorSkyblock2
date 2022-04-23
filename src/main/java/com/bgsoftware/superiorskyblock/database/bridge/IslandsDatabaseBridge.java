@@ -223,13 +223,9 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveUpgrade(Island island, Upgrade upgrade, int level) {
-        saveUpgrade(island, upgrade.getName(), level);
-    }
-
-    public static void saveUpgrade(Island island, String upgradeName, int level) {
         island.getDatabaseBridge().insertObject("islands_upgrades",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("upgrade", upgradeName),
+                new Pair<>("upgrade", upgrade.getName()),
                 new Pair<>("level", level)
         );
     }

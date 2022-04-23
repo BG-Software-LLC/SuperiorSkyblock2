@@ -9,6 +9,8 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -80,6 +82,12 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
             Message.MAXIMUM_LEVEL.send(sender, maxLevel);
             return;
         }
+
+        EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(
+                sender, island, upgrade, upgrade.getUpgradeLevel(level));
+
+        if (eventResult.isCancelled())
+            return;
 
         island.setUpgradeLevel(upgrade, level);
 

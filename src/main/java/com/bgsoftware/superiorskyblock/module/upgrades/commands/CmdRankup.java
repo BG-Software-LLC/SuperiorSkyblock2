@@ -105,8 +105,8 @@ public final class CmdRankup implements IPermissibleCommand {
                 Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(superiorPlayer,
-                        island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
+                EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(
+                        superiorPlayer, island, upgrade, upgradeLevel);
 
                 UpgradeCost upgradeCost = event.getResult().getUpgradeCost();
 

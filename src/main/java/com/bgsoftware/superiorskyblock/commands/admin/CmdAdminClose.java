@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -57,8 +57,10 @@ public final class CmdAdminClose implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        island.setLocked(true);
-        Message.ISLAND_CLOSED.send(sender);
+        if (plugin.getEventsBus().callIslandCloseEvent(island, sender)) {
+            island.setLocked(true);
+            Message.ISLAND_CLOSED.send(sender);
+        }
     }
 
 }
