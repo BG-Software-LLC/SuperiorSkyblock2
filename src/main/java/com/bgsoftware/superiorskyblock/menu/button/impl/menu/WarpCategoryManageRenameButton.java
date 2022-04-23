@@ -30,13 +30,11 @@ public final class WarpCategoryManageRenameButton extends SuperiorMenuButton<Men
 
         superiorMenu.closePage();
 
-        PlayerChat.listen(player, message -> {
+        PlayerChat.listen(player, newName -> {
             WarpCategory warpCategory = superiorMenu.getWarpCategory();
 
             if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
-                    !message.equalsIgnoreCase("-cancel")) {
-                String newName = IslandUtils.getWarpName(message);
-
+                    !newName.equalsIgnoreCase("-cancel")) {
                 if (warpCategory.getIsland().getWarpCategory(newName) != null) {
                     Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(player);
                     return true;

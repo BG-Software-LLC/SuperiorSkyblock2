@@ -128,7 +128,7 @@ public final class BlocksLogic {
             return true;
         }
 
-        String warpName = IslandUtils.getWarpName(Formatters.STRIP_COLOR_FORMATTER.format(signLines[1].trim()));
+        String warpName = Formatters.STRIP_COLOR_FORMATTER.format(signLines[1].trim());
         boolean privateFlag = signLines[2].equalsIgnoreCase("private");
 
         boolean creationFailed = false;
