@@ -22,10 +22,10 @@ public final class LocationUtils {
     }
 
     public static SmartLocation getLocation(String location) {
-        try {
-            if (location == null || location.isEmpty())
-                return null;
+        if (StringUtils.isBlank(location))
+            return null;
 
+        try {
             String[] sections = location.split(",");
 
             double x = Double.parseDouble(sections[1]);

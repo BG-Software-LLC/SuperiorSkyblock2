@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.database.sql.session.impl.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -566,7 +567,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         UUID islandUUID;
 
         String uuidRaw = resultSet.get("uuid", null);
-        if (uuidRaw == null || uuidRaw.isEmpty()) {
+        if (StringUtils.isBlank(uuidRaw)) {
             islandUUID = ownerUUID;
         } else {
             islandUUID = UUID.fromString(uuidRaw);

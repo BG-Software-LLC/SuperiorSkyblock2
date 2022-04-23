@@ -380,7 +380,7 @@ public final class RawDeserializer implements IDeserializer {
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
         List<IslandChestAttributes> islandChestAttributes = new ArrayList<>();
 
-        if (islandChest == null || islandChest.isEmpty())
+        if (StringUtils.isBlank(islandChest))
             return islandChestAttributes;
 
         String[] islandChestsSections = islandChest.split("\n");

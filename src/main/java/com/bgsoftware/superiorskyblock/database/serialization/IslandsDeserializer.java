@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
@@ -290,7 +291,7 @@ public final class IslandsDeserializer {
     }
 
     public static void deserializeBlockCounts(String blocks, Island island) {
-        if (blocks == null || blocks.isEmpty())
+        if (StringUtils.isBlank(blocks))
             return;
 
         JsonArray blockCounts;

@@ -102,7 +102,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        if (failureReason == null || failureReason.isEmpty()) {
+        if (StringUtils.isBlank(failureReason)) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED,
                     position, System.currentTimeMillis(), "", amount);
             increaseBalance(amount);
@@ -199,7 +199,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        if (failureReason == null || failureReason.isEmpty()) {
+        if (StringUtils.isBlank(failureReason)) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
             decreaseBalance(withdrawAmount);
 
