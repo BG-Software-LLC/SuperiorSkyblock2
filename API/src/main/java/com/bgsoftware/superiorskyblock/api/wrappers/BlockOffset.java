@@ -24,6 +24,11 @@ public interface BlockOffset {
     int getOffsetZ();
 
     /**
+     * Get a copy of this offset with negated offsets, which this.equals(this.negate().negate()) is true.
+     */
+    BlockOffset negate();
+
+    /**
      * Apply this block-offset to a location.
      *
      * @param location The location to apply the offset to.

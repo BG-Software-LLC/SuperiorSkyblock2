@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class SBlockOffset implements BlockOffset {
 
@@ -16,10 +18,15 @@ public final class SBlockOffset implements BlockOffset {
 
     @Nullable
     public static BlockOffset deserialize(String string) {
-        if (string == null || string.isEmpty())
+        return deserialize(string, ", ");
+    }
+
+    @Nullable
+    public static BlockOffset deserialize(String string, String separator) {
+        if (StringUtils.isBlank(string))
             return null;
 
-        String[] stringSections = string.split(", ");
+        String[] stringSections = string.split(separator);
 
         if (stringSections.length != 3)
             return null;
@@ -57,9 +64,27 @@ public final class SBlockOffset implements BlockOffset {
     }
 
     @Override
+    public BlockOffset negate() {
+        return SBlockOffset.fromOffsets(-offsetX, -offsetY, -offsetZ);
+    }
+
+    @Override
     public Location applyToLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return location.clone().add(this.offsetX, this.offsetY, this.offsetZ);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SBlockOffset that = (SBlockOffset) o;
+        return offsetX == that.offsetX && offsetY == that.offsetY && offsetZ == that.offsetZ;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(offsetX, offsetY, offsetZ);
     }
 
 }
