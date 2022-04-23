@@ -58,7 +58,6 @@ import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -1275,7 +1274,7 @@ public final class SIsland implements Island {
 
         SuperiorPlayer previousOwner = getOwner();
 
-        if (!EventsCaller.callIslandTransferEvent(this, previousOwner, superiorPlayer))
+        if (!plugin.getEventsBus().callIslandTransferEvent(this, previousOwner, superiorPlayer))
             return false;
 
         PluginDebugger.debug("Action: Transfer Owner, Island: " + owner.getName() + ", New Owner: " + superiorPlayer.getName());
@@ -3156,8 +3155,7 @@ public final class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            Executor.async(() ->
-                    EventsCaller.callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
+            Executor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
         if (++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10) {
@@ -3649,9 +3647,8 @@ public final class SIsland implements Island {
         }
     }
 
-    private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal
-            islandWorth) {
-        EventsCaller.callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
+    private void finishCalcIsland(SuperiorPlayer asker, Runnable callback, BigDecimal islandLevel, BigDecimal islandWorth) {
+        plugin.getEventsBus().callIslandWorthCalculatedEvent(this, asker, islandLevel, islandWorth);
 
         if (asker != null)
             Message.ISLAND_WORTH_RESULT.send(asker, islandWorth, islandLevel);

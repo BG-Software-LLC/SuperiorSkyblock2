@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
@@ -80,7 +79,7 @@ public final class WorldEditSchematic extends BaseSchematic implements Schematic
                 try {
                     island.handleBlocksPlace(cachedCounts);
 
-                    EventsCaller.callIslandSchematicPasteEvent(island, name, location);
+                    plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                     callback.run();
                 } catch (Throwable ex) {

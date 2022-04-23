@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.schematic;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
@@ -9,6 +10,8 @@ import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class BaseSchematic implements Schematic {
+
+    protected static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     protected final String name;
 

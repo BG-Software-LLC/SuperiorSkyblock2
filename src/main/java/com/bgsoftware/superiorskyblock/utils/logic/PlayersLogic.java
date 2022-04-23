@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
@@ -67,7 +66,7 @@ public final class PlayersLogic {
         //Checking for the stop leaving feature.
         if (plugin.getSettings().isStopLeaving() && fromInsideRange && !toInsideRange && !superiorPlayer.hasBypassModeEnabled() &&
                 !fromIsland.isSpawn() && equalWorlds) {
-            EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
+            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_ISLAND_TO_OUTSIDE);
             superiorPlayer.setLeavingFlag(true);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
@@ -76,8 +75,8 @@ public final class PlayersLogic {
 
         // Handling the leave protected event
         if (fromInsideRange && (!equalIslands || !toInsideRange)) {
-            if (!EventsCaller.callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, toLocation)) {
-                EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_PROTECTED_EVENT_CANCELLED);
+            if (!plugin.getEventsBus().callIslandLeaveProtectedEvent(superiorPlayer, fromIsland, leaveCause, toLocation)) {
+                plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_PROTECTED_EVENT_CANCELLED);
                 if (event instanceof Cancellable)
                     ((Cancellable) event).setCancelled(true);
                 return false;
@@ -87,8 +86,8 @@ public final class PlayersLogic {
         if (equalIslands)
             return true;
 
-        if (!EventsCaller.callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, toLocation)) {
-            EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
+        if (!plugin.getEventsBus().callIslandLeaveEvent(superiorPlayer, fromIsland, leaveCause, toLocation)) {
+            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LEAVE_EVENT_CANCELLED);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             return false;
@@ -130,7 +129,7 @@ public final class PlayersLogic {
         // Checking if the player is banned from the island.
         if (toIsland.isBanned(superiorPlayer) && !superiorPlayer.hasBypassModeEnabled() &&
                 !superiorPlayer.hasPermissionWithoutOP("superior.admin.ban.bypass")) {
-            EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
+            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.BANNED_FROM_ISLAND);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             Message.BANNED_FROM_ISLAND.send(superiorPlayer);
@@ -140,7 +139,7 @@ public final class PlayersLogic {
 
         // Checking if the player is locked to visitors.
         if (toIsland.isLocked() && !toIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS)) {
-            EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
+            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.LOCKED_ISLAND);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             Message.NO_CLOSE_BYPASS.send(superiorPlayer);
@@ -154,8 +153,8 @@ public final class PlayersLogic {
         boolean equalWorlds = fromLocation != null && toLocation.getWorld().equals(fromLocation.getWorld());
 
         if (toInsideRange && (!equalIslands || !fromInsideRange)) {
-            if (!EventsCaller.callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
-                EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_PROTECTED_EVENT_CANCELLED);
+            if (!plugin.getEventsBus().callIslandEnterProtectedEvent(superiorPlayer, toIsland, enterCause)) {
+                plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_PROTECTED_EVENT_CANCELLED);
                 if (event instanceof Cancellable)
                     ((Cancellable) event).setCancelled(true);
                 return;
@@ -171,8 +170,8 @@ public final class PlayersLogic {
             return;
         }
 
-        if (!EventsCaller.callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
-            EventsCaller.callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);
+        if (!plugin.getEventsBus().callIslandEnterEvent(superiorPlayer, toIsland, enterCause)) {
+            plugin.getEventsBus().callIslandRestrictMoveEvent(superiorPlayer, IslandRestrictMoveEvent.RestrictReason.ENTER_EVENT_CANCELLED);
             if (event instanceof Cancellable)
                 ((Cancellable) event).setCancelled(true);
             return;

@@ -27,7 +27,6 @@ import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.algorithm.DefaultIslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -159,7 +158,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         // Removing any active previews for the player.
         boolean updateGamemode = this.islandPreviews.endIslandPreview(superiorPlayer) != null;
 
-        if (!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName))
+        if (!plugin.getEventsBus().callPreIslandCreateEvent(superiorPlayer, islandName))
             return;
 
         UUID islandUUID = generateIslandUUID();

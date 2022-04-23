@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -75,7 +75,7 @@ public final class CmdAdminRankup implements IAdminIslandCommand {
         islands.forEach(island -> {
             UpgradeLevel upgradeLevel = island.getUpgradeLevel(upgrade);
 
-            EventResult<EventsCaller.UpgradeResult> event = EventsCaller.callIslandUpgradeEvent(null,
+            EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(null,
                     island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
 
             if (!event.isCancelled()) {

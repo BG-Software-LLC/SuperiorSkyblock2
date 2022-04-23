@@ -68,7 +68,7 @@ import com.bgsoftware.superiorskyblock.upgrade.loaders.PlaceholdersUpgradeCostLo
 import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
@@ -138,6 +138,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private SettingsHandler settingsHandler = null;
     private IScriptEngine scriptEngine = NashornEngine.getInstance();
     private WorldEventsManager worldEventsManager = new WorldEventsManagerImpl(this);
+
+    private final EventsBus eventsBus = new EventsBus(this);
 
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
@@ -222,7 +224,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             modulesHandler.loadData();
 
-            EventsCaller.callPluginInitializeEvent(this);
+            eventsBus.callPluginInitializeEvent(this);
 
             modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
@@ -299,7 +301,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 }
             }, 1L);
 
-            EventsCaller.callPluginInitializedEvent(this);
+            eventsBus.callPluginInitializedEvent(this);
 
         } catch (Throwable ex) {
             shouldEnable = false;
@@ -619,10 +621,6 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         return modulesHandler;
     }
 
-    public ServicesHandler getServices() {
-        return servicesHandler;
-    }
-
     @Override
     public IScriptEngine getScriptEngine() {
         return scriptEngine;
@@ -641,6 +639,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager) {
         this.worldEventsManager = worldEventsManager == null ? new WorldEventsManagerImpl(this) : worldEventsManager;
+    }
+
+    public EventsBus getEventsBus() {
+        return eventsBus;
+    }
+
+    public ServicesHandler getServices() {
+        return servicesHandler;
     }
 
     public void setSettings(SettingsHandler settingsHandler) {

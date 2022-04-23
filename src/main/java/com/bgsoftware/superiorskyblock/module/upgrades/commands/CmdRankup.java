@@ -16,7 +16,7 @@ import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 
@@ -105,7 +105,7 @@ public final class CmdRankup implements IPermissibleCommand {
                 Message.CUSTOM.send(superiorPlayer, requiredCheckFailure, false);
                 hasNextLevel = false;
             } else {
-                EventResult<EventsCaller.UpgradeResult> event = EventsCaller.callIslandUpgradeEvent(superiorPlayer,
+                EventResult<EventsBus.UpgradeResult> event = plugin.getEventsBus().callIslandUpgradeEvent(superiorPlayer,
                         island, upgrade.getName(), upgradeLevel.getCommands(), upgradeLevel.getCost());
 
                 UpgradeCost upgradeCost = event.getResult().getUpgradeCost();

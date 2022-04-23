@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.common.base.Preconditions;
@@ -255,7 +255,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 commandRewards = new ArrayList<>(missionData.getCommandRewards());
             }
 
-            EventResult<EventsCaller.MissionRewards> event = EventsCaller.callMissionCompleteEvent(
+            EventResult<EventsBus.MissionRewards> event = plugin.getEventsBus().callMissionCompleteEvent(
                     superiorPlayer, mission, missionData.isIslandMission(), itemRewards, commandRewards);
 
             if (event.isCancelled()) {

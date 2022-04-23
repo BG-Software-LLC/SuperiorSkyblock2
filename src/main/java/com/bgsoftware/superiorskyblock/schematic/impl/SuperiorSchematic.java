@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.schematic.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
@@ -18,7 +17,6 @@ import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
@@ -35,8 +33,6 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 
 public final class SuperiorSchematic extends BaseSchematic implements Schematic {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final CompoundTag compoundTag;
 
@@ -130,7 +126,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
 
                 island.handleBlocksPlace(cachedCounts);
 
-                EventsCaller.callIslandSchematicPasteEvent(island, name, location);
+                plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
                 loadedChunks = blockChangeTask.getLoadedChunks();
                 callback.run();

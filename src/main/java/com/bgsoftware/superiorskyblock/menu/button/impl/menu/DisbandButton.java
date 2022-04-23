@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmDisband;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -34,7 +33,7 @@ public final class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> 
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         Island targetIsland = superiorMenu.getTargetIsland();
 
-        if (disbandIsland && EventsCaller.callIslandDisbandEvent(clickedPlayer, targetIsland)) {
+        if (disbandIsland && plugin.getEventsBus().callIslandDisbandEvent(clickedPlayer, targetIsland)) {
             IslandUtils.sendMessage(targetIsland, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());
 
             Message.DISBANDED_ISLAND.send(clickedPlayer);

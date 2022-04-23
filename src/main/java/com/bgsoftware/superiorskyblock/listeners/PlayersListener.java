@@ -21,7 +21,6 @@ import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -189,7 +188,7 @@ public final class PlayersListener implements Listener {
 
         for (Island _island : plugin.getGrid().getIslands()) {
             if (_island.isCoop(superiorPlayer)) {
-                if (EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
+                if (plugin.getEventsBus().callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                     _island.removeCoop(superiorPlayer);
                     IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
                 }
@@ -355,7 +354,7 @@ public final class PlayersListener implements Listener {
 
             e.setCancelled(true);
 
-            EventResult<String> eventResult = EventsCaller.callIslandChatEvent(island, superiorPlayer, e.getMessage());
+            EventResult<String> eventResult = plugin.getEventsBus().callIslandChatEvent(island, superiorPlayer, e.getMessage());
 
             if (eventResult.isCancelled())
                 return;
