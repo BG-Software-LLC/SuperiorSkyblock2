@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.formatting;
 
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.formatting.impl.AlphabetizeFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.BooleanFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.BorderColorFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.CapitalizedFormatter;
@@ -9,10 +10,12 @@ import com.bgsoftware.superiorskyblock.formatting.impl.CommaFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.FancyNumberFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.LocaleFormatter;
+import com.bgsoftware.superiorskyblock.formatting.impl.LocationFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.RatingFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.StripColorFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.TimeFormatter;
+import org.bukkit.Location;
 
 import java.time.Duration;
 import java.util.Date;
@@ -23,6 +26,7 @@ import java.util.stream.Stream;
 
 public final class Formatters {
 
+    public static final IFormatter<String> ALPHABETIZE_FORMATTER = AlphabetizeFormatter.getInstance();
     public static final ILocaleFormatter<Boolean> BOOLEAN_FORMATTER = BooleanFormatter.getInstance();
     public static final ILocaleFormatter<BorderColor> BORDER_COLOR_FORMATTER = BorderColorFormatter.getInstance();
     public static final IFormatter<String> CAPITALIZED_FORMATTER = CapitalizedFormatter.getInstance();
@@ -31,6 +35,7 @@ public final class Formatters {
     public static final IFormatter<Date> DATE_FORMATTER = DateFormatter.getInstance();
     public static final ILocaleFormatter<Number> FANCY_NUMBER_FORMATTER = FancyNumberFormatter.getInstance();
     public static final IFormatter<Locale> LOCALE_FORMATTER = LocaleFormatter.getInstance();
+    public static final IFormatter<Location> LOCATION_FORMATTER = LocationFormatter.getInstance();
     public static final IFormatter<Number> NUMBER_FORMATTER = NumberFormatter.getInstance();
     public static final ILocaleFormatter<Number> RATING_FORMATTER = RatingFormatter.getInstance();
     public static final IFormatter<String> STRIP_COLOR_FORMATTER = StripColorFormatter.getInstance();

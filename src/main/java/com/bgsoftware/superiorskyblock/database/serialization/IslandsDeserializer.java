@@ -27,11 +27,10 @@ import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -264,7 +263,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandWarp.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandWarp.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load warps with invalid locations for %s, skipping...", uuid.get()));
@@ -283,7 +282,7 @@ public final class IslandsDeserializer {
             cachedWarpInfo.category = islandWarp.getString("category").orElse("");
             cachedWarpInfo.location = location.get();
             cachedWarpInfo.isPrivate = islandWarp.getBoolean("private").orElse(true);
-            cachedWarpInfo.icon = islandWarp.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
+            cachedWarpInfo.icon = islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
@@ -530,7 +529,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandHomes.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
@@ -567,7 +566,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandVisitorHomes.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandVisitorHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
@@ -633,7 +632,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<ItemStack[]> contents = islandChests.getString("contents").map(ItemUtils::deserialize);
+            Optional<ItemStack[]> contents = islandChests.getString("contents").map(Serializers.INVENTORY_SERIALIZER::deserialize);
             if (!contents.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island chest with invalid contents for %s, skipping...", uuid.get()));
@@ -721,7 +720,7 @@ public final class IslandsDeserializer {
             CachedWarpCategoryInfo cachedWarpCategoryInfo = new CachedWarpCategoryInfo();
             cachedWarpCategoryInfo.name = name.get();
             cachedWarpCategoryInfo.slot = warpCategory.getInt("slot").orElse(-1);
-            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
+            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);

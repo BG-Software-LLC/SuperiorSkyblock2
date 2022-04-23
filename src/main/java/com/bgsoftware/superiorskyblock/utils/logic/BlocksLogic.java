@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -161,7 +160,7 @@ public final class BlocksLogic {
             IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
             islandWarp.setPrivateFlag(privateFlag);
             if (sendMessage)
-                Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+                Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(warpLocation));
         }
 
         return true;
@@ -203,7 +202,7 @@ public final class BlocksLogic {
         island.setDescription(description);
 
         if (sendMessage)
-            Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(visitorsLocation));
+            Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(visitorsLocation));
 
         return true;
     }

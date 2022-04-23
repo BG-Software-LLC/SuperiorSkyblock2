@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -84,7 +83,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
     private static final Map<String, IslandPlaceholderParser> ISLAND_PARSES =
             new ImmutableMap.Builder<String, IslandPlaceholderParser>()
                     .put("center", (island, superiorPlayer) ->
-                            SBlockPosition.of(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())).toString())
+                            Formatters.LOCATION_FORMATTER.format(island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())))
                     .put("x", (island, superiorPlayer) ->
                             island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlockX() + "")
                     .put("y", (island, superiorPlayer) ->

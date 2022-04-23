@@ -1,11 +1,7 @@
 package com.bgsoftware.superiorskyblock.utils.items;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -18,11 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.math.BigInteger;
 import java.util.Map;
 
 public final class ItemUtils {
@@ -99,83 +90,6 @@ public final class ItemUtils {
         Map<Integer, ItemStack> additionalItems = playerInventory.addItem(itemStack);
         for (ItemStack additionalItem : additionalItems.values())
             toDrop.getWorld().dropItemNaturally(toDrop, additionalItem);
-    }
-
-    public static String serialize(ItemStack[] contents) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        DataOutputStream dataOutput = new DataOutputStream(outputStream);
-
-        CompoundTag compoundTag = new CompoundTag();
-        compoundTag.setInt("Length", contents.length);
-
-        for (int i = 0; i < contents.length; i++) {
-            if (contents[i] != null && contents[i].getType() != Material.AIR)
-                compoundTag.setTag(i + "", TagUtils.itemToCompound(contents[i]));
-        }
-
-        try {
-            compoundTag.write(dataOutput);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-            return "";
-        }
-
-        return new BigInteger(1, outputStream.toByteArray()).toString(32);
-    }
-
-    public static String serializeItem(ItemStack itemStack) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        DataOutputStream dataOutput = new DataOutputStream(outputStream);
-
-        try {
-            TagUtils.itemToCompound(itemStack).write(dataOutput);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-            return "";
-        }
-
-        return new BigInteger(1, outputStream.toByteArray()).toString(32);
-    }
-
-    public static ItemStack[] deserialize(String serialized) {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
-        CompoundTag compoundTag;
-
-        try {
-            compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-            return new ItemStack[0];
-        }
-
-        ItemStack[] contents = new ItemStack[compoundTag.getInt("Length")];
-
-        for (int i = 0; i < contents.length; i++) {
-            CompoundTag itemCompound = compoundTag.getCompound(i + "");
-            if (itemCompound != null)
-                contents[i] = TagUtils.compoundToItem(itemCompound);
-        }
-
-        return contents;
-    }
-
-    public static ItemStack deserializeItem(String serialized) {
-        if (serialized.length() > 0) {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(new BigInteger(serialized, 32).toByteArray());
-
-            try {
-                CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
-                return TagUtils.compoundToItem(compoundTag);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
-        }
-
-        return null;
     }
 
     public static boolean isValidAndSpawnEgg(ItemStack itemStack) {

@@ -14,10 +14,10 @@ import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
@@ -313,7 +313,7 @@ public final class SettingsContainer {
         endDragonFightEnabled = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight.enabled", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         BlockOffset endDragonFightPortalOffset = null;
         if (endDragonFightEnabled) {
-            endDragonFightPortalOffset = SBlockOffset.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
+            endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
             if (endDragonFightPortalOffset == null) {
                 SuperiorSkyblockPlugin.log("&c[config.yml] Cannot parse portal-offset to a valid offset, skipping...");
             }
@@ -488,8 +488,8 @@ public final class SettingsContainer {
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
-                islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH),
-                        LocationUtils.getLocation(config.getString("preview-islands." + schematic)));
+                islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                        .deserialize(config.getString("preview-islands." + schematic)));
         }
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);

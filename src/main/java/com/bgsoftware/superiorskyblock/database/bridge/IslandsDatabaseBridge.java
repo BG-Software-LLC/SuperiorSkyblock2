@@ -15,11 +15,10 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -96,7 +95,7 @@ public final class IslandsDatabaseBridge {
             island.getDatabaseBridge().insertObject("islands_homes",
                     new Pair<>("island", island.getUniqueId().toString()),
                     new Pair<>("environment", environment.name()),
-                    new Pair<>("location", LocationUtils.getLocation(location))
+                    new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
             );
         }
     }
@@ -105,7 +104,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_visitor_homes",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("environment", environment.name()),
-                new Pair<>("location", LocationUtils.getLocation(location))
+                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(location))
         );
     }
 
@@ -337,9 +336,9 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("name", islandWarp.getName()),
                 new Pair<>("category", category == null ? "" : category.getName()),
-                new Pair<>("location", LocationUtils.getLocation(islandWarp.getLocation())),
+                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation())),
                 new Pair<>("private", islandWarp.hasPrivateFlag()),
-                new Pair<>("icon", icon == null ? "" : ItemUtils.serializeItem(icon))
+                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
         );
     }
 
@@ -353,7 +352,7 @@ public final class IslandsDatabaseBridge {
     public static void updateWarpLocation(Island island, IslandWarp islandWarp) {
         island.getDatabaseBridge().updateObject("islands_warps",
                 createFilter("island", island, new Pair<>("name", islandWarp.getName())),
-                new Pair<>("location", LocationUtils.getLocation(islandWarp.getLocation()))
+                new Pair<>("location", Serializers.LOCATION_SERIALIZER.serialize(islandWarp.getLocation()))
         );
     }
 
@@ -368,7 +367,7 @@ public final class IslandsDatabaseBridge {
         ItemStack icon = islandWarp.getRawIcon();
         island.getDatabaseBridge().updateObject("islands_warps",
                 createFilter("island", island, new Pair<>("name", islandWarp.getName())),
-                new Pair<>("icon", icon == null ? "" : ItemUtils.serializeItem(icon))
+                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(icon))
         );
     }
 
@@ -468,7 +467,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands_chests",
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("index", islandChest.getIndex()),
-                new Pair<>("contents", ItemUtils.serialize(islandChest.getContents()))
+                new Pair<>("contents", Serializers.INVENTORY_SERIALIZER.serialize(islandChest.getContents()))
         );
     }
 
@@ -491,7 +490,7 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("island", island.getUniqueId().toString()),
                 new Pair<>("name", warpCategory.getName()),
                 new Pair<>("slot", warpCategory.getSlot()),
-                new Pair<>("icon", ItemUtils.serializeItem(warpCategory.getRawIcon()))
+                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(warpCategory.getRawIcon()))
         );
     }
 
@@ -520,7 +519,7 @@ public final class IslandsDatabaseBridge {
     public static void updateWarpCategoryIcon(Island island, WarpCategory warpCategory) {
         island.getDatabaseBridge().updateObject("islands_warp_categories",
                 createFilter("island", island, new Pair<>("name", warpCategory.getName())),
-                new Pair<>("icon", ItemUtils.serializeItem(warpCategory.getRawIcon()))
+                new Pair<>("icon", Serializers.ITEM_STACK_SERIALIZER.serialize(warpCategory.getRawIcon()))
         );
     }
 
@@ -560,7 +559,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().insertObject("islands",
                 new Pair<>("uuid", island.getUniqueId().toString()),
                 new Pair<>("owner", island.getOwner().getUniqueId().toString()),
-                new Pair<>("center", LocationUtils.getLocation(island.getCenter(World.Environment.NORMAL))),
+                new Pair<>("center", Serializers.LOCATION_SERIALIZER.serialize(island.getCenter(World.Environment.NORMAL))),
                 new Pair<>("creation_time", island.getCreationTime()),
                 new Pair<>("island_type", island.getSchematicName()),
                 new Pair<>("discord", island.getDiscord()),

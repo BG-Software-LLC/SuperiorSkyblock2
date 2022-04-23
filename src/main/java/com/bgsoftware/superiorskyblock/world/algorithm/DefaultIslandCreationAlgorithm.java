@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
@@ -43,7 +43,7 @@ public final class DefaultIslandCreationAlgorithm implements IslandCreationAlgor
                 islandUUID
         );
 
-        PluginDebugger.debug("Action: Calculate Next Island, Location: " + LocationUtils.getLocation(islandLocation));
+        PluginDebugger.debug("Action: Calculate Next Island, Location: " + Formatters.LOCATION_FORMATTER.format(islandLocation));
 
         Island island = plugin.getFactory().createIsland(owner, islandUUID, islandLocation.add(0.5, 0, 0.5),
                 islandName, schematic.getName());

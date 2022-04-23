@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -119,7 +120,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
         island.createWarp(warpName, superiorPlayer.getLocation(), warpCategory);
 
-        Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(superiorPlayer.getLocation()));
+        Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(superiorPlayer.getLocation()));
     }
 
 }

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.player.algorithm;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -63,7 +64,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         Block islandTeleportBlock = homeLocation.getBlock();
 
         if (island.isSpawn()) {
-            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(homeLocation));
+            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
+                    Formatters.LOCATION_FORMATTER.format(homeLocation));
             return teleport(player, homeLocation.add(0, 0.5, 0));
         }
 
@@ -183,7 +185,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         homeLocation.setPitch(pitch);
 
 
-        PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(location));
+        PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
+                Formatters.LOCATION_FORMATTER.format(location));
 
         island.setIslandHome(homeLocation);
         teleport(player, homeLocation.add(0, 1.5, 0));
@@ -211,7 +214,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                 island.setIslandHome(toTeleport);
             }
 
-            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " + LocationUtils.getLocation(toTeleport));
+            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
+                    Formatters.LOCATION_FORMATTER.format(toTeleport));
             teleport(player, toTeleport.add(0, 1.5, 0));
 
             if (teleportResult != null)

@@ -48,6 +48,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.threads.SyncedObject;
@@ -56,7 +57,6 @@ import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -110,7 +110,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -242,7 +241,7 @@ public final class SIsland implements Island {
             owner.setIsland(this);
         }
 
-        this.center = SBlockPosition.of(location);
+        this.center = new SBlockPosition(location);
         this.creationTime = creationTime;
         this.islandName = islandName;
         this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
@@ -262,7 +261,7 @@ public final class SIsland implements Island {
             return Optional.empty();
         }
 
-        Optional<Location> center = resultSet.getString("center").map(LocationUtils::getLocation);
+        Optional<Location> center = resultSet.getString("center").map(Serializers.LOCATION_SERIALIZER::deserialize);
         if (!center.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
             return Optional.empty();
@@ -772,8 +771,8 @@ public final class SIsland implements Island {
     public void setIslandHome(World.Environment environment, @Nullable Location homeLocation) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
-        PluginDebugger.debug("Action: Change Home Location, Island: " + owner.getName() +
-                ", Location: " + LocationUtils.getLocation(homeLocation));
+        PluginDebugger.debug("Action: Change Home Location, Island: " + owner.getName() + ", Location: " +
+                Formatters.LOCATION_FORMATTER.format(homeLocation));
 
         islandHomes.write(islandHomes -> islandHomes[environment.ordinal()] =
                 homeLocation == null ? null : homeLocation.clone());
@@ -801,7 +800,8 @@ public final class SIsland implements Island {
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = null);
             IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
         } else {
-            PluginDebugger.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " + LocationUtils.getLocation(visitorsLocation));
+            PluginDebugger.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " +
+                    Formatters.LOCATION_FORMATTER.format(visitorsLocation));
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
             IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
         }
@@ -2542,7 +2542,8 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
 
-        PluginDebugger.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " + LocationUtils.getLocation(location));
+        PluginDebugger.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " +
+                Formatters.LOCATION_FORMATTER.format(location));
 
         if (warpCategory == null)
             warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));

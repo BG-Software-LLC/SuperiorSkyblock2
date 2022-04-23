@@ -24,8 +24,8 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -95,7 +95,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         initializeDatabaseBridge();
         this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
-        this.lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
+        this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
     }
 
@@ -178,7 +178,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
 
                         this.islandsContainer.addIsland(island);
-                        setLastIsland(SBlockPosition.of(islandLocation));
+                        setLastIsland(new SBlockPosition(islandLocation));
 
                         pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
@@ -190,8 +190,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         IslandsDatabaseBridge.insertIsland(island);
 
                         Executor.sync(() -> superiorPlayer.runIfOnline(player -> {
-                            Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation),
-                                    System.currentTimeMillis() - startTime);
+                            Message.CREATE_ISLAND.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(
+                                    islandLocation), System.currentTimeMillis() - startTime);
                             if (teleportPlayer) {
                                 if (updateGamemode)
                                     player.setGameMode(GameMode.SURVIVAL);
@@ -594,7 +594,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void setLastIslandLocation(Location location) {
-        this.setLastIsland(SBlockPosition.of(location));
+        this.setLastIsland(new SBlockPosition(location));
     }
 
     @Override
@@ -627,11 +627,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void loadGrid(DatabaseResult resultSet) {
-        resultSet.getString("last_island").map(SBlockPosition::of)
-                .ifPresent(lastIsland -> this.lastIsland = lastIsland);
+        resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
+                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition(lastIsland));
 
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
-            lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(),
+            lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 

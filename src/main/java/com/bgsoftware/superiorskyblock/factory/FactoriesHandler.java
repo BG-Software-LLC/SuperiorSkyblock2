@@ -77,13 +77,13 @@ public final class FactoriesHandler implements FactoriesManager {
     @Override
     public BlockPosition createBlockPosition(String world, int blockX, int blockY, int blockZ) {
         Preconditions.checkNotNull(world, "world cannot be null.");
-        return SBlockPosition.of(world, blockX, blockY, blockZ);
+        return new SBlockPosition(world, blockX, blockY, blockZ);
     }
 
     @Override
     public BlockPosition createBlockPosition(Location location) {
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
-        return SBlockPosition.of(location);
+        return new SBlockPosition(location);
     }
 
     public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {

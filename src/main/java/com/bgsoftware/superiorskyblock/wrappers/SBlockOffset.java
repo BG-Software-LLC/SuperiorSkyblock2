@@ -16,28 +16,6 @@ public final class SBlockOffset implements BlockOffset {
     private final int offsetY;
     private final int offsetZ;
 
-    @Nullable
-    public static BlockOffset deserialize(String string) {
-        return deserialize(string, ", ");
-    }
-
-    @Nullable
-    public static BlockOffset deserialize(String string, String separator) {
-        if (StringUtils.isBlank(string))
-            return null;
-
-        String[] stringSections = string.split(separator);
-
-        if (stringSections.length != 3)
-            return null;
-
-        try {
-            return fromOffsets(Integer.parseInt(stringSections[0]), Integer.parseInt(stringSections[1]), Integer.parseInt(stringSections[2]));
-        } catch (NumberFormatException error) {
-            return null;
-        }
-    }
-
     public static BlockOffset fromOffsets(int offsetX, int offsetY, int offsetZ) {
         return offsetX == 0 && offsetY == 0 && offsetZ == 0 ? ZERO : new SBlockOffset(offsetX, offsetY, offsetZ);
     }

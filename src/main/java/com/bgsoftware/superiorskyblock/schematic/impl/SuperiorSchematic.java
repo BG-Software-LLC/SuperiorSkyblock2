@@ -5,9 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
 import com.bgsoftware.superiorskyblock.tag.IntTag;
@@ -15,7 +17,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockChangeTask;
@@ -91,7 +92,7 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
                 EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
                 CompoundTag entityTag = (CompoundTag) compoundValue.get("NBT");
-                BlockOffset blockOffset = SBlockOffset.deserialize(((StringTag) compoundValue.get("offset")).getValue(), ",");
+                BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(((StringTag) compoundValue.get("offset")).getValue());
                 entities.add(new SchematicEntity(entityType, entityTag, blockOffset));
             }
 
@@ -112,7 +113,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         }
 
         try {
-            PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " + LocationUtils.getLocation(location) + ", Schematic: " + name);
+            PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " +
+                    Formatters.LOCATION_FORMATTER.format(location) + ", Schematic: " + name);
 
             Location min = this.offset.applyToLocation(location);
 

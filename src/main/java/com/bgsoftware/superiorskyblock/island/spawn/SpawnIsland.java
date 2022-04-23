@@ -34,11 +34,10 @@ import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandBlocksT
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
@@ -80,15 +79,17 @@ public final class SpawnIsland implements Island {
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         SpawnIsland.plugin = plugin;
 
-        String spawnLocation = plugin.getSettings().getSpawn().getLocation().replace(" ", "");
+        String spawnLocation = plugin.getSettings().getSpawn().getLocation();
 
-        SmartLocation smartCenter = LocationUtils.getLocation(spawnLocation);
+        Location smartCenter = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
+
         assert smartCenter != null;
+
         center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().getSpawn().getSize();
 
         if (center.getWorld() == null)
-            plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);
+            plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
 
         if (center.getWorld() == null) {
             new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();

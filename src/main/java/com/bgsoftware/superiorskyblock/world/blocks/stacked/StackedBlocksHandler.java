@@ -7,13 +7,15 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.StackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -108,7 +110,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         boolean succeed = true;
 
         if (stackedBlock.getBlockKey() != null && !blockKey.equals(stackedBlock.getBlockKey())) {
-            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + SBlockPosition.of(location) + " - fixing it...");
+            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + Formatters.LOCATION_FORMATTER.format(location) + " - fixing it...");
             amount = 0;
             succeed = false;
         }
@@ -260,7 +262,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {
-        Optional<SBlockPosition> location = resultSet.getString("location").map(SBlockPosition::of);
+        Optional<Location> location = resultSet.getString("location").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize);
         if (!location.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
             return;
@@ -268,7 +270,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         if (location.get().getWorld() == null) {
             SuperiorSkyblockPlugin.log(String.format("&cCannot load stacked block with invalid world %s, skipping...",
-                    location.get().getWorldName()));
+                    ((SmartLocation) location.get()).getWorldName()));
             return;
         }
 
@@ -282,7 +284,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : KeyImpl.of(item.get());
 
-        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get().parse());
+        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get());
         stackedBlock.setAmount(amount.get());
         stackedBlock.setBlockKey(blockKey);
     }

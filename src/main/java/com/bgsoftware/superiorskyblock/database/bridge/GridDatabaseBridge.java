@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.database.bridge;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 
 @SuppressWarnings("unchecked")
@@ -19,7 +20,7 @@ public final class GridDatabaseBridge {
 
     public static void insertGrid(GridManager gridManager) {
         gridManager.getDatabaseBridge().insertObject("grid",
-                new Pair<>("last_island", SBlockPosition.of(gridManager.getLastIslandLocation()).toString()),
+                new Pair<>("last_island", Serializers.LOCATION_SPACED_SERIALIZER.serialize(gridManager.getLastIslandLocation())),
                 new Pair<>("max_island_size", plugin.getSettings().getMaxIslandSize()),
                 new Pair<>("world", plugin.getSettings().getWorlds().getDefaultWorldName())
         );

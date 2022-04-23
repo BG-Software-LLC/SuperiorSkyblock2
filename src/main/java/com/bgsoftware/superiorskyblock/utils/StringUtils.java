@@ -68,16 +68,4 @@ public final class StringUtils {
         return true;
     }
 
-    public static String removeNonAlphabet(String text, List<Character> allowedChars) {
-        StringBuilder newText = new StringBuilder();
-
-        for (char ch : text.toCharArray()) {
-            if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') ||
-                    (ch >= '1' && ch <= '9') || allowedChars.contains(ch))
-                newText.append(ch);
-        }
-
-        return newText.toString();
-    }
-
 }
