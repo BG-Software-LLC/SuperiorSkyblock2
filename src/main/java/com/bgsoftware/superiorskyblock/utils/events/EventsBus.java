@@ -68,8 +68,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandenterevent"))
             return true;
 
-        IslandEnterEvent islandEnterEvent = new IslandEnterEvent(superiorPlayer, island, enterCause);
-        callEvent(islandEnterEvent);
+        IslandEnterEvent islandEnterEvent = callEvent(new IslandEnterEvent(superiorPlayer, island, enterCause));
 
         if (setCancelledEvent(islandEnterEvent) && islandEnterEvent.getCancelTeleport() != null)
             superiorPlayer.teleport(islandEnterEvent.getCancelTeleport());
@@ -81,8 +80,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandenterprotectedevent"))
             return true;
 
-        IslandEnterProtectedEvent islandEnterProtectedEvent = new IslandEnterProtectedEvent(superiorPlayer, island, enterCause);
-        callEvent(islandEnterProtectedEvent);
+        IslandEnterProtectedEvent islandEnterProtectedEvent = callEvent(new IslandEnterProtectedEvent(superiorPlayer, island, enterCause));
 
         if (setCancelledEvent(islandEnterProtectedEvent) && islandEnterProtectedEvent.getCancelTeleport() != null)
             superiorPlayer.teleport(islandEnterProtectedEvent.getCancelTeleport());
@@ -94,9 +92,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandleaveevent"))
             return true;
 
-        IslandLeaveEvent islandLeaveEvent = new IslandLeaveEvent(superiorPlayer, island, leaveCause, location);
-        callEvent(islandLeaveEvent);
-
+        IslandLeaveEvent islandLeaveEvent = callEvent(new IslandLeaveEvent(superiorPlayer, island, leaveCause, location));
         return !setCancelledEvent(islandLeaveEvent);
     }
 
@@ -104,8 +100,8 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandleaveprotectedevent"))
             return true;
 
-        IslandLeaveProtectedEvent islandLeaveProtectedEvent = new IslandLeaveProtectedEvent(superiorPlayer, island, leaveCause, location);
-        callEvent(islandLeaveProtectedEvent);
+        IslandLeaveProtectedEvent islandLeaveProtectedEvent = callEvent(new IslandLeaveProtectedEvent(superiorPlayer,
+                island, leaveCause, location));
         return !setCancelledEvent(islandLeaveProtectedEvent);
     }
 
@@ -113,8 +109,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandbiomechangeevent"))
             return EventResult.of(false, biome);
 
-        IslandBiomeChangeEvent islandBiomeChangeEvent = new IslandBiomeChangeEvent(superiorPlayer, island, biome);
-        callEvent(islandBiomeChangeEvent);
+        IslandBiomeChangeEvent islandBiomeChangeEvent = callEvent(new IslandBiomeChangeEvent(superiorPlayer, island, biome));
         return EventResult.of(setCancelledEvent(islandBiomeChangeEvent), islandBiomeChangeEvent.getBiome());
     }
 
@@ -122,8 +117,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandcreateevent"))
             return EventResult.of(false, true);
 
-        IslandCreateEvent islandCreateEvent = new IslandCreateEvent(superiorPlayer, island, schemName);
-        callEvent(islandCreateEvent);
+        IslandCreateEvent islandCreateEvent = callEvent(new IslandCreateEvent(superiorPlayer, island, schemName));
         return EventResult.of(setCancelledEvent(islandCreateEvent), islandCreateEvent.canTeleport());
     }
 
@@ -131,8 +125,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islanddisbandevent"))
             return true;
 
-        IslandDisbandEvent islandDisbandEvent = new IslandDisbandEvent(superiorPlayer, island);
-        callEvent(islandDisbandEvent);
+        IslandDisbandEvent islandDisbandEvent = callEvent(new IslandDisbandEvent(superiorPlayer, island));
         return !setCancelledEvent(islandDisbandEvent);
     }
 
@@ -140,8 +133,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandinviteevent"))
             return true;
 
-        IslandInviteEvent islandInviteEvent = new IslandInviteEvent(superiorPlayer, targetPlayer, island);
-        callEvent(islandInviteEvent);
+        IslandInviteEvent islandInviteEvent = callEvent(new IslandInviteEvent(superiorPlayer, targetPlayer, island));
         return !setCancelledEvent(islandInviteEvent);
     }
 
@@ -150,22 +142,19 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandjoinevent"))
             return true;
 
-        IslandJoinEvent islandJoinEvent = new IslandJoinEvent(superiorPlayer, island);
-        callEvent(islandJoinEvent);
+        IslandJoinEvent islandJoinEvent = callEvent(new IslandJoinEvent(superiorPlayer, island));
         return !setCancelledEvent(islandJoinEvent);
     }
 
     public void callIslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandkickevent")) {
-            IslandKickEvent islandKickEvent = new IslandKickEvent(superiorPlayer, targetPlayer, island);
-            callEvent(islandKickEvent);
+            callEvent(new IslandKickEvent(superiorPlayer, targetPlayer, island));
         }
     }
 
     public void callIslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandbanevent")) {
-            IslandBanEvent islandBanEvent = new IslandBanEvent(superiorPlayer, targetPlayer, island);
-            callEvent(islandBanEvent);
+            callEvent(new IslandBanEvent(superiorPlayer, targetPlayer, island));
         }
     }
 
@@ -173,15 +162,13 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandquitevent"))
             return true;
 
-        IslandQuitEvent islandQuitEvent = new IslandQuitEvent(superiorPlayer, island);
-        callEvent(islandQuitEvent);
+        IslandQuitEvent islandQuitEvent = callEvent(new IslandQuitEvent(superiorPlayer, island));
         return !setCancelledEvent(islandQuitEvent);
     }
 
     public void callIslandSchematicPasteEvent(Island island, String name, Location location) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandschematicpasteevent")) {
-            IslandSchematicPasteEvent islandSchematicPasteEvent = new IslandSchematicPasteEvent(island, name, location);
-            callEvent(islandSchematicPasteEvent);
+            callEvent(new IslandSchematicPasteEvent(island, name, location));
         }
     }
 
@@ -189,8 +176,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandtransferevent"))
             return true;
 
-        IslandTransferEvent islandTransferEvent = new IslandTransferEvent(island, previousOwner, superiorPlayer);
-        callEvent(islandTransferEvent);
+        IslandTransferEvent islandTransferEvent = callEvent(new IslandTransferEvent(island, previousOwner, superiorPlayer));
         return !setCancelledEvent(islandTransferEvent);
     }
 
@@ -198,22 +184,19 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandupgradeevent"))
             return EventResult.of(false, new UpgradeResult(commands, cost));
 
-        IslandUpgradeEvent islandUpgradeEvent = new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands, cost);
-        callEvent(islandUpgradeEvent);
+        IslandUpgradeEvent islandUpgradeEvent = callEvent(new IslandUpgradeEvent(superiorPlayer, island, upgradeName, commands, cost));
         return EventResult.of(setCancelledEvent(islandUpgradeEvent), new UpgradeResult(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getUpgradeCost()));
     }
 
     public void callIslandWorthCalculatedEvent(Island island, SuperiorPlayer asker, BigDecimal islandLevel, BigDecimal islandWorth) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandworthcalculatedevent")) {
-            IslandWorthCalculatedEvent islandWorthCalculatedEvent = new IslandWorthCalculatedEvent(island, asker, islandLevel, islandWorth);
-            callEvent(islandWorthCalculatedEvent);
+            callEvent(new IslandWorthCalculatedEvent(island, asker, islandLevel, islandWorth));
         }
     }
 
     public void callIslandWorthUpdateEvent(Island island, BigDecimal oldWorth, BigDecimal oldLevel, BigDecimal newWorth, BigDecimal newLevel) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandworthupdateevent")) {
-            IslandWorthUpdateEvent islandWorthUpdateEvent = new IslandWorthUpdateEvent(island, oldWorth, oldLevel, newWorth, newLevel);
-            callEvent(islandWorthUpdateEvent);
+            callEvent(new IslandWorthUpdateEvent(island, oldWorth, oldLevel, newWorth, newLevel));
         }
     }
 
@@ -221,8 +204,8 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("missioncompleteevent"))
             return EventResult.of(false, MissionRewards.of(itemRewards, commandRewards));
 
-        MissionCompleteEvent missionCompleteEvent = new MissionCompleteEvent(superiorPlayer, mission, islandMission, itemRewards, commandRewards);
-        callEvent(missionCompleteEvent);
+        MissionCompleteEvent missionCompleteEvent = callEvent(new MissionCompleteEvent(superiorPlayer, mission,
+                islandMission, itemRewards, commandRewards));
         return EventResult.of(setCancelledEvent(missionCompleteEvent),
                 MissionRewards.of(missionCompleteEvent.getItemRewards(), missionCompleteEvent.getCommandRewards()));
     }
@@ -231,8 +214,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("preislandcreateevent"))
             return true;
 
-        PreIslandCreateEvent preIslandCreateEvent = new PreIslandCreateEvent(superiorPlayer, islandName);
-        callEvent(preIslandCreateEvent);
+        PreIslandCreateEvent preIslandCreateEvent = callEvent(new PreIslandCreateEvent(superiorPlayer, islandName));
         return !setCancelledEvent(preIslandCreateEvent);
     }
 
@@ -240,8 +222,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("blockstackevent"))
             return true;
 
-        BlockStackEvent blockStackEvent = new BlockStackEvent(block, player, originalAmount, newAmount);
-        callEvent(blockStackEvent);
+        BlockStackEvent blockStackEvent = callEvent(new BlockStackEvent(block, player, originalAmount, newAmount));
         return !setCancelledEvent(blockStackEvent);
     }
 
@@ -249,8 +230,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("blockunstackevent"))
             return true;
 
-        BlockUnstackEvent blockUnstackEvent = new BlockUnstackEvent(block, player, originalAmount, newAmount);
-        callEvent(blockUnstackEvent);
+        BlockUnstackEvent blockUnstackEvent = callEvent(new BlockUnstackEvent(block, player, originalAmount, newAmount));
         return !setCancelledEvent(blockUnstackEvent);
     }
 
@@ -258,8 +238,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandbankdepositevent"))
             return EventResult.of(false, null);
 
-        IslandBankDepositEvent islandBankDepositEvent = new IslandBankDepositEvent(superiorPlayer, island, amount);
-        callEvent(islandBankDepositEvent);
+        IslandBankDepositEvent islandBankDepositEvent = callEvent(new IslandBankDepositEvent(superiorPlayer, island, amount));
         return EventResult.of(setCancelledEvent(islandBankDepositEvent), islandBankDepositEvent.getFailureReason());
     }
 
@@ -267,15 +246,13 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandbankwithdrawevent"))
             return EventResult.of(false, null);
 
-        IslandBankWithdrawEvent islandBankWithdrawEvent = new IslandBankWithdrawEvent(superiorPlayer, island, amount);
-        callEvent(islandBankWithdrawEvent);
+        IslandBankWithdrawEvent islandBankWithdrawEvent = callEvent(new IslandBankWithdrawEvent(superiorPlayer, island, amount));
         return EventResult.of(setCancelledEvent(islandBankWithdrawEvent), islandBankWithdrawEvent.getFailureReason());
     }
 
     public void callIslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, IslandRestrictMoveEvent.RestrictReason restrictReason) {
         if (!plugin.getSettings().getDisabledEvents().contains("islandrestrictmoveevent")) {
-            IslandRestrictMoveEvent islandRestrictMoveEvent = new IslandRestrictMoveEvent(superiorPlayer, restrictReason);
-            callEvent(islandRestrictMoveEvent);
+            callEvent(new IslandRestrictMoveEvent(superiorPlayer, restrictReason));
         }
     }
 
@@ -291,8 +268,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandcoopplayerevent"))
             return true;
 
-        IslandCoopPlayerEvent islandCoopPlayerEvent = new IslandCoopPlayerEvent(island, player, target);
-        callEvent(islandCoopPlayerEvent);
+        IslandCoopPlayerEvent islandCoopPlayerEvent = callEvent(new IslandCoopPlayerEvent(island, player, target));
         return !setCancelledEvent(islandCoopPlayerEvent);
     }
 
@@ -301,8 +277,7 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islanduncoopplayerevent"))
             return true;
 
-        IslandUncoopPlayerEvent islandUncoopPlayerEvent = new IslandUncoopPlayerEvent(island, player, target, uncoopReason);
-        callEvent(islandUncoopPlayerEvent);
+        IslandUncoopPlayerEvent islandUncoopPlayerEvent = callEvent(new IslandUncoopPlayerEvent(island, player, target, uncoopReason));
         return !setCancelledEvent(islandUncoopPlayerEvent);
     }
 
@@ -310,17 +285,14 @@ public final class EventsBus {
         if (plugin.getSettings().getDisabledEvents().contains("islandchunkresetevent"))
             return;
 
-        IslandChunkResetEvent islandChunkResetEvent = new IslandChunkResetEvent(island, chunkPosition.getWorld(),
-                chunkPosition.getX(), chunkPosition.getZ());
-        callEvent(islandChunkResetEvent);
+        callEvent(new IslandChunkResetEvent(island, chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ()));
     }
 
     public EventResult<String> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
         if (plugin.getSettings().getDisabledEvents().contains("islandchatevent"))
             return EventResult.of(false, message);
 
-        IslandChatEvent islandChatEvent = new IslandChatEvent(island, superiorPlayer, message);
-        callEvent(islandChatEvent);
+        IslandChatEvent islandChatEvent = callEvent(new IslandChatEvent(island, superiorPlayer, message));
         return EventResult.of(setCancelledEvent(islandChatEvent), message);
     }
 
@@ -329,8 +301,9 @@ public final class EventsBus {
         return lastEventCancelled;
     }
 
-    private static void callEvent(Event event) {
+    private static <T extends Event> T callEvent(T event) {
         Bukkit.getPluginManager().callEvent(event);
+        return event;
     }
 
     public static final class MissionRewards {
