@@ -72,9 +72,14 @@ public final class SpawnIsland implements Island {
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
+
     private final Location center;
     private final int islandSize;
+    private final Location minLocation;
+    private final Location maxLocation;
+
     private Biome biome = Biome.PLAINS;
+
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         SpawnIsland.plugin = plugin;
@@ -87,6 +92,8 @@ public final class SpawnIsland implements Island {
 
         center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().getSpawn().getSize();
+        minLocation = center.clone().subtract(islandSize, islandSize, islandSize);
+        maxLocation = center.clone().add(islandSize, islandSize, islandSize);
 
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
@@ -327,7 +334,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandSize, 0, islandSize);
+        return this.minLocation.clone();
     }
 
     @Override
@@ -337,7 +344,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandSize, 0, islandSize);
+        return this.maxLocation.clone();
     }
 
     @Override
