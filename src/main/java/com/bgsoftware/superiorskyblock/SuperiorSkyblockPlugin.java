@@ -350,12 +350,16 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             ex.printStackTrace();
             PluginDebugger.debug(ex);
         } finally {
+            SuperiorSkyblockPlugin.log("Unloading worlds...");
             unloadIslandWorlds();
 
+            SuperiorSkyblockPlugin.log("Shutting down calculation task...");
             CalcTask.cancelTask();
-            Executor.close();
-            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
 
+            SuperiorSkyblockPlugin.log("Shutting down executor");
+            Executor.close();
+
+            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             //pluginDebugger.cancel();
             dataHandler.closeConnection();
         }
