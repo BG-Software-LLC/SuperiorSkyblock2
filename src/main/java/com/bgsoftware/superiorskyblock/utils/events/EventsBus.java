@@ -88,6 +88,8 @@ import com.bgsoftware.superiorskyblock.api.events.MissionResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeBorderColorEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeLanguageEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeRoleEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerCloseMenuEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerOpenMenuEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBlocksStackerEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBorderEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
@@ -100,6 +102,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -643,6 +646,16 @@ public final class EventsBus {
 
     public boolean callPlayerChangeRoleEvent(SuperiorPlayer superiorPlayer, PlayerRole newPlayer) {
         return callEvent(() -> new PlayerChangeRoleEvent(superiorPlayer, newPlayer), "playerchangeroleevent");
+    }
+
+    public EventResult<ISuperiorMenu> callPlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu,
+                                                               @Nullable ISuperiorMenu newMenu) {
+        return callEvent(() -> new PlayerCloseMenuEvent(superiorPlayer, superiorMenu, newMenu),
+                "playerclosemenuevent", PlayerCloseMenuEvent::getNewMenu);
+    }
+
+    public boolean callPlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu) {
+        return callEvent(() -> new PlayerOpenMenuEvent(superiorPlayer, superiorMenu), "playeropenmenuevent");
     }
 
     public boolean callPlayerToggleBlocksStackerEvent(SuperiorPlayer superiorPlayer) {
