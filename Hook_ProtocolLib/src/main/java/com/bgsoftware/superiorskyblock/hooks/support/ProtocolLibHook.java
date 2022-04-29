@@ -45,7 +45,8 @@ public final class ProtocolLibHook {
             SuperiorPlayer superiorPlayer = ProtocolLibHook.plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(event.getPlayer().getUniqueId());
             if (superiorPlayer != null && PlayerLocales.isValidLocale(newPlayerLocale) &&
                     !superiorPlayer.getUserLocale().equals(newPlayerLocale)) {
-                superiorPlayer.setUserLocale(newPlayerLocale);
+                if (ProtocolLibHook.plugin.getEventsBus().callPlayerChangeLanguageEvent(superiorPlayer, newPlayerLocale))
+                    superiorPlayer.setUserLocale(newPlayerLocale);
             }
         }
 

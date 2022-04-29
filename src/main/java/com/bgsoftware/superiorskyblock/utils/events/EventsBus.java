@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.utils.events;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
 import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
@@ -84,7 +85,12 @@ import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionResetEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerChangeBorderColorEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerChangeLanguageEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeRoleEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBlocksStackerEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBorderEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
@@ -117,6 +123,7 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -625,8 +632,37 @@ public final class EventsBus {
         return callEvent(() -> new MissionResetEvent(superiorPlayer, missionsHolder, mission), "missionresetevent");
     }
 
+    public boolean callPlayerChangeBorderColorEvent(SuperiorPlayer superiorPlayer, BorderColor borderColor) {
+        return callEvent(() -> new PlayerChangeBorderColorEvent(superiorPlayer, borderColor),
+                "playerchangebordercolorevent");
+    }
+
+    public boolean callPlayerChangeLanguageEvent(SuperiorPlayer superiorPlayer, Locale language) {
+        return callEvent(() -> new PlayerChangeLanguageEvent(superiorPlayer, language), "playerchangelanguageevent");
+    }
+
     public boolean callPlayerChangeRoleEvent(SuperiorPlayer superiorPlayer, PlayerRole newPlayer) {
         return callEvent(() -> new PlayerChangeRoleEvent(superiorPlayer, newPlayer), "playerchangeroleevent");
+    }
+
+    public boolean callPlayerToggleBlocksStackerEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerToggleBlocksStackerEvent(superiorPlayer), "playertoggleblocksstackerevent");
+    }
+
+    public boolean callPlayerToggleBorderEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerToggleBorderEvent(superiorPlayer), "playertoggleborderevent");
+    }
+
+    public boolean callPlayerToggleFlyEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerToggleBorderEvent(superiorPlayer), "playertoggleflyevent");
+    }
+
+    public boolean callPlayerTogglePanelEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerTogglePanelEvent(superiorPlayer), "playertogglepanelevent");
+    }
+
+    public boolean callPlayerToggleSpyEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerTogglePanelEvent(superiorPlayer), "playertogglespyevent");
     }
 
     public void callPluginInitializedEvent(SuperiorSkyblock plugin) {

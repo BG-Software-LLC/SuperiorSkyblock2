@@ -52,6 +52,10 @@ public final class CmdFly implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
+        if (!plugin.getEventsBus().callPlayerToggleFlyEvent(superiorPlayer))
+            return;
+
         Island island = plugin.getGrid().getIslandAt(superiorPlayer.getLocation());
         Player player = (Player) sender;
 
