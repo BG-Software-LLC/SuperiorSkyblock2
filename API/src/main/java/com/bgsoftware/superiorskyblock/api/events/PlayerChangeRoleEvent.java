@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -25,6 +26,7 @@ public class PlayerChangeRoleEvent extends Event implements Cancellable {
      * @param newRole        The new role for the player.
      */
     public PlayerChangeRoleEvent(SuperiorPlayer superiorPlayer, PlayerRole newRole) {
+        super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
         this.newRole = newRole;
     }

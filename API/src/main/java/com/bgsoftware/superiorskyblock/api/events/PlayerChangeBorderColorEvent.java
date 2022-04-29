@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -25,6 +26,7 @@ public class PlayerChangeBorderColorEvent extends Event implements Cancellable {
      * @param borderColor    The new border color of the player.
      */
     public PlayerChangeBorderColorEvent(SuperiorPlayer superiorPlayer, BorderColor borderColor) {
+        super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
         this.borderColor = borderColor;
     }

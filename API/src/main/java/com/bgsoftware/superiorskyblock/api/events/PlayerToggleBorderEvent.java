@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -22,6 +23,7 @@ public class PlayerToggleBorderEvent extends Event implements Cancellable {
      * @param superiorPlayer The player that toggled the world border.
      */
     public PlayerToggleBorderEvent(SuperiorPlayer superiorPlayer) {
+        super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
     }
 

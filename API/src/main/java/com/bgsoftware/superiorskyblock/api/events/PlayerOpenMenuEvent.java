@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -25,6 +26,7 @@ public class PlayerOpenMenuEvent extends Event implements Cancellable {
      * @param superiorMenu   The menu that was opened
      */
     public PlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu) {
+        super(!Bukkit.isPrimaryThread());
         this.superiorPlayer = superiorPlayer;
         this.superiorMenu = superiorMenu;
     }
