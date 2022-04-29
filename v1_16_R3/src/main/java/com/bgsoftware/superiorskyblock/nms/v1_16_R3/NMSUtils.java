@@ -104,7 +104,7 @@ public final class NMSUtils {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
                     if (chunkCompound == null) {
-                        ProtoChunk protoChunk = new ProtoChunk(chunkCoords, ChunkConverter.a, worldServer);
+                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, worldServer);
                         chunkCompound = ChunkRegionLoader.saveChunk(worldServer, protoChunk);
                     } else {
                         chunkCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
