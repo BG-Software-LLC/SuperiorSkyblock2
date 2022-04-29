@@ -66,6 +66,7 @@ import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.wrappers.IslandArea;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -956,11 +957,11 @@ public final class SIsland implements Island {
         if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
-        Location min = getMinimum();
-        Location max = getMaximum();
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        IslandArea islandArea = new IslandArea(this.center, islandDistance);
 
-        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
-                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+        return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
@@ -973,11 +974,10 @@ public final class SIsland implements Island {
         if (location.getWorld() == null || !plugin.getGrid().isIslandsWorld(location.getWorld()))
             return false;
 
-        Location min = getMinimumProtected();
-        Location max = getMaximumProtected();
+        IslandArea islandArea = new IslandArea(center, getIslandSize());
+        islandArea.expand(extra);
 
-        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
-                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+        return islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
@@ -987,11 +987,10 @@ public final class SIsland implements Island {
         if (chunk.getWorld() == null || !plugin.getGrid().isIslandsWorld(chunk.getWorld()))
             return false;
 
-        Location min = getMinimumProtected();
-        Location max = getMaximumProtected();
+        IslandArea islandArea = new IslandArea(center, getIslandSize());
+        islandArea.rshift(4);
 
-        return (min.getBlockX() >> 4) <= chunk.getX() && (min.getBlockZ() >> 4) <= chunk.getZ() &&
-                (max.getBlockX() >> 4) >= chunk.getX() && (max.getBlockZ() >> 4) >= chunk.getZ();
+        return islandArea.intercepts(chunk.getX(), chunk.getZ());
     }
 
     @Override
@@ -3064,12 +3063,19 @@ public final class SIsland implements Island {
         }
     }
 
+    @Nullable
     @Override
     public Key generateBlock(Location location, boolean optimizeCobblestone) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        return generateBlock(location, location.getWorld().getEnvironment(), optimizeCobblestone);
+    }
 
-        World.Environment environment = location.getWorld().getEnvironment();
+    @Override
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         int totalGeneratorAmounts = getGeneratorTotalAmount(environment);
 

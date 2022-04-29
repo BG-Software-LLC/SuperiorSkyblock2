@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.serialization.impl.InventorySerializer;
 import com.bgsoftware.superiorskyblock.serialization.impl.ItemStackSerializer;
 import com.bgsoftware.superiorskyblock.serialization.impl.LocationSerializer;
 import com.bgsoftware.superiorskyblock.serialization.impl.OffsetSerializer;
+import com.bgsoftware.superiorskyblock.serialization.impl.StackedBlockSerializer;
+import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,6 +18,7 @@ public final class Serializers {
     public static final ISerializer<Location, String> LOCATION_SERIALIZER = new LocationSerializer(",");
     public static final ISerializer<BlockOffset, String> OFFSET_SPACED_SERIALIZER = new OffsetSerializer(", ");
     public static final ISerializer<BlockOffset, String> OFFSET_SERIALIZER = new OffsetSerializer(",");
+    public static final ISerializer<Location, String> STACKED_BLOCK_SERIALIZER = StackedBlockSerializer.getInstance();
 
     private Serializers() {
 

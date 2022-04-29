@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class CmdTeleport implements ISuperiorCommand {
@@ -77,7 +77,7 @@ public final class CmdTeleport implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
     private void teleportToIsland(SuperiorPlayer superiorPlayer, Island island) {

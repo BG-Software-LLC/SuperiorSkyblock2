@@ -13,7 +13,7 @@ public final class StackedBlocksDatabaseBridge {
 
     public static void saveStackedBlock(StackedBlocksManager stackedBlocks, StackedBlock stackedBlock) {
         stackedBlocks.getDatabaseBridge().insertObject("stacked_blocks",
-                new Pair<>("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation())),
+                new Pair<>("location", Serializers.STACKED_BLOCK_SERIALIZER.serialize(stackedBlock.getLocation())),
                 new Pair<>("amount", stackedBlock.getAmount()),
                 new Pair<>("block_type", stackedBlock.getBlockKey().toString())
         );
@@ -21,7 +21,7 @@ public final class StackedBlocksDatabaseBridge {
 
     public static void deleteStackedBlock(StackedBlocksManager stackedBlocks, StackedBlock stackedBlock) {
         stackedBlocks.getDatabaseBridge().deleteObject("stacked_blocks",
-                createFilter(new Pair<>("location", Serializers.LOCATION_SPACED_SERIALIZER.serialize(stackedBlock.getLocation()))));
+                createFilter(new Pair<>("location", Serializers.STACKED_BLOCK_SERIALIZER.serialize(stackedBlock.getLocation()))));
     }
 
     public static void deleteStackedBlocks(StackedBlocksManager stackedBlocks) {

@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -122,7 +123,7 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         if (args.length != 4)
-            return new ArrayList<>();
+            return Collections.emptyList();
 
         List<String> environments = new ArrayList<>();
 

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.module.generators.GeneratorsModule;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -41,7 +42,9 @@ public final class GeneratorsListener implements Listener {
         if (!module.isEnabled())
             return;
 
-        Island island = plugin.getGrid().getIslandAt(e.getBlock().getLocation());
+        Location blockLocation = e.getBlock().getLocation();
+
+        Island island = plugin.getGrid().getIslandAt(blockLocation);
 
         if (island == null)
             return;
@@ -49,7 +52,11 @@ public final class GeneratorsListener implements Listener {
         if (e.getBlock().getType() != LAVA_MATERIAL || e.getNewState().getType() != BASALT_MATERIAL)
             return;
 
-        Key generatedBlock = island.generateBlock(e.getBlock().getLocation(), true);
+        World.Environment worldEnvironment = module.isMatchGeneratorWorld() &&
+                e.getNewState().getType() == BASALT_MATERIAL ? World.Environment.NETHER :
+                blockLocation.getWorld().getEnvironment();
+
+        Key generatedBlock = island.generateBlock(blockLocation, worldEnvironment, true);
 
         if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);
@@ -62,41 +69,60 @@ public final class GeneratorsListener implements Listener {
 
         Block block = e.getToBlock();
 
-        Island island = plugin.getGrid().getIslandAt(block.getLocation());
-
-        if (island == null)
-            return;
-
-        if (e.getBlock().getType() != LAVA_MATERIAL || !canGenerateBlock(block))
-            return;
-
         // Should fix solid blocks from generating custom blocks
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/837
         if (block.getType().isSolid())
             return;
 
-        Key generatedBlock = island.generateBlock(block.getLocation(), true);
+        Location blockLocation = block.getLocation();
+
+        Island island = plugin.getGrid().getIslandAt(blockLocation);
+
+        if (island == null)
+            return;
+
+        if (e.getBlock().getType() != LAVA_MATERIAL)
+            return;
+
+        GeneratorType generatorType = findGenerator(block);
+
+        if (generatorType == GeneratorType.NONE)
+            return;
+
+        World.Environment worldEnvironment = module.isMatchGeneratorWorld() &&
+                generatorType == GeneratorType.BASALT ? World.Environment.NETHER :
+                blockLocation.getWorld().getEnvironment();
+
+        Key generatedBlock = island.generateBlock(blockLocation, worldEnvironment, true);
 
         if (generatedBlock != null && !generatedBlock.equals(ConstantKeys.COBBLESTONE))
             e.setCancelled(true);
     }
 
-    private boolean canGenerateBlock(Block block) {
+    private GeneratorType findGenerator(Block block) {
         if (ServerVersion.isAtLeast(ServerVersion.v1_16) &&
                 block.getWorld().getEnvironment() == World.Environment.NETHER) {
             for (BlockFace blockFace : nearbyFaces) {
                 if (block.getRelative(blockFace).getType() == BLUE_ICE_MATERIAL &&
                         block.getRelative(BlockFace.DOWN).getType() == SOUL_SOIL_MATERIAL)
-                    return true;
+                    return GeneratorType.BASALT;
             }
         } else {
             for (BlockFace blockFace : nearbyFaces) {
                 if (plugin.getNMSWorld().isWaterLogged(block.getRelative(blockFace)))
-                    return true;
+                    return GeneratorType.NORMAL;
             }
         }
 
-        return false;
+        return GeneratorType.NONE;
+    }
+
+    private enum GeneratorType {
+
+        NORMAL,
+        BASALT,
+        NONE
+
     }
 
 

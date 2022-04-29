@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands;
 
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public interface IAdminPlayerCommand extends ISuperiorCommand {
@@ -70,7 +71,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
     }
 
     default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

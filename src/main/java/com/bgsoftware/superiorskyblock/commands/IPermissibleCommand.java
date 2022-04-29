@@ -11,6 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public interface IPermissibleCommand extends ISuperiorCommand {
@@ -60,7 +61,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
     void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args);
 
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

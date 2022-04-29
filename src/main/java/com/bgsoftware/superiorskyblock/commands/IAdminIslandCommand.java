@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandsListArgument;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public interface IAdminIslandCommand extends ISuperiorCommand {
@@ -62,7 +63,7 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
     }
 
     default List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }
