@@ -156,63 +156,63 @@ public final class EventsBus {
 
     public EventResult<String> callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
         return callEvent(() -> new IslandBankDepositEvent(superiorPlayer, island, amount),
-                "islandbankdepositevent", IslandBankDepositEvent::getFailureReason);
+                "islandbankdepositevent", null, IslandBankDepositEvent::getFailureReason);
     }
 
     public EventResult<String> callIslandBankWithdrawEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
         return callEvent(() -> new IslandBankWithdrawEvent(superiorPlayer, island, amount),
-                "islandbankwithdrawevent", IslandBankWithdrawEvent::getFailureReason);
+                "islandbankwithdrawevent", null, IslandBankWithdrawEvent::getFailureReason);
     }
 
     public EventResult<Biome> callIslandBiomeChangeEvent(SuperiorPlayer superiorPlayer, Island island, Biome biome) {
         return callEvent(() -> new IslandBiomeChangeEvent(superiorPlayer, island, biome),
-                "islandbiomechangeevent", IslandBiomeChangeEvent::getBiome);
+                "islandbiomechangeevent", biome, IslandBiomeChangeEvent::getBiome);
     }
 
     public EventResult<BigDecimal> callIslandChangeBankLimitEvent(CommandSender commandSender, Island island, BigDecimal bankLimit) {
         return callEvent(() -> new IslandChangeBankLimitEvent(getSuperiorPlayer(commandSender), island, bankLimit),
-                "islandchangebanklimitevent", IslandChangeBankLimitEvent::getBankLimit);
+                "islandchangebanklimitevent", bankLimit, IslandChangeBankLimitEvent::getBankLimit);
     }
 
     public EventResult<Integer> callIslandChangeBlockLimitEvent(CommandSender commandSender, Island island, Key block, int blockLimit) {
         return callEvent(() -> new IslandChangeBlockLimitEvent(getSuperiorPlayer(commandSender), island, block, blockLimit),
-                "islandchangeblocklimitevent", IslandChangeBlockLimitEvent::getBlockLimit);
+                "islandchangeblocklimitevent", blockLimit, IslandChangeBlockLimitEvent::getBlockLimit);
     }
 
     public EventResult<Integer> callIslandChangeBorderSizeEvent(CommandSender commandSender, Island island, int borderSize) {
         return callEvent(() -> new IslandChangeBorderSizeEvent(getSuperiorPlayer(commandSender), island, borderSize),
-                "islandchangebordersizeevent", IslandChangeBorderSizeEvent::getBorderSize);
+                "islandchangebordersizeevent", borderSize, IslandChangeBorderSizeEvent::getBorderSize);
     }
 
     public EventResult<Integer> callIslandChangeCoopLimitEvent(CommandSender commandSender, Island island, int coopLimit) {
         return callEvent(() -> new IslandChangeCoopLimitEvent(getSuperiorPlayer(commandSender), island, coopLimit),
-                "islandchangecooplimitevent", IslandChangeCoopLimitEvent::getCoopLimit);
+                "islandchangecooplimitevent", coopLimit, IslandChangeCoopLimitEvent::getCoopLimit);
     }
 
     public EventResult<Double> callIslandChangeCropGrowthEvent(CommandSender commandSender, Island island, double cropGrowth) {
         return callEvent(() -> new IslandChangeCropGrowthEvent(getSuperiorPlayer(commandSender), island, cropGrowth),
-                "islandchangecropgrowthevent", IslandChangeCropGrowthEvent::getCropGrowth);
+                "islandchangecropgrowthevent", cropGrowth, IslandChangeCropGrowthEvent::getCropGrowth);
     }
 
     public EventResult<String> callIslandChangeDescriptionEvent(SuperiorPlayer superiorPlayer, Island island, String description) {
         return callEvent(() -> new IslandChangeDescriptionEvent(island, superiorPlayer, description),
-                "islandchangedescriptionevent", IslandChangeDescriptionEvent::getDescription);
+                "islandchangedescriptionevent", description, IslandChangeDescriptionEvent::getDescription);
     }
 
     public EventResult<String> callIslandChangeDiscordEvent(SuperiorPlayer superiorPlayer, Island island, String discord) {
         return callEvent(() -> new IslandChangeDiscordEvent(superiorPlayer, island, discord),
-                "islandchangediscordevent", IslandChangeDiscordEvent::getDiscord);
+                "islandchangediscordevent", discord, IslandChangeDiscordEvent::getDiscord);
     }
 
     public EventResult<Integer> callIslandChangeEffectLevelEvent(CommandSender commandSender, Island island,
                                                                  PotionEffectType effectType, int effectLevel) {
         return callEvent(() -> new IslandChangeEffectLevelEvent(getSuperiorPlayer(commandSender), island, effectType, effectLevel),
-                "islandchangeeffectlevelevent", IslandChangeEffectLevelEvent::getEffectLevel);
+                "islandchangeeffectlevelevent", effectLevel, IslandChangeEffectLevelEvent::getEffectLevel);
     }
 
     public EventResult<Integer> callIslandChangeEntityLimitEvent(CommandSender commandSender, Island island, Key entity, int entityLimit) {
         return callEvent(() -> new IslandChangeEntityLimitEvent(getSuperiorPlayer(commandSender), island, entity, entityLimit),
-                "islandchangeentitylimitevent", IslandChangeEntityLimitEvent::getEntityLimit);
+                "islandchangeentitylimitevent", entityLimit, IslandChangeEntityLimitEvent::getEntityLimit);
     }
 
     public EventResult<Integer> callIslandChangeGeneratorRateEvent(CommandSender commandSender, Island island, Key block,
@@ -223,29 +223,29 @@ public final class EventsBus {
     public EventResult<Integer> callIslandChangeGeneratorRateEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Key block,
                                                                    World.Environment environment, int generatorRate) {
         return callEvent(() -> new IslandChangeGeneratorRateEvent(superiorPlayer, island, block, environment, generatorRate),
-                "islandchangegeneratorrateevent", IslandChangeGeneratorRateEvent::getGeneratorRate);
+                "islandchangegeneratorrateevent", generatorRate, IslandChangeGeneratorRateEvent::getGeneratorRate);
     }
 
     public EventResult<BigDecimal> callIslandChangeLevelBonusEvent(CommandSender commandSender, Island island,
                                                                    IslandChangeLevelBonusEvent.Reason reason,
                                                                    BigDecimal levelBonus) {
         return callEvent(() -> new IslandChangeLevelBonusEvent(getSuperiorPlayer(commandSender), island, reason, levelBonus),
-                "islandchangelevelbonusevent", IslandChangeLevelBonusEvent::getLevelBonus);
+                "islandchangelevelbonusevent", levelBonus, IslandChangeLevelBonusEvent::getLevelBonus);
     }
 
     public EventResult<Integer> callIslandChangeMembersLimitEvent(CommandSender commandSender, Island island, int membersLimit) {
         return callEvent(() -> new IslandChangeMembersLimitEvent(getSuperiorPlayer(commandSender), island, membersLimit),
-                "islandchangememberslimitevent", IslandChangeMembersLimitEvent::getMembersLimit);
+                "islandchangememberslimitevent", membersLimit, IslandChangeMembersLimitEvent::getMembersLimit);
     }
 
     public EventResult<Double> callIslandChangeMobDropsEvent(CommandSender commandSender, Island island, double mobDrops) {
         return callEvent(() -> new IslandChangeMobDropsEvent(getSuperiorPlayer(commandSender), island, mobDrops),
-                "islandchangemobdropsevent", IslandChangeMobDropsEvent::getMobDrops);
+                "islandchangemobdropsevent", mobDrops, IslandChangeMobDropsEvent::getMobDrops);
     }
 
     public EventResult<String> callIslandChangePaypalEvent(SuperiorPlayer superiorPlayer, Island island, String paypal) {
         return callEvent(() -> new IslandChangePaypalEvent(superiorPlayer, island, paypal),
-                "islandchangepaypalevent", IslandChangePaypalEvent::getPaypal);
+                "islandchangepaypalevent", paypal, IslandChangePaypalEvent::getPaypal);
     }
 
     public boolean callIslandChangePlayerPrivilegeEvent(Island island, SuperiorPlayer superiorPlayer,
@@ -256,7 +256,7 @@ public final class EventsBus {
 
     public EventResult<Integer> callIslandChangeRoleLimitEvent(CommandSender commandSender, Island island, PlayerRole playerRole, int roleLimit) {
         return callEvent(() -> new IslandChangeRoleLimitEvent(getSuperiorPlayer(commandSender), island, playerRole, roleLimit),
-                "islandchangerolelimitevent", IslandChangeRoleLimitEvent::getRoleLimit);
+                "islandchangerolelimitevent", roleLimit, IslandChangeRoleLimitEvent::getRoleLimit);
     }
 
     public boolean callIslandChangeRolePrivilegeEvent(Island island, PlayerRole playerRole) {
@@ -265,43 +265,43 @@ public final class EventsBus {
 
     public EventResult<Double> callIslandChangeSpawnerRatesEvent(CommandSender commandSender, Island island, double spawnerRates) {
         return callEvent(() -> new IslandChangeSpawnerRatesEvent(getSuperiorPlayer(commandSender), island, spawnerRates),
-                "islandchangespawnerratesevent", IslandChangeSpawnerRatesEvent::getSpawnerRates);
+                "islandchangespawnerratesevent", spawnerRates, IslandChangeSpawnerRatesEvent::getSpawnerRates);
     }
 
     public EventResult<ItemStack> callIslandChangeWarpCategoryIconEvent(SuperiorPlayer superiorPlayer, Island island,
                                                                         WarpCategory warpCategory, @Nullable ItemStack icon) {
         return callEvent(() -> new IslandChangeWarpCategoryIconEvent(superiorPlayer, island, warpCategory, icon),
-                "islandchangewarpcategoryiconevent", IslandChangeWarpCategoryIconEvent::getIcon);
+                "islandchangewarpcategoryiconevent", icon, IslandChangeWarpCategoryIconEvent::getIcon);
     }
 
     public EventResult<Integer> callIslandChangeWarpCategorySlotEvent(SuperiorPlayer superiorPlayer, Island island,
                                                                       WarpCategory warpCategory, int slot, int maxSlot) {
         return callEvent(() -> new IslandChangeWarpCategorySlotEvent(superiorPlayer, island, warpCategory, slot, maxSlot),
-                "islandchangewarpcategoryslotevent", IslandChangeWarpCategorySlotEvent::getSlot);
+                "islandchangewarpcategoryslotevent", slot, IslandChangeWarpCategorySlotEvent::getSlot);
     }
 
     public EventResult<ItemStack> callIslandChangeWarpIconEvent(SuperiorPlayer superiorPlayer, Island island,
                                                                 IslandWarp islandWarp, @Nullable ItemStack icon) {
         return callEvent(() -> new IslandChangeWarpIconEvent(superiorPlayer, island, islandWarp, icon),
-                "islandchangewarpiconevent", IslandChangeWarpIconEvent::getIcon);
+                "islandchangewarpiconevent", icon, IslandChangeWarpIconEvent::getIcon);
     }
 
     public EventResult<Location> callIslandChangeWarpLocationEvent(SuperiorPlayer superiorPlayer, Island island,
                                                                    IslandWarp islandWarp, Location location) {
         return callEvent(() -> new IslandChangeWarpLocationEvent(superiorPlayer, island, islandWarp, location),
-                "islandchangewarplocationevent", IslandChangeWarpLocationEvent::getLocation);
+                "islandchangewarplocationevent", location, IslandChangeWarpLocationEvent::getLocation);
     }
 
     public EventResult<Integer> callIslandChangeWarpsLimitEvent(CommandSender commandSender, Island island, int warpsLimit) {
         return callEvent(() -> new IslandChangeWarpsLimitEvent(getSuperiorPlayer(commandSender), island, warpsLimit),
-                "islandchangewarpslimitevent", IslandChangeWarpsLimitEvent::getWarpsLimit);
+                "islandchangewarpslimitevent", warpsLimit, IslandChangeWarpsLimitEvent::getWarpsLimit);
     }
 
     public EventResult<BigDecimal> callIslandChangeWorthBonusEvent(CommandSender commandSender, Island island,
                                                                    IslandChangeWorthBonusEvent.Reason reason,
                                                                    BigDecimal worthBonus) {
         return callEvent(() -> new IslandChangeWorthBonusEvent(getSuperiorPlayer(commandSender), island, reason, worthBonus),
-                "islandchangeworthbonusevent", IslandChangeWorthBonusEvent::getWorthBonus);
+                "islandchangeworthbonusevent", worthBonus, IslandChangeWorthBonusEvent::getWorthBonus);
     }
 
     public boolean callIslandChangeRolePrivilegeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
@@ -311,7 +311,7 @@ public final class EventsBus {
 
     public EventResult<String> callIslandChatEvent(Island island, SuperiorPlayer superiorPlayer, String message) {
         return callEvent(() -> new IslandChatEvent(island, superiorPlayer, message),
-                "islandchatevent", IslandChatEvent::getMessage);
+                "islandchatevent", message, IslandChatEvent::getMessage);
     }
 
     public void callIslandChunkResetEvent(Island island, ChunkPosition chunkPosition) {
@@ -358,7 +358,7 @@ public final class EventsBus {
 
     public EventResult<Boolean> callIslandCreateEvent(SuperiorPlayer superiorPlayer, Island island, String schemName) {
         return callEvent(() -> new IslandCreateEvent(superiorPlayer, island, schemName),
-                "islandcreateevent", IslandCreateEvent::canTeleport);
+                "islandcreateevent", true, IslandCreateEvent::canTeleport);
     }
 
     public boolean callIslandCreateWarpCategoryEvent(SuperiorPlayer superiorPlayer, Island island, String categoryName) {
@@ -528,19 +528,19 @@ public final class EventsBus {
 
     public EventResult<String> callIslandRenameEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, String islandName) {
         return callEvent(() -> new IslandRenameEvent(island, superiorPlayer, islandName),
-                "islandrenameevent", IslandRenameEvent::getIslandName);
+                "islandrenameevent", islandName, IslandRenameEvent::getIslandName);
     }
 
     public EventResult<String> callIslandRenameWarpCategoryEvent(Island island, SuperiorPlayer superiorPlayer,
                                                                  WarpCategory warpCategory, String categoryName) {
         return callEvent(() -> new IslandRenameWarpCategoryEvent(superiorPlayer, island, warpCategory, categoryName),
-                "islandrenamewarpcategoryevent", IslandRenameWarpCategoryEvent::getCategoryName);
+                "islandrenamewarpcategoryevent", categoryName, IslandRenameWarpCategoryEvent::getCategoryName);
     }
 
     public EventResult<String> callIslandRenameWarpEvent(Island island, SuperiorPlayer superiorPlayer,
                                                          IslandWarp islandWarp, String warpName) {
         return callEvent(() -> new IslandRenameWarpEvent(superiorPlayer, island, islandWarp, warpName),
-                "islandrenamewarpevent", IslandRenameWarpEvent::getWarpName);
+                "islandrenamewarpevent", warpName, IslandRenameWarpEvent::getWarpName);
     }
 
     public void callIslandRestrictMoveEvent(SuperiorPlayer superiorPlayer, IslandRestrictMoveEvent.RestrictReason restrictReason) {
@@ -558,13 +558,13 @@ public final class EventsBus {
     public EventResult<Location> callIslandSetHomeEvent(Island island, Location islandHome, IslandSetHomeEvent.Reason reason,
                                                         @Nullable SuperiorPlayer superiorPlayer) {
         return callEvent(() -> new IslandSetHomeEvent(island, islandHome, reason, superiorPlayer),
-                "islandsethomeevent", IslandSetHomeEvent::getIslandHome);
+                "islandsethomeevent", islandHome, IslandSetHomeEvent::getIslandHome);
     }
 
     public EventResult<Location> callIslandSetVisitorHomeEvent(SuperiorPlayer superiorPlayer, Island island,
                                                                Location islandVisitorHome) {
         return callEvent(() -> new IslandSetVisitorHomeEvent(superiorPlayer, island, islandVisitorHome),
-                "islandsetvisitorhomeevent", IslandSetVisitorHomeEvent::getIslandVisitorHome);
+                "islandsetvisitorhomeevent", islandVisitorHome, IslandSetVisitorHomeEvent::getIslandVisitorHome);
     }
 
     public boolean callIslandTransferEvent(Island island, SuperiorPlayer previousOwner, SuperiorPlayer superiorPlayer) {
@@ -598,9 +598,8 @@ public final class EventsBus {
     public EventResult<UpgradeResult> callIslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island,
                                                              Upgrade upgrade, UpgradeLevel upgradeLevel,
                                                              List<String> commands, @Nullable UpgradeCost upgradeCost) {
-        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel,
-                        commands, upgradeCost),
-                "islandupgradeevent", UpgradeResult::new);
+        return callEvent(() -> new IslandUpgradeEvent(superiorPlayer, island, upgrade, upgradeLevel, commands, upgradeCost),
+                "islandupgradeevent", new UpgradeResult(commands, upgradeCost), UpgradeResult::new);
     }
 
     public boolean callIslandWorldResetEvent(CommandSender sender, Island island, World.Environment environment) {
@@ -624,7 +623,7 @@ public final class EventsBus {
                                                                 Mission<?> mission, List<ItemStack> itemRewards,
                                                                 List<String> commandRewards) {
         return callEvent(() -> new MissionCompleteEvent(superiorPlayer, missionsHolder, mission, itemRewards, commandRewards),
-                "missioncompleteevent", MissionRewards::of);
+                "missioncompleteevent", new MissionRewards(itemRewards, commandRewards), MissionRewards::of);
     }
 
     public boolean callMissionResetEvent(CommandSender commandSender, IMissionsHolder missionsHolder, Mission<?> mission) {
@@ -651,7 +650,7 @@ public final class EventsBus {
     public EventResult<ISuperiorMenu> callPlayerCloseMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu,
                                                                @Nullable ISuperiorMenu newMenu) {
         return callEvent(() -> new PlayerCloseMenuEvent(superiorPlayer, superiorMenu, newMenu),
-                "playerclosemenuevent", PlayerCloseMenuEvent::getNewMenu);
+                "playerclosemenuevent", newMenu, PlayerCloseMenuEvent::getNewMenu);
     }
 
     public boolean callPlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu) {
@@ -691,9 +690,9 @@ public final class EventsBus {
     }
 
     private <T, E extends Event & Cancellable> EventResult<T> callEvent(Supplier<E> eventSupplier, String eventName,
-                                                                        Function<E, T> getResultFunction) {
+                                                                        @Nullable T def, Function<E, T> getResultFunction) {
         if (plugin.getSettings().getDisabledEvents().contains(eventName))
-            return EventResult.of(false, null);
+            return EventResult.of(false, def);
 
         E event = eventSupplier.get();
 
@@ -754,8 +753,12 @@ public final class EventsBus {
         private final UpgradeCost upgradeCost;
 
         public UpgradeResult(IslandUpgradeEvent islandUpgradeEvent) {
-            this.commands = islandUpgradeEvent.getCommands();
-            this.upgradeCost = islandUpgradeEvent.getUpgradeCost();
+            this(islandUpgradeEvent.getCommands(), islandUpgradeEvent.getUpgradeCost());
+        }
+
+        public UpgradeResult(List<String> commands, UpgradeCost upgradeCost) {
+            this.commands = commands;
+            this.upgradeCost = upgradeCost;
         }
 
         public List<String> getCommands() {
