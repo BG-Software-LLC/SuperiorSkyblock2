@@ -15,7 +15,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -159,7 +158,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
 
         @Override
         public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
     }
