@@ -72,7 +72,7 @@ public final class CmdTeamChat implements ISuperiorCommand {
             }
             superiorPlayer.toggleTeamChat();
         } else {
-            String message = CommandArguments.buildLongString(args, 1, true);
+            String message = CommandArguments.buildLongString(args, 1, superiorPlayer.hasPermissionWithoutOP("superior.chat.color"));
             IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
                     superiorPlayer.getName(), message);
             Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
