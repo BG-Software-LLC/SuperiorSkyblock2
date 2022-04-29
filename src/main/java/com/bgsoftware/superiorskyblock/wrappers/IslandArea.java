@@ -39,7 +39,7 @@ public final class IslandArea {
     }
 
     public boolean intercepts(int x, int z) {
-        return x >= this.minX && x < this.maxX && z >= this.minZ && z < this.maxZ;
+        return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
     }
 
     public IslandArea copy() {
