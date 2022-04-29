@@ -29,11 +29,11 @@ public final class DefaultSchematicParser implements SchematicParser {
         try {
             CompoundTag compoundTag = (CompoundTag) Tag.fromStream(inputStream, 0);
 
-            if (ServerVersion.isLegacy() && compoundTag.getValue().containsKey("version") &&
-                    !compoundTag.getValue().get("version").getValue().equals(ServerVersion.getBukkitVersion()))
+            if (ServerVersion.isLegacy() && compoundTag.containsKey("version") &&
+                    !ServerVersion.getBukkitVersion().equals(compoundTag.getString("version")))
                 SuperiorSkyblockPlugin.log("&cSchematic " + schematicName + " was created in a different version, may cause issues.");
 
-            if (!compoundTag.getValue().isEmpty())
+            if (!compoundTag.isEmpty())
                 return new SuperiorSchematic(schematicName, compoundTag);
         } catch (IOException ignored) {
         }

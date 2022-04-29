@@ -88,7 +88,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
                 List<ItemStack> dropItems = new ArrayList<>(e.getDrops());
                 for (ItemStack itemStack : dropItems) {
                     if (itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack) &&
-                            !plugin.getNMSTags().getNBTTag(itemStack).getValue().containsKey("WildChests")) {
+                            !plugin.getNMSTags().getNBTTag(itemStack).containsKey("WildChests")) {
                         int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);
 
                         if (Bukkit.getPluginManager().isPluginEnabled("WildStacker")) {

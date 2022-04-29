@@ -181,7 +181,7 @@ public final class NMSUtils {
         BlockData blockData = Block.getByCombinedId(combinedId);
 
         if (statesTag != null) {
-            for (Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()) {
+            for (Map.Entry<String, Tag<?>> entry : statesTag.entrySet()) {
                 try {
                     // noinspection rawtypes
                     BlockState blockState = BlockStatesMapper.getBlockState(entry.getKey());

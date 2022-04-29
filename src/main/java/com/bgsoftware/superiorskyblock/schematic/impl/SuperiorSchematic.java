@@ -10,10 +10,7 @@ import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicEntity;
 import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.FloatTag;
-import com.bgsoftware.superiorskyblock.tag.IntTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -27,7 +24,6 @@ import org.bukkit.entity.EntityType;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -48,26 +44,26 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
         super(name);
         this.compoundTag = compoundTag;
 
-        int xSize = SuperiorSchematicDeserializer.readNumberFromTag(compoundTag.getValue().get("xSize"));
-        int ySize = SuperiorSchematicDeserializer.readNumberFromTag(compoundTag.getValue().get("ySize"));
-        int zSize = SuperiorSchematicDeserializer.readNumberFromTag(compoundTag.getValue().get("zSize"));
+        int xSize = compoundTag.getInt("xSize");
+        int ySize = compoundTag.getInt("ySize");
+        int zSize = compoundTag.getInt("zSize");
 
-        int offsetX = ((IntTag) compoundTag.getValue().getOrDefault("offsetX", new IntTag(xSize / 2))).getValue();
-        int offsetY = ((IntTag) compoundTag.getValue().getOrDefault("offsetY", new IntTag(ySize / 2))).getValue();
-        int offsetZ = ((IntTag) compoundTag.getValue().getOrDefault("offsetZ", new IntTag(zSize / 2))).getValue();
+        int offsetX = compoundTag.getInt("offsetX", xSize / 2);
+        int offsetY = compoundTag.getInt("offsetY", ySize / 2);
+        int offsetZ = compoundTag.getInt("offsetZ", zSize / 2);
 
         this.offset = SBlockOffset.fromOffsets(offsetX, offsetY, offsetZ).negate();
-        this.yaw = ((FloatTag) compoundTag.getValue().getOrDefault("yaw", new FloatTag(0))).getValue();
-        this.pitch = ((FloatTag) compoundTag.getValue().getOrDefault("pitch", new FloatTag(0))).getValue();
+        this.yaw = compoundTag.getFloat("yaw");
+        this.pitch = compoundTag.getFloat("pitch");
 
-        if (!compoundTag.getValue().containsKey("blocks")) {
+        ListTag blocksList = compoundTag.getList("blocks");
+        if (blocksList == null) {
             this.blocks = Collections.emptyList();
         } else {
-            List<Tag<?>> blocksList = ((ListTag) compoundTag.getValue().get("blocks")).getValue();
             Set<SchematicBlock> schematicBlocks = new TreeSet<>(SchematicBlock::compareTo);
 
             for (Tag<?> tag : blocksList) {
-                SchematicBlock schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock(tag);
+                SchematicBlock schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag);
                 if (schematicBlock != null && schematicBlock.getCombinedId() > 0) {
                     schematicBlocks.add(schematicBlock);
                     readBlock(schematicBlock);
@@ -77,18 +73,17 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
             this.blocks = Collections.unmodifiableList(new LinkedList<>(schematicBlocks));
         }
 
-
-        if (!compoundTag.getValue().containsKey("entities")) {
+        ListTag entitiesList = compoundTag.getList("entities");
+        if (entitiesList == null) {
             this.entities = Collections.emptyList();
         } else {
-            List<Tag<?>> entitiesList = ((ListTag) compoundTag.getValue().get("entities")).getValue();
             List<SchematicEntity> entities = new LinkedList<>();
 
             for (Tag<?> tag : entitiesList) {
-                Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
-                EntityType entityType = EntityType.valueOf(((StringTag) compoundValue.get("entityType")).getValue());
-                CompoundTag entityTag = (CompoundTag) compoundValue.get("NBT");
-                BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(((StringTag) compoundValue.get("offset")).getValue());
+                CompoundTag compound = (CompoundTag) tag;
+                EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
+                CompoundTag entityTag = compound.getCompound("NBT");
+                BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compound.getString("offset"));
                 entities.add(new SchematicEntity(entityType, entityTag, blockOffset));
             }
 
