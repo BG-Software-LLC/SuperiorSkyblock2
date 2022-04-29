@@ -41,6 +41,10 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
         return create(() -> new ConcurrentHashMap<>());
     }
 
+    public static <V> KeyMapImpl<V> createConcurrentHashMap(Map<Key, V> keys) {
+        return create(() -> new ConcurrentHashMap<>(), keys);
+    }
+
     public static <V> KeyMapImpl<V> createEmptyMap() {
         return (KeyMapImpl<V>) EMPTY_MAP;
     }

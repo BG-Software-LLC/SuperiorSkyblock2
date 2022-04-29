@@ -1154,6 +1154,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void removePotionEffect(PotionEffectType type) {
+        // Do nothing.
+    }
+
+    @Override
     public int getPotionEffectLevel(PotionEffectType type) {
         return 0;
     }
@@ -1185,6 +1190,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setRoleLimit(PlayerRole playerRole, int limit) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeRoleLimit(PlayerRole playerRole) {
         // Do nothing.
     }
 
@@ -1289,6 +1299,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeRating(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
+    }
+
+    @Override
     public double getTotalRating() {
         return 0;
     }
@@ -1334,6 +1349,12 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
+        return true;
+    }
+
+    @Override
     public int getGeneratorPercentage(Key key, World.Environment environment) {
         return 0;
     }
@@ -1345,6 +1366,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeGeneratorAmount(Key key, World.Environment environment) {
         // Do nothing.
     }
 

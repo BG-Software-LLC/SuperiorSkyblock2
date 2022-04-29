@@ -374,13 +374,9 @@ public final class IslandsDatabaseBridge {
     }
 
     public static void saveRating(Island island, SuperiorPlayer superiorPlayer, Rating rating, long rateTime) {
-        saveRating(island, superiorPlayer.getUniqueId(), rating, rateTime);
-    }
-
-    public static void saveRating(Island island, UUID playerUUID, Rating rating, long rateTime) {
         island.getDatabaseBridge().insertObject("islands_ratings",
                 new Pair<>("island", island.getUniqueId().toString()),
-                new Pair<>("player", playerUUID.toString()),
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
                 new Pair<>("rating", rating.getValue()),
                 new Pair<>("rating_time", rateTime)
         );
@@ -426,6 +422,14 @@ public final class IslandsDatabaseBridge {
                 new Pair<>("environment", environment.name()),
                 new Pair<>("block", blockKey.toString()),
                 new Pair<>("rate", rate)
+        );
+    }
+
+    public static void removeGeneratorRate(Island island, World.Environment environment, Key blockKey) {
+        island.getDatabaseBridge().deleteObject("islands_generators",
+                createFilter("island", island,
+                        new Pair<>("environment", environment.name()),
+                        new Pair<>("block", blockKey.toString()))
         );
     }
 

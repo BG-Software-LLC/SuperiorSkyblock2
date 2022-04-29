@@ -148,6 +148,9 @@ public final class BlocksLogic {
             creationFailed = true;
         }
 
+        if (!plugin.getEventsBus().callIslandCreateWarpEvent(superiorPlayer, island, warpName, warpLocation, !privateFlag, null))
+            creationFailed = true;
+
         if (creationFailed) {
             for (int i = 0; i < 4; i++) {
                 signLines[i] = "";
@@ -224,7 +227,12 @@ public final class BlocksLogic {
         if (island == null)
             return true;
 
-        if (island.getWarp(sign.getLocation()) != null) {
+        IslandWarp islandWarp = island.getWarp(sign.getLocation());
+
+        if (islandWarp != null) {
+            if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
+                return false;
+
             island.deleteWarp(superiorPlayer, sign.getLocation());
         } else {
             if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {

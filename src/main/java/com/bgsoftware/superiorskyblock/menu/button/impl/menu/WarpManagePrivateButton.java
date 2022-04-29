@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
@@ -22,11 +23,21 @@ public final class WarpManagePrivateButton extends SuperiorMenuButton<MenuWarpMa
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuWarpManage superiorMenu,
                               InventoryClickEvent clickEvent) {
         IslandWarp islandWarp = superiorMenu.getIslandWarp();
-        islandWarp.setPrivateFlag(!islandWarp.hasPrivateFlag());
-        if (islandWarp.hasPrivateFlag())
-            Message.WARP_PRIVATE_UPDATE.send(clickEvent.getWhoClicked());
+
+        boolean openToPublic = islandWarp.hasPrivateFlag();
+
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
+
+        if (openToPublic ? !plugin.getEventsBus().callIslandOpenWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp) :
+                !plugin.getEventsBus().callIslandCloseWarpEvent(islandWarp.getIsland(), superiorPlayer, islandWarp))
+            return;
+
+        islandWarp.setPrivateFlag(!openToPublic);
+
+        if (openToPublic)
+            Message.WARP_PUBLIC_UPDATE.send(superiorPlayer);
         else
-            Message.WARP_PUBLIC_UPDATE.send(clickEvent.getWhoClicked());
+            Message.WARP_PRIVATE_UPDATE.send(superiorPlayer);
     }
 
     public static class Builder extends AbstractBuilder<Builder, WarpManagePrivateButton, MenuWarpManage> {

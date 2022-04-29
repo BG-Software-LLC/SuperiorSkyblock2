@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -68,6 +68,9 @@ public final class CmdAdminDelWarp implements IAdminIslandCommand {
         IslandWarp islandWarp = CommandArguments.getWarp(sender, island, args, 3);
 
         if (islandWarp == null)
+            return;
+
+        if (!plugin.getEventsBus().callIslandDeleteWarpEvent(sender, islandWarp.getIsland(), islandWarp))
             return;
 
         boolean breakSign = false;
