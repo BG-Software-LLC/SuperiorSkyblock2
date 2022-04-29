@@ -6,3 +6,8 @@
 ######################################################
 
 enabled: true
+
+# Whether generators should match their intended world instead of the world they actually generate in.
+# Right now, toggling this to true will make the basalt generator to always generate nether rates, no matter
+# in which world it's generating blocks.
+match-generator-world: true

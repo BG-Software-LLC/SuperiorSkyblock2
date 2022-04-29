@@ -16,6 +16,7 @@ import java.io.File;
 public final class GeneratorsModule extends BuiltinModule {
 
     private boolean enabled = true;
+    private boolean matchGeneratorWorld = true;
 
     public GeneratorsModule() {
         super("generators");
@@ -83,6 +84,11 @@ public final class GeneratorsModule extends BuiltinModule {
     @Override
     protected void updateConfig(SuperiorSkyblockPlugin plugin) {
         enabled = config.getBoolean("enabled");
+        matchGeneratorWorld = config.getBoolean("match-generator-world");
+    }
+
+    public boolean isMatchGeneratorWorld() {
+        return matchGeneratorWorld;
     }
 
 }

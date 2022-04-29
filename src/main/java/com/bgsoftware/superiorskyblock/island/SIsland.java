@@ -2959,12 +2959,19 @@ public final class SIsland implements Island {
         }
     }
 
+    @Nullable
     @Override
     public Key generateBlock(Location location, boolean optimizeCobblestone) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        return generateBlock(location, location.getWorld().getEnvironment(), optimizeCobblestone);
+    }
 
-        World.Environment environment = location.getWorld().getEnvironment();
+    @Override
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null.");
+        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         int totalGeneratorAmounts = getGeneratorTotalAmount(environment);
 

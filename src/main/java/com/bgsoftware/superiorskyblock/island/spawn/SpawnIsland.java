@@ -1382,6 +1382,12 @@ public final class SpawnIsland implements Island {
 
     @Nullable
     @Override
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+        return null;
+    }
+
+    @Nullable
+    @Override
     public Key generateBlock(Location location, boolean optimizeCobblestone) {
         return null;
     }
