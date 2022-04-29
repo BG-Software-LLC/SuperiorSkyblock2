@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -66,7 +65,17 @@ public final class CmdAdminRemoveBlockLimit implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
         Key key = KeyImpl.of(args[3]);
 
-        Executor.data(() -> islands.forEach(island -> island.removeBlockLimit(key)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            if (plugin.getEventsBus().callIslandRemoveBlockLimitEvent(sender, island, key)) {
+                anyIslandChanged = true;
+                island.removeBlockLimit(key);
+            }
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));

@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -68,7 +68,17 @@ public final class CmdAdminSetTeamLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setTeamLimit(limit)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeMembersLimitEvent(sender, island, limit);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setTeamLimit(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_TEAM_LIMIT_ALL.send(sender);

@@ -11,8 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -82,7 +81,18 @@ public final class CmdAdminAddBlockLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setBlockLimit(key, island.getBlockLimit(key) + limit)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeBlockLimitEvent(sender,
+                    island, key, island.getBlockLimit(key) + limit);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setBlockLimit(key, eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_BLOCK_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));

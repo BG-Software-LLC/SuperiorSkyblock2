@@ -9,14 +9,21 @@ import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeBankLimitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeBlockLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeBorderSizeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeCoopLimitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeCropGrowthEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeDescriptionEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeDiscordEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeEntityLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeMembersLimitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeMobDropsEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangePaypalEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangePlayerPrivilegeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeRolePrivilegeEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeSpawnerRatesEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpsLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChatEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
@@ -36,6 +43,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLockWorldEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandOpenEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandRemoveBlockLimitEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRemoveVisitorHomeEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRenameEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
@@ -56,6 +64,7 @@ import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -124,6 +133,11 @@ public final class EventsBus {
                 "islandchangebanklimitevent", IslandChangeBankLimitEvent::getBankLimit);
     }
 
+    public EventResult<Integer> callIslandChangeBlockLimitEvent(CommandSender commandSender, Island island, Key block, int blockLimit) {
+        return callEvent(() -> new IslandChangeBlockLimitEvent(getSuperiorPlayer(commandSender), island, block, blockLimit),
+                "islandchangeblocklimitevent", IslandChangeBlockLimitEvent::getBlockLimit);
+    }
+
     public EventResult<Integer> callIslandChangeBorderSizeEvent(CommandSender commandSender, Island island, int borderSize) {
         return callEvent(() -> new IslandChangeBorderSizeEvent(getSuperiorPlayer(commandSender), island, borderSize),
                 "islandchangebordersizeevent", IslandChangeBorderSizeEvent::getBorderSize);
@@ -132,6 +146,11 @@ public final class EventsBus {
     public EventResult<Integer> callIslandChangeCoopLimitEvent(CommandSender commandSender, Island island, int coopLimit) {
         return callEvent(() -> new IslandChangeCoopLimitEvent(getSuperiorPlayer(commandSender), island, coopLimit),
                 "islandchangecooplimitevent", IslandChangeCoopLimitEvent::getCoopLimit);
+    }
+
+    public EventResult<Double> callIslandChangeCropGrowthEvent(CommandSender commandSender, Island island, double cropGrowth) {
+        return callEvent(() -> new IslandChangeCropGrowthEvent(getSuperiorPlayer(commandSender), island, cropGrowth),
+                "islandchangecropgrowthevent", IslandChangeCropGrowthEvent::getCropGrowth);
     }
 
     public EventResult<String> callIslandChangeDescriptionEvent(SuperiorPlayer superiorPlayer, Island island, String description) {
@@ -144,11 +163,26 @@ public final class EventsBus {
                 "islandchangediscordevent", IslandChangeDiscordEvent::getDiscord);
     }
 
+    public EventResult<Integer> callIslandChangeEntityLimitEvent(CommandSender commandSender, Island island, Key entity, int entityLimit) {
+        return callEvent(() -> new IslandChangeEntityLimitEvent(getSuperiorPlayer(commandSender), island, entity, entityLimit),
+                "islandchangeentitylimitevent", IslandChangeEntityLimitEvent::getEntityLimit);
+    }
+
     public EventResult<BigDecimal> callIslandChangeLevelBonusEvent(CommandSender commandSender, Island island,
                                                                    IslandChangeLevelBonusEvent.Reason reason,
                                                                    BigDecimal levelBonus) {
         return callEvent(() -> new IslandChangeLevelBonusEvent(getSuperiorPlayer(commandSender), island, reason, levelBonus),
                 "islandchangelevelbonusevent", IslandChangeLevelBonusEvent::getLevelBonus);
+    }
+
+    public EventResult<Integer> callIslandChangeMembersLimitEvent(CommandSender commandSender, Island island, int membersLimit) {
+        return callEvent(() -> new IslandChangeMembersLimitEvent(getSuperiorPlayer(commandSender), island, membersLimit),
+                "islandchangememberslimitevent", IslandChangeMembersLimitEvent::getMembersLimit);
+    }
+
+    public EventResult<Double> callIslandChangeMobDropsEvent(CommandSender commandSender, Island island, double mobDrops) {
+        return callEvent(() -> new IslandChangeMobDropsEvent(getSuperiorPlayer(commandSender), island, mobDrops),
+                "islandchangemobdropsevent", IslandChangeMobDropsEvent::getMobDrops);
     }
 
     public EventResult<String> callIslandChangePaypalEvent(SuperiorPlayer superiorPlayer, Island island, String paypal) {
@@ -162,15 +196,25 @@ public final class EventsBus {
                 "islandchangeplayerprivilegeevent");
     }
 
+    public boolean callIslandChangeRolePrivilegeEvent(Island island, PlayerRole playerRole) {
+        return callIslandChangeRolePrivilegeEvent(island, null, playerRole);
+    }
+
+    public EventResult<Double> callIslandChangeSpawnerRatesEvent(CommandSender commandSender, Island island, double spawnerRates) {
+        return callEvent(() -> new IslandChangeSpawnerRatesEvent(getSuperiorPlayer(commandSender), island, spawnerRates),
+                "islandchangespawnerratesevent", IslandChangeSpawnerRatesEvent::getSpawnerRates);
+    }
+
+    public EventResult<Integer> callIslandChangeWarpsLimitEvent(CommandSender commandSender, Island island, int warpsLimit) {
+        return callEvent(() -> new IslandChangeWarpsLimitEvent(getSuperiorPlayer(commandSender), island, warpsLimit),
+                "islandchangewarpslimitevent", IslandChangeWarpsLimitEvent::getWarpsLimit);
+    }
+
     public EventResult<BigDecimal> callIslandChangeWorthBonusEvent(CommandSender commandSender, Island island,
                                                                    IslandChangeWorthBonusEvent.Reason reason,
                                                                    BigDecimal worthBonus) {
         return callEvent(() -> new IslandChangeWorthBonusEvent(getSuperiorPlayer(commandSender), island, reason, worthBonus),
                 "islandchangeworthbonusevent", IslandChangeWorthBonusEvent::getWorthBonus);
-    }
-
-    public boolean callIslandChangeRolePrivilegeEvent(Island island, PlayerRole playerRole) {
-        return callIslandChangeRolePrivilegeEvent(island, null, playerRole);
     }
 
     public boolean callIslandChangeRolePrivilegeEvent(Island island, @Nullable SuperiorPlayer superiorPlayer, PlayerRole playerRole) {
@@ -285,6 +329,11 @@ public final class EventsBus {
 
     public boolean callIslandQuitEvent(SuperiorPlayer superiorPlayer, Island island) {
         return callEvent(() -> new IslandQuitEvent(superiorPlayer, island), "islandquitevent");
+    }
+
+    public boolean callIslandRemoveBlockLimitEvent(CommandSender commandSender, Island island, Key block) {
+        return callEvent(() -> new IslandRemoveBlockLimitEvent(getSuperiorPlayer(commandSender), island, block),
+                "islandremoveblocklimitevent");
     }
 
     public boolean callIslandRemoveVisitorHomeEvent(SuperiorPlayer superiorPlayer, Island island) {
