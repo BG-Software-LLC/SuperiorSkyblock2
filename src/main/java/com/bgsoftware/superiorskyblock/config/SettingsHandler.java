@@ -524,6 +524,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         return this.container.autoLanguageDetection;
     }
 
+    @Override
+    public boolean isAutoUncoopWhenAlone() {
+        return this.container.autoUncoopWhenAlone;
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");
@@ -625,6 +630,9 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         if (cfg.contains("worlds.normal-world")) {
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
+        }
+        if (cfg.isBoolean("worlds.end.dragon-fight")) {
+            cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
     }
 

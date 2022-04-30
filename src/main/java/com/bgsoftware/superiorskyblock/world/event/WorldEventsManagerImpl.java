@@ -5,13 +5,17 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.logic.EntitiesLogic;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
+
+import java.util.Arrays;
 
 public final class WorldEventsManagerImpl implements WorldEventsManager {
 
@@ -49,20 +53,26 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             ChunksTracker.markDirty(island, chunk, true);
 
-        // We want to delete old holograms of stacked blocks
-        for (Entity entity : chunk.getEntities()) {
-            if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
-                    plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
-                entity.remove();
-        }
+        Executor.sync(() -> {
+            // We want to delete old holograms of stacked blocks + count entities for the chunk
+            for (Entity entity : chunk.getEntities()) {
+                if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
+                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+                    entity.remove();
+
+                EntitiesLogic.handleSpawn(entity);
+            }
+        }, 2L);
 
         Location islandCenter = island.getCenter(chunk.getWorld().getEnvironment());
 
-        if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
-            Executor.sync(() -> {
-                if (chunk.isLoaded())
-                    island.getEntitiesTracker().recalculateEntityCounts();
-            }, 20L);
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+            if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
+                Executor.sync(() -> {
+                    if (chunk.isLoaded())
+                        island.getEntitiesTracker().recalculateEntityCounts();
+                }, 20L);
+            }
         }
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
@@ -87,6 +97,9 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
 
         if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
             ChunksTracker.markDirty(island, chunk, true);
+
+        Arrays.stream(chunk.getEntities()).forEach(EntitiesLogic::handleDespawn);
+
     }
 
 }

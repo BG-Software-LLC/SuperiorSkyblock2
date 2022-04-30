@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowt
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
@@ -54,7 +55,7 @@ public final class BlockChangeTask {
             List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>();
 
             for (Map.Entry<ChunkPosition, List<BlockData>> entry : blocksCache.entrySet()) {
-                chunkFutures.add(ChunksProvider.loadChunk(entry.getKey(), chunk -> {
+                chunkFutures.add(ChunksProvider.loadChunk(entry.getKey(), ChunkLoadReason.SCHEMATIC_PLACE, chunk -> {
                     if (failed)
                         return;
 
@@ -88,8 +89,13 @@ public final class BlockChangeTask {
 
             if (onFinish != null) {
                 CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
-                    if (!failed)
-                        onFinish.run();
+                    try {
+                        if (!failed)
+                            onFinish.run();
+                    } catch (Throwable error2) {
+                        if (onFailure != null)
+                            onFailure.accept(error2);
+                    }
                 });
             }
         } catch (Throwable error) {

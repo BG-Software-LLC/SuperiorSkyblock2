@@ -676,6 +676,8 @@ PERMISSION_CHANGED_ALL: '&e&lNâng Cấp | &7Thay đổi thành công quyền {0
   các đảo.'
 PERMISSIONS_RESET_PLAYER: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền cho {0} thành giá trị mặc định!'
 PERMISSIONS_RESET_ROLES: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền của hòn đảo thành giá trị mặc định!'
+PLACEHOLDER_NO: '&c✘'
+PLACEHOLDER_YES: '&a✔'
 PLAYER_ALREADY_BANNED: '&c&lLỗi | &7Người chơi này đã bị cấm.'
 PLAYER_ALREADY_COOP: '&c&lLỗi | &7Người chơi này đã hợp tác.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lLỗi | &7Người chơi này đã có sẵn trong đảo.'
@@ -785,6 +787,7 @@ TRANSFER_BROADCAST: '&e&lĐảo | &7Lãnh đạo của hòn đảo đã được
 UNBAN_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã được dỡ bỏ lệnh cấm trong đảo bởi {1}.'
 UNCOOP_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã huỷ bỏ tư cách thành viên coop
   của {1}'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lĐảo | &7{0} đã thoát khỏi trò chơi và không
   còn là một thành viên co-op.'
 UNIGNORED_ISLAND: '&e&lĐảo | &7Đảo của {0} bây giờ không được bỏ qua từ các

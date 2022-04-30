@@ -29,7 +29,7 @@ public abstract class IslandEvent extends Event {
     }
 
     /**
-     * Get the island object that was involved in the event.
+     * Get the island that was involved in the event.
      */
     public Island getIsland() {
         return island;

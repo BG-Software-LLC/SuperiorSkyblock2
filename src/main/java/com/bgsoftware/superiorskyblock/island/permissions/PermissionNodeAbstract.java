@@ -2,23 +2,23 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
+import com.bgsoftware.superiorskyblock.structure.EnumerateMap;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class PermissionNodeAbstract implements PermissionNode {
 
-    protected final Map<IslandPrivilege, PrivilegeStatus> privileges = new ConcurrentHashMap<>();
+    protected final EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges;
 
     protected PermissionNodeAbstract() {
+        this.privileges = new EnumerateMap<>(IslandPrivilege.values());
     }
 
-    protected PermissionNodeAbstract(Map<IslandPrivilege, PrivilegeStatus> privileges) {
-        this.privileges.putAll(privileges);
+    protected PermissionNodeAbstract(EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges) {
+        this.privileges = new EnumerateMap<>(privileges);
     }
 
     protected void setPermissions(String permissions, boolean checkDefaults) {
@@ -49,15 +49,13 @@ public abstract class PermissionNodeAbstract implements PermissionNode {
     @Override
     public void setPermission(IslandPrivilege islandPrivilege, boolean value) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
-        privileges.put(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
+        this.privileges.put(islandPrivilege, value ? PrivilegeStatus.ENABLED : PrivilegeStatus.DISABLED);
     }
 
     @Override
     public Map<IslandPrivilege, Boolean> getCustomPermissions() {
-        return privileges.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                entry -> entry.getValue() == PrivilegeStatus.ENABLED
-        ));
+        return this.privileges.collect(IslandPrivilege.values(),
+                privilegeStatus -> privilegeStatus == PrivilegeStatus.ENABLED);
     }
 
     @Override

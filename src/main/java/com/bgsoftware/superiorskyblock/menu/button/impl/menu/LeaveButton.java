@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuConfirmLeave;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -31,7 +30,7 @@ public final class LeaveButton extends SuperiorMenuButton<MenuConfirmLeave> {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         Island island = clickedPlayer.getIsland();
 
-        if (leaveIsland && island != null && EventsCaller.callIslandQuitEvent(clickedPlayer, island)) {
+        if (leaveIsland && island != null && plugin.getEventsBus().callIslandQuitEvent(clickedPlayer, island)) {
             island.kickMember(clickedPlayer);
 
             IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());

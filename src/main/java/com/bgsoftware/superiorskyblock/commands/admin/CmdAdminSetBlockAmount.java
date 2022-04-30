@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -66,12 +66,12 @@ public final class CmdAdminSetBlockAmount implements ISuperiorCommand {
         if (location == null)
             return;
 
-        Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[6]);
+        NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[6]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        int amount = arguments.getKey();
+        int amount = arguments.getNumber();
 
         plugin.getStackedBlocks().setStackedBlock(location.getBlock(), amount);
 

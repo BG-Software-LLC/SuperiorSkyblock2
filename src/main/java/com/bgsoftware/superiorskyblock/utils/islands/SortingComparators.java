@@ -2,16 +2,16 @@ package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 
 import java.util.Comparator;
 
 public final class SortingComparators {
 
     public final static Comparator<SuperiorPlayer> PLAYER_NAMES_COMPARATOR = Comparator.comparing(SuperiorPlayer::getName);
-    public final static Comparator<Pair<SuperiorPlayer, Long>> PAIRED_PLAYERS_NAMES_COMPARATOR =
-            Comparator.comparing(o -> o.getKey().getName());
+    public final static Comparator<SIsland.UniqueVisitor> PAIRED_PLAYERS_NAMES_COMPARATOR =
+            Comparator.comparing(o -> o.getSuperiorPlayer().getName());
     public final static Comparator<BankTransaction> BANK_TRANSACTIONS_COMPARATOR =
             Comparator.comparingInt(BankTransaction::getPosition);
     private final static Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {

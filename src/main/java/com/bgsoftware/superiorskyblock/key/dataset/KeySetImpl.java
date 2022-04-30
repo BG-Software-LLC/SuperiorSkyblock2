@@ -2,11 +2,13 @@ package com.bgsoftware.superiorskyblock.key.dataset;
 
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -22,6 +24,14 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
     public static KeySetImpl create(Supplier<Set<String>> setCreator) {
         return new KeySetImpl(setCreator);
+    }
+
+    public static KeySetImpl createHashSet() {
+        return create(() -> new HashSet<>());
+    }
+
+    public static KeySetImpl createHashSet(Collection<Key> keys) {
+        return create(() -> new HashSet<>(), keys);
     }
 
     private KeySetImpl(Supplier<Set<String>> setCreator, Collection<String> keys) {
@@ -69,14 +79,14 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
         if (set.contains(original.toString()))
             return original;
         else if (set.contains(original.getGlobalKey()))
-            return Key.of(original.getGlobalKey(), "");
+            return KeyImpl.of(original.getGlobalKey(), "");
         else
             return def;
     }
 
     @Override
     public Set<Key> asSet() {
-        return this.set.stream().map(Key::of).collect(Collectors.toSet());
+        return this.set.stream().map(KeyImpl::of).collect(Collectors.toSet());
     }
 
 }

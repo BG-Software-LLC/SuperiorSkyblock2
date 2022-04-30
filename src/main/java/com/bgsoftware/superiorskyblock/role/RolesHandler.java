@@ -81,8 +81,9 @@ public final class RolesHandler extends AbstractHandler implements RolesManager 
         int weight = section.getInt("weight", type);
         int id = section.getInt("id", weight);
         String name = section.getString("name");
+        String displayName = section.getString("display-name");
 
-        PlayerRole playerRole = new SPlayerRole(name, id, weight, section.getStringList("permissions"), previousRole);
+        PlayerRole playerRole = new SPlayerRole(name, displayName, id, weight, section.getStringList("permissions"), previousRole);
 
         this.rolesContainer.addPlayerRole(playerRole);
 

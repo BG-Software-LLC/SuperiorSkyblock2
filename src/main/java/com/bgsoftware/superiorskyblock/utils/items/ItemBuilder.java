@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.utils.items;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -82,7 +82,7 @@ public final class ItemBuilder {
 
     public ItemBuilder withName(String name) {
         if (itemMeta != null && name != null)
-            itemMeta.setDisplayName(StringUtils.translateColors(name));
+            itemMeta.setDisplayName(Formatters.COLOR_FORMATTER.format(name));
         return this;
     }
 
@@ -94,7 +94,7 @@ public final class ItemBuilder {
 
     public ItemBuilder withLore(List<String> lore) {
         if (itemMeta != null && lore != null)
-            itemMeta.setLore(StringUtils.translateColors(lore));
+            itemMeta.setLore(Formatters.formatList(lore, Formatters.COLOR_FORMATTER));
         return this;
     }
 
@@ -114,11 +114,11 @@ public final class ItemBuilder {
 
         List<String> loreList = new ArrayList<>();
 
-        firstLine = StringUtils.translateColors(firstLine);
+        firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
         loreList.add(firstLine);
 
         for (String line : listLine)
-            loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(line));
+            loreList.add(ChatColor.getLastColors(firstLine) + Formatters.COLOR_FORMATTER.format(line));
 
         if (loreList.size() > 10) {
             for (int i = 10; i < loreList.size(); i++) {
@@ -137,12 +137,12 @@ public final class ItemBuilder {
 
         List<String> loreList = new ArrayList<>();
 
-        firstLine = StringUtils.translateColors(firstLine);
+        firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
         loreList.add(firstLine);
 
         for (String section : configurationSection.getKeys(false)) {
             section = section + ": " + configurationSection.get(section).toString();
-            loreList.add(ChatColor.getLastColors(firstLine) + StringUtils.translateColors(section));
+            loreList.add(ChatColor.getLastColors(firstLine) + Formatters.COLOR_FORMATTER.format(section));
         }
 
         if (loreList.size() > 16) {

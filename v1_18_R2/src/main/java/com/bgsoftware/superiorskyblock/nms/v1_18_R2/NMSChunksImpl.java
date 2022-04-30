@@ -79,7 +79,7 @@ public final class NMSChunksImpl implements NMSChunks {
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
                                                   net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMap.createKeyMap();
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();
 
         for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunkSections) {
@@ -124,22 +124,21 @@ public final class NMSChunksImpl implements NMSChunks {
         int minBuildHeight = worldServer.getWorld().getMinHeight();
         int maxBuildHeight = worldServer.getWorld().getMaxHeight();
 
+        int chunkWorldCoordX = chunkCoords.getX() << 4;
+        int chunkWorldCoordZ = chunkCoords.getZ() << 4;
+
         net.minecraft.world.phys.AxisAlignedBB chunkBounds = new net.minecraft.world.phys.AxisAlignedBB(
-                chunkCoords.getX() << 4, minBuildHeight, chunkCoords.getZ() << 4,
-                chunkCoords.getX() << 4 + 15, maxBuildHeight, chunkCoords.getZ() << 4 + 15
-        );
+                chunkWorldCoordX, minBuildHeight, chunkWorldCoordZ,
+                chunkWorldCoordX + 15, maxBuildHeight, chunkWorldCoordZ + 15);
 
-        List<Entity> worldEntities = new ArrayList<>();
-        worldServer.getEntities().getAll().forEach(nmsEntity -> {
+        List<net.minecraft.world.entity.Entity> worldEntities = new ArrayList<>();
+        worldServer.getEntities().get(chunkBounds, worldEntities::add);
+
+        worldEntities.forEach(nmsEntity -> {
             Entity entity = new Entity(nmsEntity);
-            if (entity.getBoundingBox().intercepts(chunkBounds))
-                worldEntities.add(entity);
+            if (!(entity.getHandle() instanceof EntityHuman))
+                entity.setRemoved(net.minecraft.world.entity.Entity.RemovalReason.b);
         });
-
-        for (Entity worldEntity : worldEntities) {
-            if (!(worldEntity.getHandle() instanceof EntityHuman))
-                worldEntity.setRemoved(net.minecraft.world.entity.Entity.RemovalReason.b);
-        }
     }
 
     private static void removeBlocks(ChunkAccess chunk) {

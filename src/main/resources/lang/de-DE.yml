@@ -765,6 +765,8 @@ PERMISSIONS_RESET_PLAYER: '&e&lInsel | &7Alle Berechtigungen für {0} erfolgreic
   Standardwerte zurückgesetzt!'
 PERMISSIONS_RESET_ROLES: '&e&lInsel | &7Alle Berechtigungen der Insel erfolgreich
   auf Standardwerte zurücksetzen!'
+PLACEHOLDER_NO: '&c✘'
+PLACEHOLDER_YES: '&a✔'
 PLAYER_ALREADY_BANNED: '&c&lFehler | &7Dieser Spieler ist bereits gesperrt.'
 PLAYER_ALREADY_COOP: '&c&lError | &7Dieser Spieler ist bereits kooperativ.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7Dieser Spieler befindet sich bereits auf
@@ -889,6 +891,7 @@ TRANSFER_ALREADY_LEADER: '&c&lError | &7Du bist bereits der Anführer dieser Ins
 TRANSFER_BROADCAST: '&e&lInsel | &7Die Führung der Insel wurde auf {0} übertragen.'
 UNBAN_ANNOUNCEMENT: '&e&lInsel | &7{0} wurde von {1} von der Insel ENTFERNT.'
 UNCOOP_ANNOUNCEMENT: '&e&lInsel | &7{0} hat {1} als Genossenschaftsmitglied entfernt.'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lInsel | &7{0} hat das Spiel verlassen und ist kein
   Koop-Mitglied mehr.'
 UNIGNORED_ISLAND: '&e&lInsel | Die Insel von &7{0} wird jetzt nicht mehr von den Top-Inseln

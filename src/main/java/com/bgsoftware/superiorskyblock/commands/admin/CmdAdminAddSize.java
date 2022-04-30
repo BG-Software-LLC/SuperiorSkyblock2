@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -60,22 +60,32 @@ public final class CmdAdminAddSize implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Pair<Integer, Boolean> arguments = CommandArguments.getSize(sender, args[3]);
+        NumberArgument<Integer> arguments = CommandArguments.getSize(sender, args[3]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        int size = arguments.getKey();
+        int size = arguments.getNumber();
 
         if (size > plugin.getSettings().getMaxIslandSize()) {
             Message.SIZE_BIGGER_MAX.send(sender);
             return;
         }
 
-        Executor.data(() -> {
-            islands.forEach(island -> island.setIslandSize(island.getIslandSize() + size));
-            Executor.sync(() -> islands.forEach(Island::updateBorder));
-        });
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeBorderSizeEvent(sender,
+                    island, island.getIslandSize() + size);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setIslandSize(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
+
+        islands.forEach(Island::updateBorder);
 
         if (islands.size() > 1)
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);

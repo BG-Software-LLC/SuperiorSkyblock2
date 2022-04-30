@@ -4,10 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public final class SBankTransaction implements BankTransaction {
         this.bankAction = bankAction;
         this.position = position;
         this.time = time;
-        this.date = StringUtils.formatDate(time);
+        this.date = Formatters.DATE_FORMATTER.format(new Date(time));
         this.failureReason = failureReason == null ? "" : failureReason;
         this.amount = amount.setScale(2, RoundingMode.HALF_EVEN);
     }

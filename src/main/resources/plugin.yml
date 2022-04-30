@@ -328,3 +328,5 @@ permissions:
             description: Withdraw money from another player's island bank.
           superior.admin.world:
             description: Unlock a world for an island.
+      superior.chat.color:
+        description: Gives access to use colors within island chat.

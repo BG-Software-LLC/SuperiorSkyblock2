@@ -107,7 +107,7 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
     }
 
     @Override
-    public Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
+    public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return defaultHolder;
     }
 

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
@@ -17,12 +18,12 @@ public interface IMessageComponent {
     }
 
     static Optional<String> replaceArgs(String msg, Object... objects) {
-        if (msg == null || msg.isEmpty())
+        if (StringUtils.isBlank(msg))
             return Optional.empty();
 
         for (int i = 0; i < objects.length; i++) {
             String objectString = objects[i] instanceof BigDecimal ?
-                    StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
+                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
             msg = msg.replace("{" + i + "}", objectString);
         }
 

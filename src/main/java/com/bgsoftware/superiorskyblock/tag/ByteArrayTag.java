@@ -39,6 +39,7 @@ import com.google.common.base.Preconditions;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 /**
  * The <code>TAG_Byte_Array</code> tag.
@@ -83,7 +84,7 @@ public final class ByteArrayTag extends Tag<byte[]> {
     public String toString() {
         StringBuilder hex = new StringBuilder();
         for (byte b : value) {
-            String hexDigits = Integer.toHexString(b).toUpperCase();
+            String hexDigits = Integer.toHexString(b).toUpperCase(Locale.ENGLISH);
             if (hexDigits.length() == 1) {
                 hex.append("0");
             }

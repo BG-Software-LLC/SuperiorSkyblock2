@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BankCustomDepositButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BankCustomWithdrawButton;
@@ -18,8 +19,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 
 import java.math.BigDecimal;
@@ -50,16 +49,15 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
 
         RegularMenuPattern.Builder<MenuIslandBank> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "island-bank.yml", null);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-bank.yml", null);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
-        if(cfg.isConfigurationSection("items")) {
+        if (cfg.isConfigurationSection("items")) {
             for (String itemChar : cfg.getConfigurationSection("items").getKeys(false)) {
                 if (cfg.contains("items." + itemChar + ".bank-action")) {
                     List<Integer> slots = menuPatternSlots.getSlots(itemChar);
@@ -133,10 +131,10 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         Message.NO_DEPOSIT_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.DEPOSIT_MONEY));
                         break;
                     case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Not enough money":
-                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.NOT_ENOUGH_MONEY_TO_DEPOSIT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Exceed bank limit":
                         Message.BANK_LIMIT_EXCEED.send(superiorPlayer);
@@ -171,7 +169,7 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         Message.NO_WITHDRAW_PERMISSION.send(superiorPlayer, island.getRequiredPlayerRole(IslandPrivileges.WITHDRAW_MONEY));
                         break;
                     case "Invalid amount":
-                        Message.INVALID_AMOUNT.send(superiorPlayer, StringUtils.format(amount));
+                        Message.INVALID_AMOUNT.send(superiorPlayer, Formatters.NUMBER_FORMATTER.format(amount));
                         break;
                     case "Bank is empty":
                         Message.ISLAND_BANK_EMPTY.send(superiorPlayer);

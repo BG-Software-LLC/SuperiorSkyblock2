@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.ValuesButton;
 import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
@@ -16,7 +18,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,6 +25,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,8 +55,8 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
     @Override
     protected String replaceTitle(String title) {
         return title.replace("{0}", island.getOwner().getName())
-                .replace("{1}", StringUtils.format(island.getWorth()))
-                .replace("{2}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()));
+                .replace("{1}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
+                .replace("{2}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()));
     }
 
     public static void init() {
@@ -62,16 +64,16 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
 
         RegularMenuPattern.Builder<MenuValues> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "values.yml", MenuValues::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "values.yml",
+                MenuValues::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
-        KeySet keysToUpdate = KeySet.createKeySet();
+        KeySet keysToUpdate = KeySetImpl.createHashSet();
 
         if (cfg.isConfigurationSection("items")) {
             for (String itemsSectionName : cfg.getConfigurationSection("items").getKeys(false)) {
@@ -138,7 +140,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
             String block = materialSections.length == 2 ? materialSections[0] : materialSections[0] + ":" + materialSections[1];
             int slot = Integer.parseInt(materialSections.length == 2 ? materialSections[1] : materialSections[2]);
             copySection(blockItemSection, section, str ->
-                    str.replace("{0}", StringUtils.format(block)).replace("{1}", "{0}"));
+                    str.replace("{0}", Formatters.CAPITALIZED_FORMATTER.format(block)).replace("{1}", "{0}"));
             section.set("block", block);
             convertType(section, block);
             patternChars[slot] = itemChar;
@@ -167,7 +169,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
     private static void convertType(ConfigurationSection section, String block) {
         String[] materialSections = block.split(":");
         String spawnerType = materialSections[0],
-                entityType = (materialSections.length >= 2 ? materialSections[1] : "PIG").toUpperCase();
+                entityType = (materialSections.length >= 2 ? materialSections[1] : "PIG").toUpperCase(Locale.ENGLISH);
         if (spawnerType.equals(Materials.SPAWNER.toBukkitType() + "")) {
             String texture = HeadUtils.getTexture(entityType);
             if (!texture.isEmpty()) {
