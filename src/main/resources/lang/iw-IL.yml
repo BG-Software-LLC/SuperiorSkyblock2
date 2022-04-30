@@ -715,6 +715,7 @@ TRANSFER_ALREADY_LEADER: '&c&lהאיגש | &7הזה יאה לש גיהנמה ר�
 TRANSFER_BROADCAST: '&e&lיא | &7{0} לא הרבע יאה תוגיהנמ.'
 UNBAN_ANNOUNCEMENT: '&e&lיא | &7{1} ידי לע הלטוב {0} לש הקחרהה.'
 UNCOOP_ANNOUNCEMENT: '&e&lיא | &7יאה לש הלועפ ףתשמכ {1} תא דירוה {0}.'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lיא | &7דוע יאה לש הלועפ ףתשמ וניא ןכלו תרשה תא בזע {0}.'
 UNIGNORED_ISLAND: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} לש יאה.'
 UNIGNORED_ISLAND_NAME: '&e&lיא | &7החלצהב םיבוטה םייאה תמישרל ףסוותה {0} יאה.'

@@ -891,6 +891,7 @@ TRANSFER_ALREADY_LEADER: '&c&lError | &7Du bist bereits der Anführer dieser Ins
 TRANSFER_BROADCAST: '&e&lInsel | &7Die Führung der Insel wurde auf {0} übertragen.'
 UNBAN_ANNOUNCEMENT: '&e&lInsel | &7{0} wurde von {1} von der Insel ENTFERNT.'
 UNCOOP_ANNOUNCEMENT: '&e&lInsel | &7{0} hat {1} als Genossenschaftsmitglied entfernt.'
+UNCOOP_AUTO_ANNOUNCEMENT: '&e&lIsland | &7There are no island members online and therefore you were un-cooped automatically.'
 UNCOOP_LEFT_ANNOUNCEMENT: '&e&lInsel | &7{0} hat das Spiel verlassen und ist kein
   Koop-Mitglied mehr.'
 UNIGNORED_ISLAND: '&e&lInsel | Die Insel von &7{0} wird jetzt nicht mehr von den Top-Inseln

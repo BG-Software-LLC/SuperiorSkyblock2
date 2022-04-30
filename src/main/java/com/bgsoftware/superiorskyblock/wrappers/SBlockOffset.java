@@ -1,11 +1,9 @@
 package com.bgsoftware.superiorskyblock.wrappers;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 public final class SBlockOffset implements BlockOffset {
