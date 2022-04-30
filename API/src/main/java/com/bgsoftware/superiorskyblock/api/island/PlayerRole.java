@@ -15,6 +15,12 @@ public interface PlayerRole {
     String getName();
 
     /**
+     * Get the display-name of the role.
+     * This is shown in chat, placeholders, etc.
+     */
+    String getDisplayName();
+
+    /**
      * Get the weight of the role in the ladder.
      */
     int getWeight();

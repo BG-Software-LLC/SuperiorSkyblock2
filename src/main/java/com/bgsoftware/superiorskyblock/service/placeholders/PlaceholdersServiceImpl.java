@@ -64,6 +64,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
                     .put("texture", SuperiorPlayer::getTextureValue)
                     .put("role", superiorPlayer -> superiorPlayer.getPlayerRole().toString())
+                    .put("role_display", superiorPlayer -> superiorPlayer.getPlayerRole().getDisplayName())
                     .put("locale", superiorPlayer -> Formatters.LOCALE_FORMATTER.format(superiorPlayer.getUserLocale()))
                     .put("world_border", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasWorldBorderEnabled(), superiorPlayer.getUserLocale()))
                     .put("blocks_stacker", superiorPlayer -> Formatters.BOOLEAN_FORMATTER.format(superiorPlayer.hasBlocksStackerEnabled(), superiorPlayer.getUserLocale()))

@@ -108,7 +108,8 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                             lore.add(placeholdersService.parsePlaceholders(member.asOfflinePlayer(), memberFormat
                                     .replace("{}", member.getName())
                                     .replace("{0}", member.getName())
-                                    .replace("{1}", onlineMessage == null ? "" : onlineMessage))
+                                    .replace("{1}", onlineMessage == null ? "" : onlineMessage)
+                                    .replace("{2}", member.getPlayerRole().getDisplayName()))
                             );
                         });
                     }
