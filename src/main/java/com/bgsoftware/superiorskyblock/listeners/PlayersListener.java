@@ -355,7 +355,9 @@ public final class PlayersListener implements Listener {
 
             e.setCancelled(true);
 
-            EventResult<String> eventResult = plugin.getEventsBus().callIslandChatEvent(island, superiorPlayer, e.getMessage());
+            EventResult<String> eventResult = plugin.getEventsBus().callIslandChatEvent(island, superiorPlayer,
+                    superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ?
+                            Formatters.COLOR_FORMATTER.format(e.getMessage()) : e.getMessage());
 
             if (eventResult.isCancelled())
                 return;
