@@ -83,8 +83,8 @@ public final class SuperiorSchematic extends BaseSchematic implements Schematic 
                 CompoundTag compound = (CompoundTag) tag;
                 EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
                 CompoundTag entityTag = compound.getCompound("NBT");
-                BlockOffset blockOffset = Serializers.OFFSET_SERIALIZER.deserialize(compound.getString("offset"));
-                entities.add(new SchematicEntity(entityType, entityTag, blockOffset));
+                Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset"));
+                entities.add(new SchematicEntity(entityType, entityTag, offset));
             }
 
             this.entities = Collections.unmodifiableList(entities);
