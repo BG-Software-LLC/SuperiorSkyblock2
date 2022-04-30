@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
+import java.util.Locale;
 
 public final class IconEditTypeButton<M extends SuperiorMenuIconEdit<M, T>, T> extends SuperiorMenuButton<M> {
 
@@ -37,7 +38,7 @@ public final class IconEditTypeButton<M extends SuperiorMenuIconEdit<M, T>, T> e
                 Material material;
 
                 try {
-                    material = Material.valueOf(sections[0].toUpperCase());
+                    material = Material.valueOf(sections[0].toUpperCase(Locale.ENGLISH));
                     if (material == Material.AIR)
                         throw new IllegalArgumentException();
                 } catch (IllegalArgumentException ex) {

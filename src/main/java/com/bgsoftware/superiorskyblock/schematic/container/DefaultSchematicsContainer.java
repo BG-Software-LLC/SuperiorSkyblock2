@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public final class DefaultSchematicsContainer implements SchematicsContainer {
@@ -18,12 +19,12 @@ public final class DefaultSchematicsContainer implements SchematicsContainer {
     @Nullable
     @Override
     public Schematic getSchematic(String name) {
-        return this.schematicMap.get(name.toLowerCase());
+        return this.schematicMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
     public void addSchematic(Schematic schematic) {
-        this.schematicMap.put(schematic.getName().toLowerCase(), schematic);
+        this.schematicMap.put(schematic.getName().toLowerCase(Locale.ENGLISH), schematic);
     }
 
     @Override

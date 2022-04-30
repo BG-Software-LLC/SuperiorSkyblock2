@@ -1,19 +1,21 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
@@ -74,7 +76,15 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
 
         boolean enable = Boolean.parseBoolean(args[4]);
 
-        islands.forEach(island -> {
+        boolean anyWorldsChanged = false;
+
+        for (Island island : islands) {
+            if (enable ? !plugin.getEventsBus().callIslandUnlockWorldEvent(island, environment) :
+                    !plugin.getEventsBus().callIslandLockWorldEvent(island, environment))
+                continue;
+
+            anyWorldsChanged = true;
+
             switch (environment) {
                 case NORMAL:
                     island.setNormalEnabled(enable);
@@ -86,9 +96,10 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
                     island.setEndEnabled(enable);
                     break;
             }
-        });
+        }
 
-        Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, StringUtils.format(args[3]));
+        if (anyWorldsChanged)
+            Message.UNLOCK_WORLD_ANNOUNCEMENT.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));
     }
 
     @Override
@@ -97,11 +108,11 @@ public final class CmdAdminUnlockWorld implements IAdminIslandCommand {
             return CommandTabCompletes.getCustomComplete(args[3], "true", "false");
 
         if (args.length != 4)
-            return new ArrayList<>();
+            return Collections.emptyList();
 
         List<String> environments = new ArrayList<>();
         for (World.Environment environment : World.Environment.values()) {
-            environments.add(environment.name().toLowerCase());
+            environments.add(environment.name().toLowerCase(Locale.ENGLISH));
         }
 
         return CommandTabCompletes.getCustomComplete(args[3], environments.toArray(new String[0]));

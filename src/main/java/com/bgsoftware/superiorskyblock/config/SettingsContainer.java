@@ -7,16 +7,19 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
+import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
@@ -36,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -197,7 +201,7 @@ public final class SettingsContainer {
     public final boolean autoUncoopWhenAlone;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
-        databaseType = config.getString("database.type");
+        databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
         databaseMySQLAddress = config.getString("database.address");
         databaseMySQLPort = config.getInt("database.port");
         databaseMySQLDBName = config.getString("database.db-name");
@@ -263,8 +267,8 @@ public final class SettingsContainer {
         stackedBlocksEnabled = config.getBoolean("stacked-blocks.enabled", true);
         stackedBlocksDisabledWorlds = config.getStringList("stacked-blocks.disabled-worlds");
         whitelistedStackedBlocks = KeySetImpl.createHashSet(config.getStringList("stacked-blocks.whitelisted")
-                .stream().map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toList()));
-        stackedBlocksName = StringUtils.translateColors(config.getString("stacked-blocks.custom-name"));
+                .stream().map(KeyImpl::of).collect(Collectors.toList()));
+        stackedBlocksName = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.custom-name"));
         stackedBlocksLimits = KeyMapImpl.createHashMap();
         config.getStringList("stacked-blocks.limits").forEach(line -> {
             String[] sections = line.split(":");
@@ -279,18 +283,18 @@ public final class SettingsContainer {
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
         stackedBlocksMenuEnabled = config.getBoolean("stacked-blocks.deposit-menu.enabled", true);
-        stackedBlocksMenuTitle = StringUtils.translateColors(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
+        stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
         islandTopOrder = config.getString("island-top-order", "WORTH");
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
-        signWarp = StringUtils.translateColors(config.getStringList("sign-warp"));
+        signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
         while (signWarp.size() < 4)
             signWarp.add("");
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
-        visitorsSignActive = StringUtils.translateColors(config.getString("visitors-sign.active", "&a[Welcome]"));
-        visitorsSignInactive = StringUtils.translateColors(config.getString("visitors-sign.inactive", "&c[Welcome]"));
+        visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
+        visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));
         islandWorldName = config.getString("worlds.world-name", "SuperiorWorld");
         normalWorldEnabled = config.getBoolean("worlds.normal.enabled", true);
         normalWorldUnlocked = config.getBoolean("worlds.normal.unlock", true);
@@ -301,7 +305,7 @@ public final class SettingsContainer {
         String netherWorldName = config.getString("worlds.nether.name", "");
         this.netherWorldName = netherWorldName.isEmpty() ? islandWorldName + "_nether" : netherWorldName;
         netherSchematicOffset = config.getBoolean("worlds.nether.schematic-offset", true);
-        netherBiome = config.getString("worlds.nether.biome", "NETHER_WASTES");
+        netherBiome = config.getString("worlds.nether.biome", "NETHER_WASTES").toUpperCase(Locale.ENGLISH);
         endWorldEnabled = config.getBoolean("worlds.end.enabled", false);
         endWorldUnlocked = config.getBoolean("worlds.end.unlock", false);
         String endWorldName = config.getString("worlds.end.name", "");
@@ -311,7 +315,7 @@ public final class SettingsContainer {
         endDragonFightEnabled = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight.enabled", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         BlockOffset endDragonFightPortalOffset = null;
         if (endDragonFightEnabled) {
-            endDragonFightPortalOffset = SBlockOffset.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
+            endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
             if (endDragonFightPortalOffset == null) {
                 SuperiorSkyblockPlugin.log("&c[config.yml] Cannot parse portal-offset to a valid offset, skipping...");
             }
@@ -330,13 +334,13 @@ public final class SettingsContainer {
         } else {
             throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
-        worldsDifficulty = config.getString("worlds.difficulty", "EASY");
+        worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
         spawnProtection = config.getBoolean("spawn.protection", true);
         spawnSettings = config.getStringList("spawn.settings")
-                .stream().map(String::toUpperCase).collect(Collectors.toList());
+                .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList());
         spawnPermissions = config.getStringList("spawn.permissions")
-                .stream().map(String::toUpperCase).collect(Collectors.toList());
+                .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList());
         spawnWorldBorder = config.getBoolean("spawn.world-border", false);
         spawnSize = config.getInt("spawn.size", 200);
         spawnDamage = config.getBoolean("spawn.players-damage", false);
@@ -349,7 +353,7 @@ public final class SettingsContainer {
         disbandCount = config.getInt("disband-count", 5);
         islandTopIncludeLeader = config.getBoolean("island-top-include-leader", true);
         defaultPlaceholders = config.getStringList("default-placeholders").stream().collect(Collectors.toMap(
-                line -> line.split(":")[0].replace("superior_", "").toLowerCase(),
+                line -> line.split(":")[0].replace("superior_", "").toLowerCase(Locale.ENGLISH),
                 line -> line.split(":")[1]
         ));
         banConfirm = config.getBoolean("ban-confirm");
@@ -362,7 +366,9 @@ public final class SettingsContainer {
         islandNamesRequiredForCreation = config.getBoolean("island-names.required-for-creation", true);
         islandNamesMaxLength = config.getInt("island-names.max-length", 16);
         islandNamesMinLength = config.getInt("island-names.min-length", 3);
-        filteredIslandNames = config.getStringList("island-names.filtered-names");
+        filteredIslandNames = config.getStringList("island-names.filtered-names").stream()
+                .map(str -> str.toLowerCase(Locale.ENGLISH))
+                .collect(Collectors.toList());
         islandNamesColorSupport = config.getBoolean("island-names.color-support", true);
         islandNamesIslandTop = config.getBoolean("island-names.island-top", true);
         islandNamesPreventPlayerNames = config.getBoolean("island-names.prevent-player-names", true);
@@ -371,12 +377,12 @@ public final class SettingsContainer {
         clearOnJoin = config.getBoolean("clear-on-join", false);
         rateOwnIsland = config.getBoolean("rate-own-island", false);
         defaultSettings = config.getStringList("default-settings")
-                .stream().map(String::toUpperCase).collect(Collectors.toList());
+                .stream().map(str -> str.toUpperCase(Locale.ENGLISH)).collect(Collectors.toList());
         defaultGenerator = new KeyMap[World.Environment.values().length];
         if (config.isConfigurationSection("default-values.generator")) {
             for (String env : config.getConfigurationSection("default-values.generator").getKeys(false)) {
                 try {
-                    World.Environment environment = World.Environment.valueOf(env.toUpperCase());
+                    World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
                 } catch (Exception ex) {
                     PluginDebugger.debug(ex);
@@ -396,9 +402,9 @@ public final class SettingsContainer {
         }
         upgradeCooldown = config.getLong("upgrade-cooldown", -1L);
         numberFormat = config.getString("number-format", "en-US");
-        StringUtils.setNumberFormatter(numberFormat);
+        NumberFormatter.setNumberFormatter(numberFormat);
         dateFormat = config.getString("date-format", "dd/MM/yyyy HH:mm:ss");
-        StringUtils.setDateFormatter(dateFormat);
+        DateFormatter.setDateFormatter(plugin, dateFormat);
         skipOneItemMenus = config.getBoolean("skip-one-item-menus", false);
         teleportOnPVPEnable = config.getBoolean("teleport-on-pvp-enable", true);
         immuneToPVPWhenTeleport = config.getBoolean("immune-to-pvp-when-teleport", true);
@@ -408,7 +414,7 @@ public final class SettingsContainer {
         if (config.contains("default-containers.containers")) {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
-                    InventoryType containerType = InventoryType.valueOf(container.toUpperCase());
+                    InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
                     ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
                     defaultContainersContents.put(containerType, items);
 
@@ -443,7 +449,7 @@ public final class SettingsContainer {
         eventCommands = new HashMap<>();
         if (config.contains("event-commands")) {
             for (String eventName : config.getConfigurationSection("event-commands").getKeys(false)) {
-                eventCommands.put(eventName.toLowerCase(), config.getStringList("event-commands." + eventName));
+                eventCommands.put(eventName.toLowerCase(Locale.ENGLISH), config.getStringList("event-commands." + eventName));
             }
         }
         warpsWarmup = config.getLong("warps-warmup", 0);
@@ -468,23 +474,24 @@ public final class SettingsContainer {
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
         disabledEvents = config.getStringList("disabled-events")
-                .stream().map(String::toLowerCase).collect(Collectors.toList());
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList());
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
-        islandChestTitle = StringUtils.translateColors(config.getString("island-chests.chest-title", "&4Island Chest"));
+        islandChestTitle = Formatters.COLOR_FORMATTER.format(config.getString("island-chests.chest-title", "&4Island Chest"));
         islandChestsDefaultPage = config.getInt("island-chests.default-pages", 0);
         islandChestsDefaultSize = Math.min(6, Math.max(1, config.getInt("island-chests.default-size", 3)));
         commandAliases = new HashMap<>();
         if (config.isConfigurationSection("command-aliases")) {
             for (String label : config.getConfigurationSection("command-aliases").getKeys(false)) {
-                commandAliases.put(label.toLowerCase(), config.getStringList("command-aliases." + label));
+                commandAliases.put(label.toLowerCase(Locale.ENGLISH), config.getStringList("command-aliases." + label));
             }
         }
         valuableBlocks = KeySetImpl.createHashSet(config.getStringList("valuable-blocks").stream()
-                .map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toSet()));
+                .map(KeyImpl::of).collect(Collectors.toSet()));
         islandPreviewLocations = new HashMap<>();
         if (config.isConfigurationSection("preview-islands")) {
             for (String schematic : config.getConfigurationSection("preview-islands").getKeys(false))
-                islandPreviewLocations.put(schematic.toLowerCase(), LocationUtils.getLocation(config.getString("preview-islands." + schematic)));
+                islandPreviewLocations.put(schematic.toLowerCase(Locale.ENGLISH), Serializers.LOCATION_SERIALIZER
+                        .deserialize(config.getString("preview-islands." + schematic)));
         }
         tabCompleteHideVanished = config.getBoolean("tab-complete-hide-vanished", true);
         dropsUpgradePlayersMultiply = config.getBoolean("drops-upgrade-players-multiply", false);
@@ -535,13 +542,15 @@ public final class SettingsContainer {
             }
         }
 
-        return KeySetImpl.createHashSet(safeBlocks.stream().map(string -> KeyImpl.of(string.toUpperCase())).collect(Collectors.toSet()));
+        return KeySetImpl.createHashSet(safeBlocks.stream()
+                .map(KeyImpl::of)
+                .collect(Collectors.toSet()));
     }
 
     private void loadGenerator(List<String> lines, int index) {
         defaultGenerator[index] = KeyMapImpl.createHashMap();
         for (String line : lines) {
-            String[] sections = line.toUpperCase().split(":");
+            String[] sections = line.toUpperCase(Locale.ENGLISH).split(":");
             String globalKey = sections[0];
             String subKey = sections.length == 2 ? "" : sections[1];
             String percentage = sections.length == 2 ? sections[1] : sections[2];

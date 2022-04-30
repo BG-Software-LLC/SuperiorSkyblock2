@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
-import javax.annotation.Nullable;
+import java.util.Objects;
 
 public final class SBlockOffset implements BlockOffset {
 
@@ -13,23 +13,6 @@ public final class SBlockOffset implements BlockOffset {
     private final int offsetX;
     private final int offsetY;
     private final int offsetZ;
-
-    @Nullable
-    public static BlockOffset deserialize(String string) {
-        if (string == null || string.isEmpty())
-            return null;
-
-        String[] stringSections = string.split(", ");
-
-        if (stringSections.length != 3)
-            return null;
-
-        try {
-            return fromOffsets(Integer.parseInt(stringSections[0]), Integer.parseInt(stringSections[1]), Integer.parseInt(stringSections[2]));
-        } catch (NumberFormatException error) {
-            return null;
-        }
-    }
 
     public static BlockOffset fromOffsets(int offsetX, int offsetY, int offsetZ) {
         return offsetX == 0 && offsetY == 0 && offsetZ == 0 ? ZERO : new SBlockOffset(offsetX, offsetY, offsetZ);
@@ -57,9 +40,27 @@ public final class SBlockOffset implements BlockOffset {
     }
 
     @Override
+    public BlockOffset negate() {
+        return SBlockOffset.fromOffsets(-offsetX, -offsetY, -offsetZ);
+    }
+
+    @Override
     public Location applyToLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         return location.clone().add(this.offsetX, this.offsetY, this.offsetZ);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SBlockOffset that = (SBlockOffset) o;
+        return offsetX == that.offsetX && offsetY == that.offsetY && offsetZ == that.offsetZ;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(offsetX, offsetY, offsetZ);
     }
 
 }

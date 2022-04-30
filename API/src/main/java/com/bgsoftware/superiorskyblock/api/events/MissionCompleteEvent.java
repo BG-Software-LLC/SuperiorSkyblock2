@@ -1,7 +1,9 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -17,8 +19,8 @@ public class MissionCompleteEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
 
     private final SuperiorPlayer superiorPlayer;
+    private final IMissionsHolder missionsHolder;
     private final Mission<?> mission;
-    private final boolean islandMission;
 
     private final List<ItemStack> itemRewards;
     private final List<String> commandRewards;
@@ -33,17 +35,21 @@ public class MissionCompleteEvent extends Event implements Cancellable {
      * @param itemRewards    The list of items that will be given as a reward.
      * @param commandRewards The list of commands that will be ran as a reward.
      */
-    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission, boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards) {
-        super(true);
-        this.superiorPlayer = superiorPlayer;
-        this.mission = mission;
-        this.islandMission = islandMission;
-        this.itemRewards = itemRewards;
-        this.commandRewards = commandRewards;
+    @Deprecated
+    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, Mission<?> mission,
+                                boolean islandMission, List<ItemStack> itemRewards, List<String> commandRewards) {
+        this(superiorPlayer, islandMission ? superiorPlayer.getIsland() : superiorPlayer, mission,
+                itemRewards, commandRewards);
     }
 
-    public static HandlerList getHandlerList() {
-        return handlers;
+    public MissionCompleteEvent(SuperiorPlayer superiorPlayer, IMissionsHolder missionsHolder,
+                                Mission<?> mission, List<ItemStack> itemRewards, List<String> commandRewards) {
+        super(!Bukkit.isPrimaryThread());
+        this.superiorPlayer = superiorPlayer;
+        this.missionsHolder = missionsHolder;
+        this.mission = mission;
+        this.itemRewards = itemRewards;
+        this.commandRewards = commandRewards;
     }
 
     /**
@@ -51,6 +57,13 @@ public class MissionCompleteEvent extends Event implements Cancellable {
      */
     public SuperiorPlayer getPlayer() {
         return superiorPlayer;
+    }
+
+    /**
+     * Get the mission holder that the mission was completed for.
+     */
+    public IMissionsHolder getMissionsHolder() {
+        return missionsHolder;
     }
 
     /**
@@ -75,10 +88,10 @@ public class MissionCompleteEvent extends Event implements Cancellable {
     }
 
     /**
-     * Check whether or not the mission is an island mission.
+     * Check whether the mission is an island mission.
      */
     public boolean isIslandMission() {
-        return islandMission;
+        return mission.getIslandMission();
     }
 
     @Override
@@ -93,6 +106,10 @@ public class MissionCompleteEvent extends Event implements Cancellable {
 
     @Override
     public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
         return handlers;
     }
 

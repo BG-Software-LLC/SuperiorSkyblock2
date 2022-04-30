@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -22,13 +23,13 @@ public final class DefaultMissionsContainer implements MissionsContainer {
 
     @Override
     public void addMission(Mission<?> mission) {
-        this.missionMap.put(mission.getName().toLowerCase(), mission);
+        this.missionMap.put(mission.getName().toLowerCase(Locale.ENGLISH), mission);
     }
 
     @Nullable
     @Override
     public Mission<?> getMission(String name) {
-        return this.missionMap.get(name.toLowerCase());
+        return this.missionMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
@@ -59,13 +60,13 @@ public final class DefaultMissionsContainer implements MissionsContainer {
 
     @Override
     public void addMissionCategory(MissionCategory missionCategory) {
-        this.missionCategoryMap.put(missionCategory.getName().toLowerCase(), missionCategory);
+        this.missionCategoryMap.put(missionCategory.getName().toLowerCase(Locale.ENGLISH), missionCategory);
     }
 
     @Nullable
     @Override
     public MissionCategory getMissionCategory(String name) {
-        return this.missionCategoryMap.get(name.toLowerCase());
+        return this.missionCategoryMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override

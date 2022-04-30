@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBiomes;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
@@ -21,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
 
@@ -74,7 +74,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBiomes superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
-        EventResult<Biome> event = EventsCaller.callIslandBiomeChangeEvent(clickedPlayer,
+        EventResult<Biome> event = plugin.getEventsBus().callIslandBiomeChangeEvent(clickedPlayer,
                 superiorMenu.getTargetIsland(), this.biome);
 
         if (event.isCancelled()) {
@@ -90,7 +90,7 @@ public final class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
                 command.replace("%player%", clickedPlayer.getName())));
 
         superiorMenu.getTargetIsland().setBiome(event.getResult());
-        Message.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase());
+        Message.CHANGED_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase(Locale.ENGLISH));
 
         Executor.sync(superiorMenu::closePage, 1L);
     }

@@ -597,6 +597,8 @@ PERMISSION_CHANGED_NAME: '&e&lWyspa | &7Pomyslnie zaktualizowano uprawnienia {0}
 PERMISSION_CHANGED_ALL: '&e&lWyspa | &7Pomyslnie zaktualizowano uprawnienia {0} dla wszystkich wysp.'
 PERMISSIONS_RESET_PLAYER: '&e&lWyspa | &7Pomyslnie zresetuj wszystkie uprawnienia dla {0} do wartosci domyslnych!'
 PERMISSIONS_RESET_ROLES: '&e&lWyspa | &7Pomyslnie zresetuj wszystkie uprawnienia wyspy do wartosci domyslnych!'
+PLACEHOLDER_NO: '&c✘'
+PLACEHOLDER_YES: '&a✔'
 PLAYER_ALREADY_BANNED: '&c&lBlad | &7Ten gracz jest juz zbanowany.'
 PLAYER_ALREADY_COOP: '&c&lBlad | &7Ten gracz jest juz w trybie wspólpracy.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lBlad | &7Ten gracz jest juz na wyspie.'

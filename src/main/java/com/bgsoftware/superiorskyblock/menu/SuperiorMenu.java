@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -25,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -32,6 +34,8 @@ import java.util.regex.Pattern;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperiorMenu {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     protected static final String[] MENU_IGNORED_SECTIONS = new String[]{
             "items", "sounds", "commands", "back"
@@ -246,7 +250,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     }
 
     private void handleSubCommand(SuperiorSkyblockPlugin plugin, String subCommand, String args, InventoryClickEvent e, CommandSender sender) {
-        switch (subCommand.toLowerCase()) {
+        switch (subCommand.toLowerCase(Locale.ENGLISH)) {
             case "player":
                 runCommand(plugin, args, e, e.getWhoClicked());
                 break;
@@ -284,6 +288,9 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             Message.OPEN_MENU_WHILE_SLEEPING.send(inventoryViewer);
             return;
         }
+
+        if (!plugin.getEventsBus().callPlayerOpenMenuEvent(inventoryViewer, this))
+            return;
 
         PluginDebugger.debug("Action: Open Menu, Target: " + inventoryViewer.getName() + ", Menu: " + getClass().getName());
 
@@ -346,10 +353,20 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
             if (!nextMove && !closeButton && plugin.getSettings().isOnlyBackButton()) {
                 open(previousMenu);
             } else if (previousMenu != null && this.menuPattern != null && this.menuPattern.isPreviousMoveAllowed()) {
-                if (previousMove)
-                    previousMenu.cloneAndOpen(previousMenu.getPreviousMenu());
-                else
+                EventResult<ISuperiorMenu> eventResult = plugin.getEventsBus().callPlayerCloseMenuEvent(superiorPlayer,
+                        this, previousMove ? previousMenu : null);
+
+                if (previousMove) {
+                    if (!eventResult.isCancelled()) {
+                        ISuperiorMenu newMenu = eventResult.getResult();
+                        if (newMenu != null)
+                            newMenu.cloneAndOpen(newMenu.getPreviousMenu());
+                    }
+                } else if (eventResult.isCancelled()) {
+                    open(previousMenu);
+                } else {
                     previousMove = true;
+                }
             }
 
             closeButton = false;

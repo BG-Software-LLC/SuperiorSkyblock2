@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalMap;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,14 +14,14 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class MenusListener implements Listener {
 
-    private final Map<UUID, ItemStack> latestClickedItem = new HashMap<>();
+    private final Map<UUID, ItemStack> latestClickedItem = AutoRemovalMap.newHashMap(1, TimeUnit.SECONDS);
     private final SuperiorSkyblockPlugin plugin;
 
     public MenusListener(SuperiorSkyblockPlugin plugin) {
@@ -36,14 +37,13 @@ public final class MenusListener implements Listener {
     public void onInventoryClickMonitor(InventoryClickEvent e) {
         if (e.getCurrentItem() != null && e.isCancelled() && e.getClickedInventory().getHolder() instanceof SuperiorMenu) {
             latestClickedItem.put(e.getWhoClicked().getUniqueId(), e.getCurrentItem());
-            Executor.sync(() -> latestClickedItem.remove(e.getWhoClicked().getUniqueId()), 20L);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onInventoryCloseMonitor(InventoryCloseEvent e) {
-        if (latestClickedItem.containsKey(e.getPlayer().getUniqueId())) {
-            ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
+        ItemStack clickedItem = latestClickedItem.get(e.getPlayer().getUniqueId());
+        if (clickedItem != null) {
             Executor.sync(() -> {
                 e.getPlayer().getInventory().removeItem(clickedItem);
                 ((Player) e.getPlayer()).updateInventory();

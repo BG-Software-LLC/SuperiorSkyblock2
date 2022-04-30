@@ -3,11 +3,11 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBorderColor;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -28,15 +28,22 @@ public final class BorderColorButton extends SuperiorMenuButton<MenuBorderColor>
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBorderColor superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
-        if (!clickedPlayer.hasWorldBorderEnabled())
+        if (!clickedPlayer.hasWorldBorderEnabled()) {
+            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(clickedPlayer))
+                return;
+
             clickedPlayer.toggleWorldBorder();
+        }
+
+        if (!plugin.getEventsBus().callPlayerChangeBorderColorEvent(clickedPlayer, borderColor))
+            return;
 
         clickedPlayer.setBorderColor(borderColor);
         plugin.getNMSWorld().setWorldBorder(clickedPlayer,
                 plugin.getGrid().getIslandAt(clickedPlayer.getLocation()));
 
         Message.BORDER_PLAYER_COLOR_UPDATED.send(clickedPlayer,
-                StringUtils.format(clickedPlayer.getUserLocale(), borderColor));
+                Formatters.BORDER_COLOR_FORMATTER.format(borderColor, clickedPlayer.getUserLocale()));
 
         Executor.sync(superiorMenu::closePage, 1L);
     }

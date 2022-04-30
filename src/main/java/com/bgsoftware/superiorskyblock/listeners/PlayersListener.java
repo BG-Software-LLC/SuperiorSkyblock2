@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SIslandChest;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
@@ -14,13 +15,12 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
@@ -28,7 +28,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -68,16 +67,16 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class PlayersListener implements Listener {
 
-    private final Set<UUID> noFallDamage = new HashSet<>();
+    private final Collection<UUID> noFallDamage = AutoRemovalCollection.newHashSet(1, TimeUnit.SECONDS);
     private final SuperiorSkyblockPlugin plugin;
     private final String buildName;
 
@@ -155,7 +154,8 @@ public final class PlayersListener implements Listener {
                 Locale playerLocale = plugin.getNMSPlayers().getPlayerLocale(player);
                 if (playerLocale != null && PlayerLocales.isValidLocale(playerLocale) &&
                         !superiorPlayer.getUserLocale().equals(playerLocale)) {
-                    superiorPlayer.setUserLocale(playerLocale);
+                    if (plugin.getEventsBus().callPlayerChangeLanguageEvent(superiorPlayer, playerLocale))
+                        superiorPlayer.setUserLocale(playerLocale);
                 }
             }), 2L);
         }
@@ -189,7 +189,7 @@ public final class PlayersListener implements Listener {
 
         for (Island _island : plugin.getGrid().getIslands()) {
             if (_island.isCoop(superiorPlayer)) {
-                if (EventsCaller.callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
+                if (plugin.getEventsBus().callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                     _island.removeCoop(superiorPlayer);
                     IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
                 }
@@ -355,7 +355,9 @@ public final class PlayersListener implements Listener {
 
             e.setCancelled(true);
 
-            EventResult<String> eventResult = EventsCaller.callIslandChatEvent(island, superiorPlayer, e.getMessage());
+            EventResult<String> eventResult = plugin.getEventsBus().callIslandChatEvent(island, superiorPlayer,
+                    superiorPlayer.hasPermissionWithoutOP("superior.chat.color") ?
+                            Formatters.COLOR_FORMATTER.format(e.getMessage()) : e.getMessage());
 
             if (eventResult.isCancelled())
                 return;
@@ -374,13 +376,15 @@ public final class PlayersListener implements Listener {
         } else {
             String islandNameFormat = Message.NAME_CHAT_FORMAT.getMessage(PlayerLocales.getDefaultLocale(),
                     island == null ? "" : plugin.getSettings().getIslandNames().isColorSupport() ?
-                            StringUtils.translateColors(island.getName()) : island.getName());
+                            Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName());
 
             e.setFormat(e.getFormat()
                     .replace("{island-level}", String.valueOf(island == null ? 0 : island.getIslandLevel()))
-                    .replace("{island-level-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getIslandLevel(), superiorPlayer.getUserLocale())))
+                    .replace("{island-level-format}", String.valueOf(island == null ? 0 :
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), superiorPlayer.getUserLocale())))
                     .replace("{island-worth}", String.valueOf(island == null ? 0 : island.getWorth()))
-                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 : StringUtils.fancyFormat(island.getWorth(), superiorPlayer.getUserLocale())))
+                    .replace("{island-worth-format}", String.valueOf(island == null ? 0 :
+                            Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), superiorPlayer.getUserLocale())))
                     .replace("{island-name}", islandNameFormat == null ? "" : islandNameFormat)
                     .replace("{island-position-worth}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_WORTH) + 1) + "")
                     .replace("{island-position-level}", island == null ? "" : (plugin.getGrid().getIslandPosition(island, SortingTypes.BY_LEVEL) + 1) + "")
@@ -404,10 +408,10 @@ public final class PlayersListener implements Listener {
         e.setCancelled(true);
 
         if (e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR) {
-            Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            Message.SCHEMATIC_RIGHT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos1(e.getClickedBlock());
         } else {
-            Message.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, SBlockPosition.of(e.getClickedBlock().getLocation()));
+            Message.SCHEMATIC_LEFT_SELECT.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(e.getClickedBlock().getLocation()));
             superiorPlayer.setSchematicPos2(e.getClickedBlock());
         }
 
@@ -438,7 +442,6 @@ public final class PlayersListener implements Listener {
                 Message.TELEPORTED_FAILED.send(superiorPlayer);
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
             }
-            Executor.sync(() -> noFallDamage.remove(e.getPlayer().getUniqueId()), 20L);
         });
     }
 
@@ -526,7 +529,7 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        String message = e.getMessage().toLowerCase();
+        String message = e.getMessage().toLowerCase(Locale.ENGLISH);
         if (island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, true) &&
                 plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(message::contains)) {
             e.setCancelled(true);

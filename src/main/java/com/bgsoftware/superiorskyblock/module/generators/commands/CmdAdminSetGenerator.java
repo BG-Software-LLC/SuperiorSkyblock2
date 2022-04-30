@@ -1,20 +1,21 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,18 +81,18 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
             return;
         }
 
-        Key material = KeyImpl.of(args[3].toUpperCase());
+        Key material = KeyImpl.of(args[3]);
         boolean percentage = args[4].endsWith("%");
 
         if (percentage)
             args[4] = args[4].substring(0, args[4].length() - 1);
 
-        Pair<Integer, Boolean> arguments = CommandArguments.getAmount(sender, args[4]);
+        NumberArgument<Integer> arguments = CommandArguments.getAmount(sender, args[4]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        int amount = arguments.getKey();
+        int amount = arguments.getNumber();
 
         if (percentage && (amount < 0 || amount > 100)) {
             Message.INVALID_PERCENTAGE.send(sender);
@@ -104,20 +105,42 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         if (environment == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> {
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
             if (percentage) {
-                island.setGeneratorPercentage(material, amount, environment);
+                if (!island.setGeneratorPercentage(material, amount, environment,
+                        sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
+                    continue;
+                }
             } else {
-                island.setGeneratorAmount(material, amount, environment);
+                if (amount <= 0) {
+                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
+                        continue;
+
+                    island.removeGeneratorAmount(material, environment);
+                } else {
+                    EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(sender,
+                            island, material, environment, amount);
+
+                    if (eventResult.isCancelled())
+                        continue;
+
+                    island.setGeneratorAmount(material, eventResult.getResult(), environment);
+                }
             }
-        }));
+            anyIslandChanged = true;
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() != 1)
-            Message.GENERATOR_UPDATED_ALL.send(sender, StringUtils.format(material.getGlobalKey()));
+            Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));
         else if (targetPlayer == null)
-            Message.GENERATOR_UPDATED_NAME.send(sender, StringUtils.format(material.getGlobalKey()), islands.get(0).getName());
+            Message.GENERATOR_UPDATED_NAME.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), islands.get(0).getName());
         else
-            Message.GENERATOR_UPDATED.send(sender, StringUtils.format(material.getGlobalKey()), targetPlayer.getName());
+            Message.GENERATOR_UPDATED.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()), targetPlayer.getName());
     }
 
     @Override

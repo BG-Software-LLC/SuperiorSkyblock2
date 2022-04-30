@@ -56,8 +56,10 @@ public final class CmdAdminOpen implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        island.setLocked(false);
-        Message.ISLAND_OPENED.send(sender);
+        if (plugin.getEventsBus().callIslandOpenEvent(island, sender)) {
+            island.setLocked(false);
+            Message.ISLAND_OPENED.send(sender);
+        }
     }
 
 }

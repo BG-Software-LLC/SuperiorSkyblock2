@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenuIconEdit;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconDisplayButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconEditLoreButton;
@@ -42,14 +42,13 @@ public final class MenuWarpCategoryIconEdit extends SuperiorMenuIconEdit<MenuWar
 
         RegularMenuPattern.Builder<MenuWarpCategoryIconEdit> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "warp-category-icon-edit.yml", null);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "warp-category-icon-edit.yml", null);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         menuPattern = patternBuilder
                 .mapButtons(getSlots(cfg, "icon-type", menuPatternSlots),

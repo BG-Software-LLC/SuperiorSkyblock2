@@ -2,6 +2,10 @@ package com.bgsoftware.superiorskyblock.api.wrappers;
 
 import org.bukkit.Location;
 
+/**
+ * This object represents an offset from a block.
+ * You can create a new instance of this class by using {@link com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager}
+ */
 public interface BlockOffset {
 
     /**
@@ -18,6 +22,11 @@ public interface BlockOffset {
      * Get the z-coords offset.
      */
     int getOffsetZ();
+
+    /**
+     * Get a copy of this offset with negated offsets, which this.equals(this.negate().negate()) is true.
+     */
+    BlockOffset negate();
 
     /**
      * Apply this block-offset to a location.

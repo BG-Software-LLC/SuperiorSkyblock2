@@ -75,13 +75,13 @@ public final class PlayersDatabaseBridge {
     public static void saveMission(SuperiorPlayer superiorPlayer, Mission<?> mission, int finishCount) {
         superiorPlayer.getDatabaseBridge().insertObject("players_missions",
                 new Pair<>("player", superiorPlayer.getUniqueId().toString()),
-                new Pair<>("name", mission.getName().toLowerCase()),
+                new Pair<>("name", mission.getName().toLowerCase(Locale.ENGLISH)),
                 new Pair<>("finish_count", finishCount));
     }
 
     public static void removeMission(SuperiorPlayer superiorPlayer, Mission<?> mission) {
         superiorPlayer.getDatabaseBridge().deleteObject("players_missions",
-                createFilter("player", superiorPlayer, new Pair<>("name", mission.getName().toLowerCase()))
+                createFilter("player", superiorPlayer, new Pair<>("name", mission.getName().toLowerCase(Locale.ENGLISH)))
         );
     }
 

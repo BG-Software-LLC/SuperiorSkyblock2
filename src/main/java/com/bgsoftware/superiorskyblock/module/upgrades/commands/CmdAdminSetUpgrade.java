@@ -1,14 +1,16 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -68,18 +70,24 @@ public final class CmdAdminSetUpgrade implements IAdminIslandCommand {
         if (upgrade == null)
             return;
 
-        Pair<Integer, Boolean> arguments = CommandArguments.getLevel(sender, args[4]);
+        NumberArgument<Integer> arguments = CommandArguments.getLevel(sender, args[4]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        int level = arguments.getKey();
+        int level = arguments.getNumber();
         int maxLevel = upgrade.getMaxUpgradeLevel();
 
         if (level > maxLevel) {
             Message.MAXIMUM_LEVEL.send(sender, maxLevel);
             return;
         }
+
+        EventResult<EventsBus.UpgradeResult> eventResult = plugin.getEventsBus().callIslandUpgradeEvent(
+                sender, island, upgrade, upgrade.getUpgradeLevel(level));
+
+        if (eventResult.isCancelled())
+            return;
 
         island.setUpgradeLevel(upgrade, level);
 

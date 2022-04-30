@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.module.missions.commands;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
@@ -74,14 +75,18 @@ public final class CmdAdminMission implements IAdminPlayerCommand {
         } else if (args[3].equalsIgnoreCase("reset")) {
             Island island = targetPlayer.getIsland();
 
-            missions.forEach(mission -> {
-                if (mission.getIslandMission()) {
-                    if (island != null)
-                        island.resetMission(mission);
-                } else {
-                    targetPlayer.resetMission(mission);
+            boolean anyIslandChanged = false;
+
+            for (Mission<?> mission : missions) {
+                IMissionsHolder missionsHolder = mission.getIslandMission() ? island : targetPlayer;
+                if (missionsHolder != null && plugin.getEventsBus().callMissionResetEvent(sender, missionsHolder, mission)) {
+                    anyIslandChanged = true;
+                    missionsHolder.resetMission(mission);
                 }
-            });
+            }
+
+            if (!anyIslandChanged)
+                return;
 
             if (missions.size() == 1)
                 Message.MISSION_STATUS_RESET.send(sender, missions.get(0).getName(), targetPlayer.getName());
