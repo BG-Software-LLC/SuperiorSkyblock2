@@ -156,7 +156,8 @@ public final class CustomEventsListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onSignBreak(BlockBreakEvent e) {
         if (e.getBlock().getState() instanceof Sign) {
-            BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) e.getBlock().getState());
+            if (!BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) e.getBlock().getState()))
+                e.setCancelled(true);
         } else {
             for (BlockFace blockFace : BlockFace.values()) {
                 Block faceBlock = e.getBlock().getRelative(blockFace);
@@ -175,8 +176,8 @@ public final class CustomEventsListener implements Listener {
                         }
                     }
 
-                    if (isSign)
-                        BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) faceBlock.getState());
+                    if (isSign && !BlocksLogic.handleSignBreak(e.getPlayer(), (Sign) faceBlock.getState()))
+                        e.setCancelled(true);
                 }
             }
         }

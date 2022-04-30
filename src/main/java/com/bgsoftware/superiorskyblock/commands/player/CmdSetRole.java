@@ -131,6 +131,10 @@ public final class CmdSetRole implements IPermissibleCommand {
         }
 
         PlayerRole currentRole = targetPlayer.getPlayerRole();
+
+        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, playerRole))
+            return;
+
         targetPlayer.setPlayerRole(playerRole);
 
         if (currentRole.isLessThan(playerRole)) {

@@ -11,10 +11,11 @@ import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -104,13 +105,35 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
         if (environment == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> {
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
             if (percentage) {
-                island.setGeneratorPercentage(material, amount, environment);
+                if (!island.setGeneratorPercentage(material, amount, environment,
+                        sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null, true)) {
+                    continue;
+                }
             } else {
-                island.setGeneratorAmount(material, amount, environment);
+                if (amount <= 0) {
+                    if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
+                        continue;
+
+                    island.removeGeneratorAmount(material, environment);
+                } else {
+                    EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeGeneratorRateEvent(sender,
+                            island, material, environment, amount);
+
+                    if (eventResult.isCancelled())
+                        continue;
+
+                    island.setGeneratorAmount(material, eventResult.getResult(), environment);
+                }
             }
-        }));
+            anyIslandChanged = true;
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() != 1)
             Message.GENERATOR_UPDATED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(material.getGlobalKey()));

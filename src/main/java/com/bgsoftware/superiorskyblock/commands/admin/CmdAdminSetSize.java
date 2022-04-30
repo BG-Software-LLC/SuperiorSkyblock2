@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -73,10 +73,19 @@ public final class CmdAdminSetSize implements IAdminIslandCommand {
             return;
         }
 
-        Executor.data(() -> {
-            islands.forEach(island -> island.setIslandSize(size));
-            Executor.sync(() -> islands.forEach(Island::updateBorder));
-        });
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeBorderSizeEvent(sender, island, size);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setIslandSize(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
+
+        islands.forEach(Island::updateBorder);
 
         if (islands.size() > 1)
             Message.CHANGED_ISLAND_SIZE_ALL.send(sender);

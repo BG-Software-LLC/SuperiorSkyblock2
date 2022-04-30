@@ -11,8 +11,7 @@ import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -77,7 +76,18 @@ public final class CmdAdminAddEntityLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setEntityLimit(entityKey, island.getEntityLimit(entityKey) + limit)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeEntityLimitEvent(sender,
+                    island, entityKey, island.getEntityLimit(entityKey) + limit);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setEntityLimit(entityKey, eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_ENTITY_LIMIT_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(entityKey.getGlobalKey()));

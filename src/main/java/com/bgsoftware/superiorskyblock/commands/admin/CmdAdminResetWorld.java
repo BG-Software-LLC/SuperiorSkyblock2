@@ -77,7 +77,9 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             return;
         }
 
-        islands.forEach(island -> {
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
             World world;
 
             try {
@@ -86,6 +88,11 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
                 PluginDebugger.debug(ex);
                 return;
             }
+
+            if (!plugin.getEventsBus().callIslandWorldResetEvent(sender, island, environment))
+                continue;
+
+            anyIslandChanged = true;
 
             // Sending the players that are in that world to the main island.
             // If the world that will be reset is the normal world, they will be teleported to spawn.
@@ -100,7 +107,10 @@ public final class CmdAdminResetWorld implements IAdminIslandCommand {
             IslandUtils.deleteChunks(island, chunkPositions, () -> island.calcIslandWorth(null));
 
             island.setSchematicGenerate(environment, false);
-        });
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.RESET_WORLD_SUCCEED_ALL.send(sender, Formatters.CAPITALIZED_FORMATTER.format(args[3]));

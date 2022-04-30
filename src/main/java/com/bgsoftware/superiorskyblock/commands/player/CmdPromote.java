@@ -105,6 +105,9 @@ public final class CmdPromote implements IPermissibleCommand {
             return;
         }
 
+        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, nextRole))
+            return;
+
         targetPlayer.setPlayerRole(nextRole);
 
         Message.PROMOTED_MEMBER.send(superiorPlayer, targetPlayer.getName(), targetPlayer.getPlayerRole());

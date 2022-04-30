@@ -1372,6 +1372,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void setPotionEffect(PotionEffectType type, int level);
 
     /**
+     * Remove a potion effect from the island.
+     *
+     * @param type The potion effect to remove.
+     */
+    void removePotionEffect(PotionEffectType type);
+
+    /**
      * Get the level of an island effect.
      *
      * @param type The potion to check.
@@ -1417,6 +1424,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * @param limit      The limit to set.
      */
     void setRoleLimit(PlayerRole playerRole, int limit);
+
+    /**
+     * Remove the limit of the amount of players that can have the role in the island.
+     *
+     * @param playerRole The role to remove the limit.
+     */
+    void removeRoleLimit(PlayerRole playerRole);
 
     /**
      * Get the limit of players that can have the same role at a time.
@@ -1573,6 +1587,13 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     void setRating(SuperiorPlayer superiorPlayer, Rating rating);
 
     /**
+     * Remove a rating of a player.
+     *
+     * @param superiorPlayer The player to remove the rating of.
+     */
+    void removeRating(SuperiorPlayer superiorPlayer);
+
+    /**
      * Get the total rating of the island.
      */
     double getTotalRating();
@@ -1630,6 +1651,7 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
     /**
      * Set a percentage for a specific key in a specific world.
      * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     * Calling this method will not make events get fired.
      * <p>
      * This function sets the amount of the key using the following formula:
      * amount = (percentage * total_amount) / (1 - percentage)
@@ -1638,8 +1660,36 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * the material's amount will be set to 1.
      * <p>
      * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
+     *
+     * @param key         The block to change the generator rate of.
+     * @param percentage  The percentage to set the new rate.
+     * @param environment The world to change the rates in.
      */
     void setGeneratorPercentage(Key key, int percentage, World.Environment environment);
+
+    /**
+     * Set a percentage for a specific key in a specific world.
+     * Percentage can be between 0 and 100 (0 will remove the key from the list).
+     * <p>
+     * This function sets the amount of the key using the following formula:
+     * amount = (percentage * total_amount) / (1 - percentage)
+     * <p>
+     * If the percentage is 100, the rest of the amounts will be cleared and
+     * the material's amount will be set to 1.
+     * <p>
+     * The amount is rounded to ensure a smaller loss, and currently it's 1%~ loss.
+     *
+     * @param key         The block to change the generator rate of.
+     * @param percentage  The percentage to set the new rate.
+     * @param environment The world to change the rates in.
+     * @param caller      The player that changes the percentages (used for the event).
+     *                    If null, it means the console did the operation.
+     * @param callEvent   Whether to call the {@link com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent}
+     * @return Whether the operation succeed.
+     * The operation may fail if callEvent is true and the event was cancelled.
+     */
+    boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
+                                   @Nullable SuperiorPlayer caller, boolean callEvent);
 
     /**
      * Get the percentage for a specific key in a specific world.
@@ -1659,6 +1709,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      * Set an amount for a specific key in a specific world.
      */
     void setGeneratorAmount(Key key, int amount, World.Environment environment);
+
+    /**
+     * Remove a rate for a specific key in a specific world.
+     */
+    void removeGeneratorAmount(Key key, World.Environment environment);
 
     /**
      * Get the amount of a specific key in a specific world.

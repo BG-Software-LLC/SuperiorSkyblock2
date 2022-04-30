@@ -25,8 +25,14 @@ public final class LanguageButton extends SuperiorMenuButton<MenuPlayerLanguage>
     @Override
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuPlayerLanguage superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
+
+        if (!plugin.getEventsBus().callPlayerChangeLanguageEvent(clickedPlayer, language))
+            return;
+
         clickedPlayer.setUserLocale(language);
+
         Message.CHANGED_LANGUAGE.send(clickedPlayer);
+
         Executor.sync(superiorMenu::closePage, 1L);
     }
 

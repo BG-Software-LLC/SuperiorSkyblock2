@@ -72,9 +72,15 @@ public final class CmdAdminSetRate implements IAdminIslandCommand {
         if (rating == null)
             return;
 
-        island.setRating(targetPlayer, rating);
-
-        Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), Formatters.CAPITALIZED_FORMATTER.format(rating.name()));
+        if (rating == Rating.UNKNOWN) {
+            if (plugin.getEventsBus().callIslandRemoveRatingEvent(sender, superiorPlayer, island)) {
+                island.removeRating(targetPlayer);
+                Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
+            }
+        } else if (plugin.getEventsBus().callIslandRateEvent(sender, superiorPlayer, island, rating)) {
+            island.setRating(targetPlayer, rating);
+            Message.RATE_CHANGE_OTHER.send(sender, targetPlayer.getName(), Formatters.CAPITALIZED_FORMATTER.format(rating.name()));
+        }
     }
 
     @Override
