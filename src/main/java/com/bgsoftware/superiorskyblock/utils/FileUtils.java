@@ -324,6 +324,7 @@ public final class FileUtils {
         }
     }
 
+    @Nullable
     public static SoundWrapper getSound(ConfigurationSection section) {
         if (section == null)
             return null;
