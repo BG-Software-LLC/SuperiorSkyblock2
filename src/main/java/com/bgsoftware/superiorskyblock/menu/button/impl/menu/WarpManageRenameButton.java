@@ -31,12 +31,10 @@ public final class WarpManageRenameButton extends SuperiorMenuButton<MenuWarpMan
 
         superiorMenu.closePage();
 
-        PlayerChat.listen(player, message -> {
+        PlayerChat.listen(player, newName -> {
             IslandWarp islandWarp = superiorMenu.getIslandWarp();
 
-            if (!message.equalsIgnoreCase("-cancel")) {
-                String newName = IslandUtils.getWarpName(message);
-
+            if (!newName.equalsIgnoreCase("-cancel")) {
                 if (islandWarp.getIsland().getWarp(newName) != null) {
                     Message.WARP_RENAME_ALREADY_EXIST.send(player);
                     return true;

@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
-import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.database.loader.v1.DatabaseLoader_V1;
@@ -210,11 +209,9 @@ public final class RawDeserializer implements IDeserializer {
 
                 if (name.contains("-")) {
                     String[] nameSections = name.split("-");
-                    category = IslandUtils.getWarpName(nameSections[0]);
+                    category = nameSections[0];
                     name = nameSections[1];
                 }
-
-                name = IslandUtils.getWarpName(name);
 
                 if (name.isEmpty())
                     continue;

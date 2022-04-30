@@ -78,7 +78,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
             return;
         }
 
-        String warpName = IslandUtils.getWarpName(args[1]);
+        String warpName = args[1];
 
         if (warpName.isEmpty()) {
             Message.WARP_ILLEGAL_NAME.send(superiorPlayer);
@@ -103,7 +103,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
         String categoryName = null;
 
         if (args.length == 3) {
-            categoryName = IslandUtils.getWarpName(args[2]);
+            categoryName = args[2];
 
             if (categoryName.isEmpty()) {
                 Message.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);

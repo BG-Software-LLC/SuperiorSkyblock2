@@ -254,7 +254,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = islandWarp.getString("name").map(IslandUtils::getWarpName).map(_name -> {
+            Optional<String> name = islandWarp.getString("name").map(_name -> {
                 return IslandUtils.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandUtils.getMaxWarpNameLength());
             });
             if (!name.isPresent() || name.get().isEmpty()) {

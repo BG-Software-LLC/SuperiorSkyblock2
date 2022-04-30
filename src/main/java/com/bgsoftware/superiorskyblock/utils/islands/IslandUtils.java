@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
@@ -251,10 +250,6 @@ public final class IslandUtils {
 
     public static boolean isValidRoleForLimit(PlayerRole playerRole) {
         return playerRole.isRoleLadder() && !playerRole.isFirstRole() && !playerRole.isLastRole();
-    }
-
-    public static String getWarpName(String rawName) {
-        return Formatters.ALPHABETIZE_FORMATTER.format(rawName);
     }
 
     public static boolean isWarpNameLengthValid(String warpName) {
