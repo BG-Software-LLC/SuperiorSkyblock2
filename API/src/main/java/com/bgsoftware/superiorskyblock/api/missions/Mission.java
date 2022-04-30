@@ -246,6 +246,7 @@ public abstract class Mission<V> {
      *
      * @param superiorPlayer The player to check.
      */
+    @Nullable
     protected SuperiorPlayer getDataKey(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return islandMission ? superiorPlayer.getIsland() == null ? null : superiorPlayer.getIsland().getOwner() : superiorPlayer;
@@ -271,6 +272,7 @@ public abstract class Mission<V> {
      * @param superiorPlayer The player to get data from.
      * @param createFunction The function that will be run when data doesn't exist yet.
      */
+    @Nullable
     protected V getOrCreate(SuperiorPlayer superiorPlayer, Function<SuperiorPlayer, ? extends V> createFunction) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(createFunction, "createFunction parameter cannot be null.");
@@ -288,6 +290,7 @@ public abstract class Mission<V> {
      *
      * @param superiorPlayer The player to get data from.
      */
+    @Nullable
     protected V get(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 

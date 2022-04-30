@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,8 +60,10 @@ public final class CmdClose implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        island.setLocked(true);
-        Message.ISLAND_CLOSED.send(superiorPlayer);
+        if (plugin.getEventsBus().callIslandCloseEvent(island, superiorPlayer)) {
+            island.setLocked(true);
+            Message.ISLAND_CLOSED.send(superiorPlayer);
+        }
     }
 
 }

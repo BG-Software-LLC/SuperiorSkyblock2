@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.tag;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -59,7 +59,7 @@ public final class TagBuilder {
         if (!(entity instanceof Player)) {
             Location offset = entity.getLocation().subtract(min);
             compoundValue.put("entityType", new StringTag(entity.getType().name()));
-            compoundValue.put("offset", new StringTag(LocationUtils.getLocation(offset)));
+            compoundValue.put("offset", new StringTag(Serializers.LOCATION_SERIALIZER.serialize(offset)));
             compoundValue.put("NBT", plugin.getNMSTags().getNBTTag(entity));
         }
         return this;

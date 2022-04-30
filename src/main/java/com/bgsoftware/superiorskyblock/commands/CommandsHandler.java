@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -21,16 +21,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public final class CommandsHandler extends AbstractHandler implements CommandsManager {
 
@@ -184,7 +185,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
                 SuperiorCommand superiorCommand = createInstance(commandClass.get());
 
-                if (file.getName().toLowerCase().contains("admin")) {
+                if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
                     registerAdminCommand(superiorCommand);
                     SuperiorSkyblockPlugin.log("Successfully loaded external admin command: " + file.getName().split("\\.")[0]);
                 } else {
@@ -259,8 +260,8 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
                                     Long timeToExecute = playerCooldowns.get(commandLabel);
                                     if (timeToExecute != null) {
                                         if (timeNow < timeToExecute) {
-                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale,
-                                                    StringUtils.formatTime(locale, timeToExecute - timeNow, TimeUnit.MILLISECONDS));
+                                            String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
+                                            Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
                                             return false;
                                         }
                                     }
@@ -318,9 +319,9 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
                     List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(), new ArrayList<>()));
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), new ArrayList<>()));
                     for (String _aliases : aliases) {
-                        if (_aliases.contains(args[0].toLowerCase())) {
+                        if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
                             list.add(_aliases);
                         }
                     }

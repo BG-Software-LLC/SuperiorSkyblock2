@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IslandFlagPagedObjectButton;
@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, MenuIslandFlags.IslandFlagInfo> {
 
@@ -63,20 +64,19 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         PagedMenuPattern.Builder<MenuIslandFlags, IslandFlagInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "settings.yml", MenuIslandFlags::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "settings.yml", MenuIslandFlags::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         int position = 0;
 
         if (cfg.isConfigurationSection("settings")) {
             for (String settingsSectionName : cfg.getConfigurationSection("settings").getKeys(false)) {
-                updateSettings(IslandFlag.getByName(settingsSectionName.toLowerCase()), cfg, position++);
+                updateSettings(IslandFlag.getByName(settingsSectionName.toLowerCase(Locale.ENGLISH)), cfg, position++);
             }
         }
 
@@ -120,7 +120,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         SoundWrapper clickSound = null;
 
         ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
-                islandFlag.getName().toLowerCase());
+                islandFlag.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemFlagSection != null) {
             enabledIslandFlagItem = FileUtils.getItemStack("settings.yml",

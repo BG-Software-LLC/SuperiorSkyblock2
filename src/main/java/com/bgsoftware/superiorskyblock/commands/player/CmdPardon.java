@@ -1,14 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
 import java.util.ArrayList;
@@ -73,6 +73,9 @@ public final class CmdPardon implements IPermissibleCommand {
             Message.PLAYER_NOT_BANNED.send(superiorPlayer);
             return;
         }
+
+        if (!plugin.getEventsBus().callIslandUnbanEvent(superiorPlayer, targetPlayer, island))
+            return;
 
         island.unbanMember(targetPlayer);
 

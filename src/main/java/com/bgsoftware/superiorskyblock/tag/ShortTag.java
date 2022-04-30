@@ -44,7 +44,7 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-public final class ShortTag extends Tag<Short> {
+public final class ShortTag extends NumberTag<Short> {
 
     protected static final Class<?> CLASS = getNNTClass("NBTTagShort");
 

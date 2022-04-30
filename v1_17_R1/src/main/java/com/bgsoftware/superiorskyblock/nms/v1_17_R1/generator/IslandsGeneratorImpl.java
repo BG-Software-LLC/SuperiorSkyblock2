@@ -30,21 +30,21 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
         switch (world.getEnvironment()) {
             case NETHER -> {
                 try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome().toUpperCase());
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome());
                 } catch (IllegalArgumentException error) {
                     targetBiome = Biome.NETHER_WASTES;
                 }
             }
             case THE_END -> {
                 try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome().toUpperCase());
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome());
                 } catch (IllegalArgumentException error) {
                     targetBiome = Biome.THE_END;
                 }
             }
             default -> {
                 try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome().toUpperCase());
+                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome());
                 } catch (IllegalArgumentException error) {
                     targetBiome = Biome.PLAINS;
                 }

@@ -34,11 +34,11 @@ import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandBlocksT
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.spawn.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -72,22 +72,31 @@ public final class SpawnIsland implements Island {
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
+
     private final Location center;
     private final int islandSize;
+    private final Location minLocation;
+    private final Location maxLocation;
+
     private Biome biome = Biome.PLAINS;
+
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         SpawnIsland.plugin = plugin;
 
-        String spawnLocation = plugin.getSettings().getSpawn().getLocation().replace(" ", "");
+        String spawnLocation = plugin.getSettings().getSpawn().getLocation();
 
-        SmartLocation smartCenter = LocationUtils.getLocation(spawnLocation);
+        Location smartCenter = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
+
         assert smartCenter != null;
+
         center = smartCenter.add(0.5, 0, 0.5);
         islandSize = plugin.getSettings().getSpawn().getSize();
+        minLocation = center.clone().subtract(islandSize, islandSize, islandSize);
+        maxLocation = center.clone().add(islandSize, islandSize, islandSize);
 
         if (center.getWorld() == null)
-            plugin.getProviders().runWorldsListeners(spawnLocation.split(",")[0]);
+            plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
 
         if (center.getWorld() == null) {
             new HandlerLoadException("The spawn location is in invalid world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
@@ -325,7 +334,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandSize, 0, islandSize);
+        return this.minLocation.clone();
     }
 
     @Override
@@ -335,7 +344,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public Location getMaximum() {
-        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandSize, 0, islandSize);
+        return this.maxLocation.clone();
     }
 
     @Override
@@ -415,7 +424,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
-        return IslandUtils.getAllChunksAsync(this, center.getWorld(), onlyProtected, noEmptyChunks, onChunkLoad);
+        return IslandUtils.getAllChunksAsync(this, center.getWorld(), onlyProtected, noEmptyChunks, ChunkLoadReason.API_REQUEST, onChunkLoad);
     }
 
     @Override
@@ -1152,6 +1161,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void removePotionEffect(PotionEffectType type) {
+        // Do nothing.
+    }
+
+    @Override
     public int getPotionEffectLevel(PotionEffectType type) {
         return 0;
     }
@@ -1183,6 +1197,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setRoleLimit(PlayerRole playerRole, int limit) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeRoleLimit(PlayerRole playerRole) {
         // Do nothing.
     }
 
@@ -1287,6 +1306,11 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public void removeRating(SuperiorPlayer superiorPlayer) {
+        // Do nothing.
+    }
+
+    @Override
     public double getTotalRating() {
         return 0;
     }
@@ -1332,6 +1356,12 @@ public final class SpawnIsland implements Island {
     }
 
     @Override
+    public boolean setGeneratorPercentage(Key key, int percentage, World.Environment environment,
+                                          @Nullable SuperiorPlayer caller, boolean callEvent) {
+        return true;
+    }
+
+    @Override
     public int getGeneratorPercentage(Key key, World.Environment environment) {
         return 0;
     }
@@ -1343,6 +1373,11 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void setGeneratorAmount(Key key, int amount, World.Environment environment) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeGeneratorAmount(Key key, World.Environment environment) {
         // Do nothing.
     }
 
@@ -1369,6 +1404,12 @@ public final class SpawnIsland implements Island {
     @Override
     public void clearGeneratorAmounts(World.Environment environment) {
         // Do nothing.
+    }
+
+    @Nullable
+    @Override
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+        return null;
     }
 
     @Nullable

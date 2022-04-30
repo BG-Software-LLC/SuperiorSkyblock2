@@ -5,9 +5,24 @@ import javax.script.ScriptException;
 
 public interface IScriptEngine {
 
-    Object eval(String stringToEvaluate) throws ScriptException;
+    /**
+     * Evaluate an expression.
+     *
+     * @param expression The expression to evaluate.
+     * @return The result of the expression.
+     * @throws ScriptException If the format of the expression is invalid.
+     */
+    Object eval(String expression) throws ScriptException;
 
-    Object eval(String stringToEvaluate, Bindings bindings) throws ScriptException;
+    /**
+     * Evaluate an expression.
+     *
+     * @param expression The expression to evaluate.
+     * @param bindings   A bindings map for the expression.
+     * @return The result of the expression.
+     * @throws ScriptException If the format of the expression is invalid.
+     */
+    Object eval(String expression, Bindings bindings) throws ScriptException;
 
 
 }

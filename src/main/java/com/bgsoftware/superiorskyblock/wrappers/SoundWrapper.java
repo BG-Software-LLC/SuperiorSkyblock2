@@ -4,6 +4,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
+
 public final class SoundWrapper {
 
     private final Sound sound;
@@ -38,6 +40,10 @@ public final class SoundWrapper {
 
     public SoundWrapper copy() {
         return new SoundWrapper(this.sound, this.volume, this.pitch);
+    }
+
+    public static boolean isEmpty(@Nullable SoundWrapper soundWrapper) {
+        return soundWrapper == null || soundWrapper.sound == null || soundWrapper.volume <= 0 || soundWrapper.pitch <= 0;
     }
 
 }

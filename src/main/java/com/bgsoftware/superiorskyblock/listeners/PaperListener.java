@@ -3,20 +3,20 @@ package com.bgsoftware.superiorskyblock.listeners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SpongeAbsorbEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class PaperListener implements Listener {
 
-    private final List<Location> alreadySpongeAbosrbCalled = new ArrayList<>();
+    private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
     private final SuperiorSkyblockPlugin plugin;
 
     public PaperListener(SuperiorSkyblockPlugin plugin) {
@@ -45,7 +45,6 @@ public final class PaperListener implements Listener {
         island.handleBlockPlace(ConstantKeys.WET_SPONGE, 1);
 
         alreadySpongeAbosrbCalled.add(location);
-        Executor.sync(() -> alreadySpongeAbosrbCalled.remove(location), 5L);
     }
 
 }

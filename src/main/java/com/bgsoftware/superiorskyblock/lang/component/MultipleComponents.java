@@ -1,8 +1,11 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -23,22 +26,24 @@ public final class MultipleComponents implements IMessageComponent {
 
         for (String key : section.getKeys(false)) {
             if (key.equals("action-bar")) {
-                messageComponents.add(ActionBarComponent.of(StringUtils.translateColors(section.getString(key + ".text"))));
+                messageComponents.add(ActionBarComponent.of(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text"))));
             } else if (key.equals("title")) {
                 messageComponents.add(TitleComponent.of(
-                        StringUtils.translateColors(section.getString(key + ".title")),
-                        StringUtils.translateColors(section.getString(key + ".sub-title")),
+                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".title")),
+                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".sub-title")),
                         section.getInt(key + ".fade-in"),
                         section.getInt(key + ".duration"),
                         section.getInt(key + ".fade-out")
                 ));
+            } else if (key.equals("sound")) {
+                messageComponents.add(SoundComponent.of(FileUtils.getSound(section.getConfigurationSection("sound"))));
             } else {
-                TextComponent textComponent = new TextComponent(StringUtils.translateColors(section.getString(key + ".text")));
+                TextComponent textComponent = new TextComponent(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
 
                 String toolTipMessage = section.getString(key + ".tooltip");
                 if (toolTipMessage != null) {
                     textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new BaseComponent[]{new TextComponent(StringUtils.translateColors(toolTipMessage))}));
+                            new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(toolTipMessage))}));
                 }
 
                 String commandMessage = section.getString(key + ".command");

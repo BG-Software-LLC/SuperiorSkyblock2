@@ -7,12 +7,15 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.bridge.StackedBlocksDatabaseBridge;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.container.StackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -91,7 +94,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     @Override
     public boolean setStackedBlock(Block block, int amount) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
-        return setStackedBlock(block.getLocation(), Key.of(block), amount);
+        return setStackedBlock(block.getLocation(), KeyImpl.of(block), amount);
     }
 
     @Override
@@ -107,7 +110,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
         boolean succeed = true;
 
         if (stackedBlock.getBlockKey() != null && !blockKey.equals(stackedBlock.getBlockKey())) {
-            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + SBlockPosition.of(location) + " - fixing it...");
+            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + Formatters.LOCATION_FORMATTER.format(location) + " - fixing it...");
             amount = 0;
             succeed = false;
         }
@@ -259,7 +262,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {
-        Optional<SBlockPosition> location = resultSet.getString("location").map(SBlockPosition::of);
+        Optional<Location> location = resultSet.getString("location").map(Serializers.STACKED_BLOCK_SERIALIZER::deserialize);
         if (!location.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
             return;
@@ -267,7 +270,7 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         if (location.get().getWorld() == null) {
             SuperiorSkyblockPlugin.log(String.format("&cCannot load stacked block with invalid world %s, skipping...",
-                    location.get().getWorldName()));
+                    ((SmartLocation) location.get()).getWorldName()));
             return;
         }
 
@@ -279,16 +282,16 @@ public final class StackedBlocksHandler extends AbstractHandler implements Stack
 
         Optional<String> item = resultSet.getString("block_type");
 
-        Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : Key.of(item.get());
+        Key blockKey = !item.isPresent() || item.get().isEmpty() ? null : KeyImpl.of(item.get());
 
-        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get().parse());
+        StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location.get());
         stackedBlock.setAmount(amount.get());
         stackedBlock.setBlockKey(blockKey);
     }
 
     private void updateStackedBlockKeys() {
         this.stackedBlocksContainer.getStackedBlocks().values().forEach(stackedBlock -> {
-            stackedBlock.setBlockKey(Key.of(stackedBlock.getLocation().getBlock()));
+            stackedBlock.setBlockKey(KeyImpl.of(stackedBlock.getLocation().getBlock()));
         });
     }
 

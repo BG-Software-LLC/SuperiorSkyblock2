@@ -23,11 +23,6 @@ edit-lore:
   - '&7&o(( &f&oLeft-Click &7&oto see island warps. ))'
   - '&7&o(( &f&oRight-Click &7&oto edit the category. ))'
 
-slots: '@'
-previous-page: '%'
-current-page: '*'
-next-page: '^'
-
 items:
   '@':
     type: STAINED_GLASS_PANE
@@ -35,15 +30,15 @@ items:
     name: '&f'
   '%':
     type: PAPER
-    name: '{0}Previous Page'
+    name: '&cPrevious Page'
   '*':
     type: DOUBLE_PLANT
     name: '&aCurrent Page'
     lore:
-      - '&7Page {0}'
+      - '&7Page 1'
   '^':
     type: PAPER
-    name: '{0}Next Page'
+    name: '&cNext Page'
   '$':
     type: STAINED_GLASS_PANE
     data: 15

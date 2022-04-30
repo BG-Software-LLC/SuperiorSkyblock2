@@ -45,7 +45,7 @@ import java.io.IOException;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class LongTag extends Tag<Long> {
+public final class LongTag extends NumberTag<Long> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagLong");
 

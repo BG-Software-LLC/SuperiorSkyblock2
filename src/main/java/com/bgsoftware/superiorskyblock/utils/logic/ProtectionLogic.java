@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
@@ -51,7 +50,7 @@ public final class ProtectionLogic {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
             if (sendMessages)
-                PlayerLocales.sendProtectionMessage(superiorPlayer);
+                Message.PROTECTION.send(superiorPlayer);
             return false;
         }
 
@@ -85,14 +84,14 @@ public final class ProtectionLogic {
 
         if (!island.hasPermission(superiorPlayer, islandPermission)) {
             if (sendMessages)
-                PlayerLocales.sendProtectionMessage(player);
+                Message.PROTECTION.send(player);
             return false;
         }
 
         if (plugin.getSettings().getValuableBlocks().contains(KeyImpl.of(block)) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.VALUABLE_BREAK)) {
             if (sendMessages)
-                PlayerLocales.sendProtectionMessage(player);
+                Message.PROTECTION.send(player);
             return false;
         }
 
@@ -135,7 +134,7 @@ public final class ProtectionLogic {
 
         if (island != null && !island.hasPermission(superiorPlayer, islandPrivilege)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             if (closeInventory) {
                 Executor.sync(() -> {
                     Inventory openInventory = e.getPlayer().getOpenInventory().getTopInventory();
@@ -161,7 +160,7 @@ public final class ProtectionLogic {
         }
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)) {
-            PlayerLocales.sendProtectionMessage(player);
+            Message.PROTECTION.send(player);
             return false;
         }
 
@@ -186,7 +185,7 @@ public final class ProtectionLogic {
         }
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.ITEM_FRAME)) {
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             return false;
         }
 
@@ -204,7 +203,7 @@ public final class ProtectionLogic {
 
         if (island != null && !plugin.getNMSPlayers().wasThrownByPlayer(item, player) &&
                 !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)) {
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             return false;
         }
 

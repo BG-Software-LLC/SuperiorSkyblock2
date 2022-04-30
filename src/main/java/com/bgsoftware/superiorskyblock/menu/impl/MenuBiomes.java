@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BiomeButton;
@@ -15,14 +14,6 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
-import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -32,6 +23,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
@@ -70,14 +62,13 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
         RegularMenuPattern.Builder<MenuBiomes> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "biomes.yml", MenuBiomes::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "biomes.yml", MenuBiomes::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         currentBiomeGlow = cfg.getBoolean("current-biome-glow", false);
 
@@ -92,7 +83,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 Biome biome;
 
                 try {
-                    biome = Biome.valueOf(biomeName.toUpperCase());
+                    biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                 } catch (IllegalArgumentException error) {
                     SuperiorSkyblockPlugin.log("&cBiome '" + biomeName + "' is not valid, skipping...");
                     continue;
@@ -170,7 +161,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
             for (String biomeName : cfg.getConfigurationSection("biomes-gui.biomes").getKeys(false)) {
                 ConfigurationSection section = cfg.getConfigurationSection("biomes-gui.biomes." + biomeName);
                 char itemChar = SuperiorMenuPattern.BUTTON_SYMBOLS[charCounter++];
-                section.set("biome", biomeName.toUpperCase());
+                section.set("biome", biomeName.toUpperCase(Locale.ENGLISH));
                 MenuConverter.convertItemAccess(section, patternChars, itemChar, itemsSection, commandsSection, soundsSection);
             }
         }

@@ -39,6 +39,13 @@ public interface IslandBank {
     BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount);
 
     /**
+     * Whether it's possible to deposit money into the bank without exceeding the bank limit.
+     *
+     * @param amount The amount of money to deposit.
+     */
+    boolean canDepositMoney(BigDecimal amount);
+
+    /**
      * Withdraw money from the bank.
      *
      * @param superiorPlayer    The player that withdrawn the money.

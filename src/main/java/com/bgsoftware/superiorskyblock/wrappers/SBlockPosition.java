@@ -6,12 +6,18 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import java.util.Objects;
+
 public final class SBlockPosition implements BlockPosition {
 
     private final int x;
     private final int y;
     private final int z;
     private final String world;
+
+    public SBlockPosition(Location location) {
+        this(location.getWorld() == null ? null : location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
 
     public SBlockPosition(String world, int x, int y, int z) {
         this.world = world;
@@ -20,17 +26,9 @@ public final class SBlockPosition implements BlockPosition {
         this.z = z;
     }
 
-    public static SBlockPosition of(String location) {
-        String[] sections = location.split(", ");
-        return of(sections[0], Integer.parseInt(sections[1]), Integer.parseInt(sections[2]), Integer.parseInt(sections[3]));
-    }
-
-    public static SBlockPosition of(Location location) {
-        return of(location.getWorld() == null ? null : location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
-    }
-
-    public static SBlockPosition of(String world, int x, int y, int z) {
-        return new SBlockPosition(world, x, y, z);
+    @Override
+    public String getWorldName() {
+        return world;
     }
 
     @Override
@@ -68,26 +66,17 @@ public final class SBlockPosition implements BlockPosition {
         return new Location(getWorld(), getX(), getY(), getZ());
     }
 
-    public String getWorldName() {
-        return world;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SBlockPosition that = (SBlockPosition) o;
+        return x == that.x && y == that.y && z == that.z && world.equals(that.world);
     }
 
     @Override
     public int hashCode() {
-        int hash = 19 * 3 + (this.world != null ? this.world.hashCode() : 0);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(this.x) ^ Double.doubleToLongBits(this.x) >>> 32);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(this.y) ^ Double.doubleToLongBits(this.y) >>> 32);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(this.z) ^ Double.doubleToLongBits(this.z) >>> 32);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof SBlockPosition) {
-            SBlockPosition other = (SBlockPosition) obj;
-            return world.equals(other.world) && x == other.x && y == other.y && z == other.z;
-        }
-        return super.equals(obj);
+        return Objects.hash(x, y, z, world);
     }
 
     @Override

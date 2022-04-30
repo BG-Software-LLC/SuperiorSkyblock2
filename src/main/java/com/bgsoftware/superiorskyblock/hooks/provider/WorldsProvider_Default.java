@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 public final class WorldsProvider_Default implements WorldsProvider {
 
-    private final Set<SBlockPosition> servedPositions = Sets.newHashSet();
+    private final Set<BlockPosition> servedPositions = Sets.newHashSet();
     private final EnumMap<World.Environment, World> islandWorlds = new EnumMap<>(World.Environment.class);
     private final SuperiorSkyblockPlugin plugin;
 
@@ -30,13 +31,16 @@ public final class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public void prepareWorlds() {
-        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty().toUpperCase());
+        Difficulty difficulty = Difficulty.valueOf(plugin.getSettings().getWorlds().getDifficulty());
         if (plugin.getSettings().getWorlds().getNormal().isEnabled())
             loadWorld(plugin.getSettings().getWorlds().getWorldName(), difficulty, World.Environment.NORMAL);
         if (plugin.getSettings().getWorlds().getNether().isEnabled())
             loadWorld(plugin.getSettings().getWorlds().getNether().getName(), difficulty, World.Environment.NETHER);
-        if (plugin.getSettings().getWorlds().getEnd().isEnabled())
-            loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
+        if (plugin.getSettings().getWorlds().getEnd().isEnabled()) {
+            World endWorld = loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
+            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
+                plugin.getNMSDragonFight().prepareEndWorld(endWorld);
+        }
     }
 
     @Override
@@ -83,11 +87,13 @@ public final class WorldsProvider_Default implements WorldsProvider {
                 location.subtract(0, 0, islandRange);
         }
 
-        if (servedPositions.contains(SBlockPosition.of(location)) || plugin.getGrid().getIslandAt(location) != null) {
+        BlockPosition blockPosition = new SBlockPosition(location);
+
+        if (servedPositions.contains(blockPosition) || plugin.getGrid().getIslandAt(location) != null) {
             return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner, islandUUID);
         }
 
-        servedPositions.add(SBlockPosition.of(location));
+        servedPositions.add(blockPosition);
 
         return location;
     }
@@ -95,7 +101,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
     @Override
     public void finishIslandCreation(Location islandLocation, UUID islandOwner, UUID islandUUID) {
         Preconditions.checkNotNull(islandLocation, "islandLocation parameter cannot be null.");
-        servedPositions.remove(SBlockPosition.of(islandLocation));
+        servedPositions.remove(new SBlockPosition(islandLocation));
     }
 
     @Override
@@ -144,7 +150,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
         }
     }
 
-    private void loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
+    private World loadWorld(String worldName, Difficulty difficulty, World.Environment environment) {
         if (Bukkit.getWorld(worldName) != null) {
             throw new RuntimeException("The world " + worldName + " is already loaded. This can occur by one of the following reasons:\n" +
                     "- Another plugin loaded it manually before SuperiorSkyblock.\n" +
@@ -166,6 +172,8 @@ public final class WorldsProvider_Default implements WorldsProvider {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv import " + worldName + " normal -g " + plugin.getName());
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv modify set generator " + plugin.getName() + " " + worldName);
         }
+
+        return world;
     }
 
 }

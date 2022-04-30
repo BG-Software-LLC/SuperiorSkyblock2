@@ -55,20 +55,17 @@ public final class NMSUtils {
 
     static {
         try {
-            biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getNormal().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.NORMAL, Biome.PLAINS);
         }
         try {
-            biomeEnumMap.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getNether().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.NETHER, Biome.NETHER_WASTES);
         }
         try {
-            biomeEnumMap.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds()
-                    .getEnd().getBiome().toUpperCase()));
+            biomeEnumMap.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome()));
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
         }
@@ -184,7 +181,7 @@ public final class NMSUtils {
         BlockData blockData = Block.getByCombinedId(combinedId);
 
         if (statesTag != null) {
-            for (Map.Entry<String, Tag<?>> entry : statesTag.getValue().entrySet()) {
+            for (Map.Entry<String, Tag<?>> entry : statesTag.entrySet()) {
                 try {
                     // noinspection rawtypes
                     BlockState blockState = BlockStatesMapper.getBlockState(entry.getKey());

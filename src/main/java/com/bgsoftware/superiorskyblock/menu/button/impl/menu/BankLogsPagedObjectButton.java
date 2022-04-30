@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuBankLogs;
@@ -45,8 +46,8 @@ public final class BankLogsPagedObjectButton extends PagedObjectButton<MenuBankL
                         Message.BANK_WITHDRAW_COMPLETED : Message.BANK_DEPOSIT_COMPLETED).getMessage(inventoryViewer.getUserLocale()))
                 .replaceAll("{3}", transaction.getDate())
                 .replaceAll("{4}", transaction.getAmount() + "")
-                .replaceAll("{5}", StringUtils.format(transaction.getAmount()))
-                .replaceAll("{6}", StringUtils.fancyFormat(transaction.getAmount(), inventoryViewer.getUserLocale()))
+                .replaceAll("{5}", Formatters.NUMBER_FORMATTER.format(transaction.getAmount()))
+                .replaceAll("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(transaction.getAmount(), inventoryViewer.getUserLocale()))
                 .asSkullOf(inventoryViewer)
                 .build(inventoryViewer);
     }

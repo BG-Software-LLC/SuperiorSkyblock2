@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategories;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -62,11 +63,17 @@ public final class WarpCategoryManageIconButton extends SuperiorMenuButton<MenuW
                     return true;
                 }
 
-                warpCategory.setSlot(slot);
-                Message.WARP_CATEGORY_SLOT_SUCCESS.send(player, slot);
+                EventResult<Integer> eventResult = plugin.getEventsBus().callIslandChangeWarpCategorySlotEvent(
+                        clickedPlayer, warpCategory.getIsland(), warpCategory, slot, MenuWarpCategories.rowsSize * 9);
 
-                if (MenuWarpCategoryManage.successUpdateSound != null)
-                    MenuWarpCategoryManage.successUpdateSound.playSound(player);
+                if (!eventResult.isCancelled()) {
+                    warpCategory.setSlot(eventResult.getResult());
+
+                    Message.WARP_CATEGORY_SLOT_SUCCESS.send(player, eventResult.getResult());
+
+                    if (MenuWarpCategoryManage.successUpdateSound != null)
+                        MenuWarpCategoryManage.successUpdateSound.playSound(player);
+                }
             }
 
             PlayerChat.remove(player);

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.google.common.base.Preconditions;
@@ -113,7 +113,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
             if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
-                PlayerLocales.sendProtectionMessage(superiorPlayer);
+                Message.PROTECTION.send(superiorPlayer);
                 e.setCancelled(true);
             }
         }

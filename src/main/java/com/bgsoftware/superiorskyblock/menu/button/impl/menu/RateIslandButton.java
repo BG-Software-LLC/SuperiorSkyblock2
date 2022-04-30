@@ -19,11 +19,13 @@ import java.util.List;
 public final class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
 
     private final Rating rating;
+    private final boolean removingRatingButton;
 
     private RateIslandButton(TemplateItem buttonItem, SoundWrapper clickSound, List<String> commands,
                              String requiredPermission, SoundWrapper lackPermissionSound, Rating rating) {
         super(buttonItem, clickSound, commands, requiredPermission, lackPermissionSound);
         this.rating = rating;
+        this.removingRatingButton = rating == Rating.UNKNOWN;
     }
 
     @Override
@@ -31,7 +33,17 @@ public final class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
         Island island = superiorMenu.getTargetIsland();
 
-        island.setRating(clickedPlayer, rating);
+        if (removingRatingButton) {
+            if (!plugin.getEventsBus().callIslandRemoveRatingEvent(clickedPlayer, clickedPlayer, island))
+                return;
+
+            island.removeRating(clickedPlayer);
+        } else {
+            if (!plugin.getEventsBus().callIslandRateEvent(clickedPlayer, clickedPlayer, island, rating))
+                return;
+
+            island.setRating(clickedPlayer, rating);
+        }
 
         Message.RATE_SUCCESS.send(clickedPlayer, rating.getValue());
 

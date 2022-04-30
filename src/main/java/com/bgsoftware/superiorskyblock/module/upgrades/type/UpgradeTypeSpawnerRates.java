@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetSpawnerRates;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
@@ -14,17 +15,17 @@ import org.bukkit.event.entity.SpawnerSpawnEvent;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public final class UpgradeTypeSpawnerRates implements IUpgradeType {
 
     private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddSpawnerRates(),
             new CmdAdminSetSpawnerRates());
 
-    private final Set<UUID> alreadyTrackedSpawning = new HashSet<>();
+    private final Collection<UUID> alreadyTrackedSpawning = AutoRemovalCollection.newHashSet(10L * 50, TimeUnit.MILLISECONDS);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -59,7 +60,6 @@ public final class UpgradeTypeSpawnerRates implements IUpgradeType {
                 if (spawnDelay > 0) {
                     plugin.getNMSWorld().setSpawnerDelay(creatureSpawner,
                             (int) Math.round(spawnDelay / spawnerRatesMultiplier));
-                    Executor.sync(() -> alreadyTrackedSpawning.remove(island.getOwner().getUniqueId()), 10L);
                 }
             }, 5L);
         }

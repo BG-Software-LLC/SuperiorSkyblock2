@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.GridHandler;
 import com.google.gson.Gson;
@@ -80,7 +81,9 @@ public final class ChunksTracker {
 
     public static void deserialize(GridHandler grid, Island island, @Nullable String serialized) {
         try {
-            if (serialized == null || serialized.isEmpty()) throw new JsonSyntaxException("");
+            if (StringUtils.isBlank(serialized))
+                throw new JsonSyntaxException("");
+
             JsonObject dirtyChunksObject = gson.fromJson(serialized, JsonObject.class);
             dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
                 String worldName = dirtyChunkEntry.getKey();

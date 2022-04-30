@@ -50,6 +50,7 @@ import java.util.Set;
  *
  * @author Graham Edgecombe
  */
+@SuppressWarnings("unused")
 public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagCompound");
@@ -72,78 +73,123 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         super(value, CLASS);
     }
 
-    public static CompoundTag fromNBT(Object tag) {
-        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to CompoundTag!");
-
-        Map<String, Tag<?>> map = new HashMap<>();
-
-        try {
-            Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
-
-            for (String key : keySet) {
-                map.put(key, Tag.fromNBT(plugin.getNMSTags().getNBTCompoundTag(tag, key)));
-            }
-
-            return new CompoundTag(map);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
-            return null;
-        }
+    public Tag<?> getTag(String key) {
+        return getTag(key, null);
     }
 
-    public static CompoundTag fromStream(DataInputStream is, int depth) throws IOException {
-        Map<String, Tag<?>> tagMap = new HashMap<>();
-        Tag<?> tag;
-
-        while (!((tag = Tag.fromStream(is, depth + 1)) instanceof EndTag)) {
-            int keyLength = is.readShort() & 0xFFFF;
-            byte[] keyBytes = new byte[keyLength];
-            is.readFully(keyBytes);
-            String key = new String(keyBytes, StandardCharsets.UTF_8);
-            tagMap.put(key, tag);
-        }
-
-        return new CompoundTag(tagMap);
+    public Tag<?> getTag(String key, Tag<?> def) {
+        return this.value.getOrDefault(key, def);
     }
 
-    public void setString(String key, String value) {
-        setTag(key, new StringTag(value));
+    public byte[] getByteArray(String key) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof ByteArrayTag ? (byte[]) tag.value : null;
     }
 
-    public void setInt(String key, int value) {
-        setTag(key, new IntTag(value));
+    public byte getByte(String key) {
+        Number number = getNumber(key);
+        return number == null ? 0 : number.byteValue();
     }
 
-    public void setShort(String key, short value) {
-        setTag(key, new ShortTag(value));
+    public CompoundTag getCompound(String key) {
+        return getCompound(key, null);
     }
 
-    public void setByte(String key, byte value) {
-        setTag(key, new ByteTag(value));
+    public CompoundTag getCompound(String key, CompoundTag def) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof CompoundTag ? (CompoundTag) tag : def;
+    }
+
+    public double getDouble(String key) {
+        Number number = getNumber(key);
+        return number == null ? 0D : number.doubleValue();
+    }
+
+    public float getFloat(String key) {
+        Number number = getNumber(key);
+        return number == null ? 0F : number.floatValue();
+    }
+
+    public int[] getIntArray(String key) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof IntArrayTag ? (int[]) tag.value : null;
+    }
+
+    public int getInt(String key) {
+        return getInt(key, 0);
+    }
+
+    public int getInt(String key, int def) {
+        return getNumber(key, def).intValue();
+    }
+
+    public ListTag getList(String key) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof ListTag ? (ListTag) tag : null;
+    }
+
+    public long getLong(String key) {
+        Number number = getNumber(key);
+        return number == null ? 0L : number.longValue();
+    }
+
+    public Number getNumber(String key) {
+        return getNumber(key, null);
+    }
+
+    public Number getNumber(String key, Number def) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof NumberTag ? (Number) tag.value : def;
+    }
+
+    public short getShort(String key) {
+        Number number = getNumber(key);
+        return number == null ? 0 : number.shortValue();
+    }
+
+    public String getString(String key) {
+        Tag<?> tag = getTag(key);
+        return tag instanceof StringTag ? (String) tag.value : null;
     }
 
     public void setTag(String key, Tag<?> value) {
         this.value.put(key, value);
     }
 
-    public String getString(String key) {
-        Tag<?> tag = getTag(key);
-        return !(tag instanceof StringTag) ? null : ((StringTag) tag).value;
+    public void setByteArray(String key, byte[] value) {
+        setTag(key, new ByteArrayTag(value));
     }
 
-    public int getInt(String key) {
-        Tag<?> tag = getTag(key);
-        return !(tag instanceof IntTag) ? 0 : ((IntTag) tag).value;
+    public void setByte(String key, byte value) {
+        setTag(key, new ByteTag(value));
     }
 
-    public CompoundTag getCompound(String key) {
-        Tag<?> tag = getTag(key);
-        return !(tag instanceof CompoundTag) ? null : (CompoundTag) tag;
+    public void setDouble(String key, double value) {
+        setTag(key, new DoubleTag(value));
     }
 
-    public Tag<?> getTag(String key) {
-        return this.value.get(key);
+    public void setFloat(String key, float value) {
+        setTag(key, new FloatTag(value));
+    }
+
+    public void setIntArray(String key, int[] value) {
+        setTag(key, new IntArrayTag(value));
+    }
+
+    public void setInt(String key, int value) {
+        setTag(key, new IntTag(value));
+    }
+
+    public void setLong(String key, long value) {
+        setTag(key, new LongTag(value));
+    }
+
+    public void setShort(String key, short value) {
+        setTag(key, new ShortTag(value));
+    }
+
+    public void setString(String key, String value) {
+        setTag(key, new StringTag(value));
     }
 
     public boolean containsKey(String key) {
@@ -152,6 +198,10 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
 
     public int size() {
         return value.size();
+    }
+
+    public boolean isEmpty() {
+        return value.isEmpty();
     }
 
     public Set<Map.Entry<String, Tag<?>>> entrySet() {
@@ -203,6 +253,41 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
             PluginDebugger.debug(ex);
             return null;
         }
+    }
+
+    public static CompoundTag fromNBT(Object tag) {
+        Preconditions.checkArgument(tag.getClass().equals(CLASS), "Cannot convert " + tag.getClass() + " to CompoundTag!");
+
+        Map<String, Tag<?>> map = new HashMap<>();
+
+        try {
+            Set<String> keySet = plugin.getNMSTags().getNBTCompoundValue(tag);
+
+            for (String key : keySet) {
+                map.put(key, Tag.fromNBT(plugin.getNMSTags().getNBTCompoundTag(tag, key)));
+            }
+
+            return new CompoundTag(map);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            PluginDebugger.debug(ex);
+            return null;
+        }
+    }
+
+    public static CompoundTag fromStream(DataInputStream is, int depth) throws IOException {
+        Map<String, Tag<?>> tagMap = new HashMap<>();
+        Tag<?> tag;
+
+        while (!((tag = Tag.fromStream(is, depth + 1)) instanceof EndTag)) {
+            int keyLength = is.readShort() & 0xFFFF;
+            byte[] keyBytes = new byte[keyLength];
+            is.readFully(keyBytes);
+            String key = new String(keyBytes, StandardCharsets.UTF_8);
+            tagMap.put(key, tag);
+        }
+
+        return new CompoundTag(tagMap);
     }
 
 }

@@ -2,11 +2,10 @@ package com.bgsoftware.superiorskyblock.island.permissions;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.structure.EnumerateMap;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.google.common.base.Preconditions;
-
-import java.util.Map;
 
 public class RolePermissionNode extends PermissionNodeAbstract {
 
@@ -23,9 +22,9 @@ public class RolePermissionNode extends PermissionNodeAbstract {
         Executor.sync(() -> setPermissions(permissions, playerRole != null), 1L);
     }
 
-    private RolePermissionNode(Map<IslandPrivilege, PrivilegeStatus> privileges, SPlayerRole playerRole, RolePermissionNode previousNode) {
+    private RolePermissionNode(EnumerateMap<IslandPrivilege, PrivilegeStatus> privileges,
+                               SPlayerRole playerRole, RolePermissionNode previousNode) {
         super(privileges);
-
         this.playerRole = playerRole;
         this.previousNode = previousNode != null ? (RolePermissionNode) previousNode.clone() : null;
     }

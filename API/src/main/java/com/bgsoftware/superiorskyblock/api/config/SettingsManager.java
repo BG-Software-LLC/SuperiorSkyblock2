@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -557,6 +558,12 @@ public interface SettingsManager {
     boolean isAutoLanguageDetection();
 
     /**
+     * Automatically uncoop players when there are no island members left online that can remove uncoop players.
+     * Config-path: auto-uncoop-when-alone
+     */
+    boolean isAutoUncoopWhenAlone();
+
+    /**
      * Get the way to sort members in the top islands menu.
      * Config-path: island-top-members-sorting
      */
@@ -955,9 +962,15 @@ public interface SettingsManager {
 
             /**
              * Whether ender-dragon fights should be enabled for islands or not.
-             * Config-path: worlds.end.dragon-fight
+             * Config-path: worlds.end.dragon-fight.enabled
              */
             boolean isDragonFight();
+
+            /**
+             * Get the offset of the portal from the center of the island.
+             * Config-path: worlds.end.dragon-fight.portal-offset
+             */
+            BlockOffset getPortalOffset();
 
         }
 

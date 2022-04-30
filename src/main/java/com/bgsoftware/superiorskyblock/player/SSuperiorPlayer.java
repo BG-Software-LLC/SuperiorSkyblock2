@@ -19,6 +19,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
@@ -607,8 +608,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos1(Block block) {
-        this.schematicPos1 = block == null ? null : SBlockPosition.of(block.getLocation());
-        PluginDebugger.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " + schematicPos1);
+        this.schematicPos1 = block == null ? null : new SBlockPosition(block.getLocation());
+        PluginDebugger.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " +
+                (block == null ? "None" : Formatters.LOCATION_FORMATTER.format(block.getLocation())));
     }
 
     @Override
@@ -618,8 +620,9 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicPos2(Block block) {
-        this.schematicPos2 = block == null ? null : SBlockPosition.of(block.getLocation());
-        PluginDebugger.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " + schematicPos2);
+        this.schematicPos2 = block == null ? null : new SBlockPosition(block.getLocation());
+        PluginDebugger.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " +
+                (block == null ? "None" : Formatters.LOCATION_FORMATTER.format(block.getLocation())));
     }
 
     /*

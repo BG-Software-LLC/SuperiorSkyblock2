@@ -6,10 +6,10 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -64,7 +64,8 @@ public final class SIslandWarp implements IslandWarp {
     @Override
     public void setLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        PluginDebugger.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " + SBlockPosition.of(location));
+        PluginDebugger.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " +
+                Formatters.LOCATION_FORMATTER.format(location));
         this.location = location.clone();
         IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }

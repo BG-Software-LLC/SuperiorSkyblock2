@@ -4,11 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 
@@ -67,12 +67,12 @@ public final class CmdChest implements IPermissibleCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         if (args.length == 2) {
-            Pair<Integer, Boolean> pageArguments = CommandArguments.getPage(superiorPlayer.asPlayer(), args[1]);
+            NumberArgument<Integer> pageArguments = CommandArguments.getPage(superiorPlayer.asPlayer(), args[1]);
 
-            if (!pageArguments.getValue())
+            if (!pageArguments.isSucceed())
                 return;
 
-            int page = pageArguments.getKey() - 1;
+            int page = pageArguments.getNumber() - 1;
             IslandChest[] islandChests = island.getChest();
 
             if (page < 0 || page >= islandChests.length) {

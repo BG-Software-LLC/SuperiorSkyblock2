@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.utils.logic;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -28,7 +29,7 @@ public final class EntitiesLogic {
         if (!EntityUtils.canHaveLimit(entity.getType()))
             return;
 
-        island.getEntitiesTracker().trackEntity(Key.of(entity), 1);
+        island.getEntitiesTracker().trackEntity(KeyImpl.of(entity), 1);
     }
 
     public static void handleDespawn(Entity entity) {
@@ -43,7 +44,7 @@ public final class EntitiesLogic {
         if (!EntityUtils.canHaveLimit(entity.getType()))
             return;
 
-        island.getEntitiesTracker().untrackEntity(Key.of(entity), 1);
+        island.getEntitiesTracker().untrackEntity(KeyImpl.of(entity), 1);
     }
 
 }

@@ -44,7 +44,7 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-public final class ByteTag extends Tag<Byte> {
+public final class ByteTag extends NumberTag<Byte> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagByte");
 

@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.block.BlockState;
 import org.bukkit.event.EventHandler;
@@ -61,7 +61,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             }
         }
 
@@ -106,7 +106,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (key != null && island.hasReachedBlockLimit(key)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(key.getGlobalKey()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(key.getGlobalKey()));
             }
         }
 
@@ -121,7 +121,7 @@ public final class UpgradeTypeBlockLimits implements IUpgradeType {
 
             if (island.hasReachedBlockLimit(blockKey)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             }
         }
 

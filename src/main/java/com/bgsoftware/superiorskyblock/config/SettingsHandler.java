@@ -526,6 +526,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     }
 
     @Override
+    public boolean isAutoUncoopWhenAlone() {
+        return this.container.autoUncoopWhenAlone;
+    }
+
+    @Override
     public TopIslandMembersSorting getTopIslandMembersSorting() {
         return this.container.islandTopMembersSorting;
     }
@@ -631,6 +636,9 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         if (cfg.contains("worlds.normal-world")) {
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
+        }
+        if (cfg.isBoolean("worlds.end.dragon-fight")) {
+            cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
     }
 

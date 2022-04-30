@@ -1,18 +1,17 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,7 +20,6 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,41 +91,55 @@ public final class IslandUtils {
         return chunkCoords;
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, World world, boolean onlyProtected, boolean noEmptyChunks, BiConsumer<Chunk, Throwable> whenComplete) {
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+                                                                   World world,
+                                                                   boolean onlyProtected,
+                                                                   boolean noEmptyChunks,
+                                                                   ChunkLoadReason chunkLoadReason,
+                                                                   BiConsumer<Chunk, Throwable> whenComplete) {
         return IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks).stream().map(chunkPosition -> {
-            CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, null);
+            CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, null);
             return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
         }).collect(Collectors.toList());
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, World world, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+                                                                   World world,
+                                                                   boolean onlyProtected,
+                                                                   boolean noEmptyChunks,
+                                                                   ChunkLoadReason chunkLoadReason,
+                                                                   Consumer<Chunk> onChunkLoad) {
         return IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks).stream()
-                .map(chunkPosition -> ChunksProvider.loadChunk(chunkPosition, onChunkLoad))
+                .map(chunkPosition -> ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad))
                 .collect(Collectors.toList());
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island, boolean onlyProtected, boolean noEmptyChunks, Consumer<Chunk> onChunkLoad) {
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+                                                                   boolean onlyProtected,
+                                                                   boolean noEmptyChunks,
+                                                                   ChunkLoadReason chunkLoadReason,
+                                                                   Consumer<Chunk> onChunkLoad) {
         List<CompletableFuture<Chunk>> chunkCoords = new ArrayList<>();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
                 World normalWorld = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-                chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+                chunkCoords.addAll(getAllChunksAsync(island, normalWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
             }
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
-            chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, netherWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
-            chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, endWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, onlyProtected, noEmptyChunks, onChunkLoad));
+            chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
         }
 
         return chunkCoords;
@@ -193,7 +205,7 @@ public final class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        EventsCaller.callIslandKickEvent(caller, target, island);
+        plugin.getEventsBus().callIslandKickEvent(caller, target, island);
 
         island.kickMember(target);
 
@@ -219,7 +231,7 @@ public final class IslandUtils {
     }
 
     public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
-        EventsCaller.callIslandBanEvent(caller, target, island);
+        plugin.getEventsBus().callIslandBanEvent(caller, target, island);
 
         island.banMember(target, caller);
 
@@ -232,16 +244,12 @@ public final class IslandUtils {
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
             plugin.getStackedBlocks().removeStackedBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
-            EventsCaller.callIslandChunkResetEvent(island, chunkPosition);
+            plugin.getEventsBus().callIslandChunkResetEvent(island, chunkPosition);
         });
     }
 
     public static boolean isValidRoleForLimit(PlayerRole playerRole) {
         return playerRole.isRoleLadder() && !playerRole.isFirstRole() && !playerRole.isLastRole();
-    }
-
-    public static String getWarpName(String rawName) {
-        return StringUtils.removeNonAlphabet(rawName, Collections.singletonList('_'));
     }
 
     public static boolean isWarpNameLengthValid(String warpName) {

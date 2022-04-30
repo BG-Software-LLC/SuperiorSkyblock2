@@ -4,7 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuMembers;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
@@ -251,14 +251,14 @@ public final class MissionsModule extends BuiltinModule {
 
         ConfigurationSection categoriesSection = config.createSection("categories");
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(
-                new RegularMenuPattern.Builder<MenuMembers>(), "missions.yml", null);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(new RegularMenuPattern.Builder<MenuMembers>(),
+                "missions.yml", null);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration missionsMenuConfig = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration missionsMenuConfig = menuLoadResult.getConfig();
 
         int islandsCategorySlot = menuPatternSlots.getSlot(missionsMenuConfig.getString("island-missions", ""));
         if (islandsCategorySlot != -1) {

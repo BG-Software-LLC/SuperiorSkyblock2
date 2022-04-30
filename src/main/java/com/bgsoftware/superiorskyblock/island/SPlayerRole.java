@@ -5,7 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.RolePermissionNode;
 import com.google.common.base.Preconditions;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
@@ -14,12 +16,15 @@ public final class SPlayerRole implements PlayerRole {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String name;
+    private final String displayName;
     private final int id;
     private final int weight;
     private final RolePermissionNode defaultPermissions;
 
-    public SPlayerRole(String name, int id, int weight, List<String> defaultPermissions, SPlayerRole previousRole) {
+    public SPlayerRole(String name, @Nullable String displayName, int id, int weight, List<String> defaultPermissions,
+                       SPlayerRole previousRole) {
         this.name = name;
+        this.displayName = displayName == null ? name : displayName;
         this.id = id;
         this.weight = weight;
 
@@ -61,7 +66,7 @@ public final class SPlayerRole implements PlayerRole {
 
     public static String getValuesString() {
         StringBuilder stringBuilder = new StringBuilder();
-        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase()));
+        plugin.getRoles().getRoles().forEach(playerRole -> stringBuilder.append(", ").append(playerRole.toString().toLowerCase(Locale.ENGLISH)));
         return stringBuilder.substring(2);
     }
 
@@ -73,6 +78,11 @@ public final class SPlayerRole implements PlayerRole {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return displayName;
     }
 
     @Override

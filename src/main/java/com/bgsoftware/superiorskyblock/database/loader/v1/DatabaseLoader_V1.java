@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.database.sql.session.impl.SQLiteSession;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -37,6 +38,7 @@ import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -204,7 +206,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     private static boolean isRemoteDatabase() {
-        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+        switch (plugin.getSettings().getDatabase().getType()) {
             case "MYSQL":
             case "MARIADB":
             case "POSTGRESQL":
@@ -355,7 +357,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
                 .addBatch();
         ((Map<String, Integer>) playerAttributes.getValue(PlayerAttributes.Field.COMPLETED_MISSIONS)).forEach((missionName, finishCount) ->
                 playersMissionsQuery.setObject(playerUUID)
-                        .setObject(missionName.toLowerCase())
+                        .setObject(missionName.toLowerCase(Locale.ENGLISH))
                         .setObject(finishCount)
                         .addBatch());
         playersSettingsQuery.setObject(playerUUID)
@@ -565,7 +567,7 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
         UUID islandUUID;
 
         String uuidRaw = resultSet.get("uuid", null);
-        if (uuidRaw == null || uuidRaw.isEmpty()) {
+        if (StringUtils.isBlank(uuidRaw)) {
             islandUUID = ownerUUID;
         } else {
             islandUUID = UUID.fromString(uuidRaw);

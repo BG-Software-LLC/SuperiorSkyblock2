@@ -37,7 +37,7 @@ public final class SQLHelper {
     public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
         SQLSession session;
 
-        switch (plugin.getSettings().getDatabase().getType().toUpperCase()) {
+        switch (plugin.getSettings().getDatabase().getType()) {
             case "MYSQL":
                 session = new MySQLSession(plugin, true);
                 break;
