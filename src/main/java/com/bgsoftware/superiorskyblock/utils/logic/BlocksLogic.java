@@ -1,19 +1,19 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -129,7 +129,7 @@ public final class BlocksLogic {
             return true;
         }
 
-        String warpName = IslandUtils.getWarpName(StringUtils.stripColors(signLines[1].trim()));
+        String warpName = Formatters.STRIP_COLOR_FORMATTER.format(signLines[1].trim());
         boolean privateFlag = signLines[2].equalsIgnoreCase("private");
 
         boolean creationFailed = false;
@@ -148,6 +148,9 @@ public final class BlocksLogic {
             creationFailed = true;
         }
 
+        if (!plugin.getEventsBus().callIslandCreateWarpEvent(superiorPlayer, island, warpName, warpLocation, !privateFlag, null))
+            creationFailed = true;
+
         if (creationFailed) {
             for (int i = 0; i < 4; i++) {
                 signLines[i] = "";
@@ -161,7 +164,7 @@ public final class BlocksLogic {
             IslandWarp islandWarp = island.createWarp(warpName, warpLocation, null);
             islandWarp.setPrivateFlag(privateFlag);
             if (sendMessage)
-                Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(warpLocation));
+                Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(warpLocation));
         }
 
         return true;
@@ -177,6 +180,11 @@ public final class BlocksLogic {
             return true;
         }
 
+        EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetVisitorHomeEvent(superiorPlayer, island, visitorsLocation);
+
+        if (eventResult.isCancelled())
+            return false;
+
         StringBuilder descriptionBuilder = new StringBuilder();
 
         for (int i = 1; i < 4; i++) {
@@ -190,7 +198,7 @@ public final class BlocksLogic {
         warpLines[0] = plugin.getSettings().getVisitorsSign().getActive();
 
         for (int i = 1; i <= 3; i++)
-            warpLines[i] = StringUtils.translateColors(warpLines[i]);
+            warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
         Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
         if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
@@ -199,29 +207,43 @@ public final class BlocksLogic {
             oldWelcomeSign.update();
         }
 
-        island.setVisitorsLocation(visitorsLocation);
-        island.setDescription(description);
+        island.setVisitorsLocation(eventResult.getResult());
+
+        EventResult<String> descriptionEventResult = plugin.getEventsBus().callIslandChangeDescriptionEvent(superiorPlayer, island, description);
+
+        if (!descriptionEventResult.isCancelled())
+            island.setDescription(descriptionEventResult.getResult());
 
         if (sendMessage)
-            Message.SET_WARP.send(superiorPlayer, SBlockPosition.of(visitorsLocation));
+            Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(visitorsLocation));
 
         return true;
     }
 
-    public static void handleSignBreak(Player player, Sign sign) {
+    public static boolean handleSignBreak(Player player, Sign sign) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
         Island island = plugin.getGrid().getIslandAt(sign.getLocation());
 
         if (island == null)
-            return;
+            return true;
 
-        if (island.getWarp(sign.getLocation()) != null) {
+        IslandWarp islandWarp = island.getWarp(sign.getLocation());
+
+        if (islandWarp != null) {
+            if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
+                return false;
+
             island.deleteWarp(superiorPlayer, sign.getLocation());
         } else {
             if (sign.getLine(0).equalsIgnoreCase(plugin.getSettings().getVisitorsSign().getActive())) {
+                if (!plugin.getEventsBus().callIslandRemoveVisitorHomeEvent(superiorPlayer, island))
+                    return false;
+
                 island.setVisitorsLocation(null);
             }
         }
+
+        return true;
     }
 
 }

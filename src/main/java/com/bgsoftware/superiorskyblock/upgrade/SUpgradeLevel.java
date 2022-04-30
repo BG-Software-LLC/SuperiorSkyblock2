@@ -4,12 +4,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -36,7 +36,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final UpgradeCost cost;
     private final List<String> commands;
     private final String permission;
-    private final Set<Pair<String, String>> requirements;
+    private final Set<UpgradeRequirement> requirements;
     private final UpgradeValue<Double> cropGrowth;
     private final UpgradeValue<Double> spawnerRates;
     private final UpgradeValue<Double> mobDrops;
@@ -53,7 +53,7 @@ public class SUpgradeLevel implements UpgradeLevel {
 
     private ItemData itemData;
 
-    public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<Pair<String, String>> requirements,
+    public SUpgradeLevel(int level, UpgradeCost cost, List<String> commands, String permission, Set<UpgradeRequirement> requirements,
                          UpgradeValue<Double> cropGrowth, UpgradeValue<Double> spawnerRates, UpgradeValue<Double> mobDrops,
                          UpgradeValue<Integer> teamLimit, UpgradeValue<Integer> warpsLimit, UpgradeValue<Integer> coopLimit,
                          UpgradeValue<Integer> borderSize, KeyMap<Integer> blockLimits,
@@ -112,11 +112,11 @@ public class SUpgradeLevel implements UpgradeLevel {
         PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
 
         if (offlinePlayer != null) {
-            for (Pair<String, String> requirement : requirements) {
-                String check = placeholdersService.parsePlaceholders(offlinePlayer, requirement.getKey());
+            for (UpgradeRequirement requirement : requirements) {
+                String check = placeholdersService.parsePlaceholders(offlinePlayer, requirement.getPlaceholder());
                 try {
                     if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
-                        return requirement.getValue();
+                        return requirement.getErrorMessage();
                 } catch (ScriptException error) {
                     PluginDebugger.debug(error);
                 }
@@ -161,7 +161,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     @Override
     public int getEntityLimit(EntityType entityType) {
         Preconditions.checkNotNull(entityType, "entityType parameter cannot be null.");
-        return getEntityLimit(Key.of(entityType));
+        return getEntityLimit(KeyImpl.of(entityType));
     }
 
     @Override

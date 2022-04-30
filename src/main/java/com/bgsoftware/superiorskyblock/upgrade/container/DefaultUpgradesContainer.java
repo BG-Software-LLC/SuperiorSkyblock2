@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public final class DefaultUpgradesContainer implements UpgradesContainer {
@@ -17,7 +18,7 @@ public final class DefaultUpgradesContainer implements UpgradesContainer {
     @Nullable
     @Override
     public Upgrade getUpgrade(String upgradeName) {
-        return this.upgrades.get(upgradeName.toLowerCase());
+        return this.upgrades.get(upgradeName.toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable
@@ -36,7 +37,7 @@ public final class DefaultUpgradesContainer implements UpgradesContainer {
 
     @Override
     public void registerUpgradeCostLoader(String id, UpgradeCostLoader costLoader) {
-        this.upgradeCostLoaders.put(id.toLowerCase(), costLoader);
+        this.upgradeCostLoaders.put(id.toLowerCase(Locale.ENGLISH), costLoader);
     }
 
     @Override
@@ -46,12 +47,12 @@ public final class DefaultUpgradesContainer implements UpgradesContainer {
 
     @Override
     public UpgradeCostLoader getUpgradeCostLoader(String id) {
-        return this.upgradeCostLoaders.get(id.toLowerCase());
+        return this.upgradeCostLoaders.get(id.toLowerCase(Locale.ENGLISH));
     }
 
     @Override
     public void addUpgrade(Upgrade upgrade) {
-        this.upgrades.put(upgrade.getName().toLowerCase(), upgrade);
+        this.upgrades.put(upgrade.getName().toLowerCase(Locale.ENGLISH), upgrade);
     }
 
 }

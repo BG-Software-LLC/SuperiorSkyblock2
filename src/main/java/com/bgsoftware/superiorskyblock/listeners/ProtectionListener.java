@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
@@ -142,24 +141,31 @@ public final class ProtectionListener implements Listener {
         BlockState blockState = clickedBlock.getState();
         Material blockType = clickedBlock.getType();
 
-        if (Materials.isChest(blockType)) requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
-        else if (blockState instanceof InventoryHolder) requiredPrivilege = IslandPrivileges.USE;
-        else if (blockState instanceof Sign) requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
-        else if (blockType == Materials.SPAWNER.toBukkitType()) requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
-        else if (blockType == FARMLAND)
+        if (Materials.isChest(blockType)) {
+            requiredPrivilege = IslandPrivileges.CHEST_ACCESS;
+        } else if (blockState instanceof InventoryHolder) {
+            requiredPrivilege = IslandPrivileges.USE;
+        } else if (blockState instanceof Sign) {
+            requiredPrivilege = IslandPrivileges.SIGN_INTERACT;
+        } else if (blockType == Materials.SPAWNER.toBukkitType()) {
+            requiredPrivilege = IslandPrivileges.SPAWNER_BREAK;
+        } else if (blockType == FARMLAND) {
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.FARM_TRAMPING : IslandPrivileges.BUILD;
-        else if (TURTLE_EGG != null && blockType == TURTLE_EGG)
+        } else if (TURTLE_EGG != null && blockType == TURTLE_EGG) {
             requiredPrivilege = e.getAction() == Action.PHYSICAL ? IslandPrivileges.TURTLE_EGG_TRAMPING : IslandPrivileges.BUILD;
-        else if (SWEET_BERRY_BUSH != null && blockType == SWEET_BERRY_BUSH && e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        } else if (SWEET_BERRY_BUSH != null && blockType == SWEET_BERRY_BUSH && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             requiredPrivilege = IslandPrivileges.FARM_TRAMPING;
-        else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1)
+        } else if (plugin.getStackedBlocks().getStackedBlockAmount(clickedBlock) > 1) {
             requiredPrivilege = IslandPrivileges.BREAK;
-        else if (blockType == Material.PUMPKIN) requiredPrivilege = IslandPrivileges.BREAK;
-        else requiredPrivilege = IslandPrivileges.INTERACT;
+        } else if (blockType == Material.PUMPKIN) {
+            requiredPrivilege = IslandPrivileges.BREAK;
+        } else {
+            requiredPrivilege = IslandPrivileges.INTERACT;
+        }
 
         if (!island.hasPermission(superiorPlayer, requiredPrivilege)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             return;
         }
 
@@ -220,7 +226,7 @@ public final class ProtectionListener implements Listener {
         IslandPrivilege islandPermission = e.getEntity() instanceof ItemFrame ? IslandPrivileges.ITEM_FRAME : IslandPrivileges.PAINTING;
         if (!island.hasPermission(superiorPlayer, islandPermission)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             return;
         }
 
@@ -247,7 +253,7 @@ public final class ProtectionListener implements Listener {
         IslandPrivilege islandPermission = e.getEntity() instanceof ItemFrame ? IslandPrivileges.ITEM_FRAME : IslandPrivileges.PAINTING;
         if (!island.hasPermission(superiorPlayer, islandPermission)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
             return;
         }
 
@@ -322,7 +328,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(e.getPlayer());
+            Message.PROTECTION.send(e.getPlayer());
             return;
         }
 
@@ -348,7 +354,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.BREAK)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(e.getPlayer());
+            Message.PROTECTION.send(e.getPlayer());
             return;
         }
 
@@ -391,7 +397,7 @@ public final class ProtectionListener implements Listener {
 
         if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -402,7 +408,7 @@ public final class ProtectionListener implements Listener {
 
         if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.LEASH)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -413,7 +419,7 @@ public final class ProtectionListener implements Listener {
 
         if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.DROP_ITEMS)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -441,7 +447,7 @@ public final class ProtectionListener implements Listener {
 
         if (island != null && !island.hasPermission(damagerPlayer, islandPermission)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(damagerPlayer);
+            Message.PROTECTION.send(damagerPlayer);
 
             if (e.getDamager() instanceof Arrow && e.getEntity().getFireTicks() > 0)
                 e.getEntity().setFireTicks(0);
@@ -468,7 +474,7 @@ public final class ProtectionListener implements Listener {
 
             if (island != null && !island.hasPermission(superiorPlayer, islandPermission)) {
                 e.setCancelled(true);
-                PlayerLocales.sendProtectionMessage(superiorPlayer);
+                Message.PROTECTION.send(superiorPlayer);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -494,7 +500,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(e.getPlayer(), IslandPrivileges.MINECART_PLACE)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(e.getPlayer());
+            Message.PROTECTION.send(e.getPlayer());
         }
     }
 
@@ -511,7 +517,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_DAMAGE)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -528,7 +534,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_ENTER)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -547,7 +553,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.MINECART_OPEN)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -564,7 +570,7 @@ public final class ProtectionListener implements Listener {
             Message.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
         } else if (!island.hasPermission(superiorPlayer, IslandPrivileges.ENDER_PEARL)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         } else if (!island.isInsideRange(e.getTo())) {
             e.setCancelled(true);
             Message.TELEPORT_OUTSIDE_ISLAND.send(superiorPlayer);
@@ -599,7 +605,7 @@ public final class ProtectionListener implements Listener {
         if (!island.hasPermission(superiorPlayer, islandPrivilege)) {
             e.setCancelled(true);
             // Using this method to fix issue #76 (A NPE error)
-            PlayerLocales.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
+            Message.PROTECTION.send((Player) projectileSource, superiorPlayer.getUserLocale());
         }
     }
 
@@ -632,7 +638,7 @@ public final class ProtectionListener implements Listener {
         if (!island.hasPermission(superiorPlayer, requiredPrivilege)) {
             e.getEntity().remove();
             // Using this method to fix issue #76 (A NPE error)
-            PlayerLocales.sendProtectionMessage((Player) projectileSource, superiorPlayer.getUserLocale());
+            Message.PROTECTION.send((Player) projectileSource, superiorPlayer.getUserLocale());
         }
     }
 
@@ -656,7 +662,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.FERTILIZE)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(e.getPlayer());
+            Message.PROTECTION.send(e.getPlayer());
             return;
         }
 
@@ -686,7 +692,7 @@ public final class ProtectionListener implements Listener {
 
         if (!island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_FISH)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(e.getPlayer());
+            Message.PROTECTION.send(e.getPlayer());
             return;
         }
 
@@ -704,7 +710,7 @@ public final class ProtectionListener implements Listener {
 
         if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.ANIMAL_SHEAR)) {
             e.setCancelled(true);
-            PlayerLocales.sendProtectionMessage(superiorPlayer);
+            Message.PROTECTION.send(superiorPlayer);
         }
     }
 
@@ -727,7 +733,7 @@ public final class ProtectionListener implements Listener {
 
             if (island != null && !island.hasPermission(superiorPlayer, IslandPrivileges.PICKUP_DROPS)) {
                 e.setCancelled(true);
-                PlayerLocales.sendProtectionMessage(superiorPlayer);
+                Message.PROTECTION.send(superiorPlayer);
             }
         }
 

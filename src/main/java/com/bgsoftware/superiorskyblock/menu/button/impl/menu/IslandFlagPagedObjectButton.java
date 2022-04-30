@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,8 +43,14 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         IslandFlag islandFlag = pagedObject.getIslandFlag();
 
         if (island.hasSettingsEnabled(islandFlag)) {
+            if (!plugin.getEventsBus().callIslandDisableFlagEvent(clickedPlayer, island, islandFlag))
+                return;
+
             island.disableSettings(islandFlag);
         } else {
+            if (!plugin.getEventsBus().callIslandEnableFlagEvent(clickedPlayer, island, islandFlag))
+                return;
+
             island.enableSettings(islandFlag);
         }
 
@@ -52,7 +58,7 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         if (clickSound != null)
             clickSound.playSound(clickEvent.getWhoClicked());
 
-        Message.UPDATED_SETTINGS.send(clickedPlayer, StringUtils.format(islandFlag.getName()));
+        Message.UPDATED_SETTINGS.send(clickedPlayer, Formatters.CAPITALIZED_FORMATTER.format(islandFlag.getName()));
 
         superiorMenu.refreshPage();
     }

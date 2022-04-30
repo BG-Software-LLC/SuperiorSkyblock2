@@ -89,6 +89,9 @@ public final class CmdAdminPromote implements IAdminPlayerCommand {
             return;
         }
 
+        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, nextRole))
+            return;
+
         targetPlayer.setPlayerRole(nextRole);
 
         Message.PROMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());

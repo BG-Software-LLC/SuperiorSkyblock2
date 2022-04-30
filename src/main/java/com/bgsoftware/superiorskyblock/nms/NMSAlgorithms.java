@@ -14,6 +14,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import javax.annotation.Nullable;
+
 public interface NMSAlgorithms {
 
     void registerCommand(BukkitCommand command);
@@ -40,6 +42,7 @@ public interface NMSAlgorithms {
 
     Enchantment getGlowEnchant();
 
-    Object getCustomHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title);
+    @Nullable
+    Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title);
 
 }

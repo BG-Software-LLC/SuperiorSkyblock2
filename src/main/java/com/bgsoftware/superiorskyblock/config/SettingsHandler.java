@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.config;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -525,6 +526,16 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     }
 
     @Override
+    public boolean isAutoUncoopWhenAlone() {
+        return this.container.autoUncoopWhenAlone;
+    }
+
+    @Override
+    public TopIslandMembersSorting getTopIslandMembersSorting() {
+        return this.container.islandTopMembersSorting;
+    }
+
+    @Override
     public int getBossbarLimit() {
         return this.container.bossBarLimit;
     }
@@ -630,6 +641,9 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
         if (cfg.contains("worlds.normal-world")) {
             cfg.set("worlds.world-name", cfg.getString("worlds.normal-world"));
             cfg.set("worlds.normal-world", null);
+        }
+        if (cfg.isBoolean("worlds.end.dragon-fight")) {
+            cfg.set("worlds.end.dragon-fight.enabled", cfg.getBoolean("worlds.end.dragon-fight"));
         }
     }
 

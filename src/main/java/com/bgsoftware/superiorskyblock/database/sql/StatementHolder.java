@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.database.sql;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -87,7 +88,7 @@ public final class StatementHolder {
     }
 
     private void executeQuery(boolean async, QueryResult<PreparedStatement> queryResult) {
-        if (query == null || !SQLHelper.isReady() || query.isEmpty())
+        if (StringUtils.isBlank(query) || !SQLHelper.isReady())
             return;
 
         if (async && !Executor.isDataThread()) {

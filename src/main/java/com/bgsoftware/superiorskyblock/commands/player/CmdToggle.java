@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -58,6 +58,9 @@ public final class CmdToggle implements ISuperiorCommand {
                 return;
             }
 
+            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(superiorPlayer))
+                return;
+
             if (superiorPlayer.hasWorldBorderEnabled()) {
                 Message.TOGGLED_WORLD_BORDER_OFF.send(superiorPlayer);
             } else {
@@ -71,6 +74,9 @@ public final class CmdToggle implements ISuperiorCommand {
                 Message.NO_COMMAND_PERMISSION.send(sender);
                 return;
             }
+
+            if (!plugin.getEventsBus().callPlayerToggleBlocksStackerEvent(superiorPlayer))
+                return;
 
             if (superiorPlayer.hasBlocksStackerEnabled()) {
                 Message.TOGGLED_STACKED_BLOCKS_OFF.send(superiorPlayer);

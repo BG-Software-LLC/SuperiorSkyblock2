@@ -28,15 +28,13 @@ public final class TagUtils {
     }
 
     public static ItemStack compoundToItem(CompoundTag compoundTag) {
-        Map<String, Tag<?>> compoundValues = compoundTag.getValue();
-
-        Material type = Material.valueOf(((StringTag) compoundValues.get("type")).getValue());
-        int amount = ((IntTag) compoundValues.get("amount")).getValue();
-        short data = ((ShortTag) compoundValues.get("data")).getValue();
+        Material type = Material.valueOf(compoundTag.getString("type"));
+        int amount = compoundTag.getInt("amount");
+        short data = compoundTag.getShort("data");
 
         ItemStack itemStack = new ItemStack(type, amount, data);
 
-        return plugin.getNMSTags().getFromNBTTag(itemStack, (CompoundTag) compoundValues.get("NBT"));
+        return plugin.getNMSTags().getFromNBTTag(itemStack, compoundTag.getCompound("NBT"));
     }
 
 }

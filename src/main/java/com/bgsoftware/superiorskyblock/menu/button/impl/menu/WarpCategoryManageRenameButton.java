@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpCategoryManage;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -30,13 +31,11 @@ public final class WarpCategoryManageRenameButton extends SuperiorMenuButton<Men
 
         superiorMenu.closePage();
 
-        PlayerChat.listen(player, message -> {
+        PlayerChat.listen(player, newName -> {
             WarpCategory warpCategory = superiorMenu.getWarpCategory();
 
             if (warpCategory.getIsland().getWarpCategory(warpCategory.getName()) != null &&
-                    !message.equalsIgnoreCase("-cancel")) {
-                String newName = IslandUtils.getWarpName(message);
-
+                    !newName.equalsIgnoreCase("-cancel")) {
                 if (warpCategory.getIsland().getWarpCategory(newName) != null) {
                     Message.WARP_CATEGORY_RENAME_ALREADY_EXIST.send(player);
                     return true;
@@ -47,12 +46,17 @@ public final class WarpCategoryManageRenameButton extends SuperiorMenuButton<Men
                     return true;
                 }
 
-                warpCategory.getIsland().renameCategory(warpCategory, newName);
+                EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameWarpCategoryEvent(
+                        warpCategory.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), warpCategory, newName);
 
-                Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, newName);
+                if (!eventResult.isCancelled()) {
+                    warpCategory.getIsland().renameCategory(warpCategory, eventResult.getResult());
 
-                if (MenuWarpCategoryManage.successUpdateSound != null)
-                    MenuWarpCategoryManage.successUpdateSound.playSound(player);
+                    Message.WARP_CATEGORY_RENAME_SUCCESS.send(player, eventResult.getResult());
+
+                    if (MenuWarpCategoryManage.successUpdateSound != null)
+                        MenuWarpCategoryManage.successUpdateSound.playSound(player);
+                }
             }
 
             PlayerChat.remove(player);

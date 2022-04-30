@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -8,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -67,19 +68,13 @@ public final class CmdDelWarp implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        StringBuilder warpNameBuilder = new StringBuilder();
+        IslandWarp islandWarp = CommandArguments.getWarp(superiorPlayer.asPlayer(), island, args, 3);
 
-        for (int i = 1; i < args.length; i++)
-            warpNameBuilder.append(" ").append(args[i]);
-
-        String warpName = warpNameBuilder.length() == 0 ? "" : warpNameBuilder.substring(1);
-
-        IslandWarp islandWarp = island.getWarp(warpName);
-
-        if (islandWarp == null) {
-            Message.INVALID_WARP.send(superiorPlayer, warpName);
+        if (islandWarp == null)
             return;
-        }
+
+        if (!plugin.getEventsBus().callIslandDeleteWarpEvent(superiorPlayer, island, islandWarp))
+            return;
 
         boolean breakSign = false;
 
@@ -91,9 +86,9 @@ public final class CmdDelWarp implements IPermissibleCommand {
             breakSign = true;
         }
 
-        island.deleteWarp(warpName);
+        island.deleteWarp(islandWarp.getName());
 
-        Message.DELETE_WARP.send(superiorPlayer, warpName);
+        Message.DELETE_WARP.send(superiorPlayer, islandWarp.getName());
 
         if (breakSign) {
             Message.DELETE_WARP_SIGN_BROKE.send(superiorPlayer);

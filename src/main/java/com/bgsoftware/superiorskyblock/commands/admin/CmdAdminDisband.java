@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -62,7 +61,7 @@ public final class CmdAdminDisband implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (EventsCaller.callIslandDisbandEvent(targetPlayer, island)) {
+        if (plugin.getEventsBus().callIslandDisbandEvent(targetPlayer, island)) {
             IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
 
             if (targetPlayer == null)
@@ -71,8 +70,9 @@ public final class CmdAdminDisband implements IAdminIslandCommand {
                 Message.DISBANDED_ISLAND_OTHER.send(sender, targetPlayer.getName());
 
             if (BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
-                Message.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), StringUtils.format(island.getIslandBank()
-                        .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
+                Message.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(),
+                        Formatters.NUMBER_FORMATTER.format(island.getIslandBank()
+                                .getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
 
             island.disbandIsland();

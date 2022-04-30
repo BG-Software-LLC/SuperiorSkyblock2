@@ -5,8 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IslandPrivilegePagedObjectButton;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges,
         MenuIslandPrivileges.IslandPrivilegeInfo> {
@@ -78,14 +79,14 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         PagedMenuPattern.Builder<MenuIslandPrivileges, IslandPrivilegeInfo> patternBuilder =
                 new PagedMenuPattern.Builder<>();
 
-        Pair<MenuPatternSlots, CommentedConfiguration> menuLoadResult = FileUtils.loadMenu(patternBuilder,
-                "permissions.yml", MenuIslandPrivileges::convertOldGUI);
+        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "permissions.yml",
+                MenuIslandPrivileges::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
 
-        MenuPatternSlots menuPatternSlots = menuLoadResult.getKey();
-        CommentedConfiguration cfg = menuLoadResult.getValue();
+        MenuPatternSlots menuPatternSlots = menuLoadResult.getPatternSlots();
+        CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         noRolePermission = cfg.getString("messages.no-role-permission", "");
         exactRolePermission = cfg.getString("messages.exact-role-permission", "");
@@ -98,7 +99,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         if (permissionsSection != null) {
             for (String key : permissionsSection.getKeys(false)) {
                 if (permissionsSection.getBoolean(key + ".display-menu", true)) {
-                    String permission = key.toLowerCase();
+                    String permission = key.toLowerCase(Locale.ENGLISH);
                     try {
                         updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                     } catch (NullPointerException error) {
@@ -157,7 +158,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         List<String> noAccessCommands = null;
 
         ConfigurationSection itemPrivilegeSection = cfg.getConfigurationSection("permissions." +
-                islandPrivilege.getName().toLowerCase());
+                islandPrivilege.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemPrivilegeSection != null) {
             enabledIslandPrivilegeItem = FileUtils.getItemStack("permissions.yml",

@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.world.chunks;
 import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Chunk;
 
@@ -20,22 +19,21 @@ public final class ChunksProvider {
 
     private static final WorkerExecutor chunksExecutor = new WorkerExecutor(10);
 
-    private static final Map<ChunkPosition, Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>>>
-            chunksInfo = new ConcurrentHashMap<>();
+    private static final Map<ChunkPosition, PendingChunkLoadRequest> pendingRequests = new ConcurrentHashMap<>();
 
     private ChunksProvider() {
 
     }
 
-    public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, Consumer<Chunk> onLoadConsumer) {
-        PluginDebugger.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString());
+    public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason, Consumer<Chunk> onLoadConsumer) {
+        PluginDebugger.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
 
-        Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.get(chunkPosition);
+        PendingChunkLoadRequest pendingRequest = pendingRequests.get(chunkPosition);
 
-        if (chunkInfo != null) {
+        if (pendingRequest != null) {
             if (onLoadConsumer != null)
-                chunkInfo.getValue().add(onLoadConsumer);
-            return chunkInfo.getKey();
+                pendingRequest.callbacks.add(onLoadConsumer);
+            return pendingRequest.completableFuture;
         } else {
             CompletableFuture<Chunk> completableFuture = new CompletableFuture<>();
             Set<Consumer<Chunk>> chunkConsumers = new HashSet<>();
@@ -43,8 +41,8 @@ public final class ChunksProvider {
             if (onLoadConsumer != null)
                 chunkConsumers.add(onLoadConsumer);
 
-            chunksInfo.put(chunkPosition, new Pair<>(completableFuture, chunkConsumers));
-            chunksExecutor.addWorker(new ChunkLoadWorker(chunkPosition));
+            pendingRequests.put(chunkPosition, new PendingChunkLoadRequest(completableFuture, chunkConsumers, chunkLoadReason));
+            chunksExecutor.addWorker(new ChunkLoadWorker(chunkPosition, chunkLoadReason));
 
             if (!chunksExecutor.isRunning())
                 start();
@@ -65,20 +63,22 @@ public final class ChunksProvider {
     private static final class ChunkLoadWorker implements IWorker {
 
         private final ChunkPosition chunkPosition;
+        private final ChunkLoadReason chunkLoadReason;
 
-        public ChunkLoadWorker(ChunkPosition chunkPosition) {
+        public ChunkLoadWorker(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason) {
             this.chunkPosition = chunkPosition;
+            this.chunkLoadReason = chunkLoadReason;
         }
 
         @Override
         public void work() {
-            PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString());
+            PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
             plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
                     chunkPosition.getX(), chunkPosition.getZ()).whenComplete((chunk, error) -> {
                 if (error != null) {
                     error.printStackTrace();
                 }
-                
+
                 try {
                     finishLoad(chunk);
                 } catch (Exception ex) {
@@ -89,14 +89,32 @@ public final class ChunksProvider {
         }
 
         private void finishLoad(Chunk chunk) {
-            PluginDebugger.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString());
+            PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
 
-            Pair<CompletableFuture<Chunk>, Set<Consumer<Chunk>>> chunkInfo = chunksInfo.remove(chunkPosition);
 
-            if (chunkInfo != null) {
-                chunkInfo.getValue().forEach(chunkConsumer -> chunkConsumer.accept(chunk));
-                chunkInfo.getKey().complete(chunk);
+            PluginDebugger.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString() +
+                    (pendingRequest == null ? "" : ", Reason: " + pendingRequest.chunkLoadReason));
+
+
+            if (pendingRequest != null) {
+                pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));
+                pendingRequest.completableFuture.complete(chunk);
             }
+        }
+
+    }
+
+    private static final class PendingChunkLoadRequest {
+
+        private final CompletableFuture<Chunk> completableFuture;
+        private final Set<Consumer<Chunk>> callbacks;
+        private final ChunkLoadReason chunkLoadReason;
+
+        public PendingChunkLoadRequest(CompletableFuture<Chunk> completableFuture, Set<Consumer<Chunk>> callbacks,
+                                       ChunkLoadReason chunkLoadReason) {
+            this.completableFuture = completableFuture;
+            this.callbacks = callbacks;
+            this.chunkLoadReason = chunkLoadReason;
         }
 
     }

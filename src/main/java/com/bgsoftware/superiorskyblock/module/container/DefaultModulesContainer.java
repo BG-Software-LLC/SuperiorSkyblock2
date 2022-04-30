@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public final class DefaultModulesContainer implements ModulesContainer {
@@ -22,7 +23,7 @@ public final class DefaultModulesContainer implements ModulesContainer {
 
     @Override
     public void registerModule(PluginModule pluginModule, File modulesFolder, SuperiorSkyblockPlugin plugin) {
-        String moduleName = pluginModule.getName().toLowerCase();
+        String moduleName = pluginModule.getName().toLowerCase(Locale.ENGLISH);
 
         Preconditions.checkState(!modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " already exists.");
 
@@ -42,7 +43,7 @@ public final class DefaultModulesContainer implements ModulesContainer {
 
     @Override
     public void unregisterModule(PluginModule pluginModule, SuperiorSkyblockPlugin plugin) {
-        String moduleName = pluginModule.getName().toLowerCase();
+        String moduleName = pluginModule.getName().toLowerCase(Locale.ENGLISH);
 
         Preconditions.checkState(modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " is not registered in the plugin anymore.");
 
@@ -77,7 +78,7 @@ public final class DefaultModulesContainer implements ModulesContainer {
     @Nullable
     @Override
     public PluginModule getModule(String name) {
-        return this.modulesMap.get(name.toLowerCase());
+        return this.modulesMap.get(name.toLowerCase(Locale.ENGLISH));
     }
 
     @Override

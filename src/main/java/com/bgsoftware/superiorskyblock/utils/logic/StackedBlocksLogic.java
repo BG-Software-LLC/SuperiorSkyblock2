@@ -4,21 +4,19 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
@@ -26,7 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Map;
-import java.util.Set;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public final class StackedBlocksLogic {
@@ -38,18 +36,13 @@ public final class StackedBlocksLogic {
     private static final Map<Material, Material> AGAINST_BLOCK_CHANGE_MATERIAL = buildImmutableMap(
             new Pair<>(Materials.getMaterialSafe("GLOWING_REDSTONE_ORE"), Material.REDSTONE_ORE)
     );
-    private static final Set<Material> DATA_REMOVAL_MATERIALS = buildImmutableSet(
-            Materials.END_PORTAL_FRAME.toBukkitType(),
-            Materials.getMaterialSafe("PRISMARINE_BRICKS"),
-            Materials.getMaterialSafe("DARK_PRISMARINE")
-    );
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private StackedBlocksLogic() {
     }
 
-    public static boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock, BlockState replaceState) {
+    public static boolean canStackBlocks(Player player, ItemStack placeItem, Block againstBlock) {
         if (!plugin.getSettings().getStackedBlocks().isEnabled())
             return false;
 
@@ -68,23 +61,16 @@ public final class StackedBlocksLogic {
         if (newAgainstBlockType != null)
             againstBlock.setType(newAgainstBlockType);
 
-        //noinspection deprecation
-        byte blockData = againstBlock.getData();
-        Material blockType = againstBlock.getType();
+        KeySet whitelist = (KeySet) plugin.getSettings().getStackedBlocks().getWhitelisted();
 
-        if (CAULDRON_ITEM != null && blockType == Material.CAULDRON && CAULDRON_ITEM == placeItem.getType()) {
-            blockType = CAULDRON_ITEM;
-        }
+        Key againstBlockKey = whitelist.getKey(KeyImpl.of(againstBlock));
 
-        if (DATA_REMOVAL_MATERIALS.contains(blockType)) {
-            blockData = 0;
-        }
-
-        if (blockType != placeItem.getType() || blockData != placeItem.getDurability() ||
-                (replaceState != null && replaceState.getType() != Material.AIR))
+        if (!whitelist.contains(againstBlockKey))
             return false;
 
-        if (!plugin.getSettings().getStackedBlocks().getWhitelisted().contains(KeyImpl.of(againstBlock)))
+        Key placeItemBlockKey = whitelist.getKey(KeyImpl.of(placeItem));
+
+        if (!Objects.equals(againstBlockKey, placeItemBlockKey))
             return false;
 
         return superiorPlayer.hasPermission("superior.island.stacker.*") ||
@@ -122,7 +108,7 @@ public final class StackedBlocksLogic {
 
         Block block = stackedBlock.getBlock();
 
-        if (!EventsCaller.callBlockStackEvent(block, player, blockAmount, blockAmount + amount)) {
+        if (!plugin.getEventsBus().callBlockStackEvent(block, player, blockAmount, blockAmount + amount)) {
             depositedAmount.accept(0);
             return false;
         }
@@ -178,7 +164,7 @@ public final class StackedBlocksLogic {
         // Fix amount so it won't be more than the stack's amount
         amount = Math.min(amount, blockAmount);
 
-        if (!EventsCaller.callBlockUnstackEvent(block, player, blockAmount, blockAmount - amount))
+        if (!plugin.getEventsBus().callBlockUnstackEvent(block, player, blockAmount, blockAmount - amount))
             return false;
 
         Island island = plugin.getGrid().getIslandAt(block.getLocation());
@@ -232,15 +218,6 @@ public final class StackedBlocksLogic {
         for (Pair<Material, Material> material : materials) {
             if (material.getKey() != null && material.getValue() != null)
                 builder.put(material.getKey(), material.getValue());
-        }
-        return builder.build();
-    }
-
-    private static Set<Material> buildImmutableSet(Material... materials) {
-        ImmutableSet.Builder<Material> builder = new ImmutableSet.Builder<>();
-        for (Material material : materials) {
-            if (material != null)
-                builder.add(material);
         }
         return builder.build();
     }

@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public abstract class CommandsMap {
@@ -28,7 +29,7 @@ public abstract class CommandsMap {
 
     public void registerCommand(SuperiorCommand superiorCommand, boolean sort) {
         List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase();
+        String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, new ArrayList<>()));
 
         if (subCommands.containsKey(label)) {
@@ -38,7 +39,7 @@ public abstract class CommandsMap {
         subCommands.put(label, superiorCommand);
 
         for (int i = 1; i < aliases.size(); i++) {
-            aliasesToCommand.put(aliases.get(i).toLowerCase(), superiorCommand);
+            aliasesToCommand.put(aliases.get(i).toLowerCase(Locale.ENGLISH), superiorCommand);
         }
 
         if (sort) {
@@ -53,7 +54,7 @@ public abstract class CommandsMap {
         Preconditions.checkNotNull(superiorCommand, "superiorCommand parameter cannot be null.");
 
         List<String> aliases = new ArrayList<>(superiorCommand.getAliases());
-        String label = aliases.get(0).toLowerCase();
+        String label = aliases.get(0).toLowerCase(Locale.ENGLISH);
         aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(label, new ArrayList<>()));
 
         subCommands.remove(label);
@@ -62,7 +63,7 @@ public abstract class CommandsMap {
 
     @Nullable
     public SuperiorCommand getCommand(String label) {
-        label = label.toLowerCase();
+        label = label.toLowerCase(Locale.ENGLISH);
         return subCommands.getOrDefault(label, aliasesToCommand.get(label));
     }
 

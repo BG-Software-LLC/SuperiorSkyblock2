@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuTopIslands;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -74,18 +74,18 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
         String islandName = !plugin.getSettings().getIslandNames().isIslandTop() ||
                 island.getName().isEmpty() ? islandOwner.getName() :
                 plugin.getSettings().getIslandNames().isColorSupport() ?
-                        StringUtils.translateColors(island.getName()) : island.getName();
+                        Formatters.COLOR_FORMATTER.format(island.getName()) : island.getName();
 
         itemBuilder.replaceName("{0}", islandName)
                 .replaceName("{1}", String.valueOf(place))
-                .replaceName("{2}", StringUtils.format(island.getIslandLevel()))
-                .replaceName("{3}", StringUtils.format(island.getWorth()))
-                .replaceName("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
-                .replaceName("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
-                .replaceName("{7}", StringUtils.format(island.getTotalRating()))
-                .replaceName("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
-                .replaceName("{9}", StringUtils.format(island.getRatingAmount()))
-                .replaceName("{10}", StringUtils.format(island.getAllPlayersInside().size()));
+                .replaceName("{2}", Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
+                .replaceName("{3}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
+                .replaceName("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), inventoryViewer.getUserLocale()))
+                .replaceName("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()))
+                .replaceName("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
+                .replaceName("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
+                .replaceName("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
+                .replaceName("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size()));
 
         ItemMeta itemMeta = itemBuilder.getItemMeta();
 
@@ -101,6 +101,9 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                     } else {
                         PlaceholdersService placeholdersService = plugin.getServices().getPlaceholdersService();
 
+                        if (plugin.getSettings().getTopIslandMembersSorting() != TopIslandMembersSorting.NAMES)
+                            members.sort(plugin.getSettings().getTopIslandMembersSorting().getComparator());
+
                         members.forEach(member -> {
                             String onlineMessage = member.isOnline() ?
                                     Message.ISLAND_TOP_STATUS_ONLINE.getMessage(inventoryViewer.getUserLocale()) :
@@ -109,7 +112,8 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                             lore.add(placeholdersService.parsePlaceholders(member.asOfflinePlayer(), memberFormat
                                     .replace("{}", member.getName())
                                     .replace("{0}", member.getName())
-                                    .replace("{1}", onlineMessage == null ? "" : onlineMessage))
+                                    .replace("{1}", onlineMessage == null ? "" : onlineMessage)
+                                    .replace("{2}", member.getPlayerRole().getDisplayName()))
                             );
                         });
                     }
@@ -117,14 +121,14 @@ public final class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTop
                     lore.add(line
                             .replace("{0}", island.getOwner().getName())
                             .replace("{1}", String.valueOf(place))
-                            .replace("{2}", StringUtils.format(island.getIslandLevel()))
-                            .replace("{3}", StringUtils.format(island.getWorth()))
-                            .replace("{5}", StringUtils.fancyFormat(island.getIslandLevel(), inventoryViewer.getUserLocale()))
-                            .replace("{6}", StringUtils.fancyFormat(island.getWorth(), inventoryViewer.getUserLocale()))
-                            .replace("{7}", StringUtils.format(island.getTotalRating()))
-                            .replace("{8}", StringUtils.formatRating(PlayerLocales.getDefaultLocale(), island.getTotalRating()))
-                            .replace("{9}", StringUtils.format(island.getRatingAmount()))
-                            .replace("{10}", StringUtils.format(island.getAllPlayersInside().size())));
+                            .replace("{2}", Formatters.NUMBER_FORMATTER.format(island.getIslandLevel()))
+                            .replace("{3}", Formatters.NUMBER_FORMATTER.format(island.getWorth()))
+                            .replace("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getIslandLevel(), inventoryViewer.getUserLocale()))
+                            .replace("{6}", Formatters.FANCY_NUMBER_FORMATTER.format(island.getWorth(), inventoryViewer.getUserLocale()))
+                            .replace("{7}", Formatters.NUMBER_FORMATTER.format(island.getTotalRating()))
+                            .replace("{8}", Formatters.RATING_FORMATTER.format(island.getTotalRating(), inventoryViewer.getUserLocale()))
+                            .replace("{9}", Formatters.NUMBER_FORMATTER.format(island.getRatingAmount()))
+                            .replace("{10}", Formatters.NUMBER_FORMATTER.format(island.getAllPlayersInside().size())));
                 }
             }
 

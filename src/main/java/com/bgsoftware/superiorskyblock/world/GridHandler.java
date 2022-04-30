@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.handler.AbstractHandler;
 import com.bgsoftware.superiorskyblock.island.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.spawn.SpawnIsland;
@@ -23,10 +24,9 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.algorithm.DefaultIslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -50,6 +50,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -93,9 +94,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         initializeDatabaseBridge();
         this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
-        this.lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
+        this.lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(), 0, 100, 0);
         Executor.sync(this::updateSpawn);
-        Executor.timer(plugin.getNMSDragonFight()::tickBattles, 1L);
     }
 
     public void updateSpawn() {
@@ -158,7 +158,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         // Removing any active previews for the player.
         boolean updateGamemode = this.islandPreviews.endIslandPreview(superiorPlayer) != null;
 
-        if (!EventsCaller.callPreIslandCreateEvent(superiorPlayer, islandName))
+        if (!plugin.getEventsBus().callPreIslandCreateEvent(superiorPlayer, islandName))
             return;
 
         UUID islandUUID = generateIslandUUID();
@@ -177,7 +177,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
 
                         this.islandsContainer.addIsland(island);
-                        setLastIsland(SBlockPosition.of(islandLocation));
+                        setLastIsland(new SBlockPosition(islandLocation));
 
                         pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
@@ -189,8 +189,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                         IslandsDatabaseBridge.insertIsland(island);
 
                         Executor.sync(() -> superiorPlayer.runIfOnline(player -> {
-                            Message.CREATE_ISLAND.send(superiorPlayer, SBlockPosition.of(islandLocation),
-                                    System.currentTimeMillis() - startTime);
+                            Message.CREATE_ISLAND.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(
+                                    islandLocation), System.currentTimeMillis() - startTime);
                             if (teleportPlayer) {
                                 if (updateGamemode)
                                     player.setGameMode(GameMode.SURVIVAL);
@@ -199,8 +199,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
                                         Executor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
                                         if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                            if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                                                plugin.getNMSDragonFight().startDragonBattle(island, island.getCenter(World.Environment.THE_END));
+                                            plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                                         }
                                     }
                                 });
@@ -237,7 +236,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
         Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
 
-        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase());
+        Location previewLocation = plugin.getSettings().getPreviewIslands().get(schemName.toLowerCase(Locale.ENGLISH));
         if (previewLocation != null && previewLocation.getWorld() != null) {
             superiorPlayer.teleport(previewLocation, result -> {
                 if (result) {
@@ -310,7 +309,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
             Executor.data(() -> IslandsDatabaseBridge.deleteIsland(island));
         }
 
-        plugin.getNMSDragonFight().removeDragonBattle(island);
+        plugin.getServices().getDragonBattleService().stopEnderDragonBattle(island);
 
         ChunksTracker.removeIsland(island);
     }
@@ -349,7 +348,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
-        String inputName = StringUtils.stripColors(islandName);
+        String inputName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
     }
 
@@ -594,7 +593,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void setLastIslandLocation(Location location) {
-        this.setLastIsland(SBlockPosition.of(location));
+        this.setLastIsland(new SBlockPosition(location));
     }
 
     @Override
@@ -627,11 +626,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     public void loadGrid(DatabaseResult resultSet) {
-        resultSet.getString("last_island").map(SBlockPosition::of)
-                .ifPresent(lastIsland -> this.lastIsland = lastIsland);
+        resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
+                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition(lastIsland));
 
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
-            lastIsland = SBlockPosition.of(plugin.getSettings().getWorlds().getDefaultWorldName(),
+            lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
                     lastIsland.getX(), lastIsland.getY(), lastIsland.getZ());
         }
 

@@ -1,12 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.Location;
 
 import java.util.Arrays;
@@ -68,7 +70,13 @@ public final class CmdSetTeleport implements IPermissibleCommand {
             return;
         }
 
-        island.setIslandHome(newLocation);
+        EventResult<Location> eventResult = plugin.getEventsBus().callIslandSetHomeEvent(island, newLocation,
+                IslandSetHomeEvent.Reason.SET_HOME_COMMAND, superiorPlayer);
+
+        if (eventResult.isCancelled())
+            return;
+
+        island.setIslandHome(eventResult.getResult());
         Message.CHANGED_TELEPORT_LOCATION.send(superiorPlayer);
     }
 

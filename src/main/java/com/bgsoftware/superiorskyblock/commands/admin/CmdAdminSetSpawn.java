@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,7 +57,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
         Location spawnLocation = new Location(player.getWorld(), playerLocation.getBlockX(), playerLocation.getBlockY(),
                 playerLocation.getBlockZ(), playerLocation.getYaw(), playerLocation.getPitch());
 
-        String newSpawnLocation = LocationUtils.getLocation(spawnLocation).replace(",", ", ");
+        String newSpawnLocation = Serializers.LOCATION_SPACED_SERIALIZER.serialize(spawnLocation);
 
         try {
             plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
@@ -73,7 +72,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }
