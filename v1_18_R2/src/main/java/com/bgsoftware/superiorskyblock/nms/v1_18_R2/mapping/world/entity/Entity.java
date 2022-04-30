@@ -4,7 +4,6 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.dimension.end.EnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.pathfinder.PathEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.PlayerConnection;
@@ -21,6 +20,7 @@ import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.pathfinder.PathPoint;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
@@ -126,7 +126,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
 
     @Nullable
     public EnderDragonBattle getEnderDragonBattle() {
-        return EnderDragonBattle.ofNullable(((EntityEnderDragon) handle).fy());
+        return ((EntityEnderDragon) handle).fy();
     }
 
     public PathEntity findPath(int from, int to, @Nullable PathPoint pathNode) {

@@ -28,8 +28,9 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
             'X', 'Y', 'Z'
     };
 
-    private static final ReflectField<Object> INVENTORY =
-            new ReflectField<>("org.bukkit.craftbukkit.VERSION.inventory.CraftInventory", Object.class, "inventory");
+    private static final ReflectField<Object> INVENTORY = new ReflectField<>(
+            "org.bukkit.craftbukkit.VERSION.inventory.CraftInventory", Object.class, "inventory")
+            .removeFinal();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     protected final String title;
@@ -92,8 +93,11 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
             inventory = Bukkit.createInventory(holder, this.buttons.length, title);
         }
 
-        if (inventory.getHolder() == null)
-            INVENTORY.set(inventory, plugin.getNMSAlgorithms().getCustomHolder(this.inventoryType, holder, title));
+        if (inventory.getHolder() == null) {
+            Object menuHolder = plugin.getNMSAlgorithms().createMenuInventoryHolder(this.inventoryType, holder, title);
+            if (menuHolder != null)
+                INVENTORY.set(inventory, menuHolder);
+        }
 
         return inventory;
     }
@@ -142,6 +146,8 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
 
         public B setButtons(SuperiorMenuButton<M>[] buttons) {
             if (buttons != null) {
+                setRowsSize(buttons.length / 9);
+
                 for (int slot = 0; slot < this.buttons.length && slot < buttons.length; ++slot)
                     this.buttons[slot] = buttons[slot];
             }

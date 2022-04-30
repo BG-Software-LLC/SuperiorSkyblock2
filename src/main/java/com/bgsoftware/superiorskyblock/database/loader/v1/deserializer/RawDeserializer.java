@@ -14,8 +14,11 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpA
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
+import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -71,7 +75,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String worldSection : _locationParam.split(";")) {
             try {
                 String[] locationSection = worldSection.split("=");
-                String environment = locationSection[0].toUpperCase();
+                String environment = locationSection[0].toUpperCase(Locale.ENGLISH);
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
             } catch (Exception error) {
                 PluginDebugger.debug(error);
@@ -200,7 +204,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : islandWarps.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 String category = "";
                 boolean privateFlag = sections.length == 3 && Boolean.parseBoolean(sections[2]);
 
@@ -237,13 +241,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
-        KeyMap<Integer> blockLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
 
         if (blocks != null) {
             for (String limit : blocks.split(",")) {
                 try {
                     String[] sections = limit.split("=");
-                    blockLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    blockLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
@@ -307,13 +311,13 @@ public final class RawDeserializer implements IDeserializer {
                 String[] sections = env.split(":");
                 try {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
-                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMap.createKeyMap());
+                    deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMapImpl.createHashMap());
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
             }
         } else {
-            deserializeGenerators(generator, cobbleGenerator[0] = KeyMap.createKeyMap());
+            deserializeGenerators(generator, cobbleGenerator[0] = KeyMapImpl.createHashMap());
         }
 
         return cobbleGenerator;
@@ -340,13 +344,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
-        KeyMap<Integer> entityLimits = KeyMap.createKeyMap();
+        KeyMap<Integer> entityLimits = KeyMapImpl.createHashMap();
 
         if (entities != null) {
             for (String limit : entities.split(",")) {
                 try {
                     String[] sections = limit.split("=");
-                    entityLimits.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                    entityLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }
@@ -376,7 +380,7 @@ public final class RawDeserializer implements IDeserializer {
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
         List<IslandChestAttributes> islandChestAttributes = new ArrayList<>();
 
-        if (islandChest == null || islandChest.isEmpty())
+        if (StringUtils.isBlank(islandChest))
             return islandChestAttributes;
 
         String[] islandChestsSections = islandChest.split("\n");
@@ -420,7 +424,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String entry : categories.split(";")) {
             try {
                 String[] sections = entry.split("=");
-                String name = StringUtils.stripColors(sections[0].trim());
+                String name = Formatters.STRIP_COLOR_FORMATTER.format(sections[0].trim());
                 int slot = Integer.parseInt(sections[1]);
                 String icon = sections[2];
 
@@ -438,13 +442,13 @@ public final class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeBlockCounts(String blockCountsParam) {
-        KeyMap<BigInteger> blockCounts = KeyMap.createKeyMap();
+        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
 
         if (blockCountsParam != null) {
             for (String blockCountSection : blockCountsParam.split(";")) {
                 String[] blockCountSections = blockCountSection.split("=");
                 try {
-                    blockCounts.put(Key.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
+                    blockCounts.put(KeyImpl.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
                 } catch (NumberFormatException error) {
                     PluginDebugger.debug(error);
                 }
@@ -481,7 +485,7 @@ public final class RawDeserializer implements IDeserializer {
         for (String limit : generator.split(",")) {
             try {
                 String[] sections = limit.split("=");
-                cobbleGenerator.put(Key.of(sections[0]), Integer.parseInt(sections[1]));
+                cobbleGenerator.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
             } catch (Exception error) {
                 PluginDebugger.debug(error);
             }

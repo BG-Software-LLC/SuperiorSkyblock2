@@ -1,11 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import org.bukkit.command.CommandSender;
 
@@ -57,7 +56,7 @@ public final class CmdAdminPurge implements ISuperiorCommand {
             plugin.getGrid().getIslandsToPurge().forEach(island -> plugin.getGrid().removeIslandFromPurge(island));
             Message.PURGE_CLEAR.send(sender);
         } else {
-            long timeToPurge = StringUtils.parseLong(args[2]);
+            long timeToPurge = parseLongSafe(args[2]);
             long currentTime = System.currentTimeMillis() / 1000;
 
             List<Island> islands = plugin.getGrid().getIslands().stream().filter(island -> {
@@ -77,6 +76,14 @@ public final class CmdAdminPurge implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length == 3 ? CommandTabCompletes.getCustomComplete(args[2], "cancel") : new ArrayList<>();
+    }
+
+    private static long parseLongSafe(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (Exception error) {
+            return 0;
+        }
     }
 
 }

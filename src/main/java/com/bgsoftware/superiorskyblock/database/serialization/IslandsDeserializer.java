@@ -8,9 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
@@ -21,16 +19,18 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserial
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.RawDeserializer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -131,7 +131,7 @@ public final class IslandsDeserializer {
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
             SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
-            cachedIslandInfo.uniqueVisitors.add(new Pair<>(visitorPlayer, visitTime));
+            cachedIslandInfo.uniqueVisitors.add(new SIsland.UniqueVisitor(visitorPlayer, visitTime));
         });
     }
 
@@ -263,7 +263,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandWarp.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandWarp.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load warps with invalid locations for %s, skipping...", uuid.get()));
@@ -282,7 +282,7 @@ public final class IslandsDeserializer {
             cachedWarpInfo.category = islandWarp.getString("category").orElse("");
             cachedWarpInfo.location = location.get();
             cachedWarpInfo.isPrivate = islandWarp.getBoolean("private").orElse(true);
-            cachedWarpInfo.icon = islandWarp.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
+            cachedWarpInfo.icon = islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
@@ -290,7 +290,7 @@ public final class IslandsDeserializer {
     }
 
     public static void deserializeBlockCounts(String blocks, Island island) {
-        if (blocks == null || blocks.isEmpty())
+        if (StringUtils.isBlank(blocks))
             return;
 
         JsonArray blockCounts;
@@ -506,7 +506,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMap.createKeyMap())
+            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap())
                     .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
         });
     }
@@ -529,7 +529,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandHomes.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
@@ -566,7 +566,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<Location> location = islandVisitorHomes.getString("location").map(LocationUtils::getLocation);
+            Optional<Location> location = islandVisitorHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
@@ -632,7 +632,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<ItemStack[]> contents = islandChests.getString("contents").map(ItemUtils::deserialize);
+            Optional<ItemStack[]> contents = islandChests.getString("contents").map(Serializers.INVENTORY_SERIALIZER::deserialize);
             if (!contents.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island chest with invalid contents for %s, skipping...", uuid.get()));
@@ -710,7 +710,7 @@ public final class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> name = warpCategory.getString("name").map(StringUtils::stripColors);
+            Optional<String> name = warpCategory.getString("name").map(Formatters.STRIP_COLOR_FORMATTER::format);
             if (!name.isPresent() || name.get().isEmpty()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load warp categories with invalid name for %s, skipping...", uuid.get()));
@@ -720,7 +720,7 @@ public final class IslandsDeserializer {
             CachedWarpCategoryInfo cachedWarpCategoryInfo = new CachedWarpCategoryInfo();
             cachedWarpCategoryInfo.name = name.get();
             cachedWarpCategoryInfo.slot = warpCategory.getInt("slot").orElse(-1);
-            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(ItemUtils::deserializeItem).orElse(null);
+            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);

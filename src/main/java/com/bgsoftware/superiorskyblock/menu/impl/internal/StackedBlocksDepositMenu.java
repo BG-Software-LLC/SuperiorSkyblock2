@@ -50,7 +50,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
         if (itemToDeposit == null || itemToDeposit.getType() == Material.AIR)
             return;
 
-        if (!StackedBlocksLogic.canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock(), null))
+        if (!StackedBlocksLogic.canStackBlocks((Player) e.getWhoClicked(), itemToDeposit, stackedBlock.getBlock()))
             e.setCancelled(true);
     }
 
@@ -60,7 +60,7 @@ public final class StackedBlocksDepositMenu implements InventoryHolder {
 
         for (ItemStack itemStack : e.getInventory().getContents()) {
             if (itemStack != null && itemStack.getType() != Material.AIR) {
-                if (StackedBlocksLogic.canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock(), null)) {
+                if (StackedBlocksLogic.canStackBlocks((Player) e.getPlayer(), itemStack, stackedBlock.getBlock())) {
                     depositAmount += itemStack.getAmount();
                     blockItem = itemStack;
                 } else {

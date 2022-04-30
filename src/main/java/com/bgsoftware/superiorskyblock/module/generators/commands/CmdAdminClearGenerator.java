@@ -1,12 +1,11 @@
 package com.bgsoftware.superiorskyblock.module.generators.commands;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
@@ -67,7 +66,19 @@ public final class CmdAdminClearGenerator implements IAdminIslandCommand {
         if (environment == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> island.clearGeneratorAmounts(environment)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            if (!plugin.getEventsBus().callIslandClearGeneratorRatesEvent(sender, island, environment))
+                continue;
+
+            anyIslandChanged = true;
+
+            island.clearGeneratorAmounts(environment);
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() != 1)
             Message.GENERATOR_CLEARED_ALL.send(sender);

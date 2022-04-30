@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarpManage;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -46,12 +47,17 @@ public final class WarpManageRenameButton extends SuperiorMenuButton<MenuWarpMan
                     return true;
                 }
 
-                islandWarp.getIsland().renameWarp(islandWarp, newName);
+                EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameWarpEvent(
+                        islandWarp.getIsland(), plugin.getPlayers().getSuperiorPlayer(player), islandWarp, newName);
 
-                Message.WARP_RENAME_SUCCESS.send(player, newName);
+                if (!eventResult.isCancelled()) {
+                    islandWarp.getIsland().renameWarp(islandWarp, eventResult.getResult());
 
-                if (MenuWarpManage.successUpdateSound != null)
-                    MenuWarpManage.successUpdateSound.playSound(player);
+                    Message.WARP_RENAME_SUCCESS.send(player, eventResult.getResult());
+
+                    if (MenuWarpManage.successUpdateSound != null)
+                        MenuWarpManage.successUpdateSound.playSound(player);
+                }
             }
 
             PlayerChat.remove(player);

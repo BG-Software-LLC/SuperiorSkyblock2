@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -15,6 +16,7 @@ import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.world.blocks.stacked.StackedBlock;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
@@ -50,7 +52,8 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
                     chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks)));
         } else {
-            IslandUtils.getAllChunksAsync(island, true, true, plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
+            IslandUtils.getAllChunksAsync(island, true, true, ChunkLoadReason.BLOCKS_RECALCULATE,
+                    plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
                         .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk))).whenComplete(
@@ -62,7 +65,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         BlockCountsTracker blockCounts = new BlockCountsTracker();
         CompletableFuture<IslandCalculationResult> result = new CompletableFuture<>();
 
-        Set<Pair<Location, Integer>> spawnersToCheck = new HashSet<>();
+        Set<SpawnerInfo> spawnersToCheck = new HashSet<>();
         Set<ChunkPosition> chunksToCheck = new HashSet<>();
 
         Executor.createTask().runAsync(v -> {
@@ -80,7 +83,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
                     Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(location);
 
                     if (spawnerInfo.getValue() == null) {
-                        spawnersToCheck.add(new Pair<>(location, spawnerInfo.getKey()));
+                        spawnersToCheck.add(new SpawnerInfo(location, spawnerInfo.getKey()));
                     } else {
                         Key spawnerKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", spawnerInfo.getValue(), location);
                         blockCounts.addCounts(spawnerKey, spawnerInfo.getKey());
@@ -109,21 +112,23 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
             Key blockKey;
             int blockCount;
 
-            for (Pair<Location, Integer> pair : spawnersToCheck) {
+            for (SpawnerInfo spawnerInfo : spawnersToCheck) {
                 try {
-                    CreatureSpawner creatureSpawner = (CreatureSpawner) pair.getKey().getBlock().getState();
-                    blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", creatureSpawner.getSpawnedType() + "", pair.getKey());
-                    blockCount = pair.getValue();
+                    CreatureSpawner creatureSpawner = (CreatureSpawner) spawnerInfo.location.getBlock().getState();
+                    blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "",
+                            creatureSpawner.getSpawnedType() + "", spawnerInfo.location);
+                    blockCount = spawnerInfo.spawnerCount;
 
                     if (blockCount <= 0) {
-                        Pair<Integer, String> spawnerInfo = plugin.getProviders().getSpawnersProvider().getSpawner(pair.getKey());
+                        Pair<Integer, String> spawnersProviderInfo = plugin.getProviders()
+                                .getSpawnersProvider().getSpawner(spawnerInfo.location);
 
-                        String entityType = spawnerInfo.getValue();
+                        String entityType = spawnersProviderInfo.getValue();
                         if (entityType == null)
                             entityType = creatureSpawner.getSpawnedType().name();
 
-                        blockCount = spawnerInfo.getKey();
-                        blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, pair.getKey());
+                        blockCount = spawnersProviderInfo.getKey();
+                        blockKey = KeyImpl.of(Materials.SPAWNER.toBukkitType().name() + "", entityType, spawnerInfo.location);
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
@@ -150,7 +155,7 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
 
     private static class BlockCountsTracker implements IslandCalculationResult {
 
-        private final KeyMap<BigInteger> blockCounts = KeyMap.createConcurrentKeyMap();
+        private final KeyMap<BigInteger> blockCounts = KeyMapImpl.createConcurrentHashMap();
 
         @Override
         public Map<Key, BigInteger> getBlockCounts() {
@@ -164,6 +169,18 @@ public final class DefaultIslandCalculationAlgorithm implements IslandCalculatio
         public void addCounts(KeyMap<Integer> other) {
             other.forEach(this::addCounts);
         }
+    }
+
+    private static final class SpawnerInfo {
+
+        private final Location location;
+        private final int spawnerCount;
+
+        SpawnerInfo(Location location, int spawnerCount) {
+            this.location = location;
+            this.spawnerCount = spawnerCount;
+        }
+
     }
 
 }

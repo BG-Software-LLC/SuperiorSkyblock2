@@ -3,20 +3,26 @@ package com.bgsoftware.superiorskyblock.lang;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
-import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public enum Message {
 
@@ -565,6 +571,8 @@ public enum Message {
     PERMISSION_CHANGED,
     PERMISSION_CHANGED_ALL,
     PERMISSION_CHANGED_NAME,
+    PLACEHOLDER_NO,
+    PLACEHOLDER_YES,
     PLAYER_ALREADY_BANNED,
     PLAYER_ALREADY_COOP,
     PLAYER_ALREADY_IN_ISLAND,
@@ -697,13 +705,52 @@ public enum Message {
     WORLD_NOT_ENABLED,
     WORLD_NOT_UNLOCKED,
 
-    CUSTOM {
+    SCHEMATICS {
+
+        private final Collection<UUID> noSchematicMessages = AutoRemovalCollection.newHashSet(3, TimeUnit.SECONDS);
+
         @Override
         public void send(CommandSender sender, Locale locale, Object... objects) {
-            String message = objects.length == 0 ? null : objects[0] == null ? null : objects[0].toString();
-            boolean translateColors = objects.length >= 2 && objects[1] instanceof Boolean && (boolean) objects[1];
-            if (message != null && !message.isEmpty())
-                sender.sendMessage(translateColors ? StringUtils.translateColors(message) : message);
+            if (!(sender instanceof Player) || objects.length != 1 || !(objects[0] instanceof String))
+                return;
+
+            UUID playerUUID = ((Player) sender).getUniqueId();
+            String message = (String) objects[0];
+
+            if (noSchematicMessages.add(playerUUID)) {
+                Message.CUSTOM.send(sender, locale, message, false);
+            }
+        }
+    },
+
+    PROTECTION {
+
+        @Nullable
+        private Collection<UUID> noInteractMessages;
+
+        @Override
+        public void send(CommandSender sender, Locale locale, Object... args) {
+            if (!(sender instanceof Player))
+                return;
+
+            if (noInteractMessages == null)
+                noInteractMessages = AutoRemovalCollection.newHashSet(plugin.getSettings().getProtectedMessageDelay() * 50, TimeUnit.MILLISECONDS);
+
+            UUID playerUUID = ((Player) sender).getUniqueId();
+
+            if (noInteractMessages.add(playerUUID)) {
+                Message.ISLAND_PROTECTED.send(sender, locale, args);
+            }
+        }
+    },
+
+    CUSTOM {
+        @Override
+        public void send(CommandSender sender, Locale locale, Object... args) {
+            String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
+            boolean translateColors = args.length >= 2 && args[1] instanceof Boolean && (boolean) args[1];
+            if (!StringUtils.isBlank(message))
+                sender.sendMessage(translateColors ? Formatters.COLOR_FORMATTER.format(message) : message);
         }
 
     };
@@ -776,7 +823,7 @@ public enum Message {
                 if (cfg.isConfigurationSection(locale.name())) {
                     locale.setMessage(fileLocale, MultipleComponents.parseSection(cfg.getConfigurationSection(locale.name())));
                 } else {
-                    locale.setMessage(fileLocale, RawMessageComponent.of(StringUtils.translateColors(cfg.getString(locale.name(), ""))));
+                    locale.setMessage(fileLocale, RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(cfg.getString(locale.name(), ""))));
                 }
 
                 if (countMessages)
@@ -795,15 +842,16 @@ public enum Message {
         return messageContainer == null || messageContainer.getMessage().isEmpty();
     }
 
+    @Nullable
     public String getMessage(java.util.Locale locale, Object... objects) {
-        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects);
+        return isEmpty(locale) ? defaultMessage : IMessageComponent.replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
-    public void send(SuperiorPlayer superiorPlayer, Object... objects) {
+    public final void send(SuperiorPlayer superiorPlayer, Object... objects) {
         superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
     }
 
-    public void send(CommandSender sender, Object... objects) {
+    public final void send(CommandSender sender, Object... objects) {
         send(sender, PlayerLocales.getLocale(sender), objects);
     }
 
@@ -815,19 +863,6 @@ public enum Message {
 
     private void setMessage(java.util.Locale locale, IMessageComponent messageComponent) {
         messages.put(locale, messageComponent);
-    }
-
-    private static String replaceArgs(String msg, Object... objects) {
-        if (msg == null)
-            return null;
-
-        for (int i = 0; i < objects.length; i++) {
-            String objectString = objects[i] instanceof BigDecimal ?
-                    StringUtils.format((BigDecimal) objects[i]) : objects[i].toString();
-            msg = msg.replace("{" + i + "}", objectString);
-        }
-
-        return msg;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

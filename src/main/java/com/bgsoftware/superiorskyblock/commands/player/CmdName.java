@@ -1,13 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -63,7 +65,12 @@ public final class CmdName implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        String islandName = args[1];
+        EventResult<String> eventResult = plugin.getEventsBus().callIslandRenameEvent(island, superiorPlayer, args[1]);
+
+        if (eventResult.isCancelled())
+            return;
+
+        String islandName = eventResult.getResult();
 
         if (!StringUtils.isValidName(superiorPlayer, island, islandName))
             return;
@@ -71,7 +78,7 @@ public final class CmdName implements IPermissibleCommand {
         island.setName(islandName);
 
         String coloredName = plugin.getSettings().getIslandNames().isColorSupport() ?
-                StringUtils.translateColors(islandName) : islandName;
+                Formatters.COLOR_FORMATTER.format(islandName) : islandName;
 
         for (Player player : Bukkit.getOnlinePlayers())
             Message.NAME_ANNOUNCEMENT.send(player, superiorPlayer.getName(), coloredName);

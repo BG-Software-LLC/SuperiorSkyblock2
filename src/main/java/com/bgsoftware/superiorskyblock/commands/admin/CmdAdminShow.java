@@ -1,36 +1,35 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public final class CmdAdminShow implements IAdminIslandCommand {
 
@@ -96,13 +95,15 @@ public final class CmdAdminShow implements IAdminIslandCommand {
 
         // Island location
         if (!Message.ISLAND_INFO_LOCATION.isEmpty(locale))
-            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, SBlockPosition.of(island.getCenter(World.Environment.NORMAL)))).append("\n");
+            infoMessage.append(Message.ISLAND_INFO_LOCATION.getMessage(locale, Formatters.LOCATION_FORMATTER.format(
+                    island.getCenter(World.Environment.NORMAL)))).append("\n");
 
         // Island last time updated
         if (lastTime != -1) {
             if (!Message.ISLAND_INFO_LAST_TIME_UPDATED.isEmpty(locale)) {
-                infoMessage.append(Message.ISLAND_INFO_LAST_TIME_UPDATED.getMessage(locale, StringUtils.formatTime(locale,
-                        System.currentTimeMillis() - (lastTime * 1000), TimeUnit.MILLISECONDS))).append("\n");
+
+                infoMessage.append(Message.ISLAND_INFO_LAST_TIME_UPDATED.getMessage(locale, Formatters.TIME_FORMATTER.format(
+                        Duration.ofMillis(System.currentTimeMillis() - (lastTime * 1000)), locale))).append("\n");
             }
         } else {
             if (!Message.ISLAND_INFO_LAST_TIME_UPDATED_CURRENTLY_ACTIVE.isEmpty(locale)) {
@@ -113,7 +114,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
         // Island rate
         if (!Message.ISLAND_INFO_RATE.isEmpty(locale)) {
             double rating = island.getTotalRating();
-            infoMessage.append(Message.ISLAND_INFO_RATE.getMessage(locale, StringUtils.formatRating(locale, rating), StringUtils.format(rating), island.getRatingAmount())).append("\n");
+            infoMessage.append(Message.ISLAND_INFO_RATE.getMessage(locale, Formatters.RATING_FORMATTER.format(rating, locale),
+                    Formatters.NUMBER_FORMATTER.format(rating), island.getRatingAmount())).append("\n");
         }
 
         if (BuiltinModules.BANK.isEnabled()) {
@@ -193,7 +195,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
 
         // Island bank limit
         if (!Message.ISLAND_INFO_ADMIN_BANK_LIMIT.isEmpty(locale)) {
-            infoMessage.append(Message.ISLAND_INFO_ADMIN_BANK_LIMIT.getMessage(locale, StringUtils.format(island.getBankLimit())));
+            infoMessage.append(Message.ISLAND_INFO_ADMIN_BANK_LIMIT.getMessage(locale,
+                    Formatters.NUMBER_FORMATTER.format(island.getBankLimit())));
             if (!island.getBankLimitRaw().equals(island.getBankLimit()))
                 infoMessage.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
             infoMessage.append("\n");
@@ -233,7 +236,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 StringBuilder entitiesString = new StringBuilder();
                 for (Map.Entry<Key, Integer> entry : island.getEntitiesLimitsAsKeys().entrySet()) {
-                    entitiesString.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue()));
+                    entitiesString.append(Message.ISLAND_INFO_ADMIN_ENTITIES_LIMITS_LINE.getMessage(locale,
+                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().toString()), entry.getValue()));
                     if (!island.getCustomEntitiesLimits().containsKey(entry.getKey()))
                         entitiesString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                     entitiesString.append("\n");
@@ -247,7 +251,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeBlockLimits.class)) {
                 StringBuilder blocksString = new StringBuilder();
                 for (Map.Entry<Key, Integer> entry : island.getBlocksLimits().entrySet()) {
-                    blocksString.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(locale, StringUtils.format(entry.getKey().toString()), entry.getValue()));
+                    blocksString.append(Message.ISLAND_INFO_ADMIN_BLOCKS_LIMITS_LINE.getMessage(locale,
+                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().toString()), entry.getValue()));
                     if (!island.getCustomBlocksLimits().containsKey(entry.getKey()))
                         blocksString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                     blocksString.append("\n");
@@ -265,15 +270,16 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     for (Map.Entry<String, Integer> entry : island.getGeneratorPercentages(environment).entrySet()) {
                         Key key = KeyImpl.of(entry.getKey());
                         generatorString.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES_LINE.getMessage(locale,
-                                StringUtils.format(entry.getKey()),
-                                StringUtils.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
+                                Formatters.CAPITALIZED_FORMATTER.format(entry.getKey()),
+                                Formatters.NUMBER_FORMATTER.format(IslandUtils.getGeneratorPercentageDecimal(island, key, environment)),
                                 island.getGeneratorAmount(key, environment))
                         );
                         if (!customGeneratorValues.containsKey(key))
                             generatorString.append(" ").append(Message.ISLAND_INFO_ADMIN_VALUE_SYNCED.getMessage(locale));
                         generatorString.append("\n");
                     }
-                    infoMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString, StringUtils.format(environment.name())));
+                    infoMessage.append(Message.ISLAND_INFO_ADMIN_GENERATOR_RATES.getMessage(locale, generatorString,
+                            Formatters.CAPITALIZED_FORMATTER.format(environment.name())));
                 }
             }
         }
@@ -285,7 +291,8 @@ public final class CmdAdminShow implements IAdminIslandCommand {
                     BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeIslandEffects.class)) {
                 StringBuilder blocksString = new StringBuilder();
                 for (Map.Entry<PotionEffectType, Integer> entry : island.getPotionEffects().entrySet()) {
-                    blocksString.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale, StringUtils.format(entry.getKey().getName()), entry.getValue())).append("\n");
+                    blocksString.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS_LINE.getMessage(locale,
+                            Formatters.CAPITALIZED_FORMATTER.format(entry.getKey().getName()), entry.getValue())).append("\n");
                 }
                 infoMessage.append(Message.ISLAND_INFO_ADMIN_ISLAND_EFFECTS.getMessage(locale, blocksString));
             }

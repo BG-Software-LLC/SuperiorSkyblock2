@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.hooks.support.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.lang.Message;
@@ -104,7 +105,7 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }
@@ -146,7 +147,7 @@ public final class StackedBlocksProvider_WildStacker implements StackedBlocksPro
 
             if (island.hasReachedBlockLimit(blockKey, increaseAmount)) {
                 e.setCancelled(true);
-                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), StringUtils.format(blockKey.toString()));
+                Message.REACHED_BLOCK_LIMIT.send(e.getPlayer(), Formatters.CAPITALIZED_FORMATTER.format(blockKey.toString()));
             } else {
                 island.handleBlockPlace(blockKey, increaseAmount);
             }

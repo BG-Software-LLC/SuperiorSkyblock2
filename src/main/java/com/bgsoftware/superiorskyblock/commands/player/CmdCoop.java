@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
 import java.util.ArrayList;
@@ -95,7 +94,7 @@ public final class CmdCoop implements IPermissibleCommand {
             return;
         }
 
-        if (!EventsCaller.callIslandCoopPlayerEvent(island, superiorPlayer, targetPlayer))
+        if (!plugin.getEventsBus().callIslandCoopPlayerEvent(island, superiorPlayer, targetPlayer))
             return;
 
         island.addCoop(targetPlayer);

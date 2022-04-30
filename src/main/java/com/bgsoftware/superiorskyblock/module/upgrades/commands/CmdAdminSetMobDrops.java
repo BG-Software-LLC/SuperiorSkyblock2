@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.module.upgrades.commands;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -61,14 +61,24 @@ public final class CmdAdminSetMobDrops implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Pair<Double, Boolean> arguments = CommandArguments.getMultiplier(sender, args[3]);
+        NumberArgument<Double> arguments = CommandArguments.getMultiplier(sender, args[3]);
 
-        if (!arguments.getValue())
+        if (!arguments.isSucceed())
             return;
 
-        double multiplier = arguments.getKey();
+        double multiplier = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setMobDropsMultiplier(multiplier)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Double> eventResult = plugin.getEventsBus().callIslandChangeMobDropsEvent(sender, island, multiplier);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setMobDropsMultiplier(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_MOB_DROPS_ALL.send(sender);

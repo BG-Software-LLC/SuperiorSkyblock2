@@ -3,13 +3,13 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuWarps;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +35,7 @@ public final class WarpPagedObjectButton extends PagedObjectButton<MenuWarps, Is
             itemBuilder.appendLore(MenuWarps.editLore);
 
         return itemBuilder.replaceAll("{0}", islandWarp.getName())
-                .replaceAll("{1}", SBlockPosition.of(islandWarp.getLocation()).toString())
+                .replaceAll("{1}", Formatters.LOCATION_FORMATTER.format(islandWarp.getLocation()))
                 .replaceAll("{2}", islandWarp.hasPrivateFlag() ?
                         ensureNotNull(Message.ISLAND_WARP_PRIVATE.getMessage(superiorPlayer.getUserLocale())) :
                         ensureNotNull(Message.ISLAND_WARP_PUBLIC.getMessage(superiorPlayer.getUserLocale())))

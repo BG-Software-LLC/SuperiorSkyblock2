@@ -45,7 +45,7 @@ import java.io.IOException;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class FloatTag extends Tag<Float> {
+public final class FloatTag extends NumberTag<Float> {
 
     static final Class<?> CLASS = getNNTClass("NBTTagFloat");
 

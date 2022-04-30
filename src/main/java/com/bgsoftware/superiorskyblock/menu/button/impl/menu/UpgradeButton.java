@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuUpgrades;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
@@ -50,7 +51,11 @@ public final class UpgradeButton extends SuperiorMenuButton<MenuUpgrades> {
 
         TemplateItem buttonItem = nextLevel ? itemData.hasNextLevel : itemData.noNextLevel;
 
-        return (buttonItem == null ? INVALID_ITEM : buttonItem).build(inventoryViewer);
+        return (buttonItem == null ? INVALID_ITEM : buttonItem).getBuilder()
+                .replaceAll("{0}", levelCost.getCost() + "")
+                .replaceAll("{1}", Formatters.NUMBER_FORMATTER.format(levelCost.getCost()))
+                .replaceAll("{2}", Formatters.FANCY_NUMBER_FORMATTER.format(levelCost.getCost(), inventoryViewer.getUserLocale()))
+                .build(inventoryViewer);
     }
 
     @Override

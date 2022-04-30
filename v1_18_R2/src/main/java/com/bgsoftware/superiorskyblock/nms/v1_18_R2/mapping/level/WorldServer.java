@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
 import net.minecraft.world.level.dimension.WorldDimension;
+import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.storage.WorldPersistentData;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
@@ -221,6 +222,10 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
 
     public StructureManager getStructureManager() {
         return new StructureManager(handle.a());
+    }
+
+    public EnderDragonBattle getEnderDragonBattle() {
+        return handle.E();
     }
 
 }

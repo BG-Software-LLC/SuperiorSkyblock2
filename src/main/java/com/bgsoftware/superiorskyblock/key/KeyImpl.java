@@ -14,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 public final class KeyImpl implements Key {
@@ -28,8 +29,8 @@ public final class KeyImpl implements Key {
     private boolean apiKey = false;
 
     private KeyImpl(String globalKey, String subKey) {
-        this.globalKey = globalKey;
-        this.subKey = subKey;
+        this.globalKey = globalKey.toUpperCase(Locale.ENGLISH);
+        this.subKey = subKey.toUpperCase(Locale.ENGLISH);
     }
 
     public static Key of(EntityType entityType) {

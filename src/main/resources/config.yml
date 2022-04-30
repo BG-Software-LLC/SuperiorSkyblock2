@@ -320,9 +320,16 @@ worlds:
     # The default biome for the world.
     # If the biome is invalid, THE_END will be used.
     biome: THE_END
-    # Should dragon fight be enabled? This will spawn dragons for each island.
-    # This feature is in beta, expect bugs!
-    dragon-fight: false
+    # Settings related to dragon fights on the server.
+    dragon-fight:
+      # Whether dragon fights should be enabled.
+      # If enabled, each island will have it's own ender dragon to battle with.
+      enabled: false
+      # The offset of the end portal (where it should be spawning) from the middle of the island.
+      # The format is '<offset-x>, <offset-y>, <offset-z>' (may be negative).
+      # Having the offset going beyond the island-radius is an undefined behavior!
+      portal-offset: '0, 0, 0'
+
   # The difficulty of the island worlds.
   difficulty: EASY
 
@@ -565,8 +572,7 @@ default-containers:
 default-signs: [ ]
 
 # A list of commands that will be executed when an event is called.
-# You can find a list of events here:
-# https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events
+# You can find a list of events at @ https://bg-software.com/superiorskyblock/api/
 # A list of placeholders (Not all of them work for all the events):
 # %island% %player% %schematic% %enter-cause% %target% %leave-cause% %old-owner% %new-owner% %worth% %level%
 event-commands:
@@ -674,8 +680,7 @@ negative-worth: true
 negative-level: true
 
 # A list of events that will not be fired. This can increase performance.
-# You can find a list of events here:
-# https://github.com/OmerBenGera/SuperiorSkyblockAPI/tree/master/src/main/java/com/bgsoftware/superiorskyblock/api/events
+# You can find a list of events at @ https://bg-software.com/superiorskyblock/api/
 disabled-events: [ ]
 
 # Should there be a schematic-name argument in the create command?

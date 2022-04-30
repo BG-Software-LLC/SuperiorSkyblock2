@@ -47,14 +47,23 @@ public interface IslandCreationAlgorithm {
             this.shouldTeleportPlayer = shouldTeleportPlayer;
         }
 
+        /**
+         * Get the created island object.
+         */
         public Island getIsland() {
             return island;
         }
 
+        /**
+         * Get the location of the new island.
+         */
         public Location getIslandLocation() {
             return islandLocation;
         }
 
+        /**
+         * Get whether the player that created the island should be teleported to it.
+         */
         public boolean shouldTeleportPlayer() {
             return shouldTeleportPlayer;
         }

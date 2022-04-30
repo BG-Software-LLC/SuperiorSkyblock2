@@ -82,6 +82,9 @@ public final class CmdAdminDemote implements IAdminPlayerCommand {
             return;
         }
 
+        if (!plugin.getEventsBus().callPlayerChangeRoleEvent(targetPlayer, previousRole))
+            return;
+
         targetPlayer.setPlayerRole(previousRole);
 
         Message.DEMOTED_MEMBER.send(sender, targetPlayer.getName(), targetPlayer.getPlayerRole());

@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
 import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
@@ -247,7 +247,7 @@ public final class NMSWorldImpl implements NMSWorld {
             System.arraycopy(CraftSign.revertComponents(tileEntitySign.lines), 0, lines, 0, lines.length);
             String[] strippedLines = new String[4];
             for (int i = 0; i < 4; i++)
-                strippedLines[i] = StringUtils.stripColors(lines[i]);
+                strippedLines[i] = Formatters.STRIP_COLOR_FORMATTER.format(lines[i]);
 
             IChatBaseComponent[] newLines;
 

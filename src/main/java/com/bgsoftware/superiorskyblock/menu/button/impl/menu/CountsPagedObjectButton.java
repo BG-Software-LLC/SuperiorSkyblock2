@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.menu.button.impl.menu;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuCounts;
@@ -221,12 +222,12 @@ public final class CountsPagedObjectButton extends PagedObjectButton<MenuCounts,
                 .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
                 .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
-                .replaceAll("{0}", StringUtils.format(materialName))
+                .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
                 .replaceAll("{1}", amount + "")
-                .replaceAll("{2}", StringUtils.format(worthValue.multiply(amount)))
-                .replaceAll("{3}", StringUtils.format(levelValue.multiply(amount)))
-                .replaceAll("{4}", StringUtils.fancyFormat(worthValue.multiply(amount), inventoryViewer.getUserLocale()))
-                .replaceAll("{5}", StringUtils.fancyFormat(levelValue.multiply(amount), inventoryViewer.getUserLocale()))
+                .replaceAll("{2}", Formatters.NUMBER_FORMATTER.format(worthValue.multiply(amount)))
+                .replaceAll("{3}", Formatters.NUMBER_FORMATTER.format(levelValue.multiply(amount)))
+                .replaceAll("{4}", Formatters.FANCY_NUMBER_FORMATTER.format(worthValue.multiply(amount), inventoryViewer.getUserLocale()))
+                .replaceAll("{5}", Formatters.FANCY_NUMBER_FORMATTER.format(levelValue.multiply(amount), inventoryViewer.getUserLocale()))
                 .build(inventoryViewer);
     }
 

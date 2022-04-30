@@ -5,11 +5,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandPrivileges;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
@@ -25,6 +25,8 @@ import java.util.List;
 
 public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<MenuIslandPrivileges,
         MenuIslandPrivileges.IslandPrivilegeInfo> {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private IslandPrivilegePagedObjectButton(String requiredPermission, SoundWrapper lackPermissionSound,
                                              int objectIndex) {
@@ -79,9 +81,11 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
                 if (previousRole == null) {
                     onFailurePermissionChange(clickedPlayer, false);
                 } else {
-                    island.setPermission(previousRole, pagedObject.getIslandPrivilege());
-                    onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
-                            StringUtils.format(pagedObject.getIslandPrivilege().getName()));
+                    if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, previousRole)) {
+                        island.setPermission(previousRole, pagedObject.getIslandPrivilege());
+                        onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
+                                Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
+                    }
                 }
             }
         } else if (clickEvent.getClick().isRightClick() && clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
@@ -89,9 +93,11 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
             if (nextRole == null) {
                 onFailurePermissionChange(clickedPlayer, false);
             } else {
-                island.setPermission(nextRole, pagedObject.getIslandPrivilege());
-                onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
-                        StringUtils.format(pagedObject.getIslandPrivilege().getName()));
+                if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, nextRole)) {
+                    island.setPermission(nextRole, pagedObject.getIslandPrivilege());
+                    onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
+                            Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
+                }
             }
         }
     }
@@ -104,6 +110,9 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
             String permissionHolderName = permissionHolder.getName();
 
             boolean currentValue = permissionNode.hasPermission(pagedObject.getIslandPrivilege());
+
+            if (!plugin.getEventsBus().callIslandChangePlayerPrivilegeEvent(island, clickedPlayer, permissionHolder, !currentValue))
+                return;
 
             island.setPermission(permissionHolder, pagedObject.getIslandPrivilege(), !currentValue);
 
