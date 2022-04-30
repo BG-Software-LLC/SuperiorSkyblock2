@@ -1,10 +1,13 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
+import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -37,6 +40,18 @@ public final class MultipleComponents implements IMessageComponent {
                 ));
             } else if (key.equals("sound")) {
                 messageComponents.add(SoundComponent.of(FileUtils.getSound(section.getConfigurationSection("sound"))));
+            } else if (key.equals("bossbar")) {
+                BossBar.Color color;
+
+                try {
+                    color = BossBar.Color.valueOf(section.getString(key + ".color").toUpperCase());
+                } catch (Exception error) {
+                    color = BossBar.Color.PINK;
+                }
+
+                messageComponents.add(BossBarComponent.of(
+                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".message")),
+                        color, section.getInt(key + ".ticks")));
             } else {
                 TextComponent textComponent = new TextComponent(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
 

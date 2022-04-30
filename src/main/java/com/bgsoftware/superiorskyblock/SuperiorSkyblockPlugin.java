@@ -56,6 +56,7 @@ import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
 import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
+import com.bgsoftware.superiorskyblock.service.bossbar.BossBarsServiceImpl;
 import com.bgsoftware.superiorskyblock.service.hologram.HologramsServiceImpl;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.tasks.CalcTask;
@@ -206,6 +207,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         this.servicesHandler.registerPlaceholdersService(new PlaceholdersServiceImpl());
         this.servicesHandler.registerHologramsService(new HologramsServiceImpl(this));
         this.servicesHandler.registerEnderDragonService(new DragonBattleServiceImpl(this));
+        this.servicesHandler.registerBossBarsService(new BossBarsServiceImpl(this));
     }
 
     @Override

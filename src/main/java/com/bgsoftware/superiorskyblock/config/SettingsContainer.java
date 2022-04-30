@@ -201,6 +201,7 @@ public final class SettingsContainer {
     public final boolean autoLanguageDetection;
     public final boolean autoUncoopWhenAlone;
     public final TopIslandMembersSorting islandTopMembersSorting;
+    public final int bossBarLimit;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -512,6 +513,7 @@ public final class SettingsContainer {
             islandTopMembersSorting = TopIslandMembersSorting.NAMES;
         }
         this.islandTopMembersSorting = islandTopMembersSorting;
+        bossBarLimit = config.getInt("bossbar-limit", 1);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

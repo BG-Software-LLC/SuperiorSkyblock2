@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.mojang.authlib.GameProfile;
@@ -17,6 +19,8 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.craftbukkit.v1_12_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftItem;
@@ -80,6 +84,13 @@ public final class NMSPlayersImpl implements NMSPlayers {
     }
 
     @Override
+    public BossBar createBossBar(Player player, String message, BossBar.Color color, double ticksToRun) {
+        BossBarImpl bossBar = new BossBarImpl(message, BarColor.valueOf(color.name()), ticksToRun);
+        bossBar.addPlayer(player);
+        return bossBar;
+    }
+
+    @Override
     public void sendTitle(Player player, String title, String subtitle, int fadeIn, int duration, int fadeOut) {
         player.sendTitle(title, subtitle, fadeIn, duration, fadeOut);
     }
@@ -98,6 +109,40 @@ public final class NMSPlayersImpl implements NMSPlayers {
         } catch (IllegalArgumentException error) {
             return null;
         }
+    }
+
+    private static final class BossBarImpl implements BossBar {
+
+        private final org.bukkit.boss.BossBar bossBar;
+        private final BossBarTask bossBarTask;
+
+        public BossBarImpl(String message, BarColor color, double ticksToRun) {
+            bossBar = Bukkit.createBossBar(message, color, BarStyle.SOLID);
+            this.bossBarTask = BossBarTask.create(this, ticksToRun);
+        }
+
+        @Override
+        public void addPlayer(Player player) {
+            this.bossBar.addPlayer(player);
+            this.bossBarTask.registerTask(player);
+        }
+
+        @Override
+        public void removeAll() {
+            this.bossBar.removeAll();
+            this.bossBar.getPlayers().forEach(this.bossBarTask::unregisterTask);
+        }
+
+        @Override
+        public void setProgress(double progress) {
+            this.bossBar.setProgress(progress);
+        }
+
+        @Override
+        public double getProgress() {
+            return this.bossBar.getProgress();
+        }
+
     }
 
 }

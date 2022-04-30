@@ -758,3 +758,7 @@ auto-uncoop-when-alone: false
 # NAMES - Sort members by their names.
 # ROLES - Sort members by their island roles.
 island-top-members-sorting: NAMES
+
+# Limit of the amount of bossbar tasks each player can have at the same time.
+# Once the limit is reached, the old ones will get removed.
+bossbar-limit: 1

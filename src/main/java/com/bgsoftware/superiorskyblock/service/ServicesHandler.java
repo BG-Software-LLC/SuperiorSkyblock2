@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.service;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
 import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import org.bukkit.Bukkit;
@@ -14,6 +15,7 @@ public final class ServicesHandler {
     private PlaceholdersService placeholdersService;
     private HologramsService hologramsService;
     private DragonBattleService dragonBattleService;
+    private BossBarsService bossBarsService;
 
     public ServicesHandler(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -34,6 +36,11 @@ public final class ServicesHandler {
         Bukkit.getServicesManager().register(DragonBattleService.class, dragonBattleService, plugin, ServicePriority.Normal);
     }
 
+    public void registerBossBarsService(BossBarsService bossBarsService) {
+        this.bossBarsService = bossBarsService;
+        Bukkit.getServicesManager().register(BossBarsService.class, bossBarsService, plugin, ServicePriority.Normal);
+    }
+
     public PlaceholdersService getPlaceholdersService() {
         return placeholdersService;
     }
@@ -44,6 +51,10 @@ public final class ServicesHandler {
 
     public DragonBattleService getDragonBattleService() {
         return dragonBattleService;
+    }
+
+    public BossBarsService getBossBarsService() {
+        return bossBarsService;
     }
 
 }
