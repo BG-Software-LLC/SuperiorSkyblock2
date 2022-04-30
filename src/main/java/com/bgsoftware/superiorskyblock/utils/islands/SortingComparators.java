@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -41,9 +42,19 @@ public final class SortingComparators {
         int compare = Integer.compare(o2.getAllPlayersInside().size(), o1.getAllPlayersInside().size());
         return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
     };
+    public final static Comparator<SuperiorPlayer> ISLAND_ROLES_COMPARATOR = (o1, o2) -> {
+        // Comparison is between o2 and o1 as the lower the weight is, the higher the player is.
+        int compare = Integer.compare(o2.getPlayerRole().getWeight(), o1.getPlayerRole().getWeight());
+        return compare == 0 ? PLAYER_NAMES_COMPARATOR.compare(o1, o2) : compare;
+    };
 
     private SortingComparators() {
 
+    }
+
+    public static void initializeTopIslandMembersSorting() throws IllegalArgumentException {
+        TopIslandMembersSorting.NAMES.setComparator(PLAYER_NAMES_COMPARATOR);
+        TopIslandMembersSorting.ROLES.setComparator(ISLAND_ROLES_COMPARATOR);
     }
 
 

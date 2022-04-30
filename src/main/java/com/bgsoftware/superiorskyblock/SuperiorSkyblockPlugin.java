@@ -68,6 +68,7 @@ import com.bgsoftware.superiorskyblock.upgrade.loaders.VaultUpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
+import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.bgsoftware.superiorskyblock.utils.items.EnchantsUtils;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
@@ -193,6 +194,14 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
         IslandPrivileges.registerPrivileges();
         SortingTypes.registerSortingTypes();
         IslandFlags.registerFlags();
+
+        try {
+            SortingComparators.initializeTopIslandMembersSorting();
+        } catch (IllegalArgumentException error) {
+            shouldEnable = false;
+            log("&cThe TopIslandMembersSorting was already initialized. " +
+                    "This can be caused by a reload or another plugin initializing it.");
+        }
 
         this.servicesHandler.registerPlaceholdersService(new PlaceholdersServiceImpl());
         this.servicesHandler.registerHologramsService(new HologramsServiceImpl(this));

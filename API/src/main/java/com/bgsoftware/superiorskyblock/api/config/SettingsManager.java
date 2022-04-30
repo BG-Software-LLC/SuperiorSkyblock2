@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.config;
 
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -561,6 +562,12 @@ public interface SettingsManager {
      * Config-path: auto-uncoop-when-alone
      */
     boolean isAutoUncoopWhenAlone();
+
+    /**
+     * Get the way to sort members in the top islands menu.
+     * Config-path: island-top-members-sorting
+     */
+    TopIslandMembersSorting getTopIslandMembersSorting();
 
     interface Database {
 

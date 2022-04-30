@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.config;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
@@ -199,6 +200,7 @@ public final class SettingsContainer {
     public final long recalcTaskTimeout;
     public final boolean autoLanguageDetection;
     public final boolean autoUncoopWhenAlone;
+    public final TopIslandMembersSorting islandTopMembersSorting;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -503,6 +505,13 @@ public final class SettingsContainer {
         recalcTaskTimeout = config.getLong("recalc-task-timeout");
         autoLanguageDetection = config.getBoolean("auto-language-detection", true);
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
+        TopIslandMembersSorting islandTopMembersSorting;
+        try {
+            islandTopMembersSorting = TopIslandMembersSorting.valueOf(config.getString("island-top-members-sorting").toUpperCase());
+        } catch (IllegalArgumentException error) {
+            islandTopMembersSorting = TopIslandMembersSorting.NAMES;
+        }
+        this.islandTopMembersSorting = islandTopMembersSorting;
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {
