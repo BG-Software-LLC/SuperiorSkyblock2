@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -48,7 +47,7 @@ public final class DefaultIslandCreationAlgorithm implements IslandCreationAlgor
         Island island = plugin.getFactory().createIsland(owner, islandUUID, islandLocation.add(0.5, 0, 0.5),
                 islandName, schematic.getName());
 
-        EventResult<Boolean> event = EventsCaller.callIslandCreateEvent(owner, island, schematic.getName());
+        EventResult<Boolean> event = plugin.getEventsBus().callIslandCreateEvent(owner, island, schematic.getName());
 
         if (!event.isCancelled()) {
             schematic.pasteSchematic(island, islandLocation.getBlock().getRelative(BlockFace.DOWN).getLocation(), () -> {

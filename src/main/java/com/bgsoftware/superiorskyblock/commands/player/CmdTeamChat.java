@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public final class CmdTeamChat implements ISuperiorCommand {
@@ -72,7 +73,7 @@ public final class CmdTeamChat implements ISuperiorCommand {
             }
             superiorPlayer.toggleTeamChat();
         } else {
-            String message = CommandArguments.buildLongString(args, 1, true);
+            String message = CommandArguments.buildLongString(args, 1, superiorPlayer.hasPermissionWithoutOP("superior.chat.color"));
             IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(), superiorPlayer.getPlayerRole(),
                     superiorPlayer.getName(), message);
             Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole(), superiorPlayer.getName(), message);
@@ -86,7 +87,7 @@ public final class CmdTeamChat implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

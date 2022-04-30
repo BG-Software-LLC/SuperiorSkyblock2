@@ -70,6 +70,9 @@ public final class CmdPanel implements ISuperiorCommand {
                 plugin.getMenus().openVisitors(superiorPlayer, null, island);
                 return;
             } else if (args[1].equalsIgnoreCase("toggle")) {
+                if (!plugin.getEventsBus().callPlayerTogglePanelEvent(superiorPlayer))
+                    return;
+
                 if (superiorPlayer.hasToggledPanel()) {
                     superiorPlayer.setToggledPanel(false);
                     Message.PANEL_TOGGLE_OFF.send(superiorPlayer);

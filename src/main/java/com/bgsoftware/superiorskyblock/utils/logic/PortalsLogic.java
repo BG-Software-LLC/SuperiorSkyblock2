@@ -1,12 +1,15 @@
 package com.bgsoftware.superiorskyblock.utils.logic;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -87,10 +90,20 @@ public final class PortalsLogic {
                 island.setSchematicGenerate(destinationEnvironment);
 
                 if (shouldOffsetSchematic(destinationEnvironment)) {
-                    BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth),
-                            schematicLevel = island.getRawLevel().subtract(originalLevel);
-                    island.setBonusWorth(island.getBonusWorth().subtract(schematicWorth));
-                    island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
+                    {
+                        BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
+                        EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
+                                IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
+                        if (!eventResult.isCancelled())
+                            island.setBonusWorth(eventResult.getResult());
+                    }
+                    {
+                        BigDecimal schematicLevel = island.getRawLevel().subtract(originalLevel);
+                        EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(null, island,
+                                IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
+                        if (!eventResult.isCancelled())
+                            island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
+                    }
                 }
 
                 Location destinationLocation = island.getIslandHome(destinationEnvironment);

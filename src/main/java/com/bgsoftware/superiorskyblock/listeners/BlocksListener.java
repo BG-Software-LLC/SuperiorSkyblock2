@@ -4,9 +4,11 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -187,17 +189,23 @@ public final class BlocksListener implements Listener {
     public void onStructureGrow(StructureGrowEvent e) {
         Island island = plugin.getGrid().getIslandAt(e.getLocation());
 
-        List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
+        if (island == null)
+            return;
 
-        if (island != null) {
-            blockStates.forEach(blockState -> {
-                if (!island.isInsideRange(blockState.getLocation())) {
-                    e.getBlocks().remove(blockState);
-                } else {
-                    island.handleBlockPlace(KeyImpl.of(blockState), 1);
-                }
-            });
-        }
+        List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
+
+        blockStates.forEach(blockState -> {
+            if (!island.isInsideRange(blockState.getLocation())) {
+                e.getBlocks().remove(blockState);
+            } else {
+                Key blockKey = KeyImpl.of(blockState);
+                blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + 1);
+            }
+        });
+
+        if (!blockCounts.isEmpty())
+            island.handleBlocksPlace(blockCounts);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

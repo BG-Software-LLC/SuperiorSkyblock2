@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -68,7 +68,17 @@ public final class CmdAdminSetCropGrowth implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setCropGrowthMultiplier(multiplier)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Double> eventResult = plugin.getEventsBus().callIslandChangeCropGrowthEvent(sender, island, multiplier);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setCropGrowthMultiplier(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_CROP_GROWTH_ALL.send(sender);

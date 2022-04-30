@@ -1,13 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,8 +63,14 @@ public final class CmdSetDiscord implements IPermissibleCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         String discord = CommandArguments.buildLongString(args, 1, false);
-        island.setDiscord(discord);
-        Message.CHANGED_DISCORD.send(superiorPlayer, discord);
+
+        EventResult<String> eventResult = plugin.getEventsBus().callIslandChangeDiscordEvent(superiorPlayer, island, discord);
+
+        if (eventResult.isCancelled())
+            return;
+
+        island.setDiscord(eventResult.getResult());
+        Message.CHANGED_DISCORD.send(superiorPlayer, eventResult.getResult());
     }
 
 }

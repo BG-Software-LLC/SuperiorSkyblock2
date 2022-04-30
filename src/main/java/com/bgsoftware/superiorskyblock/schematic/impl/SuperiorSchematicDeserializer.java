@@ -3,11 +3,8 @@ package com.bgsoftware.superiorskyblock.schematic.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicBlock;
 import com.bgsoftware.superiorskyblock.schematic.data.SchematicPosition;
-import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.IntTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.TagUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -50,13 +47,6 @@ public final class SuperiorSchematicDeserializer {
 
     private SuperiorSchematicDeserializer() {
 
-    }
-
-    public static int readNumberFromTag(Tag<?> tag) {
-        if (tag instanceof ByteTag)
-            return ((ByteTag) tag).getValue();
-        else
-            return ((IntTag) tag).getValue();
     }
 
     public static void convertOldTileEntity(CompoundTag compoundTag) {
@@ -186,30 +176,29 @@ public final class SuperiorSchematicDeserializer {
     }
 
     @Nullable
-    public static SchematicBlock deserializeSchematicBlock(Tag<?> tag) {
-        Map<String, Tag<?>> compoundValue = ((CompoundTag) tag).getValue();
-        SchematicPosition schematicPosition = SchematicPosition.of(((StringTag) compoundValue.get("blockPosition")).getValue());
+    public static SchematicBlock deserializeSchematicBlock(CompoundTag compoundTag) {
+        SchematicPosition schematicPosition = SchematicPosition.of(compoundTag.getString("blockPosition"));
         int x = schematicPosition.getX();
         int y = schematicPosition.getY();
         int z = schematicPosition.getZ();
         int combinedId;
 
-        if (compoundValue.containsKey("combinedId")) {
-            combinedId = ((IntTag) compoundValue.get("combinedId")).getValue();
-        } else if (compoundValue.containsKey("id") && compoundValue.containsKey("data")) {
-            int id = ((IntTag) compoundValue.get("id")).getValue();
-            int data = ((IntTag) compoundValue.get("data")).getValue();
+        if (compoundTag.containsKey("combinedId")) {
+            combinedId = compoundTag.getInt("combinedId");
+        } else if (compoundTag.containsKey("id") && compoundTag.containsKey("data")) {
+            int id = compoundTag.getInt("id");
+            int data = compoundTag.getInt("data");
             combinedId = id + (data << 12);
-        } else if (compoundValue.containsKey("type")) {
+        } else if (compoundTag.containsKey("type")) {
             Material type;
 
             try {
-                type = Material.valueOf(((StringTag) compoundValue.get("type")).getValue());
+                type = Material.valueOf(compoundTag.getString("type"));
             } catch (Exception ignored) {
                 return null;
             }
 
-            int data = ((IntTag) compoundValue.getOrDefault("data", new IntTag(0))).getValue();
+            int data = compoundTag.getInt("data");
 
             combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
         } else {
@@ -217,13 +206,13 @@ public final class SuperiorSchematicDeserializer {
             return null;
         }
 
-        byte skyLightLevel = ((ByteTag) compoundValue.getOrDefault("skyLightLevel", new ByteTag((byte) 0))).getValue();
-        byte blockLightLevel = ((ByteTag) compoundValue.getOrDefault("blockLightLevel", new ByteTag((byte) 0))).getValue();
+        byte skyLightLevel = compoundTag.getByte("skyLightLevel");
+        byte blockLightLevel = compoundTag.getByte("blockLightLevel");
 
-        SuperiorSchematicDeserializer.convertOldTileEntity((CompoundTag) tag);
+        SuperiorSchematicDeserializer.convertOldTileEntity(compoundTag);
 
-        CompoundTag statesTag = (CompoundTag) compoundValue.get("states");
-        CompoundTag tileEntity = (CompoundTag) compoundValue.get("tileEntity");
+        CompoundTag statesTag = compoundTag.getCompound("states");
+        CompoundTag tileEntity = compoundTag.getCompound("tileEntity");
 
         return new SchematicBlock(combinedId, SBlockOffset.fromOffsets(x, y, z), skyLightLevel, blockLightLevel, statesTag, tileEntity);
     }

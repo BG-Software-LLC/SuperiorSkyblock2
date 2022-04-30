@@ -18,7 +18,7 @@ allprojects {
         maven { url 'https://repo.bg-software.com/repository/public-libs/' }
 
         String mavenUsername = System.getenv('mavenUsername') == null ? project.mavenUsername : System.getenv('mavenUsername');
-        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenUsername : System.getenv('mavenPassword');
+        String mavenPassword = System.getenv('mavenPassword') == null ? project.mavenPassword : System.getenv('mavenPassword');
 
         if (mavenUsername != null && mavenPassword != null) {
             maven {
@@ -47,6 +47,10 @@ subprojects {
     }
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation fileTree("archive")
     implementation project(":API")
@@ -58,6 +62,7 @@ dependencies {
 
     implementation 'com.zaxxer:HikariCP:latest'
     implementation 'org.slf4j:SLF4J:latest'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     // Spigot jars
     compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
@@ -88,6 +93,7 @@ shadowJar {
     dependsOn(jar)
 
     relocate 'com.zaxxer.hikari', 'com.bgsoftware.superiorskyblock.libs.hikari'
+    relocate 'org.bstats', 'com.bgsoftware.superiorskyblock.libs.bstats'
 
     if (System.getenv("BUILD_NUMBER") == null) {
         archiveName = rootProject.name + "-" + version + ".jar"

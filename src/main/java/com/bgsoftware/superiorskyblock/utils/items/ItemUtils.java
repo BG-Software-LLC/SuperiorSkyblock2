@@ -27,27 +27,42 @@ public final class ItemUtils {
 
     }
 
-    public static void removeItem(ItemStack itemStack, Event event, Player player) {
+    public static boolean removeItemFromHand(ItemStack itemStack, Event event, Player player) {
         ReflectMethod<EquipmentSlot> reflectMethod = null;
 
-        if (event instanceof BlockPlaceEvent)
+        if (event instanceof BlockPlaceEvent) {
             reflectMethod = GET_HAND_BLOCK_PLACE;
-        else if (event instanceof PlayerInteractEvent)
+        } else if (event instanceof PlayerInteractEvent) {
             reflectMethod = GET_HAND_PLAYER_INTERACT;
+        }
 
-        if (reflectMethod != null && reflectMethod.isValid()) {
-            EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
-            if (equipmentSlot.name().equals("OFF_HAND")) {
-                ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
-                if (offHand.isSimilar(itemStack)) {
-                    offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
-                    SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), offHand);
-                    return;
-                }
+        if (reflectMethod == null || !reflectMethod.isValid())
+            return false;
+
+        EquipmentSlot equipmentSlot = reflectMethod.invoke(event);
+
+        if (equipmentSlot == EquipmentSlot.HAND) {
+            ItemStack mainHand = player.getInventory().getItemInHand();
+            if (mainHand.isSimilar(itemStack)) {
+                mainHand.setAmount(mainHand.getAmount() - itemStack.getAmount());
+                player.getInventory().setItemInHand(mainHand);
+                return true;
+            }
+        } else if (equipmentSlot.name().equals("OFF_HAND")) {
+            ItemStack offHand = GET_ITEM_IN_OFF_HAND.invoke(player.getInventory());
+            if (offHand.isSimilar(itemStack)) {
+                offHand.setAmount(offHand.getAmount() - itemStack.getAmount());
+                SET_ITEM_IN_OFF_HAND.invoke(player.getInventory(), offHand);
+                return true;
             }
         }
 
-        player.getInventory().removeItem(itemStack);
+        return false;
+    }
+
+    public static void removeItem(ItemStack itemStack, Event event, Player player) {
+        if (!removeItemFromHand(itemStack, event, player))
+            player.getInventory().removeItem(itemStack);
     }
 
     public static void setItem(ItemStack itemStack, Event event, Player player) {

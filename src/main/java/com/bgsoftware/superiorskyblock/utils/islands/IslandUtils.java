@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
@@ -206,7 +205,7 @@ public final class IslandUtils {
     }
 
     public static void handleKickPlayer(SuperiorPlayer caller, String callerName, Island island, SuperiorPlayer target) {
-        EventsCaller.callIslandKickEvent(caller, target, island);
+        plugin.getEventsBus().callIslandKickEvent(caller, target, island);
 
         island.kickMember(target);
 
@@ -232,7 +231,7 @@ public final class IslandUtils {
     }
 
     public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
-        EventsCaller.callIslandBanEvent(caller, target, island);
+        plugin.getEventsBus().callIslandBanEvent(caller, target, island);
 
         island.banMember(target, caller);
 
@@ -245,7 +244,7 @@ public final class IslandUtils {
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
             plugin.getStackedBlocks().removeStackedBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
-            EventsCaller.callIslandChunkResetEvent(island, chunkPosition);
+            plugin.getEventsBus().callIslandChunkResetEvent(island, chunkPosition);
         });
     }
 

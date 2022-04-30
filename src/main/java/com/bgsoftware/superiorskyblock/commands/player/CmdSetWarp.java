@@ -10,6 +10,8 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.google.common.base.Preconditions;
+import org.bukkit.Location;
 
 import java.util.Collections;
 import java.util.List;
@@ -102,6 +104,7 @@ public final class CmdSetWarp implements IPermissibleCommand {
 
         if (args.length == 3) {
             categoryName = args[2];
+
             if (categoryName.isEmpty()) {
                 Message.WARP_CATEGORY_ILLEGAL_NAME.send(superiorPlayer);
                 return;
@@ -111,15 +114,24 @@ public final class CmdSetWarp implements IPermissibleCommand {
                 Message.WARP_CATEGORY_NAME_TOO_LONG.send(superiorPlayer);
                 return;
             }
+
+            if (island.getWarpCategory(categoryName) == null &&
+                    !plugin.getEventsBus().callIslandCreateWarpCategoryEvent(superiorPlayer, island, categoryName))
+                return;
         }
 
         WarpCategory warpCategory = categoryName == null ? null : island.createWarpCategory(categoryName);
 
-        assert superiorPlayer.getLocation() != null;
+        Location warpLocation = superiorPlayer.getLocation();
 
-        island.createWarp(warpName, superiorPlayer.getLocation(), warpCategory);
+        Preconditions.checkState(warpLocation != null, "Null location for a warp.");
 
-        Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(superiorPlayer.getLocation()));
+        if (!plugin.getEventsBus().callIslandCreateWarpEvent(superiorPlayer, island, warpName, warpLocation, warpCategory))
+            return;
+
+        island.createWarp(warpName, warpLocation, warpCategory);
+
+        Message.SET_WARP.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(warpLocation));
     }
 
 }

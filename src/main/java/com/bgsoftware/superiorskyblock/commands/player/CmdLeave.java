@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -73,7 +72,7 @@ public final class CmdLeave implements ISuperiorCommand {
             return;
         }
 
-        if (!EventsCaller.callIslandQuitEvent(superiorPlayer, island))
+        if (!plugin.getEventsBus().callIslandQuitEvent(superiorPlayer, island))
             return;
 
         island.kickMember(superiorPlayer);
@@ -85,7 +84,7 @@ public final class CmdLeave implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

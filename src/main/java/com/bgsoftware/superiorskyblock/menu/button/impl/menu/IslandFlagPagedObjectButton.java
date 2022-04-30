@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.impl.MenuIslandFlags;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -44,8 +43,14 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         IslandFlag islandFlag = pagedObject.getIslandFlag();
 
         if (island.hasSettingsEnabled(islandFlag)) {
+            if (!plugin.getEventsBus().callIslandDisableFlagEvent(clickedPlayer, island, islandFlag))
+                return;
+
             island.disableSettings(islandFlag);
         } else {
+            if (!plugin.getEventsBus().callIslandEnableFlagEvent(clickedPlayer, island, islandFlag))
+                return;
+
             island.enableSettings(islandFlag);
         }
 

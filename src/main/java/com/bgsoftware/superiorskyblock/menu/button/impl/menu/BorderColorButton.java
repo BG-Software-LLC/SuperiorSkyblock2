@@ -28,8 +28,15 @@ public final class BorderColorButton extends SuperiorMenuButton<MenuBorderColor>
     public void onButtonClick(SuperiorSkyblockPlugin plugin, MenuBorderColor superiorMenu, InventoryClickEvent clickEvent) {
         SuperiorPlayer clickedPlayer = plugin.getPlayers().getSuperiorPlayer(clickEvent.getWhoClicked());
 
-        if (!clickedPlayer.hasWorldBorderEnabled())
+        if (!clickedPlayer.hasWorldBorderEnabled()) {
+            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(clickedPlayer))
+                return;
+
             clickedPlayer.toggleWorldBorder();
+        }
+
+        if (!plugin.getEventsBus().callPlayerChangeBorderColorEvent(clickedPlayer, borderColor))
+            return;
 
         clickedPlayer.setBorderColor(borderColor);
         plugin.getNMSWorld().setWorldBorder(clickedPlayer,

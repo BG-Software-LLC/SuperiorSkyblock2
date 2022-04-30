@@ -1,12 +1,17 @@
 package com.bgsoftware.superiorskyblock.api.events;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.google.common.base.Preconditions;
 import org.bukkit.event.Cancellable;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,9 +19,12 @@ import java.util.List;
  */
 public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
 
+    @Nullable
     private final SuperiorPlayer superiorPlayer;
-    private final String upgradeName;
+    private final Upgrade upgrade;
+    private final UpgradeLevel upgradeLevel;
     private final List<String> commands;
+    @Nullable
     private UpgradeCost upgradeCost;
     private boolean cancelled = false;
 
@@ -24,16 +32,44 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * The constructor for the event.
      *
      * @param superiorPlayer The player who upgraded the island. Can be null if ran by the console.
-     * @param island         The island object that was upgraded.
+     * @param island         The island that was upgraded.
      * @param upgradeName    The name of the upgrade.
      * @param commands       The commands that will be ran upon upgrade.
      * @param upgradeCost    The cost of the upgrade
+     * @deprecated See {@link #IslandUpgradeEvent(SuperiorPlayer, Island, Upgrade, UpgradeLevel, List, UpgradeCost)}
      */
-    public IslandUpgradeEvent(SuperiorPlayer superiorPlayer, Island island, String upgradeName, List<String> commands, UpgradeCost upgradeCost) {
+    @Deprecated
+    public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, String upgradeName,
+                              List<String> commands, @Nullable UpgradeCost upgradeCost) {
+        super(island);
+        Upgrade upgrade = SuperiorSkyblockAPI.getUpgrades().getUpgrade(upgradeName);
+
+        this.superiorPlayer = superiorPlayer;
+        this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
+        this.upgradeLevel = Preconditions.checkNotNull(island.getUpgradeLevel(upgrade), "upgradeLevel cannot be null");
+        this.commands = new ArrayList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.upgradeCost = upgradeCost;
+    }
+
+    /**
+     * The constructor for the event.
+     *
+     * @param superiorPlayer The player who upgraded the island.
+     *                       Can be null if ran by the console.
+     * @param island         The island that was upgraded.
+     * @param upgrade        The upgrade.
+     * @param upgradeLevel   The level that will be upgraded into.
+     * @param commands       The commands that will be running upon upgrade.
+     * @param upgradeCost    The cost of the upgrade.
+     *                       If null, there was no cost for the upgrade (For example, setupgrade command).
+     */
+    public IslandUpgradeEvent(@Nullable SuperiorPlayer superiorPlayer, Island island, Upgrade upgrade,
+                              UpgradeLevel upgradeLevel, List<String> commands, @Nullable UpgradeCost upgradeCost) {
         super(island);
         this.superiorPlayer = superiorPlayer;
-        this.upgradeName = upgradeName;
-        this.commands = commands;
+        this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
+        this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
+        this.commands = new ArrayList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.upgradeCost = upgradeCost;
     }
 
@@ -50,7 +86,21 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * Get the name of the upgrade.
      */
     public String getUpgradeName() {
-        return upgradeName;
+        return upgrade.getName();
+    }
+
+    /**
+     * Get the name of the upgrade.
+     */
+    public Upgrade getUpgrade() {
+        return upgrade;
+    }
+
+    /**
+     * Get the level that will be upgraded to.
+     */
+    public UpgradeLevel getUpgradeLevel() {
+        return upgradeLevel;
     }
 
     /**
@@ -63,6 +113,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
     /**
      * Get the upgrade cost that is used.
      */
+    @Nullable
     public UpgradeCost getUpgradeCost() {
         return upgradeCost;
     }
@@ -72,7 +123,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      *
      * @param upgradeCost The new upgrade cost.
      */
-    public void setUpgradeCost(UpgradeCost upgradeCost) {
+    public void setUpgradeCost(@Nullable UpgradeCost upgradeCost) {
         this.upgradeCost = upgradeCost;
     }
 
@@ -100,15 +151,19 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
      * Get the amount that will be withdrawn.
      */
     public BigDecimal getCost() {
-        return upgradeCost.getCost();
+        return upgradeCost == null ? BigDecimal.ZERO : upgradeCost.getCost();
     }
 
     /**
      * Set the amount that will be withdrawn.
      *
      * @param cost The new amount to be withdrawn.
+     * @throws IllegalStateException If the upgradeCost is null. Use {@link #setUpgradeCost(UpgradeCost)} instead.
      */
-    public void setCost(BigDecimal cost) {
+    public void setCost(BigDecimal cost) throws IllegalStateException {
+        if (this.upgradeCost == null)
+            throw new IllegalStateException("Cannot set raw cost when upgradeCost is null.");
+
         setUpgradeCost(this.upgradeCost.clone(cost));
     }
 

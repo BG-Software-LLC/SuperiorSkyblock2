@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -84,7 +83,7 @@ public final class SIslandBank implements IslandBank {
 
             BigDecimal playerBalance = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
 
-            EventResult<String> eventResult = EventsCaller.callIslandBankDepositEvent(superiorPlayer, island, amount);
+            EventResult<String> eventResult = plugin.getEventsBus().callIslandBankDepositEvent(superiorPlayer, island, amount);
 
             if (eventResult.isCancelled()) {
                 failureReason = eventResult.getResult();
@@ -129,7 +128,7 @@ public final class SIslandBank implements IslandBank {
         PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " +
                 commandSender.getName() + ", Money: " + amount);
 
-        EventResult<String> eventResult = EventsCaller.callIslandBankDepositEvent(commandSender instanceof Player ?
+        EventResult<String> eventResult = plugin.getEventsBus().callIslandBankDepositEvent(commandSender instanceof Player ?
                 plugin.getPlayers().getSuperiorPlayer(commandSender) : null, island, amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
@@ -178,8 +177,7 @@ public final class SIslandBank implements IslandBank {
         } else {
             PluginDebugger.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
 
-            EventResult<String> eventResult = EventsCaller.callIslandBankWithdrawEvent(superiorPlayer,
-                    island, withdrawAmount);
+            EventResult<String> eventResult = plugin.getEventsBus().callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
             if (eventResult.isCancelled()) {
                 failureReason = eventResult.getResult();
@@ -227,7 +225,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        EventResult<String> eventResult = EventsCaller.callIslandBankWithdrawEvent(commandSender instanceof Player ?
+        EventResult<String> eventResult = plugin.getEventsBus().callIslandBankWithdrawEvent(commandSender instanceof Player ?
                 plugin.getPlayers().getSuperiorPlayer(commandSender) : null, island, amount);
 
         BankAction bankAction = eventResult.isCancelled() ? BankAction.WITHDRAW_FAILED : BankAction.WITHDRAW_COMPLETED;

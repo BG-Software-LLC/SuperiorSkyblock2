@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
 import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
@@ -68,7 +68,18 @@ public final class CmdAdminAddSpawnerRates implements IAdminIslandCommand {
 
         double multiplier = arguments.getNumber();
 
-        Executor.data(() -> islands.forEach(island -> island.setSpawnerRatesMultiplier(island.getSpawnerRatesMultiplier() + multiplier)));
+        boolean anyIslandChanged = false;
+
+        for (Island island : islands) {
+            EventResult<Double> eventResult = plugin.getEventsBus().callIslandChangeSpawnerRatesEvent(sender,
+                    island, island.getSpawnerRatesMultiplier() + multiplier);
+            anyIslandChanged |= !eventResult.isCancelled();
+            if (!eventResult.isCancelled())
+                island.setSpawnerRatesMultiplier(eventResult.getResult());
+        }
+
+        if (!anyIslandChanged)
+            return;
 
         if (islands.size() > 1)
             Message.CHANGED_SPAWNER_RATES_ALL.send(sender);

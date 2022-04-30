@@ -97,7 +97,7 @@ public final class BlockData {
                     InventoryType containerType = InventoryType.valueOf(inventoryType);
                     ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
                     if (items != null)
-                        clonedTileEntity.setTag("Items", new ListTag(CompoundTag.class, items.getValue()));
+                        clonedTileEntity.setTag("Items", items.copy());
                 } catch (Exception error) {
                     PluginDebugger.debug(error);
                 }

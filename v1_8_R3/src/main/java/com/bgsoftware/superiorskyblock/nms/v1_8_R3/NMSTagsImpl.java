@@ -28,7 +28,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.Set;
 
-@SuppressWarnings({"unused", "rawtypes"})
+@SuppressWarnings({"unused"})
 public final class NMSTagsImpl implements NMSTags {
 
     @Override
@@ -135,7 +135,7 @@ public final class NMSTagsImpl implements NMSTags {
     public Object parseList(ListTag listTag) {
         NBTTagList nbtTagList = new NBTTagList();
 
-        for (Tag tag : listTag.getValue())
+        for (Tag<?> tag : listTag)
             nbtTagList.add((NBTBase) tag.toNBT());
 
         return nbtTagList;

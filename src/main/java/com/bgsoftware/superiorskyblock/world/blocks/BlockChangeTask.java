@@ -89,8 +89,13 @@ public final class BlockChangeTask {
 
             if (onFinish != null) {
                 CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
-                    if (!failed)
-                        onFinish.run();
+                    try {
+                        if (!failed)
+                            onFinish.run();
+                    } catch (Throwable error2) {
+                        if (onFailure != null)
+                            onFailure.accept(error2);
+                    }
                 });
             }
         } catch (Throwable error) {

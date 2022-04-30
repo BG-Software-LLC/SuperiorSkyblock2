@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import org.bukkit.command.CommandSender;
 
@@ -62,7 +61,7 @@ public final class CmdAdminDisband implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
-        if (EventsCaller.callIslandDisbandEvent(targetPlayer, island)) {
+        if (plugin.getEventsBus().callIslandDisbandEvent(targetPlayer, island)) {
             IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), sender.getName());
 
             if (targetPlayer == null)

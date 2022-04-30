@@ -9,7 +9,6 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,7 +72,7 @@ public final class CmdAdminSetSpawn implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 }

@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
-import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public final class CmdAdminRemoveRatings implements IAdminIslandCommand {
@@ -58,15 +57,27 @@ public final class CmdAdminRemoveRatings implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Executor.data(() -> {
-            if (targetPlayer != null) {
-                plugin.getGrid().getIslands().forEach(island -> island.setRating(targetPlayer, Rating.UNKNOWN));
-            } else {
-                islands.forEach(Island::removeRatings);
-            }
-        });
+        boolean removingAllRatings = targetPlayer == null;
+        Collection<Island> iterIslands = removingAllRatings ? islands : plugin.getGrid().getIslands();
 
-        if (targetPlayer != null)
+        boolean anyIslandChanged = false;
+
+        for (Island island : iterIslands) {
+            if (removingAllRatings) {
+                if (plugin.getEventsBus().callIslandClearRatingsEvent(sender, island)) {
+                    anyIslandChanged = true;
+                    island.removeRatings();
+                }
+            } else if (plugin.getEventsBus().callIslandRemoveRatingEvent(sender, targetPlayer, island)) {
+                anyIslandChanged = true;
+                island.removeRating(targetPlayer);
+            }
+        }
+
+        if (!anyIslandChanged)
+            return;
+
+        if (!removingAllRatings)
             Message.RATE_REMOVE_ALL.send(sender, targetPlayer.getName());
         else if (islands.size() == 1)
             Message.RATE_REMOVE_ALL.send(sender, islands.get(0).getName());

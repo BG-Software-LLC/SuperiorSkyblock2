@@ -4,12 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -97,7 +96,7 @@ public final class CmdInvite implements IPermissibleCommand {
                 return;
             }
 
-            if (!EventsCaller.callIslandInviteEvent(superiorPlayer, targetPlayer, island))
+            if (!plugin.getEventsBus().callIslandInviteEvent(superiorPlayer, targetPlayer, island))
                 return;
 
             island.inviteMember(targetPlayer);

@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 
 import java.math.BigDecimal;
@@ -73,7 +72,7 @@ public final class CmdDisband implements IPermissibleCommand {
 
         if (plugin.getSettings().isDisbandConfirm()) {
             plugin.getMenus().openConfirmDisband(superiorPlayer, null, island);
-        } else if (EventsCaller.callIslandDisbandEvent(superiorPlayer, island)) {
+        } else if (plugin.getEventsBus().callIslandDisbandEvent(superiorPlayer, island)) {
             IslandUtils.sendMessage(island, Message.DISBAND_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
 
             Message.DISBANDED_ISLAND.send(superiorPlayer);

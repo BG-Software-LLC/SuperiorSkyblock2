@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.mission;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.MissionsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -15,7 +16,7 @@ import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsCaller;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.google.common.base.Preconditions;
@@ -213,7 +214,15 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();
-            Island playerIsland = superiorPlayer.getIsland();
+
+            IMissionsHolder missionsHolder = missionData.isIslandMission() ? superiorPlayer.getIsland() : superiorPlayer;
+
+            if (missionsHolder == null) {
+                mission.onCompleteFail(superiorPlayer);
+                if (result != null)
+                    result.accept(false);
+                throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
+            }
 
             if (!forceReward) {
                 if (!canCompleteAgain(superiorPlayer, mission)) {
@@ -227,13 +236,6 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                     if (result != null)
                         result.accept(false);
                     return;
-                }
-
-                if (missionData.isIslandMission() && playerIsland == null) {
-                    mission.onCompleteFail(superiorPlayer);
-                    if (result != null)
-                        result.accept(false);
-                    throw new IllegalStateException("Cannot reward island mission " + mission.getName() + " as the player " + superiorPlayer.getName() + " does not have island.");
                 }
 
                 if (checkAutoReward && !isAutoReward(mission)) {
@@ -255,8 +257,8 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 commandRewards = new ArrayList<>(missionData.getCommandRewards());
             }
 
-            EventResult<EventsCaller.MissionRewards> event = EventsCaller.callMissionCompleteEvent(
-                    superiorPlayer, mission, missionData.isIslandMission(), itemRewards, commandRewards);
+            EventResult<EventsBus.MissionRewards> event = plugin.getEventsBus().callMissionCompleteEvent(
+                    superiorPlayer, missionsHolder, mission, itemRewards, commandRewards);
 
             if (event.isCancelled()) {
                 if (!forceReward)
@@ -269,12 +271,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             if (!forceReward)
                 mission.onComplete(superiorPlayer);
 
-            if (missionData.isIslandMission()) {
-                assert playerIsland != null;
-                playerIsland.completeMission(mission);
-            } else {
-                superiorPlayer.completeMission(mission);
-            }
+            missionsHolder.completeMission(mission);
 
             if (result != null)
                 result.accept(true);
@@ -283,8 +280,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 ItemStack toGive = new ItemBuilder(itemStack)
                         .replaceAll("{0}", mission.getName())
                         .replaceAll("{1}", superiorPlayer.getName())
-                        .replaceAll("{2}", playerIsland == null ? "" : playerIsland.getName().isEmpty() ?
-                                playerIsland.getOwner() == null ? "" : playerIsland.getOwner().getName() : playerIsland.getName())
+                        .replaceAll("{2}", getIslandPlaceholder(missionsHolder))
                         .build();
                 toGive.setAmount(itemStack.getAmount());
                 Executor.ensureMain(() -> superiorPlayer.runIfOnline(player ->
@@ -296,8 +292,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("%mission%", mission.getName())
                             .replace("%player%", superiorPlayer.getName())
-                            .replace("%island%", playerIsland == null ? "" : playerIsland.getName().isEmpty() ?
-                                    playerIsland.getOwner() == null ? "" : playerIsland.getOwner().getName() : playerIsland.getName())
+                            .replace("%island%", getIslandPlaceholder(missionsHolder))
                     );
                 }
             });
@@ -458,6 +453,16 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
 
         throw new IllegalArgumentException("Class " + clazz + " has no valid constructors.");
+    }
+
+    private static String getIslandPlaceholder(@Nullable IMissionsHolder missionsHolder) {
+        if (!(missionsHolder instanceof Island))
+            return "";
+
+        Island island = (Island) missionsHolder;
+
+        return island.getName().isEmpty() ? island.getOwner() == null ? "" :
+                island.getOwner().getName() : island.getName();
     }
 
 }

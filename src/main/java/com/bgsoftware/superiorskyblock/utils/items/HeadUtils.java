@@ -50,9 +50,9 @@ public final class HeadUtils {
     public static ItemStack getPlayerHead(ItemStack itemStack, String texture) {
         CompoundTag compoundTag = TagUtils.itemToCompound(itemStack);
 
-        CompoundTag nbtTag = (CompoundTag) compoundTag.getValue().getOrDefault("NBT", new CompoundTag());
+        CompoundTag nbtTag = compoundTag.getCompound("NBT", new CompoundTag());
 
-        CompoundTag skullOwner = (CompoundTag) nbtTag.getValue().getOrDefault("SkullOwner", new CompoundTag());
+        CompoundTag skullOwner = nbtTag.getCompound("SkullOwner", new CompoundTag());
 
         UUID ownerUUID = new UUID(texture.hashCode(), texture.hashCode());
 
