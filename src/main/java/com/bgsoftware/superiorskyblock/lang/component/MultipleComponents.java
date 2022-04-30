@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -49,7 +50,7 @@ public final class MultipleComponents implements IMessageComponent {
                 }
 
                 messageComponents.add(BossBarComponent.of(
-                        StringUtils.translateColors(section.getString(key + ".message")),
+                        Formatters.COLOR_FORMATTER.format(section.getString(key + ".message")),
                         color, section.getInt(key + ".ticks")));
             } else {
                 TextComponent textComponent = new TextComponent(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
