@@ -18,8 +18,9 @@ import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
@@ -141,7 +142,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                             island.hasPermission(superiorPlayer, IslandPrivileges.PAYPAL_SHOW) ? island.getPaypal() : "None")
                     .put("discord_all", (island, superiorPlayer) -> island.getDiscord())
                     .put("paypal_all", (island, superiorPlayer) -> island.getPaypal())
-                    .put("exists", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(true, superiorPlayer.getUserLocale()))
+                    .put("exists", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island != null, superiorPlayer.getUserLocale()))
                     .put("locked", (island, superiorPlayer) -> Formatters.BOOLEAN_FORMATTER.format(island.isLocked(), superiorPlayer.getUserLocale()))
                     .put("name", (island, superiorPlayer) -> {
                         return plugin.getSettings().getIslandNames().isColorSupport() ?
@@ -221,26 +222,28 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         this.placeholdersProviders.addAll(placeholdersProviders);
     }
 
-    public String parsePlaceholders(OfflinePlayer offlinePlayer, String str) {
+    public String parsePlaceholders(@Nullable OfflinePlayer offlinePlayer, String str) {
         for (PlaceholdersProvider placeholdersProvider : placeholdersProviders)
             str = placeholdersProvider.parsePlaceholders(offlinePlayer, str);
 
         return str;
     }
 
-    public String handlePluginPlaceholder(OfflinePlayer offlinePlayer, String placeholder) {
-        Player player = offlinePlayer.getPlayer();
-        SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
+    public String handlePluginPlaceholder(@Nullable OfflinePlayer offlinePlayer, String placeholder) {
+        SuperiorPlayer superiorPlayer = offlinePlayer == null ? null :
+                plugin.getPlayers().getSuperiorPlayer(offlinePlayer.getUniqueId());
 
         Optional<String> placeholderResult = Optional.empty();
 
-        PlayerPlaceholderParser customPlayerParser = CUSTOM_PLAYER_PARSERS.get(placeholder);
-        if (customPlayerParser != null) {
-            placeholderResult = Optional.ofNullable(customPlayerParser.apply(superiorPlayer));
-        } else {
-            IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(placeholder);
-            if (customIslandParser != null)
-                placeholderResult = Optional.ofNullable(customIslandParser.apply(superiorPlayer.getIsland(), superiorPlayer));
+        if (superiorPlayer != null) {
+            PlayerPlaceholderParser customPlayerParser = CUSTOM_PLAYER_PARSERS.get(placeholder);
+            if (customPlayerParser != null) {
+                placeholderResult = Optional.ofNullable(customPlayerParser.apply(superiorPlayer));
+            } else {
+                IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(placeholder);
+                if (customIslandParser != null)
+                    placeholderResult = Optional.ofNullable(customIslandParser.apply(superiorPlayer.getIsland(), superiorPlayer));
+            }
         }
 
         if (!placeholderResult.isPresent()) {
@@ -251,9 +254,8 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
                         .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
-
-                Island island = subPlaceholder.startsWith("location_") && player != null ?
-                        plugin.getGrid().getIslandAt(player.getLocation()) : superiorPlayer.getIsland();
+                Island island = superiorPlayer == null ? null : subPlaceholder.startsWith("location_") ?
+                        plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) : superiorPlayer.getIsland();
 
                 subPlaceholder = subPlaceholder.replace("location_", "");
 
@@ -275,51 +277,61 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         CUSTOM_ISLAND_PARSERS.put(placeholderName, placeholderFunction);
     }
 
-    private static Optional<String> parsePlaceholdersForIsland(Island island, SuperiorPlayer superiorPlayer,
+    private static Optional<String> parsePlaceholdersForIsland(@Nullable Island island,
+                                                               @Nullable SuperiorPlayer superiorPlayer,
                                                                String placeholder, String subPlaceholder) {
         Matcher matcher;
 
-        if (island == null) {
-            return subPlaceholder.equals("exists") ? Optional.of("No") : Optional.empty();
-        } else if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
-        } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String upgradeName = matcher.group(1);
-            return Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
-                    .getUpgrade(upgradeName)).getLevel() + "");
-        } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1);
-            return Optional.of(Formatters.NUMBER_FORMATTER.format(island
-                    .getBlockCountAsBigInteger(KeyImpl.of(keyName))));
-        } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1);
-            return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
-        } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1);
-            return Optional.of(island.getEntityLimit(KeyImpl.of(keyName)) + "");
-        } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            String keyName = matcher.group(1);
-            return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
-        } else if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-            return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
-        } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            return handleMembersPlaceholder(island, matcher.group(1));
-        } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            String visitorName = matcher.group(1);
-            return Optional.of(island.getUniqueVisitorsWithTimes().stream()
-                    .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
-                    .findFirst()
-                    .map(Pair::getValue).map(value -> Formatters.DATE_FORMATTER.format(new Date(value)))
-                    .orElse("Haven't Joined"));
-        } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
-            return handleIslandFlagsPlaceholder(island, matcher.group(1));
-        } else {
-            return Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
-                    .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
+        if (island != null && superiorPlayer != null) {
+            if ((matcher = PERMISSION_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                return handlePermissionsPlaceholder(island, superiorPlayer, matcher.group(1));
+            } else if ((matcher = UPGRADE_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String upgradeName = matcher.group(1);
+                return Optional.of(island.getUpgradeLevel(plugin.getUpgrades()
+                        .getUpgrade(upgradeName)).getLevel() + "");
+            } else if ((matcher = COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String keyName = matcher.group(1);
+                return Optional.of(Formatters.NUMBER_FORMATTER.format(island
+                        .getBlockCountAsBigInteger(KeyImpl.of(keyName))));
+            } else if ((matcher = BLOCK_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String keyName = matcher.group(1);
+                return Optional.of(island.getBlockLimit(KeyImpl.of(keyName)) + "");
+            } else if ((matcher = ENTITY_LIMIT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String keyName = matcher.group(1);
+                return Optional.of(island.getEntityLimit(KeyImpl.of(keyName)) + "");
+            } else if ((matcher = ENTITY_COUNT_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+                String keyName = matcher.group(1);
+                return Optional.of(Formatters.NUMBER_FORMATTER.format(island.getEntitiesTracker().getEntityCount(KeyImpl.of(keyName))));
+            } else if ((matcher = MEMBER_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                return handleMembersPlaceholder(island, matcher.group(1));
+            } else if ((matcher = VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                String visitorName = matcher.group(1);
+                return Optional.of(island.getUniqueVisitorsWithTimes().stream()
+                        .filter(uniqueVisitor -> uniqueVisitor.getKey().getName().equalsIgnoreCase(visitorName))
+                        .findFirst()
+                        .map(Pair::getValue).map(value -> Formatters.DATE_FORMATTER.format(new Date(value)))
+                        .orElse("Haven't Joined"));
+            } else if ((matcher = ISLAND_FLAG_PLACEHOLDER_PATTERN.matcher(subPlaceholder)).matches()) {
+                return handleIslandFlagsPlaceholder(island, matcher.group(1));
+            }
         }
+
+        if ((matcher = TOP_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
+            return handleTopIslandsPlaceholder(island, superiorPlayer, matcher.group(1));
+        } else {
+            try {
+                return Optional.ofNullable(ISLAND_PARSES.get(subPlaceholder))
+                        .map(placeholderParser -> placeholderParser.apply(island, superiorPlayer));
+            } catch (NullPointerException ignored) {
+                // One of the island parses failed due to invalid island being sent.
+            }
+        }
+
+        return Optional.empty();
     }
 
-    private static Optional<String> handlePermissionsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
+    private static Optional<String> handlePermissionsPlaceholder(@NotNull Island island,
+                                                                 @NotNull SuperiorPlayer superiorPlayer,
                                                                  String placeholder) {
         try {
             IslandPrivilege islandPrivilege = IslandPrivilege.getByName(placeholder);
@@ -329,7 +341,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         }
     }
 
-    private static Optional<String> handleIslandFlagsPlaceholder(Island island, String placeholder) {
+    private static Optional<String> handleIslandFlagsPlaceholder(@NotNull Island island, String placeholder) {
         try {
             IslandFlag islandFlag = IslandFlag.getByName(placeholder);
             return Optional.of(island.hasSettingsEnabled(islandFlag) + "");
@@ -338,7 +350,8 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         }
     }
 
-    private static Optional<String> handleTopIslandsPlaceholder(Island island, SuperiorPlayer superiorPlayer,
+    private static Optional<String> handleTopIslandsPlaceholder(@Nullable Island island,
+                                                                @Nullable SuperiorPlayer superiorPlayer,
                                                                 String subPlaceholder) {
         Matcher matcher;
         SortingType sortingType;
@@ -401,7 +414,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         return Optional.ofNullable(targetIsland).map(getValueFunction);
     }
 
-    private static Optional<String> handleMembersPlaceholder(Island island, String placeholder) {
+    private static Optional<String> handleMembersPlaceholder(@NotNull Island island, String placeholder) {
         List<SuperiorPlayer> members = island.getIslandMembers(false);
 
         int targetMemberIndex = -1;
