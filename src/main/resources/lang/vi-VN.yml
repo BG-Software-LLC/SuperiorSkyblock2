@@ -541,6 +541,7 @@ ISLAND_PREVIEW_START: |
   &e&lXem Trước | &7Nhập &a&lDONG-Y &7để tạo đảo mới, hoặc &c&lHUY-BO &7để dừng chế độ xem trước.
   &e&lXem Trước | &7Bạn không thể rời khỏi khu vực của hòn đảo, nếu không chế độ xem trước sẽ tự động bị hủy.
 ISLAND_PROTECTED: '&c&lLỗi | &7Hòn đảo này được bảo vệ.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lĐảo | &7Thành viên đảo của {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Ngoại tuyến)'

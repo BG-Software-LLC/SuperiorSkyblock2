@@ -485,6 +485,7 @@ ISLAND_PREVIEW_START: |
   &e&lVista Previa | &7Type &a&lCONFIRM &7para crear una nueva isla, o &c&lCANCELAR &7para cancelar el modo de vista previa.
   &e&lVista Previa | &7No puede salir del área de la isla, de lo contrario el modo de vista previa se cancelará automáticamente.
 ISLAND_PROTECTED: '&c&lError | &7Esta isla está protegida.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lIsla | &7Miembros de la isla de {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Desconectado)'

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.lang;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
@@ -470,6 +471,7 @@ public enum Message {
     ISLAND_PREVIEW_CONFIRM_TEXT,
     ISLAND_PREVIEW_START,
     ISLAND_PROTECTED,
+    ISLAND_PROTECTED_OPPED,
     ISLAND_TEAM_STATUS_FOOTER,
     ISLAND_TEAM_STATUS_HEADER,
     ISLAND_TEAM_STATUS_OFFLINE,
@@ -741,6 +743,11 @@ public enum Message {
 
             if (noInteractMessages.add(playerUUID)) {
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
+
+                SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
+                
+                if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
+                    Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
             }
         }
     },

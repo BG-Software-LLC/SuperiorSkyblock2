@@ -487,6 +487,7 @@ ISLAND_PREVIEW_START: |
   &e&lPodglad | &7Wpisz &a&lCONFIRM &7by stworzyc nowa wyspe, lub &c&lCANCEL &7by wylaczyc tryb podladu.
   &e&lPodglad | &7Nie mozesz opuscic terenu wyspy, w przeciwnym razie tryb podgladowy zostanie anulowany.
 ISLAND_PROTECTED: '&c&lBlad | &7Ta wyspa jest zabezpieczona.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lWyspa | &7Czlonkowie {0}''s Wyspy &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'

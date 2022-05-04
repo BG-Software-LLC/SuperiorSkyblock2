@@ -490,6 +490,7 @@ ISLAND_PREVIEW_START: |
   &e&lAnteprima | &7Scrivi &a&lCONFIRM &7per creare una nuova isola, oppure &c&lCANCEL &7per annullare la modalità di anteprima.
   &e&lAnteprima | &7Non è possibile lasciare l'area dell'isola, altrimenti la modalità anteprima verrà annullata automaticamente.
 ISLAND_PROTECTED: '&c&lErrore | &7Quest''isola è protetta.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lIsola | &7Membri dell''isola di {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Disconnesso)'

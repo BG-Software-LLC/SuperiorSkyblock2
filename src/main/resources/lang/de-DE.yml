@@ -605,6 +605,7 @@ ISLAND_PREVIEW_START: |
   &e&lVorschau | &7Gebe &a&lCONFIRM &7 ein, um eine neue Insel zu erstellen, oder &c&lCANCEL &7, um den Vorschaumodus abzubrechen.
   &e&lVorschau | &7Du kannst das Inselgebiet nicht verlassen, sonst wird der Vorschaumodus automatisch abgebrochen.
 ISLAND_PROTECTED: '&c&lError | &7Diese Insel ist geschützt.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lInsel | &7Mitglieder von {0}´s Insel &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Offline)'

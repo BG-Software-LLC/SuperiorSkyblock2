@@ -503,6 +503,7 @@ ISLAND_PREVIEW_START: |
   &e&lPreview | &7Type &a&lCONFIRM &7to create a new island, or &c&lCANCEL &7to cancel the preview mode.
   &e&lPreview | &7You cannot leave the area of the island, otherwise the preview mode will be cancelled automatically.
 ISLAND_PROTECTED: '&c&lהאיגש | &7ןגומ הזה יאה.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lיא | &7 לש יאה לש םינקחשה {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(קתונמ)'

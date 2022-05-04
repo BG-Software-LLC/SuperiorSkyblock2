@@ -487,6 +487,7 @@ ISLAND_PREVIEW_START: |
   &e&lPrévisualisation | &7Tapez &a&lCONFIRMER &7pour séléctionner cette île, ou &c&lANNULER &7pour annuler la prévisualisation.
   &e&lPrévisualisation | &7Si vous quittez la zone de l'île, la prévisualisation sera désactivée.
 ISLAND_PROTECTED: '&c&lErreur | &7Cette île est protégée.'
+ISLAND_PROTECTED_OPPED: '&7&oYou can bypass this restriction by using "/is admin bypass".'
 ISLAND_TEAM_STATUS_FOOTER: ''
 ISLAND_TEAM_STATUS_HEADER: '&e&lIle | &7Membres de l''île de {0} &8[&e{1}&8/&e{2}&8]&7:'
 ISLAND_TEAM_STATUS_OFFLINE: '&c(Hors Ligne)'
