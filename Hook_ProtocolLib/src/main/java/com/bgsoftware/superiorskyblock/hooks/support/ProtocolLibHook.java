@@ -30,7 +30,8 @@ public final class ProtocolLibHook {
 
         @Override
         public void onPacketReceiving(PacketEvent event) {
-            if (!ProtocolLibHook.plugin.getSettings().isAutoLanguageDetection() || event.getPlayer() == null)
+            if (!ProtocolLibHook.plugin.getSettings().isAutoLanguageDetection() || event.getPlayer() == null ||
+                    event.isPlayerTemporary())
                 return;
 
             PacketContainer packetContainer = event.getPacket();
