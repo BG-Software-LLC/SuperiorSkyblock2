@@ -523,6 +523,9 @@ public final class PlayersListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent e) {
+        if (plugin.getSettings().getBlockedVisitorsCommands().isEmpty())
+            return;
+
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
         if (superiorPlayer.hasBypassModeEnabled())
@@ -530,9 +533,12 @@ public final class PlayersListener implements Listener {
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
 
-        String message = e.getMessage().toLowerCase(Locale.ENGLISH);
+        String[] message = e.getMessage().toLowerCase(Locale.ENGLISH).split(" ");
+
+        String commandLabel = message[0].toCharArray()[0] == '/' ? message[0].substring(1) : message[0];
+        
         if (island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, true) &&
-                plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(message::contains)) {
+                plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(commandLabel::contains)) {
             e.setCancelled(true);
             Message.VISITOR_BLOCK_COMMAND.send(superiorPlayer);
         }
