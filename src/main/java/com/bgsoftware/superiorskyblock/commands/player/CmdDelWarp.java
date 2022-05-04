@@ -68,7 +68,7 @@ public final class CmdDelWarp implements IPermissibleCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        IslandWarp islandWarp = CommandArguments.getWarp(superiorPlayer.asPlayer(), island, args, 3);
+        IslandWarp islandWarp = CommandArguments.getWarp(superiorPlayer.asPlayer(), island, args, 1);
 
         if (islandWarp == null)
             return;
