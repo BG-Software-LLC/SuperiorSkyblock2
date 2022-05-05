@@ -26,6 +26,11 @@ public final class ComplexMessageComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.COMPLEX_MESSAGE;
+    }
+
+    @Override
     public String getMessage() {
         return this.textComponent.getText();
     }

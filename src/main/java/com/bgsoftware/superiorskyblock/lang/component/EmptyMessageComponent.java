@@ -16,6 +16,11 @@ public final class EmptyMessageComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.EMPTY;
+    }
+
+    @Override
     public String getMessage() {
         return "";
     }

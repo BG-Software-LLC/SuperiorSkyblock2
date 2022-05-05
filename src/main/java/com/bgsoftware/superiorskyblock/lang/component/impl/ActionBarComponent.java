@@ -25,6 +25,11 @@ public final class ActionBarComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.ACTION_BAR;
+    }
+
+    @Override
     public String getMessage() {
         return this.message;
     }

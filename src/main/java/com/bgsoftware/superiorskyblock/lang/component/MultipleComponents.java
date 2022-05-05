@@ -68,7 +68,7 @@ public final class MultipleComponents implements IMessageComponent {
             }
         }
 
-        messageComponents.removeIf(component -> component instanceof EmptyMessageComponent);
+        messageComponents.removeIf(component -> component.getType() == Type.EMPTY);
 
         return messageComponents.isEmpty() ? EmptyMessageComponent.getInstance() :
                 messageComponents.size() == 1 ? messageComponents.get(0) : new MultipleComponents(messageComponents);
@@ -76,6 +76,11 @@ public final class MultipleComponents implements IMessageComponent {
 
     private MultipleComponents(List<IMessageComponent> messageComponents) {
         this.messageComponents = messageComponents;
+    }
+
+    @Override
+    public Type getType() {
+        return Type.MULTIPLE;
     }
 
     @Override

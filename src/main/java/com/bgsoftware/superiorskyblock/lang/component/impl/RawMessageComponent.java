@@ -21,6 +21,11 @@ public final class RawMessageComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.RAW_MESSAGE;
+    }
+
+    @Override
     public String getMessage() {
         return this.message;
     }

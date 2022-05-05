@@ -36,6 +36,11 @@ public final class TitleComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.TITLE;
+    }
+
+    @Override
     public String getMessage() {
         return this.titleMessage;
     }

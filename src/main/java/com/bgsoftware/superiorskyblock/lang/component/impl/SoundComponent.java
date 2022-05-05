@@ -20,6 +20,12 @@ public final class SoundComponent implements IMessageComponent {
         this.soundWrapper = soundWrapper;
     }
 
+
+    @Override
+    public Type getType() {
+        return Type.SOUND;
+    }
+
     @Override
     public String getMessage() {
         return "";

@@ -31,6 +31,11 @@ public final class BossBarComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.BOSS_BAR;
+    }
+
+    @Override
     public String getMessage() {
         return this.message;
     }

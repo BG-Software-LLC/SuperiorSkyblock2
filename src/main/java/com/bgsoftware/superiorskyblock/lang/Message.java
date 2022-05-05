@@ -3,11 +3,9 @@ package com.bgsoftware.superiorskyblock.lang;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
-import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -830,12 +828,7 @@ public enum Message {
             }
 
             for (Message locale : values()) {
-                if (cfg.isConfigurationSection(locale.name())) {
-                    locale.setMessage(fileLocale, MultipleComponents.parseSection(cfg.getConfigurationSection(locale.name())));
-                } else {
-                    locale.setMessage(fileLocale, RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(cfg.getString(locale.name(), ""))));
-                }
-
+                locale.setMessage(fileLocale, plugin.getServices().getMessagesService().parseComponent(cfg, locale.name()));
                 if (countMessages)
                     messagesAmount++;
             }
