@@ -430,8 +430,8 @@ public final class EventsBus {
         return !islandEnterProtectedEvent.isCancelled();
     }
 
-    public EventResult<Boolean> callIslandGenerateBlockEvent(Island island, Key block) {
-        return callEvent(() -> new IslandGenerateBlockEvent(island, block), "islandgenerateblockevent",
+    public EventResult<Boolean> callIslandGenerateBlockEvent(Island island, Location location, Key block) {
+        return callEvent(() -> new IslandGenerateBlockEvent(island, location, block), "islandgenerateblockevent",
                 true, IslandGenerateBlockEvent::isPlaceBlock);
     }
 

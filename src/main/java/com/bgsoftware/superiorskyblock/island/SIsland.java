@@ -3111,7 +3111,7 @@ public final class SIsland implements Island {
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         handleBlockPlace(generatedBlock, 1);
 
-        EventResult<Boolean> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(this, generatedBlock);
+        EventResult<Boolean> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(this, location, generatedBlock);
 
         if (eventResult.isCancelled())
             return null;
