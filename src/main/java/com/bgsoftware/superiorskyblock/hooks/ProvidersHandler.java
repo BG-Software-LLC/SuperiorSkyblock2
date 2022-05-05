@@ -382,6 +382,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
         if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
             registerHook("ProtocolLibHook");
+
+        if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
+            registerHook("OraxenHook");
     }
 
     private void registerSpawnersProvider() {

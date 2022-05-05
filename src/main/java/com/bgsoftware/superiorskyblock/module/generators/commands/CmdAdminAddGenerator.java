@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -71,16 +70,6 @@ public final class CmdAdminAddGenerator implements IAdminIslandCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, List<Island> islands, String[] args) {
-        Material rawMaterial = CommandArguments.getMaterial(sender, args[3]);
-
-        if (rawMaterial == null)
-            return;
-
-        if (!rawMaterial.isSolid()) {
-            Message.MATERIAL_NOT_SOLID.send(sender);
-            return;
-        }
-
         Key material = KeyImpl.of(args[3]);
         boolean percentage = args[4].endsWith("%");
 

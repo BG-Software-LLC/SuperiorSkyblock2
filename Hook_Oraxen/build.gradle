@@ -1,0 +1,19 @@
+group 'Hook_Oraxen'
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
+}
+
+dependencies {
+    compileOnly 'io.th0rgal:Oraxen:1.133.0'
+    compileOnly "org.spigotmc:v1_8_R3-Taco:latest"
+    compileOnly project(":API")
+    compileOnly parent
+}
+
+if (project.hasProperty('hook.compile_oraxen') &&
+        !Boolean.valueOf(project.findProperty("hook.compile_oraxen").toString())) {
+    project.tasks.all { task -> task.enabled = false }
+}
