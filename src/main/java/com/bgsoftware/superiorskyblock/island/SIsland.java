@@ -59,6 +59,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -3100,7 +3101,13 @@ public final class SIsland implements Island {
             }
         }
 
-        Key generatedBlock = KeyImpl.of(newState);
+        EventResult<EventsBus.GenerateBlockResult> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(
+                this, location, KeyImpl.of(newState));
+
+        if (eventResult.isCancelled())
+            return null;
+
+        Key generatedBlock = eventResult.getResult().getBlock();
 
         PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() + ", Block: " + generatedBlock);
 
@@ -3111,13 +3118,8 @@ public final class SIsland implements Island {
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         handleBlockPlace(generatedBlock, 1);
 
-        EventResult<Boolean> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(this, location, generatedBlock);
-
-        if (eventResult.isCancelled())
-            return null;
-
         // Checking whether the plugin should set the block in the world.
-        if (eventResult.getResult()) {
+        if (eventResult.getResult().isPlaceBlock()) {
             int combinedId;
 
             try {

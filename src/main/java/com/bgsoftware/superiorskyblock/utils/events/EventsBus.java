@@ -430,9 +430,9 @@ public final class EventsBus {
         return !islandEnterProtectedEvent.isCancelled();
     }
 
-    public EventResult<Boolean> callIslandGenerateBlockEvent(Island island, Location location, Key block) {
+    public EventResult<GenerateBlockResult> callIslandGenerateBlockEvent(Island island, Location location, Key block) {
         return callEvent(() -> new IslandGenerateBlockEvent(island, location, block), "islandgenerateblockevent",
-                true, IslandGenerateBlockEvent::isPlaceBlock);
+                new GenerateBlockResult(block, true), GenerateBlockResult::new);
     }
 
     public boolean callIslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
@@ -773,6 +773,30 @@ public final class EventsBus {
 
         public UpgradeCost getUpgradeCost() {
             return upgradeCost;
+        }
+
+    }
+
+    public static final class GenerateBlockResult {
+
+        private final Key block;
+        private final boolean placeBlock;
+
+        public GenerateBlockResult(IslandGenerateBlockEvent event) {
+            this(event.getBlock(), event.isPlaceBlock());
+        }
+
+        public GenerateBlockResult(Key block, boolean placeBlock) {
+            this.block = block;
+            this.placeBlock = placeBlock;
+        }
+
+        public Key getBlock() {
+            return block;
+        }
+
+        public boolean isPlaceBlock() {
+            return placeBlock;
         }
 
     }
