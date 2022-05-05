@@ -33,6 +33,13 @@ public final class SuperiorSkyblockAPI {
 
     private static SuperiorSkyblock plugin;
 
+    /**
+     * Private constructor to prevent people from creating an instance of this class.
+     */
+    private SuperiorSkyblockAPI() {
+
+    }
+
     /*
      *  Player Methods
      */
