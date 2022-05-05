@@ -3102,30 +3102,35 @@ public final class SIsland implements Island {
 
         Key generatedBlock = KeyImpl.of(newState);
 
-        String[] typeSections = newState.split(":");
+        PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() + ", Block: " + generatedBlock);
 
-        if (optimizeCobblestone && typeSections[0].contains("COBBLESTONE"))
+        if (optimizeCobblestone && generatedBlock.getGlobalKey().contains("COBBLESTONE"))
             /* Block is being counted in BlocksListener#onBlockFromToMonitor */
             return generatedBlock;
 
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         handleBlockPlace(generatedBlock, 1);
 
-        Material generateBlockType = Material.valueOf(typeSections[0]);
-        byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
-        int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+        EventResult<Boolean> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(this, generatedBlock);
 
-        if (combinedId == -1) {
-            SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
-            generateBlockType = Material.COBBLESTONE;
-            blockData = 0;
-            combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+        if (eventResult.isCancelled())
+            return null;
+
+        // Checking whether the plugin should set the block in the world.
+        if (eventResult.getResult()) {
+            int combinedId;
+
+            try {
+                Material generateBlockType = Material.valueOf(generatedBlock.getGlobalKey());
+                byte blockData = generatedBlock.getSubKey().isEmpty() ? 0 : Byte.parseByte(generatedBlock.getSubKey());
+                combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+            } catch (IllegalArgumentException error) {
+                SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generatedBlock);
+                combinedId = plugin.getNMSAlgorithms().getCombinedId(Material.COBBLESTONE, (byte) 0);
+            }
+
+            plugin.getNMSWorld().setBlock(location, combinedId);
         }
-
-        PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() +
-                ", Block: " + generateBlockType + ":" + blockData);
-
-        plugin.getNMSWorld().setBlock(location, combinedId);
 
         plugin.getNMSWorld().playGeneratorSound(location);
 

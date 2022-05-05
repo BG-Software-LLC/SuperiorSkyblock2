@@ -52,6 +52,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnableFlagEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
@@ -427,6 +428,11 @@ public final class EventsBus {
             superiorPlayer.teleport(islandEnterProtectedEvent.getCancelTeleport());
 
         return !islandEnterProtectedEvent.isCancelled();
+    }
+
+    public EventResult<Boolean> callIslandGenerateBlockEvent(Island island, Key block) {
+        return callEvent(() -> new IslandGenerateBlockEvent(island, block), "islandgenerateblockevent",
+                true, IslandGenerateBlockEvent::isPlaceBlock);
     }
 
     public boolean callIslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
