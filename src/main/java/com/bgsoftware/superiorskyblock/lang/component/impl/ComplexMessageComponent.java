@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.lang.component.impl;
 
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -30,13 +31,13 @@ public final class ComplexMessageComponent implements IMessageComponent {
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
+    public void sendMessage(CommandSender sender, Object... args) {
         if (!(sender instanceof Player)) {
             String rawMessage = getMessage();
             if (rawMessage != null && !rawMessage.isEmpty())
                 sender.sendMessage(rawMessage);
         } else {
-            BaseComponent[] duplicate = replaceArgs(this.textComponent, objects);
+            BaseComponent[] duplicate = replaceArgs(this.textComponent, args);
             if (duplicate.length > 0)
                 ((Player) sender).spigot().sendMessage(duplicate);
         }
@@ -53,7 +54,7 @@ public final class ComplexMessageComponent implements IMessageComponent {
             duplicate[i] = textComponents[i].duplicate();
             if (duplicate[i] instanceof TextComponent) {
                 TextComponent textComponent = (TextComponent) duplicate[i];
-                textComponent.setText(IMessageComponent.replaceArgs(textComponent.getText(), objects).orElse(""));
+                textComponent.setText(Message.replaceArgs(textComponent.getText(), objects).orElse(""));
             }
             HoverEvent hoverEvent = duplicate[i].getHoverEvent();
             if (hoverEvent != null)

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import org.bukkit.command.CommandSender;
 
 public final class EmptyMessageComponent implements IMessageComponent {
@@ -20,7 +21,7 @@ public final class EmptyMessageComponent implements IMessageComponent {
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
+    public void sendMessage(CommandSender sender, Object... args) {
         // Do nothing.
     }
 

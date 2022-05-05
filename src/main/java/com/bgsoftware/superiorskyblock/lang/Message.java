@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
@@ -17,11 +17,13 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -745,7 +747,7 @@ public enum Message {
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
 
                 SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-                
+
                 if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
                     Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
             }
@@ -852,7 +854,7 @@ public enum Message {
 
     @Nullable
     public String getMessage(java.util.Locale locale, Object... objects) {
-        return isEmpty(locale) ? defaultMessage : IMessageComponent.replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
+        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... objects) {
@@ -881,6 +883,19 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    public static Optional<String> replaceArgs(String msg, Object... objects) {
+        if (StringUtils.isBlank(msg))
+            return Optional.empty();
+
+        for (int i = 0; i < objects.length; i++) {
+            String objectString = objects[i] instanceof BigDecimal ?
+                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
+            msg = msg.replace("{" + i + "}", objectString);
+        }
+
+        return msg.isEmpty() ? Optional.empty() : Optional.of(msg);
     }
 
 }

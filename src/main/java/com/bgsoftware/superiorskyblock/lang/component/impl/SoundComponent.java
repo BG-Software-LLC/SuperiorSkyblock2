@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.lang.component.impl;
 
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,7 +26,7 @@ public final class SoundComponent implements IMessageComponent {
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
+    public void sendMessage(CommandSender sender, Object... args) {
         if (sender instanceof Player)
             soundWrapper.playSound((Player) sender);
     }
