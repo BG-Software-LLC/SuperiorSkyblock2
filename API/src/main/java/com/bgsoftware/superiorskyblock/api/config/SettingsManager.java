@@ -470,6 +470,12 @@ public interface SettingsManager {
     List<String> getDisabledEvents();
 
     /**
+     * List of commands that should be disabled within the plugin.
+     * Config-path: disabled-commands
+     */
+    List<String> getDisabledCommands();
+
+    /**
      * Whether the schematic-name argument should be when executing /is create or not.
      * Config-path: schematic-name-argument
      */

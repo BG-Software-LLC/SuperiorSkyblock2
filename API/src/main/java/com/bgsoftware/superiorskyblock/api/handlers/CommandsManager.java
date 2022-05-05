@@ -42,6 +42,13 @@ public interface CommandsManager {
     List<SuperiorCommand> getSubCommands();
 
     /**
+     * Get all the registered sub-commands.
+     *
+     * @param includeDisabled Whether to include disabled commands.
+     */
+    List<SuperiorCommand> getSubCommands(boolean includeDisabled);
+
+    /**
      * Get a sub command by its label.
      *
      * @param commandLabel The label of the sub command.
