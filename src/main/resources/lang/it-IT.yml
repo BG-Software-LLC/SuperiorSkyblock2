@@ -106,6 +106,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: quantità
 COMMAND_ARGUMENT_BIOME: bioma
+COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: 'command...'
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: effetto-pozione
@@ -354,6 +355,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lErrore | &7Non puoi interagire al di fuori del tuo
 INVALID_AMOUNT: '&c&lErrore | &7Importo invalido {0}.'
 INVALID_BIOME: '&c&lErrore | &7Bioma invalido {0}.'
 INVALID_BLOCK: '&c&lErrore| &7Posizione del blocco invalida {0}.'
+INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_EFFECT: '&c&lErrore| &7Effetto invalido {0}.'
 INVALID_ENTITY: '&c&lErrore | &7Entità invalida {0}.'
 INVALID_ENVIRONMENT: '&c&lErrore | &7Mondo invalido {0}.'

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -286,6 +287,14 @@ public final class CommandTabCompletes {
         return Arrays.stream(World.Environment.values())
                 .map(environment -> environment.name().toLowerCase(Locale.ENGLISH))
                 .filter(environmentName -> environmentName.contains(lowerArgument))
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getBorderColors(String argument) {
+        String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
+        return Stream.of(BorderColor.values())
+                .map(borderColor -> borderColor.name().toLowerCase(Locale.ENGLISH))
+                .filter(borderColorName -> borderColorName.contains(lowerArgument))
                 .collect(Collectors.toList());
     }
 

@@ -155,6 +155,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: Betrag
 COMMAND_ARGUMENT_BIOME: biom
+COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: Befehl...
 COMMAND_ARGUMENT_DISCORD: Discord...
 COMMAND_ARGUMENT_EFFECT: Trank-Effekt
@@ -461,6 +462,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lError | &7Du kannst außerhalb der Border nicht in
 INVALID_AMOUNT: '&c&lError | &7Ungültiger Betrag {0}.'
 INVALID_BIOME: '&c&lError | &7Ungültiges Biom {0}.'
 INVALID_BLOCK: '&c&lError | &7Ungültige Blockposition {0}.'
+INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_EFFECT: '&c&lError | &7Ungültige Wirkung {0}.'
 INVALID_ENTITY: '&c&lError | &7Ungültige Entität {0}.'
 INVALID_ENVIRONMENT: '&c&lError | &7Ungültige Welt {0}.'

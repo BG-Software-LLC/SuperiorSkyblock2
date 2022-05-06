@@ -87,6 +87,12 @@ public interface SettingsManager {
     String getIslandTopOrder();
 
     /**
+     * Whether coop members are enabled.
+     * Config path: coop-members
+     */
+    boolean isCoopMembers();
+
+    /**
      * All settings related to the island-roles.
      * Config path: island-roles
      */

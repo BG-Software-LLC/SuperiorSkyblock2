@@ -618,7 +618,7 @@ public final class SIsland implements Island {
     @Override
     public boolean isCoop(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return coopPlayers.contains(superiorPlayer);
+        return plugin.getSettings().isCoopMembers() && coopPlayers.contains(superiorPlayer);
     }
 
     @Override

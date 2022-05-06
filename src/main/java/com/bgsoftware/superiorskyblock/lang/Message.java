@@ -117,6 +117,7 @@ public enum Message {
     COMMAND_ARGUMENT_ALL_PLAYERS("*"),
     COMMAND_ARGUMENT_AMOUNT("amount"),
     COMMAND_ARGUMENT_BIOME("biome"),
+    COMMAND_ARGUMENT_BORDER_COLOR("border-color"),
     COMMAND_ARGUMENT_COMMAND("command..."),
     COMMAND_ARGUMENT_DISCORD("discord..."),
     COMMAND_ARGUMENT_EFFECT("effect"),
@@ -364,6 +365,7 @@ public enum Message {
     INVALID_AMOUNT,
     INVALID_BIOME,
     INVALID_BLOCK,
+    INVALID_BORDER_COLOR,
     INVALID_EFFECT,
     INVALID_ENTITY,
     INVALID_ENVIRONMENT,
@@ -745,7 +747,7 @@ public enum Message {
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
 
                 SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-                
+
                 if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
                     Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
             }

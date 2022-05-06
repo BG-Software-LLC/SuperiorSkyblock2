@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.arguments;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -398,6 +399,20 @@ public final class CommandArguments {
         }
 
         return parsedArgs;
+    }
+
+    public static BorderColor getBorderColor(CommandSender sender, String argument) {
+        BorderColor borderColor = null;
+
+        try {
+            borderColor = BorderColor.valueOf(argument.toUpperCase(Locale.ENGLISH));
+        } catch (Exception ignored) {
+        }
+
+        if (borderColor == null)
+            Message.INVALID_BORDER_COLOR.send(sender, argument);
+
+        return borderColor;
     }
 
     private static NumberArgument<Integer> getInt(CommandSender sender, String argument, Message locale) {

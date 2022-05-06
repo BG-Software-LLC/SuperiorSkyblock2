@@ -128,6 +128,7 @@ COMMAND_ARGUMENT_ALL_ISLANDS: '*'
 COMMAND_ARGUMENT_ALL_PLAYERS: '*'
 COMMAND_ARGUMENT_AMOUNT: so-luong
 COMMAND_ARGUMENT_BIOME: quan-xa
+COMMAND_ARGUMENT_BORDER_COLOR: 'border-color'
 COMMAND_ARGUMENT_COMMAND: lenh...
 COMMAND_ARGUMENT_DISCORD: discord...
 COMMAND_ARGUMENT_EFFECT: hieu-ung-thuoc
@@ -403,6 +404,7 @@ INTERACT_OUTSIDE_ISLAND: '&c&lLỗi | &7Bạn không thể tương tác ngoài p
 INVALID_AMOUNT: '&c&lLỗi | &7Số lượng không hợp lệ {0}.'
 INVALID_BIOME: '&c&lLỗi | &7Quần xã không chính xác {0}.'
 INVALID_BLOCK: '&c&lLỗi | &7Vị trí khối không hợp lệ {0}.'
+INVALID_BORDER_COLOR: '&c&lError | &7Invalid border color {0}.'
 INVALID_EFFECT: '&c&lLỗi | &7Hiệu ứng không hợp lệ {0}.'
 INVALID_ENTITY: '&c&lLỗi | &7Vật thể không chính xác {0}.'
 INVALID_ENVIRONMENT: '&c&lLỗi | &7Thế giới {0} không hợp lệ.'

@@ -84,6 +84,7 @@ public final class SettingsContainer {
     public final String islandLevelFormula;
     public final boolean roundedIslandLevel;
     public final String islandTopOrder;
+    public boolean coopMembers;
     public final ConfigurationSection islandRolesSection;
     public final long calcInterval;
     public final String signWarpLine;
@@ -290,6 +291,7 @@ public final class SettingsContainer {
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
         islandTopOrder = config.getString("island-top-order", "WORTH");
+        coopMembers = config.getBoolean("coop-members", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
         signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
