@@ -66,6 +66,11 @@ public interface GridManager {
     void setIslandCreationAlgorithm(@Nullable IslandCreationAlgorithm islandCreationAlgorithm);
 
     /**
+     * Get the currently used island creation algorithm.
+     */
+    IslandCreationAlgorithm getIslandCreationAlgorithm();
+
+    /**
      * Checks if a player has an active request for creating an island.
      *
      * @param superiorPlayer The player to check.
