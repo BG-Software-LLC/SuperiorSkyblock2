@@ -75,30 +75,31 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
                                    InventoryClickEvent clickEvent) {
         PlayerRole currentRole = island.getRequiredPlayerRole(pagedObject.getIslandPrivilege());
 
+        if (clickedPlayer.getPlayerRole().isLessThan(currentRole)) {
+            onFailurePermissionChange(clickedPlayer, false);
+            return;
+        }
+
+        PlayerRole newRole = null;
+
         if (clickEvent.getClick().isLeftClick()) {
-            if (!clickedPlayer.getPlayerRole().isLessThan(currentRole)) {
-                PlayerRole previousRole = SPlayerRole.of(currentRole.getWeight() - 1);
-                if (previousRole == null) {
-                    onFailurePermissionChange(clickedPlayer, false);
-                } else {
-                    if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, previousRole)) {
-                        island.setPermission(previousRole, pagedObject.getIslandPrivilege());
-                        onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
-                                Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
-                    }
-                }
+            newRole = SPlayerRole.of(currentRole.getWeight() - 1);
+
+            if (newRole == null)
+                newRole = clickedPlayer.getPlayerRole();
+        } else {
+            if (clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
+                newRole = SPlayerRole.of(currentRole.getWeight() + 1);
             }
-        } else if (clickEvent.getClick().isRightClick() && clickedPlayer.getPlayerRole().isHigherThan(currentRole)) {
-            PlayerRole nextRole = SPlayerRole.of(currentRole.getWeight() + 1);
-            if (nextRole == null) {
-                onFailurePermissionChange(clickedPlayer, false);
-            } else {
-                if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, nextRole)) {
-                    island.setPermission(nextRole, pagedObject.getIslandPrivilege());
-                    onSuccessfulPermissionChange(clickedPlayer, superiorMenu,
-                            Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
-                }
-            }
+
+            if (newRole == null)
+                newRole = SPlayerRole.guestRole();
+        }
+
+        if (plugin.getEventsBus().callIslandChangeRolePrivilegeEvent(island, clickedPlayer, newRole)) {
+            island.setPermission(newRole, pagedObject.getIslandPrivilege());
+            onSuccessfulPermissionChange(island, clickedPlayer, superiorMenu,
+                    Formatters.CAPITALIZED_FORMATTER.format(pagedObject.getIslandPrivilege().getName()));
         }
     }
 
@@ -116,11 +117,12 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
 
             island.setPermission(permissionHolder, pagedObject.getIslandPrivilege(), !currentValue);
 
-            onSuccessfulPermissionChange(clickedPlayer, superiorMenu, permissionHolderName);
+            onSuccessfulPermissionChange(island, clickedPlayer, superiorMenu, permissionHolderName);
         }
     }
 
-    private void onSuccessfulPermissionChange(SuperiorPlayer clickedPlayer, MenuIslandPrivileges superiorMenu,
+    private void onSuccessfulPermissionChange(Island island, SuperiorPlayer clickedPlayer,
+                                              MenuIslandPrivileges superiorMenu,
                                               String permissionHolderName) {
         Player player = clickedPlayer.asPlayer();
 
@@ -135,8 +137,8 @@ public final class IslandPrivilegePagedObjectButton extends PagedObjectButton<Me
 
         pagedObject.getAccessCommands().forEach(command -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                 command.replace("%player%", clickedPlayer.getName())));
-
-        superiorMenu.refreshPage();
+        
+        MenuIslandPrivileges.refreshMenus(island);
     }
 
     private void onFailurePermissionChange(SuperiorPlayer clickedPlayer,
