@@ -70,6 +70,10 @@ public final class MultipleComponents implements IMessageComponent {
 
         messageComponents.removeIf(component -> component.getType() == Type.EMPTY);
 
+        return of(messageComponents);
+    }
+
+    public static IMessageComponent of(List<IMessageComponent> messageComponents) {
         return messageComponents.isEmpty() ? EmptyMessageComponent.getInstance() :
                 messageComponents.size() == 1 ? messageComponents.get(0) : new MultipleComponents(messageComponents);
     }
