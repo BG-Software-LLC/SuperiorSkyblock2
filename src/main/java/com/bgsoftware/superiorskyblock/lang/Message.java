@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -882,8 +883,11 @@ public enum Message {
 
     public void send(CommandSender sender, Locale locale, Object... objects) {
         IMessageComponent messageComponent = getComponent(locale);
-        if (messageComponent != null)
-            messageComponent.sendMessage(sender, objects);
+        if (messageComponent != null) {
+            EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
+            if (!eventResult.isCancelled())
+                eventResult.getResult().sendMessage(sender, objects);
+        }
     }
 
     private void setMessage(Locale locale, IMessageComponent messageComponent) {
