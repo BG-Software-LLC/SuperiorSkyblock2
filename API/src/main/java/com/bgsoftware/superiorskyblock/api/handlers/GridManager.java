@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public interface GridManager {
+public interface GridManager extends IDatabaseBridgeHolder {
 
     /**
      * Create a new island.
@@ -379,10 +380,5 @@ public interface GridManager {
      * Get the islands container.
      */
     IslandsContainer getIslandsContainer();
-
-    /**
-     * Get the database-bridge of the grid.
-     */
-    DatabaseBridge getDatabaseBridge();
 
 }

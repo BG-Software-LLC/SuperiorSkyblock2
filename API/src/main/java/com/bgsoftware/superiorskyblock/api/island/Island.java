@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
@@ -33,7 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public interface Island extends Comparable<Island>, IMissionsHolder {
+public interface Island extends Comparable<Island>, IMissionsHolder, IDatabaseBridgeHolder {
 
     /*
      *  General methods
@@ -1849,10 +1850,5 @@ public interface Island extends Comparable<Island>, IMissionsHolder {
      */
     @Deprecated
     IslandDataHandler getDataHandler();
-
-    /**
-     * Get the current database bridge of the island.
-     */
-    DatabaseBridge getDatabaseBridge();
 
 }
