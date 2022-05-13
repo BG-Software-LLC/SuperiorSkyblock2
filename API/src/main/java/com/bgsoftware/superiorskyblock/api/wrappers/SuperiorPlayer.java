@@ -1,8 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
-import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
-import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -486,13 +484,5 @@ public interface SuperiorPlayer extends IMissionsHolder, IDatabaseBridgeHolder {
      * Merge another player into this object.
      */
     void merge(SuperiorPlayer otherPlayer);
-
-    /**
-     * Get the data handler of the object.
-     *
-     * @deprecated See getDatabaseBridge
-     */
-    @Deprecated
-    PlayerDataHandler getDataHandler();
 
 }

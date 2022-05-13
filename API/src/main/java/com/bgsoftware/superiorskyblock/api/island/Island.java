@@ -1,8 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
-import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
@@ -1838,17 +1836,5 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IDatabaseBr
      * @param rows  The amount of rows for that page.
      */
     void setChestRows(int index, int rows);
-
-    /*
-     *  Data related methods
-     */
-
-    /**
-     * Get the data handler of the object.
-     *
-     * @deprecated See getDatabaseBridge
-     */
-    @Deprecated
-    IslandDataHandler getDataHandler();
 
 }

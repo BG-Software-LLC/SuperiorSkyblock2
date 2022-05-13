@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.player;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -10,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
@@ -401,12 +399,6 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     @Override
     public void merge(SuperiorPlayer other) {
         // Do nothing.
-    }
-
-    @Override
-    @Deprecated
-    public PlayerDataHandler getDataHandler() {
-        return EmptyDataHandler.getInstance();
     }
 
     @Override
