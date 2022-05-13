@@ -8,12 +8,14 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.persistence.EmptyPersistentDataContainer;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -415,6 +417,11 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public PersistentDataContainer getPersistentDataContainer() {
+        return EmptyPersistentDataContainer.getInstance();
+    }
+
+    @Override
     public void completeMission(Mission<?> mission) {
         // Do nothing.
     }
@@ -448,5 +455,4 @@ public final class SuperiorNPCPlayer implements SuperiorPlayer {
     public Map<Mission<?>, Integer> getCompletedMissionsWithAmounts() {
         return Collections.emptyMap();
     }
-
 }

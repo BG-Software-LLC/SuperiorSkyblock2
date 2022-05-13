@@ -194,6 +194,10 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         setTag(key, new StringTag(value));
     }
 
+    public void putAll(CompoundTag other) {
+        this.value.putAll(other.value);
+    }
+
     public boolean containsKey(String key) {
         return this.value.containsKey(key);
     }

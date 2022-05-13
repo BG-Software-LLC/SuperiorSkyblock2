@@ -9,13 +9,25 @@ import com.google.common.base.Preconditions;
 import org.apache.commons.lang.IllegalClassException;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.Consumer;
 
-public final class PersistentDataContainerImpl implements PersistentDataContainer {
+public final class PersistentDataContainerImpl<E> implements PersistentDataContainer {
+
+
+    private final E holder;
+    private final Consumer<E> saveFunction;
 
     private final CompoundTag innerTag = new CompoundTag();
+
+    public PersistentDataContainerImpl(E holder, Consumer<E> saveFunction) {
+        this.holder = holder;
+        this.saveFunction = saveFunction;
+    }
 
     @Override
     public boolean has(String key) {
@@ -47,6 +59,9 @@ public final class PersistentDataContainerImpl implements PersistentDataContaine
         Preconditions.checkNotNull(value, "value parameter cannot be null");
         Preconditions.checkNotNull(returnType, "returnType parameter cannot be null");
         Tag<?> oldValue = innerTag.setTag(key, PersistenceDataTypeSerializer.serialize(value, type));
+
+        this.saveFunction.accept(holder);
+
         return oldValue == null ? null : PersistenceDataTypeSerializer.deserialize(oldValue, returnType);
     }
 
@@ -55,6 +70,9 @@ public final class PersistentDataContainerImpl implements PersistentDataContaine
     public Object remove(String key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Tag<?> oldValue = innerTag.remove(key);
+
+        this.saveFunction.accept(holder);
+
         return oldValue == null ? null : oldValue.getValue();
     }
 
@@ -68,6 +86,9 @@ public final class PersistentDataContainerImpl implements PersistentDataContaine
             return null;
 
         Tag<?> oldValue = innerTag.remove(key);
+
+        this.saveFunction.accept(holder);
+
         return PersistenceDataTypeSerializer.deserialize(oldValue, type);
     }
 
@@ -119,6 +140,16 @@ public final class PersistentDataContainerImpl implements PersistentDataContaine
         }
 
         return byteArrayDataOutput.toByteArray();
+    }
+
+    @Override
+    public void load(byte[] data) {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        try {
+            this.innerTag.putAll((CompoundTag) Tag.fromStream(new DataInputStream(byteArrayInputStream), 0));
+        } catch (Exception error) {
+            throw new IllegalArgumentException(error);
+        }
     }
 
     @Nullable

@@ -121,8 +121,18 @@ public interface PersistentDataContainer {
 
     /**
      * Get the serialized contents of the container as a bytes array.
-     * The format for formatting the container may be changed depending on the implementation of the container.
+     * The format of the serialized data may be different depending on the implementation of the container.
+     * The serialized data must be loaded without any errors using {@link #load(byte[])}.
      */
     byte[] serialize();
+
+    /**
+     * Load contents from the serialized data into the container.
+     * The format of the serialized data may be different depending on the implementation of the container.
+     *
+     * @param data The serialized data.
+     * @throws IllegalArgumentException If the given data cannot be serialized correctly.
+     */
+    void load(byte[] data) throws IllegalArgumentException;
 
 }

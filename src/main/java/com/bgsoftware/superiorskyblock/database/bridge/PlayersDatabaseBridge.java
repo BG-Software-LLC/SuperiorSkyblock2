@@ -7,12 +7,19 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
 public final class PlayersDatabaseBridge {
+
+    private static final Map<UUID, Map<FutureSave, Set<Object>>> SAVE_METHODS_TO_BE_EXECUTED = new ConcurrentHashMap<>();
 
     private PlayersDatabaseBridge() {
     }
@@ -85,6 +92,13 @@ public final class PlayersDatabaseBridge {
         );
     }
 
+    public static void savePersistentDataContainer(SuperiorPlayer superiorPlayer) {
+        superiorPlayer.getDatabaseBridge().insertObject("players_custom_data",
+                new Pair<>("player", superiorPlayer.getUniqueId().toString()),
+                new Pair<>("data", superiorPlayer.getPersistentDataContainer().serialize())
+        );
+    }
+
     public static void insertPlayer(SuperiorPlayer superiorPlayer) {
         Locale userLocale = superiorPlayer.getUserLocale();
 
@@ -116,6 +130,11 @@ public final class PlayersDatabaseBridge {
                 new Pair<>("last_time_updated", superiorPlayer.getLastTimeStatus())
         );
 
+        superiorPlayer.getDatabaseBridge().updateObject("players_custom_data",
+                createFilter("player", superiorPlayer),
+                new Pair<>("data", superiorPlayer.getPersistentDataContainer().serialize())
+        );
+
         superiorPlayer.getDatabaseBridge().updateObject("players_settings",
                 createFilter("player", superiorPlayer),
                 new Pair<>("language", userLocale.getLanguage() + "-" + userLocale.getCountry()),
@@ -136,8 +155,33 @@ public final class PlayersDatabaseBridge {
     public static void deletePlayer(SuperiorPlayer superiorPlayer) {
         DatabaseFilter playerFilter = createFilter("player", superiorPlayer);
         superiorPlayer.getDatabaseBridge().deleteObject("players", createFilter("uuid", superiorPlayer));
+        superiorPlayer.getDatabaseBridge().deleteObject("players_custom_data", playerFilter);
         superiorPlayer.getDatabaseBridge().deleteObject("players_settings", playerFilter);
         superiorPlayer.getDatabaseBridge().deleteObject("players_missions", playerFilter);
+    }
+
+    public static void markPersistentDataContainerToBeSaved(SuperiorPlayer superiorPlayer) {
+        Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(superiorPlayer.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
+                .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
+        if (varsForPersistentData.isEmpty())
+            varsForPersistentData.add(new Object());
+    }
+
+    public static boolean isModified(SuperiorPlayer superiorPlayer) {
+        return SAVE_METHODS_TO_BE_EXECUTED.containsKey(superiorPlayer.getUniqueId());
+    }
+
+    public static void executeFutureSaves(SuperiorPlayer superiorPlayer) {
+        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayer.getUniqueId());
+        if (futureSaves != null) {
+            for (Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()) {
+                switch (futureSaveEntry.getKey()) {
+                    case PERSISTENT_DATA:
+                        savePersistentDataContainer(superiorPlayer);
+                        break;
+                }
+            }
+        }
     }
 
     private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
@@ -146,6 +190,12 @@ public final class PlayersDatabaseBridge {
         if (others != null)
             filters.addAll(Arrays.asList(others));
         return new DatabaseFilter(filters);
+    }
+
+    private enum FutureSave {
+
+        PERSISTENT_DATA
+
     }
 
 }

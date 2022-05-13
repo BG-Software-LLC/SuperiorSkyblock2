@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
+import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -20,7 +21,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface SuperiorPlayer extends IMissionsHolder {
+public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder {
 
     /*
      *   General Methods

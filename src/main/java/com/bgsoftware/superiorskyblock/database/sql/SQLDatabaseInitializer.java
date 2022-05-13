@@ -153,6 +153,11 @@ public final class SQLDatabaseInitializer {
                 new Pair<>("contents", "LONGTEXT")
         );
 
+        SQLHelper.createTable("islands_custom_data",
+                new Pair<>("island", "UUID PRIMARY KEY"),
+                new Pair<>("data", "BLOB")
+        );
+
         SQLHelper.createTable("islands_effects",
                 new Pair<>("island", "UUID"),
                 new Pair<>("effect_type", "UNIQUE_TEXT"),
@@ -295,6 +300,11 @@ public final class SQLDatabaseInitializer {
                 new Pair<>("last_used_skin", "TEXT"),
                 new Pair<>("disbands", "INTEGER"),
                 new Pair<>("last_time_updated", "BIGINT")
+        );
+
+        SQLHelper.createTable("players_custom_data",
+                new Pair<>("player", "UUID PRIMARY KEY"),
+                new Pair<>("data", "BLOB")
         );
 
         SQLHelper.createTable("players_missions",

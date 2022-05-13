@@ -16,7 +16,9 @@ public final class PersistentDataTag<E> extends Tag<E> {
 
     @Override
     protected void writeData(DataOutputStream os) throws IOException {
-        os.write(serializer.serialize(value));
+        byte[] data = serializer.serialize(value);
+        os.writeInt(data.length);
+        os.write(data);
     }
 
 }

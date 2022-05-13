@@ -82,4 +82,24 @@ public final class PlayersDeserializer {
         });
     }
 
+    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<CachedPlayerInfo> databaseCache) {
+        databaseBridge.loadAllObjects("players_custom_data", customDataRow -> {
+            DatabaseResult customData = new DatabaseResult(customDataRow);
+
+            Optional<UUID> uuid = customData.getUUID("player");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load custom data for null players, skipping...");
+                return;
+            }
+
+            byte[] persistentData = customData.getBlob("data").orElse(new byte[0]);
+
+            if (persistentData.length == 0)
+                return;
+
+            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedPlayerInfo::new);
+            cachedPlayerInfo.persistentData = persistentData;
+        });
+    }
+
 }

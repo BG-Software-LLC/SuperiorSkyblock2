@@ -126,6 +126,7 @@ public final class DataHandler extends AbstractHandler {
 
         PlayersDeserializer.deserializeMissions(playersLoader, databaseCache);
         PlayersDeserializer.deserializePlayerSettings(playersLoader, databaseCache);
+        PlayersDeserializer.deserializePersistentDataContainer(playersLoader, databaseCache);
 
         playersLoader.loadAllObjects("players", resultSet -> {
             plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet));
@@ -168,6 +169,7 @@ public final class DataHandler extends AbstractHandler {
         IslandsDeserializer.deserializeVisitorHomes(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeIslandSettings(islandsLoader, databaseCache);
         IslandsDeserializer.deserializeBankTransactions(islandsLoader, databaseCache);
+        IslandsDeserializer.deserializePersistentDataContainer(islandsLoader, databaseCache);
 
         islandsLoader.loadAllObjects("islands", resultSet -> {
             plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));

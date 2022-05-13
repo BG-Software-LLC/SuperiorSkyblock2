@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -131,6 +132,7 @@ public final class SIsland implements Island {
     private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
     private final IslandBlocksTrackerAlgorithm blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
     private final IslandEntitiesTrackerAlgorithm entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
+    private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
     private final SyncedObject<BukkitTask> bankInterestTask = SyncedObject.of(null);
 
     /*
@@ -3236,6 +3238,11 @@ public final class SIsland implements Island {
         return databaseBridge;
     }
 
+    @Override
+    public PersistentDataContainer getPersistentDataContainer() {
+        return persistentDataContainer;
+    }
+
     private void replaceVisitor(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         uniqueVisitors.write(uniqueVisitors -> {
             for (UniqueVisitor uniqueVisitor : uniqueVisitors) {
@@ -3538,6 +3545,8 @@ public final class SIsland implements Island {
         });
 
         cachedIslandInfo.bankTransactions.forEach(islandBank::loadTransaction);
+        if (cachedIslandInfo.persistentData.length > 0)
+            this.persistentDataContainer.load(cachedIslandInfo.persistentData);
     }
 
     private void startBankInterest() {

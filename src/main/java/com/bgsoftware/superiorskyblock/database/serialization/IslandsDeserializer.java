@@ -28,8 +28,11 @@ import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.google.gson.Gson;
@@ -42,6 +45,9 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -802,6 +808,26 @@ public final class IslandsDeserializer {
                 SBankTransaction.fromDatabase(bankTransaction).ifPresent(cachedIslandInfo.bankTransactions::add);
             });
         }
+    }
+
+    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+        databaseBridge.loadAllObjects("islands_custom_data", customDataRow -> {
+            DatabaseResult customData = new DatabaseResult(customDataRow);
+
+            Optional<UUID> uuid = customData.getUUID("island");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load custom data for null islands, skipping...");
+                return;
+            }
+
+            byte[] persistentData = customData.getBlob("data").orElse(new byte[0]);
+
+            if (persistentData.length == 0)
+                return;
+
+            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
+            cachedIslandInfo.persistentData = persistentData;
+        });
     }
 
 }

@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.tag.PersistentDataTagSerialized;
 import com.bgsoftware.superiorskyblock.tag.ShortTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.tag.UUIDTag;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang.IllegalClassException;
@@ -22,6 +23,7 @@ import org.apache.commons.lang.IllegalClassException;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 public final class PersistenceDataTypeSerializer {
@@ -37,6 +39,7 @@ public final class PersistenceDataTypeSerializer {
             .put(Long.class, value -> new LongTag((long) value))
             .put(Short.class, value -> new ShortTag((short) value))
             .put(String.class, value -> new StringTag((String) value))
+            .put(UUID.class, value -> new UUIDTag((UUID) value))
             .build();
 
     private PersistenceDataTypeSerializer() {
@@ -66,7 +69,8 @@ public final class PersistenceDataTypeSerializer {
     }
 
     public static boolean isTagOfType(Tag<?> tag, PersistentDataType<?> type) {
-        return tag.getValue().getClass().isAssignableFrom(type.getType());
+        return tag instanceof PersistentDataTagSerialized ? type.getContext() != null :
+                tag.getValue().getClass().isAssignableFrom(type.getType());
     }
 
     private static void checkTagType(Tag<?> tag, PersistentDataType<?> type) {

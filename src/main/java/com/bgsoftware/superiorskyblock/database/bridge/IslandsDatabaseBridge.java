@@ -555,6 +555,13 @@ public final class IslandsDatabaseBridge {
         );
     }
 
+    public static void savePersistentDataContainer(Island island) {
+        island.getDatabaseBridge().insertObject("islands_custom_data",
+                new Pair<>("island", island.getUniqueId().toString()),
+                new Pair<>("data", island.getPersistentDataContainer().serialize())
+        );
+    }
+
     public static void insertIsland(Island island) {
         island.getDatabaseBridge().insertObject("islands",
                 new Pair<>("uuid", island.getUniqueId().toString()),
@@ -603,6 +610,7 @@ public final class IslandsDatabaseBridge {
         island.getDatabaseBridge().deleteObject("islands_banks", islandFilter);
         island.getDatabaseBridge().deleteObject("islands_bans", islandFilter);
         island.getDatabaseBridge().deleteObject("islands_block_limits", islandFilter);
+        island.getDatabaseBridge().deleteObject("islands_custom_data", islandFilter);
         island.getDatabaseBridge().deleteObject("islands_chests", islandFilter);
         island.getDatabaseBridge().deleteObject("islands_effects", islandFilter);
         island.getDatabaseBridge().deleteObject("islands_entity_limits", islandFilter);
@@ -636,6 +644,13 @@ public final class IslandsDatabaseBridge {
             varsForBlockCounts.add(new Object());
     }
 
+    public static void markPersistentDataContainerToBeSaved(Island island) {
+        Set<Object> varsForPersistentData = SAVE_METHODS_TO_BE_EXECUTED.computeIfAbsent(island.getUniqueId(), u -> new EnumMap<>(FutureSave.class))
+                .computeIfAbsent(FutureSave.PERSISTENT_DATA, e -> new HashSet<>());
+        if (varsForPersistentData.isEmpty())
+            varsForPersistentData.add(new Object());
+    }
+
     public static boolean isModified(Island island) {
         return SAVE_METHODS_TO_BE_EXECUTED.containsKey(island.getUniqueId());
     }
@@ -651,6 +666,9 @@ public final class IslandsDatabaseBridge {
                     case ISLAND_CHESTS:
                         for (Object islandChest : futureSaveEntry.getValue())
                             saveIslandChest(island, (IslandChest) islandChest);
+                        break;
+                    case PERSISTENT_DATA:
+                        savePersistentDataContainer(island);
                         break;
                 }
             }
@@ -668,7 +686,8 @@ public final class IslandsDatabaseBridge {
     private enum FutureSave {
 
         BLOCK_COUNTS,
-        ISLAND_CHESTS
+        ISLAND_CHESTS,
+        PERSISTENT_DATA
 
     }
 
