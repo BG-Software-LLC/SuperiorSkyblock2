@@ -3721,8 +3721,9 @@ public final class SIsland implements Island {
                 entityLimits.put(entry.getKey(), entry.getValue());
         }
 
-        for (int i = 0; i < cobbleGeneratorValues.length; i++) {
-            Map<Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+        Map<Key, UpgradeValue<Integer>>[] generatorRates = upgradeLevel.getGeneratorUpgradeValue();
+        for (int i = 0; i < cobbleGeneratorValues.length && i < generatorRates.length; i++) {
+            Map<Key, UpgradeValue<Integer>> levelGenerator = generatorRates[i];
             if (levelGenerator != null) {
                 KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
 
