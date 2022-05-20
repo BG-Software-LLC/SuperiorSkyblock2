@@ -368,8 +368,8 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             ex.printStackTrace();
             PluginDebugger.debug(ex);
         } finally {
-            SuperiorSkyblockPlugin.log("Unloading worlds...");
-            unloadIslandWorlds();
+            // SuperiorSkyblockPlugin.log("Unloading worlds...");
+            // unloadIslandWorlds();
 
             SuperiorSkyblockPlugin.log("Shutting down calculation task...");
             CalcTask.cancelTask();
