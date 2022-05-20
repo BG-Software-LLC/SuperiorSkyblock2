@@ -213,6 +213,13 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     @Override
     public void onEnable() {
         try {
+            if (SuperiorSkyblockAPI.getSuperiorSkyblock() == null) {
+                shouldEnable = false;
+                HandlerLoadException.handle(new HandlerLoadException("The API instance was not initialized properly. Contact Ome_R regarding this!",
+                        HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN));
+                return;
+            }
+
             if (!shouldEnable) {
                 Bukkit.shutdown();
                 return;
