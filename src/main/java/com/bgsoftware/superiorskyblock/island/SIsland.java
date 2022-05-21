@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
-import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
@@ -28,7 +27,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
@@ -3228,12 +3226,6 @@ public final class SIsland implements Island {
     }
 
     @Override
-    @Deprecated
-    public IslandDataHandler getDataHandler() {
-        return EmptyDataHandler.getInstance();
-    }
-
-    @Override
     public DatabaseBridge getDatabaseBridge() {
         return databaseBridge;
     }
@@ -3730,8 +3722,9 @@ public final class SIsland implements Island {
                 entityLimits.put(entry.getKey(), entry.getValue());
         }
 
-        for (int i = 0; i < cobbleGeneratorValues.length; i++) {
-            Map<Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+        Map<Key, UpgradeValue<Integer>>[] generatorRates = upgradeLevel.getGeneratorUpgradeValue();
+        for (int i = 0; i < cobbleGeneratorValues.length && i < generatorRates.length; i++) {
+            Map<Key, UpgradeValue<Integer>> levelGenerator = generatorRates[i];
             if (levelGenerator != null) {
                 KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
 

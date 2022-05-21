@@ -38,6 +38,7 @@ import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -55,10 +56,22 @@ public final class FactoriesHandler implements FactoriesManager {
         this.islandsFactory = islandsFactory;
     }
 
+    @Nullable
+    @Override
+    public IslandsFactory getIslandsFactory() {
+        return islandsFactory;
+    }
+
     @Override
     public void registerPlayersFactory(PlayersFactory playersFactory) {
         Preconditions.checkNotNull(playersFactory, "playersFactory parameter cannot be null.");
         this.playersFactory = playersFactory;
+    }
+
+    @Nullable
+    @Override
+    public PlayersFactory getPlayersFactory() {
+        return playersFactory;
     }
 
     @Override
@@ -67,10 +80,22 @@ public final class FactoriesHandler implements FactoriesManager {
         this.banksFactory = banksFactory;
     }
 
+    @Nullable
+    @Override
+    public BanksFactory getBanksFactory() {
+        return banksFactory;
+    }
+
     @Override
     public void registerDatabaseBridgeFactory(DatabaseBridgeFactory databaseBridgeFactory) {
         Preconditions.checkNotNull(databaseBridgeFactory, "databaseBridgeFactory parameter cannot be null.");
         this.databaseBridgeFactory = databaseBridgeFactory;
+    }
+
+    @Nullable
+    @Override
+    public DatabaseBridgeFactory getDatabaseBridgeFactory() {
+        return databaseBridgeFactory;
     }
 
     @Override
@@ -124,23 +149,55 @@ public final class FactoriesHandler implements FactoriesManager {
     }
 
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
-        return islandsFactory == null ? DefaultIslandCalculationAlgorithm.getInstance() :
-                islandsFactory.createIslandCalculationAlgorithm(island);
+        IslandCalculationAlgorithm original = DefaultIslandCalculationAlgorithm.getInstance();
+        if (islandsFactory == null)
+            return original;
+
+        try {
+            // noinspection deprecation
+            return islandsFactory.createIslandCalculationAlgorithm(island);
+        } catch (UnsupportedOperationException error) {
+            return islandsFactory.createIslandCalculationAlgorithm(island, original);
+        }
     }
 
     public IslandBlocksTrackerAlgorithm createIslandBlocksTrackerAlgorithm(Island island) {
-        return islandsFactory == null ? new DefaultIslandBlocksTrackerAlgorithm(island) :
-                islandsFactory.createIslandBlocksTrackerAlgorithm(island);
+        IslandBlocksTrackerAlgorithm original = new DefaultIslandBlocksTrackerAlgorithm(island);
+        if (islandsFactory == null)
+            return original;
+
+        try {
+            // noinspection deprecation
+            return islandsFactory.createIslandBlocksTrackerAlgorithm(island);
+        } catch (UnsupportedOperationException error) {
+            return islandsFactory.createIslandBlocksTrackerAlgorithm(island, original);
+        }
     }
 
     public IslandEntitiesTrackerAlgorithm createIslandEntitiesTrackerAlgorithm(Island island) {
-        return islandsFactory == null ? new DefaultIslandEntitiesTrackerAlgorithm(island) :
-                islandsFactory.createIslandEntitiesTrackerAlgorithm(island);
+        IslandEntitiesTrackerAlgorithm original = new DefaultIslandEntitiesTrackerAlgorithm(island);
+        if (islandsFactory == null)
+            return original;
+
+        try {
+            // noinspection deprecation
+            return islandsFactory.createIslandEntitiesTrackerAlgorithm(island);
+        } catch (UnsupportedOperationException error) {
+            return islandsFactory.createIslandEntitiesTrackerAlgorithm(island, original);
+        }
     }
 
     public PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {
-        return playersFactory == null ? DefaultPlayerTeleportAlgorithm.getInstance() :
-                playersFactory.createPlayerTeleportAlgorithm(superiorPlayer);
+        PlayerTeleportAlgorithm original = DefaultPlayerTeleportAlgorithm.getInstance();
+        if (playersFactory == null)
+            return original;
+
+        try {
+            // noinspection deprecation
+            return playersFactory.createPlayerTeleportAlgorithm(superiorPlayer);
+        } catch (UnsupportedOperationException error) {
+            return playersFactory.createPlayerTeleportAlgorithm(superiorPlayer, original);
+        }
     }
 
     public boolean hasCustomDatabaseBridge() {

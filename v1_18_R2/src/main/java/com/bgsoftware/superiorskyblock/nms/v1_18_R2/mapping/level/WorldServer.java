@@ -154,6 +154,10 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
         return handle.f(y);
     }
 
+    public int getSectionYFromSectionIndex(int index) {
+        return handle.g(index);
+    }
+
     public TileEntity getTileEntity(BlockPosition blockPosition) {
         return TileEntity.ofNullable(handle.c_(blockPosition.getHandle()));
     }
@@ -226,6 +230,10 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
 
     public EnderDragonBattle getEnderDragonBattle() {
         return handle.E();
+    }
+
+    public BlockPosition getBlockRandomPos(int i, int j, int k, int l) {
+        return new BlockPosition(handle.a(i, j, k, l));
     }
 
 }

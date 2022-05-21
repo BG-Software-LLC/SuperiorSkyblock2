@@ -152,6 +152,10 @@ public final class WorldServer extends MappedObject<net.minecraft.server.level.W
         return handle.f(y);
     }
 
+    public int getSectionYFromSectionIndex(int index) {
+        return handle.g(index);
+    }
+
     public TileEntity getTileEntity(BlockPosition blockPosition) {
         return TileEntity.ofNullable(handle.c_(blockPosition.getHandle()));
     }

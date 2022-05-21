@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -10,7 +11,7 @@ import org.bukkit.block.Block;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-public interface StackedBlocksManager {
+public interface StackedBlocksManager extends IDatabaseBridgeHolder {
 
     /**
      * Get the block amount in a specific block.
@@ -126,10 +127,5 @@ public interface StackedBlocksManager {
      * @param chunk The chunk to update holograms in.
      */
     void removeStackedBlockHolograms(Chunk chunk);
-
-    /**
-     * Get the database-bridge of the stacked-blocks manager.
-     */
-    DatabaseBridge getDatabaseBridge();
 
 }

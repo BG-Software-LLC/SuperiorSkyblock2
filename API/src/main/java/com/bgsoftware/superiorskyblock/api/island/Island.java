@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
-import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
+import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
@@ -34,7 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder {
+public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
 
     /*
      *  General methods
@@ -1838,22 +1837,5 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param rows  The amount of rows for that page.
      */
     void setChestRows(int index, int rows);
-
-    /*
-     *  Data related methods
-     */
-
-    /**
-     * Get the data handler of the object.
-     *
-     * @deprecated See getDatabaseBridge
-     */
-    @Deprecated
-    IslandDataHandler getDataHandler();
-
-    /**
-     * Get the current database bridge of the island.
-     */
-    DatabaseBridge getDatabaseBridge();
 
 }

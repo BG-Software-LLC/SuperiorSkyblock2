@@ -17,8 +17,20 @@ public interface PlayersFactory {
      * Create a teleport algorithm for a player.
      *
      * @param superiorPlayer The player to set the algorithm to.
+     * @deprecated Use {@link #createPlayerTeleportAlgorithm(SuperiorPlayer, PlayerTeleportAlgorithm)}
      */
-    PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer);
+    @Deprecated
+    default PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {
+        throw new UnsupportedOperationException("Unsupported operation.");
+    }
+
+    /**
+     * Create a teleport algorithm for a player.
+     *
+     * @param superiorPlayer The player to set the algorithm to.
+     * @param original       The original teleport algorithm.
+     */
+    PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer, PlayerTeleportAlgorithm original);
 
     /**
      * Create a new persistent data container for a player.
