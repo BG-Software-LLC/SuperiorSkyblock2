@@ -31,7 +31,6 @@ public final class DefaultIslandsContainer implements IslandsContainer {
 
     public DefaultIslandsContainer(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        SortingType.values().forEach(sortingType -> addSortingType(sortingType, false));
     }
 
     @Override

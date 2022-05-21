@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,16 +27,21 @@ import java.util.stream.Collectors;
 @SuppressWarnings("WeakerAccess")
 public final class PlayersHandler extends AbstractHandler implements PlayersManager {
 
-    private final PlayersContainer playersContainer;
+    private PlayersContainer playersContainer;
 
-    public PlayersHandler(SuperiorSkyblockPlugin plugin, PlayersContainer playersContainer) {
+    public PlayersHandler(SuperiorSkyblockPlugin plugin) {
         super(plugin);
+    }
+
+    public void setPlayersContainer(@NotNull PlayersContainer playersContainer) {
         this.playersContainer = playersContainer;
     }
 
     @Override
     public void loadData() {
         // Data is loaded by the database bridge.
+        if (this.playersContainer == null)
+            throw new RuntimeException("PlayersManager was not initialized correctly. Contact Ome_R regarding this!");
     }
 
     @Override

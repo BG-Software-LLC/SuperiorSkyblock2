@@ -43,6 +43,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -65,7 +66,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     private final IslandsPurger islandsPurger;
     private final IslandPreviews islandPreviews;
-    private final IslandsContainer islandsContainer;
+    private IslandsContainer islandsContainer;
     private DatabaseBridge databaseBridge;
     private IslandCreationAlgorithm islandCreationAlgorithm;
 
@@ -81,16 +82,25 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     private boolean forceSort = false;
 
-    public GridHandler(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews,
-                       IslandsContainer islandsContainer) {
+    private final List<SortingType> pendingSortingTypes = new ArrayList<>();
+
+    public GridHandler(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews) {
         super(plugin);
         this.islandsPurger = islandsPurger;
         this.islandPreviews = islandPreviews;
+    }
+
+    public void setIslandsContainer(@NotNull IslandsContainer islandsContainer) {
         this.islandsContainer = islandsContainer;
+        pendingSortingTypes.forEach(sortingType -> islandsContainer.addSortingType(sortingType, false));
+        pendingSortingTypes.clear();
     }
 
     @Override
     public void loadData() {
+        if (this.islandsContainer == null)
+            throw new RuntimeException("GridManager was not initialized correctly. Contact Ome_R regarding this!");
+
         initializeDatabaseBridge();
         this.islandCreationAlgorithm = DefaultIslandCreationAlgorithm.getInstance();
 
@@ -560,7 +570,12 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     public void registerSortingType(SortingType sortingType) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         PluginDebugger.debug("Action: Register Sorting Type, Sorting Type: " + sortingType.getName());
-        this.islandsContainer.addSortingType(sortingType, true);
+
+        if (this.islandsContainer == null) {
+            pendingSortingTypes.add(sortingType);
+        } else {
+            this.islandsContainer.addSortingType(sortingType, true);
+        }
     }
 
     @Override

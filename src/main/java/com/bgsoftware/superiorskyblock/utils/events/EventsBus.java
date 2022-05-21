@@ -101,12 +101,14 @@ import com.bgsoftware.superiorskyblock.api.events.SendMessageEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -689,8 +691,8 @@ public final class EventsBus {
         callEvent(new PluginInitializedEvent(plugin));
     }
 
-    public void callPluginInitializeEvent(SuperiorSkyblock plugin) {
-        callEvent(new PluginInitializeEvent(plugin));
+    public PluginInitializeResult callPluginInitializeEvent(SuperiorSkyblock plugin) {
+        return new PluginInitializeResult(callEvent(new PluginInitializeEvent(plugin)));
     }
 
     public boolean callPreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName) {
@@ -805,6 +807,34 @@ public final class EventsBus {
 
         public boolean isPlaceBlock() {
             return placeBlock;
+        }
+
+    }
+
+    public static final class PluginInitializeResult {
+
+        @Nullable
+        private final IslandsContainer islandsContainer;
+        @Nullable
+        private final PlayersContainer playersContainer;
+
+        public PluginInitializeResult(PluginInitializeEvent event) {
+            this(event.getIslandsContainer(), event.getPlayersContainer());
+        }
+
+        public PluginInitializeResult(@Nullable IslandsContainer islandsContainer, @Nullable PlayersContainer playersContainer) {
+            this.islandsContainer = islandsContainer;
+            this.playersContainer = playersContainer;
+        }
+
+        @Nullable
+        public IslandsContainer getIslandsContainer() {
+            return islandsContainer;
+        }
+
+        @Nullable
+        public PlayersContainer getPlayersContainer() {
+            return playersContainer;
         }
 
     }

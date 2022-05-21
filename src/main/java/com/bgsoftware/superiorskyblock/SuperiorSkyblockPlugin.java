@@ -55,8 +55,8 @@ import com.bgsoftware.superiorskyblock.role.container.DefaultRolesContainer;
 import com.bgsoftware.superiorskyblock.schematic.SchematicsHandler;
 import com.bgsoftware.superiorskyblock.schematic.container.DefaultSchematicsContainer;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
-import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.service.bossbar.BossBarsServiceImpl;
+import com.bgsoftware.superiorskyblock.service.dragon.DragonBattleServiceImpl;
 import com.bgsoftware.superiorskyblock.service.hologram.HologramsServiceImpl;
 import com.bgsoftware.superiorskyblock.service.message.MessagesServiceImpl;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
@@ -97,6 +97,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -112,7 +113,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
     private final DataHandler dataHandler = new DataHandler(this);
     private final FactoriesHandler factoriesHandler = new FactoriesHandler();
     private final GridHandler gridHandler = new GridHandler(this,
-            new DefaultIslandsPurger(), new DefaultIslandPreviews(), new DefaultIslandsContainer(this));
+            new DefaultIslandsPurger(), new DefaultIslandPreviews());
     private final StackedBlocksHandler stackedBlocksHandler = new StackedBlocksHandler(this,
             new DefaultStackedBlocksContainer());
     private final BlockValuesHandler blockValuesHandler = new BlockValuesHandler(this,
@@ -120,8 +121,7 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
             new GeneralBlockValuesContainer(), new GeneralBlockValuesContainer());
     private final SchematicsHandler schematicsHandler = new SchematicsHandler(this,
             new DefaultSchematicsContainer());
-    private final PlayersHandler playersHandler = new PlayersHandler(this,
-            new DefaultPlayersContainer());
+    private final PlayersHandler playersHandler = new PlayersHandler(this);
     private final RolesHandler rolesHandler = new RolesHandler(this,
             new DefaultRolesContainer());
     private final MissionsHandler missionsHandler = new MissionsHandler(this,
@@ -244,7 +244,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
 
             modulesHandler.loadData();
 
-            eventsBus.callPluginInitializeEvent(this);
+            EventsBus.PluginInitializeResult eventResult = eventsBus.callPluginInitializeEvent(this);
+            this.playersHandler.setPlayersContainer(Optional.ofNullable(eventResult.getPlayersContainer()).orElse(new DefaultPlayersContainer()));
+            this.gridHandler.setIslandsContainer(Optional.ofNullable(eventResult.getIslandsContainer()).orElse(new DefaultIslandsContainer(this)));
 
             modulesHandler.enableModules(ModuleLoadTime.BEFORE_WORLD_CREATION);
 
@@ -464,9 +466,9 @@ public final class SuperiorSkyblockPlugin extends JavaPlugin implements Superior
                 if (generatorsFilesList != null) {
                     for (File file : generatorsFilesList) {
                         //noinspection deprecation
-                        Optional<Class<?>> generatorClassOptional = FileUtils.getClasses(file.toURL(), ChunkGenerator.class).stream().findFirst();
-                        if (generatorClassOptional.isPresent()) {
-                            Class<?> generatorClass = generatorClassOptional.get();
+                        List<Class<?>> generatorClasses = FileUtils.getClasses(file.toURL(), ChunkGenerator.class);
+                        if (!generatorClasses.isEmpty()) {
+                            Class<?> generatorClass = generatorClasses.get(0);
                             for (Constructor<?> constructor : generatorClass.getConstructors()) {
                                 if (constructor.getParameterCount() == 0) {
                                     worldGenerator = (ChunkGenerator) generatorClass.newInstance();
