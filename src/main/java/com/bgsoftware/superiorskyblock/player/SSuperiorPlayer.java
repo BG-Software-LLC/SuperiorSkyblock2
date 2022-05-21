@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
-import com.bgsoftware.superiorskyblock.api.data.PlayerDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -14,7 +13,6 @@ import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgori
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
@@ -704,12 +702,6 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
         PlayersDatabaseBridge.updatePlayer(this);
         PlayersDatabaseBridge.deletePlayer(otherPlayer);
-    }
-
-    @Override
-    @Deprecated
-    public PlayerDataHandler getDataHandler() {
-        return EmptyDataHandler.getInstance();
     }
 
     @Override

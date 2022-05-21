@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.IslandWarpA
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.StackedBlockAttributes;
 import com.bgsoftware.superiorskyblock.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.EmptyParameterGuardDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.IDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.database.loader.v1.deserializer.MultipleDeserializer;
@@ -58,7 +59,9 @@ public final class DatabaseLoader_V1 implements DatabaseLoader {
     private final List<StackedBlockAttributes> loadedBlocks = new ArrayList<>();
     private final List<BankTransactionsAttributes> loadedBankTransactions = new ArrayList<>();
     private final IDeserializer deserializer = new MultipleDeserializer(
-            new JsonDeserializer(this), new RawDeserializer(this, plugin)
+            EmptyParameterGuardDeserializer.getInstance(),
+            new JsonDeserializer(this),
+            new RawDeserializer(this, plugin)
     );
     private GridAttributes gridAttributes;
 

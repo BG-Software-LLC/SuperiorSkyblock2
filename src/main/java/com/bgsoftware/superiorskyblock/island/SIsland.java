@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.island;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
-import com.bgsoftware.superiorskyblock.api.data.IslandDataHandler;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
@@ -27,7 +26,6 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.database.EmptyDataHandler;
 import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
@@ -59,6 +57,7 @@ import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
@@ -3100,32 +3099,38 @@ public final class SIsland implements Island {
             }
         }
 
-        Key generatedBlock = KeyImpl.of(newState);
+        EventResult<EventsBus.GenerateBlockResult> eventResult = plugin.getEventsBus().callIslandGenerateBlockEvent(
+                this, location, KeyImpl.of(newState));
 
-        String[] typeSections = newState.split(":");
+        if (eventResult.isCancelled())
+            return null;
 
-        if (optimizeCobblestone && typeSections[0].contains("COBBLESTONE"))
+        Key generatedBlock = eventResult.getResult().getBlock();
+
+        PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() + ", Block: " + generatedBlock);
+
+        if (optimizeCobblestone && generatedBlock.getGlobalKey().contains("COBBLESTONE"))
             /* Block is being counted in BlocksListener#onBlockFromToMonitor */
             return generatedBlock;
 
         // If the block is a custom block, and the event was cancelled - we need to call the handleBlockPlace manually.
         handleBlockPlace(generatedBlock, 1);
 
-        Material generateBlockType = Material.valueOf(typeSections[0]);
-        byte blockData = typeSections.length == 2 ? Byte.parseByte(typeSections[1]) : 0;
-        int combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+        // Checking whether the plugin should set the block in the world.
+        if (eventResult.getResult().isPlaceBlock()) {
+            int combinedId;
 
-        if (combinedId == -1) {
-            SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generateBlockType + ":" + blockData);
-            generateBlockType = Material.COBBLESTONE;
-            blockData = 0;
-            combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+            try {
+                Material generateBlockType = Material.valueOf(generatedBlock.getGlobalKey());
+                byte blockData = generatedBlock.getSubKey().isEmpty() ? 0 : Byte.parseByte(generatedBlock.getSubKey());
+                combinedId = plugin.getNMSAlgorithms().getCombinedId(generateBlockType, blockData);
+            } catch (IllegalArgumentException error) {
+                SuperiorSkyblockPlugin.log("&cFailed to generate block for type " + generatedBlock);
+                combinedId = plugin.getNMSAlgorithms().getCombinedId(Material.COBBLESTONE, (byte) 0);
+            }
+
+            plugin.getNMSWorld().setBlock(location, combinedId);
         }
-
-        PluginDebugger.debug("Action: Generate Block, Island: " + getOwner().getName() +
-                ", Block: " + generateBlockType + ":" + blockData);
-
-        plugin.getNMSWorld().setBlock(location, combinedId);
 
         plugin.getNMSWorld().playGeneratorSound(location);
 
@@ -3216,12 +3221,6 @@ public final class SIsland implements Island {
         islandChests[index].setRows(rows);
 
         IslandsDatabaseBridge.markIslandChestsToBeSaved(this, islandChests[index]);
-    }
-
-    @Override
-    @Deprecated
-    public IslandDataHandler getDataHandler() {
-        return EmptyDataHandler.getInstance();
     }
 
     @Override
@@ -3714,8 +3713,9 @@ public final class SIsland implements Island {
                 entityLimits.put(entry.getKey(), entry.getValue());
         }
 
-        for (int i = 0; i < cobbleGeneratorValues.length; i++) {
-            Map<Key, UpgradeValue<Integer>> levelGenerator = upgradeLevel.getGeneratorUpgradeValue()[i];
+        Map<Key, UpgradeValue<Integer>>[] generatorRates = upgradeLevel.getGeneratorUpgradeValue();
+        for (int i = 0; i < cobbleGeneratorValues.length && i < generatorRates.length; i++) {
+            Map<Key, UpgradeValue<Integer>> levelGenerator = generatorRates[i];
             if (levelGenerator != null) {
                 KeyMap<UpgradeValue<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
 
