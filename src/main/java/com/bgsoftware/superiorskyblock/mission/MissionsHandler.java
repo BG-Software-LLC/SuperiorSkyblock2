@@ -302,31 +302,38 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void saveMissionsData() {
-        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
+        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
 
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs();
         }
-
-        YamlConfiguration data = new YamlConfiguration();
 
         for (Mission<?> mission : getAllMissions()) {
-            ConfigurationSection section = data.createSection(mission.getName());
-            mission.saveProgress(section);
-            data.set(mission.getName(), section);
-        }
+            YamlConfiguration data = new YamlConfiguration();
 
-        try {
-            data.save(file);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+            try {
+                mission.saveProgress(data);
+            } catch (Throwable error) {
+                SuperiorSkyblockPlugin.log("&cFailed saving mission data for " + mission.getName() + ":");
+                error.printStackTrace();
+                PluginDebugger.debug(error);
+                continue;
+            }
+
+            if (data.getKeys(true).isEmpty())
+                continue;
+
+            File dataFile = new File(dataFolder, mission.getName() + ".yml");
+
+            try {
+                if (!dataFile.exists())
+                    dataFile.createNewFile();
+
+                data.save(dataFile);
+            } catch (IOException error) {
+                error.printStackTrace();
+                PluginDebugger.debug(error);
+            }
         }
     }
 
@@ -335,28 +342,29 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         loadMissionsData(getAllMissions());
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void loadMissionsData(List<Mission<?>> missionsList) {
         Preconditions.checkNotNull(missionsList, "missionsList parameter cannot be null.");
 
-        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
+        // Convert old data file to new format.
+        convertOldMissionsData();
 
-        if (!file.exists()) {
-            try {
-                file.getParentFile().mkdirs();
-                file.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
-            }
-        }
+        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
 
-        YamlConfiguration data = YamlConfiguration.loadConfiguration(file);
+        if (!dataFolder.exists())
+            return;
 
         for (Mission<?> mission : missionsList) {
-            if (data.contains(mission.getName()))
-                mission.loadProgress(data.getConfigurationSection(mission.getName()));
+            File dataFile = new File(dataFolder, mission.getName() + ".yml");
+            if (dataFile.exists()) {
+                try {
+                    mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
+                } catch (Throwable error) {
+                    SuperiorSkyblockPlugin.log("&cFailed loading mission data for " + mission.getName() + ":");
+                    error.printStackTrace();
+                    PluginDebugger.debug(error);
+                }
+            }
         }
     }
 
@@ -463,6 +471,49 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
 
         return island.getName().isEmpty() ? island.getOwner() == null ? "" :
                 island.getOwner().getName() : island.getName();
+    }
+
+    private void convertOldMissionsData() {
+        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
+
+        if (!file.exists())
+            return;
+
+        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+
+        YamlConfiguration oldData = YamlConfiguration.loadConfiguration(file);
+
+        for (Mission<?> mission : getAllMissions()) {
+            if (oldData.contains(mission.getName())) {
+                ConfigurationSection dataSection = oldData.getConfigurationSection(mission.getName());
+                YamlConfiguration data = convertSectionToYaml(dataSection, new YamlConfiguration());
+
+                if (data.getKeys(true).isEmpty())
+                    continue;
+
+                File dataFile = new File(dataFolder, mission.getName() + ".yml");
+
+                try {
+                    if (!dataFile.exists()) {
+                        dataFile.getParentFile().mkdirs();
+                        dataFile.createNewFile();
+                    }
+                    data.save(dataFile);
+                } catch (IOException error) {
+                    error.printStackTrace();
+                    PluginDebugger.debug(error);
+                }
+            }
+        }
+
+        file.delete();
+    }
+
+    private static YamlConfiguration convertSectionToYaml(ConfigurationSection section, YamlConfiguration config) {
+        for (String key : section.getKeys(false))
+            config.set(key, section.get(key));
+
+        return config;
     }
 
 }
