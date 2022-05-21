@@ -476,6 +476,12 @@ public interface SettingsManager {
     List<String> getDisabledEvents();
 
     /**
+     * List of plugins that their hooks should not be enabled.
+     * Config-path: disabled-hooks
+     */
+    List<String> getDisabledHooks();
+
+    /**
      * Whether the schematic-name argument should be when executing /is create or not.
      * Config-path: schematic-name-argument
      */

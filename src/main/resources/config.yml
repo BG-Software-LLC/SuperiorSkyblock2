@@ -686,6 +686,10 @@ negative-level: true
 # You can find a list of events at @ https://bg-software.com/superiorskyblock/api/
 disabled-events: [ ]
 
+# List of plugins that their hooks should not be enabled.
+# Simply add the plugin's name in order to prevent it from enabling.
+disabled-hooks: [ ]
+
 # Should there be a schematic-name argument in the create command?
 # When enabled, people will be able to skip the create menu and create islands directly with the command.
 schematic-name-argument: true

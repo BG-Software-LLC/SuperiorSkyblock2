@@ -158,7 +158,7 @@ public final class WorldsProvider_Default implements WorldsProvider {
         }
 
         World world = WorldCreator.name(worldName)
-                .type(WorldType.FLAT)
+                .type(WorldType.NORMAL)
                 .environment(environment)
                 .generator(plugin.getGenerator())
                 .createWorld();

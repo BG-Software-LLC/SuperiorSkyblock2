@@ -392,7 +392,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         String placeholderValue = matcher.group(1);
 
         if (placeholderValue.equals("position"))
-            return Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
+            return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
 
         Function<Island, String> getValueFunction;
 

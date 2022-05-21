@@ -184,6 +184,7 @@ public final class SettingsContainer {
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
+    public final List<String> disabledHooks;
     public final boolean schematicNameArgument;
     public final String islandChestTitle;
     public final int islandChestsDefaultPage;
@@ -479,6 +480,8 @@ public final class SettingsContainer {
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
         disabledEvents = config.getStringList("disabled-events")
+                .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList());
+        disabledHooks = config.getStringList("disabled-hooks")
                 .stream().map(str -> str.toLowerCase(Locale.ENGLISH)).collect(Collectors.toList());
         schematicNameArgument = config.getBoolean("schematic-name-argument", true);
         islandChestTitle = Formatters.COLOR_FORMATTER.format(config.getString("island-chests.chest-title", "&4Island Chest"));

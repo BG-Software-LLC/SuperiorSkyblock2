@@ -234,8 +234,10 @@ public final class NMSChunksImpl implements NMSChunks {
             IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
 
             net.minecraft.world.level.chunk.ChunkSection[] chunkSections = chunk.getSections();
-            for (int i = 0; i < chunkSections.length; ++i)
-                chunkSections[i] = new net.minecraft.world.level.chunk.ChunkSection(i, biomesRegistry);
+            for (int i = 0; i < chunkSections.length; ++i) {
+                chunkSections[i] = new net.minecraft.world.level.chunk.ChunkSection(
+                        worldServer.getSectionYFromSectionIndex(i), biomesRegistry);
+            }
 
             removeEntities(chunk);
 
