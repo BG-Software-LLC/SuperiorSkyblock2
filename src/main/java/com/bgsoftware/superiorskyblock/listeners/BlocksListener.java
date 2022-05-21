@@ -2,13 +2,9 @@ package com.bgsoftware.superiorskyblock.listeners;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
-import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
-import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataTypeContext;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
@@ -23,9 +19,6 @@ import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -62,14 +55,12 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.vehicle.VehicleDestroyEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,82 +80,6 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
         if (plugin.getSettings().isPhysicsListener())
             Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
-    }
-
-    private static final PersistentDataType<CustomClass> CUSTOM_CLASS_DATA_TYPE = new PersistentDataType<>(CustomClass.class, new PersistentDataTypeContext<CustomClass>() {
-        @Override
-        public byte[] serialize(CustomClass value) {
-            ByteArrayDataOutput byteArrayDataOutput = ByteStreams.newDataOutput();
-            byteArrayDataOutput.writeUTF(value.label);
-            byteArrayDataOutput.writeInt(value.count);
-            return byteArrayDataOutput.toByteArray();
-        }
-
-        @Override
-        public CustomClass deserialize(byte[] data) {
-            ByteArrayDataInput byteArrayDataInput = ByteStreams.newDataInput(data);
-            return new CustomClass(byteArrayDataInput.readUTF(), byteArrayDataInput.readInt());
-        }
-    });
-
-    @EventHandler
-    public void a(IslandCreateEvent event) {
-        PersistentDataContainer persistentDataContainer = event.getIsland().getPersistentDataContainer();
-        persistentDataContainer.put("owner", PersistentDataType.UUID, event.getPlayer().getUniqueId());
-        persistentDataContainer.put("large_big_decimal", PersistentDataType.BIG_DECIMAL, new BigDecimal("10000000000000000000000000000000000000000000000"));
-        persistentDataContainer.put("custom_class", CUSTOM_CLASS_DATA_TYPE, new CustomClass("Custom label", 8));
-    }
-
-    @EventHandler
-    public void a(PlayerJoinEvent event) {
-        Executor.sync(() -> {
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(event.getPlayer());
-            Island island = superiorPlayer.getIsland();
-
-            if (island == null)
-                return;
-
-            PersistentDataContainer persistentDataContainer = island.getPersistentDataContainer();
-
-            if (persistentDataContainer.hasKeyOfType("owner", PersistentDataType.UUID)) {
-                Bukkit.broadcastMessage("Owner: " + persistentDataContainer.get("owner", PersistentDataType.UUID));
-            } else {
-                Bukkit.broadcastMessage("Missing Owner");
-            }
-
-            if (persistentDataContainer.hasKeyOfType("large_big_decimal", PersistentDataType.BIG_DECIMAL)) {
-                Bukkit.broadcastMessage("Big Decimal: " + persistentDataContainer.get("large_big_decimal", PersistentDataType.BIG_DECIMAL));
-            } else {
-                Bukkit.broadcastMessage("Missing Big Decimal");
-            }
-
-            if (persistentDataContainer.hasKeyOfType("custom_class", CUSTOM_CLASS_DATA_TYPE)) {
-                Bukkit.broadcastMessage("Custom Class: " + persistentDataContainer.get("custom_class", CUSTOM_CLASS_DATA_TYPE));
-            } else {
-                Bukkit.broadcastMessage("Missing Custom Class");
-            }
-
-
-        }, 40L);
-    }
-
-    private static final class CustomClass {
-
-        private final String label;
-        private final int count;
-
-        CustomClass(String label, int count) {
-            this.label = label;
-            this.count = count;
-        }
-
-        @Override
-        public String toString() {
-            return "CustomClass{" +
-                    "label='" + label + '\'' +
-                    ", count=" + count +
-                    '}';
-        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
