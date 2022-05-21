@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -29,6 +30,7 @@ public class SendMessageEvent extends Event implements Cancellable {
      * @param messageComponent The message component that is being sent.
      */
     public SendMessageEvent(CommandSender receiver, String messageType, IMessageComponent messageComponent, Object[] args) {
+        super(!Bukkit.isPrimaryThread());
         this.receiver = receiver;
         this.messageType = messageType;
         this.messageComponent = messageComponent;
