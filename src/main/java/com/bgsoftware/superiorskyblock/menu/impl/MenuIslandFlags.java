@@ -59,9 +59,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
     @Override
     protected List<IslandFlagInfo> requestObjects() {
         if (!convertedFlags) {
-            islandFlags.forEach(IslandFlagInfo::getIslandFlag);
-            islandFlags.removeIf(IslandFlagInfo::isInvalid);
-            convertedFlags = true;
+            convertedFlags = !islandFlags.removeIf(IslandFlagInfo::tryValidate);
         }
 
         return islandFlags;
@@ -220,7 +218,11 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
             return cachedIslandFlag;
         }
 
-        public boolean isInvalid() {
+        public boolean tryValidate() {
+            if (cachedIslandFlag == null) {
+                cachedIslandFlag = getIslandFlag();
+            }
+
             return cachedIslandFlag == null;
         }
 

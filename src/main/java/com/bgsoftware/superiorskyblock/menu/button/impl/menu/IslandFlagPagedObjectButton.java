@@ -29,8 +29,12 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         SuperiorPlayer inventoryViewer = superiorMenu.getInventoryViewer();
         Island island = superiorMenu.getTargetIsland();
 
+        IslandFlag islandFlag = islandFlagInfo.getIslandFlag();
 
-        return island.hasSettingsEnabled(islandFlagInfo.getIslandFlag()) ?
+        if(islandFlag == null)
+            return buttonItem;
+
+        return island.hasSettingsEnabled(islandFlag) ?
                 islandFlagInfo.getEnabledIslandFlagItem().build(inventoryViewer) :
                 islandFlagInfo.getDisabledIslandFlagItem().build(inventoryViewer);
     }
@@ -41,6 +45,9 @@ public final class IslandFlagPagedObjectButton extends PagedObjectButton<MenuIsl
         Island island = superiorMenu.getTargetIsland();
 
         IslandFlag islandFlag = pagedObject.getIslandFlag();
+
+        if(islandFlag == null)
+            return;
 
         if (island.hasSettingsEnabled(islandFlag)) {
             if (!plugin.getEventsBus().callIslandDisableFlagEvent(clickedPlayer, island, islandFlag))
