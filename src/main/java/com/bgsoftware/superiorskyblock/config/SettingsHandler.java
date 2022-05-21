@@ -146,6 +146,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     }
 
     @Override
+    public boolean isCoopMembers() {
+        return this.container.coopMembers;
+    }
+
+    @Override
     public IslandRoles getIslandRoles() {
         return this.islandRoles;
     }

@@ -1,10 +1,12 @@
 package com.bgsoftware.superiorskyblock.utils.islands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
@@ -258,6 +260,27 @@ public final class IslandUtils {
 
     public static int getMaxWarpNameLength() {
         return 255;
+    }
+
+    public static boolean handleBorderColorUpdate(SuperiorPlayer superiorPlayer, BorderColor borderColor) {
+        if (!superiorPlayer.hasWorldBorderEnabled()) {
+            if (!plugin.getEventsBus().callPlayerToggleBorderEvent(superiorPlayer))
+                return false;
+
+            superiorPlayer.toggleWorldBorder();
+        }
+
+        if (!plugin.getEventsBus().callPlayerChangeBorderColorEvent(superiorPlayer, borderColor))
+            return false;
+
+        superiorPlayer.setBorderColor(borderColor);
+        plugin.getNMSWorld().setWorldBorder(superiorPlayer,
+                plugin.getGrid().getIslandAt(superiorPlayer.getLocation()));
+
+        Message.BORDER_PLAYER_COLOR_UPDATED.send(superiorPlayer,
+                Formatters.BORDER_COLOR_FORMATTER.format(borderColor, superiorPlayer.getUserLocale()));
+
+        return true;
     }
 
 }

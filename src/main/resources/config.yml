@@ -149,6 +149,9 @@ rounded-island-level: false
 # Use WORTH, LEVEL, RATING or PLAYERS.
 island-top-order: 'WORTH'
 
+# Whether coop members should be enabled or not.
+coop-members: true
+
 # All settings related to island roles.
 # You can find a list of permissions here: https://wiki.bg-software.com/superiorskyblock/island-permissions
 island-roles:
