@@ -99,7 +99,7 @@ public final class SlimefunHook {
                 BlocksLogic.handleBreak(e.getBlock());
         }
 
-        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        //@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onChunkWipe(IslandChunkResetEvent e) {
             BlockStorage blockStorage = BlockStorage.getStorage(e.getWorld());
 
