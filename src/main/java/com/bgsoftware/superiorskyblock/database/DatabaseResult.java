@@ -122,6 +122,10 @@ public final class DatabaseResult {
 
     }
 
+    public Optional<byte[]> getBlob(String key) {
+        return getObject(key, byte[].class);
+    }
+
     private <T> Optional<T> getObject(String key, Class<T> clazz) {
         Object value = getObject(key);
         return Optional.ofNullable(value == null || !value.getClass().isAssignableFrom(clazz) ? null : clazz.cast(value));

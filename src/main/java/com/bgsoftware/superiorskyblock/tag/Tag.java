@@ -122,6 +122,12 @@ public abstract class Tag<E> {
                 return CompoundTag.fromStream(is, depth);
             case NBTTags.TYPE_INT_ARRAY:
                 return IntArrayTag.fromStream(is);
+            case NBTTags.TYPE_BIG_DECIMAL:
+                return BigDecimalTag.fromStream(is);
+            case NBTTags.TYPE_UUID:
+                return UUIDTag.fromStream(is);
+            case NBTTags.TYPE_PERSISTENT_DATA:
+                return PersistentDataTagSerialized.fromStream(is);
         }
 
         throw new IllegalArgumentException("Invalid tag: " + type);

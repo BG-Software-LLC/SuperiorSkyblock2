@@ -13,11 +13,14 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
@@ -27,6 +30,7 @@ import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandBlocksTrac
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithms.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
+import com.bgsoftware.superiorskyblock.persistence.PersistentDataContainerImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
@@ -222,6 +226,20 @@ public final class FactoriesHandler implements FactoriesManager {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);
+    }
+
+    public PersistentDataContainer createPersistentDataContainer(Island island) {
+        PersistentDataContainerImpl<Island> persistentDataContainer = new PersistentDataContainerImpl<>(
+                island, IslandsDatabaseBridge::markPersistentDataContainerToBeSaved);
+        return islandsFactory == null ? persistentDataContainer :
+                islandsFactory.createPersistentDataContainer(island, persistentDataContainer);
+    }
+
+    public PersistentDataContainer createPersistentDataContainer(SuperiorPlayer superiorPlayer) {
+        PersistentDataContainerImpl<SuperiorPlayer> persistentDataContainer = new PersistentDataContainerImpl<>(
+                superiorPlayer, PlayersDatabaseBridge::markPersistentDataContainerToBeSaved);
+        return playersFactory == null ? persistentDataContainer :
+                playersFactory.createPersistentDataContainer(superiorPlayer, persistentDataContainer);
     }
 
 }

@@ -19,5 +19,6 @@ public final class CachedPlayerInfo {
     public Locale userLocale = PlayerLocales.getDefaultLocale();
     public boolean worldBorderEnabled = plugin.getSettings().isDefaultWorldBorder();
     public Map<Mission<?>, Integer> completedMissions = new HashMap<>();
+    public byte[] persistentData = new byte[0];
 
 }

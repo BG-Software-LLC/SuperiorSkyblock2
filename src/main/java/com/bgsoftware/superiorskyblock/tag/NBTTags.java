@@ -46,6 +46,10 @@ public final class NBTTags {
     public static final int TYPE_LIST = 9;
     public static final int TYPE_COMPOUND = 10;
     public static final int TYPE_INT_ARRAY = 11;
+    public static final int TYPE_BIG_DECIMAL = 12;
+    public static final int TYPE_UUID = 13;
+    public static final int TYPE_PERSISTENT_DATA = 14;
+
     private NBTTags() {
 
     }

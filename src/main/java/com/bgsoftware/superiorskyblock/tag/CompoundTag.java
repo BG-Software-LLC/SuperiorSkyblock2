@@ -35,6 +35,7 @@ package com.bgsoftware.superiorskyblock.tag;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -152,8 +153,9 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         return tag instanceof StringTag ? (String) tag.value : null;
     }
 
-    public void setTag(String key, Tag<?> value) {
-        this.value.put(key, value);
+    @Nullable
+    public Tag<?> setTag(String key, Tag<?> value) {
+        return this.value.put(key, value);
     }
 
     public void setByteArray(String key, byte[] value) {
@@ -192,8 +194,16 @@ public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Itera
         setTag(key, new StringTag(value));
     }
 
+    public void putAll(CompoundTag other) {
+        this.value.putAll(other.value);
+    }
+
     public boolean containsKey(String key) {
         return this.value.containsKey(key);
+    }
+
+    public Tag<?> remove(String key) {
+        return this.value.remove(key);
     }
 
     public int size() {

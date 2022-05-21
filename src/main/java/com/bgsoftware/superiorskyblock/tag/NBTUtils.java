@@ -54,7 +54,9 @@ public final class NBTUtils {
      * @return The type name.
      */
     public static String getTypeName(Class<? extends Tag> clazz) {
-        if (clazz.equals(ByteArrayTag.class)) {
+        if (clazz.equals(BigDecimalTag.class)) {
+            return "TAG_Big_Decimal";
+        } else if (clazz.equals(ByteArrayTag.class)) {
             return "TAG_Byte_Array";
         } else if (clazz.equals(ByteTag.class)) {
             return "TAG_Byte";
@@ -91,7 +93,9 @@ public final class NBTUtils {
      * @throws IllegalArgumentException if the tag class is invalid.
      */
     public static int getTypeCode(Class<? extends Tag> clazz) {
-        if (clazz.equals(ByteArrayTag.class)) {
+        if (clazz.equals(BigDecimalTag.class)) {
+            return NBTTags.TYPE_BIG_DECIMAL;
+        } else if (clazz.equals(ByteArrayTag.class)) {
             return NBTTags.TYPE_BYTE_ARRAY;
         } else if (clazz.equals(ByteTag.class)) {
             return NBTTags.TYPE_BYTE;
@@ -109,12 +113,16 @@ public final class NBTUtils {
             return NBTTags.TYPE_LIST;
         } else if (clazz.equals(LongTag.class)) {
             return NBTTags.TYPE_LONG;
+        } else if (clazz.equals(PersistentDataTag.class) || clazz.equals(PersistentDataTagSerialized.class)) {
+            return NBTTags.TYPE_PERSISTENT_DATA;
         } else if (clazz.equals(ShortTag.class)) {
             return NBTTags.TYPE_SHORT;
         } else if (clazz.equals(StringTag.class)) {
             return NBTTags.TYPE_STRING;
         } else if (clazz.equals(IntArrayTag.class)) {
             return NBTTags.TYPE_INT_ARRAY;
+        } else if (clazz.equals(UUIDTag.class)) {
+            return NBTTags.TYPE_UUID;
         } else {
             throw new IllegalArgumentException("Invalid tag classs (" + clazz.getName() + ").");
         }
@@ -151,6 +159,12 @@ public final class NBTUtils {
                 return ListTag.class;
             case NBTTags.TYPE_COMPOUND:
                 return CompoundTag.class;
+            case NBTTags.TYPE_BIG_DECIMAL:
+                return BigDecimalTag.class;
+            case NBTTags.TYPE_UUID:
+                return UUIDTag.class;
+            case NBTTags.TYPE_PERSISTENT_DATA:
+                return PersistentDataTagSerialized.class;
             default:
                 throw new IllegalArgumentException("Invalid tag type : " + type + ".");
         }

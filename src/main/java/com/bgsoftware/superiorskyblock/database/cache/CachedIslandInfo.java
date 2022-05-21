@@ -59,6 +59,7 @@ public final class CachedIslandInfo {
     public List<CachedWarpInfo> cachedWarpInfoList = new ArrayList<>();
     public List<CachedWarpCategoryInfo> cachedWarpCategoryInfoList = new ArrayList<>();
     public List<BankTransaction> bankTransactions = new ArrayList<>();
+    public byte[] persistentData = new byte[0];
 
     public CachedIslandInfo() {
 

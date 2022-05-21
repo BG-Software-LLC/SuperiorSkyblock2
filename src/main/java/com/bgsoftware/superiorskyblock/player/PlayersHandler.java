@@ -149,7 +149,16 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
     // Updating last time status
     public void savePlayers() {
-        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer).forEach(PlayersDatabaseBridge::saveLastTimeStatus);
+        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer)
+                .forEach(PlayersDatabaseBridge::saveLastTimeStatus);
+
+        List<SuperiorPlayer> modifiedPlayers = getAllPlayers().stream()
+                .filter(PlayersDatabaseBridge::isModified)
+                .collect(Collectors.toList());
+
+        if (!modifiedPlayers.isEmpty())
+            modifiedPlayers.forEach(PlayersDatabaseBridge::executeFutureSaves);
+
     }
 
 }

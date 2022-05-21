@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -56,6 +57,7 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
 
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+    private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
 
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
@@ -710,6 +712,11 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public PersistentDataContainer getPersistentDataContainer() {
+        return persistentDataContainer;
+    }
+
+    @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         PluginDebugger.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
@@ -795,6 +802,8 @@ public final class SSuperiorPlayer implements SuperiorPlayer {
         this.userLocale = cachedPlayerInfo.userLocale;
         this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
         this.completedMissions.putAll(cachedPlayerInfo.completedMissions);
+        if (cachedPlayerInfo.persistentData.length > 0)
+            this.persistentDataContainer.load(cachedPlayerInfo.persistentData);
     }
 
 }
