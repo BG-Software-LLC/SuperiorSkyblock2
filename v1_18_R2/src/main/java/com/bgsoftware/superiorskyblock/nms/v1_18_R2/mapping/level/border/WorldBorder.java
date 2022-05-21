@@ -33,4 +33,8 @@ public final class WorldBorder extends MappedObject<net.minecraft.world.level.bo
         return handle.i();
     }
 
+    public void setWarningDistance(int warningBlocks) {
+        handle.c(warningBlocks);
+    }
+
 }

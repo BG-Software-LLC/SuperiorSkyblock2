@@ -150,6 +150,8 @@ public final class NMSWorldImpl implements NMSWorld {
             } else {
                 worldBorder = new WorldBorder();
 
+                worldBorder.setWarningDistance(0);
+
                 worldBorder.setWorld(worldServer);
                 worldBorder.setSize((island.getIslandSize() * 2) + 1);
 
