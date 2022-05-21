@@ -1,7 +1,8 @@
 package com.bgsoftware.superiorskyblock.lang.component.impl;
 
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import org.bukkit.command.CommandSender;
 
@@ -20,13 +21,18 @@ public final class RawMessageComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.RAW_MESSAGE;
+    }
+
+    @Override
     public String getMessage() {
         return this.message;
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
-        IMessageComponent.replaceArgs(this.message, objects).ifPresent(sender::sendMessage);
+    public void sendMessage(CommandSender sender, Object... args) {
+        Message.replaceArgs(this.message, args).ifPresent(sender::sendMessage);
     }
 
 }

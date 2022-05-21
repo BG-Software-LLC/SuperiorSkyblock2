@@ -97,6 +97,7 @@ import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
+import com.bgsoftware.superiorskyblock.api.events.SendMessageEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -106,6 +107,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
@@ -693,6 +695,12 @@ public final class EventsBus {
 
     public boolean callPreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName) {
         return callEvent(() -> new PreIslandCreateEvent(superiorPlayer, islandName), "preislandcreateevent");
+    }
+
+    public EventResult<IMessageComponent> callSendMessageEvent(CommandSender receiver, String messageType,
+                                                               IMessageComponent messageComponent, Object... args) {
+        return callEvent(() -> new SendMessageEvent(receiver, messageType, messageComponent, args),
+                "sendmessageevent", messageComponent, SendMessageEvent::getMessageComponent);
     }
 
     private <T, E extends Event & Cancellable> EventResult<T> callEvent(Supplier<E> eventSupplier, String eventName,

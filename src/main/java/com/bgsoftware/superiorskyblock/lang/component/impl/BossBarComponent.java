@@ -3,8 +3,9 @@ package com.bgsoftware.superiorskyblock.lang.component.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import org.apache.logging.log4j.util.Strings;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -30,14 +31,19 @@ public final class BossBarComponent implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.BOSS_BAR;
+    }
+
+    @Override
     public String getMessage() {
         return this.message;
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
+    public void sendMessage(CommandSender sender, Object... args) {
         if (sender instanceof Player) {
-            IMessageComponent.replaceArgs(this.message, objects).ifPresent(message -> {
+            Message.replaceArgs(this.message, args).ifPresent(message -> {
                 plugin.getServices().getBossBarsService().createBossBar((Player) sender, message, this.color, this.ticksToRun);
             });
         }

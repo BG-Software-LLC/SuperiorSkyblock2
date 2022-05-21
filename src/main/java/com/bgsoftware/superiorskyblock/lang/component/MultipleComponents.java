@@ -1,15 +1,14 @@
 package com.bgsoftware.superiorskyblock.lang.component;
 
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -69,8 +68,12 @@ public final class MultipleComponents implements IMessageComponent {
             }
         }
 
-        messageComponents.removeIf(IMessageComponent::isEmpty);
+        messageComponents.removeIf(component -> component.getType() == Type.EMPTY);
 
+        return of(messageComponents);
+    }
+
+    public static IMessageComponent of(List<IMessageComponent> messageComponents) {
         return messageComponents.isEmpty() ? EmptyMessageComponent.getInstance() :
                 messageComponents.size() == 1 ? messageComponents.get(0) : new MultipleComponents(messageComponents);
     }
@@ -80,13 +83,18 @@ public final class MultipleComponents implements IMessageComponent {
     }
 
     @Override
+    public Type getType() {
+        return Type.MULTIPLE;
+    }
+
+    @Override
     public String getMessage() {
         return messageComponents.isEmpty() ? "" : messageComponents.get(0).getMessage();
     }
 
     @Override
-    public void sendMessage(CommandSender sender, Object... objects) {
-        this.messageComponents.forEach(messageComponent -> messageComponent.sendMessage(sender, objects));
+    public void sendMessage(CommandSender sender, Object... args) {
+        this.messageComponents.forEach(messageComponent -> messageComponent.sendMessage(sender, args));
     }
 
 }

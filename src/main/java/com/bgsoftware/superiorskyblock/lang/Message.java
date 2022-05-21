@@ -3,25 +3,26 @@ package com.bgsoftware.superiorskyblock.lang;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.component.IMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
-import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
 import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.utils.events.EventResult;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -708,7 +709,7 @@ public enum Message {
     WORLD_NOT_ENABLED,
     WORLD_NOT_UNLOCKED,
 
-    SCHEMATICS {
+    SCHEMATICS(true) {
 
         private final Collection<UUID> noSchematicMessages = AutoRemovalCollection.newHashSet(3, TimeUnit.SECONDS);
 
@@ -726,7 +727,7 @@ public enum Message {
         }
     },
 
-    PROTECTION {
+    PROTECTION(true) {
 
         @Nullable
         private Collection<UUID> noInteractMessages;
@@ -745,14 +746,14 @@ public enum Message {
                 Message.ISLAND_PROTECTED.send(sender, locale, args);
 
                 SuperiorCommand bypassCommand = plugin.getCommands().getAdminCommand("bypass");
-                
+
                 if (bypassCommand != null && sender.hasPermission(bypassCommand.getPermission()))
                     Message.ISLAND_PROTECTED_OPPED.send(sender, locale, args);
             }
         }
     },
 
-    CUSTOM {
+    CUSTOM(true) {
         @Override
         public void send(CommandSender sender, Locale locale, Object... args) {
             String message = args.length == 0 ? null : args[0] == null ? null : args[0].toString();
@@ -766,14 +767,24 @@ public enum Message {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final String defaultMessage;
-    private final Map<java.util.Locale, IMessageComponent> messages = new HashMap<>();
+    private final boolean isCustom;
+    private final Map<Locale, IMessageComponent> messages = new HashMap<>();
 
     Message() {
         this(null);
     }
 
+    Message(boolean isCustom) {
+        this(null, isCustom);
+    }
+
     Message(String defaultMessage) {
+        this(defaultMessage, false);
+    }
+
+    Message(String defaultMessage, boolean isCustom) {
         this.defaultMessage = defaultMessage;
+        this.isCustom = isCustom;
     }
 
     public static void reload() {
@@ -802,7 +813,7 @@ public enum Message {
 
         for (File langFile : Objects.requireNonNull(langFolder.listFiles())) {
             String fileName = langFile.getName().split("\\.")[0];
-            java.util.Locale fileLocale;
+            Locale fileLocale;
 
             try {
                 fileLocale = PlayerLocales.getLocale(fileName);
@@ -828,14 +839,11 @@ public enum Message {
             }
 
             for (Message locale : values()) {
-                if (cfg.isConfigurationSection(locale.name())) {
-                    locale.setMessage(fileLocale, MultipleComponents.parseSection(cfg.getConfigurationSection(locale.name())));
-                } else {
-                    locale.setMessage(fileLocale, RawMessageComponent.of(Formatters.COLOR_FORMATTER.format(cfg.getString(locale.name(), ""))));
+                if (!locale.isCustom()) {
+                    locale.setMessage(fileLocale, plugin.getServices().getMessagesService().parseComponent(cfg, locale.name()));
+                    if (countMessages)
+                        messagesAmount++;
                 }
-
-                if (countMessages)
-                    messagesAmount++;
             }
 
             countMessages = false;
@@ -845,14 +853,24 @@ public enum Message {
         SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
-    public boolean isEmpty(java.util.Locale locale) {
-        IMessageComponent messageContainer = messages.get(locale);
-        return messageContainer == null || messageContainer.getMessage().isEmpty();
+    public boolean isCustom() {
+        return isCustom;
+    }
+
+    public boolean isEmpty(Locale locale) {
+        IMessageComponent messageContainer = getComponent(locale);
+        return messageContainer == null || messageContainer.getType() == IMessageComponent.Type.EMPTY ||
+                messageContainer.getMessage().isEmpty();
     }
 
     @Nullable
-    public String getMessage(java.util.Locale locale, Object... objects) {
-        return isEmpty(locale) ? defaultMessage : IMessageComponent.replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
+    public IMessageComponent getComponent(Locale locale) {
+        return messages.get(locale);
+    }
+
+    @Nullable
+    public String getMessage(Locale locale, Object... objects) {
+        return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
     public final void send(SuperiorPlayer superiorPlayer, Object... objects) {
@@ -863,13 +881,16 @@ public enum Message {
         send(sender, PlayerLocales.getLocale(sender), objects);
     }
 
-    public void send(CommandSender sender, java.util.Locale locale, Object... objects) {
-        IMessageComponent messageComponent = messages.get(locale);
-        if (messageComponent != null)
-            messageComponent.sendMessage(sender, objects);
+    public void send(CommandSender sender, Locale locale, Object... objects) {
+        IMessageComponent messageComponent = getComponent(locale);
+        if (messageComponent != null) {
+            EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, objects);
+            if (!eventResult.isCancelled())
+                eventResult.getResult().sendMessage(sender, objects);
+        }
     }
 
-    private void setMessage(java.util.Locale locale, IMessageComponent messageComponent) {
+    private void setMessage(Locale locale, IMessageComponent messageComponent) {
         messages.put(locale, messageComponent);
     }
 
@@ -881,6 +902,19 @@ public enum Message {
             dest.getParentFile().mkdirs();
             file.renameTo(dest);
         }
+    }
+
+    public static Optional<String> replaceArgs(String msg, Object... objects) {
+        if (StringUtils.isBlank(msg))
+            return Optional.empty();
+
+        for (int i = 0; i < objects.length; i++) {
+            String objectString = objects[i] instanceof BigDecimal ?
+                    Formatters.NUMBER_FORMATTER.format((BigDecimal) objects[i]) : objects[i].toString();
+            msg = msg.replace("{" + i + "}", objectString);
+        }
+
+        return msg.isEmpty() ? Optional.empty() : Optional.of(msg);
     }
 
 }
