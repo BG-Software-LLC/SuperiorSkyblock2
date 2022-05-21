@@ -60,6 +60,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
     private static final Pattern MEMBER_PLACEHOLDER_PATTERN = Pattern.compile("member_(.+)");
     private static final Pattern VISITOR_LAST_JOIN_PLACEHOLDER_PATTERN = Pattern.compile("visitor_last_join_(.+)");
     private static final Pattern ISLAND_FLAG_PLACEHOLDER_PATTERN = Pattern.compile("flag_(.+)");
+    private static final Pattern MISSIONS_COMPLETED_PATTERN = Pattern.compile("missions_completed_(.+)");
 
     private static final Map<String, PlayerPlaceholderParser> PLAYER_PARSES =
             new ImmutableMap.Builder<String, PlayerPlaceholderParser>()
@@ -250,8 +251,8 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
             Matcher matcher;
 
             if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
-                placeholderResult = Optional.ofNullable(PLAYER_PARSES.get(matcher.group(1)))
-                        .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
+                String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
+                placeholderResult = parsePlaceholdersForPlayer(superiorPlayer, subPlaceholder);
             } else if ((matcher = ISLAND_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
                 Island island = superiorPlayer == null ? null : subPlaceholder.startsWith("location_") ?
@@ -275,6 +276,22 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
     @Override
     public void registerPlaceholder(String placeholderName, IslandPlaceholderParser placeholderFunction) {
         CUSTOM_ISLAND_PARSERS.put(placeholderName, placeholderFunction);
+    }
+
+    private static Optional<String> parsePlaceholdersForPlayer(@Nullable SuperiorPlayer superiorPlayer,
+                                                               String subPlaceholder) {
+        Matcher matcher;
+
+        if (superiorPlayer != null) {
+            if ((matcher = MISSIONS_COMPLETED_PATTERN.matcher(subPlaceholder)).matches()) {
+                String categoryName = matcher.group(1);
+                return Optional.of(superiorPlayer.getCompletedMissions().stream().filter(mission ->
+                        mission.getMissionCategory().getName().equalsIgnoreCase(categoryName)).count() + "");
+            }
+        }
+
+        return Optional.ofNullable(PLAYER_PARSES.get(subPlaceholder))
+                .map(placeholderParser -> placeholderParser.apply(superiorPlayer));
     }
 
     private static Optional<String> parsePlaceholdersForIsland(@Nullable Island island,
@@ -375,7 +392,7 @@ public final class PlaceholdersServiceImpl implements PlaceholdersService {
         String placeholderValue = matcher.group(1);
 
         if (placeholderValue.equals("position"))
-            return Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
+            return island == null ? Optional.empty() : Optional.of((plugin.getGrid().getIslandPosition(island, sortingType) + 1) + "");
 
         Function<Island, String> getValueFunction;
 

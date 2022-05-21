@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.threads.Executor;
@@ -55,6 +54,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public final class ProvidersHandler extends AbstractHandler implements ProvidersManager {
@@ -359,28 +359,28 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     private void registerGeneralHooks() {
-        if (Bukkit.getPluginManager().isPluginEnabled("LeaderHeads"))
+        if (canRegisterHook("LeaderHeads"))
             registerHook("LeaderHeadsHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("JetsMinions"))
+        if (canRegisterHook("JetsMinions"))
             registerHook("JetsMinionsHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("SkinsRestorer"))
+        if (canRegisterHook("SkinsRestorer"))
             registerHook("SkinsRestorerHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("ChangeSkin"))
+        if (canRegisterHook("ChangeSkin"))
             registerHook("ChangeSkinHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("Slimefun"))
+        if (canRegisterHook("Slimefun"))
             registerHook("SlimefunHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("CoreProtect"))
+        if (canRegisterHook("CoreProtect"))
             registerHook("CoreProtectHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("SlimeWorldManager"))
+        if (canRegisterHook("SlimeWorldManager"))
             registerHook("SlimeWorldManagerHook");
 
-        if (Bukkit.getPluginManager().isPluginEnabled("ProtocolLib"))
+        if (canRegisterHook("ProtocolLib"))
             registerHook("ProtocolLibHook");
 
         if (Bukkit.getPluginManager().isPluginEnabled("Oraxen"))
@@ -396,35 +396,35 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
         Optional<SpawnersProvider> spawnersProvider = Optional.empty();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("MergedSpawner") &&
+        if (canRegisterHook("MergedSpawner") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("MergedSpawner"))) {
             spawnersProvider = createInstance("SpawnersProvider_MergedSpawner");
             listenToSpawnerChanges = false;
-        } else if (Bukkit.getPluginManager().isPluginEnabled("AdvancedSpawners") &&
+        } else if (canRegisterHook("AdvancedSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("AdvancedSpawners"))) {
             spawnersProvider = createInstance("SpawnersProvider_AdvancedSpawners");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
+        } else if (canRegisterHook("WildStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("WildStacker"))) {
             spawnersProvider = createInstance("SpawnersProvider_WildStacker");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("SilkSpawners") &&
+        } else if (canRegisterHook("SilkSpawners") &&
                 Bukkit.getPluginManager().getPlugin("SilkSpawners").getDescription().getAuthors().contains("CandC_9_12") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("SilkSpawners"))) {
             spawnersProvider = createInstance("SpawnersProvider_SilkSpawners");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("PvpingSpawners") &&
+        } else if (canRegisterHook("PvpingSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("PvpingSpawners"))) {
             spawnersProvider = createInstance("SpawnersProvider_PvpingSpawners");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("EpicSpawners") &&
+        } else if (canRegisterHook("EpicSpawners") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("EpicSpawners"))) {
             if (Bukkit.getPluginManager().getPlugin("EpicSpawners").getDescription().getVersion().startsWith("7")) {
                 spawnersProvider = createInstance("SpawnersProvider_EpicSpawners7");
             } else {
                 spawnersProvider = createInstance("SpawnersProvider_EpicSpawners6");
             }
-        } else if (Bukkit.getPluginManager().isPluginEnabled("UltimateStacker") &&
+        } else if (canRegisterHook("UltimateStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("UltimateStacker"))) {
             spawnersProvider = createInstance("SpawnersProvider_UltimateStacker");
             listenToSpawnerChanges = false;
-        } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
+        } else if (canRegisterHook("RoseStacker") &&
                 (auto || configSpawnersProvider.equalsIgnoreCase("RoseStacker"))) {
             spawnersProvider = createInstance("SpawnersProvider_RoseStacker");
             listenToSpawnerChanges = false;
@@ -442,10 +442,10 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
 
         Optional<StackedBlocksProvider> stackedBlocksProvider = Optional.empty();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("WildStacker") &&
+        if (canRegisterHook("WildStacker") &&
                 (auto || configStackedBlocksProvider.equalsIgnoreCase("WildStacker"))) {
             stackedBlocksProvider = createInstance("StackedBlocksProvider_WildStacker");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("RoseStacker") &&
+        } else if (canRegisterHook("RoseStacker") &&
                 (auto || configStackedBlocksProvider.equalsIgnoreCase("RoseStacker"))) {
             stackedBlocksProvider = createInstance("StackedBlocksProvider_RoseStacker");
         }
@@ -456,7 +456,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private void registerPermissionsProvider() {
         Optional<PermissionsProvider> permissionsProvider = Optional.empty();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) {
+        if (canRegisterHook("LuckPerms")) {
             permissionsProvider = createInstance("PermissionsProvider_LuckPerms");
         }
 
@@ -466,7 +466,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private void registerPricesProvider() {
         Optional<PricesProvider> pricesProvider = Optional.empty();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("ShopGUIPlus")) {
+        if (canRegisterHook("ShopGUIPlus")) {
             pricesProvider = createInstance("PricesProvider_ShopGUIPlus");
         }
 
@@ -476,14 +476,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private void registerVanishProvider() {
         Optional<VanishProvider> vanishProvider = Optional.empty();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("VanishNoPacket")) {
+        if (canRegisterHook("VanishNoPacket")) {
             vanishProvider = createInstance("VanishProvider_VanishNoPacket");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("SuperVanish") ||
-                Bukkit.getPluginManager().isPluginEnabled("PremiumVanish")) {
+        } else if (canRegisterHook("SuperVanish") ||
+                canRegisterHook("PremiumVanish")) {
             vanishProvider = createInstance("VanishProvider_SuperVanish");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
+        } else if (canRegisterHook("Essentials")) {
             vanishProvider = createInstance("VanishProvider_Essentials");
-        } else if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
+        } else if (canRegisterHook("CMI")) {
             vanishProvider = createInstance("VanishProvider_CMI");
         }
 
@@ -491,11 +491,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     private void registerAFKProvider() {
-        if (Bukkit.getPluginManager().isPluginEnabled("CMI")) {
+        if (canRegisterHook("CMI")) {
             Optional<AFKProvider> afkProvider = createInstance("AFKProvider_CMI");
             afkProvider.ifPresent(this::addAFKProvider);
         }
-        if (Bukkit.getPluginManager().isPluginEnabled("Essentials")) {
+        if (canRegisterHook("Essentials")) {
             Optional<AFKProvider> afkProvider = createInstance("AFKProvider_Essentials");
             afkProvider.ifPresent(this::addAFKProvider);
         }
@@ -513,7 +513,7 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     }
 
     private void registerEconomyProviders() {
-        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+        if (canRegisterHook("Vault")) {
             if (this.economyProvider instanceof EconomyProvider_Default ||
                     this.bankEconomyProvider instanceof EconomyProvider_Default) {
                 Optional<EconomyProvider> economyProviderOptional = createInstance("EconomyProvider_Vault");
@@ -530,11 +530,11 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
     private void registerPlaceholdersProvider() {
         List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
 
-        if (Bukkit.getPluginManager().isPluginEnabled("MVdWPlaceholderAPI")) {
+        if (canRegisterHook("MVdWPlaceholderAPI")) {
             Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_MVdWPlaceholderAPI");
             placeholdersProvider.ifPresent(placeholdersProviders::add);
         }
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+        if (canRegisterHook("PlaceholderAPI")) {
             Optional<PlaceholdersProvider> placeholdersProvider = createInstance("PlaceholdersProvider_PlaceholderAPI");
             placeholdersProvider.ifPresent(placeholdersProviders::add);
         }
@@ -602,6 +602,14 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             PluginDebugger.debug(error);
             return Optional.empty();
         }
+    }
+
+    private boolean canRegisterHook(String pluginName) {
+        return Bukkit.getPluginManager().isPluginEnabled(pluginName) && isHookEnabled(pluginName);
+    }
+
+    private boolean isHookEnabled(String pluginName) {
+        return !plugin.getSettings().getDisabledHooks().contains(pluginName.toLowerCase(Locale.ENGLISH));
     }
 
 }

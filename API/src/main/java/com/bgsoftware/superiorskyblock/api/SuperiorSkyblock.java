@@ -17,10 +17,11 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.handlers.UpgradesManager;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
+import org.bukkit.plugin.Plugin;
 
 import javax.annotation.Nullable;
 
-public interface SuperiorSkyblock {
+public interface SuperiorSkyblock extends Plugin {
 
     /**
      * Get the grid of the core.

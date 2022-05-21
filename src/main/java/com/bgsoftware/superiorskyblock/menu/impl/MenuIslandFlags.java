@@ -22,6 +22,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,8 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
     private static PagedMenuPattern<MenuIslandFlags, IslandFlagInfo> menuPattern;
 
     private static final List<IslandFlagInfo> islandFlags = new ArrayList<>();
+
+    private static boolean convertedFlags = false;
 
     private final Island island;
 
@@ -55,6 +58,12 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
     @Override
     protected List<IslandFlagInfo> requestObjects() {
+        if (!convertedFlags) {
+            islandFlags.forEach(IslandFlagInfo::getIslandFlag);
+            islandFlags.removeIf(IslandFlagInfo::isInvalid);
+            convertedFlags = true;
+        }
+
         return islandFlags;
     }
 
@@ -76,7 +85,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         if (cfg.isConfigurationSection("settings")) {
             for (String settingsSectionName : cfg.getConfigurationSection("settings").getKeys(false)) {
-                updateSettings(IslandFlag.getByName(settingsSectionName.toLowerCase(Locale.ENGLISH)), cfg, position++);
+                updateSettings(settingsSectionName, cfg, position++);
             }
         }
 
@@ -97,30 +106,30 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
         SuperiorMenu.refreshMenus(MenuIslandFlags.class, superiorMenu -> superiorMenu.island.equals(island));
     }
 
-    public static void updateSettings(IslandFlag islandFlag) {
+    public static void updateSettings(String islandFlagName) {
         File file = new File(plugin.getDataFolder(), "menus/settings.yml");
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
         int position = 0;
 
         for (String key : cfg.getConfigurationSection("settings").getKeys(false)) {
-            if (islandFlag.getName().equalsIgnoreCase(key))
+            if (islandFlagName.equalsIgnoreCase(key))
                 break;
 
             position++;
         }
 
-        updateSettings(islandFlag, cfg, position);
+        updateSettings(islandFlagName, cfg, position);
     }
 
-    public static void updateSettings(IslandFlag islandFlag, YamlConfiguration cfg, int position) {
-        islandFlags.removeIf(islandFlagInfo -> islandFlagInfo.getIslandFlag() == islandFlag);
+    public static void updateSettings(String islandFlagName, YamlConfiguration cfg, int position) {
+        islandFlags.removeIf(islandFlagInfo -> islandFlagInfo.getIslandFlagName().equalsIgnoreCase(islandFlagName));
 
         TemplateItem enabledIslandFlagItem = null;
         TemplateItem disabledIslandFlagItem = null;
         SoundWrapper clickSound = null;
 
         ConfigurationSection itemFlagSection = cfg.getConfigurationSection("settings." +
-                islandFlag.getName().toLowerCase(Locale.ENGLISH));
+                islandFlagName.toLowerCase(Locale.ENGLISH));
 
         if (itemFlagSection != null) {
             enabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
@@ -130,7 +139,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
             clickSound = FileUtils.getSound(itemFlagSection.getConfigurationSection("sound"));
         }
 
-        islandFlags.add(new IslandFlagInfo(islandFlag, enabledIslandFlagItem,
+        islandFlags.add(new IslandFlagInfo(islandFlagName, enabledIslandFlagItem,
                 disabledIslandFlagItem, clickSound, position));
         Collections.sort(islandFlags);
     }
@@ -181,23 +190,42 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
     public static class IslandFlagInfo implements Comparable<IslandFlagInfo> {
 
-        private final IslandFlag islandFlag;
+        private final String islandFlagName;
         private final TemplateItem enabledIslandFlagItem;
         private final TemplateItem disabledIslandFlagItem;
         private final SoundWrapper clickSound;
         private final int position;
 
-        public IslandFlagInfo(IslandFlag islandFlag, TemplateItem enabledIslandFlagItem,
+        private IslandFlag cachedIslandFlag = null;
+
+        public IslandFlagInfo(String islandFlagName, TemplateItem enabledIslandFlagItem,
                               TemplateItem disabledIslandFlagItem, SoundWrapper clickSound, int position) {
-            this.islandFlag = islandFlag;
+            this.islandFlagName = islandFlagName;
             this.enabledIslandFlagItem = enabledIslandFlagItem;
             this.disabledIslandFlagItem = disabledIslandFlagItem;
             this.clickSound = clickSound;
             this.position = position;
         }
 
+        @Nullable
         public IslandFlag getIslandFlag() {
-            return islandFlag;
+            if (cachedIslandFlag == null) {
+                try {
+                    cachedIslandFlag = IslandFlag.getByName(islandFlagName);
+                } catch (Exception ignored) {
+                    // Flag is faulty.
+                }
+            }
+
+            return cachedIslandFlag;
+        }
+
+        public boolean isInvalid() {
+            return cachedIslandFlag == null;
+        }
+
+        public String getIslandFlagName() {
+            return islandFlagName;
         }
 
         public ItemBuilder getEnabledIslandFlagItem() {

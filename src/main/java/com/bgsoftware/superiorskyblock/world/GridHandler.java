@@ -225,6 +225,11 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     }
 
     @Override
+    public IslandCreationAlgorithm getIslandCreationAlgorithm() {
+        return this.islandCreationAlgorithm;
+    }
+
+    @Override
     public boolean hasActiveCreateRequest(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         return pendingCreationTasks.contains(superiorPlayer.getUniqueId());

@@ -21,11 +21,16 @@ public final class ChunksProvider {
 
     private static final Map<ChunkPosition, PendingChunkLoadRequest> pendingRequests = new ConcurrentHashMap<>();
 
+    private static boolean stopped = false;
+
     private ChunksProvider() {
 
     }
 
     public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason, Consumer<Chunk> onLoadConsumer) {
+        if (stopped)
+            return new CompletableFuture<>();
+
         PluginDebugger.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
 
         PendingChunkLoadRequest pendingRequest = pendingRequests.get(chunkPosition);
@@ -52,6 +57,7 @@ public final class ChunksProvider {
     }
 
     public static void stop() {
+        stopped = true;
         if (chunksExecutor.isRunning())
             chunksExecutor.stop();
     }
@@ -72,6 +78,9 @@ public final class ChunksProvider {
 
         @Override
         public void work() {
+            if (stopped)
+                return;
+
             PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
             plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
                     chunkPosition.getX(), chunkPosition.getZ()).whenComplete((chunk, error) -> {

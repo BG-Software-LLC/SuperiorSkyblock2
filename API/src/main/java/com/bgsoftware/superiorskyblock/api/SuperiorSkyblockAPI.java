@@ -41,6 +41,35 @@ public final class SuperiorSkyblockAPI {
     }
 
     /*
+     * General Methods
+     */
+
+    /**
+     * Get the plugin instance.
+     */
+    public static SuperiorSkyblock getSuperiorSkyblock() {
+        return plugin;
+    }
+
+    /**
+     * Set the plugin's instance for the API.
+     * Do not use this method on your own, as it may cause an undefined behavior when using the API.
+     *
+     * @param plugin The instance of the plugin to set to the API.
+     */
+    public static void setPluginInstance(SuperiorSkyblock plugin) {
+        if (SuperiorSkyblockAPI.plugin != null) {
+            throw new UnsupportedOperationException("You cannot initialize the plugin instance after it was initialized.");
+        }
+
+        SuperiorSkyblockAPI.plugin = plugin;
+    }
+
+    public static int getAPIVersion() {
+        return 1;
+    }
+
+    /*
      *  Player Methods
      */
 
@@ -173,7 +202,7 @@ public final class SuperiorSkyblockAPI {
      */
 
     /**
-     * Get a schematic object by it's name
+     * Get a schematic object by its name
      */
     @Nullable
     public static Schematic getSchematic(String name) {
@@ -313,27 +342,6 @@ public final class SuperiorSkyblockAPI {
      */
     public static ModulesManager getModules() {
         return plugin.getModules();
-    }
-
-    /**
-     * Get the superiorskyblock object.
-     */
-    public static SuperiorSkyblock getSuperiorSkyblock() {
-        return plugin;
-    }
-
-    /**
-     * Set the plugin's instance for the API.
-     * Do not use this method on your own, as it may cause an undefined behavior when using the API.
-     *
-     * @param plugin The instance of the plugin to set to the API.
-     */
-    public static void setPluginInstance(SuperiorSkyblock plugin) {
-        if (SuperiorSkyblockAPI.plugin != null) {
-            throw new UnsupportedOperationException("You cannot initialize the plugin instance after it was initialized.");
-        }
-
-        SuperiorSkyblockAPI.plugin = plugin;
     }
 
 }

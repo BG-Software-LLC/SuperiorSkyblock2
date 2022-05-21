@@ -415,7 +415,7 @@ public final class MenusProvider_Default implements MenusProvider {
     @Override
     public void updateSettings(IslandFlag islandFlag) {
         Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
-        MenuIslandFlags.updateSettings(islandFlag);
+        MenuIslandFlags.updateSettings(islandFlag.getName());
     }
 
     @Override
