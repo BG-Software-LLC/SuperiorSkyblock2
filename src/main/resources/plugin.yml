@@ -18,8 +18,9 @@ softdepend:
   - JetsMinions
   - LeaderHeads
   - LuckPerms
-  - MVdWPlaceholderAPI
   - MergedSpawner
+  - MVdWPlaceholderAPI
+  - Oraxen
   - PlaceholderAPI
   - ProtocolLib
   - PvpingSpawners
