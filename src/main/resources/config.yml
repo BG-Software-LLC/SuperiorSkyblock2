@@ -683,6 +683,10 @@ negative-level: true
 # You can find a list of events at @ https://bg-software.com/superiorskyblock/api/
 disabled-events: [ ]
 
+# A list of commands that should be disabled within the plugin.
+# You can add a label or an alias of a command to disable it.
+disabled-commands: [ ]
+
 # List of plugins that their hooks should not be enabled.
 # Simply add the plugin's name in order to prevent it from enabling.
 disabled-hooks: [ ]

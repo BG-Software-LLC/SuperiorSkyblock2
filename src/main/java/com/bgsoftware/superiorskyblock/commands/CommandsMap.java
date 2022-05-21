@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class CommandsMap {
 
@@ -64,11 +65,20 @@ public abstract class CommandsMap {
     @Nullable
     public SuperiorCommand getCommand(String label) {
         label = label.toLowerCase(Locale.ENGLISH);
-        return subCommands.getOrDefault(label, aliasesToCommand.get(label));
+        SuperiorCommand superiorCommand = subCommands.getOrDefault(label, aliasesToCommand.get(label));
+        return superiorCommand != null && isCommandDisabled(superiorCommand) ? null : superiorCommand;
     }
 
-    public List<SuperiorCommand> getSubCommands() {
-        return Collections.unmodifiableList(new ArrayList<>(subCommands.values()));
+    public List<SuperiorCommand> getSubCommands(boolean includeDisabled) {
+        return includeDisabled ? Collections.unmodifiableList(new ArrayList<>(subCommands.values())) :
+                Collections.unmodifiableList(subCommands.values().stream()
+                        .filter(superiorCommand -> !isCommandDisabled(superiorCommand))
+                        .collect(Collectors.toList()));
+    }
+
+    private boolean isCommandDisabled(SuperiorCommand superiorCommand) {
+        return !(superiorCommand instanceof IAdminIslandCommand) && superiorCommand.getAliases().stream()
+                .anyMatch(plugin.getSettings().getDisabledCommands()::contains);
     }
 
 }

@@ -456,6 +456,11 @@ public final class SettingsHandler extends AbstractHandler implements SettingsMa
     }
 
     @Override
+    public List<String> getDisabledCommands() {
+        return this.container.disabledCommands;
+    }
+
+    @Override
     public List<String> getDisabledHooks() {
         return this.container.disabledHooks;
     }

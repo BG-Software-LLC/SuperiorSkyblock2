@@ -108,7 +108,12 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public List<SuperiorCommand> getSubCommands() {
-        return playerCommandsMap.getSubCommands();
+        return getSubCommands(false);
+    }
+
+    @Override
+    public List<SuperiorCommand> getSubCommands(boolean includeDisabled) {
+        return playerCommandsMap.getSubCommands(includeDisabled);
     }
 
     @Nullable
@@ -119,7 +124,7 @@ public final class CommandsHandler extends AbstractHandler implements CommandsMa
 
     @Override
     public List<SuperiorCommand> getAdminSubCommands() {
-        return adminCommandsMap.getSubCommands();
+        return adminCommandsMap.getSubCommands(true);
     }
 
     @Nullable

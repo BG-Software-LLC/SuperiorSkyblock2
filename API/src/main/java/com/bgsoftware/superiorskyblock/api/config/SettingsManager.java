@@ -470,6 +470,12 @@ public interface SettingsManager {
     List<String> getDisabledEvents();
 
     /**
+     * List of commands that should be disabled within the plugin.
+     * Config-path: disabled-commands
+     */
+    List<String> getDisabledCommands();
+
+    /**
      * List of plugins that their hooks should not be enabled.
      * Config-path: disabled-hooks
      */
