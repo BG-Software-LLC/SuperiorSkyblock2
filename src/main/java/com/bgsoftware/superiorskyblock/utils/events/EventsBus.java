@@ -52,6 +52,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnableFlagEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
@@ -431,6 +432,11 @@ public final class EventsBus {
         return !islandEnterProtectedEvent.isCancelled();
     }
 
+    public EventResult<GenerateBlockResult> callIslandGenerateBlockEvent(Island island, Location location, Key block) {
+        return callEvent(() -> new IslandGenerateBlockEvent(island, location, block), "islandgenerateblockevent",
+                new GenerateBlockResult(block, true), GenerateBlockResult::new);
+    }
+
     public boolean callIslandInviteEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
         return callEvent(() -> new IslandInviteEvent(superiorPlayer, targetPlayer, island), "islandinviteevent");
     }
@@ -775,6 +781,30 @@ public final class EventsBus {
 
         public UpgradeCost getUpgradeCost() {
             return upgradeCost;
+        }
+
+    }
+
+    public static final class GenerateBlockResult {
+
+        private final Key block;
+        private final boolean placeBlock;
+
+        public GenerateBlockResult(IslandGenerateBlockEvent event) {
+            this(event.getBlock(), event.isPlaceBlock());
+        }
+
+        public GenerateBlockResult(Key block, boolean placeBlock) {
+            this.block = block;
+            this.placeBlock = placeBlock;
+        }
+
+        public Key getBlock() {
+            return block;
+        }
+
+        public boolean isPlaceBlock() {
+            return placeBlock;
         }
 
     }

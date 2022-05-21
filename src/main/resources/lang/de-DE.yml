@@ -766,8 +766,8 @@ PERMISSIONS_RESET_PLAYER: '&e&lInsel | &7Alle Berechtigungen für {0} erfolgreic
   Standardwerte zurückgesetzt!'
 PERMISSIONS_RESET_ROLES: '&e&lInsel | &7Alle Berechtigungen der Insel erfolgreich
   auf Standardwerte zurücksetzen!'
-PLACEHOLDER_NO: '&c✘'
-PLACEHOLDER_YES: '&a✔'
+PLACEHOLDER_NO: 'No'
+PLACEHOLDER_YES: 'Yes'
 PLAYER_ALREADY_BANNED: '&c&lFehler | &7Dieser Spieler ist bereits gesperrt.'
 PLAYER_ALREADY_COOP: '&c&lError | &7Dieser Spieler ist bereits kooperativ.'
 PLAYER_ALREADY_IN_ISLAND: '&c&lError | &7Dieser Spieler befindet sich bereits auf

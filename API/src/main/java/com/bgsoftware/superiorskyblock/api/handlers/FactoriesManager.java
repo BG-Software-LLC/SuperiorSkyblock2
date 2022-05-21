@@ -8,6 +8,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import org.bukkit.Location;
 
+import javax.annotation.Nullable;
+
 public interface FactoriesManager {
 
     /**
@@ -16,9 +18,21 @@ public interface FactoriesManager {
     void registerIslandsFactory(IslandsFactory islandsFactory);
 
     /**
-     * Register a custom islands factory.
+     * Get the current islands factory.
+     */
+    @Nullable
+    IslandsFactory getIslandsFactory();
+
+    /**
+     * Register a custom players factory.
      */
     void registerPlayersFactory(PlayersFactory playersFactory);
+
+    /**
+     * Get the current players factory.
+     */
+    @Nullable
+    PlayersFactory getPlayersFactory();
 
     /**
      * Register a custom banks factory.
@@ -26,9 +40,21 @@ public interface FactoriesManager {
     void registerBanksFactory(BanksFactory banksFactory);
 
     /**
+     * Get the current banks factory.
+     */
+    @Nullable
+    BanksFactory getBanksFactory();
+
+    /**
      * Register a custom database-bridge factory.
      */
     void registerDatabaseBridgeFactory(DatabaseBridgeFactory databaseBridgeFactory);
+
+    /**
+     * Get the database bridge factory.
+     */
+    @Nullable
+    DatabaseBridgeFactory getDatabaseBridgeFactory();
 
     /**
      * Create a {@link BlockOffset} object from given offsets.
