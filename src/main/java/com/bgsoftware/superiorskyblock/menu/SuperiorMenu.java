@@ -179,7 +179,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
     }
 
     public final void onClick(SuperiorSkyblockPlugin plugin, InventoryClickEvent clickEvent) {
-        if (refreshing)
+        if (refreshing || clickEvent.getCurrentItem() == null)
             return;
 
         Preconditions.checkNotNull(this.menuPattern, "menu wasn't initialized properly.");
