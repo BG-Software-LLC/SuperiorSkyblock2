@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -71,7 +71,7 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
 
         PagedMenuPattern.Builder<MenuIslandFlags, IslandFlagInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "settings.yml", MenuIslandFlags::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "settings.yml", MenuIslandFlags::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
@@ -130,11 +130,11 @@ public final class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, Me
                 islandFlagName.toLowerCase(Locale.ENGLISH));
 
         if (itemFlagSection != null) {
-            enabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
+            enabledIslandFlagItem = MenuParser.getItemStack("settings.yml",
                     itemFlagSection.getConfigurationSection("settings-enabled"));
-            disabledIslandFlagItem = FileUtils.getItemStack("settings.yml",
+            disabledIslandFlagItem = MenuParser.getItemStack("settings.yml",
                     itemFlagSection.getConfigurationSection("settings-disabled"));
-            clickSound = FileUtils.getSound(itemFlagSection.getConfigurationSection("sound"));
+            clickSound = MenuParser.getSound(itemFlagSection.getConfigurationSection("sound"));
         }
 
         islandFlags.add(new IslandFlagInfo(islandFlagName, enabledIslandFlagItem,

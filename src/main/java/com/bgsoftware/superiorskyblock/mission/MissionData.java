@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.mission;
 
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import org.bukkit.configuration.ConfigurationSection;
@@ -42,7 +42,7 @@ public final class MissionData {
 
         if (section.contains("rewards.items")) {
             for (String key : section.getConfigurationSection("rewards.items").getKeys(false)) {
-                TemplateItem templateItem = FileUtils.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
+                TemplateItem templateItem = MenuParser.getItemStack("config.yml", section.getConfigurationSection("rewards.items." + key));
                 if (templateItem != null) {
                     ItemStack itemStack = templateItem.build();
                     itemStack.setAmount(section.getInt("rewards.items." + key + ".amount", 1));
@@ -53,9 +53,9 @@ public final class MissionData {
 
         this.commandRewards.addAll(section.getStringList("rewards.commands"));
 
-        this.notCompleted = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
-        this.canComplete = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
-        this.completed = FileUtils.getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
+        this.notCompleted = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.not-completed"));
+        this.canComplete = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.can-complete"));
+        this.completed = MenuParser.getItemStack("config.yml", section.getConfigurationSection("icons.completed"));
     }
 
     public boolean isAutoReward() {

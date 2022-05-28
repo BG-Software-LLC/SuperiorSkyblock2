@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -67,7 +67,7 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
 
         PagedMenuPattern.Builder<MenuTopIslands, Island> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "top-islands.yml", MenuTopIslands::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "top-islands.yml", MenuTopIslands::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
@@ -118,10 +118,10 @@ public final class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Isla
                     continue;
 
                 TopIslandsPagedObjectButton.Builder slotsBuilder = new TopIslandsPagedObjectButton.Builder()
-                        .setIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")))
-                        .setNoIslandItem(FileUtils.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")))
-                        .setIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")))
-                        .setNoIslandSound(FileUtils.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")))
+                        .setIslandItem(MenuParser.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("island")))
+                        .setNoIslandItem(MenuParser.getItemStack("top-islands.yml", itemsSection.getConfigurationSection("no-island")))
+                        .setIslandSound(MenuParser.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".island")))
+                        .setNoIslandSound(MenuParser.getSound(cfg.getConfigurationSection("sounds." + slotsChar + ".no-island")))
                         .setIslandCommands(cfg.getStringList("commands." + slotsChar + ".island"))
                         .setNoIslandCommands(cfg.getStringList("commands." + slotsChar + ".no-island"));
 

@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -56,7 +56,7 @@ public final class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings
 
         PagedMenuPattern.Builder<MenuIslandRatings, RatingInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-ratings.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-ratings.yml",
                 MenuIslandRatings::convertOldGUI);
 
         if (menuLoadResult == null)

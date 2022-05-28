@@ -19,7 +19,7 @@ import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import org.bukkit.Material;
@@ -94,7 +94,7 @@ public final class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
 
         PagedMenuPattern.Builder<MenuWarps, IslandWarp> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "warps.yml", MenuWarps::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warps.yml", MenuWarps::convertOldGUI);
 
         if (menuLoadResult == null)
             return;

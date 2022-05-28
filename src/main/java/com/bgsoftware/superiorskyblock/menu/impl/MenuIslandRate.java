@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -45,7 +45,7 @@ public final class MenuIslandRate extends SuperiorMenu<MenuIslandRate> {
 
         RegularMenuPattern.Builder<MenuIslandRate> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-rate.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-rate.yml",
                 MenuIslandRate::convertOldGUI);
 
         if (menuLoadResult == null)

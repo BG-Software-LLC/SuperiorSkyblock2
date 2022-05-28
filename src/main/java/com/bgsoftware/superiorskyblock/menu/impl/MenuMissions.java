@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.OpenMissionCategoryButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 
 public final class MenuMissions extends SuperiorMenu<MenuMissions> {
 
@@ -30,7 +30,7 @@ public final class MenuMissions extends SuperiorMenu<MenuMissions> {
 
         RegularMenuPattern.Builder<MenuMissions> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "missions.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "missions.yml", null);
 
         if (menuLoadResult == null)
             return;

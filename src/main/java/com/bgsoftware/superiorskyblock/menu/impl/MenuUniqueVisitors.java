@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.UniqueVisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public final class MenuUniqueVisitors extends PagedSuperiorMenu<MenuUniqueVisito
 
         PagedMenuPattern.Builder<MenuUniqueVisitors, UniqueVisitorInfo> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "unique-visitors.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "unique-visitors.yml", null);
 
         if (menuLoadResult == null)
             return;

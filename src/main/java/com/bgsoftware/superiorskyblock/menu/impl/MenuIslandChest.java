@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IslandChestPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Arrays;
@@ -50,7 +50,7 @@ public final class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, Is
 
         PagedMenuPattern.Builder<MenuIslandChest, IslandChest> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-chest.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-chest.yml", null);
 
         if (menuLoadResult == null)
             return;
@@ -76,8 +76,8 @@ public final class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, Is
                 }
 
                 patternBuilder.mapButtons(slots, new IslandChestPagedObjectButton.Builder()
-                        .setButtonItem(FileUtils.getItemStack("island-chest.yml", validPageSection))
-                        .setNullItem(FileUtils.getItemStack("island-chest.yml", invalidPageSection)));
+                        .setButtonItem(MenuParser.getItemStack("island-chest.yml", validPageSection))
+                        .setNullItem(MenuParser.getItemStack("island-chest.yml", invalidPageSection)));
             }
         }
 

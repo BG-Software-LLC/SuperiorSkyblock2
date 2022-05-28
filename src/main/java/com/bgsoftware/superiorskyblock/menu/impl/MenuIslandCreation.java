@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -64,7 +64,7 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
         RegularMenuPattern.Builder<MenuIslandCreation> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-creation.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-creation.yml",
                 MenuIslandCreation::convertOldGUI);
 
         if (menuLoadResult == null)
@@ -124,8 +124,8 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 ConfigurationSection soundSection = cfg.getConfigurationSection("sounds." + itemSectionName);
                 if (soundSection != null) {
                     buttonBuilder
-                            .setAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("access")))
-                            .setNoAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("no-access")));
+                            .setAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("access")))
+                            .setNoAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("no-access")));
                 }
 
                 ConfigurationSection commandSection = cfg.getConfigurationSection("commands." + itemSectionName);
@@ -137,9 +137,9 @@ public final class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
 
                 patternBuilder.mapButtons(menuPatternSlots.getSlots(itemSectionName), buttonBuilder
                         .setOffset(itemSection.getBoolean("offset", false))
-                        .setAccessItem(FileUtils.getItemStack("island-creation.yml",
+                        .setAccessItem(MenuParser.getItemStack("island-creation.yml",
                                 itemSection.getConfigurationSection("access")))
-                        .setNoAccessItem(FileUtils.getItemStack("island-creation.yml",
+                        .setNoAccessItem(MenuParser.getItemStack("island-creation.yml",
                                 itemSection.getConfigurationSection("no-access"))));
             }
         }

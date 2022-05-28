@@ -17,7 +17,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.HeadUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import org.bukkit.configuration.ConfigurationSection;
@@ -64,7 +64,7 @@ public final class MenuValues extends SuperiorMenu<MenuValues> {
 
         RegularMenuPattern.Builder<MenuValues> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "values.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "values.yml",
                 MenuValues::convertOldGUI);
 
         if (menuLoadResult == null)

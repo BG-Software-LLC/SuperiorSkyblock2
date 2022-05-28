@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BanButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 
 public final class MenuConfirmBan extends SuperiorMenu<MenuConfirmBan> {
 
@@ -37,7 +37,7 @@ public final class MenuConfirmBan extends SuperiorMenu<MenuConfirmBan> {
 
         RegularMenuPattern.Builder<MenuConfirmBan> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "confirm-ban.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "confirm-ban.yml", null);
 
         if (menuLoadResult == null)
             return;

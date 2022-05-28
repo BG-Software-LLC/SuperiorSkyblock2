@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -62,7 +62,7 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
 
         RegularMenuPattern.Builder<MenuBiomes> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "biomes.yml", MenuBiomes::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "biomes.yml", MenuBiomes::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
@@ -95,19 +95,19 @@ public final class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 BiomeButton.Builder buttonBuilder = new BiomeButton.Builder(biome);
 
                 if (itemSection.contains("access")) {
-                    buttonBuilder.setAccessItem(FileUtils.getItemStack("biomes.yml",
+                    buttonBuilder.setAccessItem(MenuParser.getItemStack("biomes.yml",
                             itemSection.getConfigurationSection("access")));
                 }
                 if (itemSection.contains("no-access")) {
-                    buttonBuilder.setNoAccessItem(FileUtils.getItemStack("biomes.yml",
+                    buttonBuilder.setNoAccessItem(MenuParser.getItemStack("biomes.yml",
                             itemSection.getConfigurationSection("no-access")));
                 }
                 if (soundSection != null) {
                     if (soundSection.contains("access")) {
-                        buttonBuilder.setAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("access")));
+                        buttonBuilder.setAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("access")));
                     }
                     if (soundSection.contains("no-access")) {
-                        buttonBuilder.setNoAccessSound(FileUtils.getSound(soundSection.getConfigurationSection("no-access")));
+                        buttonBuilder.setNoAccessSound(MenuParser.getSound(soundSection.getConfigurationSection("no-access")));
                     }
                 }
                 if (commandSection != null) {

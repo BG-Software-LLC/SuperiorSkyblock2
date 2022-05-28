@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -47,7 +47,7 @@ public final class MenuMembers extends PagedSuperiorMenu<MenuMembers, SuperiorPl
 
         PagedMenuPattern.Builder<MenuMembers, SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "members.yml", MenuMembers::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "members.yml", MenuMembers::convertOldGUI);
 
         if (menuLoadResult == null)
             return;

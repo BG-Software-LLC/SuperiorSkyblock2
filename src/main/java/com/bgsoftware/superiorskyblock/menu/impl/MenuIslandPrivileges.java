@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
@@ -79,7 +79,7 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
         PagedMenuPattern.Builder<MenuIslandPrivileges, IslandPrivilegeInfo> patternBuilder =
                 new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "permissions.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "permissions.yml",
                 MenuIslandPrivileges::convertOldGUI);
 
         if (menuLoadResult == null)
@@ -161,14 +161,14 @@ public final class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPriv
                 islandPrivilege.getName().toLowerCase(Locale.ENGLISH));
 
         if (itemPrivilegeSection != null) {
-            enabledIslandPrivilegeItem = FileUtils.getItemStack("permissions.yml",
+            enabledIslandPrivilegeItem = MenuParser.getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("permission-enabled"));
-            disabledIslandPrivilegeItem = FileUtils.getItemStack("permissions.yml",
+            disabledIslandPrivilegeItem = MenuParser.getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("permission-disabled"));
-            rolePrivilegeItem = FileUtils.getItemStack("permissions.yml",
+            rolePrivilegeItem = MenuParser.getItemStack("permissions.yml",
                     itemPrivilegeSection.getConfigurationSection("role-permission"));
-            accessSound = FileUtils.getSound(itemPrivilegeSection.getConfigurationSection("has-access.sound"));
-            noAccessSound = FileUtils.getSound(itemPrivilegeSection.getConfigurationSection("no-access.sound"));
+            accessSound = MenuParser.getSound(itemPrivilegeSection.getConfigurationSection("has-access.sound"));
+            noAccessSound = MenuParser.getSound(itemPrivilegeSection.getConfigurationSection("no-access.sound"));
             accessCommands = itemPrivilegeSection.getStringList("has-access.commands");
             noAccessCommands = itemPrivilegeSection.getStringList("no-access.commands");
         }

@@ -15,7 +15,7 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.menu.IconRenameButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpIconEditConfirmButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.ItemBuilder;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 
@@ -43,7 +43,7 @@ public final class MenuWarpIconEdit extends SuperiorMenuIconEdit<MenuWarpIconEdi
 
         RegularMenuPattern.Builder<MenuWarpIconEdit> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "warp-icon-edit.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warp-icon-edit.yml", null);
 
         if (menuLoadResult == null)
             return;

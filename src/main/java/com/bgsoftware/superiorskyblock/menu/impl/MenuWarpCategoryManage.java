@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryManageR
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryManageWarpsButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 
 public final class MenuWarpCategoryManage extends SuperiorMenu<MenuWarpCategoryManage> {
@@ -46,7 +46,7 @@ public final class MenuWarpCategoryManage extends SuperiorMenu<MenuWarpCategoryM
 
         RegularMenuPattern.Builder<MenuWarpCategoryManage> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "warp-category-manage.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warp-category-manage.yml", null);
 
         if (menuLoadResult == null)
             return;
@@ -55,7 +55,7 @@ public final class MenuWarpCategoryManage extends SuperiorMenu<MenuWarpCategoryM
         CommentedConfiguration cfg = menuLoadResult.getConfig();
 
         if (cfg.isConfigurationSection("success-update-sound"))
-            successUpdateSound = FileUtils.getSound(cfg.getConfigurationSection("success-update-sound"));
+            successUpdateSound = MenuParser.getSound(cfg.getConfigurationSection("success-update-sound"));
 
         menuPattern = patternBuilder
                 .mapButtons(getSlots(cfg, "category-rename", menuPatternSlots),

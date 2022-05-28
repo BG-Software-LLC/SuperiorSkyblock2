@@ -13,7 +13,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -39,7 +39,7 @@ public final class MenuBorderColor extends SuperiorMenu<MenuBorderColor> {
 
         RegularMenuPattern.Builder<MenuBorderColor> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "border-color.yml", MenuBorderColor::convertOldGUI);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "border-color.yml", MenuBorderColor::convertOldGUI);
 
         if (menuLoadResult == null)
             return;
@@ -56,9 +56,9 @@ public final class MenuBorderColor extends SuperiorMenu<MenuBorderColor> {
 
                 patternBuilder.setButtons(menuPatternSlots.getSlots(itemsSectionName),
                         new BorderColorToggleButton.Builder()
-                                .setEnabledItem(FileUtils.getItemStack("border-color.yml",
+                                .setEnabledItem(MenuParser.getItemStack("border-color.yml",
                                         itemsSection.getConfigurationSection("disable-border")))
-                                .setDisabledItem(FileUtils.getItemStack("border-color.yml",
+                                .setDisabledItem(MenuParser.getItemStack("border-color.yml",
                                         itemsSection.getConfigurationSection("enable-border"))));
             }
         }

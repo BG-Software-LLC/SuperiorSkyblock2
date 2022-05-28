@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -44,7 +44,7 @@ public final class MenuConfirmDisband extends SuperiorMenu<MenuConfirmDisband> {
 
         RegularMenuPattern.Builder<MenuConfirmDisband> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "confirm-disband.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "confirm-disband.yml",
                 MenuConfirmDisband::convertOldGUI);
 
         if (menuLoadResult == null)

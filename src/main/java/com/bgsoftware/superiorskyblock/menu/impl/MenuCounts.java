@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.CountsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.Material;
 
 import java.math.BigInteger;
@@ -52,7 +52,7 @@ public final class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.B
 
         PagedMenuPattern.Builder<MenuCounts, BlockCount> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder,
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder,
                 "counts.yml", null);
 
         if (menuLoadResult == null)

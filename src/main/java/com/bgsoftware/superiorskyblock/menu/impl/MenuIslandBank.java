@@ -17,8 +17,7 @@ import com.bgsoftware.superiorskyblock.menu.button.impl.menu.BankWithdrawButton;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.OpenBankLogsButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 
 import java.math.BigDecimal;
@@ -49,7 +48,7 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
 
         RegularMenuPattern.Builder<MenuIslandBank> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "island-bank.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "island-bank.yml", null);
 
         if (menuLoadResult == null)
             return;
@@ -66,8 +65,8 @@ public final class MenuIslandBank extends SuperiorMenu<MenuIslandBank> {
                         continue;
                     }
 
-                    SoundWrapper successSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
-                    SoundWrapper failSound = FileUtils.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
+                    SoundWrapper successSound = MenuParser.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".success-sound"));
+                    SoundWrapper failSound = MenuParser.getSound(cfg.getConfigurationSection("sounds." + itemChar + ".fail-sound"));
 
                     if (cfg.isDouble("items." + itemChar + ".bank-action.withdraw")) {
                         double withdrawPercentage = cfg.getDouble("items." + itemChar + ".bank-action.withdraw");

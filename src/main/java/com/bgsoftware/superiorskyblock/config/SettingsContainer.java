@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
@@ -22,6 +21,7 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
 import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
 import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
@@ -429,7 +429,7 @@ public final class SettingsContainer {
                     for (String slot : containerSection.getKeys(false)) {
                         try {
                             // Reading the item from the config
-                            TemplateItem templateItem = FileUtils.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
+                            TemplateItem templateItem = MenuParser.getItemStack("config.yml", containerSection.getConfigurationSection(slot));
 
                             if (templateItem == null)
                                 continue;

@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -38,7 +38,7 @@ public final class MultipleComponents implements IMessageComponent {
                         section.getInt(key + ".fade-out")
                 ));
             } else if (key.equals("sound")) {
-                messageComponents.add(SoundComponent.of(FileUtils.getSound(section.getConfigurationSection("sound"))));
+                messageComponents.add(SoundComponent.of(MenuParser.getSound(section.getConfigurationSection("sound"))));
             } else if (key.equals("bossbar")) {
                 BossBar.Color color;
 

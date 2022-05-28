@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.CoopsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public final class MenuCoops extends PagedSuperiorMenu<MenuCoops, SuperiorPlayer
 
         PagedMenuPattern.Builder<MenuCoops, SuperiorPlayer> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "coops.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "coops.yml", null);
 
         if (menuLoadResult == null)
             return;

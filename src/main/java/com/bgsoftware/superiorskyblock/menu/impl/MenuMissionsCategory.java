@@ -12,7 +12,7 @@ import com.bgsoftware.superiorskyblock.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.MissionsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -73,7 +73,7 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCa
 
         PagedMenuPattern.Builder<MenuMissionsCategory, Mission<?>> patternBuilder = new PagedMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "missions-category.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "missions-category.yml", null);
 
         if (menuLoadResult == null)
             return;
@@ -93,9 +93,9 @@ public final class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCa
                 if (soundSection == null)
                     continue;
 
-                SoundWrapper completedSound = FileUtils.getSound(soundSection.getConfigurationSection("completed"));
-                SoundWrapper notCompletedSound = FileUtils.getSound(soundSection.getConfigurationSection("not-completed"));
-                SoundWrapper canCompleteSound = FileUtils.getSound(soundSection.getConfigurationSection("can-complete"));
+                SoundWrapper completedSound = MenuParser.getSound(soundSection.getConfigurationSection("completed"));
+                SoundWrapper notCompletedSound = MenuParser.getSound(soundSection.getConfigurationSection("not-completed"));
+                SoundWrapper canCompleteSound = MenuParser.getSound(soundSection.getConfigurationSection("can-complete"));
 
                 patternBuilder.setPagedObjectSlots(menuPatternSlots.getSlots(slotChar), new MissionsPagedObjectButton.Builder()
                         .setCompletedSound(completedSound)

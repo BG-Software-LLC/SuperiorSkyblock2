@@ -11,7 +11,7 @@ import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.WarpCategoryButton;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public final class MenuWarpCategories extends SuperiorMenu<MenuWarpCategories> {
 
         RegularMenuPattern.Builder<MenuWarpCategories> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "warp-categories.yml",
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "warp-categories.yml",
                 MenuWarpCategories::convertOldGUI);
 
         if (menuLoadResult == null)

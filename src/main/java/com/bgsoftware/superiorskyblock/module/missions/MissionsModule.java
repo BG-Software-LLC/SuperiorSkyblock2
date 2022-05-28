@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
 import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
 import com.bgsoftware.superiorskyblock.utils.FileUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -251,7 +252,7 @@ public final class MissionsModule extends BuiltinModule {
 
         ConfigurationSection categoriesSection = config.createSection("categories");
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(new RegularMenuPattern.Builder<MenuMembers>(),
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(new RegularMenuPattern.Builder<MenuMembers>(),
                 "missions.yml", null);
 
         if (menuLoadResult == null)

@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
 import com.bgsoftware.superiorskyblock.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import com.google.common.collect.Maps;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -47,7 +47,7 @@ public final class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
 
         RegularMenuPattern.Builder<SuperiorMenuCustom> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, fileName, true, null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, fileName, true, null);
 
         if (menuLoadResult == null)
             return;

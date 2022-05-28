@@ -10,7 +10,7 @@ import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.menu.button.impl.menu.LanguageButton;
 import com.bgsoftware.superiorskyblock.menu.file.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
+import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 
 public final class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
@@ -31,7 +31,7 @@ public final class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
 
         RegularMenuPattern.Builder<MenuPlayerLanguage> patternBuilder = new RegularMenuPattern.Builder<>();
 
-        MenuParseResult menuLoadResult = FileUtils.loadMenu(patternBuilder, "player-language.yml", null);
+        MenuParseResult menuLoadResult = MenuParser.loadMenu(patternBuilder, "player-language.yml", null);
 
         if (menuLoadResult == null)
             return;
