@@ -265,7 +265,7 @@ public final class UpgradesModule extends BuiltinModule {
 
             super.config.set("upgrades", config.get("upgrades"));
 
-            File moduleConfigFile = new File(getDataFolder(), "config.yml");
+            File moduleConfigFile = new File(getModuleFolder(), "config.yml");
 
             try {
                 super.config.save(moduleConfigFile);

@@ -22,15 +22,16 @@ public final class DefaultModulesContainer implements ModulesContainer {
     private final Map<PluginModule, ModuleData> modulesData = new HashMap<>();
 
     @Override
-    public void registerModule(PluginModule pluginModule, File modulesFolder, SuperiorSkyblockPlugin plugin) {
+    public void registerModule(PluginModule pluginModule, File modulesFolder, File modulesDataFolder, SuperiorSkyblockPlugin plugin) {
         String moduleName = pluginModule.getName().toLowerCase(Locale.ENGLISH);
 
         Preconditions.checkState(!modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " already exists.");
 
-        File dataFolder = new File(modulesFolder, pluginModule.getName());
+        File dataFolder = new File(modulesDataFolder, pluginModule.getName());
+        File moduleFolder = new File(modulesFolder, pluginModule.getName());
 
         try {
-            pluginModule.initModule(plugin, dataFolder);
+            pluginModule.initModule(plugin, moduleFolder, dataFolder);
         } catch (Throwable error) {
             SuperiorSkyblockPlugin.log("&cAn error occurred while initializing the module " + pluginModule.getName() + ":");
             SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");

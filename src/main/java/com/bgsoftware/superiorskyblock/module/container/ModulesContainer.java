@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public interface ModulesContainer {
 
-    void registerModule(PluginModule pluginModule, File modulesFolder, SuperiorSkyblockPlugin plugin);
+    void registerModule(PluginModule pluginModule, File modulesFolder, File modulesDataFolder, SuperiorSkyblockPlugin plugin);
 
     void unregisterModule(PluginModule pluginModule, SuperiorSkyblockPlugin plugin);
 

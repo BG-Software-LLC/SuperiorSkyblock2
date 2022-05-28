@@ -75,7 +75,7 @@ public abstract class BuiltinModule extends PluginModule {
     }
 
     public File createConfig() {
-        File configFile = new File(getDataFolder(), "config.yml");
+        File configFile = new File(getModuleFolder(), "config.yml");
 
         if (!configFile.exists())
             FileUtils.saveResource("modules/" + getName() + "/config.yml");
