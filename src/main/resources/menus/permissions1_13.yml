@@ -933,6 +933,39 @@ permissions:
         volume: 0.2
         pitch: 0.2
 
+  ignite_creeper:
+    display-menu: true
+    permission-enabled:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Currently &aENABLED&7.'
+    permission-disabled:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Currently &cDISABLED&7.'
+    role-permission:
+      type: CREEPER_SPAWN_EGG
+      name: '&6Ignite Creepers'
+      lore:
+        - '&7Access to ignite creepers with flint and steel inside the island.'
+        - '&7Role: &e{}&7.'
+        - ''
+        - '{0}'
+    has-access:
+      sound:
+        type: ENTITY_EXPERIENCE_ORB_PICKUP
+        volume: 0.2
+        pitch: 0.2
+    no-access:
+      sound:
+        type: BLOCK_ANVIL_PLACE
+        volume: 0.2
+        pitch: 0.2
+
   interact:
     display-menu: true
     permission-enabled:

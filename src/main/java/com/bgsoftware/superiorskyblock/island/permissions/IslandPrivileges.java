@@ -36,6 +36,7 @@ public final class IslandPrivileges {
     public static final IslandPrivilege FISH = register("FISH");
     public static final IslandPrivilege FLY = register("FLY");
     public static final IslandPrivilege HORSE_INTERACT = register("HORSE_INTERACT");
+    public static final IslandPrivilege IGNITE_CREEPER = register("IGNITE_CREEPER");
     public static final IslandPrivilege INTERACT = register("INTERACT");
     public static final IslandPrivilege INVITE_MEMBER = register("INVITE_MEMBER");
     public static final IslandPrivilege ISLAND_CHEST = register("ISLAND_CHEST");

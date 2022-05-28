@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Donkey;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
@@ -130,6 +131,9 @@ public final class ProtectionLogic {
                 e.getRightClicked() instanceof Mule || e.getRightClicked() instanceof Donkey))) {
             islandPrivilege = IslandPrivileges.HORSE_INTERACT;
             closeInventory = true;
+        } else if (usedItem != null && e.getRightClicked() instanceof Creeper &&
+                usedItem.getType() == Material.FLINT_AND_STEEL) {
+            islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
         } else return;
 
         if (island != null && !island.hasPermission(superiorPlayer, islandPrivilege)) {
