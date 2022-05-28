@@ -33,7 +33,7 @@ public final class GeneratorsModule extends BuiltinModule {
             super.config.set("enabled", config.getBoolean("generators"));
             config.set("generators", null);
 
-            File moduleConfigFile = new File(getDataFolder(), "config.yml");
+            File moduleConfigFile = new File(getModuleFolder(), "config.yml");
 
             try {
                 super.config.save(moduleConfigFile);

@@ -16,19 +16,19 @@ import java.net.URLConnection;
 public final class ModuleResources {
 
     private final File moduleFile;
-    private final File dataFolder;
+    private final File moduleFolder;
     private final ClassLoader classLoader;
 
     /**
      * Constructor for the class.
      *
-     * @param moduleFile  The file of the module.
-     * @param dataFolder  The data folder of the module.
-     * @param classLoader The class loader of the module.
+     * @param moduleFile   The file of the module.
+     * @param moduleFolder The data folder of the module.
+     * @param classLoader  The class loader of the module.
      */
-    public ModuleResources(File moduleFile, File dataFolder, ClassLoader classLoader) {
+    public ModuleResources(File moduleFile, File moduleFolder, ClassLoader classLoader) {
         this.moduleFile = moduleFile;
-        this.dataFolder = dataFolder;
+        this.moduleFolder = moduleFolder;
         this.classLoader = classLoader;
     }
 
@@ -44,9 +44,9 @@ public final class ModuleResources {
         resourcePath = resourcePath.replace('\\', '/');
 
         try (InputStream resourceInput = getResource(resourcePath)) {
-            File outFile = new File(this.dataFolder, resourcePath);
+            File outFile = new File(this.moduleFolder, resourcePath);
             int lastIndex = resourcePath.lastIndexOf(47);
-            File outDir = new File(this.dataFolder, resourcePath.substring(0, Math.max(lastIndex, 0)));
+            File outDir = new File(this.moduleFolder, resourcePath.substring(0, Math.max(lastIndex, 0)));
 
             if (!outDir.exists()) {
                 outDir.mkdirs();

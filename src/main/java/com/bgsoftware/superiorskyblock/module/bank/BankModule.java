@@ -57,7 +57,7 @@ public final class BankModule extends BuiltinModule {
             updatedConfig = true;
 
         if (updatedConfig) {
-            File moduleConfigFile = new File(getDataFolder(), "config.yml");
+            File moduleConfigFile = new File(getModuleFolder(), "config.yml");
 
             try {
                 super.config.save(moduleConfigFile);

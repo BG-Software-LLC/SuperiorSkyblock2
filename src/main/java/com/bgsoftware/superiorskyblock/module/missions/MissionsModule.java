@@ -54,7 +54,7 @@ public final class MissionsModule extends BuiltinModule {
         FileUtils.copyResource("modules/missions/KillsMissions");
         FileUtils.copyResource("modules/missions/StatisticsMissions");
 
-        File categoriesFolder = new File(getDataFolder(), "categories");
+        File categoriesFolder = new File(getModuleFolder(), "categories");
 
         if ((!categoriesFolder.exists() || !categoriesFolder.isDirectory()) && categoriesFolder.mkdirs()) {
             FileUtils.saveResource("modules/missions/categories/farmer/farmer_1.yml");
@@ -81,7 +81,7 @@ public final class MissionsModule extends BuiltinModule {
 
     @Override
     protected void onPluginInit(SuperiorSkyblockPlugin plugin) {
-        File file = new File(getDataFolder(), "config.yml");
+        File file = new File(getModuleFolder(), "config.yml");
 
         if (!file.exists())
             FileUtils.saveResource("modules/missions/config.yml");
@@ -177,7 +177,7 @@ public final class MissionsModule extends BuiltinModule {
     }
 
     private boolean canLoadCategory(SuperiorSkyblockPlugin plugin, String categoryName, List<Mission<?>> categoryMissions) {
-        File categoryFolder = new File(getDataFolder(), "categories/" + categoryName);
+        File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
         if (!categoryFolder.exists()) {
             SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " doesn't exist, skipping...");
@@ -223,7 +223,7 @@ public final class MissionsModule extends BuiltinModule {
 
             ConfigurationSection missionSection = missionConfigFile.getConfigurationSection("");
 
-            Mission<?> mission = plugin.getMissions().loadMission(missionName, getDataFolder(), missionSection);
+            Mission<?> mission = plugin.getMissions().loadMission(missionName, getModuleFolder(), missionSection);
 
             if (mission != null) {
                 categoryMissions.add(mission);
@@ -272,8 +272,8 @@ public final class MissionsModule extends BuiltinModule {
             categoriesSection.set("players.slot", playersCategorySlot);
         }
 
-        File islandsCategoryFile = new File(getDataFolder(), "categories/islands");
-        File playersCategoryFile = new File(getDataFolder(), "categories/players");
+        File islandsCategoryFile = new File(getModuleFolder(), "categories/islands");
+        File playersCategoryFile = new File(getModuleFolder(), "categories/players");
 
         islandsCategoryFile.mkdirs();
         playersCategoryFile.mkdirs();
@@ -344,13 +344,13 @@ public final class MissionsModule extends BuiltinModule {
             if (oldMissionsFiles != null) {
                 for (File jarFile : oldMissionsFiles) {
                     if (jarFile.getName().endsWith(".jar"))
-                        jarFile.renameTo(new File(getDataFolder(), jarFile.getName()));
+                        jarFile.renameTo(new File(getModuleFolder(), jarFile.getName()));
                 }
             }
 
             File oldDataFile = new File(oldMissionsFolder, "_data.yml");
             if (oldDataFile.exists())
-                oldDataFile.renameTo(new File(getDataFolder(), "_data.yml"));
+                oldDataFile.renameTo(new File(getModuleFolder(), "_data.yml"));
 
             FileUtils.deleteDirectory(oldMissionsFolder);
         }

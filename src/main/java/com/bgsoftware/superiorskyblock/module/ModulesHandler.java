@@ -27,11 +27,13 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
 
     private final ModulesContainer modulesContainer;
     private final File modulesFolder;
+    private final File dataFolder;
 
     public ModulesHandler(SuperiorSkyblockPlugin plugin, ModulesContainer modulesContainer) {
         super(plugin);
         this.modulesContainer = modulesContainer;
-        modulesFolder = new File(plugin.getDataFolder(), "modules");
+        this.modulesFolder = new File(plugin.getDataFolder(), "modules");
+        this.dataFolder = new File(plugin.getDataFolder(), "data/modules");
     }
 
     @Override
@@ -50,7 +52,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
     @Override
     public void registerModule(PluginModule pluginModule) {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
-        this.modulesContainer.registerModule(pluginModule, modulesFolder, plugin);
+        this.modulesContainer.registerModule(pluginModule, modulesFolder, dataFolder, plugin);
     }
 
     @Override

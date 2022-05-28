@@ -23,6 +23,7 @@ public abstract class PluginModule {
 
     private File dataFolder;
     private File moduleFile;
+    private File moduleFolder;
     private ClassLoader classLoader;
     private Logger logger;
     private ModuleResources moduleResources;
@@ -147,9 +148,20 @@ public abstract class PluginModule {
     /**
      * Get the data folder of the module.
      * The path for the folder is always plugins/SuperiorSkyblock2/modules/{module-name}/
+     *
+     * @deprecated Misleading name; check out {@link #getModuleFolder()}
      */
+    @Deprecated
     public final File getDataFolder() {
-        return dataFolder;
+        return this.getModuleFolder();
+    }
+
+    /**
+     * Get the folder of the module.
+     * The path for the folder is always plugins/SuperiorSkyblock2/modules/{module-name}/
+     */
+    public final File getModuleFolder() {
+        return this.moduleFolder;
     }
 
     /**
@@ -160,6 +172,14 @@ public abstract class PluginModule {
     @Nullable
     public final File getModuleFile() {
         return moduleFile;
+    }
+
+    /**
+     * Get the folder where data of the module can be stored at.
+     * The path for the folder is always plugins/SuperiorSkyblock2/data/modules/{module-name}/
+     */
+    public final File getDatabaseFolder() {
+        return this.dataFolder;
     }
 
     /**
@@ -181,7 +201,7 @@ public abstract class PluginModule {
 
     /**
      * Check whether the module was initialized or not.
-     * Modules will be initialized after calling to {@link #initModule(SuperiorSkyblock, File)}
+     * Modules will be initialized after calling to {@link #initModule(SuperiorSkyblock, File, File)}
      */
     public final boolean isInitialized() {
         return initialized;
@@ -216,22 +236,37 @@ public abstract class PluginModule {
      * This method cannot be called twice - do not call it unless you know what you are doing.
      *
      * @param plugin     An instance to the plugin.
-     * @param dataFolder The folder of the module.
+     * @param dataFolder The database folder of the module.
      */
+    @Deprecated
     public final void initModule(SuperiorSkyblock plugin, File dataFolder) {
+        this.initModule(plugin, new File(moduleFile.getParentFile(), moduleName), dataFolder);
+    }
+
+    /**
+     * Initialize the module.
+     * This method cannot be called twice - do not call it unless you know what you are doing.
+     *
+     * @param plugin       An instance to the plugin.
+     * @param dataFolder   The database folder of the module.
+     * @param moduleFolder The folder of the module.
+     */
+    public final void initModule(SuperiorSkyblock plugin, File moduleFolder, File dataFolder) {
         if (initialized)
             throw new RuntimeException("The module " + moduleName + " was already initialized.");
 
         initialized = true;
 
         this.dataFolder = dataFolder;
+        this.moduleFolder = moduleFolder;
+
+        if (!moduleFolder.exists() && !moduleFolder.mkdirs())
+            throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
+
         this.logger = new ModuleLogger(this);
 
         if (moduleFile != null && classLoader != null)
-            this.moduleResources = new ModuleResources(this.moduleFile, this.dataFolder, this.classLoader);
-
-        if (!dataFolder.exists() && !dataFolder.mkdirs())
-            throw new RuntimeException("Cannot create module folder for " + moduleName + ".");
+            this.moduleResources = new ModuleResources(this.moduleFile, this.moduleFolder, this.classLoader);
 
         onPluginInit(plugin);
     }
