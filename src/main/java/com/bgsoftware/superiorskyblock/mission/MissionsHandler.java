@@ -305,17 +305,17 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         if (!oldDataFolder.exists())
             return true;
 
-        if (newDataFolder.mkdirs()) {
-            for (File file : oldDataFolder.listFiles()) {
-                File targetFile = new File(newDataFolder, file.getName());
-                if (!file.renameTo(targetFile))
-                    return false;
-            }
+        newDataFolder.mkdirs();
 
-            return true;
+        for (File file : oldDataFolder.listFiles()) {
+            File targetFile = new File(newDataFolder, file.getName());
+            if (!file.renameTo(targetFile))
+                return false;
         }
 
-        return false;
+        FileUtils.deleteDirectory(oldDataFolder);
+
+        return true;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
