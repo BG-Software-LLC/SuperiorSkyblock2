@@ -39,6 +39,8 @@ import java.util.function.Consumer;
 
 public final class MissionsHandler extends AbstractHandler implements MissionsManager {
 
+    private static final Object DATA_FOLDER_MUTEX = new Object();
+
     private final MissionsContainer missionsContainer;
 
     public MissionsHandler(SuperiorSkyblockPlugin plugin, MissionsContainer missionsContainer) {
@@ -328,8 +330,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             try {
                 if (!dataFile.exists())
                     dataFile.createNewFile();
-
-                data.save(dataFile);
+                synchronized (DATA_FOLDER_MUTEX) {
+                    data.save(dataFile);
+                }
             } catch (IOException error) {
                 error.printStackTrace();
                 PluginDebugger.debug(error);
@@ -358,7 +361,9 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
             File dataFile = new File(dataFolder, mission.getName() + ".yml");
             if (dataFile.exists()) {
                 try {
-                    mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
+                    synchronized (DATA_FOLDER_MUTEX) {
+                        mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
+                    }
                 } catch (Throwable error) {
                     SuperiorSkyblockPlugin.log("&cFailed loading mission data for " + mission.getName() + ":");
                     error.printStackTrace();
@@ -366,6 +371,24 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
                 }
             }
         }
+    }
+
+    public void convertPlayerData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer) {
+        getAllMissions().forEach(mission -> mission.transferData(oldPlayer, newPlayer));
+
+        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+
+        if (!dataFolder.exists())
+            return;
+
+        // Convert the data in the data files as well
+        Executor.async(() -> {
+            for (File file : dataFolder.listFiles()) {
+                synchronized (DATA_FOLDER_MUTEX) {
+                    FileUtils.replaceString(file, oldPlayer.getUniqueId() + "", newPlayer.getUniqueId() + "");
+                }
+            }
+        });
     }
 
     public void loadMissionCategory(MissionCategory missionCategory) {
