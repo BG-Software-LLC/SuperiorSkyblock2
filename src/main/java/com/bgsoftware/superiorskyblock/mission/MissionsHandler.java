@@ -299,14 +299,32 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         }
     }
 
+    private boolean moveOldDataFolder(File newDataFolder) {
+        File oldDataFolder = new File(BuiltinModules.MISSIONS.getModuleFolder(), "data");
+
+        if (!oldDataFolder.exists())
+            return true;
+
+        if (newDataFolder.mkdirs()) {
+            for (File file : oldDataFolder.listFiles()) {
+                File targetFile = new File(newDataFolder, file.getName());
+                if (!file.renameTo(targetFile))
+                    return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void saveMissionsData() {
-        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
 
-        if (!dataFolder.exists()) {
+        if (!dataFolder.exists())
             dataFolder.mkdirs();
-        }
 
         for (Mission<?> mission : getAllMissions()) {
             YamlConfiguration data = new YamlConfiguration();
@@ -349,7 +367,10 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         // Convert old data file to new format.
         convertOldMissionsData();
 
-        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
+
+        if (!moveOldDataFolder(dataFolder))
+            throw new IllegalStateException("Failed moving old missions folder.");
 
         if (!dataFolder.exists())
             return;
@@ -474,12 +495,12 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     }
 
     private void convertOldMissionsData() {
-        File file = new File(BuiltinModules.MISSIONS.getDataFolder(), "_data.yml");
+        File file = new File(BuiltinModules.MISSIONS.getModuleFolder(), "_data.yml");
 
         if (!file.exists())
             return;
 
-        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
 
         YamlConfiguration oldData = YamlConfiguration.loadConfiguration(file);
 
