@@ -151,6 +151,8 @@ public final class PlayersHandler extends AbstractHandler implements PlayersMana
 
         for (Island island : plugin.getGrid().getIslands())
             island.replacePlayers(originPlayer, newPlayer);
+
+        plugin.getEventsBus().callPlayerReplaceEvent(originPlayer, newPlayer);
     }
 
     // Updating last time status

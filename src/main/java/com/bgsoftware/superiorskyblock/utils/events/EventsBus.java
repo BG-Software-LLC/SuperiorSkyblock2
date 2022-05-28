@@ -91,6 +91,7 @@ import com.bgsoftware.superiorskyblock.api.events.PlayerChangeLanguageEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeRoleEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerCloseMenuEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerOpenMenuEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerReplaceEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBlocksStackerEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBorderEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
@@ -665,6 +666,12 @@ public final class EventsBus {
 
     public boolean callPlayerOpenMenuEvent(SuperiorPlayer superiorPlayer, ISuperiorMenu superiorMenu) {
         return callEvent(() -> new PlayerOpenMenuEvent(superiorPlayer, superiorMenu), "playeropenmenuevent");
+    }
+
+    public void callPlayerReplaceEvent(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer) {
+        if (!plugin.getSettings().getDisabledEvents().contains("playerreplaceevent")) {
+            callEvent(new PlayerReplaceEvent(oldPlayer, newPlayer));
+        }
     }
 
     public boolean callPlayerToggleBlocksStackerEvent(SuperiorPlayer superiorPlayer) {
