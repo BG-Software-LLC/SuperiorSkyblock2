@@ -321,7 +321,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void saveMissionsData() {
-        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
+        File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
 
         if (!dataFolder.exists())
             dataFolder.mkdirs();
@@ -367,7 +367,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         // Convert old data file to new format.
         convertOldMissionsData();
 
-        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
+        File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
 
         if (!moveOldDataFolder(dataFolder))
             throw new IllegalStateException("Failed moving old missions folder.");
@@ -500,7 +500,7 @@ public final class MissionsHandler extends AbstractHandler implements MissionsMa
         if (!file.exists())
             return;
 
-        File dataFolder = BuiltinModules.MISSIONS.getDatabaseFolder();
+        File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
 
         YamlConfiguration oldData = YamlConfiguration.loadConfiguration(file);
 

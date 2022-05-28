@@ -33,7 +33,7 @@ public final class ModulesHandler extends AbstractHandler implements ModulesMana
         super(plugin);
         this.modulesContainer = modulesContainer;
         this.modulesFolder = new File(plugin.getDataFolder(), "modules");
-        this.dataFolder = new File(plugin.getDataFolder(), "data/modules");
+        this.dataFolder = new File(plugin.getDataFolder(), "datastore/modules");
     }
 
     @Override

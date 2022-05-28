@@ -176,9 +176,9 @@ public abstract class PluginModule {
 
     /**
      * Get the folder where data of the module can be stored at.
-     * The path for the folder is always plugins/SuperiorSkyblock2/data/modules/{module-name}/
+     * The path for the folder is always plugins/SuperiorSkyblock2/datastore/modules/{module-name}/
      */
-    public final File getDatabaseFolder() {
+    public final File getDataStoreFolder() {
         return this.dataFolder;
     }
 

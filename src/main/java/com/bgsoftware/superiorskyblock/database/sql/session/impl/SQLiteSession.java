@@ -48,7 +48,7 @@ public final class SQLiteSession implements SQLSession {
     public boolean createConnection() {
         log("Trying to connect to local database (SQLite)...");
 
-        File file = new File(plugin.getDataFolder(), "data/database.db");
+        File file = new File(plugin.getDataFolder(), "datastore/database.db");
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
