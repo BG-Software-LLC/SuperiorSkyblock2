@@ -53,6 +53,8 @@ public final class IslandPrivileges {
     public static final IslandPrivilege OPEN_ISLAND = register("OPEN_ISLAND");
     public static final IslandPrivilege PAINTING = register("PAINTING");
     public static final IslandPrivilege PAYPAL_SHOW = register("PAYPAL_SHOW");
+    @Nullable
+    public static final IslandPrivilege PICKUP_AXOLOTL = register("PICKUP_AXOLOTL", ServerVersion.isAtLeast(ServerVersion.v1_17));
     public static final IslandPrivilege PICKUP_DROPS = register("PICKUP_DROPS");
     @Nullable
     public static final IslandPrivilege PICKUP_FISH = register("PICKUP_FISH", !ServerVersion.isLegacy());

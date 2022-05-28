@@ -16,6 +16,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Donkey;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.ItemFrame;
@@ -27,12 +28,24 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public final class ProtectionLogic {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    @Nullable
+    private static final EntityType AXOLOTL_TYPE = getSafeEntityType("AXOLOTL");
 
     private ProtectionLogic() {
+    }
+
+    @Nullable
+    private static EntityType getSafeEntityType(String entityType) {
+        try {
+            return EntityType.valueOf(entityType);
+        } catch (IllegalArgumentException error) {
+            return null;
+        }
     }
 
     public static boolean handleBlockPlace(Block block, Player player, boolean sendMessages) {
@@ -134,6 +147,9 @@ public final class ProtectionLogic {
         } else if (usedItem != null && e.getRightClicked() instanceof Creeper &&
                 usedItem.getType() == Material.FLINT_AND_STEEL) {
             islandPrivilege = IslandPrivileges.IGNITE_CREEPER;
+        } else if (usedItem != null && ServerVersion.isAtLeast(ServerVersion.v1_17) &&
+                usedItem.getType() == Material.WATER_BUCKET && e.getRightClicked().getType() == AXOLOTL_TYPE) {
+            islandPrivilege = IslandPrivileges.PICKUP_AXOLOTL;
         } else return;
 
         if (island != null && !island.hasPermission(superiorPlayer, islandPrivilege)) {
