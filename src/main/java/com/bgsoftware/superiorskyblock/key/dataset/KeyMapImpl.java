@@ -5,8 +5,10 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +29,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
     private final Map<String, V> innerMap;
 
     private Set<Entry<Key, V>> entrySet;
+    private Map<Key, V> innerReflectedMap;
 
     public static <V> KeyMapImpl<V> create(Supplier<Map<String, V>> mapCreator) {
         return new KeyMapImpl<>(mapCreator);
@@ -144,9 +147,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public Map<Key, V> asMap() {
-        return innerMap.entrySet().stream().collect(Collectors.toMap(entry -> KeyImpl.of(entry.getKey()), Entry::getValue, (v1, v2) -> {
-            throw new IllegalStateException(String.format("Duplicate key %s", v1));
-        }, HashMap::new));
+        return Collections.unmodifiableMap(innerReflectedMap == null ? (innerReflectedMap = new InnerReflectedMap()) : innerReflectedMap);
     }
 
     private final class EntrySet extends AbstractSet<Entry<Key, V>> {
@@ -241,6 +242,155 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
         public int characteristics() {
             return spliterator.characteristics();
         }
+    }
+
+    private final class InnerReflectedMap implements Map<Key, V> {
+
+        private Set<Key> keySet;
+        private Set<Entry<Key, V>> entrySet;
+
+        @Override
+        public int size() {
+            return KeyMapImpl.this.innerMap.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return KeyMapImpl.this.innerMap.isEmpty();
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return KeyMapImpl.this.innerMap.containsKey(key);
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            return KeyMapImpl.this.innerMap.containsValue(value);
+        }
+
+        @Override
+        public V get(Object key) {
+            return KeyMapImpl.this.innerMap.get(key);
+        }
+
+        @Nullable
+        @Override
+        public V put(Key key, V value) {
+            // No implementation
+            return null;
+        }
+
+        @Override
+        public V remove(Object key) {
+            // No implementation
+            return null;
+        }
+
+        @Override
+        public void putAll(@NotNull Map<? extends Key, ? extends V> m) {
+            // No implementation
+        }
+
+        @Override
+        public void clear() {
+            // No implementation
+        }
+
+        @NotNull
+        @Override
+        public Set<Key> keySet() {
+            Set<Key> keySet = this.keySet;
+            if (keySet == null) {
+                keySet = this.keySet = new AbstractSet<Key>() {
+                    public Iterator<Key> iterator() {
+                        return new Iterator<Key>() {
+                            private final Iterator<Entry<String, V>> iterator = KeyMapImpl.this.innerMap.entrySet().iterator();
+
+                            public boolean hasNext() {
+                                return iterator.hasNext();
+                            }
+
+                            public Key next() {
+                                return Key.of(iterator.next().getKey());
+                            }
+
+                            public void remove() {
+                                iterator.remove();
+                            }
+                        };
+                    }
+
+                    public int size() {
+                        return InnerReflectedMap.this.size();
+                    }
+
+                    public boolean isEmpty() {
+                        return InnerReflectedMap.this.isEmpty();
+                    }
+
+                    public void clear() {
+                        InnerReflectedMap.this.clear();
+                    }
+
+                    public boolean contains(Object k) {
+                        return InnerReflectedMap.this.containsKey(k);
+                    }
+                };
+            }
+            return keySet;
+        }
+
+        @NotNull
+        @Override
+        public Collection<V> values() {
+            return KeyMapImpl.this.innerMap.values();
+        }
+
+        @NotNull
+        @Override
+        public Set<Entry<Key, V>> entrySet() {
+            Set<Entry<Key, V>> entrySet = this.entrySet;
+            if (entrySet == null) {
+                entrySet = this.entrySet = new AbstractSet<Entry<Key, V>>() {
+                    public Iterator<Entry<Key, V>> iterator() {
+                        return new Iterator<Entry<Key, V>>() {
+                            private final Iterator<Entry<String, V>> iterator = KeyMapImpl.this.innerMap.entrySet().iterator();
+
+                            public boolean hasNext() {
+                                return iterator.hasNext();
+                            }
+
+                            public Entry<Key, V> next() {
+                                return new KeyEntry(iterator.next());
+                            }
+
+                            public void remove() {
+                                iterator.remove();
+                            }
+                        };
+                    }
+
+                    public int size() {
+                        return InnerReflectedMap.this.size();
+                    }
+
+                    public boolean isEmpty() {
+                        return InnerReflectedMap.this.isEmpty();
+                    }
+
+                    public void clear() {
+                        InnerReflectedMap.this.clear();
+                    }
+
+                    public boolean contains(Object k) {
+                        return InnerReflectedMap.this.containsKey(k);
+                    }
+                };
+            }
+            return entrySet;
+        }
+
     }
 
     private final class KeyEntry implements Entry<Key, V> {
