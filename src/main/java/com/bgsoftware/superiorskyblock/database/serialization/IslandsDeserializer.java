@@ -23,16 +23,13 @@ import com.bgsoftware.superiorskyblock.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.google.gson.Gson;
@@ -45,9 +42,6 @@ import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Optional;
@@ -60,6 +54,8 @@ public final class IslandsDeserializer {
     private static final IDeserializer oldDataDeserializer = new MultipleDeserializer(
             new JsonDeserializer(null), new RawDeserializer(null, plugin)
     );
+
+    private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
 
     private IslandsDeserializer() {
 
@@ -340,7 +336,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.blockLimits.put(block.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
+            cachedIslandInfo.blockLimits.put(block.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
         });
     }
 
@@ -369,7 +365,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.entityLimits.put(entity.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
+            cachedIslandInfo.entityLimits.put(entity.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
         });
     }
 
@@ -513,7 +509,7 @@ public final class IslandsDeserializer {
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap())
-                    .put(block.get(), new UpgradeValue<>(rate.get(), n -> n < 0));
+                    .put(block.get(), rate.get() < 0 ? Value.syncedFixed(rate.get()) : Value.fixed(rate.get()));
         });
     }
 
@@ -617,7 +613,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.islandEffects.put(effectType.get(), new UpgradeValue<>(level.get(), i -> i < 0));
+            cachedIslandInfo.islandEffects.put(effectType.get(), level.get() < 0 ? Value.syncedFixed(level.get()) : Value.fixed(level.get()));
         });
     }
 
@@ -702,7 +698,7 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.roleLimits.put(playerRole.get(), new UpgradeValue<>(limit.get(), i -> i < 0));
+            cachedIslandInfo.roleLimits.put(playerRole.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
         });
     }
 
@@ -774,22 +770,29 @@ public final class IslandsDeserializer {
             UUID uuid = UUID.fromString(island.get());
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid, CachedIslandInfo::new);
 
-            cachedIslandInfo.islandSize = new UpgradeValue<>(islandSettings.getInt("size")
-                    .orElse(-1), i -> i < 0);
-            cachedIslandInfo.teamLimit = new UpgradeValue<>(islandSettings.getInt("members_limit")
-                    .orElse(-1), i -> i < 0);
-            cachedIslandInfo.warpsLimit = new UpgradeValue<>(islandSettings.getInt("warps_limit")
-                    .orElse(-1), i -> i < 0);
-            cachedIslandInfo.cropGrowth = new UpgradeValue<>(islandSettings.getDouble("crop_growth_multiplier")
-                    .orElse(-1D), i -> i < 0);
-            cachedIslandInfo.spawnerRates = new UpgradeValue<>(islandSettings.getDouble("spawner_rates_multiplier")
-                    .orElse(-1D), i -> i < 0);
-            cachedIslandInfo.mobDrops = new UpgradeValue<>(islandSettings.getDouble("mob_drops_multiplier")
-                    .orElse(-1D), i -> i < 0);
-            cachedIslandInfo.coopLimit = new UpgradeValue<>(islandSettings.getInt("coops_limit")
-                    .orElse(-1), i -> i < 0);
-            cachedIslandInfo.bankLimit = new UpgradeValue<>(islandSettings.getBigDecimal("bank_limit")
-                    .orElse(new BigDecimal(-2)), i -> i.compareTo(new BigDecimal(-1)) < 0);
+            int borderSize = islandSettings.getInt("size").orElse(-1);
+            cachedIslandInfo.islandSize = borderSize < 0 ? Value.syncedFixed(borderSize) : Value.fixed(borderSize);
+
+            int membersLimit = islandSettings.getInt("members_limit").orElse(-1);
+            cachedIslandInfo.teamLimit = membersLimit < 0 ? Value.syncedFixed(membersLimit) : Value.fixed(membersLimit);
+
+            int warpsLimit = islandSettings.getInt("warps_limit").orElse(-1);
+            cachedIslandInfo.warpsLimit = warpsLimit < 0 ? Value.syncedFixed(warpsLimit) : Value.fixed(warpsLimit);
+
+            double cropGrowth = islandSettings.getDouble("crop_growth_multiplier").orElse(-1D);
+            cachedIslandInfo.cropGrowth = cropGrowth < 0 ? Value.syncedFixed(cropGrowth) : Value.fixed(cropGrowth);
+
+            double spawnerRates = islandSettings.getDouble("spawner_rates_multiplier").orElse(-1D);
+            cachedIslandInfo.spawnerRates = spawnerRates < 0 ? Value.syncedFixed(spawnerRates) : Value.fixed(spawnerRates);
+
+            double mobDrops = islandSettings.getDouble("mob_drops_multiplier").orElse(-1D);
+            cachedIslandInfo.mobDrops = mobDrops < 0 ? Value.syncedFixed(mobDrops) : Value.fixed(mobDrops);
+
+            int coopLimit = islandSettings.getInt("coops_limit").orElse(-1);
+            cachedIslandInfo.coopLimit = coopLimit < 0 ? Value.syncedFixed(coopLimit) : Value.fixed(coopLimit);
+
+            BigDecimal bankLimit = islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE);
+            cachedIslandInfo.bankLimit = bankLimit.compareTo(SYNCED_BANK_LIMIT_VALUE) <= 0 ? Value.syncedFixed(bankLimit) : Value.fixed(bankLimit);
         });
     }
 

@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
 import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.google.common.collect.ImmutableMap;
@@ -121,7 +120,7 @@ public final class StackedBlocksLogic {
             BigInteger bigAmount = BigInteger.valueOf(amount);
 
             //Checking for the specific provided key.
-            if (islandBlockLimit.compareTo(BigInteger.valueOf(IslandUtils.NO_LIMIT.get())) > 0 &&
+            if (islandBlockLimit.compareTo(BigInteger.ZERO) >= 0 &&
                     islandBlockCount.add(bigAmount).compareTo(islandBlockLimit) > 0) {
                 amount = islandBlockLimit.subtract(islandBlockCount).intValue();
             } else {
@@ -129,7 +128,7 @@ public final class StackedBlocksLogic {
                 Key globalKey = KeyImpl.of(blockKey.getGlobalKey());
                 islandBlockLimit = BigInteger.valueOf(island.getExactBlockLimit(globalKey));
                 islandBlockCount = island.getBlockCountAsBigInteger(globalKey);
-                if (islandBlockLimit.compareTo(BigInteger.valueOf(IslandUtils.NO_LIMIT.get())) > 0 &&
+                if (islandBlockLimit.compareTo(BigInteger.ZERO) >= 0 &&
                         islandBlockCount.add(bigAmount).compareTo(islandBlockLimit) > 0) {
                     amount = islandBlockLimit.subtract(islandBlockCount).intValue();
                 }

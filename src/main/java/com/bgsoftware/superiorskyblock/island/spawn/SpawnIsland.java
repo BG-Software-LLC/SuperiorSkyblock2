@@ -1017,12 +1017,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getBlockLimit(Key key) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
     public int getExactBlockLimit(Key key) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
@@ -1067,12 +1067,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getEntityLimit(EntityType entityType) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
     public int getEntityLimit(Key key) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
@@ -1127,7 +1127,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getTeamLimit() {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
@@ -1142,7 +1142,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getWarpsLimit() {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
@@ -1152,7 +1152,7 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getWarpsLimitRaw() {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
@@ -1207,12 +1207,12 @@ public final class SpawnIsland implements Island {
 
     @Override
     public int getRoleLimit(PlayerRole playerRole) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override
     public int getRoleLimitRaw(PlayerRole playerRole) {
-        return IslandUtils.NO_LIMIT.get();
+        return -1;
     }
 
     @Override

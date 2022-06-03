@@ -159,7 +159,7 @@ public final class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntiti
     }
 
     private boolean canTrackEntity(Key key) {
-        return island.getEntityLimit(key) != IslandUtils.NO_LIMIT.get();
+        return island.getEntityLimit(key) != -1;
     }
 
 }

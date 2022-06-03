@@ -2,21 +2,35 @@ package com.bgsoftware.superiorskyblock.upgrade;
 
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.upgrade.cost.EmptyUpgradeCost;
 import org.bukkit.World;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
 public class SUpgrade implements Upgrade {
 
-    private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0, EmptyUpgradeCost.getInstance(),
-            Collections.emptyList(), "", Collections.emptySet(), UpgradeValue.NEGATIVE_DOUBLE,
-            UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE_DOUBLE, UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE,
-            UpgradeValue.NEGATIVE, UpgradeValue.NEGATIVE, KeyMapImpl.createEmptyMap(), KeyMapImpl.createEmptyMap(),
-            new KeyMap[World.Environment.values().length], Collections.emptyMap(), UpgradeValue.NEGATIVE_BIG_DECIMAL,
+    private static final SUpgradeLevel NULL_LEVEL = new SUpgradeLevel(0,
+            EmptyUpgradeCost.getInstance(),
+            Collections.emptyList(),
+            "",
+            Collections.emptySet(),
+            Value.syncedFixed(-1D),
+            Value.syncedFixed(-1D),
+            Value.syncedFixed(-1D),
+            Value.syncedFixed(-1),
+            Value.syncedFixed(-1),
+            Value.syncedFixed(-1),
+            Value.syncedFixed(-1),
+            KeyMapImpl.createEmptyMap(),
+            KeyMapImpl.createEmptyMap(),
+            new KeyMap[World.Environment.values().length],
+            Collections.emptyMap(),
+            Value.syncedFixed(new BigDecimal(-2)),
             Collections.emptyMap());
 
     private final String name;

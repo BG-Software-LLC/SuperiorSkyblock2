@@ -8,7 +8,6 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
 import com.google.common.base.Preconditions;
 
 import java.math.BigDecimal;
@@ -48,7 +47,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
             increaseAmount = true;
         }
 
-        boolean hasBlockLimit = island.getBlockLimit(key) != IslandUtils.NO_LIMIT.get();
+        boolean hasBlockLimit = island.getBlockLimit(key) != -1;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (increaseAmount || hasBlockLimit || valuesMenu) {
@@ -84,7 +83,7 @@ public final class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTr
             decreaseAmount = true;
         }
 
-        boolean hasBlockLimit = island.getBlockLimit(key) != IslandUtils.NO_LIMIT.get();
+        boolean hasBlockLimit = island.getBlockLimit(key) != -1;
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (decreaseAmount || hasBlockLimit || valuesMenu) {

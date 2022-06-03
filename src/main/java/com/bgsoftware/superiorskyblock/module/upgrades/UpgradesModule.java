@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
@@ -26,7 +27,6 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRa
 import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.upgrade.UpgradeRequirement;
-import com.bgsoftware.superiorskyblock.upgrade.UpgradeValue;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -196,14 +196,15 @@ public final class UpgradesModule extends BuiltinModule {
             String[] sections = line.split(";");
             requirements.add(new UpgradeRequirement(sections[0], Formatters.COLOR_FORMATTER.format(sections[1])));
         }
-        UpgradeValue<Double> cropGrowth = new UpgradeValue<>(levelSection.getDouble("crop-growth", -1D), true);
-        UpgradeValue<Double> spawnerRates = new UpgradeValue<>(levelSection.getDouble("spawner-rates", -1D), true);
-        UpgradeValue<Double> mobDrops = new UpgradeValue<>(levelSection.getDouble("mob-drops", -1D), true);
-        UpgradeValue<Integer> teamLimit = new UpgradeValue<>(levelSection.getInt("team-limit", -1), true);
-        UpgradeValue<Integer> warpsLimit = new UpgradeValue<>(levelSection.getInt("warps-limit", -1), true);
-        UpgradeValue<Integer> coopLimit = new UpgradeValue<>(levelSection.getInt("coop-limit", -1), true);
-        UpgradeValue<Integer> borderSize = new UpgradeValue<>(levelSection.getInt("border-size", -1), true);
-        UpgradeValue<BigDecimal> bankLimit = new UpgradeValue<>(new BigDecimal(levelSection.getString("bank-limit", "-1")), true);
+
+        Value<Double> cropGrowth = Value.syncedFixed(levelSection.getDouble("crop-growth", -1D));
+        Value<Double> spawnerRates = Value.syncedFixed(levelSection.getDouble("spawner-rates", -1D));
+        Value<Double> mobDrops = Value.syncedFixed(levelSection.getDouble("mob-drops", -1D));
+        Value<Integer> teamLimit = Value.syncedFixed(levelSection.getInt("team-limit", -1));
+        Value<Integer> warpsLimit = Value.syncedFixed(levelSection.getInt("warps-limit", -1));
+        Value<Integer> coopLimit = Value.syncedFixed(levelSection.getInt("coop-limit", -1));
+        Value<Integer> borderSize = Value.syncedFixed(levelSection.getInt("border-size", -1));
+        Value<BigDecimal> bankLimit = Value.syncedFixed(new BigDecimal(levelSection.getString("bank-limit", "-1")));
         KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
         if (levelSection.contains("block-limits")) {
             for (String block : levelSection.getConfigurationSection("block-limits").getKeys(false)) {
