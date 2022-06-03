@@ -563,7 +563,9 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks.support." + className);
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
-        } catch (Exception ignored) {
+        } catch (Throwable error) {
+            SuperiorSkyblockPlugin.log("&cAn error occurred while registering " + className + ":");
+            error.printStackTrace();
         }
     }
 
