@@ -3011,9 +3011,9 @@ public final class SIsland implements Island {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
 
         KeyMap<Value<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, true);
-        int finalAmount = Math.max(1, amount);
-        PluginDebugger.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + finalAmount + ", World: " + environment);
-        cobbleGeneratorValues.put(key, Value.fixed(finalAmount));
+        amount = Math.max(0, amount);
+        PluginDebugger.debug("Action: Set Generator, Island: " + owner.getName() + ", Block: " + key + ", Amount: " + amount + ", World: " + environment);
+        cobbleGeneratorValues.put(key, Value.fixed(amount));
 
         IslandsDatabaseBridge.saveGeneratorRate(this, environment, key, amount);
     }
@@ -3797,43 +3797,47 @@ public final class SIsland implements Island {
             return bankLimit;
         });
 
-
         for (Map.Entry<Key, Value<Integer>> entry : upgradeLevel.getBlockLimitsUpgradeValue().entrySet()) {
             Value<Integer> currentValue = blockLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || entry.getValue().get() > currentValue.get())
+            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get()))
                 blockLimits.put(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<Key, Value<Integer>> entry : upgradeLevel.getEntityLimitsUpgradeValue().entrySet()) {
             Value<Integer> currentValue = entityLimits.getRaw(entry.getKey(), null);
-            if (currentValue == null || entry.getValue().get() > currentValue.get())
+            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get()))
                 entityLimits.put(entry.getKey(), entry.getValue());
         }
 
-        Map<Key, Value<Integer>>[] generatorRates = upgradeLevel.getGeneratorUpgradeValue();
-        for (int i = 0; i < cobbleGeneratorValues.length && i < generatorRates.length; i++) {
-            Map<Key, Value<Integer>> levelGenerator = generatorRates[i];
-            if (levelGenerator != null) {
-                KeyMap<Value<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
+        Map<Key, Value<Integer>>[] upgradeGeneratorRates = upgradeLevel.getGeneratorUpgradeValue();
+        for (int i = 0; i < cobbleGeneratorValues.length && i < upgradeGeneratorRates.length; i++) {
+            Map<Key, Value<Integer>> upgradeLevelGeneratorRates = upgradeGeneratorRates[i];
+            if (upgradeLevelGeneratorRates != null) {
+                KeyMap<Value<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(i, false);
 
-                if (!levelGenerator.isEmpty()) {
-                    new HashSet<>(cobbleGeneratorValues.entrySet()).stream().filter(entry -> entry.getValue() instanceof SyncedValue)
-                            .forEach(entry -> cobbleGeneratorValues.remove(entry.getKey()));
+                if (cobbleGeneratorValues != null && !upgradeLevelGeneratorRates.isEmpty())
+                    cobbleGeneratorValues.entrySet().removeIf(entry -> entry.getValue() instanceof SyncedValue);
+
+                for (Map.Entry<Key, Value<Integer>> entry : upgradeLevelGeneratorRates.entrySet()) {
+                    Value<Integer> currentValue = cobbleGeneratorValues == null ? null : cobbleGeneratorValues.get(entry.getKey());
+                    if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get())) {
+                        if (cobbleGeneratorValues == null)
+                            cobbleGeneratorValues = getCobbleGeneratorValues(i, true);
+                        cobbleGeneratorValues.put(entry.getKey(), entry.getValue());
+                    }
                 }
-
-                cobbleGeneratorValues.putAll(levelGenerator);
             }
         }
 
         for (Map.Entry<PotionEffectType, Value<Integer>> entry : upgradeLevel.getPotionEffectsUpgradeValue().entrySet()) {
             Value<Integer> currentValue = islandEffects.get(entry.getKey());
-            if (currentValue == null || entry.getValue().get() > currentValue.get())
+            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get()))
                 islandEffects.put(entry.getKey(), entry.getValue());
         }
 
         for (Map.Entry<PlayerRole, Value<Integer>> entry : upgradeLevel.getRoleLimitsUpgradeValue().entrySet()) {
             Value<Integer> currentValue = roleLimits.get(entry.getKey());
-            if (currentValue == null || entry.getValue().get() > currentValue.get())
+            if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < entry.getValue().get()))
                 roleLimits.put(entry.getKey(), entry.getValue());
         }
     }
