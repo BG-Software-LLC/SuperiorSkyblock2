@@ -146,7 +146,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
     @Override
     public Map<Key, V> asMap() {
-        return Collections.unmodifiableMap(innerReflectedMap == null ? (innerReflectedMap = new InnerReflectedMap()) : innerReflectedMap);
+        return innerReflectedMap == null ? (innerReflectedMap = new InnerReflectedMap()) : innerReflectedMap;
     }
 
     private final class InnerReflectedMap implements Map<Key, V> {
@@ -182,24 +182,22 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
         @Nullable
         @Override
         public V put(Key key, V value) {
-            // No implementation
-            return null;
+            return KeyMapImpl.this.innerMap.put(key.toString(), value);
         }
 
         @Override
         public V remove(Object key) {
-            // No implementation
-            return null;
+            return KeyMapImpl.this.innerMap.remove(key);
         }
 
         @Override
         public void putAll(@NotNull Map<? extends Key, ? extends V> m) {
-            // No implementation
+            m.forEach(this::put);
         }
 
         @Override
         public void clear() {
-            // No implementation
+            KeyMapImpl.this.innerMap.clear();
         }
 
         @NotNull

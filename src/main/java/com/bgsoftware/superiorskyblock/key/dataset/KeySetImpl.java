@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 
 public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
-    private final Set<String> set;
+    private final Set<String> innerSet;
 
     private Set<Key> innerReflectedSet;
 
@@ -39,11 +38,11 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
     private KeySetImpl(Supplier<Set<String>> setCreator, Collection<String> keys) {
         this(setCreator);
-        this.set.addAll(keys);
+        this.innerSet.addAll(keys);
     }
 
     private KeySetImpl(Supplier<Set<String>> setCreator) {
-        this.set = setCreator.get();
+        this.innerSet = setCreator.get();
     }
 
     @Override
@@ -54,22 +53,22 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
     @Override
     public int size() {
-        return set.size();
+        return innerSet.size();
     }
 
     @Override
     public boolean contains(Object o) {
-        return o instanceof Key && (set.contains(o.toString()) || (!((Key) o).getSubKey().isEmpty() && set.contains(((Key) o).getGlobalKey())));
+        return o instanceof Key && (innerSet.contains(o.toString()) || (!((Key) o).getSubKey().isEmpty() && innerSet.contains(((Key) o).getGlobalKey())));
     }
 
     @Override
     public boolean add(Key key) {
-        return set.add(key.toString());
+        return innerSet.add(key.toString());
     }
 
     @Override
     public boolean remove(Object o) {
-        return o instanceof Key ? set.remove(o.toString()) : set.remove(o);
+        return o instanceof Key ? innerSet.remove(o.toString()) : innerSet.remove(o);
     }
 
     @Override
@@ -79,9 +78,9 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
     @Override
     public Key getKey(Key original, @Nullable Key def) {
-        if (set.contains(original.toString()))
+        if (innerSet.contains(original.toString()))
             return original;
-        else if (set.contains(original.getGlobalKey()))
+        else if (innerSet.contains(original.getGlobalKey()))
             return KeyImpl.of(original.getGlobalKey(), "");
         else
             return def;
@@ -89,24 +88,24 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
     @Override
     public Set<Key> asSet() {
-        return Collections.unmodifiableSet(innerReflectedSet == null ? (innerReflectedSet = new InnerReflectedSet()) : innerReflectedSet);
+        return innerReflectedSet == null ? (innerReflectedSet = new InnerReflectedSet()) : innerReflectedSet;
     }
 
     private final class InnerReflectedSet implements Set<Key> {
 
         @Override
         public int size() {
-            return KeySetImpl.this.set.size();
+            return KeySetImpl.this.innerSet.size();
         }
 
         @Override
         public boolean isEmpty() {
-            return KeySetImpl.this.set.isEmpty();
+            return KeySetImpl.this.innerSet.isEmpty();
         }
 
         @Override
         public boolean contains(Object o) {
-            return KeySetImpl.this.set.contains(o);
+            return KeySetImpl.this.innerSet.contains(o);
         }
 
         @NotNull
@@ -117,58 +116,57 @@ public final class KeySetImpl extends AbstractSet<Key> implements KeySet {
 
         @Override
         public Object @NotNull [] toArray() {
-            return KeySetImpl.this.set.toArray();
+            return KeySetImpl.this.innerSet.toArray();
         }
 
         @Override
         public <T> T @NotNull [] toArray(T @NotNull [] a) {
-            return KeySetImpl.this.set.toArray(a);
+            return KeySetImpl.this.innerSet.toArray(a);
         }
 
         @Override
         public boolean add(Key key) {
-            // No implementation
-            return false;
+            return KeySetImpl.this.innerSet.add(key.toString());
         }
 
         @Override
         public boolean remove(Object o) {
-            // No implementation
-            return false;
+            return KeySetImpl.this.innerSet.remove(o);
         }
 
         @Override
         public boolean containsAll(@NotNull Collection<?> c) {
-            return KeySetImpl.this.set.containsAll(c);
+            return KeySetImpl.this.innerSet.containsAll(c);
         }
 
         @Override
         public boolean addAll(@NotNull Collection<? extends Key> c) {
-            // No implementation
-            return false;
+            boolean added = false;
+            for (Key key : c) {
+                added |= add(key);
+            }
+            return added;
         }
 
         @Override
         public boolean retainAll(@NotNull Collection<?> c) {
-            // No implementation
-            return false;
+            return KeySetImpl.this.innerSet.retainAll(c);
         }
 
         @Override
         public boolean removeAll(@NotNull Collection<?> c) {
-            // No implementation
-            return false;
+            return KeySetImpl.this.innerSet.removeAll(c);
         }
 
         @Override
         public void clear() {
-            // No implementation
+            KeySetImpl.this.innerSet.clear();
         }
     }
 
     private final class SetIterator implements Iterator<Key> {
 
-        final Iterator<String> innerSetIterator = KeySetImpl.this.set.iterator();
+        final Iterator<String> innerSetIterator = KeySetImpl.this.innerSet.iterator();
 
         @Override
         public boolean hasNext() {
