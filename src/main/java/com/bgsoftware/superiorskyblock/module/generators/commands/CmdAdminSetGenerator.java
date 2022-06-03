@@ -103,7 +103,7 @@ public final class CmdAdminSetGenerator implements IAdminIslandCommand {
                     continue;
                 }
             } else {
-                if (amount <= 0) {
+                if (amount < 0) {
                     if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
                         continue;
 

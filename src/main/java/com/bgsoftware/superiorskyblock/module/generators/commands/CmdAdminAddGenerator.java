@@ -106,7 +106,7 @@ public final class CmdAdminAddGenerator implements IAdminIslandCommand {
             } else {
                 int generatorRate = island.getGeneratorAmount(material, environment) + amount;
 
-                if (generatorRate <= 0) {
+                if (generatorRate < 0) {
                     if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
                         continue;
 
