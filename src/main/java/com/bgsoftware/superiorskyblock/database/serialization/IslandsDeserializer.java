@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.database.DatabaseResult;
@@ -508,8 +509,12 @@ public final class IslandsDeserializer {
             }
 
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            (cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap())
-                    .put(block.get(), rate.get() < 0 ? Value.syncedFixed(rate.get()) : Value.fixed(rate.get()));
+            KeyMap<Value<Integer>> generatorRates = cachedIslandInfo.cobbleGeneratorValues[environment.get()];
+
+            if (generatorRates == null)
+                generatorRates = cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap();
+
+            generatorRates.put(block.get(), rate.get() < 0 ? Value.syncedFixed(rate.get()) : Value.fixed(rate.get()));
         });
     }
 
