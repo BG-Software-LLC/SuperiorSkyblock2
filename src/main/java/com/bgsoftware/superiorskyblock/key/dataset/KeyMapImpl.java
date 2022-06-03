@@ -324,7 +324,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
         @Override
         public Key next() {
-            return Key.of(innerMapIterator.next());
+            return KeyImpl.of(innerMapIterator.next());
         }
 
         @Override
@@ -380,7 +380,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
         @Override
         public boolean tryAdvance(Consumer<? super Key> action) {
-            return spliterator.tryAdvance(entry -> action.accept(Key.of(entry)));
+            return spliterator.tryAdvance(entry -> action.accept(KeyImpl.of(entry)));
         }
 
         @Override
@@ -409,7 +409,7 @@ public final class KeyMapImpl<V> extends AbstractMap<Key, V> implements KeyMap<V
 
         @Override
         public Key getKey() {
-            return Key.of(entry.getKey());
+            return KeyImpl.of(entry.getKey());
         }
 
         @Override
