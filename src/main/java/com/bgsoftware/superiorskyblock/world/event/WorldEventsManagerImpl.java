@@ -40,10 +40,6 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
         if (island == null || island.isSpawn())
             return;
 
-        if (chunk.getWorld().getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
-            island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
-        }
-
         plugin.getNMSChunks().injectChunkSections(chunk);
 
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
@@ -66,8 +62,12 @@ public final class WorldEventsManagerImpl implements WorldEventsManager {
 
         Location islandCenter = island.getCenter(chunk.getWorld().getEnvironment());
 
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-            if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
+        if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
+            if (chunk.getWorld().getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
+                island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
+            }
+
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 Executor.sync(() -> {
                     if (chunk.isLoaded())
                         island.getEntitiesTracker().recalculateEntityCounts();
