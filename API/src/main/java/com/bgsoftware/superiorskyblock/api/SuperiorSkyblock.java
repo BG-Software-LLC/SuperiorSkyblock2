@@ -114,6 +114,7 @@ public interface SuperiorSkyblock extends Plugin {
     /**
      * Get the world events-manager of the plugin.
      */
+    @Deprecated
     WorldEventsManager getWorldEventsManager();
 
     /**
@@ -122,6 +123,7 @@ public interface SuperiorSkyblock extends Plugin {
      * @param worldEventsManager The new events-manager to set.
      *                           If null, the default events-manager will be set.
      */
+    @Deprecated
     void setWorldEventsManager(@Nullable WorldEventsManager worldEventsManager);
 
 }
