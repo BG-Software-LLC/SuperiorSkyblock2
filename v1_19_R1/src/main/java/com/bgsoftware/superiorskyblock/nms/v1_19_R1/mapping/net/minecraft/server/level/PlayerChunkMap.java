@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.world.level.GeneratorAccess;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 public final class PlayerChunkMap extends MappedObject<net.minecraft.server.level.PlayerChunkMap> {
@@ -25,8 +26,16 @@ public final class PlayerChunkMap extends MappedObject<net.minecraft.server.leve
         super(handle);
     }
 
-    public NBTTagCompound read(ChunkCoordIntPair chunkCoordIntPair) throws IOException {
-        return NBTTagCompound.ofNullable(handle.readSync(chunkCoordIntPair.getHandle()));
+    public CompletableFuture<NBTTagCompound> read(ChunkCoordIntPair chunkCoordIntPair) {
+        CompletableFuture<NBTTagCompound> completableFuture = new CompletableFuture<>();
+        handle.f(chunkCoordIntPair.getHandle()).whenComplete((nbtTagCompound, throwable) -> {
+            if (throwable != null) {
+                completableFuture.completeExceptionally(throwable);
+            } else {
+                completableFuture.complete(NBTTagCompound.ofNullable(nbtTagCompound.orElse(null)));
+            }
+        });
+        return completableFuture;
     }
 
     public NBTTagCompound getChunkData(ResourceKey<WorldDimension> resourcekey, Supplier<WorldPersistentData> supplier,

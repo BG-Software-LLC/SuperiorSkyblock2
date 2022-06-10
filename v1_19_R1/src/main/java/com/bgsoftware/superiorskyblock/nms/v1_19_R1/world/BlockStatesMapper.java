@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1.world;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import net.minecraft.world.level.block.state.properties.BlockProperties;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 
 import java.lang.reflect.Field;
@@ -16,43 +17,41 @@ public final class BlockStatesMapper {
 
     static {
         Map<String, String> fieldNameToName = new HashMap<>();
-        fieldNameToName.put("G", "axis-empty");
-        fieldNameToName.put("O", "facing-notup");
-        fieldNameToName.put("P", "facing-horizontal");
-        fieldNameToName.put("T", "wall-east");
-        fieldNameToName.put("U", "wall-north");
-        fieldNameToName.put("V", "wall-south");
-        fieldNameToName.put("W", "wall-west");
-        fieldNameToName.put("X", "redstone-east");
-        fieldNameToName.put("Y", "redstone-north");
-        fieldNameToName.put("Z", "redstone-south");
-        fieldNameToName.put("aa", "redstone-west");
-        fieldNameToName.put("ab", "double-half");
-        fieldNameToName.put("ad", "track-shape-empty");
-        fieldNameToName.put("ae", "track-shape");
-        fieldNameToName.put("am", "age1");
-        fieldNameToName.put("an", "age2");
-        fieldNameToName.put("ao", "age3");
-        fieldNameToName.put("ap", "age5");
-        fieldNameToName.put("aq", "age7");
-        fieldNameToName.put("ar", "age15");
-        fieldNameToName.put("as", "age25");
-        fieldNameToName.put("aF", "level3");
-        fieldNameToName.put("aG", "level8");
-        fieldNameToName.put("aH", "level1-8");
-        fieldNameToName.put("aK", "level15");
-        fieldNameToName.put("ax", "distance1-7");
-        fieldNameToName.put("aR", "distance7");
-        fieldNameToName.put("aY", "chest-type");
-        fieldNameToName.put("aZ", "comparator-mode");
-        fieldNameToName.put("bc", "piston-type");
-        fieldNameToName.put("bd", "slab-type");
+        fieldNameToName.put("J", "axis-empty");
+        fieldNameToName.put("R", "facing-notup");
+        fieldNameToName.put("S", "facing-horizontal");
+        fieldNameToName.put("W", "wall-east");
+        fieldNameToName.put("X", "wall-north");
+        fieldNameToName.put("Y", "wall-south");
+        fieldNameToName.put("Z", "wall-west");
+        fieldNameToName.put("aa", "redstone-east");
+        fieldNameToName.put("ab", "redstone-north");
+        fieldNameToName.put("ac", "redstone-south");
+        fieldNameToName.put("ad", "redstone-west");
+        fieldNameToName.put("ae", "double-half");
+        fieldNameToName.put("ag", "track-shape-empty");
+        fieldNameToName.put("ah", "track-shape");
+        fieldNameToName.put("aq", "age1");
+        fieldNameToName.put("ar", "age2");
+        fieldNameToName.put("as", "age3");
+        fieldNameToName.put("at", "age4");
+        fieldNameToName.put("au", "age5");
+        fieldNameToName.put("av", "age7");
+        fieldNameToName.put("aw", "age15");
+        fieldNameToName.put("ax", "age25");
+        fieldNameToName.put("aK", "level3");
+        fieldNameToName.put("aL", "level8");
+        fieldNameToName.put("aM", "level1-8");
+        fieldNameToName.put("aP", "level15");
+        fieldNameToName.put("aC", "distance1-7");
+        fieldNameToName.put("aW", "distance7");
+        fieldNameToName.put("bd", "chest-type");
+        fieldNameToName.put("be", "comparator-mode");
+        fieldNameToName.put("bh", "piston-type");
+        fieldNameToName.put("bi", "slab-type");
 
         try {
-            // Fixes BlockProperties being private-class in some versions of Yatopia causing illegal access errors.
-            Class<?> blockPropertiesClass = Class.forName("net.minecraft.world.level.block.state.properties.BlockProperties");
-
-            for (Field field : blockPropertiesClass.getFields()) {
+            for (Field field : BlockProperties.class.getFields()) {
                 field.setAccessible(true);
                 Object value = field.get(null);
                 if (value instanceof IBlockState) {

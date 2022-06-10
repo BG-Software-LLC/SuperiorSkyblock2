@@ -9,20 +9,20 @@ import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.SectionPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagList;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.network.PlayerConnection;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.lighting.LightEngine;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.lighting.LightEngineLayerEventListener;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagList;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.network.PlayerConnection;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
@@ -50,6 +50,7 @@ import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.chunk.NibbleArray;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -201,8 +202,8 @@ public final class NMSChunksImpl implements NMSChunks {
                 playerConnection.sendPacket(mapChunkPacket);
             });
         }, unloadedChunkCompound -> {
-            Codec<DataPaletteBlock<Holder<BiomeBase>>> codec = DataPaletteBlock.codecRW(biomesRegistryHolder,
-                    biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b), null);
+            Codec<PalettedContainerRO<Holder<BiomeBase>>> codec = DataPaletteBlock.b(biomesRegistryHolder,
+                    biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b));
             DataResult<NBTBase> dataResult = codec.encodeStart(DynamicOpsNBT.a,
                     new DataPaletteBlock<>(biomesRegistryHolder, biomeBase, DataPaletteBlock.d.e));
             NBTBase biomesCompound = dataResult.getOrThrow(false, error -> {
@@ -250,8 +251,8 @@ public final class NMSChunksImpl implements NMSChunks {
                     new ClientboundLevelChunkWithLightPacket((Chunk) chunk.getHandle(),
                             worldServer.getLightEngine().getHandle(), null, null, true));
         }, unloadedChunkCompound -> {
-            Codec<DataPaletteBlock<IBlockData>> blocksCodec = DataPaletteBlock.codecRW(Block.CODEC, IBlockData.b,
-                    DataPaletteBlock.d.d, Block.AIR.getBlockData().getHandle(), null);
+            Codec<PalettedContainerRO<IBlockData>> blocksCodec = DataPaletteBlock.b(Block.CODEC, IBlockData.b,
+                    DataPaletteBlock.d.d, Block.AIR.getBlockData().getHandle());
 
             NBTTagList tileEntities = new NBTTagList();
 
@@ -281,8 +282,8 @@ public final class NMSChunksImpl implements NMSChunks {
 
                 IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
                 Registry<Holder<BiomeBase>> biomesRegistryHolder = worldServer.getBiomeRegistryHolder();
-                Codec<DataPaletteBlock<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.codecRW(biomesRegistryHolder,
-                        biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b), null);
+                Codec<PalettedContainerRO<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.b(biomesRegistryHolder,
+                        biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b));
 
                 LightEngine lightEngine = worldServer.getLightEngine();
                 net.minecraft.world.level.chunk.ChunkSection[] chunkSections = protoChunk.getSections();
@@ -348,10 +349,10 @@ public final class NMSChunksImpl implements NMSChunks {
             IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
             Registry<Holder<BiomeBase>> biomesRegistryHolder = worldServer.getBiomeRegistryHolder();
 
-            Codec<DataPaletteBlock<IBlockData>> blocksCodec = DataPaletteBlock.codecRW(Block.CODEC, IBlockData.b,
-                    DataPaletteBlock.d.d, Blocks.a.m(), null);
-            Codec<DataPaletteBlock<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.codecRW(biomesRegistryHolder,
-                    biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b), null);
+            Codec<PalettedContainerRO<IBlockData>> blocksCodec = DataPaletteBlock.b(Block.CODEC, IBlockData.b,
+                    DataPaletteBlock.d.d, Blocks.a.m());
+            Codec<PalettedContainerRO<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.b(biomesRegistryHolder,
+                    biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b));
 
             net.minecraft.world.level.chunk.ChunkSection[] chunkSections =
                     new net.minecraft.world.level.chunk.ChunkSection[worldServer.getSectionsAmount()];
@@ -363,9 +364,9 @@ public final class NMSChunksImpl implements NMSChunks {
                 int sectionIndex = worldServer.getSectionIndexFromSectionY(yPosition);
 
                 if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
-                    DataPaletteBlock<IBlockData> blocksDataPalette;
+                    PalettedContainerRO<IBlockData> blocksDataPalette;
                     if (sectionCompound.hasKeyOfType("block_states", 10)) {
-                        DataResult<DataPaletteBlock<IBlockData>> dataResult = blocksCodec.parse(DynamicOpsNBT.a,
+                        DataResult<PalettedContainerRO<IBlockData>> dataResult = blocksCodec.parse(DynamicOpsNBT.a,
                                 sectionCompound.getCompound("block_states").getHandle()).promotePartial((sx) -> {
                         });
                         blocksDataPalette = dataResult.getOrThrow(false, error -> {
@@ -374,9 +375,9 @@ public final class NMSChunksImpl implements NMSChunks {
                         blocksDataPalette = new DataPaletteBlock<>(Block.CODEC, Blocks.a.m(), DataPaletteBlock.d.d);
                     }
 
-                    DataPaletteBlock<Holder<BiomeBase>> biomesDataPalette;
+                    PalettedContainerRO<Holder<BiomeBase>> biomesDataPalette;
                     if (sectionCompound.hasKeyOfType("biomes", 10)) {
-                        DataResult<DataPaletteBlock<Holder<BiomeBase>>> dataResult = biomesCodec.parse(DynamicOpsNBT.a,
+                        DataResult<PalettedContainerRO<Holder<BiomeBase>>> dataResult = biomesCodec.parse(DynamicOpsNBT.a,
                                 sectionCompound.getCompound("biomes").getHandle()).promotePartial((sx) -> {
                         });
                         biomesDataPalette = dataResult.getOrThrow(false, error -> {
@@ -387,7 +388,7 @@ public final class NMSChunksImpl implements NMSChunks {
                     }
 
                     chunkSections[sectionIndex] = new net.minecraft.world.level.chunk.ChunkSection(
-                            yPosition, blocksDataPalette, biomesDataPalette);
+                            yPosition, blocksDataPalette.e(), biomesDataPalette.e());
                 }
 
             }

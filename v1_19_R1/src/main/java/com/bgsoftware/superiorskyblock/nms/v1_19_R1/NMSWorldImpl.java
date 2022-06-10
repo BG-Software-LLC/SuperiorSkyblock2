@@ -11,7 +11,9 @@ import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.tags.TagsBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.SoundEffectType;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.entity.TileEntity;
@@ -20,9 +22,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.lighting.LightEngine;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -36,7 +35,6 @@ import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.level.EnumSkyBlock;
@@ -66,7 +64,6 @@ import org.bukkit.craftbukkit.v1_19_R1.CraftWorldBorder;
 import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_19_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_19_R1.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
@@ -79,7 +76,7 @@ public final class NMSWorldImpl implements NMSWorld {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final ReflectField<IChunkAccess> CHUNK_ACCESS = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.com.bgsoftware.superiorskyblock.nms.v1_19_R1.generator.CustomChunkGenerator$CustomBiomeGrid", IChunkAccess.class, "biome");
+            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", IChunkAccess.class, "biome");
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
@@ -143,14 +140,13 @@ public final class NMSWorldImpl implements NMSWorld {
             if (world == null || player == null)
                 return;
 
-            WorldBorder worldBorder;
-
             if (disabled || island == null || (!plugin.getSettings().getSpawn().isWorldBorder() && island.isSpawn())) {
-                worldBorder = world.getWorldBorder();
+                player.setWorldBorder(Bukkit.createWorldBorder());
             } else {
-                worldBorder = new CraftWorldBorder((CraftWorld) world);
+                WorldBorder worldBorder = Bukkit.createWorldBorder();
                 worldBorder.setWarningDistance(0);
                 worldBorder.setSize((island.getIslandSize() * 2) + 1);
+                ((CraftWorldBorder) worldBorder).getHandle().world = (((CraftWorld) world).getHandle());
 
                 org.bukkit.World.Environment environment = world.getEnvironment();
 
@@ -159,14 +155,12 @@ public final class NMSWorldImpl implements NMSWorld {
                 double worldBorderSize = worldBorder.getSize();
 
                 switch (superiorPlayer.getBorderColor()) {
-                    case GREEN -> worldBorder.setSize(worldBorderSize, Long.MAX_VALUE);
+                    case GREEN -> worldBorder.setSize(worldBorderSize + 1.0D, Long.MAX_VALUE);
                     case RED -> worldBorder.setSize(worldBorderSize - 1.0D, Long.MAX_VALUE);
                 }
-            }
 
-            ClientboundInitializeBorderPacket packetPlayOutWorldBorder = new ClientboundInitializeBorderPacket(((CraftWorldBorder) worldBorder).getHandle());
-            Entity entity = new Entity(((CraftPlayer) player).getHandle());
-            entity.getPlayerConnection().sendPacket(packetPlayOutWorldBorder);
+                player.setWorldBorder(worldBorder);
+            }
         } catch (NullPointerException ignored) {
         }
     }
