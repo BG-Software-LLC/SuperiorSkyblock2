@@ -86,6 +86,9 @@ public final class NMSUtils {
 
         Executor.createTask().runAsync(v -> {
             chunks.forEach(chunkCoords -> {
+                if (!chunkLoader.chunkExists(chunkCoords.x, chunkCoords.z))
+                    return;
+
                 try {
                     Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
 

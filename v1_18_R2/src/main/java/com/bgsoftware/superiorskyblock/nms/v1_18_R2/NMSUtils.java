@@ -120,20 +120,18 @@ public final class NMSUtils {
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null) {
-                        ChunkAccess protoChunk = createProtoChunk(chunkCoords, worldServer);
-                        chunkCompound = worldServer.saveChunk(protoChunk);
-                    } else {
-                        chunkCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
-                                Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound,
-                                chunkCoords, worldServer.getHandle());
-                    }
+                    if (chunkCompound == null)
+                        return;
 
-                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkCompound, chunkCoords);
+                    NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
+                            Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound,
+                            chunkCoords, worldServer.getHandle());
+
+                    UnloadedChunkCompound unloadedChunkCompound = new UnloadedChunkCompound(chunkDataCompound, chunkCoords);
                     chunkConsumer.accept(unloadedChunkCompound);
 
                     if (saveChunks)
-                        chunkCompounds.add(new Pair<>(chunkCoords, chunkCompound));
+                        chunkCompounds.add(new Pair<>(chunkCoords, chunkDataCompound));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     PluginDebugger.debug(ex);

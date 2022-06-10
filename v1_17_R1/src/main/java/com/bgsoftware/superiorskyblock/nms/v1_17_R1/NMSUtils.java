@@ -30,7 +30,6 @@ import net.minecraft.world.level.chunk.ChunkConverter;
 import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.chunk.storage.ChunkRegionLoader;
 import net.minecraft.world.level.levelgen.HeightMap;
 
 import java.util.ArrayList;
@@ -103,18 +102,16 @@ public final class NMSUtils {
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null) {
-                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, worldServer);
-                        chunkCompound = ChunkRegionLoader.saveChunk(worldServer, protoChunk);
-                    } else {
-                        chunkCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
-                                Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
-                    }
+                    if (chunkCompound == null)
+                        return;
 
-                    if (chunkCompound.hasKeyOfType("Level", 10)) {
-                        chunkConsumer.accept(chunkCoords, chunkCompound.getCompound("Level"));
+                    NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
+                            Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
+
+                    if (chunkDataCompound.hasKeyOfType("Level", 10)) {
+                        chunkConsumer.accept(chunkCoords, chunkDataCompound.getCompound("Level"));
                         if (saveChunks)
-                            playerChunkMap.a(chunkCoords, chunkCompound);
+                            playerChunkMap.a(chunkCoords, chunkDataCompound);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.world.event;
 
 import org.bukkit.Chunk;
 
+@Deprecated
 public interface WorldEventsManager {
 
     /**
@@ -9,6 +10,7 @@ public interface WorldEventsManager {
      *
      * @param chunk The chunk that was loaded.
      */
+    @Deprecated
     void loadChunk(Chunk chunk);
 
     /**
@@ -16,6 +18,7 @@ public interface WorldEventsManager {
      *
      * @param chunk The chunk that was unloaded.
      */
+    @Deprecated
     void unloadChunk(Chunk chunk);
 
 }

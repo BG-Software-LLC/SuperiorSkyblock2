@@ -10,6 +10,7 @@ import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R3.ChunkProviderServer;
+import net.minecraft.server.v1_8_R3.ChunkRegionLoader;
 import net.minecraft.server.v1_8_R3.ChunkSection;
 import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -79,6 +80,10 @@ public final class NMSUtils {
                 uuid -> CHUNK_LOADER.get(worldServer.chunkProviderServer));
 
         chunks.forEach(chunkCoords -> {
+            if (chunkLoader instanceof ChunkRegionLoader &&
+                    !((ChunkRegionLoader) chunkLoader).chunkExists(worldServer, chunkCoords.x, chunkCoords.z))
+                return;
+
             try {
                 Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
 

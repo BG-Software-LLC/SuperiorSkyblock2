@@ -18,7 +18,6 @@ import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkConverter;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R3.ChunkRegionLoader;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.HeightMap;
 import net.minecraft.server.v1_16_R3.IBlockData;
@@ -103,18 +102,16 @@ public final class NMSUtils {
                 try {
                     NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
 
-                    if (chunkCompound == null) {
-                        ProtoChunk protoChunk = createProtoChunk(chunkCoords, worldServer);
-                        chunkCompound = ChunkRegionLoader.saveChunk(worldServer, protoChunk);
-                    } else {
-                        chunkCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
-                                Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
-                    }
+                    if (chunkCompound == null)
+                        return;
 
-                    if (chunkCompound.hasKeyOfType("Level", 10)) {
-                        chunkConsumer.accept(chunkCoords, chunkCompound.getCompound("Level"));
+                    NBTTagCompound chunkDataCompound = playerChunkMap.getChunkData(worldServer.getTypeKey(),
+                            Suppliers.ofInstance(worldServer.getWorldPersistentData()), chunkCompound, chunkCoords, worldServer);
+
+                    if (chunkDataCompound.hasKeyOfType("Level", 10)) {
+                        chunkConsumer.accept(chunkCoords, chunkDataCompound.getCompound("Level"));
                         if (saveChunks)
-                            playerChunkMap.a(chunkCoords, chunkCompound);
+                            playerChunkMap.a(chunkCoords, chunkDataCompound);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
