@@ -98,7 +98,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -1304,8 +1303,6 @@ public final class SIsland implements Island {
         IslandsDatabaseBridge.saveIslandLeader(this);
         IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
 
-        plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner.getUniqueId());
-
         plugin.getMissions().getAllMissions().forEach(mission -> mission.transferData(previousOwner, owner));
 
         return true;
@@ -1319,7 +1316,6 @@ public final class SIsland implements Island {
         if (owner == originalPlayer) {
             owner = newPlayer;
             IslandsDatabaseBridge.saveIslandLeader(this);
-            plugin.getGrid().transferIsland(originalPlayer.getUniqueId(), owner.getUniqueId());
         } else if (isMember(originalPlayer)) {
             members.write(members -> {
                 members.remove(originalPlayer);

@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.island.container;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -37,9 +38,13 @@ public interface IslandsContainer {
      * Get an island by its leader's uuid.
      *
      * @param uuid The uuid of the island's leader.
+     * @deprecated Not supported anymore.
      */
     @Nullable
-    Island getIslandByLeader(UUID uuid);
+    @Deprecated
+    default Island getIslandByLeader(UUID uuid) {
+        return SuperiorSkyblockAPI.getGrid().getIsland(uuid);
+    }
 
     /**
      * Get an island by its position in the top-islands.
@@ -78,8 +83,12 @@ public interface IslandsContainer {
      *
      * @param oldLeader The uuid of the current leader.
      * @param newLeader The uuid of the new leader.
+     * @deprecated Not supported anymore.
      */
-    void transferIsland(UUID oldLeader, UUID newLeader);
+    @Deprecated
+    default void transferIsland(UUID oldLeader, UUID newLeader) {
+
+    }
 
     /**
      * Sort islands for the top-islands.

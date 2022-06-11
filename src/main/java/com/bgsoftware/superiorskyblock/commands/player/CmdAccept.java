@@ -65,7 +65,7 @@ public final class CmdAccept implements ISuperiorCommand {
                 return;
             }
         } else {
-            if ((island = plugin.getGrid().getIsland(targetPlayer)) == null || !island.isInvited(superiorPlayer)) {
+            if ((island = targetPlayer.getIsland()) == null || !island.isInvited(superiorPlayer)) {
                 Message.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }

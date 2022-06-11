@@ -332,7 +332,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return getIsland(superiorPlayer.getIslandLeader().getUniqueId());
+        return superiorPlayer.getIsland();
     }
 
     @Override
@@ -351,7 +351,8 @@ public final class GridHandler extends AbstractHandler implements GridManager {
     @Override
     public Island getIsland(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
-        return this.islandsContainer.getIslandByLeader(uuid);
+        SuperiorPlayer superiorPlayer = plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(uuid);
+        return superiorPlayer == null ? null : getIsland(superiorPlayer);
     }
 
     @Override
@@ -406,9 +407,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     @Override
     public void transferIsland(UUID oldOwner, UUID newOwner) {
-        Preconditions.checkNotNull(oldOwner, "oldOwner parameter cannot be null.");
-        Preconditions.checkNotNull(newOwner, "newOwner parameter cannot be null.");
-        this.islandsContainer.transferIsland(oldOwner, newOwner);
+        // Do nothing.
     }
 
     @Override
@@ -631,7 +630,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
         do {
             uuid = UUID.randomUUID();
-        } while (getIslandByUUID(uuid) != null || getIsland(uuid) != null);
+        } while (getIslandByUUID(uuid) != null || plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(uuid) != null);
 
         return uuid;
     }
