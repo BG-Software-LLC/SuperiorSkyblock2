@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.menu.impl.internal.StackedBlocksDepositMenu;
+import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.LocationUtils;
 import com.bgsoftware.superiorskyblock.utils.ServerVersion;
@@ -62,7 +63,9 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("unused")
 public final class BlocksListener implements Listener {
@@ -80,6 +83,11 @@ public final class BlocksListener implements Listener {
         this.plugin = plugin;
         if (plugin.getSettings().isPhysicsListener())
             Bukkit.getPluginManager().registerEvents(new PhysicsListener(), plugin);
+        try {
+            Class.forName("org.bukkit.event.block.SpongeAbsorbEvent");
+            Bukkit.getPluginManager().registerEvents(new SpongeListener(), plugin);
+        } catch (Throwable ignored) {
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -566,6 +574,36 @@ public final class BlocksListener implements Listener {
         public void onStackedBlockPhysics(BlockPhysicsEvent e) {
             if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
                 e.setCancelled(true);
+        }
+
+    }
+
+    private final class SpongeListener implements Listener {
+
+        private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
+
+        @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+        public void onSpongeAbsorb(org.bukkit.event.block.SpongeAbsorbEvent e) {
+            if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
+                e.setCancelled(true);
+        }
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onSpongeAbsorbMonitor(org.bukkit.event.block.SpongeAbsorbEvent e) {
+            Location location = e.getBlock().getLocation();
+
+            if (alreadySpongeAbosrbCalled.contains(location))
+                return;
+
+            Island island = plugin.getGrid().getIslandAt(location);
+
+            if (island == null)
+                return;
+
+            island.handleBlockBreak(e.getBlock(), 1);
+            island.handleBlockPlace(ConstantKeys.WET_SPONGE, 1);
+
+            alreadySpongeAbosrbCalled.add(location);
         }
 
     }

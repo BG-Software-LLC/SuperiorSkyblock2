@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.hooks.provider.SpawnersProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.superiorskyblock.hooks.provider.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.hooks.provider.WorldsProvider_Default;
-import com.bgsoftware.superiorskyblock.listeners.PaperListener;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
@@ -506,8 +505,6 @@ public final class ProvidersHandler extends AbstractHandler implements Providers
             Optional<AsyncProvider> asyncProviderOptional = createInstance("AsyncProvider_Paper");
             asyncProviderOptional.ifPresent(asyncProvider -> {
                 this.asyncProvider = asyncProvider;
-                // Only added in versions 1.13+ of paper, so it can be here
-                Bukkit.getPluginManager().registerEvents(new PaperListener(plugin), plugin);
             });
         }
     }
