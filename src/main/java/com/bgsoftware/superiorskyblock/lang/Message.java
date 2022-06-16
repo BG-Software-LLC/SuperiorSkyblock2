@@ -6,10 +6,15 @@ import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -352,7 +357,35 @@ public enum Message {
     GOT_BANNED,
     GOT_DEMOTED,
     GOT_EXPELLED,
-    GOT_INVITE,
+    GOT_INVITE {
+        @Override
+        public void send(CommandSender sender, Locale locale, Object... args) {
+            if (!(sender instanceof Player)) {
+                super.send(sender, locale, args);
+            } else {
+                String message = getMessage(locale);
+
+                if (message == null)
+                    return;
+
+                BaseComponent[] baseComponents = TextComponent.fromLegacyText(message);
+                if (!GOT_INVITE_TOOLTIP.isEmpty(locale)) {
+                    for (BaseComponent baseComponent : baseComponents)
+                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(GOT_INVITE_TOOLTIP.getMessage(locale))}));
+                }
+
+                for (BaseComponent baseComponent : baseComponents)
+                    baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + args[0]));
+
+                IMessageComponent messageComponent = ComplexMessageComponent.of(baseComponents);
+                if (messageComponent != null) {
+                    EventResult<IMessageComponent> eventResult = plugin.getEventsBus().callSendMessageEvent(sender, name(), messageComponent, args);
+                    if (!eventResult.isCancelled())
+                        eventResult.getResult().sendMessage(sender, args);
+                }
+            }
+        }
+    },
     GOT_INVITE_TOOLTIP,
     GOT_KICKED,
     GOT_PROMOTED,

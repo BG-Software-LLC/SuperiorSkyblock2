@@ -28,9 +28,6 @@ import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
 import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
 import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
 import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -161,16 +158,11 @@ public final class PlayersListener implements Listener {
         }
 
         Executor.async(() -> superiorPlayer.runIfOnline(player -> {
-            java.util.Locale locale = superiorPlayer.getUserLocale();
+            Locale locale = superiorPlayer.getUserLocale();
             if (!Message.GOT_INVITE.isEmpty(locale)) {
                 for (Island _island : plugin.getGrid().getIslands()) {
-                    if (_island.isInvited(superiorPlayer)) {
-                        TextComponent textComponent = new TextComponent(Message.GOT_INVITE.getMessage(locale, _island.getOwner().getName()));
-                        if (!Message.GOT_INVITE_TOOLTIP.isEmpty(locale))
-                            textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(Message.GOT_INVITE_TOOLTIP.getMessage(locale))}));
-                        textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/is accept " + _island.getOwner().getName()));
-                        player.spigot().sendMessage(textComponent);
-                    }
+                    if (_island.isInvited(superiorPlayer))
+                        Message.GOT_INVITE.send(superiorPlayer, _island.getOwner().getName());
                 }
             }
         }), 40L);
@@ -536,7 +528,7 @@ public final class PlayersListener implements Listener {
         String[] message = e.getMessage().toLowerCase(Locale.ENGLISH).split(" ");
 
         String commandLabel = message[0].toCharArray()[0] == '/' ? message[0].substring(1) : message[0];
-        
+
         if (island != null && !island.isSpawn() && island.isVisitor(superiorPlayer, true) &&
                 plugin.getSettings().getBlockedVisitorsCommands().stream().anyMatch(commandLabel::contains)) {
             e.setCancelled(true);
