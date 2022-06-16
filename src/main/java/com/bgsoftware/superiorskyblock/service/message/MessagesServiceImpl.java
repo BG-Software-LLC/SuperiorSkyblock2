@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
 import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
 import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
 import com.google.common.base.Preconditions;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -75,7 +76,12 @@ public final class MessagesServiceImpl implements MessagesService {
 
         @Override
         public boolean addComplexMessage(@Nullable TextComponent textComponent) {
-            return addMessageComponent(ComplexMessageComponent.of(textComponent));
+            return addComplexMessage(new BaseComponent[]{textComponent});
+        }
+
+        @Override
+        public boolean addComplexMessage(@Nullable BaseComponent[] baseComponents) {
+            return addMessageComponent(ComplexMessageComponent.of(baseComponents));
         }
 
         @Override

@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
@@ -1602,6 +1603,23 @@ public final class SIsland implements Island {
         getIslandMembers(true).stream()
                 .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
                 .forEach(superiorPlayer -> Message.CUSTOM.send(superiorPlayer, message, false));
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, Object... args) {
+        this.sendMessage(messageComponent, Collections.emptyList(), args);
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
+        Preconditions.checkNotNull(messageComponent, "messageComponent parameter cannot be null.");
+        Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
+
+        PluginDebugger.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredMembers + ", Message: " + messageComponent.getMessage());
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> messageComponent.sendMessage(superiorPlayer.asPlayer(), args));
     }
 
     @Override

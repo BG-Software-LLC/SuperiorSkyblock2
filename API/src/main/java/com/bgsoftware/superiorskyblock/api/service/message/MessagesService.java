@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.api.service.message;
 
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -65,6 +66,14 @@ public interface MessagesService {
          * @return true if the complex message was successfully added.
          */
         boolean addComplexMessage(@Nullable TextComponent textComponent);
+
+        /**
+         * Add a complex message to the message component.
+         *
+         * @param baseComponents The base components of the message.
+         * @return true if the complex message was successfully added.
+         */
+        boolean addComplexMessage(@Nullable BaseComponent[] baseComponents);
 
         /**
          * Add a raw message to the message component.

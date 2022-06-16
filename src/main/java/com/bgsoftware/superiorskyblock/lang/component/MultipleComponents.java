@@ -52,19 +52,22 @@ public final class MultipleComponents implements IMessageComponent {
                         Formatters.COLOR_FORMATTER.format(section.getString(key + ".message")),
                         color, section.getInt(key + ".ticks")));
             } else {
-                TextComponent textComponent = new TextComponent(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
+                BaseComponent[] baseComponents = TextComponent.fromLegacyText(Formatters.COLOR_FORMATTER.format(section.getString(key + ".text")));
 
                 String toolTipMessage = section.getString(key + ".tooltip");
                 if (toolTipMessage != null) {
-                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(toolTipMessage))}));
+                    for (BaseComponent baseComponent : baseComponents)
+                        baseComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                new BaseComponent[]{new TextComponent(Formatters.COLOR_FORMATTER.format(toolTipMessage))}));
                 }
 
                 String commandMessage = section.getString(key + ".command");
-                if (commandMessage != null)
-                    textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
+                if (commandMessage != null) {
+                    for (BaseComponent baseComponent : baseComponents)
+                        baseComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, commandMessage));
+                }
 
-                messageComponents.add(ComplexMessageComponent.of(textComponent));
+                messageComponents.add(ComplexMessageComponent.of(baseComponents));
             }
         }
 

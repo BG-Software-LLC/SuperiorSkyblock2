@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
@@ -83,11 +84,11 @@ public final class CmdInvite implements IPermissibleCommand {
         }
 
         java.util.Locale locale = superiorPlayer.getUserLocale();
-        String message;
+        IMessageComponent messageComponent;
 
         if (island.isInvited(targetPlayer)) {
             island.revokeInvite(targetPlayer);
-            message = Message.REVOKE_INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
+            messageComponent = Message.REVOKE_INVITE_ANNOUNCEMENT.getComponent(locale);
             if (targetPlayer.isOnline())
                 Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         } else {
@@ -100,7 +101,7 @@ public final class CmdInvite implements IPermissibleCommand {
                 return;
 
             island.inviteMember(targetPlayer);
-            message = Message.INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
+            messageComponent = Message.INVITE_ANNOUNCEMENT.getComponent(locale);
 
             java.util.Locale targetLocal = targetPlayer.getUserLocale();
             Player target = targetPlayer.asPlayer();
@@ -114,8 +115,8 @@ public final class CmdInvite implements IPermissibleCommand {
             }
         }
 
-        if (message != null)
-            island.sendMessage(message);
+        if (messageComponent != null)
+            island.sendMessage(messageComponent, superiorPlayer.getName(), targetPlayer.getName());
     }
 
     @Override

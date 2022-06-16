@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.lang.component.impl;
 
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.lang.Message;
 import com.bgsoftware.superiorskyblock.lang.component.EmptyMessageComponent;
-import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.utils.StringUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -14,15 +14,28 @@ import javax.annotation.Nullable;
 
 public final class ComplexMessageComponent implements IMessageComponent {
 
+    private final BaseComponent[] baseComponents;
     private final TextComponent textComponent;
 
-    public static IMessageComponent of(@Nullable TextComponent textComponent) {
-        return textComponent == null || StringUtils.isBlank(textComponent.getText()) ?
-                EmptyMessageComponent.getInstance() : new ComplexMessageComponent(textComponent);
+    public static IMessageComponent of(@Nullable BaseComponent[] baseComponents) {
+        if (baseComponents == null || baseComponents.length == 0)
+            return EmptyMessageComponent.getInstance();
+
+        boolean isTextEmpty = true;
+
+        for (BaseComponent baseComponent : baseComponents) {
+            if (baseComponent instanceof TextComponent && !StringUtils.isBlank(((TextComponent) baseComponent).getText())) {
+                isTextEmpty = false;
+                break;
+            }
+        }
+
+        return isTextEmpty ? EmptyMessageComponent.getInstance() : new ComplexMessageComponent(baseComponents);
     }
 
-    private ComplexMessageComponent(TextComponent textComponent) {
-        this.textComponent = textComponent;
+    private ComplexMessageComponent(BaseComponent[] baseComponents) {
+        this.baseComponents = baseComponents;
+        this.textComponent = findTextComponent(baseComponents);
     }
 
     @Override
@@ -42,14 +55,10 @@ public final class ComplexMessageComponent implements IMessageComponent {
             if (rawMessage != null && !rawMessage.isEmpty())
                 sender.sendMessage(rawMessage);
         } else {
-            BaseComponent[] duplicate = replaceArgs(this.textComponent, args);
+            BaseComponent[] duplicate = replaceArgs(this.baseComponents, args);
             if (duplicate.length > 0)
                 ((Player) sender).spigot().sendMessage(duplicate);
         }
-    }
-
-    private static BaseComponent[] replaceArgs(BaseComponent textComponent, Object... objects) {
-        return replaceArgs(new BaseComponent[]{textComponent}, objects);
     }
 
     private static BaseComponent[] replaceArgs(BaseComponent[] textComponents, Object... objects) {
@@ -67,6 +76,16 @@ public final class ComplexMessageComponent implements IMessageComponent {
         }
 
         return duplicate;
+    }
+
+    @Nullable
+    private static TextComponent findTextComponent(BaseComponent[] baseComponents) {
+        for (BaseComponent baseComponent : baseComponents) {
+            if (baseComponent instanceof TextComponent)
+                return (TextComponent) baseComponent;
+        }
+
+        return null;
     }
 
 }

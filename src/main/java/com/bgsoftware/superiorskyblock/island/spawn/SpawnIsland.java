@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -722,6 +723,16 @@ public final class SpawnIsland implements Island {
 
     @Override
     public void sendMessage(String message, UUID... ignoredMembers) {
+        // Do nothing.
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, Object... args) {
+        // Do nothing.
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
         // Do nothing.
     }
 
