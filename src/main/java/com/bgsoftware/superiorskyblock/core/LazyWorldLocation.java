@@ -13,7 +13,7 @@ public class LazyWorldLocation extends Location {
 
     public LazyWorldLocation(String worldName, double x, double y, double z, float pitch, float yaw) {
         super(Bukkit.getWorld(worldName), x, y, z, pitch, yaw);
-        this.worldName = super.getWorld() == null ? worldName : null;
+        this.worldName = worldName;
     }
 
     @Override
