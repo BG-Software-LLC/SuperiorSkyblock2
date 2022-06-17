@@ -644,7 +644,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     public void loadGrid(DatabaseResult resultSet) {
         resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
-                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition(lastIsland));
+                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((SmartLocation) lastIsland));
 
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
             lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),

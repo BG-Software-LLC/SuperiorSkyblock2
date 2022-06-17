@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -14,6 +15,10 @@ public class SBlockPosition implements BlockPosition {
     private final int y;
     private final int z;
     private final String world;
+
+    public SBlockPosition(SmartLocation location) {
+        this(location.getWorldName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+    }
 
     public SBlockPosition(Location location) {
         this(location.getWorld() == null ? null : location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
