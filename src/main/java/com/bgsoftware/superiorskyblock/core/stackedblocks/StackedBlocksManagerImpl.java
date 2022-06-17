@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.StackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.SmartLocation;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
@@ -270,7 +270,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
 
         if (location.get().getWorld() == null) {
             SuperiorSkyblockPlugin.log(String.format("&cCannot load stacked block with invalid world %s, skipping...",
-                    ((SmartLocation) location.get()).getWorldName()));
+                    ((LazyWorldLocation) location.get()).getWorldName()));
             return;
         }
 

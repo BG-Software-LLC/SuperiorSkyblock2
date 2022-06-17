@@ -32,7 +32,7 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.core.SmartLocation;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -276,7 +276,7 @@ public class IslandsDeserializer {
             if (location.get().getWorld() == null) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load warps with invalid world %s for %s, skipping...",
-                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
+                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
                 return;
             }
 
@@ -546,7 +546,7 @@ public class IslandsDeserializer {
             if (location.get().getWorld() == null) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
-                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
+                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
                 return;
             }
 
@@ -583,7 +583,7 @@ public class IslandsDeserializer {
             if (location.get().getWorld() == null) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
-                                ((SmartLocation) location.get()).getWorldName(), uuid.get()));
+                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
                 return;
             }
 

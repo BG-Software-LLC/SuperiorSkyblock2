@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.SmartLocation;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +44,7 @@ public class LocationSerializer implements ISerializer<Location, String> {
             float yaw = sections.length > 5 ? Float.parseFloat(sections[4]) : 0;
             float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
 
-            return new SmartLocation(sections[0], x, y, z, yaw, pitch);
+            return new LazyWorldLocation(sections[0], x, y, z, yaw, pitch);
         } catch (Exception ex) {
             SuperiorSkyblockPlugin.log("Error while parsing location: `" + element + "`");
             PluginDebugger.debug(ex);

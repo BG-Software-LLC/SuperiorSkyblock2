@@ -5,13 +5,13 @@ import org.bukkit.Location;
 import org.bukkit.World;
 
 /**
- * Smart location will update the world again if it's null on initialize.
+ * LazyWorldLocation will update the world again if it's null on initialize.
  */
-public class SmartLocation extends Location {
+public class LazyWorldLocation extends Location {
 
-    private String worldName;
+    private final String worldName;
 
-    public SmartLocation(String worldName, double x, double y, double z, float pitch, float yaw) {
+    public LazyWorldLocation(String worldName, double x, double y, double z, float pitch, float yaw) {
         super(Bukkit.getWorld(worldName), x, y, z, pitch, yaw);
         this.worldName = super.getWorld() == null ? worldName : null;
     }
@@ -22,13 +22,6 @@ public class SmartLocation extends Location {
             setWorld(Bukkit.getWorld(worldName));
 
         return super.getWorld();
-    }
-
-    @Override
-    public void setWorld(World world) {
-        super.setWorld(world);
-        if (world != null)
-            worldName = null;
     }
 
     public String getWorldName() {

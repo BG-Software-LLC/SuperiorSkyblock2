@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
-import com.bgsoftware.superiorskyblock.core.SmartLocation;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -645,7 +645,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     public void loadGrid(DatabaseResult resultSet) {
         resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
-                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((SmartLocation) lastIsland));
+                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((LazyWorldLocation) lastIsland));
 
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
             lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),

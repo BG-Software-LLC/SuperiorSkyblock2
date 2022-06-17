@@ -31,7 +31,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.SmartLocation;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -274,7 +274,7 @@ public class SIsland implements Island {
         if (center.get().getWorld() == null) {
             SuperiorSkyblockPlugin.log(
                     String.format("&cCannot load island invalid world %s for %s, skipping...",
-                            ((SmartLocation) center.get()).getWorldName(), uuid.get()));
+                            ((LazyWorldLocation) center.get()).getWorldName(), uuid.get()));
             return Optional.empty();
         }
 

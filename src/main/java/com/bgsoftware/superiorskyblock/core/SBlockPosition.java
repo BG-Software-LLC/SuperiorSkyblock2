@@ -15,7 +15,7 @@ public class SBlockPosition implements BlockPosition {
     private final int z;
     private final String world;
 
-    public SBlockPosition(SmartLocation location) {
+    public SBlockPosition(LazyWorldLocation location) {
         this(location.getWorldName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
