@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
-import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
