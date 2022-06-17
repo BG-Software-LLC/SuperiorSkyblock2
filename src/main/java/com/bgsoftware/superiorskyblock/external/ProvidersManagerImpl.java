@@ -557,7 +557,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private void registerHook(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
@@ -578,7 +578,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private <T> Optional<T> createInstance(String className) {
         try {
-            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.hooks." + className);
+            Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
             try {
                 Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
                 if (!(boolean) compatibleMethod.invoke(null))
