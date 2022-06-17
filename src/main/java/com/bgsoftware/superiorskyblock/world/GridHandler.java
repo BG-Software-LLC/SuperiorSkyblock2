@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.threads.Executor;
 import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
 import com.bgsoftware.superiorskyblock.world.algorithm.DefaultIslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
@@ -646,7 +647,7 @@ public final class GridHandler extends AbstractHandler implements GridManager {
 
     public void loadGrid(DatabaseResult resultSet) {
         resultSet.getString("last_island").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize)
-                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition(lastIsland));
+                .ifPresent(lastIsland -> this.lastIsland = new SBlockPosition((SmartLocation) lastIsland));
 
         if (!lastIsland.getWorldName().equalsIgnoreCase(plugin.getSettings().getWorlds().getDefaultWorldName())) {
             lastIsland = new SBlockPosition(plugin.getSettings().getWorlds().getDefaultWorldName(),
