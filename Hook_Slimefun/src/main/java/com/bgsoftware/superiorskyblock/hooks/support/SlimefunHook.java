@@ -7,12 +7,14 @@ import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.utils.logic.StackedBlocksLogic;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
+import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
 import io.github.thebusybiscuit.slimefun4.api.events.AndroidMineEvent;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
@@ -33,14 +35,20 @@ import java.util.Map;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-public final class SlimefunHook {
+public class SlimefunHook {
 
     private static final ReflectField<Map<Location, Config>> BLOCK_STORAGE_STORAGE = new ReflectField<>(BlockStorage.class, Map.class, "storage");
 
     private static SuperiorSkyblockPlugin plugin;
 
+    private static Singleton<BlockChangesListener> blockChangesListener;
+    private static Singleton<StackedBlocksListener> stackedBlocksListener;
+
     public static void register(SuperiorSkyblockPlugin plugin) {
         SlimefunHook.plugin = plugin;
+        blockChangesListener = plugin.getListener(BlockChangesListener.class);
+        stackedBlocksListener = plugin.getListener(StackedBlocksListener.class);
+
         try {
             Class.forName("io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule");
             new Slimefun4RelocationsProtectionModule().register();
@@ -88,15 +96,18 @@ public final class SlimefunHook {
     }
 
     @SuppressWarnings("unused")
-    private static final class Slimefun4Listener implements Listener {
+    private static class Slimefun4Listener implements Listener {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onAndroidMiner(AndroidMineEvent e) {
             PluginDebugger.debug("Action: Android Break, Block: " + e.getBlock().getLocation() + ", Type: " + e.getBlock().getType());
-            if (StackedBlocksLogic.tryUnstack(null, e.getBlock(), plugin))
+            if (stackedBlocksListener.get().tryUnstack(null, e.getBlock())) {
                 e.setCancelled(true);
-            else
-                BlocksLogic.handleBreak(e.getBlock());
+            } else {
+                blockChangesListener.get().onBlockBreak(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
+                        plugin.getNMSWorld().getDefaultAmount(e.getBlock()),
+                        BlockChangesListener.Flag.SAVE_BLOCK_COUNT, BlockChangesListener.Flag.DIRTY_CHUNK);
+            }
         }
 
         //@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -117,12 +128,14 @@ public final class SlimefunHook {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onAutoPlacerPlaceBlock(BlockPlacerPlaceEvent e) {
-            BlocksLogic.handlePlace(e.getBlock(), null);
+            blockChangesListener.get().onBlockPlace(KeyImpl.of(e.getBlock()), e.getBlock().getLocation(),
+                    plugin.getNMSWorld().getDefaultAmount(e.getBlock()), null,
+                    BlockChangesListener.Flag.DIRTY_CHUNK, BlockChangesListener.Flag.SAVE_BLOCK_COUNT);
         }
 
     }
 
-    private static final class Slimefun4ProtectionModule implements
+    private static class Slimefun4ProtectionModule implements
             me.mrCookieSlime.Slimefun.cscorelib2.protection.ProtectionModule {
 
         @Override
@@ -152,7 +165,7 @@ public final class SlimefunHook {
         }
     }
 
-    private static final class Slimefun4RelocationsProtectionModule implements
+    private static class Slimefun4RelocationsProtectionModule implements
             io.github.thebusybiscuit.slimefun4.libraries.dough.protection.ProtectionModule {
 
         private static final ReflectMethod<Void> OLD_REGISTER_MODULE = new ReflectMethod<>(
@@ -176,7 +189,7 @@ public final class SlimefunHook {
         }
 
         public void register() {
-            Executor.sync(() -> {
+            BukkitExecutor.sync(() -> {
                 if (OLD_REGISTER_MODULE.isValid()) {
                     OLD_REGISTER_MODULE.invoke(Slimefun.getProtectionManager(), Bukkit.getServer(), plugin.getName(),
                             (Function<Plugin, ProtectionModule>) pl -> this);

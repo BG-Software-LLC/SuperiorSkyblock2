@@ -6,11 +6,11 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeBlockLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
@@ -18,7 +18,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.potion.PotionEffectType;
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class CmdAdminShow implements IAdminIslandCommand {
+public class CmdAdminShow implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {

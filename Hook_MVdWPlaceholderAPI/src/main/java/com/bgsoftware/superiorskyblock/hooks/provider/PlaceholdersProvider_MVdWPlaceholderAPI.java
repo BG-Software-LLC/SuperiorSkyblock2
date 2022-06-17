@@ -2,14 +2,14 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import be.maximvdw.placeholderapi.PlaceholderAPI;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
+import com.bgsoftware.superiorskyblock.dependencies.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import org.bukkit.OfflinePlayer;
 
 import java.util.regex.Pattern;
 
 @SuppressWarnings("unused")
-public final class PlaceholdersProvider_MVdWPlaceholderAPI implements PlaceholdersProvider {
+public class PlaceholdersProvider_MVdWPlaceholderAPI implements PlaceholdersProvider {
 
     private static final Pattern BUILT_IN_NUMERIC_PLACEHOLDER = Pattern.compile("\\{(\\d)}");
 

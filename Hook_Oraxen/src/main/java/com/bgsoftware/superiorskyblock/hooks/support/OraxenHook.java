@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public final class OraxenHook {
+public class OraxenHook {
 
     private static final List<Pair<MechanicFactory, SetBlockModelFunction>> AVAILABLE_MECHANICS;
 
@@ -57,7 +57,7 @@ public final class OraxenHook {
         Bukkit.getPluginManager().registerEvents(new GeneratorListener(), plugin);
     }
 
-    private static final class GeneratorListener implements Listener {
+    private static class GeneratorListener implements Listener {
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onIslandGenerateBlock(IslandGenerateBlockEvent event) {

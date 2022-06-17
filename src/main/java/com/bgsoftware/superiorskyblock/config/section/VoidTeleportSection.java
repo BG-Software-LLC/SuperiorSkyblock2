@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
-public final class VoidTeleportSection implements SettingsManager.VoidTeleport {
+public class VoidTeleportSection implements SettingsManager.VoidTeleport {
 
     private final SettingsContainer container;
 

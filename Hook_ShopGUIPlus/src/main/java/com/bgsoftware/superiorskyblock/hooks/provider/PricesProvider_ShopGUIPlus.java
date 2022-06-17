@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Set;
 
-public final class PricesProvider_ShopGUIPlus implements PricesProvider {
+public class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     private static final ReflectMethod<Set<Shop>> GET_SHOPS_METHOD = new ReflectMethod<>(ShopManager.class, Set.class, "getShops");
 

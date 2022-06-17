@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -44,9 +44,9 @@ import java.io.IOException;
  *
  * @author Graham Edgecombe
  */
-public final class DoubleTag extends NumberTag<Double> {
+public class DoubleTag extends NumberTag<Double> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagDouble");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagDouble");
 
     /**
      * Creates the tag.

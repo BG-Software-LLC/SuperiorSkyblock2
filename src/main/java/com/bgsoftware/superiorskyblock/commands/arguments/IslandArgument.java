@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 import javax.annotation.Nullable;
 
-public final class IslandArgument extends Argument<Island, SuperiorPlayer> {
+public class IslandArgument extends Argument<Island, SuperiorPlayer> {
 
     public static final IslandArgument EMPTY = new IslandArgument(null, null);
 

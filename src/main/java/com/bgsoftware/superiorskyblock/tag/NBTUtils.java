@@ -38,7 +38,7 @@ package com.bgsoftware.superiorskyblock.tag;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class NBTUtils {
+public class NBTUtils {
 
     /**
      * Default private constructor.

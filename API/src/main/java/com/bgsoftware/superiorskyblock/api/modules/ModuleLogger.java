@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 /**
  * Simple implementation of a custom logger for modules.
  */
-public final class ModuleLogger extends Logger {
+public class ModuleLogger extends Logger {
 
     private final String loggerPrefix;
 

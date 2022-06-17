@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
-import com.bgsoftware.superiorskyblock.island.IslandPosition;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.IslandPosition;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
@@ -23,7 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-public final class DefaultIslandsContainer implements IslandsContainer {
+public class DefaultIslandsContainer implements IslandsContainer {
 
     private final Map<IslandPosition, Island> islandsByPositions = new ConcurrentHashMap<>();
     private final Map<UUID, Island> islandsByUUID = new ConcurrentHashMap<>();
@@ -133,7 +133,7 @@ public final class DefaultIslandsContainer implements IslandsContainer {
         }
 
         if (Bukkit.isPrimaryThread()) {
-            Executor.async(() -> sortIslandsInternal(sortingType, onFinish));
+            BukkitExecutor.async(() -> sortIslandsInternal(sortingType, onFinish));
         } else {
             sortIslandsInternal(sortingType, onFinish);
         }

@@ -9,7 +9,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public final class FAWESchematicParser implements SchematicParser {
+public class FAWESchematicParser implements SchematicParser {
 
     public FAWESchematicParser() {
 

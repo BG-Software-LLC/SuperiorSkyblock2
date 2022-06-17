@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.UUID;
 
-public final class BossBarTask extends BukkitRunnable {
+public class BossBarTask extends BukkitRunnable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 

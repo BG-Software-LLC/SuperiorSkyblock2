@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -47,9 +47,9 @@ import java.util.Locale;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class ByteArrayTag extends Tag<byte[]> {
+public class ByteArrayTag extends Tag<byte[]> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagByteArray");
 
     /**
      * Creates the tag.

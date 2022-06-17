@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.module;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import org.bukkit.event.Listener;
 
-public final class ModuleData {
+public class ModuleData {
 
     private final Listener[] listeners;
     private final SuperiorCommand[] commands;

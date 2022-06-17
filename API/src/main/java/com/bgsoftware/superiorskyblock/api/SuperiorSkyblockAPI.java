@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public final class SuperiorSkyblockAPI {
+public class SuperiorSkyblockAPI {
 
     private static SuperiorSkyblock plugin;
 

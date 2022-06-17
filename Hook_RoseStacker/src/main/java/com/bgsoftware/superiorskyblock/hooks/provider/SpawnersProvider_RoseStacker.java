@@ -5,7 +5,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.dependencies.provider.SpawnersProvider_AutoDetect;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.SpawnerStackEvent;
@@ -21,7 +22,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect {
+public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect {
 
     private static ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = null;
     private static boolean registered = false;

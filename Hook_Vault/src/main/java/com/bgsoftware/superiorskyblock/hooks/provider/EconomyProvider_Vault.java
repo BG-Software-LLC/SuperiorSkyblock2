@@ -12,7 +12,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.math.BigDecimal;
 
-public final class EconomyProvider_Vault implements EconomyProvider {
+public class EconomyProvider_Vault implements EconomyProvider {
 
     private static Economy econ;
 

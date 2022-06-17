@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.container.value;
 
-public final class FixedValue<V extends Number> implements Value<V> {
+public class FixedValue<V extends Number> implements Value<V> {
 
     private final V value;
 

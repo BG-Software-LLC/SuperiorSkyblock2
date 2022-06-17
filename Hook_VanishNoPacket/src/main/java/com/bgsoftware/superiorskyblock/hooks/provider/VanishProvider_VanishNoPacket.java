@@ -2,7 +2,8 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
-import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.listener.PlayersListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,16 +13,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.kitteh.vanish.VanishPlugin;
 import org.kitteh.vanish.event.VanishStatusChangeEvent;
 
-public final class VanishProvider_VanishNoPacket implements VanishProvider, Listener {
+public class VanishProvider_VanishNoPacket implements VanishProvider, Listener {
 
     private static boolean alreadyEnabled = false;
 
     private final SuperiorSkyblockPlugin plugin;
     private final VanishPlugin instance;
+    private final Singleton<PlayersListener> playersListener;
 
     public VanishProvider_VanishNoPacket(SuperiorSkyblockPlugin plugin) {
-        instance = JavaPlugin.getPlugin(VanishPlugin.class);
         this.plugin = plugin;
+        this.instance = JavaPlugin.getPlugin(VanishPlugin.class);
+        this.playersListener = plugin.getListener(PlayersListener.class);
 
         if (!alreadyEnabled) {
             alreadyEnabled = true;
@@ -39,9 +42,9 @@ public final class VanishProvider_VanishNoPacket implements VanishProvider, List
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerVanish(VanishStatusChangeEvent e) {
         if (e.isVanishing()) {
-            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+            this.playersListener.get().notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         } else {
-            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
+            this.playersListener.get().notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(e.getPlayer()));
         }
     }
 

@@ -3,8 +3,9 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.dependencies.provider.SpawnersProvider_AutoDetect;
 import com.google.common.base.Preconditions;
 import de.candc.events.SpawnerBreakEvent;
 import de.candc.events.SpawnerPlaceEvent;
@@ -15,7 +16,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-public final class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetect {
+public class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetect {
 
     private static boolean registered = false;
 

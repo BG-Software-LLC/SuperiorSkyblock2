@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.listener.IStackedBlocksListener;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings({"deprecation", "unused"})
-public final class CoreProtectHook {
+public class CoreProtectHook {
 
     private static SuperiorSkyblockPlugin plugin;
     private static Plugin coreProtect;
@@ -23,9 +23,9 @@ public final class CoreProtectHook {
     }
 
     private static void recordBlockAction(OfflinePlayer offlinePlayer, Block block,
-                                         IStackedBlocksListener.Action action) {
+                                          IStackedBlocksListener.Action action) {
         if (!Bukkit.isPrimaryThread()) {
-            Executor.sync(() -> recordBlockAction(offlinePlayer, block, action));
+            BukkitExecutor.sync(() -> recordBlockAction(offlinePlayer, block, action));
             return;
         }
 

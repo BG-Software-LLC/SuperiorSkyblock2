@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.hooks.support;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -12,7 +12,7 @@ import com.comphenix.protocol.events.PacketEvent;
 
 import java.util.Locale;
 
-public final class ProtocolLibHook {
+public class ProtocolLibHook {
 
     private static SuperiorSkyblockPlugin plugin;
 
@@ -22,7 +22,7 @@ public final class ProtocolLibHook {
         protocolManager.addPacketListener(new ChangePlayerLanguageListener(plugin));
     }
 
-    private static final class ChangePlayerLanguageListener extends PacketAdapter {
+    private static class ChangePlayerLanguageListener extends PacketAdapter {
 
         private ChangePlayerLanguageListener(SuperiorSkyblockPlugin plugin) {
             super(plugin, PacketType.Play.Client.SETTINGS);

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks.support;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import me.robin.leaderheads.datacollectors.DataCollector;
 import me.robin.leaderheads.objects.BoardType;
 
@@ -14,7 +14,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
-public final class LeaderHeadsHook {
+public class LeaderHeadsHook {
 
     private static SuperiorSkyblockPlugin plugin;
 

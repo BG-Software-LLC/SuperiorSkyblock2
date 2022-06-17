@@ -5,16 +5,16 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import org.bukkit.command.CommandSender;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdAdminDeposit implements IAdminIslandCommand {
+public class CmdAdminDeposit implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -67,7 +67,7 @@ public final class CmdAdminDeposit implements IAdminIslandCommand {
         if (amount == null)
             return;
 
-        Executor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount)));
+        BukkitExecutor.data(() -> islands.forEach(island -> island.getIslandBank().depositAdminMoney(sender, amount)));
 
         if (targetPlayer == null)
             Message.ADMIN_DEPOSIT_MONEY_NAME.send(sender, Formatters.NUMBER_FORMATTER.format(amount), islands.size() == 1 ? islands.get(0).getName() : "all");

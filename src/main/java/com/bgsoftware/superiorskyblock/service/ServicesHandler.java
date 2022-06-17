@@ -9,7 +9,7 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 
-public final class ServicesHandler {
+public class ServicesHandler {
 
     private final SuperiorSkyblockPlugin plugin;
 

@@ -2,17 +2,17 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdAdminAddDisbands implements IAdminPlayerCommand {
+public class CmdAdminAddDisbands implements IAdminPlayerCommand {
     @Override
     public List<String> getAliases() {
         return Arrays.asList("adddisbands", "givedisbands");
@@ -64,7 +64,7 @@ public final class CmdAdminAddDisbands implements IAdminPlayerCommand {
 
         int amount = arguments.getNumber();
 
-        Executor.data(() -> targetPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(superiorPlayer.getDisbands() + amount)));
+        BukkitExecutor.data(() -> targetPlayers.forEach(superiorPlayer -> superiorPlayer.setDisbands(superiorPlayer.getDisbands() + amount)));
 
         if (targetPlayers.size() > 1) {
             Message.DISBAND_GIVE_ALL.send(sender, amount);

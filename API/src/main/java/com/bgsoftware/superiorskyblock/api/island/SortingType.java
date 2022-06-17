@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class SortingType implements Comparator<Island> {
+public class SortingType implements Comparator<Island> {
 
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
 

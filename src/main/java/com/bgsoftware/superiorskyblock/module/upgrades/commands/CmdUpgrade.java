@@ -6,14 +6,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
-import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdUpgrade implements ISuperiorCommand {
+public class CmdUpgrade implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

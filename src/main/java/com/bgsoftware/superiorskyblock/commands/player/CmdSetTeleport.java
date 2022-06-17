@@ -5,16 +5,16 @@ import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import org.bukkit.Location;
 
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdSetTeleport implements IPermissibleCommand {
+public class CmdSetTeleport implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {

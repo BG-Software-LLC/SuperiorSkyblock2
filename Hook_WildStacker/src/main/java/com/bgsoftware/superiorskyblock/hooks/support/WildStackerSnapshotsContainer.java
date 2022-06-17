@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.support;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
 import org.bukkit.Chunk;
@@ -9,7 +9,7 @@ import org.bukkit.Chunk;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class WildStackerSnapshotsContainer {
+public class WildStackerSnapshotsContainer {
 
     private static final Map<ChunkPosition, StackedSnapshot> cachedSnapshots = new ConcurrentHashMap<>();
 

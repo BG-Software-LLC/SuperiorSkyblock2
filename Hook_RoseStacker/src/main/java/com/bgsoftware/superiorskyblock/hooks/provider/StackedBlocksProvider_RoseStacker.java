@@ -4,11 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.logic.ProtectionLogic;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.dependencies.provider.StackedBlocksProvider_AutoDetect;
+import com.bgsoftware.superiorskyblock.listener.ProtectionListener;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.BlockStackEvent;
@@ -27,13 +26,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_AutoDetect {
+public class StackedBlocksProvider_RoseStacker implements StackedBlocksProvider_AutoDetect {
 
     private static boolean registered = false;
 
-    public StackedBlocksProvider_RoseStacker() {
+    private final SuperiorSkyblockPlugin plugin;
+    private final Singleton<ProtectionListener> protectionListener;
+
+    public StackedBlocksProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        this.protectionListener = plugin.getListener(ProtectionListener.class);
+
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
             SuperiorSkyblockPlugin.log("Using RoseStacker as a stacked-blocks provider.");
         }
@@ -58,10 +63,7 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
         return blockKeys.entrySet().stream().map(entry -> new Pair<>(entry.getKey(), entry.getValue())).collect(Collectors.toSet());
     }
 
-    @SuppressWarnings("unused")
-    private static final class StackerListener implements Listener {
-
-        private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBlockStack(BlockStackEvent e) {
@@ -84,37 +86,27 @@ public final class StackedBlocksProvider_RoseStacker implements StackedBlocksPro
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockStackProtection(BlockStackEvent e) {
-            if (!ProtectionLogic.handleBlockPlace(e.getStack().getBlock(), e.getPlayer(), true))
+            if (protectionListener.get().preventBlockPlace(e.getStack().getBlock(), e.getPlayer(),
+                    ProtectionListener.Flag.SEND_MESSAGES, ProtectionListener.Flag.PREVENT_OUTSIDE_ISLANDS))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockUnstackProtection(BlockUnstackEvent e) {
-            if (e.getPlayer() != null && !ProtectionLogic.handleBlockBreak(
-                    e.getStack().getBlock(), e.getPlayer(), true))
+            if (e.getPlayer() != null && protectionListener.get().preventBlockPlace(e.getStack().getBlock(), e.getPlayer(),
+                    ProtectionListener.Flag.SEND_MESSAGES, ProtectionListener.Flag.PREVENT_OUTSIDE_ISLANDS))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
         public void onBlockStackInteractionProtection(PlayerInteractEvent e) {
-            if (e.getClickedBlock() == null || !e.getPlayer().isSneaking())
-                return;
-
-            Island island = plugin.getGrid().getIslandAt(e.getClickedBlock().getLocation());
-
-            if (island == null)
-                return;
-
-            StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getClickedBlock());
-
-            if (stackedBlock == null)
-                return;
-
-            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
-
-            if (!island.hasPermission(superiorPlayer, IslandPrivileges.BUILD)) {
-                Message.PROTECTION.send(superiorPlayer);
-                e.setCancelled(true);
+            if (e.getClickedBlock() != null && e.getPlayer().isSneaking()) {
+                StackedBlock stackedBlock = RoseStackerAPI.getInstance().getStackedBlock(e.getClickedBlock());
+                if (stackedBlock != null) {
+                    if (protectionListener.get().preventBlockPlace(e.getClickedBlock(), e.getPlayer(),
+                            ProtectionListener.Flag.SEND_MESSAGES, ProtectionListener.Flag.PREVENT_OUTSIDE_ISLANDS))
+                        e.setCancelled(true);
+                }
             }
         }
 

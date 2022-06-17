@@ -7,12 +7,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.hooks.support.WildStackerSnapshotsContainer;
-import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.dependencies.provider.StackedBlocksProvider_AutoDetect;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -31,7 +31,7 @@ import org.bukkit.event.Listener;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public final class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
+public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_AutoDetect, StackedBlocksSnapshotProvider {
 
     private static boolean registered = false;
 

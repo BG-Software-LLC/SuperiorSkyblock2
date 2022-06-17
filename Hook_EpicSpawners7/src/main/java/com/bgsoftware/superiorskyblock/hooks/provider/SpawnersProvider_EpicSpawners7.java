@@ -5,12 +5,11 @@ import com.bgsoftware.superiorskyblock.api.hooks.SpawnersProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.key.ConstantKeys;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.google.common.base.Preconditions;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
@@ -26,7 +25,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
 @SuppressWarnings("unused")
-public final class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
+public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
 
     private static boolean registered = false;
 
@@ -82,7 +81,7 @@ public final class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
                 // Custom spawners are egg spawners. Therefore, we want to remove one egg spawner from the counts and
                 // replace it with the custom spawner. We subtract the spawner 1 tick later, so it will be registered
                 // before removing it.
-                Executor.sync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
+                BukkitExecutor.sync(() -> island.handleBlockBreak(ConstantKeys.EGG_MOB_SPAWNER, 1), 1L);
             } else {
                 // Vanilla spawners are listened in the vanilla listeners as well, and therefore 1 spawner is already
                 // being counted by the other listeners. We need to subtract 1 so the counts will be adjusted correctly.

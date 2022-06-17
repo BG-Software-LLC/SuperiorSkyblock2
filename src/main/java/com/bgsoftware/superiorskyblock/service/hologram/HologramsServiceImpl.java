@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.service.hologram.HologramsService;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-public final class HologramsServiceImpl implements HologramsService {
+public class HologramsServiceImpl implements HologramsService {
 
     private final SuperiorSkyblockPlugin plugin;
 

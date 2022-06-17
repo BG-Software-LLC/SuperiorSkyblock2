@@ -4,11 +4,11 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.schematic.BaseSchematic;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public final class WorldEditSchematic extends BaseSchematic implements Schematic {
+public class WorldEditSchematic extends BaseSchematic implements Schematic {
 
     private static ReflectMethod<Object> AT;
     private static ReflectMethod<EditSession> PASTE;

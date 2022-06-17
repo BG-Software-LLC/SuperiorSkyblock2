@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import java.util.Locale;
 
 @SuppressWarnings("unused")
-public final class PermissionsProvider_LuckPerms implements PermissionsProvider {
+public class PermissionsProvider_LuckPerms implements PermissionsProvider {
 
     private static LuckPerms luckPerms = null;
 

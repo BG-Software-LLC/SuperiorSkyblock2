@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-public final class NBTTags {
+public class NBTTags {
 
     public static final int TYPE_END = 0;
     public static final int TYPE_BYTE = 1;

@@ -6,7 +6,7 @@ import org.bukkit.World;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class ChunksProvider_Paper implements ChunksProvider {
+public class ChunksProvider_Paper implements ChunksProvider {
 
     @Override
     public CompletableFuture<Chunk> loadChunk(World world, int chunkX, int chunkZ) {

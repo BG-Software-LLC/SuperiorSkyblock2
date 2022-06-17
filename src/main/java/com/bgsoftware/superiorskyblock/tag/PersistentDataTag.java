@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataTypeContext
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public final class PersistentDataTag<E> extends Tag<E> {
+public class PersistentDataTag<E> extends Tag<E> {
 
     private final PersistentDataTypeContext<E> serializer;
 

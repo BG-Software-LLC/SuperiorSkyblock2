@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class DefaultPlayersContainer implements PlayersContainer {
+public class DefaultPlayersContainer implements PlayersContainer {
 
     private final Map<UUID, SuperiorPlayer> players = new ConcurrentHashMap<>();
     private final Map<String, SuperiorPlayer> playersByNames = new ConcurrentHashMap<>();

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.dependencies.provider.SpawnersProviderItemMetaSpawnerType;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -15,7 +16,7 @@ import skyblock.hassan.plugin.api.SpawnerStackEvent;
 import skyblock.hassan.plugin.api.SpawnerUnstackEvent;
 import skyblock.hassan.plugin.spawners.StackedSpawner;
 
-public final class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMetaSpawnerType {
+public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
 

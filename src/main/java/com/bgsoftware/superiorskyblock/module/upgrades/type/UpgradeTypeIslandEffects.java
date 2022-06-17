@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddEffect;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetEffect;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +14,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import java.util.Arrays;
 import java.util.List;
 
-public final class UpgradeTypeIslandEffects implements IUpgradeType {
+public class UpgradeTypeIslandEffects implements IUpgradeType {
 
     private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddEffect(),
             new CmdAdminSetEffect());
@@ -35,7 +35,7 @@ public final class UpgradeTypeIslandEffects implements IUpgradeType {
         return commands;
     }
 
-    private final class IslandEffectsListener implements Listener {
+    private class IslandEffectsListener implements Listener {
 
         @EventHandler(ignoreCancelled = true)
         public void onPlayerEffect(EntityPotionEffectEvent e) {

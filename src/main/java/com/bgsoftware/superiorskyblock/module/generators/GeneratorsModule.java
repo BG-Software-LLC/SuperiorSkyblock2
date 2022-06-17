@@ -3,17 +3,17 @@ package com.bgsoftware.superiorskyblock.module.generators;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
-import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminAddGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminClearGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGenerator;
+import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.event.Listener;
 
 import java.io.File;
 
-public final class GeneratorsModule extends BuiltinModule {
+public class GeneratorsModule extends BuiltinModule {
 
     private boolean enabled = true;
     private boolean matchGeneratorWorld = true;

@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class CmdAdminPurge implements ISuperiorCommand {
+public class CmdAdminPurge implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -67,7 +67,7 @@ public final class CmdAdminPurge implements ISuperiorCommand {
             if (islands.isEmpty()) {
                 Message.NO_ISLANDS_TO_PURGE.send(sender);
             } else {
-                Executor.async(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
+                BukkitExecutor.async(() -> islands.forEach(island -> plugin.getGrid().addIslandToPurge(island)));
                 Message.PURGED_ISLANDS.send(sender, islands.size());
             }
         }

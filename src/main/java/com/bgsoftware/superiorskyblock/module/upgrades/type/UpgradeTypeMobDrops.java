@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetMobDrops;
-import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class UpgradeTypeMobDrops implements IUpgradeType {
+public class UpgradeTypeMobDrops implements IUpgradeType {
 
     private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddMobDrops(),
             new CmdAdminSetMobDrops());
@@ -43,7 +43,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
         return commands;
     }
 
-    private final class MobDropsListener implements Listener {
+    private class MobDropsListener implements Listener {
 
         // Priority is set to HIGH for fixing detection with WildStacker
         // https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/540
@@ -62,7 +62,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
             if (island == null)
                 return;
 
-            EntityUtils.cacheEntityEquipment(livingEntity);
+            BukkitEntities.cacheEntityEquipment(livingEntity);
         }
 
         @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -78,7 +78,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
             if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
                 EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
                 if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
-                        EntityUtils.getPlayerDamager((EntityDamageByEntityEvent) lastDamage) == null)
+                        BukkitEntities.getPlayerDamager((EntityDamageByEntityEvent) lastDamage) == null)
                     return;
             }
 
@@ -87,7 +87,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
             if (mobDropsMultiplier > 1) {
                 List<ItemStack> dropItems = new ArrayList<>(e.getDrops());
                 for (ItemStack itemStack : dropItems) {
-                    if (itemStack != null && !EntityUtils.isEquipment(e.getEntity(), itemStack) &&
+                    if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack) &&
                             !plugin.getNMSTags().getNBTTag(itemStack).containsKey("WildChests")) {
                         int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);
 
@@ -123,7 +123,7 @@ public final class UpgradeTypeMobDrops implements IUpgradeType {
                 }
             }
 
-            EntityUtils.clearEntityEquipment(e.getEntity());
+            BukkitEntities.clearEntityEquipment(e.getEntity());
         }
 
     }

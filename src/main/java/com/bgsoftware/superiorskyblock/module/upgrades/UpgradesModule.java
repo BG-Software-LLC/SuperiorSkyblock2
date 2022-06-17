@@ -7,11 +7,9 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
+import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
@@ -24,10 +22,12 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
-import com.bgsoftware.superiorskyblock.upgrade.SUpgrade;
-import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.upgrade.UpgradeRequirement;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.module.BuiltinModule;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -46,7 +46,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public final class UpgradesModule extends BuiltinModule {
+public class UpgradesModule extends BuiltinModule {
 
     private static final int MAX_UPGRADES_NAME_LENGTH = 255;
 

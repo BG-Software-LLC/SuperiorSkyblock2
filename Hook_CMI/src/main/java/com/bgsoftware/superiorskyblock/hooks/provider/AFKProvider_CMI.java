@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 
-public final class AFKProvider_CMI implements AFKProvider {
+public class AFKProvider_CMI implements AFKProvider {
 
     public AFKProvider_CMI() {
         SuperiorSkyblockPlugin.log("Hooked into CMI for support of afk status of players.");

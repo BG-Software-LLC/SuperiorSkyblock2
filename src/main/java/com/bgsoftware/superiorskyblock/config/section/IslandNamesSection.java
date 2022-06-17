@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
 import java.util.List;
 
-public final class IslandNamesSection implements SettingsManager.IslandNames {
+public class IslandNamesSection implements SettingsManager.IslandNames {
 
     private final SettingsContainer container;
 

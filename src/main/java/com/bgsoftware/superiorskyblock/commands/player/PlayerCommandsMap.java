@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.commands.CommandsMap;
 
-public final class PlayerCommandsMap extends CommandsMap {
+public class PlayerCommandsMap extends CommandsMap {
 
     public PlayerCommandsMap(SuperiorSkyblockPlugin plugin) {
         super(plugin);

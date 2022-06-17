@@ -7,18 +7,18 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -33,7 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
-public final class SIslandBank implements IslandBank {
+public class SIslandBank implements IslandBank {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final BigDecimal MONEY_FAILURE = BigDecimal.valueOf(-1);
@@ -101,7 +101,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        if (StringUtils.isBlank(failureReason)) {
+        if (Text.isBlank(failureReason)) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED,
                     position, System.currentTimeMillis(), "", amount);
             increaseBalance(amount);
@@ -197,7 +197,7 @@ public final class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        if (StringUtils.isBlank(failureReason)) {
+        if (Text.isBlank(failureReason)) {
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
             decreaseBalance(withdrawAmount);
 

@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 @SuppressWarnings("unused")
-public final class ChangeSkinHook implements Listener {
+public class ChangeSkinHook implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
 

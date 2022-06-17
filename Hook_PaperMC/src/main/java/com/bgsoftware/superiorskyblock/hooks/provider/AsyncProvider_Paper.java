@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
+import com.bgsoftware.superiorskyblock.dependencies.provider.AsyncProvider;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import java.util.function.Consumer;
 
-public final class AsyncProvider_Paper implements AsyncProvider {
+public class AsyncProvider_Paper implements AsyncProvider {
 
     @Override
     public void teleport(Entity entity, Location location, Consumer<Boolean> teleportResult) {

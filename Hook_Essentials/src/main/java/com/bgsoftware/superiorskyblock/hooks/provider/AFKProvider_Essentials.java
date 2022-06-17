@@ -7,7 +7,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class AFKProvider_Essentials implements AFKProvider {
+public class AFKProvider_Essentials implements AFKProvider {
 
     private final Essentials instance;
 

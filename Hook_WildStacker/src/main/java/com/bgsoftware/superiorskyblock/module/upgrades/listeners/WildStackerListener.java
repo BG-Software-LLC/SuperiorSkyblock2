@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 
 import javax.annotation.Nullable;
 
-public final class WildStackerListener implements Listener {
+public class WildStackerListener implements Listener {
 
     @Nullable
     private final UpgradeTypeSpawnerRates spawnerRates = BuiltinModules.UPGRADES

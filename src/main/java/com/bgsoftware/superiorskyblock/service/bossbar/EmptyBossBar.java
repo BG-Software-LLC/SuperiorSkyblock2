@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.service.bossbar;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import org.bukkit.entity.Player;
 
-public final class EmptyBossBar implements BossBar {
+public class EmptyBossBar implements BossBar {
 
     private static final EmptyBossBar INSTANCE = new EmptyBossBar();
 

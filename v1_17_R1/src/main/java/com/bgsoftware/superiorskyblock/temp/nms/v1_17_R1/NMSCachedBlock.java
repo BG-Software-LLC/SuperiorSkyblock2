@@ -1,0 +1,21 @@
+package com.bgsoftware.superiorskyblock.temp.nms.v1_17_R1;
+
+import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+
+public class NMSCachedBlock implements ICachedBlock {
+
+    private final BlockData blockData;
+
+    public NMSCachedBlock(Block block) {
+        this.blockData = block.getBlockData();
+    }
+
+    @Override
+    public void setBlock(Location location) {
+        location.getWorld().getBlockAt(location).setBlockData(blockData);
+    }
+
+}

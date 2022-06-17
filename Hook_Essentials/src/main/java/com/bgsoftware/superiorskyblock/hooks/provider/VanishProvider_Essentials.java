@@ -2,7 +2,8 @@ package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
-import com.bgsoftware.superiorskyblock.utils.logic.PlayersLogic;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.listener.PlayersListener;
 import com.earth2me.essentials.Essentials;
 import net.ess3.api.events.VanishStatusChangeEvent;
 import org.bukkit.Bukkit;
@@ -12,16 +13,18 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class VanishProvider_Essentials implements VanishProvider, Listener {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class VanishProvider_Essentials implements VanishProvider, Listener {
 
     private static boolean alreadyEnabled = false;
 
+    private final SuperiorSkyblockPlugin plugin;
     private final Essentials instance;
+    private final Singleton<PlayersListener> playersListener;
 
-    public VanishProvider_Essentials() {
-        instance = JavaPlugin.getPlugin(Essentials.class);
+    public VanishProvider_Essentials(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        this.instance = JavaPlugin.getPlugin(Essentials.class);
+        this.playersListener = plugin.getListener(PlayersListener.class);
 
         if (!alreadyEnabled) {
             alreadyEnabled = true;
@@ -40,9 +43,9 @@ public final class VanishProvider_Essentials implements VanishProvider, Listener
     public void onPlayerVanish(VanishStatusChangeEvent e) {
         Player affectedPlayer = e.getAffected() == null ? e.getController().getBase() : e.getAffected().getBase();
         if (e.getValue()) {
-            PlayersLogic.handleQuit(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
+            this.playersListener.get().notifyPlayerQuit(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         } else {
-            PlayersLogic.handleJoin(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
+            this.playersListener.get().notifyPlayerJoin(plugin.getPlayers().getSuperiorPlayer(affectedPlayer));
         }
     }
 

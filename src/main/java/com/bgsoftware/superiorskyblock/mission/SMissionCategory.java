@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import java.util.Collections;
 import java.util.List;
 
-public final class SMissionCategory implements MissionCategory {
+public class SMissionCategory implements MissionCategory {
 
     private final String name;
     private final int slot;

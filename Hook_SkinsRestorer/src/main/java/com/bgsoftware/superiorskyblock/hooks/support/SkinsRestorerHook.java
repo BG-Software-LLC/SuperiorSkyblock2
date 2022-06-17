@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.hooks.support;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.events.SkinApplyBukkitEvent;
@@ -17,7 +17,7 @@ import skinsrestorer.shared.exception.SkinRequestException;
 import skinsrestorer.shared.storage.SkinStorage;
 
 @SuppressWarnings("unused")
-public final class SkinsRestorerHook {
+public class SkinsRestorerHook {
 
     private static SuperiorSkyblockPlugin plugin;
     private static ISkinsRestorer skinsRestorer = null;
@@ -36,13 +36,13 @@ public final class SkinsRestorerHook {
 
     private static void setSkinTexture(SuperiorPlayer superiorPlayer) {
         if (Bukkit.isPrimaryThread()) {
-            Executor.async(() -> setSkinTexture(superiorPlayer));
+            BukkitExecutor.async(() -> setSkinTexture(superiorPlayer));
             return;
         }
 
         Property property = skinsRestorer.getSkin(superiorPlayer);
         if (property != null)
-            Executor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
+            BukkitExecutor.sync(() -> plugin.getNMSPlayers().setSkinTexture(superiorPlayer, property));
     }
 
     interface ISkinsRestorer {
@@ -51,7 +51,7 @@ public final class SkinsRestorerHook {
 
     }
 
-    private static final class SkinsRestorerOld implements ISkinsRestorer {
+    private static class SkinsRestorerOld implements ISkinsRestorer {
 
         @Override
         public Property getSkin(SuperiorPlayer superiorPlayer) {
@@ -66,7 +66,7 @@ public final class SkinsRestorerHook {
 
     }
 
-    private static final class SkinsRestorerNew implements ISkinsRestorer {
+    private static class SkinsRestorerNew implements ISkinsRestorer {
 
         private static final ReflectMethod<Object> SKINS_RESTORER_GET_SKIN = new ReflectMethod<>(SkinsRestorerAPI.class, "getSkinData", String.class);
 
@@ -81,11 +81,11 @@ public final class SkinsRestorerHook {
 
     }
 
-    private static final class SkinsListener implements Listener {
+    private static class SkinsListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSkinApply(SkinApplyBukkitEvent event) {
-            if(event.getProperty() instanceof Property) {
+            if (event.getProperty() instanceof Property) {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(event.getWho());
                 plugin.getNMSPlayers().setSkinTexture(superiorPlayer, (Property) event.getProperty());
             }

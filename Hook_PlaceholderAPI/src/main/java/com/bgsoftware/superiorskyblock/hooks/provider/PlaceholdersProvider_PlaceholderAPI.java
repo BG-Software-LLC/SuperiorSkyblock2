@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.hooks.provider;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.dependencies.provider.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -8,7 +9,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("unused")
-public final class PlaceholdersProvider_PlaceholderAPI implements PlaceholdersProvider {
+public class PlaceholdersProvider_PlaceholderAPI implements PlaceholdersProvider {
 
     private final SuperiorSkyblockPlugin plugin;
 

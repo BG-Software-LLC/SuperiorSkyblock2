@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public final class CmdAdminSetChestRow implements IAdminIslandCommand {
+public class CmdAdminSetChestRow implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -84,7 +84,7 @@ public final class CmdAdminSetChestRow implements IAdminIslandCommand {
             return;
         }
 
-        Executor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
+        BukkitExecutor.data(() -> islands.forEach(island -> island.setChestRows(page - 1, rows)));
 
         if (islands.size() > 1)
             Message.CHANGED_CHEST_SIZE_ALL.send(sender, page, rows);

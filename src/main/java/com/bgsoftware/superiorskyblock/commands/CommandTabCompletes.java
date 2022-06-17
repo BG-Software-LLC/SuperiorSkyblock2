@@ -9,9 +9,9 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.menu.impl.internal.SuperiorMenuCustom;
-import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuCustom;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public final class CommandTabCompletes {
+public class CommandTabCompletes {
 
     private CommandTabCompletes() {
 
@@ -201,7 +201,7 @@ public final class CommandTabCompletes {
     public static List<String> getEntitiesForLimit(String argument) {
         String lowerArgument = argument.toLowerCase(Locale.ENGLISH);
         return Stream.of(EntityType.values())
-                .filter(EntityUtils::canHaveLimit)
+                .filter(BukkitEntities::canHaveLimit)
                 .map(entityType -> entityType.name().toLowerCase(Locale.ENGLISH))
                 .filter(entityTypeName -> entityTypeName.contains(lowerArgument))
                 .collect(Collectors.toList());

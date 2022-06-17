@@ -4,9 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.dependencies.provider.SpawnersProviderItemMetaSpawnerType;
 import com.google.common.base.Preconditions;
 import com.songoda.ultimatestacker.UltimateStacker;
 import com.songoda.ultimatestacker.events.SpawnerBreakEvent;
@@ -17,7 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-public final class SpawnersProvider_UltimateStacker implements SpawnersProviderItemMetaSpawnerType {
+public class SpawnersProvider_UltimateStacker implements SpawnersProviderItemMetaSpawnerType {
 
     private static boolean registered = false;
 

@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBarsService;
 import org.bukkit.entity.Player;
 
-public final class BossBarsServiceImpl implements BossBarsService {
+public class BossBarsServiceImpl implements BossBarsService {
 
     private final SuperiorSkyblockPlugin plugin;
 
