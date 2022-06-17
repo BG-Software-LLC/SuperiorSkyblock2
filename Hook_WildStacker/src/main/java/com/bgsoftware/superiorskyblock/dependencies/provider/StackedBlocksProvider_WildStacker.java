@@ -7,11 +7,11 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.CustomKeyParser;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.dependencies.support.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.dependencies.support.WildStackerSnapshotsContainer;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceEvent;
 import com.bgsoftware.wildstacker.api.events.BarrelPlaceInventoryEvent;
@@ -34,9 +34,12 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
     private static boolean registered = false;
 
-    public StackedBlocksProvider_WildStacker() {
+    private final SuperiorSkyblockPlugin plugin;
+
+    public StackedBlocksProvider_WildStacker(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
 
             SuperiorSkyblockAPI.getBlockValues().registerKeyParser(new CustomKeyParser() {
@@ -88,9 +91,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onBarrelPlace(BarrelPlaceEvent e) {

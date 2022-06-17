@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.dependencies.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
@@ -30,6 +29,8 @@ import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
 import com.bgsoftware.superiorskyblock.core.menu.MenusManagerImpl;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlocksManagerImpl;
+import com.bgsoftware.superiorskyblock.core.stackedblocks.container.DefaultStackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.core.task.CalcTask;
 import com.bgsoftware.superiorskyblock.core.task.ShutdownTask;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -37,6 +38,7 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockWorthValuesContainer;
 import com.bgsoftware.superiorskyblock.core.values.container.GeneralBlockValuesContainer;
+import com.bgsoftware.superiorskyblock.dependencies.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
@@ -77,8 +79,6 @@ import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceI
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
-import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlocksManagerImpl;
-import com.bgsoftware.superiorskyblock.core.stackedblocks.container.DefaultStackedBlocksContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -401,8 +401,15 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     private <T> T loadNMSClass(String className, String version) throws Exception {
-        // noinspection unchecked
-        return (T) Class.forName(String.format("com.bgsoftware.superiorskyblock.temp.nms.%s.%s", version, className)).newInstance();
+        Class<?> nmsClass = Class.forName(String.format("com.bgsoftware.superiorskyblock.nms.%s.%s", version, className));
+        try {
+            Constructor<?> constructor = nmsClass.getConstructor(SuperiorSkyblockPlugin.class);
+            // noinspection unchecked
+            return (T) constructor.newInstance(this);
+        } catch (NoSuchMethodException error) {
+            // noinspection unchecked
+            return (T) nmsClass.newInstance();
+        }
     }
 
     public ChunkGenerator getGenerator() {

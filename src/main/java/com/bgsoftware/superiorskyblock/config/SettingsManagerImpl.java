@@ -20,8 +20,8 @@ import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
 import com.bgsoftware.superiorskyblock.config.section.VoidTeleportSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -556,7 +556,6 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     }
 
     public void updateValue(String path, Object value) throws IOException {
-        SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
         File file = new File(plugin.getDataFolder(), "config.yml");
 
         if (!file.exists())

@@ -13,11 +13,6 @@ public class CompletableFutureList<E> extends ArrayList<CompletableFuture<E>> {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public CompletableFutureList() {
-
-    }
-
-    public CompletableFutureList(ArrayList<CompletableFuture<E>> other) {
-        super(other);
     }
 
     public void forEachCompleted(Consumer<? super E> consumer, Consumer<Throwable> onFailure) {

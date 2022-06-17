@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.dependencies.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.google.common.base.Preconditions;
 import de.candc.events.SpawnerBreakEvent;
 import de.candc.events.SpawnerPlaceEvent;
@@ -19,9 +19,12 @@ public class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetec
 
     private static boolean registered = false;
 
-    public SpawnersProvider_SilkSpawners() {
+    private final SuperiorSkyblockPlugin plugin;
+
+    public SpawnersProvider_SilkSpawners(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_SilkSpawners.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_SilkSpawners.StackerListener(), plugin);
             registered = true;
             SuperiorSkyblockPlugin.log("Using SilkSpawners as a spawners provider.");
         }
@@ -40,9 +43,7 @@ public class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetec
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(SpawnerPlaceEvent e) {

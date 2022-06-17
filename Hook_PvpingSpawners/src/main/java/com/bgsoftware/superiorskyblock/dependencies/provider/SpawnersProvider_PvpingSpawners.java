@@ -19,12 +19,14 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
 
     private static boolean registered = false;
 
+    private final SuperiorSkyblockPlugin plugin;
     private final Main main;
 
-    public SpawnersProvider_PvpingSpawners() {
+    public SpawnersProvider_PvpingSpawners(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         main = (Main) Bukkit.getPluginManager().getPlugin("PvpingSpawners");
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
             SuperiorSkyblockPlugin.log("Using PvpingSpawners as a spawners provider.");
         }
@@ -44,9 +46,7 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e) {

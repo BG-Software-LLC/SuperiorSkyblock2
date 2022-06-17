@@ -23,16 +23,17 @@ import org.bukkit.inventory.ItemStack;
 
 public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect {
 
-    private static ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE = null;
+    private static ReflectMethod<EntityType> GET_STACKED_ITEM_ENTITY_TYPE =
+            new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
     private static boolean registered = false;
 
-    public SpawnersProvider_RoseStacker() {
+    private final SuperiorSkyblockPlugin plugin;
+
+    public SpawnersProvider_RoseStacker(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
-
-            GET_STACKED_ITEM_ENTITY_TYPE = new ReflectMethod<>(StackerUtils.class, "getStackedItemEntityType", ItemStack.class);
-
             SuperiorSkyblockPlugin.log("Using RoseStacker as a spawners provider.");
         }
     }
@@ -60,9 +61,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerStackEvent e) {

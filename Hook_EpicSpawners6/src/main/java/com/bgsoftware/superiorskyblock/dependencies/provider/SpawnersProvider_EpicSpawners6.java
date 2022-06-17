@@ -4,11 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.google.common.base.Preconditions;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
@@ -28,10 +28,12 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
     private static boolean registered = false;
 
     private final EpicSpawners instance = EpicSpawners.getInstance();
+    private final SuperiorSkyblockPlugin plugin;
 
-    public SpawnersProvider_EpicSpawners6() {
+    public SpawnersProvider_EpicSpawners6(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
             SuperiorSkyblockPlugin.log("Using EpicSpawners as a spawners provider.");
         }
@@ -60,9 +62,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onSpawnerStack(SpawnerPlaceEvent e) {

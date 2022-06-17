@@ -18,11 +18,13 @@ public class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     private static final ReflectMethod<Set<Shop>> GET_SHOPS_METHOD = new ReflectMethod<>(ShopManager.class, Set.class, "getShops");
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
-    private static final KeyMap<Double> cachedPrices = KeyMap.createConcurrentKeyMap();
+    private final ShopGuiPlugin shopPlugin = ShopGuiPlugin.getInstance();
+    private final KeyMap<Double> cachedPrices = KeyMap.createConcurrentKeyMap();
 
-    public PricesProvider_ShopGUIPlus() {
+    private final SuperiorSkyblockPlugin plugin;
+
+    public PricesProvider_ShopGUIPlus(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         SuperiorSkyblockPlugin.log("Using ShopGUIPlus as a prices provider.");
     }
 

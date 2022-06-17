@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.dependencies.provider;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.google.common.base.Preconditions;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
@@ -20,9 +20,12 @@ public class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDete
 
     private static boolean registered = false;
 
-    public SpawnersProvider_MergedSpawner() {
+    private final SuperiorSkyblockPlugin plugin;
+
+    public SpawnersProvider_MergedSpawner(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
         if (!registered) {
-            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), SuperiorSkyblockPlugin.getPlugin());
+            Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), plugin);
             registered = true;
             SuperiorSkyblockPlugin.log("Using MergedSpawner as a spawners provider.");
         }
@@ -48,9 +51,7 @@ public class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDete
     }
 
     @SuppressWarnings("unused")
-    private static class StackerListener implements Listener {
-
-        private final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private class StackerListener implements Listener {
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerStack(MergedSpawnerPlaceEvent e) {
