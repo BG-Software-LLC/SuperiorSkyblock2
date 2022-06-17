@@ -38,7 +38,7 @@ import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockLevelsContainer;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockWorthValuesContainer;
 import com.bgsoftware.superiorskyblock.core.values.container.GeneralBlockValuesContainer;
-import com.bgsoftware.superiorskyblock.dependencies.ProvidersManagerImpl;
+import com.bgsoftware.superiorskyblock.external.ProvidersManagerImpl;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.bgsoftware.superiorskyblock.island.container.DefaultIslandsContainer;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;

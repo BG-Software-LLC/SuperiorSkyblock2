@@ -97,7 +97,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         if (Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit")) {
             try {
                 Class.forName("com.boydti.fawe.object.schematic.Schematic");
-                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.schematic.parser.FAWESchematicParser").newInstance();
+                SchematicParser schematicParser = (SchematicParser) Class.forName("com.bgsoftware.superiorskyblock.world.schematic.parser.FAWESchematicParser").newInstance();
                 this.schematicsContainer.addSchematicParser(schematicParser);
             } catch (Exception ignored) {
             }
