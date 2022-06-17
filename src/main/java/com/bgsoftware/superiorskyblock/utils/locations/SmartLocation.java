@@ -9,11 +9,11 @@ import org.bukkit.World;
  */
 public final class SmartLocation extends Location {
 
-    private String worldName;
+    private final String worldName;
 
     public SmartLocation(String worldName, double x, double y, double z, float pitch, float yaw) {
         super(Bukkit.getWorld(worldName), x, y, z, pitch, yaw);
-        this.worldName = super.getWorld() == null ? worldName : null;
+        this.worldName = worldName;
     }
 
     @Override
@@ -22,13 +22,6 @@ public final class SmartLocation extends Location {
             setWorld(Bukkit.getWorld(worldName));
 
         return super.getWorld();
-    }
-
-    @Override
-    public void setWorld(World world) {
-        super.setWorld(world);
-        if (world != null)
-            worldName = null;
     }
 
     public String getWorldName() {
