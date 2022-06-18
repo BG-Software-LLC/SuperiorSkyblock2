@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
@@ -16,7 +17,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -46,35 +46,45 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
 
     private static PagedMenuPattern<SuperiorMenuSettings, ItemStack> menuPattern;
 
-    private static final List<String> pathSlots = new ArrayList<>();
+    private static final Map<String, List<String>> pathSlots = new HashMap<>();
     private static final String[] ignorePaths = new String[]{"database", "max-island-size", "island-roles",
             "worlds.normal-world", "commands-cooldown", "starter-chest", "event-commands"};
-    private static final Map<UUID, Integer> lastPage = new HashMap<>();
+
+    private static final Map<UUID, ISuperiorMenu> lastPage = new HashMap<>();
+
     private static final Set<UUID> pageMove = new HashSet<>();
     private static final Set<UUID> activePlayers = new HashSet<>();
 
     private static CommentedConfiguration config;
 
-    private SuperiorMenuSettings(SuperiorPlayer superiorPlayer) {
+    private final String configurationPath;
+
+    private SuperiorMenuSettings(SuperiorPlayer superiorPlayer, String configurationPath) {
         super(menuPattern, superiorPlayer, true);
+        this.configurationPath = configurationPath;
         setPageMoveRunnable(_superiorPlayer -> pageMove.add(_superiorPlayer.getUniqueId()));
     }
 
     @Override
     public void cloneAndOpen(ISuperiorMenu previousMenu) {
-        openInventory(inventoryViewer, previousMenu);
+        openInventory(inventoryViewer, previousMenu, currentPage, configurationPath);
+    }
+
+    @Override
+    protected String replaceTitle(String title) {
+        return configurationPath.isEmpty() ? title : ChatColor.BOLD + "Section: " + configurationPath;
     }
 
     @Override
     protected List<ItemStack> requestObjects() {
         List<ItemStack> itemStacks = new ArrayList<>();
-        buildFromSection(itemStacks, config.getConfigurationSection(""));
+        buildFromSection(itemStacks, config.getConfigurationSection(this.configurationPath));
         return itemStacks;
     }
 
     @Override
     public void open(ISuperiorMenu previousMenu) {
-        lastPage.put(inventoryViewer.getUniqueId(), currentPage);
+        lastPage.put(inventoryViewer.getUniqueId(), this);
         super.open(previousMenu);
     }
 
@@ -82,7 +92,8 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
     public void closeInventory(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer) {
         super.closeInventory(plugin, superiorPlayer);
 
-        if (!activePlayers.remove(superiorPlayer.getUniqueId()) && !pageMove.remove(superiorPlayer.getUniqueId())) {
+        if ((!previousMove || previousMenu == null) && !activePlayers.remove(superiorPlayer.getUniqueId()) &&
+                !pageMove.remove(superiorPlayer.getUniqueId())) {
             reloadConfiguration();
             lastPage.remove(superiorPlayer.getUniqueId());
         }
@@ -98,6 +109,7 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
 
         menuPattern = patternBuilder
                 .setTitle(ChatColor.BOLD + "Settings Editor")
+                .setPreviousMoveAllowed(true)
                 .setInventoryType(InventoryType.CHEST)
                 .setRowsSize(6)
                 .setButton(47, new DummyButton.Builder<SuperiorMenuSettings>()
@@ -119,44 +131,18 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
     }
 
     public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu) {
-        openInventory(superiorPlayer, previousMenu, 1);
+        openInventory(superiorPlayer, previousMenu, 1, "");
     }
 
-    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, int page) {
-        SuperiorMenuSettings superiorMenuSettings = new SuperiorMenuSettings(superiorPlayer);
+    public static void openInventory(SuperiorPlayer superiorPlayer, ISuperiorMenu previousMenu, int page, String path) {
+        SuperiorMenuSettings superiorMenuSettings = new SuperiorMenuSettings(superiorPlayer, path);
         superiorMenuSettings.currentPage = page;
         superiorMenuSettings.open(previousMenu);
     }
 
     private static boolean onPlayerChat(Player player, Object message, String path) {
         if (!message.toString().equalsIgnoreCase("-cancel")) {
-            if (config.isConfigurationSection(path)) {
-                Matcher matcher;
-                if (!(matcher = Pattern.compile("(.*):(.*)").matcher(message.toString())).matches()) {
-                    player.sendMessage(ChatColor.RED + "Please follow the <sub-section>:<value> format");
-                } else {
-                    path = path + "." + matcher.group(1);
-                    message = matcher.group(2);
-
-                    if (config.get(path) != null && config.get(path).toString().equals(message)) {
-                        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Removed the value " + matcher.group(1) + " from " + path);
-                        message = null;
-                    } else {
-                        player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Added the value " + message.toString() + " to " + path);
-
-                        try {
-                            message = Integer.valueOf(message.toString());
-                        } catch (IllegalArgumentException ex) {
-                            if (message.toString().equalsIgnoreCase("true") || message.toString().equalsIgnoreCase("false")) {
-                                message = Boolean.valueOf(message.toString());
-                            }
-                        }
-
-                    }
-
-                    config.set(path, message);
-                }
-            } else if (config.isList(path)) {
+            if (config.isList(path)) {
                 List<String> list = config.getStringList(path);
 
                 if (list.contains(message.toString())) {
@@ -205,13 +191,16 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
 
     private static void reopenMenu(Player player) {
         BukkitExecutor.sync(() -> {
-            Integer page = lastPage.remove(player.getUniqueId());
-
-            if (page == null)
-                page = 1;
-
             PlayerChat.remove(player);
-            SuperiorMenuSettings.openInventory(plugin.getPlayers().getSuperiorPlayer(player), null, Math.max(1, page));
+
+            ISuperiorMenu previousMenu = lastPage.remove(player.getUniqueId());
+            if (previousMenu != null) {
+                previousMenu.cloneAndOpen(previousMenu.getPreviousMenu());
+            } else {
+                SuperiorMenuSettings.openInventory(plugin.getPlayers().getSuperiorPlayer(player), null);
+            }
+
+
         });
     }
 
@@ -235,37 +224,37 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
     }
 
     private static void buildFromSection(List<ItemStack> itemStacks, ConfigurationSection section) {
+        List<String> pathSlots = new ArrayList<>();
+
         for (String path : section.getKeys(false)) {
             String fullPath = section.getCurrentPath().isEmpty() ? path : section.getCurrentPath() + "." + path;
 
             if (Arrays.stream(ignorePaths).anyMatch(fullPath::contains))
                 continue;
 
-            if (section.isConfigurationSection(path)) {
-                buildFromSection(itemStacks, section.getConfigurationSection(path));
-            } else {
-                ItemBuilder itemBuilder = new ItemBuilder(Materials.CLOCK.toBukkitItem()).withName("&6" +
-                        Formatters.CAPITALIZED_FORMATTER.format(fullPath.replace("-", "_")
-                                .replace(".", "_").replace(" ", "_"))
-                );
+            ItemBuilder itemBuilder = new ItemBuilder(Materials.CLOCK.toBukkitItem()).withName("&6" +
+                    Formatters.CAPITALIZED_FORMATTER.format(path.replace("-", "_")
+                            .replace(".", "_").replace(" ", "_"))
+            );
 
-                if (section.isBoolean(path))
-                    itemBuilder.withLore("&7Value: " + section.getBoolean(path));
-                else if (section.isInt(path))
-                    itemBuilder.withLore("&7Value: " + section.getInt(path));
-                else if (section.isDouble(path))
-                    itemBuilder.withLore("&7Value: " + section.getDouble(path));
-                else if (section.isString(path))
-                    itemBuilder.withLore("&7Value: " + section.getString(path));
-                else if (section.isList(path))
-                    itemBuilder.withLore("&7Value:", section.getStringList(path));
-                else if (section.isConfigurationSection(path))
-                    itemBuilder.withLore("&7Value:", section.getConfigurationSection(path));
+            if (section.isBoolean(path))
+                itemBuilder.withLore("&7Value: " + section.getBoolean(path));
+            else if (section.isInt(path))
+                itemBuilder.withLore("&7Value: " + section.getInt(path));
+            else if (section.isDouble(path))
+                itemBuilder.withLore("&7Value: " + section.getDouble(path));
+            else if (section.isString(path))
+                itemBuilder.withLore("&7Value: " + section.getString(path));
+            else if (section.isList(path))
+                itemBuilder.withLore("&7Value:", section.getStringList(path));
+            else if (section.isConfigurationSection(path))
+                itemBuilder.withLore("&7Click to edit section.");
 
-                pathSlots.add(fullPath);
-                itemStacks.add(itemBuilder.build());
-            }
+            pathSlots.add(path);
+            itemStacks.add(itemBuilder.build());
         }
+
+        SuperiorMenuSettings.pathSlots.put(section.getCurrentPath(), pathSlots);
     }
 
     private static class SaveButton extends SuperiorMenuButton<SuperiorMenuSettings> {
@@ -313,31 +302,44 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
                                   InventoryClickEvent clickEvent) {
             try {
                 Player player = (Player) clickEvent.getWhoClicked();
-                String path = pathSlots.get((superiorMenu.currentPage - 1) * 36 + clickEvent.getRawSlot());
+                String sectionPath = pathSlots.get(superiorMenu.configurationPath).get((superiorMenu.currentPage - 1) * 36 + clickEvent.getRawSlot());
 
-                if (path == null)
+                if (sectionPath == null)
                     return;
 
-                if (config.isBoolean(path)) {
-                    updateConfig(player, path, !config.getBoolean(path));
-                    activePlayers.add(player.getUniqueId());
+                String fullPath = superiorMenu.configurationPath.isEmpty() ? sectionPath :
+                        superiorMenu.configurationPath + "." + sectionPath;
 
+                if (config.isConfigurationSection(fullPath)) {
+                    prepareClose(player, superiorMenu);
+                    openInventory(superiorMenu.inventoryViewer, superiorMenu, 1, fullPath);
+                } else if (config.isBoolean(fullPath)) {
+                    updateConfig(player, fullPath, !config.getBoolean(fullPath));
+
+                    prepareClose(player, superiorMenu);
                     superiorMenu.closePage();
+
                     reopenMenu(player);
                 } else {
-                    activePlayers.add(player.getUniqueId());
-                    PlayerChat.listen(player, message -> onPlayerChat(player, message, path));
+                    PlayerChat.listen(player, message -> onPlayerChat(player, message, fullPath));
 
+                    prepareClose(player, superiorMenu);
                     player.closeInventory();
+
                     player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " Please enter a new value (-cancel to cancel):");
 
-                    if (config.isList(path) || config.isConfigurationSection(path)) {
+                    if (config.isList(fullPath)) {
                         player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
                     }
                 }
             } catch (Exception error) {
                 PluginDebugger.debug(error);
             }
+        }
+
+        private void prepareClose(Player player, SuperiorMenuSettings superiorMenu) {
+            superiorMenu.previousMove = false;
+            activePlayers.add(player.getUniqueId());
         }
 
         private static class Builder extends PagedObjectBuilder<Builder, SuperiorSettingsPagedObjectButton, SuperiorMenuSettings> {

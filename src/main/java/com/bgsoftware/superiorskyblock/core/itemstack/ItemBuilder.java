@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFlag;
@@ -125,29 +124,6 @@ public class ItemBuilder {
             for (int i = 10; i < loreList.size(); i++) {
                 loreList.remove(loreList.get(i));
             }
-            loreList.add(ChatColor.getLastColors(firstLine) + "...");
-        }
-
-        itemMeta.setLore(loreList);
-        return this;
-    }
-
-    public ItemBuilder withLore(String firstLine, ConfigurationSection configurationSection) {
-        if (itemMeta == null)
-            return this;
-
-        List<String> loreList = new ArrayList<>();
-
-        firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
-        loreList.add(firstLine);
-
-        for (String section : configurationSection.getKeys(false)) {
-            section = section + ": " + configurationSection.get(section).toString();
-            loreList.add(ChatColor.getLastColors(firstLine) + Formatters.COLOR_FORMATTER.format(section));
-        }
-
-        if (loreList.size() > 16) {
-            loreList = loreList.subList(0, 16);
             loreList.add(ChatColor.getLastColors(firstLine) + "...");
         }
 
