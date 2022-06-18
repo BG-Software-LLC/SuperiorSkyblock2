@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -785,6 +786,23 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param ignoredMembers An array of ignored members.
      */
     void sendMessage(String message, UUID... ignoredMembers);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     * @param args             Arguments for the component.
+     */
+    void sendMessage(IMessageComponent messageComponent, Object... args);
+
+    /**
+     * Send a message to all the members of the island.
+     *
+     * @param messageComponent The message to send
+     * @param ignoredMembers   An array of ignored members.
+     * @param args             Arguments for the component.
+     */
+    void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args);
 
     /**
      * Send a plain message to all the members of the island.

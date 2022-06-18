@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.superiorskyblock.api.service.hologram.Hologram;
 import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.sounds.SoundEffect;
@@ -26,7 +26,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
 @SuppressWarnings("unused")
-public final class NMSHologramsImpl implements NMSHolograms {
+public class NMSHologramsImpl implements NMSHolograms {
 
     @Override
     public Hologram createHologram(Location location) {
@@ -42,7 +42,7 @@ public final class NMSHologramsImpl implements NMSHolograms {
         return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
-    private static final class EntityHologram extends EntityArmorStand implements Hologram {
+    private static class EntityHologram extends EntityArmorStand implements Hologram {
 
         private static final AxisAlignedBB EMPTY_BOUND = new AxisAlignedBB(0D, 0D, 0D, 0D, 0D, 0D);
 

@@ -30,7 +30,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import java.util.Set;
 
 @SuppressWarnings({"unused"})
-public final class NMSTagsImpl implements NMSTags {
+public class NMSTagsImpl implements NMSTags {
 
     @Override
     public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {

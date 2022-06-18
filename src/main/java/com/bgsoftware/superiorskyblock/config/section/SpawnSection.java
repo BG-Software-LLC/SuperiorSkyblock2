@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
 import java.util.List;
 
-public final class SpawnSection implements SettingsManager.Spawn {
+public class SpawnSection implements SettingsManager.Spawn {
 
     private final SettingsContainer container;
 

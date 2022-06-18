@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("NullableProblems")
-public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
+public class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
 
     private static final SpikesCache INSTANCE = new SpikesCache();
 
@@ -151,7 +151,7 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
         this.cachedSpikes.cleanUp();
     }
 
-    private final class InternalCacheLoader extends CacheLoader<BlockPosition, List<WorldGenEnder.Spike>> {
+    private class InternalCacheLoader extends CacheLoader<BlockPosition, List<WorldGenEnder.Spike>> {
 
         @Override
         public List<WorldGenEnder.Spike> load(BlockPosition blockPosition) {

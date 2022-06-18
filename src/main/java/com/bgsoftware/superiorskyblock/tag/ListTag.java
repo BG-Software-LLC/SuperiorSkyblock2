@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,9 +50,9 @@ import java.util.List;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("rawtypes")
-public final class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
+public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagList");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagList");
 
     /**
      * The type.
@@ -99,7 +99,7 @@ public final class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>>
         List<Tag<?>> tagList = new ArrayList<>();
 
         for (int i = 0; i < length; i++) {
-            Tag<?> tag = Tag.fromStream(is, depth + 1, childType);
+            Tag<?> tag = fromStream(is, depth + 1, childType);
             if (tag instanceof EndTag) {
                 throw new IOException("TAG_End not permitted in a list.");
             }

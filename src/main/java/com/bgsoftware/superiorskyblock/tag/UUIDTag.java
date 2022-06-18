@@ -6,7 +6,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-public final class UUIDTag extends Tag<UUID> {
+public class UUIDTag extends Tag<UUID> {
 
     public UUIDTag(UUID value) {
         super(value, null);

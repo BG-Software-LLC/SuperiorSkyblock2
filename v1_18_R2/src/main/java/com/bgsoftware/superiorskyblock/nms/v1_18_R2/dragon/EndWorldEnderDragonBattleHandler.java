@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 
 import javax.annotation.Nullable;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
+public class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
 
     private final Map<UUID, IslandEnderDragonBattle> worldDragonBattlesMap = new HashMap<>();
     private final List<IslandEnderDragonBattle> worldDragonBattlesList = new LinkedList<>();

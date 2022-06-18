@@ -4,14 +4,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
@@ -50,33 +50,14 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public final class NMSChunksImpl implements NMSChunks {
+public class NMSChunksImpl implements NMSChunks {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin;
 
-    private static void removeEntities(Chunk chunk) {
-        for (int i = 0; i < chunk.entitySlices.length; i++) {
-            chunk.entitySlices[i].forEach(entity -> {
-                if (!(entity instanceof EntityHuman))
-                    entity.dead = true;
-            });
-            chunk.entitySlices[i] = new UnsafeList<>();
-        }
-    }
-
-    private static void removeBlocks(Chunk chunk) {
-        WorldServer worldServer = (WorldServer) chunk.world;
-
-        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
-            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
-            Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunk.locX, chunk.locZ);
-
-            for (int i = 0; i < 16; i++)
-                chunk.getSections()[i] = generatedChunk.getSections()[i];
-
-            for (Map.Entry<BlockPosition, TileEntity> entry : generatedChunk.getTileEntities().entrySet())
-                worldServer.setTileEntity(entry.getKey(), entry.getValue());
-        }
+    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        NMSUtils.init(plugin);
+        CropsTickingTileEntity.init(plugin);
     }
 
     @Override
@@ -211,11 +192,11 @@ public final class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshLights(org.bukkit.Chunk chunk, List<BlockData> blockDataList) {
+    public void refreshLights(org.bukkit.Chunk chunk, List<SchematicBlock> blockDataList) {
         World world = ((CraftChunk) chunk).getHandle().getWorld();
 
         // Update lights for the blocks.
-        for (BlockData blockData : blockDataList) {
+        for (SchematicBlock blockData : blockDataList) {
             BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
             if (plugin.getSettings().isLightsUpdate() && blockData.getBlockLightLevel() > 0)
                 world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
@@ -246,6 +227,31 @@ public final class NMSChunksImpl implements NMSChunks {
                 cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
         } else {
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+        }
+    }
+
+    private static void removeEntities(Chunk chunk) {
+        for (int i = 0; i < chunk.entitySlices.length; i++) {
+            chunk.entitySlices[i].forEach(entity -> {
+                if (!(entity instanceof EntityHuman))
+                    entity.dead = true;
+            });
+            chunk.entitySlices[i] = new UnsafeList<>();
+        }
+    }
+
+    private static void removeBlocks(Chunk chunk) {
+        WorldServer worldServer = (WorldServer) chunk.world;
+
+        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
+            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer, 0L, worldServer.generator);
+            Chunk generatedChunk = customChunkGenerator.getOrCreateChunk(chunk.locX, chunk.locZ);
+
+            for (int i = 0; i < 16; i++)
+                chunk.getSections()[i] = generatedChunk.getSections()[i];
+
+            for (Map.Entry<BlockPosition, TileEntity> entry : generatedChunk.getTileEntities().entrySet())
+                worldServer.setTileEntity(entry.getKey(), entry.getValue());
         }
     }
 

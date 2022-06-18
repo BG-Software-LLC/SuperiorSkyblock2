@@ -13,7 +13,7 @@ import org.bukkit.event.block.BlockGrowEvent;
 import java.util.Arrays;
 import java.util.List;
 
-public final class UpgradeTypeCropGrowth implements IUpgradeType {
+public class UpgradeTypeCropGrowth implements IUpgradeType {
 
     private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddCropGrowth(),
             new CmdAdminSetCropGrowth());
@@ -34,7 +34,7 @@ public final class UpgradeTypeCropGrowth implements IUpgradeType {
         return commands;
     }
 
-    private final class CropGrowthListener implements Listener {
+    private class CropGrowthListener implements Listener {
 
         // Should potentially fix crop growth tile entities "disappearing"
         @EventHandler(priority = EventPriority.LOWEST)

@@ -6,34 +6,35 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.listener.SignsListener;
+import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.generator.IslandsGeneratorImpl;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.Block;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.SoundEffectType;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.BlockData;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.properties.BlockState;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.border.WorldBorder;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk.ChunkAccess;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk.ChunkSection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.lighting.LightEngine;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.generator.IslandsGeneratorImpl;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.SoundEffectType;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.entity.TileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.border.WorldBorder;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkAccess;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkSection;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting.LightEngine;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.utils.StringUtils;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
-import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -74,15 +75,22 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.List;
 import java.util.Map;
 
-public final class NMSWorldImpl implements NMSWorld {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectField<IChunkAccess> CHUNK_ACCESS = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", IChunkAccess.class, "biome");
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
+
+    private final SuperiorSkyblockPlugin plugin;
+    private final Singleton<SignsListener> signsListener;
+
+    public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        this.signsListener = plugin.getListener(SignsListener.class);
+        NMSUtils.init(plugin);
+    }
 
     @Override
     public Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z) {
@@ -211,11 +219,11 @@ public final class NMSWorldImpl implements NMSWorld {
 
     @Override
     public void setBlocks(org.bukkit.Chunk bukkitChunk,
-                          List<com.bgsoftware.superiorskyblock.world.blocks.BlockData> blockDataList) {
+                          List<SchematicBlock> blockDataList) {
         ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
         blockDataList.forEach(blockData -> {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
-                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getClonedTileEntity());
+                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getTileEntityData());
         });
         setBiome(chunk, NMSUtils.getWorldBiome(bukkitChunk.getWorld().getEnvironment()));
     }
@@ -360,7 +368,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
             IChatBaseComponent[] newLines;
 
-            if (BlocksLogic.handleSignPlace(island.getOwner(), island, location, strippedLines, false))
+            if (signsListener.get().shouldReplaceSignLines(island.getOwner(), island, location, strippedLines, false))
                 newLines = CraftSign.sanitizeLines(strippedLines);
             else
                 newLines = CraftSign.sanitizeLines(lines);

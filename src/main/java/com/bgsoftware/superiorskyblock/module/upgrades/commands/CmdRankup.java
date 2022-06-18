@@ -11,13 +11,13 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import org.bukkit.Bukkit;
 
 import java.time.Duration;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdRankup implements IPermissibleCommand {
+public class CmdRankup implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -136,7 +136,7 @@ public final class CmdRankup implements IPermissibleCommand {
         }
 
         SUpgradeLevel.ItemData itemData = ((SUpgradeLevel) upgradeLevel).getItemData();
-        SoundWrapper sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
+        GameSound sound = hasNextLevel ? itemData.hasNextLevelSound : itemData.noNextLevelSound;
 
         if (sound != null)
             superiorPlayer.runIfOnline(sound::playSound);

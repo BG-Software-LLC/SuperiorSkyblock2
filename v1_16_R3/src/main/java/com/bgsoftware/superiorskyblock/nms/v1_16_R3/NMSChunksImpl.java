@@ -6,16 +6,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.BiomeBase;
@@ -72,9 +72,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class NMSChunksImpl implements NMSChunks {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class NMSChunksImpl implements NMSChunks {
 
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
             BiomeStorage.class, BiomeBase[].class, "h");
@@ -87,86 +85,12 @@ public final class NMSChunksImpl implements NMSChunks {
     private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
             LightEngineThreaded.class, ThreadedMailbox.class, "b");
 
-    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
-        Set<Location> spawnersLocations = new HashSet<>();
+    private final SuperiorSkyblockPlugin plugin;
 
-        for (ChunkSection chunkSection : chunkSections) {
-            if (chunkSection != null) {
-                for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
-                    IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
-                    if (blockData.getBlock() != Blocks.AIR) {
-                        Location location = new Location(chunkPosition.getWorld(),
-                                (chunkPosition.getX() << 4) + bp.getX(),
-                                chunkSection.getYPosition() + bp.getY(),
-                                (chunkPosition.getZ() << 4) + bp.getZ());
-
-                        int blockAmount = 1;
-
-                        if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
-                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
-                            blockAmount = 2;
-                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
-                        }
-
-                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
-                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
-                        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                        if (type == Material.SPAWNER) {
-                            spawnersLocations.add(location);
-                        }
-                    }
-                }
-            }
-        }
-
-        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
-    }
-
-    private static void removeEntities(Chunk chunk) {
-        Collection<Entity>[] entitySlices = null;
-        Function<Void, Collection<Entity>> entitySliceCreationFunction = null;
-
-        try {
-            entitySlices = chunk.entitySlices;
-            entitySliceCreationFunction = v -> new UnsafeList<>();
-        } catch (Throwable ex) {
-            try {
-                entitySlices = ENTITY_SLICE_ARRAY.get(chunk);
-                entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);
-            } catch (Exception ex2) {
-                ex2.printStackTrace();
-                PluginDebugger.debug(ex2);
-            }
-        }
-
-        if (entitySlices != null) {
-            for (int i = 0; i < entitySlices.length; i++) {
-                entitySlices[i].forEach(entity -> {
-                    if (!(entity instanceof EntityHuman))
-                        entity.dead = true;
-                });
-                entitySlices[i] = entitySliceCreationFunction.apply(null);
-            }
-        }
-    }
-
-    private static void removeBlocks(Chunk chunk) {
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
-        WorldServer worldServer = chunk.world;
-
-        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
-            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer,
-                    worldServer.getChunkProvider().chunkGenerator, worldServer.generator);
-            ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
-            customChunkGenerator.buildBase(null, protoChunk);
-
-            for (int i = 0; i < 16; i++)
-                chunk.getSections()[i] = protoChunk.getSections()[i];
-
-            for (Map.Entry<BlockPosition, TileEntity> entry : protoChunk.x().entrySet())
-                worldServer.setTileEntity(entry.getKey(), entry.getValue());
-        }
+    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        NMSUtils.init(plugin);
+        CropsTickingTileEntity.init(plugin);
     }
 
     @Override
@@ -343,14 +267,14 @@ public final class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<BlockData> blockDataList) {
+    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         WorldServer world = (WorldServer) chunk.getWorld();
 
         if (plugin.getSettings().isLightsUpdate()) {
             // Update lights for the blocks.
             // We use a delayed task to avoid null nibbles
-            Executor.sync(() -> {
+            BukkitExecutor.sync(() -> {
                 if (STAR_LIGHT_INTERFACE.isValid()) {
                     LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.e();
                     StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
@@ -362,7 +286,7 @@ public final class NMSChunksImpl implements NMSChunks {
                                                     new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, true))
                                     ), null));
                 } else {
-                    for (BlockData blockData : blockDataList) {
+                    for (SchematicBlock blockData : blockDataList) {
                         BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
                         if (blockData.getBlockLightLevel() > 0) {
                             try {
@@ -402,6 +326,88 @@ public final class NMSChunksImpl implements NMSChunks {
                 world.tileEntityListTick.remove(cropsTickingTileEntity);
         } else {
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
+        }
+    }
+
+    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
+        Set<Location> spawnersLocations = new HashSet<>();
+
+        for (ChunkSection chunkSection : chunkSections) {
+            if (chunkSection != null) {
+                for (BlockPosition bp : BlockPosition.b(0, 0, 0, 15, 15, 15)) {
+                    IBlockData blockData = chunkSection.getType(bp.getX(), bp.getY(), bp.getZ());
+                    if (blockData.getBlock() != Blocks.AIR) {
+                        Location location = new Location(chunkPosition.getWorld(),
+                                (chunkPosition.getX() << 4) + bp.getX(),
+                                chunkSection.getYPosition() + bp.getY(),
+                                (chunkPosition.getZ() << 4) + bp.getZ());
+
+                        int blockAmount = 1;
+
+                        if ((blockData.getBlock().a(TagsBlock.SLABS) || blockData.getBlock().a(TagsBlock.WOODEN_SLABS)) &&
+                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.DOUBLE) {
+                            blockAmount = 2;
+                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.BOTTOM);
+                        }
+
+                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock());
+                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
+                        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                        if (type == Material.SPAWNER) {
+                            spawnersLocations.add(location);
+                        }
+                    }
+                }
+            }
+        }
+
+        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+    }
+
+    private static void removeEntities(Chunk chunk) {
+        Collection<Entity>[] entitySlices = null;
+        Function<Void, Collection<Entity>> entitySliceCreationFunction = null;
+
+        try {
+            entitySlices = chunk.entitySlices;
+            entitySliceCreationFunction = v -> new UnsafeList<>();
+        } catch (Throwable ex) {
+            try {
+                entitySlices = ENTITY_SLICE_ARRAY.get(chunk);
+                entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);
+            } catch (Exception ex2) {
+                ex2.printStackTrace();
+                PluginDebugger.debug(ex2);
+            }
+        }
+
+        if (entitySlices != null) {
+            for (int i = 0; i < entitySlices.length; i++) {
+                entitySlices[i].forEach(entity -> {
+                    if (!(entity instanceof EntityHuman))
+                        entity.dead = true;
+                });
+                entitySlices[i] = entitySliceCreationFunction.apply(null);
+            }
+        }
+    }
+
+    private static void removeBlocks(Chunk chunk) {
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+        WorldServer worldServer = chunk.world;
+
+        if (worldServer.generator != null && !(worldServer.generator instanceof IslandsGenerator)) {
+            CustomChunkGenerator customChunkGenerator = new CustomChunkGenerator(worldServer,
+                    worldServer.getChunkProvider().chunkGenerator, worldServer.generator);
+            ProtoChunk protoChunk = NMSUtils.createProtoChunk(chunkCoords, worldServer);
+            customChunkGenerator.buildBase(null, protoChunk);
+
+            for (int i = 0; i < 16; i++)
+                chunk.getSections()[i] = protoChunk.getSections()[i];
+
+            for (Map.Entry<BlockPosition, TileEntity> entry : protoChunk.x().entrySet())
+                worldServer.setTileEntity(entry.getKey(), entry.getValue());
         }
     }
 

@@ -11,16 +11,20 @@ import net.minecraft.world.level.World;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEnderDragon;
 
-public final class IslandEntityEnderDragon extends EntityEnderDragon {
+public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
-    private BlockPosition islandBlockPosition;
+    private static SuperiorSkyblockPlugin plugin;
 
     public static EntityEnderDragon fromEntityTypes(EntityTypes<? extends EntityEnderDragon> entityTypes, World world) {
         return plugin.getGrid().isIslandsWorld(world.getWorld()) ? new IslandEntityEnderDragon(world) :
                 new EntityEnderDragon(entityTypes, world);
     }
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        IslandEntityEnderDragon.plugin = plugin;
+    }
+
+    private BlockPosition islandBlockPosition;
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
         this(worldServer);

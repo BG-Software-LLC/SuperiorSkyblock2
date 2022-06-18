@@ -3,16 +3,16 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdFly implements ISuperiorCommand {
+public class CmdFly implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {

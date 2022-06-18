@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.dragon.EndWorldEnderDragonBattleHandler;
@@ -8,10 +9,8 @@ import com.bgsoftware.superiorskyblock.nms.v1_17_R1.dragon.IslandEnderDragonBatt
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.dragon.SpikesCache;
 import com.google.common.cache.LoadingCache;
-import net.minecraft.core.IRegistry;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.EnumCreatureType;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 import net.minecraft.world.level.levelgen.feature.WorldGenEnder;
@@ -29,7 +28,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 @SuppressWarnings({"unused"})
-public final class NMSDragonFightImpl implements NMSDragonFight {
+public class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<EntityTypes.b<?>> ENTITY_TYPES_BUILDER = new ReflectField<EntityTypes.b<?>>(
             EntityTypes.class, EntityTypes.b.class, Modifier.PRIVATE | Modifier.FINAL, 1)
@@ -47,6 +46,10 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
     static {
         ENTITY_TYPES_BUILDER.set(EntityTypes.v, (EntityTypes.b<EntityEnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
+    }
+
+    public NMSDragonFightImpl(SuperiorSkyblockPlugin plugin) {
+        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

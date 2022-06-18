@@ -3,17 +3,18 @@ package com.bgsoftware.superiorskyblock.service.message;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.lang.component.MultipleComponents;
-import com.bgsoftware.superiorskyblock.lang.component.impl.ActionBarComponent;
-import com.bgsoftware.superiorskyblock.lang.component.impl.BossBarComponent;
-import com.bgsoftware.superiorskyblock.lang.component.impl.ComplexMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.impl.RawMessageComponent;
-import com.bgsoftware.superiorskyblock.lang.component.impl.SoundComponent;
-import com.bgsoftware.superiorskyblock.lang.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.wrappers.SoundWrapper;
+import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.RawMessageComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
 import com.google.common.base.Preconditions;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -23,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public final class MessagesServiceImpl implements MessagesService {
+public class MessagesServiceImpl implements MessagesService {
 
     public MessagesServiceImpl() {
 
@@ -59,7 +60,7 @@ public final class MessagesServiceImpl implements MessagesService {
         return new BuilderImpl();
     }
 
-    private static final class BuilderImpl implements Builder {
+    private static class BuilderImpl implements Builder {
 
         private final List<IMessageComponent> messageComponents = new ArrayList<>();
 
@@ -75,7 +76,12 @@ public final class MessagesServiceImpl implements MessagesService {
 
         @Override
         public boolean addComplexMessage(@Nullable TextComponent textComponent) {
-            return addMessageComponent(ComplexMessageComponent.of(textComponent));
+            return addComplexMessage(new BaseComponent[]{textComponent});
+        }
+
+        @Override
+        public boolean addComplexMessage(@Nullable BaseComponent[] baseComponents) {
+            return addMessageComponent(ComplexMessageComponent.of(baseComponents));
         }
 
         @Override
@@ -85,7 +91,7 @@ public final class MessagesServiceImpl implements MessagesService {
 
         @Override
         public boolean addSound(Sound sound, float volume, float pitch) {
-            return addMessageComponent(SoundComponent.of(new SoundWrapper(sound, volume, pitch)));
+            return addMessageComponent(SoundComponent.of(new GameSound(sound, volume, pitch)));
         }
 
         @Override

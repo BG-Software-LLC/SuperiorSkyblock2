@@ -11,7 +11,7 @@ import org.bukkit.entity.Animals;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
-public final class NMSEntitiesImpl implements NMSEntities {
+public class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(Entity.class, int.class, "portalTicks");
 

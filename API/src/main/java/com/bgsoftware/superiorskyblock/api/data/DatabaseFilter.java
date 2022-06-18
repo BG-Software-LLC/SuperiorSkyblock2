@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import java.util.Collection;
 import java.util.Collections;
 
-public final class DatabaseFilter {
+public class DatabaseFilter {
 
     private final Collection<Pair<String, Object>> filters;
 

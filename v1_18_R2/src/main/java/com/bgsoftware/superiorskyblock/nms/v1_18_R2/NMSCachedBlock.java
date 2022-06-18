@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
-import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
-public final class NMSCachedBlock implements ICachedBlock {
+public class NMSCachedBlock implements ICachedBlock {
 
     private final BlockData blockData;
 

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1.algorithms;
 
 import org.bukkit.enchantments.Enchantment;
 
-public final class GlowEnchantmentFactory {
+public class GlowEnchantmentFactory {
 
     public static Enchantment createEnchantment() {
         try {

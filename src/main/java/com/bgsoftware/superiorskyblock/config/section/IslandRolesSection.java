@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 import org.bukkit.configuration.ConfigurationSection;
 
-public final class IslandRolesSection implements SettingsManager.IslandRoles {
+public class IslandRolesSection implements SettingsManager.IslandRoles {
 
     private final SettingsContainer container;
 

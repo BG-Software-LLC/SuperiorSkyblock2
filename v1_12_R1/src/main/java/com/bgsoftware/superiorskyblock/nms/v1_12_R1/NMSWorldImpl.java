@@ -5,14 +5,15 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.listener.SignsListener;
+import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.logic.BlocksLogic;
-import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.BlockDoubleStep;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -52,12 +53,19 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Arrays;
 import java.util.List;
 
-public final class NMSWorldImpl implements NMSWorld {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
             "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeBase[].class, "biome");
+
+    private final SuperiorSkyblockPlugin plugin;
+    private final Singleton<SignsListener> signsListener;
+
+    public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        this.signsListener = plugin.getListener(SignsListener.class);
+        NMSUtils.init(plugin);
+    }
 
     @Override
     @SuppressWarnings("deprecation")
@@ -158,11 +166,11 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<com.bgsoftware.superiorskyblock.world.blocks.BlockData> blockDataList) {
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for (BlockData blockData : blockDataList) {
+        for (SchematicBlock blockData : blockDataList) {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
-                    blockData.getCombinedId(), blockData.getClonedTileEntity());
+                    blockData.getCombinedId(), blockData.getTileEntityData());
         }
     }
 
@@ -251,7 +259,7 @@ public final class NMSWorldImpl implements NMSWorld {
 
             IChatBaseComponent[] newLines;
 
-            if (BlocksLogic.handleSignPlace(island.getOwner(), island, location, strippedLines, false))
+            if (signsListener.get().shouldReplaceSignLines(island.getOwner(), island, location, strippedLines, false))
                 newLines = CraftSign.sanitizeLines(strippedLines);
             else
                 newLines = CraftSign.sanitizeLines(lines);

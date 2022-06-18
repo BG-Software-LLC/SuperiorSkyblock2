@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public final class IslandsListArgument extends Argument<List<Island>, SuperiorPlayer> {
+public class IslandsListArgument extends Argument<List<Island>, SuperiorPlayer> {
 
     public IslandsListArgument(List<Island> islands, @Nullable SuperiorPlayer superiorPlayer) {
         super(islands, superiorPlayer);

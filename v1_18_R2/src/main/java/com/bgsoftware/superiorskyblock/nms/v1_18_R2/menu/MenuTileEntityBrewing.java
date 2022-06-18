@@ -1,13 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.menu;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.world.level.block.entity.TileEntityBrewingStand;
-import net.minecraft.world.level.block.entity.TileEntityFurnaceFurnace;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityBrewing extends TileEntityBrewingStand {
+public class MenuTileEntityBrewing extends TileEntityBrewingStand {
 
     private final InventoryHolder holder;
 

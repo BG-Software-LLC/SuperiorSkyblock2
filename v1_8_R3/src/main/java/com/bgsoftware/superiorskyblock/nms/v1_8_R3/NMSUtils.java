@@ -2,8 +2,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -30,17 +30,21 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public final class NMSUtils {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class NMSUtils {
 
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(
             ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
+    private static SuperiorSkyblockPlugin plugin;
+
     private NMSUtils() {
 
+    }
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        NMSUtils.plugin = plugin;
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,

@@ -42,9 +42,9 @@ import java.io.IOException;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("WeakerAccess")
-public final class EndTag extends Tag<Object> {
+public class EndTag extends Tag<Object> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagEnd");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagEnd");
 
     /**
      * Creates the tag.

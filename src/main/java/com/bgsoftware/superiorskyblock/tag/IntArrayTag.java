@@ -36,7 +36,7 @@
 //@formatter:on
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -51,9 +51,9 @@ import java.util.UUID;
  * @author Jocopa3
  */
 @SuppressWarnings("WeakerAccess")
-public final class IntArrayTag extends Tag<int[]> {
+public class IntArrayTag extends Tag<int[]> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagIntArray");
 
     /**
      * Creates the tag.

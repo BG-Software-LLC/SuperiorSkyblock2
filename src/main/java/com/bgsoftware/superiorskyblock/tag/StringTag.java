@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -45,9 +45,9 @@ import java.nio.charset.StandardCharsets;
  *
  * @author Graham Edgecombe
  */
-public final class StringTag extends Tag<String> {
+public class StringTag extends Tag<String> {
 
-    protected static final Class<?> CLASS = getNNTClass("NBTTagString");
+    /*package*/  static final Class<?> CLASS = getNNTClass("NBTTagString");
 
     /**
      * Creates the tag.

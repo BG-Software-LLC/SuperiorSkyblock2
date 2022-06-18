@@ -22,53 +22,54 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.database.cache.CachedIslandInfo;
-import com.bgsoftware.superiorskyblock.database.cache.DatabaseCache;
-import com.bgsoftware.superiorskyblock.database.serialization.IslandsDeserializer;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
+import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.container.value.SyncedValue;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
-import com.bgsoftware.superiorskyblock.island.flags.IslandFlags;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.island.permissions.PermissionNodeAbstract;
-import com.bgsoftware.superiorskyblock.island.permissions.PlayerPermissionNode;
-import com.bgsoftware.superiorskyblock.island.warps.SIslandWarp;
-import com.bgsoftware.superiorskyblock.island.warps.SWarpCategory;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
+import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
+import com.bgsoftware.superiorskyblock.island.upgrade.DefaultUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
+import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
+import com.bgsoftware.superiorskyblock.island.warp.SWarpCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
-import com.bgsoftware.superiorskyblock.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.structure.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.threads.SyncedObject;
-import com.bgsoftware.superiorskyblock.upgrade.DefaultUpgradeLevel;
-import com.bgsoftware.superiorskyblock.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.events.EventsBus;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingComparators;
-import com.bgsoftware.superiorskyblock.utils.islands.SortingTypes;
-import com.bgsoftware.superiorskyblock.utils.locations.SmartLocation;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
-import com.bgsoftware.superiorskyblock.wrappers.IslandArea;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
@@ -98,7 +99,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -119,7 +119,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
-public final class SIsland implements Island {
+public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
     private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
@@ -133,7 +133,7 @@ public final class SIsland implements Island {
     private final IslandBlocksTrackerAlgorithm blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
     private final IslandEntitiesTrackerAlgorithm entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
     private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
-    private final SyncedObject<BukkitTask> bankInterestTask = SyncedObject.of(null);
+    private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
 
     /*
      * Island Flags
@@ -161,14 +161,14 @@ public final class SIsland implements Island {
     /*
      * Island Upgrade Values
      */
-    private final SyncedObject<Value<Integer>> islandSize = SyncedObject.of(Value.syncedFixed(-1));
-    private final SyncedObject<Value<Integer>> warpsLimit = SyncedObject.of(Value.syncedFixed(-1));
-    private final SyncedObject<Value<Integer>> teamLimit = SyncedObject.of(Value.syncedFixed(-1));
-    private final SyncedObject<Value<Integer>> coopLimit = SyncedObject.of(Value.syncedFixed(-1));
-    private final SyncedObject<Value<Double>> cropGrowth = SyncedObject.of(Value.syncedFixed(-1D));
-    private final SyncedObject<Value<Double>> spawnerRates = SyncedObject.of(Value.syncedFixed(-1D));
-    private final SyncedObject<Value<Double>> mobDrops = SyncedObject.of(Value.syncedFixed(-1D));
-    private final SyncedObject<Value<BigDecimal>> bankLimit = SyncedObject.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
+    private final Synchronized<Value<Integer>> islandSize = Synchronized.of(Value.syncedFixed(-1));
+    private final Synchronized<Value<Integer>> warpsLimit = Synchronized.of(Value.syncedFixed(-1));
+    private final Synchronized<Value<Integer>> teamLimit = Synchronized.of(Value.syncedFixed(-1));
+    private final Synchronized<Value<Integer>> coopLimit = Synchronized.of(Value.syncedFixed(-1));
+    private final Synchronized<Value<Double>> cropGrowth = Synchronized.of(Value.syncedFixed(-1D));
+    private final Synchronized<Value<Double>> spawnerRates = Synchronized.of(Value.syncedFixed(-1D));
+    private final Synchronized<Value<Double>> mobDrops = Synchronized.of(Value.syncedFixed(-1D));
+    private final Synchronized<Value<BigDecimal>> bankLimit = Synchronized.of(Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE));
     private final Map<PlayerRole, Value<Integer>> roleLimits = new ConcurrentHashMap<>();
     private final KeyMap<Value<Integer>>[] cobbleGeneratorValues = new KeyMap[World.Environment.values().length];
     private final Map<PotionEffectType, Value<Integer>> islandEffects = new ConcurrentHashMap<>();
@@ -178,13 +178,13 @@ public final class SIsland implements Island {
     /*
      * Island Player-Trackers
      */
-    private final SyncedObject<SortedSet<SuperiorPlayer>> members = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<SortedSet<SuperiorPlayer>> playersInside = SyncedObject.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
-    private final SyncedObject<SortedSet<UniqueVisitor>> uniqueVisitors = SyncedObject.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
+    private final Synchronized<SortedSet<SuperiorPlayer>> members = Synchronized.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final Synchronized<SortedSet<SuperiorPlayer>> playersInside = Synchronized.of(new TreeSet<>(SortingComparators.PLAYER_NAMES_COMPARATOR));
+    private final Synchronized<SortedSet<UniqueVisitor>> uniqueVisitors = Synchronized.of(new TreeSet<>(SortingComparators.PAIRED_PLAYERS_NAMES_COMPARATOR));
     private final Set<SuperiorPlayer> bannedPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> coopPlayers = Sets.newConcurrentHashSet();
     private final Set<SuperiorPlayer> invitedPlayers = Sets.newConcurrentHashSet();
-    private final Map<SuperiorPlayer, PlayerPermissionNode> playerPermissions = new ConcurrentHashMap<>();
+    private final Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = new ConcurrentHashMap<>();
     private final Map<UUID, Rating> ratings = new ConcurrentHashMap<>();
 
     /*
@@ -197,8 +197,8 @@ public final class SIsland implements Island {
     /*
      * General Settings
      */
-    private final SyncedObject<Location[]> islandHomes = SyncedObject.of(new Location[World.Environment.values().length]);
-    private final SyncedObject<Location[]> visitorHomes = SyncedObject.of(new Location[World.Environment.values().length]);
+    private final Synchronized<Location[]> islandHomes = Synchronized.of(new Location[World.Environment.values().length]);
+    private final Synchronized<Location[]> visitorHomes = Synchronized.of(new Location[World.Environment.values().length]);
     private final Map<IslandPrivilege, PlayerRole> rolePermissions = new ConcurrentHashMap<>();
     private final Map<IslandFlag, Byte> islandFlags = new ConcurrentHashMap<>();
     private final Map<String, Integer> upgrades = new ConcurrentHashMap<>();
@@ -207,7 +207,7 @@ public final class SIsland implements Island {
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
-    private final SyncedObject<IslandChest[]> islandChests = SyncedObject.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
+    private final Synchronized<IslandChest[]> islandChests = Synchronized.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
     private volatile String discord = "None";
     private volatile String paypal = "None";
     private volatile boolean isLocked = false;
@@ -274,7 +274,7 @@ public final class SIsland implements Island {
         if (center.get().getWorld() == null) {
             SuperiorSkyblockPlugin.log(
                     String.format("&cCannot load island invalid world %s for %s, skipping...",
-                            ((SmartLocation) center.get()).getWorldName(), uuid.get()));
+                            ((LazyWorldLocation) center.get()).getWorldName(), uuid.get()));
             return Optional.empty();
         }
 
@@ -309,7 +309,7 @@ public final class SIsland implements Island {
 
             Optional<String> blockCountsString = resultSet.getString("block_counts");
             if (blockCountsString.isPresent())
-                Executor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
+                BukkitExecutor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
 
             CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(uuid.get());
 
@@ -433,7 +433,7 @@ public final class SIsland implements Island {
 
         invitedPlayers.add(superiorPlayer);
         //Revoke the invite after 5 minutes
-        Executor.sync(() -> revokeInvite(superiorPlayer), 6000L);
+        BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
 
     @Override
@@ -1135,7 +1135,7 @@ public final class SIsland implements Island {
         PluginDebugger.debug("Action: Set Permission, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName() + ", Permission: " + islandPrivilege.getName() + ", Value: " + value);
 
         if (!playerPermissions.containsKey(superiorPlayer))
-            playerPermissions.put(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
+            playerPermissions.put(superiorPlayer, new PlayerPrivilegeNode(superiorPlayer, this));
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
@@ -1170,9 +1170,9 @@ public final class SIsland implements Island {
     }
 
     @Override
-    public PermissionNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
+    public PrivilegeNodeAbstract getPermissionNode(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return playerPermissions.getOrDefault(superiorPlayer, new PlayerPermissionNode(superiorPlayer, this));
+        return playerPermissions.getOrDefault(superiorPlayer, new PlayerPrivilegeNode(superiorPlayer, this));
     }
 
     @Override
@@ -1304,8 +1304,6 @@ public final class SIsland implements Island {
         IslandsDatabaseBridge.saveIslandLeader(this);
         IslandsDatabaseBridge.addMember(this, previousOwner, getCreationTime());
 
-        plugin.getGrid().transferIsland(previousOwner.getUniqueId(), owner.getUniqueId());
-
         plugin.getMissions().getAllMissions().forEach(mission -> mission.transferData(previousOwner, owner));
 
         return true;
@@ -1319,7 +1317,6 @@ public final class SIsland implements Island {
         if (owner == originalPlayer) {
             owner = newPlayer;
             IslandsDatabaseBridge.saveIslandLeader(this);
-            plugin.getGrid().transferIsland(originalPlayer.getUniqueId(), owner.getUniqueId());
         } else if (isMember(originalPlayer)) {
             members.write(members -> {
                 members.remove(originalPlayer);
@@ -1342,7 +1339,7 @@ public final class SIsland implements Island {
     @Override
     public void calcIslandWorth(@Nullable SuperiorPlayer asker, @Nullable Runnable callback) {
         if (!Bukkit.isPrimaryThread()) {
-            Executor.sync(() -> calcIslandWorth(asker, callback));
+            BukkitExecutor.sync(() -> calcIslandWorth(asker, callback));
             return;
         }
 
@@ -1609,6 +1606,23 @@ public final class SIsland implements Island {
     }
 
     @Override
+    public void sendMessage(IMessageComponent messageComponent, Object... args) {
+        this.sendMessage(messageComponent, Collections.emptyList(), args);
+    }
+
+    @Override
+    public void sendMessage(IMessageComponent messageComponent, List<UUID> ignoredMembers, Object... args) {
+        Preconditions.checkNotNull(messageComponent, "messageComponent parameter cannot be null.");
+        Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
+
+        PluginDebugger.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredMembers + ", Message: " + messageComponent.getMessage());
+
+        getIslandMembers(true).stream()
+                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .forEach(superiorPlayer -> messageComponent.sendMessage(superiorPlayer.asPlayer(), args));
+    }
+
+    @Override
     public void sendTitle(@Nullable String title, @Nullable String subtitle, int fadeIn, int duration,
                           int fadeOut, UUID... ignoredMembers) {
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
@@ -1758,7 +1772,7 @@ public final class SIsland implements Island {
             this.bankInterestTask.set(bankInterestTask -> {
                 if (bankInterestTask != null)
                     bankInterestTask.cancel();
-                return Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
             });
         }
 
@@ -2372,7 +2386,7 @@ public final class SIsland implements Island {
         PotionEffect potionEffect = new PotionEffect(type, Integer.MAX_VALUE, level - 1);
         Value<Integer> oldPotionLevel = islandEffects.put(type, Value.fixed(level));
 
-        Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             assert player != null;
             if (oldPotionLevel != null && oldPotionLevel.get() > level)
@@ -2390,7 +2404,7 @@ public final class SIsland implements Island {
 
         islandEffects.remove(type);
 
-        Executor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
+        BukkitExecutor.ensureMain(() -> getAllPlayersInside().forEach(superiorPlayer -> {
             Player player = superiorPlayer.asPlayer();
             if (player != null)
                 player.removePotionEffect(type);
@@ -2657,7 +2671,7 @@ public final class SIsland implements Island {
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(plugin.getSettings().getWarpsWarmup()), superiorPlayer.getUserLocale()));
-            superiorPlayer.setTeleportTask(Executor.sync(() ->
+            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
                     warpPlayerWithoutWarmup(superiorPlayer, islandWarp), plugin.getSettings().getWarpsWarmup() / 50));
         } else {
             warpPlayerWithoutWarmup(superiorPlayer, islandWarp);
@@ -3287,7 +3301,7 @@ public final class SIsland implements Island {
      */
 
     private void replacePermissions(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
-        PlayerPermissionNode playerPermissionNode = playerPermissions.remove(originalPlayer);
+        PlayerPrivilegeNode playerPermissionNode = playerPermissions.remove(originalPlayer);
         if (playerPermissionNode != null) {
             playerPermissions.put(newPlayer, playerPermissionNode);
             IslandsDatabaseBridge.clearPlayerPermission(this, originalPlayer);
@@ -3302,7 +3316,7 @@ public final class SIsland implements Island {
         BigDecimal newLevel = getIslandLevel();
 
         if (oldLevel.compareTo(newLevel) != 0 || oldWorth.compareTo(newWorth) != 0) {
-            Executor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
+            BukkitExecutor.async(() -> plugin.getEventsBus().callIslandWorthUpdateEvent(this, oldWorth, oldLevel, newWorth, newLevel), 0L);
         }
 
         if (++blocksUpdateCounter >= Bukkit.getOnlinePlayers().size() * 10) {
@@ -3352,7 +3366,7 @@ public final class SIsland implements Island {
             return;
         }
 
-        if (!LocationUtils.isSafeBlock(location.getBlock())) {
+        if (!WorldBlocks.isSafeBlock(location.getBlock())) {
             Message.UNSAFE_WARP.send(superiorPlayer);
             return;
         }
@@ -3582,7 +3596,7 @@ public final class SIsland implements Island {
                 this.bankInterestTask.set(bankInterestTask -> {
                     if (bankInterestTask != null)
                         bankInterestTask.cancel();
-                    return Executor.sync(() -> giveInterest(true), ticksToNextInterest);
+                    return BukkitExecutor.sync(() -> giveInterest(true), ticksToNextInterest);
                 });
             }
         }
@@ -3910,7 +3924,7 @@ public final class SIsland implements Island {
         }
     }
 
-    public static final class UniqueVisitor {
+    public static class UniqueVisitor {
 
         private final Pair<SuperiorPlayer, Long> pair;
 

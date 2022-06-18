@@ -3,22 +3,19 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.island.permissions.IslandPrivileges;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.entity.Player;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdInvite implements IPermissibleCommand {
+public class CmdInvite implements IPermissibleCommand {
 
     @Override
     public List<String> getAliases() {
@@ -82,13 +79,15 @@ public final class CmdInvite implements IPermissibleCommand {
             return;
         }
 
+        boolean isTargetOnline = targetPlayer.isOnline();
+
         java.util.Locale locale = superiorPlayer.getUserLocale();
-        String message;
+        IMessageComponent messageComponent;
 
         if (island.isInvited(targetPlayer)) {
             island.revokeInvite(targetPlayer);
-            message = Message.REVOKE_INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
-            if (targetPlayer.isOnline())
+            messageComponent = Message.REVOKE_INVITE_ANNOUNCEMENT.getComponent(locale);
+            if (isTargetOnline)
                 Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         } else {
             if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
@@ -100,22 +99,14 @@ public final class CmdInvite implements IPermissibleCommand {
                 return;
 
             island.inviteMember(targetPlayer);
-            message = Message.INVITE_ANNOUNCEMENT.getMessage(locale, superiorPlayer.getName(), targetPlayer.getName());
+            messageComponent = Message.INVITE_ANNOUNCEMENT.getComponent(locale);
 
-            java.util.Locale targetLocal = targetPlayer.getUserLocale();
-            Player target = targetPlayer.asPlayer();
-
-            if (target != null && !Message.GOT_INVITE.isEmpty(targetLocal)) {
-                TextComponent textComponent = new TextComponent(Message.GOT_INVITE.getMessage(targetLocal, superiorPlayer.getName()));
-                if (!Message.GOT_INVITE_TOOLTIP.isEmpty(targetLocal))
-                    textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent[]{new TextComponent(Message.GOT_INVITE_TOOLTIP.getMessage(targetLocal))}));
-                textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/" + plugin.getCommands().getLabel() + " accept " + superiorPlayer.getName()));
-                target.spigot().sendMessage(textComponent);
-            }
+            if (isTargetOnline)
+                Message.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
         }
 
-        if (message != null)
-            island.sendMessage(message);
+        if (messageComponent != null)
+            island.sendMessage(messageComponent, superiorPlayer.getName(), targetPlayer.getName());
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.algorithms.GlowEnchantment;
 import net.minecraft.server.v1_8_R3.Block;
@@ -29,9 +29,13 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 
-public final class NMSAlgorithmsImpl implements NMSAlgorithms {
+public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin;
+
+    public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void registerCommand(BukkitCommand command) {

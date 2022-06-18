@@ -11,7 +11,7 @@ import java.util.UUID;
  *
  * @param <T> The type of the value to store.
  */
-public final class PersistentDataType<T> {
+public class PersistentDataType<T> {
 
     public static final PersistentDataType<BigDecimal> BIG_DECIMAL = new PersistentDataType<>(BigDecimal.class);
     public static final PersistentDataType<byte[]> BYTE_ARRAY = new PersistentDataType<>(byte[].class);

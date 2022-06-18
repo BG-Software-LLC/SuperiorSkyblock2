@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.utils.logic.PortalsLogic;
+import com.bgsoftware.superiorskyblock.listener.PortalsListener;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public final class CmdAdminTeleport implements IAdminIslandCommand {
+public class CmdAdminTeleport implements IAdminIslandCommand {
 
     @Override
     public List<String> getAliases() {
@@ -82,9 +82,9 @@ public final class CmdAdminTeleport implements IAdminIslandCommand {
 
         if (environment != plugin.getSettings().getWorlds().getDefaultWorld()) {
             if (!island.wasSchematicGenerated(environment)) {
-                PortalsLogic.handlePlayerPortal((Player) sender, ((Player) sender).getLocation(),
-                        environment == World.Environment.NETHER ? PlayerTeleportEvent.TeleportCause.NETHER_PORTAL :
-                                PlayerTeleportEvent.TeleportCause.END_PORTAL, null);
+                PlayerTeleportEvent.TeleportCause teleportCause = environment == World.Environment.NETHER ?
+                        PlayerTeleportEvent.TeleportCause.NETHER_PORTAL : PlayerTeleportEvent.TeleportCause.END_PORTAL;
+                plugin.getListener(PortalsListener.class).get().onPlayerPortal((Player) sender, ((Player) sender).getLocation(), teleportCause);
                 return;
             }
         }

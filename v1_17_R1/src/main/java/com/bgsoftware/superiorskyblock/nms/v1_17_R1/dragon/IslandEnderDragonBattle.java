@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class IslandEnderDragonBattle extends EnderDragonBattle {
+public class IslandEnderDragonBattle extends EnderDragonBattle {
 
     private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<EnderDragonBattle>(
             EntityEnderDragon.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)

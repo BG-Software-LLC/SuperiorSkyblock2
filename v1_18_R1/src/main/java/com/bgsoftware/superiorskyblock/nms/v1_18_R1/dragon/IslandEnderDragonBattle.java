@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.BossBattleServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.chunk.ChunkAccess;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.BossBattleServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.entity.TileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerLanding;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
@@ -33,7 +33,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public final class IslandEnderDragonBattle extends EnderDragonBattle {
+public class IslandEnderDragonBattle extends EnderDragonBattle {
 
     private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<EnderDragonBattle>(
             EntityEnderDragon.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)

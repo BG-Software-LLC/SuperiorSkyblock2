@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.api.handlers;
 
-import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
@@ -119,8 +118,10 @@ public interface GridManager extends IDatabaseBridgeHolder {
      *
      * @param superiorPlayer The player to check.
      * @return The island of the player. May be null.
+     * @deprecated See {@link SuperiorPlayer#getIsland()}
      */
     @Nullable
+    @Deprecated
     Island getIsland(SuperiorPlayer superiorPlayer);
 
     /**
@@ -149,8 +150,10 @@ public interface GridManager extends IDatabaseBridgeHolder {
      *
      * @param uuid The uuid of the owner.
      * @return The island of the owner. May be null.
+     * @deprecated See {@link SuperiorPlayer#getIsland()}
      */
     @Nullable
+    @Deprecated
     Island getIsland(UUID uuid);
 
     /**

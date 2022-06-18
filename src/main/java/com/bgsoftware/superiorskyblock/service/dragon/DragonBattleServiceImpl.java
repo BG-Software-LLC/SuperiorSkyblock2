@@ -10,7 +10,7 @@ import org.bukkit.entity.EnderDragon;
 
 import javax.annotation.Nullable;
 
-public final class DragonBattleServiceImpl implements DragonBattleService {
+public class DragonBattleServiceImpl implements DragonBattleService {
 
     private final SuperiorSkyblockPlugin plugin;
 

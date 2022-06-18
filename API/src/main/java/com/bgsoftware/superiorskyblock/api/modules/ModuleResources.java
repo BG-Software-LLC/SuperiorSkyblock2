@@ -13,7 +13,7 @@ import java.net.URLConnection;
 /**
  * Class to handle resources for a module.
  */
-public final class ModuleResources {
+public class ModuleResources {
 
     private final File moduleFile;
     private final File moduleFolder;
