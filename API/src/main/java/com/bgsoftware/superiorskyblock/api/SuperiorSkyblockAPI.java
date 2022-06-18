@@ -65,8 +65,12 @@ public class SuperiorSkyblockAPI {
         SuperiorSkyblockAPI.plugin = plugin;
     }
 
+    /**
+     * Get the version of the API.
+     * Everytime a change is made to the API, the version of it changes.
+     */
     public static int getAPIVersion() {
-        return 1;
+        return 2;
     }
 
     /*
