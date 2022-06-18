@@ -12,7 +12,8 @@ public class EmptyCounterChunkSection extends ChunkSection {
 
     private static final ReflectField<Integer> NON_EMPTY_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "nonEmptyBlockCount");
     private static final ReflectField<Integer> TICKING_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "tickingBlockCount");
-    private static final ReflectField<DataPaletteBlock> BLOCK_IDS = new ReflectField<>(ChunkSection.class, DataPaletteBlock.class, "blockIds");
+    private static final ReflectField<DataPaletteBlock> BLOCK_IDS = new ReflectField<DataPaletteBlock>(
+            ChunkSection.class, DataPaletteBlock.class, "blockIds").removeFinal();
     private static final ReflectField<NibbleArray> EMITTED_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "emittedLight");
     private static final ReflectField<NibbleArray> SKY_LIGHT = new ReflectField<>(ChunkSection.class, NibbleArray.class, "skyLight");
 
