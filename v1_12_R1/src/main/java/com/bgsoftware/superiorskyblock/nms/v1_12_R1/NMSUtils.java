@@ -33,6 +33,8 @@ import java.util.function.Consumer;
 
 public class NMSUtils {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(
             ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
     private static final ReflectMethod<Void> SAVE_CHUNK = new ReflectMethod<>(
@@ -42,14 +44,9 @@ public class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
-    private static SuperiorSkyblockPlugin plugin;
 
     private NMSUtils() {
 
-    }
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        NMSUtils.plugin = plugin;
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,

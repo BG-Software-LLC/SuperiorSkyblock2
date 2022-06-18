@@ -13,11 +13,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEnderDragon;
 
 public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static SuperiorSkyblockPlugin plugin;
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        IslandEntityEnderDragon.plugin = plugin;
-    }
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static EntityEnderDragon fromEntityTypes(EntityTypes<? extends EntityEnderDragon> entityTypes, World world) {
         return plugin.getGrid().isIslandsWorld(world.getWorld()) ? new IslandEntityEnderDragon(world) :

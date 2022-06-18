@@ -14,11 +14,7 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderDragon;
 
 public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static SuperiorSkyblockPlugin plugin;
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        IslandEntityEnderDragon.plugin = plugin;
-    }
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private BlockPosition islandBlockPosition;
 

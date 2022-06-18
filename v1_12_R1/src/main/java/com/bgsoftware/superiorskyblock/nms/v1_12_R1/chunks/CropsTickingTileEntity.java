@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
-    private static SuperiorSkyblockPlugin plugin;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
     private static int random = ThreadLocalRandom.current().nextInt();
@@ -30,10 +30,6 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     private final int chunkZ;
 
     private int currentTick = 0;
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        CropsTickingTileEntity.plugin = plugin;
-    }
 
     private CropsTickingTileEntity(Island island, Chunk chunk) {
         this.island = new WeakReference<>(island);

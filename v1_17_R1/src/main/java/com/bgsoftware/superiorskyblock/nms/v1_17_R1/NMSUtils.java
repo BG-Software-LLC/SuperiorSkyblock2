@@ -41,19 +41,15 @@ import java.util.function.Consumer;
 
 public class NMSUtils {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
             PlayerChunkMap.class, Map.class, "visibleChunks", "l");
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, "a", Packet.class, boolean.class);
 
-    private static SuperiorSkyblockPlugin plugin;
-
     private NMSUtils() {
 
-    }
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        NMSUtils.plugin = plugin;
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,

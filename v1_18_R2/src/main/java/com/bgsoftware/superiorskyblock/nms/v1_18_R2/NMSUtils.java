@@ -7,23 +7,23 @@ import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.SectionPosition;
-import com.bgsoftware.superiorskyblock.tag.ByteTag;
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
-import com.bgsoftware.superiorskyblock.tag.StringTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.PlayerChunkMap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.entity.TileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkSection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.tag.ByteTag;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
+import com.bgsoftware.superiorskyblock.tag.StringTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.common.base.Suppliers;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
@@ -46,20 +46,14 @@ import java.util.function.Consumer;
 
 public class NMSUtils {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, 1, Packet.class, boolean.class);
 
-    private static SuperiorSkyblockPlugin plugin;
-
-    private NMSUtils() {
-
-    }
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        NMSUtils.plugin = plugin;
-
+    static {
         try {
             biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
         } catch (IllegalArgumentException error) {
@@ -75,6 +69,10 @@ public class NMSUtils {
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
         }
+
+    }
+
+    private NMSUtils() {
 
     }
 

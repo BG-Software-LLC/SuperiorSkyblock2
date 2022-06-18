@@ -5,15 +5,13 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.algorithms.GlowEnchantmentFactory;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.RegistryBlocks;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.Block;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.network.chat.ChatSerializer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.item.ItemStack;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.menu.MenuTileEntityFurnace;
@@ -57,13 +55,6 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    @Override
-    public void init() {
-        NMSUtils.init(plugin);
-        CropsTickingTileEntity.init(plugin);
-        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

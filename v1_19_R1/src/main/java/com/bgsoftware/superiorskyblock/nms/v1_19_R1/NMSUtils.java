@@ -46,20 +46,14 @@ import java.util.function.Consumer;
 
 public final class NMSUtils {
 
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
     private static final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, 1, Packet.class, boolean.class);
 
-    private static SuperiorSkyblockPlugin plugin;
-
-    private NMSUtils() {
-
-    }
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        NMSUtils.plugin = plugin;
-
+    static {
         try {
             biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
         } catch (IllegalArgumentException error) {
@@ -75,6 +69,9 @@ public final class NMSUtils {
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
         }
+    }
+
+    private NMSUtils() {
 
     }
 

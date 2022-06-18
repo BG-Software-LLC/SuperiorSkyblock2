@@ -3,8 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkAccess;
@@ -23,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CropsTickingTileEntity extends TileEntity {
 
-    private static SuperiorSkyblockPlugin plugin;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
     private static int random = ThreadLocalRandom.current().nextInt();
@@ -34,10 +34,6 @@ public class CropsTickingTileEntity extends TileEntity {
     private final int chunkZ;
 
     private int currentTick = 0;
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        CropsTickingTileEntity.plugin = plugin;
-    }
 
     private CropsTickingTileEntity(Island island, ChunkAccess chunk, BlockPosition blockPosition) {
         super(TileEntityTypes.v, blockPosition.getHandle(), chunk.getWorld().getType(blockPosition).getHandle());

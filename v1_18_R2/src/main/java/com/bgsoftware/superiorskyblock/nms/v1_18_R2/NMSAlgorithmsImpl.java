@@ -4,20 +4,18 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEntityEnderDragon;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.algorithms.GlowEnchantmentFactory;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.RegistryBlocks;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.chat.ChatSerializer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.item.ItemStack;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.menu.MenuTileEntityFurnace;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.menu.MenuTileEntityHopper;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.algorithms.GlowEnchantmentFactory;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.RegistryBlocks;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.chat.ChatSerializer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.item.ItemStack;
 import net.minecraft.world.IInventory;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -57,13 +55,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    @Override
-    public void init() {
-        NMSUtils.init(plugin);
-        CropsTickingTileEntity.init(plugin);
-        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

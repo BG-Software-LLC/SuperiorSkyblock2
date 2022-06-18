@@ -15,11 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static SuperiorSkyblockPlugin plugin;
-
-    public static void init(SuperiorSkyblockPlugin plugin) {
-        IslandEntityEnderDragon.plugin = plugin;
-    }
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     @NotNull
     public static EntityEnderDragon fromEntityTypes(EntityTypes<? extends EntityEnderDragon> entityTypes, World world) {
