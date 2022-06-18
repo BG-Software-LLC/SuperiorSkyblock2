@@ -78,7 +78,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             if (plugin.getSettings().isDropsUpgradePlayersMultiply()) {
                 EntityDamageEvent lastDamage = e.getEntity().getLastDamageCause();
                 if (!(lastDamage instanceof EntityDamageByEntityEvent) ||
-                        BukkitEntities.getPlayerDamager((EntityDamageByEntityEvent) lastDamage) == null)
+                        !BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) lastDamage).getDamager()).isPresent())
                     return;
             }
 

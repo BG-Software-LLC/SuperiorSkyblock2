@@ -61,10 +61,6 @@ public class WorldBlocks {
         return true;
     }
 
-    public static Location getRelative(Location location, BlockFace face) {
-        return location.clone().add(face.getModX(), face.getModY(), face.getModZ());
-    }
-
     public static Location getBlockLocation(Location location) {
         return new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }

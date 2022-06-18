@@ -505,7 +505,8 @@ public class PlayersListener implements Listener {
         Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
         SuperiorPlayer damagerPlayer = !(e instanceof EntityDamageByEntityEvent) ? null :
-                BukkitEntities.getPlayerDamager((EntityDamageByEntityEvent) e);
+                BukkitEntities.getPlayerSource(((EntityDamageByEntityEvent) e).getDamager())
+                        .map(plugin.getPlayers()::getSuperiorPlayer).orElse(null);
 
         if (damagerPlayer == null) {
             if (island != null) {

@@ -218,7 +218,7 @@ public class IslandFlagsListener implements Listener {
         if (e.getEntityType() != EntityType.SPLASH_POTION)
             return;
 
-        BukkitEntities.getRealPlayerDamager(e.getEntity()).ifPresent(shooterPlayer -> {
+        BukkitEntities.getPlayerSource(e.getEntity()).ifPresent(shooterPlayer -> {
             if (!preventAction(e.getEntity().getLocation(), IslandFlags.PVP))
                 return;
 

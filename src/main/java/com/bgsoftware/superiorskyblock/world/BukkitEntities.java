@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import org.bukkit.Material;
 import org.bukkit.entity.AbstractHorse;
@@ -20,7 +19,6 @@ import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Slime;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.AbstractHorseInventory;
 import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
@@ -97,7 +95,7 @@ public class BukkitEntities {
         entityContent.remove(livingEntity.getUniqueId());
     }
 
-    public static Optional<Player> getRealPlayerDamager(Entity damager) {
+    public static Optional<Player> getPlayerSource(Entity damager) {
         if (damager instanceof Projectile) {
             ProjectileSource shooter = ((Projectile) damager).getShooter();
             if (shooter instanceof Player)
@@ -107,18 +105,6 @@ public class BukkitEntities {
         }
 
         return Optional.empty();
-    }
-
-    public static SuperiorPlayer getPlayerDamager(EntityDamageByEntityEvent event) {
-        if (event.getDamager() instanceof Projectile) {
-            ProjectileSource shooter = ((Projectile) event.getDamager()).getShooter();
-            if (shooter instanceof Player)
-                return plugin.getPlayers().getSuperiorPlayer((Player) shooter);
-        } else if (event.getDamager() instanceof Player) {
-            return plugin.getPlayers().getSuperiorPlayer((Player) event.getDamager());
-        }
-
-        return null;
     }
 
     public static Key getLimitEntityType(Entity entity) {

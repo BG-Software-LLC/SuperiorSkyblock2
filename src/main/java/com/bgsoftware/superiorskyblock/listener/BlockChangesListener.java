@@ -313,7 +313,7 @@ public class BlockChangesListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     private void onChorusHit(ProjectileHitEvent e) {
         if (ServerVersion.isLessThan(ServerVersion.v1_18) && PROJECTILE_HIT_EVENT_TARGET_BLOCK.isValid()) {
-            BukkitEntities.getRealPlayerDamager(e.getEntity()).ifPresent(shooter -> {
+            BukkitEntities.getPlayerSource(e.getEntity()).ifPresent(shooter -> {
                 Block hitBlock = PROJECTILE_HIT_EVENT_TARGET_BLOCK.invoke(e);
                 if (hitBlock != null && hitBlock.getType() == CHORUS_FLOWER) {
                     onBlockBreak(ConstantKeys.CHORUS_FLOWER, hitBlock.getLocation(), 1, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);

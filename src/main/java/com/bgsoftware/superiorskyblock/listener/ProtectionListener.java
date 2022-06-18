@@ -275,7 +275,7 @@ public class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityAttack(EntityDamageByEntityEvent e) {
         if (!(e.getEntity() instanceof Player)) {
-            BukkitEntities.getRealPlayerDamager(e.getDamager()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(damagerPlayer -> {
+            BukkitEntities.getPlayerSource(e.getDamager()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(damagerPlayer -> {
                 Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
 
                 IslandPrivilege islandPrivilege;
@@ -312,7 +312,7 @@ public class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakByEntityEvent e) {
-        BukkitEntities.getRealPlayerDamager(e.getRemover()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(removerPlayer -> {
+        BukkitEntities.getPlayerSource(e.getRemover()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(removerPlayer -> {
             IslandPrivilege islandPrivilege = e.getEntity() instanceof ItemFrame ? IslandPrivileges.ITEM_FRAME : IslandPrivileges.PAINTING;
             Location entityLocation = e.getEntity().getLocation();
             Island island = plugin.getGrid().getIslandAt(entityLocation);
@@ -574,7 +574,7 @@ public class ProtectionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerFish(ProjectileLaunchEvent e) {
         if (e.getEntity() instanceof FishHook || (!ServerVersion.isLegacy() && e.getEntity() instanceof Trident)) {
-            BukkitEntities.getRealPlayerDamager(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(fisherPlayer -> {
+            BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(fisherPlayer -> {
                 IslandPrivilege islandPrivilege = e.getEntity() instanceof FishHook ? IslandPrivileges.FISH :
                         IslandPrivileges.PICKUP_DROPS;
                 Location entityLocation = e.getEntity().getLocation();
@@ -588,7 +588,7 @@ public class ProtectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onProjectileHit(ProjectileHitEvent e) {
-        BukkitEntities.getRealPlayerDamager(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
+        BukkitEntities.getPlayerSource(e.getEntity()).map(plugin.getPlayers()::getSuperiorPlayer).ifPresent(shooterPlayer -> {
             Location location;
             IslandPrivilege islandPrivilege;
             Block hitBlock;
