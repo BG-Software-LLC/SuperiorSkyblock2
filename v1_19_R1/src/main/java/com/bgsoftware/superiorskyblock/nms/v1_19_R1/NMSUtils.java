@@ -3,6 +3,8 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.SectionPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
@@ -22,8 +24,6 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.base.Suppliers;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
@@ -46,14 +46,20 @@ import java.util.function.Consumer;
 
 public final class NMSUtils {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-
     private static final EnumMap<World.Environment, Biome> biomeEnumMap = new EnumMap<>(World.Environment.class);
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, 1, Packet.class, boolean.class);
 
-    static {
+    private static SuperiorSkyblockPlugin plugin;
+
+    private NMSUtils() {
+
+    }
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        NMSUtils.plugin = plugin;
+
         try {
             biomeEnumMap.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
         } catch (IllegalArgumentException error) {
@@ -69,9 +75,6 @@ public final class NMSUtils {
         } catch (IllegalArgumentException error) {
             biomeEnumMap.put(World.Environment.THE_END, Biome.THE_END);
         }
-    }
-
-    private NMSUtils() {
 
     }
 
@@ -113,7 +116,7 @@ public final class NMSUtils {
                                                  Runnable onFinish) {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().getPlayerChunkMap();
 
-        Executor.createTask().runAsync(v -> {
+        BukkitExecutor.createTask().runAsync(v -> {
             List<Pair<ChunkCoordIntPair, NBTTagCompound>> chunkCompounds = new ArrayList<>();
 
             chunks.forEach(chunkCoords -> {

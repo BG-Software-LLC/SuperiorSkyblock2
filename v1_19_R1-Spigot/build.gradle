@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-20220305.050345-9' // API is the same as in 1.18
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT' // API is the same as in 1.18
     compileOnly 'org.spigotmc:v1_19_R1:b3513'
 
     compileOnly project(":API")

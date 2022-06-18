@@ -15,17 +15,21 @@ import org.jetbrains.annotations.NotNull;
 
 public final class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static SuperiorSkyblockPlugin plugin;
 
-    private final Entity entity = new Entity(this);
-
-    private BlockPosition islandBlockPosition;
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        IslandEntityEnderDragon.plugin = plugin;
+    }
 
     @NotNull
     public static EntityEnderDragon fromEntityTypes(EntityTypes<? extends EntityEnderDragon> entityTypes, World world) {
         return plugin.getGrid().isIslandsWorld(world.getWorld()) ? new IslandEntityEnderDragon(world) :
                 new EntityEnderDragon(entityTypes, world);
     }
+
+    private final Entity entity = new Entity(this);
+
+    private BlockPosition islandBlockPosition;
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
         this(worldServer.getHandle());

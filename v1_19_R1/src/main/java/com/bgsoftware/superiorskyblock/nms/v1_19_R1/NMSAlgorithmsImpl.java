@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.algorithms.GlowEnchantmentFactory;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
@@ -39,7 +39,6 @@ import java.util.function.BiFunction;
 
 public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 
     static {
@@ -50,6 +49,12 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
         MENUS_HOLDER_CREATORS.put(InventoryType.HOPPER, MenuTileEntityHopper::new);
         MENUS_HOLDER_CREATORS.put(InventoryType.BLAST_FURNACE, MenuTileEntityFurnace::new);
         MENUS_HOLDER_CREATORS.put(InventoryType.SMOKER, MenuTileEntityFurnace::new);
+    }
+
+    private final SuperiorSkyblockPlugin plugin;
+
+    public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
     }
 
     @Override
