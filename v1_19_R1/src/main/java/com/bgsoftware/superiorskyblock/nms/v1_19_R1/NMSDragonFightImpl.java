@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon.EndWorldEnderDragonBattleHandler;
@@ -46,10 +45,6 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
 
     static {
         ENTITY_TYPES_BUILDER.set(EntityTypes.v, (EntityTypes.b<EntityEnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
-    }
-
-    public NMSDragonFightImpl(SuperiorSkyblockPlugin plugin) {
-        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

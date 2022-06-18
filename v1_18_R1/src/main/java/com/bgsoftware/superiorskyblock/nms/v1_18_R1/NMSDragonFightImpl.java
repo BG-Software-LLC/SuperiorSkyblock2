@@ -1,14 +1,13 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.IslandEnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.IslandEntityEnderDragon;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.SpikesCache;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.google.common.cache.LoadingCache;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
@@ -46,10 +45,6 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
     static {
         ENTITY_TYPES_BUILDER.set(EntityTypes.v, (EntityTypes.b<EntityEnderDragon>) IslandEntityEnderDragon::fromEntityTypes);
-    }
-
-    public NMSDragonFightImpl(SuperiorSkyblockPlugin plugin) {
-        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

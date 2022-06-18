@@ -258,6 +258,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 return;
             }
 
+            nmsAlgorithms.init();
+
             try {
                 bukkitListeners.register();
             } catch (RuntimeException ex) {

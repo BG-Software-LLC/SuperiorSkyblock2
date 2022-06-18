@@ -14,13 +14,13 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
-import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
@@ -92,7 +92,6 @@ public class NMSWorldImpl implements NMSWorld {
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.signsListener = plugin.getListener(SignsListener.class);
-        NMSUtils.init(plugin);
     }
 
     @Override

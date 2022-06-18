@@ -16,19 +16,19 @@ import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.SoundEffectType;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.properties.BlockState;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.border.WorldBorder;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.lighting.LightEngine;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -87,7 +87,6 @@ public class NMSWorldImpl implements NMSWorld {
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.signsListener = plugin.getListener(SignsListener.class);
-        NMSUtils.init(plugin);
     }
 
     @Override

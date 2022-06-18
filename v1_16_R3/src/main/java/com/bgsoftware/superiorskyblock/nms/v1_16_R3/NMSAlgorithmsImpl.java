@@ -5,6 +5,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms.GlowEnchantmentFactory;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityFurnace;
@@ -55,6 +57,13 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void init() {
+        NMSUtils.init(plugin);
+        CropsTickingTileEntity.init(plugin);
+        IslandEntityEnderDragon.init(plugin);
     }
 
     @Override

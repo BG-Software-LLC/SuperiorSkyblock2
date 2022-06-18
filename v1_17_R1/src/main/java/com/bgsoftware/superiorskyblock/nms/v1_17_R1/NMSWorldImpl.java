@@ -14,8 +14,8 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
-import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.generator.IslandsGeneratorImpl;
+import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
@@ -87,7 +87,6 @@ public class NMSWorldImpl implements NMSWorld {
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.signsListener = plugin.getListener(SignsListener.class);
-        NMSUtils.init(plugin);
     }
 
     @Override

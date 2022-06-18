@@ -64,7 +64,6 @@ public class NMSWorldImpl implements NMSWorld {
     public NMSWorldImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.signsListener = plugin.getListener(SignsListener.class);
-        NMSUtils.init(plugin);
     }
 
     @Override

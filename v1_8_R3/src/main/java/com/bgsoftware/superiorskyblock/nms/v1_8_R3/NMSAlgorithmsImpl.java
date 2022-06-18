@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.algorithms.GlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.chunks.CropsTickingTileEntity;
 import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.IBlockData;
@@ -35,6 +36,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void init() {
+        NMSUtils.init(plugin);
+        CropsTickingTileEntity.init(plugin);
     }
 
     @Override

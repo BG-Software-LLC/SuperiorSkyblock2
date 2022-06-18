@@ -4,29 +4,29 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.SectionPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagList;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.network.PlayerConnection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.lighting.LightEngine;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.lighting.LightEngineLayerEventListener;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagList;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.network.PlayerConnection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.entity.Entity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.serialization.Codec;
@@ -78,8 +78,6 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        NMSUtils.init(plugin);
-        CropsTickingTileEntity.init(plugin);
     }
 
     @Override

@@ -92,8 +92,6 @@ public class NMSChunksImpl implements NMSChunks {
 
     public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        NMSUtils.init(plugin);
-        CropsTickingTileEntity.init(plugin);
     }
 
     @Override
