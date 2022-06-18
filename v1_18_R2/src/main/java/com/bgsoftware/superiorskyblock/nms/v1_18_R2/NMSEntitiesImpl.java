@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;

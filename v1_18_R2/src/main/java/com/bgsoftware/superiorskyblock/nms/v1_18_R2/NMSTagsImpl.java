@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.item.ItemStack;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.item.ItemStack;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;

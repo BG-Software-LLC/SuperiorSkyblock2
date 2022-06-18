@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 
 import java.lang.reflect.Modifier;

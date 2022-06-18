@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.EndWorldEnderDragonBa
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEntityEnderDragon;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.SpikesCache;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import com.google.common.cache.LoadingCache;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;

@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;

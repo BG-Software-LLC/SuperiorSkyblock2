@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.properties.BlockState;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 

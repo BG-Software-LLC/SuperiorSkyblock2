@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 
 import javax.annotation.Nullable;

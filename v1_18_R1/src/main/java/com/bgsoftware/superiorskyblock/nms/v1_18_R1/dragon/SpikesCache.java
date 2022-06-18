@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.MathHelper;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.util.MathHelper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
