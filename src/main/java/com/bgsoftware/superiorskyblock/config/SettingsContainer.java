@@ -8,23 +8,23 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.formatting.impl.DateFormatter;
-import com.bgsoftware.superiorskyblock.formatting.impl.NumberFormatter;
-import com.bgsoftware.superiorskyblock.handler.HandlerLoadException;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeySetImpl;
-import com.bgsoftware.superiorskyblock.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
+import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.io.Resources;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.utils.FileUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.menu.file.MenuParser;
-import com.bgsoftware.superiorskyblock.utils.items.TemplateItem;
-import com.bgsoftware.superiorskyblock.values.BlockValuesHandler;
-import com.bgsoftware.superiorskyblock.wrappers.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -44,7 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public final class SettingsContainer {
+public class SettingsContainer {
 
     public final String databaseType;
     public final String databaseMySQLAddress;
@@ -180,7 +180,7 @@ public final class SettingsContainer {
     public final boolean defaultIslandFly;
     public final String defaultBorderColor;
     public final boolean obsidianToLava;
-    public final BlockValuesHandler.SyncWorthStatus syncWorth;
+    public final BlockValuesManagerImpl.SyncWorthStatus syncWorth;
     public final boolean negativeWorth;
     public final boolean negativeLevel;
     public final List<String> disabledEvents;
@@ -206,7 +206,7 @@ public final class SettingsContainer {
     public final TopIslandMembersSorting islandTopMembersSorting;
     public final int bossBarLimit;
 
-    public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws HandlerLoadException {
+    public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
         databaseMySQLAddress = config.getString("database.address");
         databaseMySQLPort = config.getInt("database.port");
@@ -339,7 +339,7 @@ public final class SettingsContainer {
             this.defaultWorldEnvironment = World.Environment.THE_END;
             this.defaultWorldName = this.endWorldName;
         } else {
-            throw new HandlerLoadException("Cannot find a default islands world.", HandlerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+            throw new ManagerLoadException("Cannot find a default islands world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
         worldsDifficulty = config.getString("worlds.difficulty", "EASY").toUpperCase(Locale.ENGLISH);
         spawnLocation = config.getString("spawn.location", "SuperiorWorld, 0, 100, 0, 0, 0");
@@ -477,7 +477,7 @@ public final class SettingsContainer {
         defaultIslandFly = config.getBoolean("default-island-fly", false);
         defaultBorderColor = config.getString("default-border-color", "BLUE");
         obsidianToLava = config.getBoolean("obsidian-to-lava", false);
-        syncWorth = BlockValuesHandler.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
+        syncWorth = BlockValuesManagerImpl.SyncWorthStatus.of(config.getString("sync-worth", "NONE"));
         negativeWorth = config.getBoolean("negative-worth", true);
         negativeLevel = config.getBoolean("negative-level", true);
         disabledEvents = config.getStringList("disabled-events")
@@ -539,7 +539,7 @@ public final class SettingsContainer {
         File file = new File(plugin.getDataFolder(), "safe_blocks.yml");
 
         if (!file.exists())
-            FileUtils.saveResource("safe_blocks.yml");
+            Resources.saveResource("safe_blocks.yml");
 
         CommentedConfiguration cfg = CommentedConfiguration.loadConfiguration(file);
 

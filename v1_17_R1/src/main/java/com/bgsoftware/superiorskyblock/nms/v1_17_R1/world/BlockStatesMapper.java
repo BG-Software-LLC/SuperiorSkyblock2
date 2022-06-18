@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_17_R1.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 
 import javax.annotation.Nullable;
@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class BlockStatesMapper {
+public class BlockStatesMapper {
 
     private static final Map<String, IBlockState<?>> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState<?>, String> blockStateToName = new HashMap<>();

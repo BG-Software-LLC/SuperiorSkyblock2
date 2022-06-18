@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 
-public final class PlayerChat {
+public class PlayerChat {
 
     private static final Map<UUID, PlayerChat> playerChatListeners = new HashMap<>();
     private final Function<String, Boolean> chatConsumer;

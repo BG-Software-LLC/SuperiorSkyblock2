@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.island.container.value;
 
 import java.util.function.Supplier;
 
-public final class SuppliedSyncedValue<V extends Number> implements SyncedValue<V> {
+public class SuppliedSyncedValue<V extends Number> implements SyncedValue<V> {
 
     private final Supplier<V> supplier;
 

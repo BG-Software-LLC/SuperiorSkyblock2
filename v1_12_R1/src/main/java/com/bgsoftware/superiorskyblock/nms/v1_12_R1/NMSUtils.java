@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_12_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -31,9 +31,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public final class NMSUtils {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+public class NMSUtils {
 
     private static final ReflectField<IChunkLoader> CHUNK_LOADER = new ReflectField<>(
             ChunkProviderServer.class, IChunkLoader.class, "chunkLoader");
@@ -44,8 +42,14 @@ public final class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
+    private static SuperiorSkyblockPlugin plugin;
+
     private NMSUtils() {
 
+    }
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        NMSUtils.plugin = plugin;
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
@@ -84,7 +88,7 @@ public final class NMSUtils {
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
                 uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
 
-        Executor.createTask().runAsync(v -> {
+        BukkitExecutor.createTask().runAsync(v -> {
             chunks.forEach(chunkCoords -> {
                 if (!chunkLoader.chunkExists(chunkCoords.x, chunkCoords.z))
                     return;

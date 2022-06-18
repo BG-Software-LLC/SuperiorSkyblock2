@@ -6,7 +6,7 @@ import net.minecraft.server.v1_16_R3.WorldGenEndTrophy;
 
 import java.lang.reflect.Modifier;
 
-public final class DragonUtils {
+public class DragonUtils {
 
     private static final ReflectField<BlockPosition> END_PODIUM_LOCATION = new ReflectField<BlockPosition>(
             WorldGenEndTrophy.class, BlockPosition.class,

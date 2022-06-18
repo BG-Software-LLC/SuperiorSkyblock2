@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
-public final class IslandChestsSection implements SettingsManager.IslandChests {
+public class IslandChestsSection implements SettingsManager.IslandChests {
 
     private final SettingsContainer container;
 

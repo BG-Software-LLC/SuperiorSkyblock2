@@ -4,7 +4,7 @@ import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.TileEntityBrewingStand;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityBrewing extends TileEntityBrewingStand {
+public class MenuTileEntityBrewing extends TileEntityBrewingStand {
 
     private final InventoryHolder holder;
 

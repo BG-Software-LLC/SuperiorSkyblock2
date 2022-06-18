@@ -7,7 +7,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public final class PersistentDataTagSerialized extends Tag<byte[]> {
+public class PersistentDataTagSerialized extends Tag<byte[]> {
 
     public PersistentDataTagSerialized(byte[] value) {
         super(value, null);

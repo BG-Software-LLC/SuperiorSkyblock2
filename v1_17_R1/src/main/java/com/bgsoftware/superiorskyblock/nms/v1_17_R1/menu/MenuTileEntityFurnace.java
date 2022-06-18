@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TileEntityFurnaceFurnace;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityFurnace extends TileEntityFurnaceFurnace {
+public class MenuTileEntityFurnace extends TileEntityFurnaceFurnace {
 
     private final InventoryHolder holder;
 

@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.menu;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.Block;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.world.level.block.entity.TileEntityDispenser;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityDispenser extends TileEntityDispenser {
+public class MenuTileEntityDispenser extends TileEntityDispenser {
 
     private final InventoryHolder holder;
 

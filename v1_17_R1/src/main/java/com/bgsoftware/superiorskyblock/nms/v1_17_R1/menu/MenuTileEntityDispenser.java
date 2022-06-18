@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TileEntityDispenser;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityDispenser extends TileEntityDispenser {
+public class MenuTileEntityDispenser extends TileEntityDispenser {
 
     private final InventoryHolder holder;
 

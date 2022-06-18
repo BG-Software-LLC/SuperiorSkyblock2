@@ -3,10 +3,10 @@ package com.bgsoftware.superiorskyblock.module.upgrades.type;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetSpawnerRates;
-import com.bgsoftware.superiorskyblock.structure.AutoRemovalCollection;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public final class UpgradeTypeSpawnerRates implements IUpgradeType {
+public class UpgradeTypeSpawnerRates implements IUpgradeType {
 
     private static final List<ISuperiorCommand> commands = Arrays.asList(new CmdAdminAddSpawnerRates(),
             new CmdAdminSetSpawnerRates());
@@ -55,7 +55,7 @@ public final class UpgradeTypeSpawnerRates implements IUpgradeType {
         double spawnerRatesMultiplier = island.getSpawnerRatesMultiplier();
 
         if (spawnerRatesMultiplier > 1 && alreadyTrackedSpawning.add(island.getOwner().getUniqueId())) {
-            Executor.sync(() -> {
+            BukkitExecutor.sync(() -> {
                 int spawnDelay = plugin.getNMSWorld().getSpawnerDelay(creatureSpawner);
                 if (spawnDelay > 0) {
                     plugin.getNMSWorld().setSpawnerDelay(creatureSpawner,
@@ -65,7 +65,7 @@ public final class UpgradeTypeSpawnerRates implements IUpgradeType {
         }
     }
 
-    private final class SpawnerRatesListener implements Listener {
+    private class SpawnerRatesListener implements Listener {
 
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

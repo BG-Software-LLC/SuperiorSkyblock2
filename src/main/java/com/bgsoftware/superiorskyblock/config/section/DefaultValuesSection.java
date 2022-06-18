@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 import java.math.BigDecimal;
 import java.util.Map;
 
-public final class DefaultValuesSection implements SettingsManager.DefaultValues {
+public class DefaultValuesSection implements SettingsManager.DefaultValues {
 
     private final SettingsContainer container;
 

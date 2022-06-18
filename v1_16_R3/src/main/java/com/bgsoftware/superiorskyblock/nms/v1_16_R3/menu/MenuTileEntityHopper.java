@@ -4,7 +4,7 @@ import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.TileEntityHopper;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityHopper extends TileEntityHopper {
+public class MenuTileEntityHopper extends TileEntityHopper {
 
     private final InventoryHolder holder;
 

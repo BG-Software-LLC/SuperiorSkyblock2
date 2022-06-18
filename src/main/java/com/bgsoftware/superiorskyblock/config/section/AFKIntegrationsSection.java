@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
-public final class AFKIntegrationsSection implements SettingsManager.AFKIntegrations {
+public class AFKIntegrationsSection implements SettingsManager.AFKIntegrations {
 
     private final SettingsContainer container;
 

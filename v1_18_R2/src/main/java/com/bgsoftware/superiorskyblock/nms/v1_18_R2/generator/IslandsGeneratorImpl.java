@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings({"unused", "NullableProblems"})
-public final class IslandsGeneratorImpl extends IslandsGenerator {
+public class IslandsGeneratorImpl extends IslandsGenerator {
 
     private final SuperiorSkyblockPlugin plugin;
 

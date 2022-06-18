@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon;
 
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.MathHelper;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.util.MathHelper;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.CacheStats;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
+public class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
 
     private static final SpikesCache INSTANCE = new SpikesCache();
 
@@ -41,7 +41,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull List<WorldGenEnder.Spike> get(@NotNull Long worldSeed) throws ExecutionException {
+    public @NotNull
+    List<WorldGenEnder.Spike> get(@NotNull Long worldSeed) throws ExecutionException {
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition().getHandle());
@@ -51,7 +52,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull List<WorldGenEnder.Spike> getUnchecked(@NotNull Long worldSeed) {
+    public @NotNull
+    List<WorldGenEnder.Spike> getUnchecked(@NotNull Long worldSeed) {
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.getUnchecked(DragonUtils.getCurrentPodiumPosition().getHandle());
@@ -61,7 +63,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull ImmutableMap<Long, List<WorldGenEnder.Spike>> getAll(@NotNull Iterable<? extends Long> keys) {
+    public @NotNull
+    ImmutableMap<Long, List<WorldGenEnder.Spike>> getAll(@NotNull Iterable<? extends Long> keys) {
         throw new UnsupportedOperationException("This operation is not supported in SpikesCache.");
     }
 
@@ -81,7 +84,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull ConcurrentMap<Long, List<WorldGenEnder.Spike>> asMap() {
+    public @NotNull
+    ConcurrentMap<Long, List<WorldGenEnder.Spike>> asMap() {
         throw new UnsupportedOperationException("This operation is not supported in SpikesCache.");
     }
 
@@ -92,8 +96,9 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull List<WorldGenEnder.Spike> get(@NotNull Long worldSeed,
-                                                  @NotNull Callable<? extends List<WorldGenEnder.Spike>> loader) throws ExecutionException {
+    public @NotNull
+    List<WorldGenEnder.Spike> get(@NotNull Long worldSeed,
+                                  @NotNull Callable<? extends List<WorldGenEnder.Spike>> loader) throws ExecutionException {
         try {
             this.worldSeed = worldSeed;
             return cachedSpikes.get(DragonUtils.getCurrentPodiumPosition().getHandle(), loader);
@@ -103,7 +108,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull ImmutableMap<Long, List<WorldGenEnder.Spike>> getAllPresent(@NotNull Iterable<?> keys) {
+    public @NotNull
+    ImmutableMap<Long, List<WorldGenEnder.Spike>> getAllPresent(@NotNull Iterable<?> keys) {
         throw new UnsupportedOperationException("This operation is not supported in SpikesCache.");
     }
 
@@ -143,7 +149,8 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
     }
 
     @Override
-    public @NotNull CacheStats stats() {
+    public @NotNull
+    CacheStats stats() {
         return this.cachedSpikes.stats();
     }
 
@@ -152,10 +159,11 @@ public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.
         this.cachedSpikes.cleanUp();
     }
 
-    private final class InternalCacheLoader extends CacheLoader<net.minecraft.core.BlockPosition, List<WorldGenEnder.Spike>> {
+    private class InternalCacheLoader extends CacheLoader<net.minecraft.core.BlockPosition, List<WorldGenEnder.Spike>> {
 
         @Override
-        public @NotNull List<WorldGenEnder.Spike> load(@NotNull net.minecraft.core.BlockPosition nmsBlockPosition) {
+        public @NotNull
+        List<WorldGenEnder.Spike> load(@NotNull net.minecraft.core.BlockPosition nmsBlockPosition) {
             BlockPosition blockPosition = new BlockPosition(nmsBlockPosition);
 
             List<Integer> list = IntStream.range(0, 10).boxed().collect(Collectors.toList());

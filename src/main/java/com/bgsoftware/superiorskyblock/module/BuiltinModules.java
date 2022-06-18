@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.UpgradesModule;
 
 import java.util.Locale;
 
-public final class BuiltinModules {
+public class BuiltinModules {
 
     public static final GeneratorsModule GENERATORS = new GeneratorsModule();
     public static final MissionsModule MISSIONS = new MissionsModule();

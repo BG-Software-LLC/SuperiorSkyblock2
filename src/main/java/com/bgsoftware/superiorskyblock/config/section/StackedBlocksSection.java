@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public final class StackedBlocksSection implements SettingsManager.StackedBlocks {
+public class StackedBlocksSection implements SettingsManager.StackedBlocks {
 
     private final SettingsContainer container;
     private final DepositMenu depositMenu = new DepositMenuSection();

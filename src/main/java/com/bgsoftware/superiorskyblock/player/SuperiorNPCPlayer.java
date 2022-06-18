@@ -10,10 +10,9 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.database.bridge.EmptyDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.SPlayerRole;
-import com.bgsoftware.superiorskyblock.lang.PlayerLocales;
-import com.bgsoftware.superiorskyblock.persistence.EmptyPersistentDataContainer;
+import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.island.persistence.EmptyPersistentDataContainer;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -31,7 +30,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public final class SuperiorNPCPlayer implements SuperiorPlayer {
+public class SuperiorNPCPlayer implements SuperiorPlayer {
 
     private final Entity npc;
 

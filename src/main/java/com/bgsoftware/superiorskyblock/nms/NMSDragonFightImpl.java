@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 
-public final class NMSDragonFightImpl implements NMSDragonFight {
+public class NMSDragonFightImpl implements NMSDragonFight {
 
     @Override
     public void prepareEndWorld(World bukkitWorld) {

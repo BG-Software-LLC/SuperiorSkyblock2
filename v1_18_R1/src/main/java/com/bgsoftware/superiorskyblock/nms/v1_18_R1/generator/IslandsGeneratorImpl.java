@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings({"unused", "NullableProblems"})
-public final class IslandsGeneratorImpl extends IslandsGenerator {
+public class IslandsGeneratorImpl extends IslandsGenerator {
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -38,12 +38,14 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
     public BiomeProvider getDefaultBiomeProvider(@NotNull WorldInfo worldInfo) {
         return new BiomeProvider() {
             @Override
-            public @NotNull Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
+            public @NotNull
+            Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
                 return NMSUtils.getWorldBiome(worldInfo.getEnvironment());
             }
 
             @Override
-            public @NotNull List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
+            public @NotNull
+            List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
                 return NMSUtils.getAllBiomes();
             }
 

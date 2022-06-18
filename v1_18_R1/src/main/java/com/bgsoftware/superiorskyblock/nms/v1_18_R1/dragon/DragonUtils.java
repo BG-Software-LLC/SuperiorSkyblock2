@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.levelgen.feature.WorldGenEndTrophy;
 
 import java.lang.reflect.Modifier;
 
-public final class DragonUtils {
+public class DragonUtils {
 
     private static final ReflectField<net.minecraft.core.BlockPosition> END_PODIUM_LOCATION = new ReflectField<net.minecraft.core.BlockPosition>(
             WorldGenEndTrophy.class, net.minecraft.core.BlockPosition.class,

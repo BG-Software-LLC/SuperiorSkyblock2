@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
-public final class DatabaseSection implements SettingsManager.Database {
+public class DatabaseSection implements SettingsManager.Database {
 
     private final SettingsContainer container;
 

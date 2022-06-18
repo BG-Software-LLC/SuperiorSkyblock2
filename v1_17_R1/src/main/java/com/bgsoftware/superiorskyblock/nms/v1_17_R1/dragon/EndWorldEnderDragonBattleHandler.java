@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
+public class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
 
     private final Map<UUID, IslandEnderDragonBattle> worldDragonBattlesMap = new HashMap<>();
     private final List<IslandEnderDragonBattle> worldDragonBattlesList = new LinkedList<>();

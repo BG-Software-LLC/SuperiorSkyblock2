@@ -4,7 +4,7 @@ import net.minecraft.server.v1_16_R3.ChatMessage;
 import net.minecraft.server.v1_16_R3.TileEntityFurnaceFurnace;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityFurnace extends TileEntityFurnaceFurnace {
+public class MenuTileEntityFurnace extends TileEntityFurnaceFurnace {
 
     private final InventoryHolder holder;
 

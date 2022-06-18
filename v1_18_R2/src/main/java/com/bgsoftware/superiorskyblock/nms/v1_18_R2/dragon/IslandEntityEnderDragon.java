@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
@@ -13,19 +13,23 @@ import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEnderDragon;
 import org.jetbrains.annotations.NotNull;
 
-public final class IslandEntityEnderDragon extends EntityEnderDragon {
+public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static SuperiorSkyblockPlugin plugin;
 
-    private final Entity entity = new Entity(this);
-
-    private BlockPosition islandBlockPosition;
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        IslandEntityEnderDragon.plugin = plugin;
+    }
 
     @NotNull
     public static EntityEnderDragon fromEntityTypes(EntityTypes<? extends EntityEnderDragon> entityTypes, World world) {
         return plugin.getGrid().isIslandsWorld(world.getWorld()) ? new IslandEntityEnderDragon(world) :
                 new EntityEnderDragon(entityTypes, world);
     }
+
+    private final Entity entity = new Entity(this);
+
+    private BlockPosition islandBlockPosition;
 
     public IslandEntityEnderDragon(WorldServer worldServer, BlockPosition islandBlockPosition) {
         this(worldServer.getHandle());

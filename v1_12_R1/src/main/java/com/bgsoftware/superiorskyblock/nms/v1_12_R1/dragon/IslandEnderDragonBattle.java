@@ -43,9 +43,9 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-public final class IslandEnderDragonBattle extends EnderDragonBattle {
+public class IslandEnderDragonBattle extends EnderDragonBattle {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static SuperiorSkyblockPlugin plugin;
 
     private static final ReflectField<EnderDragonBattle> DRAGON_BATTLE = new ReflectField<EnderDragonBattle>(
             EntityEnderDragon.class, EnderDragonBattle.class, Modifier.PRIVATE | Modifier.FINAL, 1)
@@ -81,6 +81,10 @@ public final class IslandEnderDragonBattle extends EnderDragonBattle {
     private int crystalsCount = 0;
     private boolean dragonKilled = false;
     private boolean previouslyKilled = false;
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        IslandEnderDragonBattle.plugin = plugin;
+    }
 
     public IslandEnderDragonBattle(Island island, WorldServer worldServer, Location location) {
         this(island, worldServer, new BlockPosition(location.getX(), location.getY(), location.getZ()),

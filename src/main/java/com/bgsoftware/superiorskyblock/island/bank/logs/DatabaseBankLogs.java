@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.database.DatabaseResult;
+import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
-public final class DatabaseBankLogs implements IBankLogs {
+public class DatabaseBankLogs implements IBankLogs {
 
     private final LoadingCache<Integer, List<BankTransaction>> cachedBankTransactions = CacheBuilder.newBuilder()
             .maximumSize(1)

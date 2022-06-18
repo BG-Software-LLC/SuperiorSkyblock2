@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 
-public final class BigDecimalTag extends Tag<BigDecimal> {
+public class BigDecimalTag extends Tag<BigDecimal> {
 
     public BigDecimalTag(BigDecimal value) {
         super(value, null);

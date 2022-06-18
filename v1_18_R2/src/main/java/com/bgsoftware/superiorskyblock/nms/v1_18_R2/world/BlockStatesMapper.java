@@ -1,15 +1,15 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.properties.BlockState;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public final class BlockStatesMapper {
+public class BlockStatesMapper {
 
     private static final Map<String, BlockState<?>> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState<?>, String> blockStateToName = new HashMap<>();

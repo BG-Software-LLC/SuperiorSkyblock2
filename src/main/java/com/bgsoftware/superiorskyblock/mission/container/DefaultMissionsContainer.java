@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public final class DefaultMissionsContainer implements MissionsContainer {
+public class DefaultMissionsContainer implements MissionsContainer {
 
     private final Map<String, Mission<?>> missionMap = new HashMap<>();
     private final Map<Mission<?>, MissionData> missionDataMap = new HashMap<>();

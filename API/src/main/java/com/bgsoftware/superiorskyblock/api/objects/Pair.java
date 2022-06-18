@@ -8,7 +8,7 @@ import java.util.Map;
  * @param <E1> First element of this pair.
  * @param <E2> Second element of this pair.
  */
-public final class Pair<E1, E2> {
+public class Pair<E1, E2> {
 
     private E1 firstElement;
     private E2 secondElement;

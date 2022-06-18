@@ -17,7 +17,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-public final class ModuleClassLoader extends URLClassLoader {
+public class ModuleClassLoader extends URLClassLoader {
 
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 

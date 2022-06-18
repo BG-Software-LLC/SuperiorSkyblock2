@@ -1,12 +1,12 @@
 package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
-import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
 @SuppressWarnings("deprecation")
-public final class NMSCachedBlock implements ICachedBlock {
+public class NMSCachedBlock implements ICachedBlock {
 
     private final Material blockType;
     private final byte blockData;

@@ -8,7 +8,7 @@ import net.minecraft.server.v1_12_R1.DataPaletteBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.NibbleArray;
 
-public final class EmptyCounterChunkSection extends ChunkSection {
+public class EmptyCounterChunkSection extends ChunkSection {
 
     private static final ReflectField<Integer> NON_EMPTY_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "nonEmptyBlockCount");
     private static final ReflectField<Integer> TICKING_BLOCK_COUNT = new ReflectField<>(ChunkSection.class, int.class, "tickingBlockCount");

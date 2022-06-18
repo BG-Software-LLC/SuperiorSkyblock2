@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public final class IslandPrivilege implements Enumerable {
+public class IslandPrivilege implements Enumerable {
 
     private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
     private static int ordinalCounter = 0;

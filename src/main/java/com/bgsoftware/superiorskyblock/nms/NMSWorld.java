@@ -5,8 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.world.blocks.BlockData;
-import com.bgsoftware.superiorskyblock.world.blocks.ICachedBlock;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -33,7 +32,7 @@ public interface NMSWorld {
 
     Object getBlockData(Block block);
 
-    void setBlocks(Chunk chunk, List<BlockData> blockDataList);
+    void setBlocks(Chunk chunk, List<SchematicBlock> blockDataList);
 
     void setBlock(Location location, int combinedId);
 

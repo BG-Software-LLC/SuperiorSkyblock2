@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.lang.Message;
-import com.bgsoftware.superiorskyblock.threads.Executor;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.time.Duration;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public final class CmdTeleport implements ISuperiorCommand {
+public class CmdTeleport implements ISuperiorCommand {
 
     @Override
     public List<String> getAliases() {
@@ -68,7 +68,7 @@ public final class CmdTeleport implements ISuperiorCommand {
                 !superiorPlayer.hasPermission("superior.admin.bypass.warmup")) {
             Message.TELEPORT_WARMUP.send(superiorPlayer, Formatters.TIME_FORMATTER.format(
                     Duration.ofMillis(plugin.getSettings().getHomeWarmup()), superiorPlayer.getUserLocale()));
-            superiorPlayer.setTeleportTask(Executor.sync(() ->
+            superiorPlayer.setTeleportTask(BukkitExecutor.sync(() ->
                     teleportToIsland(superiorPlayer, island), plugin.getSettings().getHomeWarmup() / 50));
         } else {
             teleportToIsland(superiorPlayer, island);

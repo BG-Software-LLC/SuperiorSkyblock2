@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public final class DefaultModulesContainer implements ModulesContainer {
+public class DefaultModulesContainer implements ModulesContainer {
 
     private final Map<String, PluginModule> modulesMap = new HashMap<>();
     private final Map<PluginModule, ModuleData> modulesData = new HashMap<>();

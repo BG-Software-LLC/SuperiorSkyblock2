@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3.algorithms;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.enchantments.EnchantmentTarget;
 
-public final class GlowEnchantment extends Enchantment {
+public class GlowEnchantment extends Enchantment {
 
     private GlowEnchantment(int id) {
         super(id);

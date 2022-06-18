@@ -18,7 +18,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 
 @SuppressWarnings("unused")
-public final class NMSHologramsImpl implements NMSHolograms {
+public class NMSHologramsImpl implements NMSHolograms {
 
     @Override
     public Hologram createHologram(Location location) {
@@ -33,7 +33,7 @@ public final class NMSHologramsImpl implements NMSHolograms {
         return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
-    private static final class EntityHologram extends EntityArmorStand implements Hologram {
+    private static class EntityHologram extends EntityArmorStand implements Hologram {
 
         EntityHologram(World world, double x, double y, double z) {
             super(world, x, y, z);

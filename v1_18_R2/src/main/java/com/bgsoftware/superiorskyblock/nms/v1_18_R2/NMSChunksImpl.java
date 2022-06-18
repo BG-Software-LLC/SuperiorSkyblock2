@@ -4,29 +4,30 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.key.dataset.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.SectionPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.BlockPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.ChunkCoordIntPair;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.SectionPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.WorldServer;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.Block;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.block.state.BlockData;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk.ChunkAccess;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.chunk.ChunkSection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.lighting.LightEngine;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.level.lighting.LightEngineLayerEventListener;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.nbt.NBTTagList;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.network.PlayerConnection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.world.chunks.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksTracker;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkAccess;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkSection;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting.LightEngine;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting.LightEngineLayerEventListener;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.PlayerConnection;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -73,91 +74,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
-public final class NMSChunksImpl implements NMSChunks {
+public class NMSChunksImpl implements NMSChunks {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin;
 
-    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
-                                                  net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
-        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
-        Set<Location> spawnersLocations = new HashSet<>();
-
-        for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunkSections) {
-            ChunkSection chunkSection = ChunkSection.ofNullable(nmsSection);
-            if (chunkSection != null) {
-                for (BlockPosition blockPosition : BlockPosition.allBlocksBetween(0, 0, 0, 15, 15, 15)) {
-                    BlockData blockData = chunkSection.getType(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-                    Block block = blockData.getBlock();
-
-                    if (block.getHandle() != Blocks.a) {
-                        Location location = new Location(chunkPosition.getWorld(),
-                                (chunkPosition.getX() << 4) + blockPosition.getX(),
-                                chunkSection.getYPosition() + blockPosition.getY(),
-                                (chunkPosition.getZ() << 4) + blockPosition.getZ());
-
-                        int blockAmount = 1;
-
-                        if ((TagsBlock.isTagged(TagsBlock.SLABS, block) || TagsBlock.isTagged(TagsBlock.WOODEN_SLABS, block)) &&
-                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.c) {
-                            blockAmount = 2;
-                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.b);
-                        }
-
-                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock().getHandle());
-                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
-                        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
-                        if (type == Material.SPAWNER) {
-                            spawnersLocations.add(location);
-                        }
-                    }
-                }
-            }
-        }
-
-        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
-    }
-
-    private static void removeEntities(ChunkAccess chunk) {
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
-        WorldServer worldServer = chunk.getWorld();
-
-        int minBuildHeight = worldServer.getWorld().getMinHeight();
-        int maxBuildHeight = worldServer.getWorld().getMaxHeight();
-
-        int chunkWorldCoordX = chunkCoords.getX() << 4;
-        int chunkWorldCoordZ = chunkCoords.getZ() << 4;
-
-        net.minecraft.world.phys.AxisAlignedBB chunkBounds = new net.minecraft.world.phys.AxisAlignedBB(
-                chunkWorldCoordX, minBuildHeight, chunkWorldCoordZ,
-                chunkWorldCoordX + 15, maxBuildHeight, chunkWorldCoordZ + 15);
-
-        List<net.minecraft.world.entity.Entity> worldEntities = new ArrayList<>();
-        worldServer.getEntities().get(chunkBounds, worldEntities::add);
-
-        worldEntities.forEach(nmsEntity -> {
-            Entity entity = new Entity(nmsEntity);
-            if (!(entity.getHandle() instanceof EntityHuman))
-                entity.setRemoved(net.minecraft.world.entity.Entity.RemovalReason.b);
-        });
-    }
-
-    private static void removeBlocks(ChunkAccess chunk) {
-        WorldServer worldServer = chunk.getWorld();
-
-        ChunkGenerator bukkitGenerator = worldServer.getWorld().getGenerator();
-
-        if (bukkitGenerator != null && !(bukkitGenerator instanceof IslandsGenerator)) {
-            CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer.getHandle(),
-                    worldServer.getChunkProvider().getGenerator(),
-                    bukkitGenerator);
-
-            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer.getHandle(),
-                    Collections.singletonList(chunk.getHandle()), ChunkStatus.h, 0);
-
-            chunkGenerator.a(region,
-                    worldServer.getStructureManager().getStructureManager(region).getHandle(),
-                    chunk.getHandle());
-        }
+    public NMSChunksImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+        NMSUtils.init(plugin);
+        CropsTickingTileEntity.init(plugin);
     }
 
     @Override
@@ -424,20 +348,20 @@ public final class NMSChunksImpl implements NMSChunks {
 
     @Override
     public void refreshLights(org.bukkit.Chunk bukkitChunk,
-                              List<com.bgsoftware.superiorskyblock.world.blocks.BlockData> blockDataList) {
+                              List<SchematicBlock> blockDataList) {
         ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
         WorldServer world = chunk.getWorld();
 
         // Update lights for the blocks.
         // We use a delayed task to avoid null nibbles
-        Executor.sync(() -> {
+        BukkitExecutor.sync(() -> {
             boolean canSkyLight = bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL;
             LightEngine lightEngine = world.getLightEngine();
             LightEngineLayerEventListener blocksLightLayer = lightEngine.getLayer(EnumSkyBlock.b);
             LightEngineLayerEventListener skyLightLayer = lightEngine.getLayer(EnumSkyBlock.a);
 
             if (plugin.getSettings().isLightsUpdate()) {
-                for (com.bgsoftware.superiorskyblock.world.blocks.BlockData blockData : blockDataList) {
+                for (SchematicBlock blockData : blockDataList) {
                     BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
                     if (blockData.getBlockLightLevel() > 0) {
                         blocksLightLayer.flagDirty(blockPosition, blockData.getBlockLightLevel());
@@ -481,6 +405,89 @@ public final class NMSChunksImpl implements NMSChunks {
                 cropsTickingTileEntity.remove();
         } else {
             CropsTickingTileEntity.create(island, chunkAccess);
+        }
+    }
+
+    private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
+                                                  net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
+        KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
+        Set<Location> spawnersLocations = new HashSet<>();
+
+        for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunkSections) {
+            ChunkSection chunkSection = ChunkSection.ofNullable(nmsSection);
+            if (chunkSection != null) {
+                for (BlockPosition blockPosition : BlockPosition.allBlocksBetween(0, 0, 0, 15, 15, 15)) {
+                    BlockData blockData = chunkSection.getType(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
+                    Block block = blockData.getBlock();
+
+                    if (block.getHandle() != Blocks.a) {
+                        Location location = new Location(chunkPosition.getWorld(),
+                                (chunkPosition.getX() << 4) + blockPosition.getX(),
+                                chunkSection.getYPosition() + blockPosition.getY(),
+                                (chunkPosition.getZ() << 4) + blockPosition.getZ());
+
+                        int blockAmount = 1;
+
+                        if ((TagsBlock.isTagged(TagsBlock.SLABS, block) || TagsBlock.isTagged(TagsBlock.WOODEN_SLABS, block)) &&
+                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.c) {
+                            blockAmount = 2;
+                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.b);
+                        }
+
+                        Material type = CraftMagicNumbers.getMaterial(blockData.getBlock().getHandle());
+                        Key blockKey = KeyImpl.of(type.name() + "", "0", location);
+                        blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, 0) + blockAmount);
+                        if (type == Material.SPAWNER) {
+                            spawnersLocations.add(location);
+                        }
+                    }
+                }
+            }
+        }
+
+        return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+    }
+
+    private static void removeEntities(ChunkAccess chunk) {
+        ChunkCoordIntPair chunkCoords = chunk.getPos();
+        WorldServer worldServer = chunk.getWorld();
+
+        int minBuildHeight = worldServer.getWorld().getMinHeight();
+        int maxBuildHeight = worldServer.getWorld().getMaxHeight();
+
+        int chunkWorldCoordX = chunkCoords.getX() << 4;
+        int chunkWorldCoordZ = chunkCoords.getZ() << 4;
+
+        net.minecraft.world.phys.AxisAlignedBB chunkBounds = new net.minecraft.world.phys.AxisAlignedBB(
+                chunkWorldCoordX, minBuildHeight, chunkWorldCoordZ,
+                chunkWorldCoordX + 15, maxBuildHeight, chunkWorldCoordZ + 15);
+
+        List<net.minecraft.world.entity.Entity> worldEntities = new ArrayList<>();
+        worldServer.getEntities().get(chunkBounds, worldEntities::add);
+
+        worldEntities.forEach(nmsEntity -> {
+            Entity entity = new Entity(nmsEntity);
+            if (!(entity.getHandle() instanceof EntityHuman))
+                entity.setRemoved(net.minecraft.world.entity.Entity.RemovalReason.b);
+        });
+    }
+
+    private static void removeBlocks(ChunkAccess chunk) {
+        WorldServer worldServer = chunk.getWorld();
+
+        ChunkGenerator bukkitGenerator = worldServer.getWorld().getGenerator();
+
+        if (bukkitGenerator != null && !(bukkitGenerator instanceof IslandsGenerator)) {
+            CustomChunkGenerator chunkGenerator = new CustomChunkGenerator(worldServer.getHandle(),
+                    worldServer.getChunkProvider().getGenerator(),
+                    bukkitGenerator);
+
+            RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer.getHandle(),
+                    Collections.singletonList(chunk.getHandle()), ChunkStatus.h, 0);
+
+            chunkGenerator.a(region,
+                    worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    chunk.getHandle());
         }
     }
 

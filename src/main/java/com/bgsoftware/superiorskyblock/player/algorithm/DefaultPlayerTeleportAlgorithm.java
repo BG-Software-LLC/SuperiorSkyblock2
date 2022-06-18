@@ -4,16 +4,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
-import com.bgsoftware.superiorskyblock.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.utils.events.EventResult;
-import com.bgsoftware.superiorskyblock.utils.islands.IslandUtils;
-import com.bgsoftware.superiorskyblock.utils.teleport.TeleportUtils;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunkPosition;
-import com.bgsoftware.superiorskyblock.world.chunks.ChunksProvider;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.world.EntityTeleports;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
@@ -47,7 +47,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
     @Override
     public CompletableFuture<Boolean> teleport(Player player, Location location) {
         CompletableFuture<Boolean> completableFuture = new CompletableFuture<>();
-        TeleportUtils.teleport(player, location, completableFuture::complete);
+        EntityTeleports.teleport(player, location, completableFuture::complete);
         return completableFuture;
     }
 
@@ -105,7 +105,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                         {
                             Block teleportLocationHighestBlock = islandTeleportBlock.getWorld()
                                     .getHighestBlockAt(islandTeleportBlock.getLocation());
-                            if (LocationUtils.isSafeBlock(teleportLocationHighestBlock)) {
+                            if (WorldBlocks.isSafeBlock(teleportLocationHighestBlock)) {
                                 adjustAndTeleportPlayerToLocation(player, island, teleportLocationHighestBlock.getLocation(),
                                         rotationYaw, rotationPitch, completableFuture::complete);
                                 return;
@@ -114,7 +114,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
                         {
                             Block centerHighestBlock = islandCenterBlock.getWorld().getHighestBlockAt(islandCenterBlock.getLocation());
-                            if (LocationUtils.isSafeBlock(centerHighestBlock)) {
+                            if (WorldBlocks.isSafeBlock(centerHighestBlock)) {
                                 adjustAndTeleportPlayerToLocation(player, island, centerHighestBlock.getLocation(), rotationYaw,
                                         rotationPitch, completableFuture::complete);
                                 return;
@@ -132,7 +132,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
                         World islandsWorld = plugin.getGrid().getIslandsWorld(island, environment);
 
-                        Executor.createTask().runAsync(v -> {
+                        BukkitExecutor.createTask().runAsync(v -> {
                             List<Location> safeLocations = new ArrayList<>();
 
                             for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
@@ -146,7 +146,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                     continue;
                                 }
 
-                                if (LocationUtils.isChunkEmpty(null, chunkSnapshot))
+                                if (WorldBlocks.isChunkEmpty(null, chunkSnapshot))
                                     continue;
 
                                 int worldBuildLimit = islandsWorld.getMaxHeight() - 1;
@@ -165,9 +165,9 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                         // In some versions, the ChunkSnapshot#getHighestBlockYAt seems to return
                                         // one block above the actual highest block. Therefore, the check is on the
                                         // returned block and the block below it.
-                                        if (LocationUtils.isSafeBlock(chunkSnapshot, x, y, z)) {
+                                        if (WorldBlocks.isSafeBlock(chunkSnapshot, x, y, z)) {
                                             safeLocations.add(new Location(islandsWorld, worldX, y, worldZ));
-                                        } else if (y - 1 >= worldMinLimit && LocationUtils.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
+                                        } else if (y - 1 >= worldMinLimit && WorldBlocks.isSafeBlock(chunkSnapshot, x, y - 1, z)) {
                                             safeLocations.add(new Location(islandsWorld, worldX, y - 1, worldZ));
                                         }
                                     }
@@ -210,7 +210,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
     private void teleportIfSafe(Player player, Island island, Block block, Location customLocation, float yaw, float pitch,
                                 BiConsumer<Boolean, Location> teleportResult) {
         ChunksProvider.loadChunk(ChunkPosition.of(block), ChunkLoadReason.ENTITY_TELEPORT, chunk -> {
-            if (!LocationUtils.isSafeBlock(block)) {
+            if (!WorldBlocks.isSafeBlock(block)) {
                 if (teleportResult != null)
                     teleportResult.accept(false, null);
                 return;

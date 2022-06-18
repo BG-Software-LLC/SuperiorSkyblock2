@@ -12,9 +12,13 @@ import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEnderDragon;
 
-public final class IslandEntityEnderDragon extends EntityEnderDragon {
+public class IslandEntityEnderDragon extends EntityEnderDragon {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static SuperiorSkyblockPlugin plugin;
+
+    public static void init(SuperiorSkyblockPlugin plugin) {
+        IslandEntityEnderDragon.plugin = plugin;
+    }
 
     private BlockPosition islandBlockPosition;
 

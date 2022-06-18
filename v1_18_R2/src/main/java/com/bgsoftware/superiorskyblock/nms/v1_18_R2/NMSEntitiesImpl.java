@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.nms.NMSEntities;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftAnimals;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Modifier;
 
-public final class NMSEntitiesImpl implements NMSEntities {
+public class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
             net.minecraft.world.entity.Entity.class, int.class, Modifier.PROTECTED, 2);

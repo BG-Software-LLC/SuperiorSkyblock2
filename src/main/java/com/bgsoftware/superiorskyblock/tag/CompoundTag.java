@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.utils.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,9 +52,9 @@ import java.util.Set;
  * @author Graham Edgecombe
  */
 @SuppressWarnings("unused")
-public final class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
+public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Tag<?>> {
 
-    static final Class<?> CLASS = getNNTClass("NBTTagCompound");
+    /*package*/ static final Class<?> CLASS = getNNTClass("NBTTagCompound");
 
     public CompoundTag() {
         this(new HashMap<>());

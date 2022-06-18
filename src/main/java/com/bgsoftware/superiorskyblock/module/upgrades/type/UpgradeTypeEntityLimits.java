@@ -4,14 +4,14 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.structure.AutoRemovalMap;
-import com.bgsoftware.superiorskyblock.threads.Executor;
-import com.bgsoftware.superiorskyblock.utils.LocationUtils;
-import com.bgsoftware.superiorskyblock.utils.ServerVersion;
-import com.bgsoftware.superiorskyblock.utils.entities.EntityUtils;
-import com.bgsoftware.superiorskyblock.utils.items.ItemUtils;
-import com.bgsoftware.superiorskyblock.utils.legacy.Materials;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.world.BukkitEntities;
+import com.bgsoftware.superiorskyblock.world.BukkitItems;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-public final class UpgradeTypeEntityLimits implements IUpgradeType {
+public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private static final ReflectMethod<EquipmentSlot> INTERACT_GET_HAND = new ReflectMethod<>(
             PlayerInteractEvent.class, "getHand");
@@ -58,13 +58,13 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
         return Collections.emptyList();
     }
 
-    private final class EntityLimitsListener implements Listener {
+    private class EntityLimitsListener implements Listener {
 
         private final Map<Location, UUID> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
-            if (EntityUtils.canBypassEntityLimit(e.getEntity()))
+            if (BukkitEntities.canBypassEntityLimit(e.getEntity()))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getLocation());
@@ -72,7 +72,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            if (!EntityUtils.canHaveLimit(e.getEntityType()))
+            if (!BukkitEntities.canHaveLimit(e.getEntityType()))
                 return;
 
             island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
@@ -84,7 +84,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onHangingPlace(HangingPlaceEvent e) {
-            if (EntityUtils.canBypassEntityLimit(e.getEntity()))
+            if (BukkitEntities.canBypassEntityLimit(e.getEntity()))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getEntity().getLocation());
@@ -92,7 +92,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            if (!EntityUtils.canHaveLimit(e.getEntity().getType()))
+            if (!BukkitEntities.canHaveLimit(e.getEntity().getType()))
                 return;
 
             island.hasReachedEntityLimit(KeyImpl.of(e.getEntity())).whenComplete((result, ex) -> {
@@ -125,7 +125,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onVehicleSpawn(VehicleCreateEvent e) {
-            if (!(e.getVehicle() instanceof Minecart) || EntityUtils.canBypassEntityLimit(e.getVehicle()))
+            if (!(e.getVehicle() instanceof Minecart) || BukkitEntities.canBypassEntityLimit(e.getVehicle()))
                 return;
 
             Island island = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
@@ -133,19 +133,19 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            UUID placedVehicle = vehiclesOwners.remove(LocationUtils.getBlockLocation(e.getVehicle().getLocation()));
+            UUID placedVehicle = vehiclesOwners.remove(WorldBlocks.getBlockLocation(e.getVehicle().getLocation()));
 
-            if (!EntityUtils.canHaveLimit(e.getVehicle().getType()))
+            if (!BukkitEntities.canHaveLimit(e.getVehicle().getType()))
                 return;
 
             island.hasReachedEntityLimit(KeyImpl.of(e.getVehicle())).whenComplete((result, ex) -> {
                 if (result) {
-                    Executor.sync(() -> {
+                    BukkitExecutor.sync(() -> {
                         removeEntity(e.getVehicle());
                         if (placedVehicle != null) {
                             Player player = Bukkit.getPlayer(placedVehicle);
                             if (player != null)
-                                ItemUtils.addItem(asItemStack(e.getVehicle()), player.getInventory(), player.getLocation());
+                                BukkitItems.addItem(asItemStack(e.getVehicle()), player.getInventory(), player.getLocation());
                         }
                     });
                 }
@@ -185,7 +185,7 @@ public final class UpgradeTypeEntityLimits implements IUpgradeType {
 
         private void removeEntity(Entity entity) {
             if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
-                Executor.ensureMain(entity::remove);
+                BukkitExecutor.ensureMain(entity::remove);
             } else {
                 entity.remove();
             }

@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TileEntityHopper;
 import org.bukkit.inventory.InventoryHolder;
 
-public final class MenuTileEntityHopper extends TileEntityHopper {
+public class MenuTileEntityHopper extends TileEntityHopper {
 
     private final InventoryHolder holder;
 

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.config.section;
 import com.bgsoftware.superiorskyblock.api.config.SettingsManager;
 import com.bgsoftware.superiorskyblock.config.SettingsContainer;
 
-public final class VisitorsSignSection implements SettingsManager.VisitorsSign {
+public class VisitorsSignSection implements SettingsManager.VisitorsSign {
 
     private final SettingsContainer container;
 
