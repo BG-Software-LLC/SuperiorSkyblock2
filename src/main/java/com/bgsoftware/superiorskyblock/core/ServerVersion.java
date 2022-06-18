@@ -17,6 +17,7 @@ public enum ServerVersion {
     v1_16(116),
     v1_17(117),
     v1_18(118),
+    v1_19(119),
 
     UNKONWN(-1);
 
