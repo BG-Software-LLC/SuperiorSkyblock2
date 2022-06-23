@@ -6,6 +6,8 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
+import com.bgsoftware.superiorskyblock.core.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -13,10 +15,8 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
-import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
-import com.bgsoftware.superiorskyblock.core.SchematicEntity;
 import com.bgsoftware.superiorskyblock.world.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -84,7 +84,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
                 CompoundTag entityTag = compound.getCompound("NBT");
                 Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset"));
-                entities.add(new SchematicEntity(entityType, entityTag, offset));
+                if (offset != null)
+                    entities.add(new SchematicEntity(entityType, entityTag,
+                            SBlockOffset.fromOffsets(offset.getX(), offset.getY(), offset.getZ())));
             }
 
             this.entities = Collections.unmodifiableList(entities);

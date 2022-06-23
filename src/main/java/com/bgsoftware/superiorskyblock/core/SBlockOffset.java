@@ -10,15 +10,19 @@ public class SBlockOffset implements BlockOffset {
 
     public static final SBlockOffset ZERO = new SBlockOffset(0, 0, 0);
 
-    private final int offsetX;
-    private final int offsetY;
-    private final int offsetZ;
+    private final double offsetX;
+    private final double offsetY;
+    private final double offsetZ;
 
     public static BlockOffset fromOffsets(int offsetX, int offsetY, int offsetZ) {
         return offsetX == 0 && offsetY == 0 && offsetZ == 0 ? ZERO : new SBlockOffset(offsetX, offsetY, offsetZ);
     }
 
-    private SBlockOffset(int offsetX, int offsetY, int offsetZ) {
+    public static BlockOffset fromOffsets(double offsetX, double offsetY, double offsetZ) {
+        return offsetX == 0 && offsetY == 0 && offsetZ == 0 ? ZERO : new SBlockOffset(offsetX, offsetY, offsetZ);
+    }
+
+    private SBlockOffset(double offsetX, double offsetY, double offsetZ) {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.offsetZ = offsetZ;
@@ -26,17 +30,17 @@ public class SBlockOffset implements BlockOffset {
 
     @Override
     public int getOffsetX() {
-        return this.offsetX;
+        return (int) this.offsetX;
     }
 
     @Override
     public int getOffsetY() {
-        return this.offsetY;
+        return (int) this.offsetY;
     }
 
     @Override
     public int getOffsetZ() {
-        return this.offsetZ;
+        return (int) this.offsetZ;
     }
 
     @Override
