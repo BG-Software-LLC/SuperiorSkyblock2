@@ -4,8 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
 import org.bukkit.Bukkit;
@@ -85,13 +85,9 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAtPosition(int position, SortingType sortingType) {
         ensureSortingType(sortingType);
 
-        if (position < 0 || position > getIslandsAmount()) {
-            return null;
-        }
-
         Set<Island> sortedIslands = this.sortedIslands.get(sortingType);
 
-        return Iterables.get(sortedIslands, position);
+        return position < 0 || position > sortedIslands.size() ? null : Iterables.get(sortedIslands, position);
     }
 
     @Override
