@@ -273,13 +273,6 @@ public class IslandsDeserializer {
                 return;
             }
 
-            if (location.get().getWorld() == null) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load warps with invalid world %s for %s, skipping...",
-                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
-                return;
-            }
-
             CachedWarpInfo cachedWarpInfo = new CachedWarpInfo();
             cachedWarpInfo.name = name.get();
             cachedWarpInfo.category = islandWarp.getString("category").orElse("");
@@ -543,13 +536,6 @@ public class IslandsDeserializer {
                 return;
             }
 
-            if (location.get().getWorld() == null) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
-                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
-                return;
-            }
-
             CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
             cachedIslandInfo.islandHomes[environment.get()] = location.get();
         });
@@ -577,13 +563,6 @@ public class IslandsDeserializer {
             if (!location.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
-                return;
-            }
-
-            if (location.get().getWorld() == null) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid world %s for %s, skipping...",
-                                ((LazyWorldLocation) location.get()).getWorldName(), uuid.get()));
                 return;
             }
 
