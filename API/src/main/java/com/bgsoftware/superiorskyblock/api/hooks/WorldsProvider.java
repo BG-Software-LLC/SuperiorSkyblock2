@@ -11,7 +11,6 @@ public interface WorldsProvider {
 
     /**
      * Prepare all the island worlds on startup.
-     * They must be loaded so SSB will be able to load the islands!
      */
     void prepareWorlds();
 

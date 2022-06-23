@@ -271,13 +271,6 @@ public class SIsland implements Island {
             return Optional.empty();
         }
 
-        if (center.get().getWorld() == null) {
-            SuperiorSkyblockPlugin.log(
-                    String.format("&cCannot load island invalid world %s for %s, skipping...",
-                            ((LazyWorldLocation) center.get()).getWorldName(), uuid.get()));
-            return Optional.empty();
-        }
-
         PluginDebugger.debug("Action: Load Island, UUID: " + uuid.get() + ", Owner: " + owner.get().getUniqueId());
 
         SIsland island = new SIsland(
