@@ -93,6 +93,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -3872,7 +3873,7 @@ public class SIsland implements Island {
     }
 
     private void updateIslandChests() {
-        List<IslandChest> islandChestList = Arrays.asList(this.islandChests.get());
+        List<IslandChest> islandChestList = new ArrayList<>(Arrays.asList(this.islandChests.get()));
         boolean updatedChests = false;
 
         while (islandChestList.size() < plugin.getSettings().getIslandChests().getDefaultPages()) {
