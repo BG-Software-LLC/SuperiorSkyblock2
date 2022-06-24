@@ -670,6 +670,8 @@ public class SIsland implements Island {
         if (!changePlayers)
             return;
 
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_PLAYERS, this);
+
         if (!isMember(superiorPlayer) && superiorPlayer.isShownAsOnline()) {
             Optional<UniqueVisitor> uniqueVisitorOptional = uniqueVisitors.readAndGet(uniqueVisitors ->
                     uniqueVisitors.stream().filter(pair -> pair.getSuperiorPlayer().equals(superiorPlayer)).findFirst());
@@ -1840,10 +1842,14 @@ public class SIsland implements Island {
 
         if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
             islandWorth.updateAndGet(islandWorth -> islandWorth.add(blockValue.multiply(new BigDecimal(amount))));
+            if (save)
+                plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
             islandLevel.updateAndGet(islandLevel -> islandLevel.add(blockLevel.multiply(new BigDecimal(amount))));
+            if (save)
+                plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
 
         if (updateLastTimeStatus)
@@ -1910,10 +1916,14 @@ public class SIsland implements Island {
 
         if (blockValue.compareTo(BigDecimal.ZERO) != 0) {
             this.islandWorth.updateAndGet(islandWorth -> islandWorth.subtract(blockValue.multiply(new BigDecimal(amount))));
+            if (save)
+                plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
         }
 
         if (blockLevel.compareTo(BigDecimal.ZERO) != 0) {
             this.islandLevel.updateAndGet(islandLevel -> islandLevel.subtract(blockLevel.multiply(new BigDecimal(amount))));
+            if (save)
+                plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
 
         boolean hasBlockLimit = blockLimits.containsKey(key),
@@ -1945,6 +1955,8 @@ public class SIsland implements Island {
         blocksTracker.clearBlockCounts();
         islandWorth.set(BigDecimal.ZERO);
         islandLevel.set(BigDecimal.ZERO);
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_WORTH, this);
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
     }
 
     @Override
@@ -2738,6 +2750,8 @@ public class SIsland implements Island {
 
         ratings.put(superiorPlayer.getUniqueId(), rating);
 
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_RATING, this);
+
         IslandsDatabaseBridge.saveRating(this, superiorPlayer, rating, System.currentTimeMillis());
 
         plugin.getMenus().refreshIslandRatings(this);
@@ -2750,6 +2764,8 @@ public class SIsland implements Island {
         PluginDebugger.debug("Action: Remove Rating, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
 
         ratings.remove(superiorPlayer.getUniqueId());
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_RATING, this);
 
         IslandsDatabaseBridge.removeRating(this, superiorPlayer);
 
@@ -2780,6 +2796,8 @@ public class SIsland implements Island {
     public void removeRatings() {
         PluginDebugger.debug("Action: Remove Ratings, Island: " + owner.getName());
         ratings.clear();
+
+        plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_RATING, this);
 
         IslandsDatabaseBridge.clearRatings(this);
 

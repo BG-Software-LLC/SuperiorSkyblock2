@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.objects.Enumerable;
 import com.google.common.base.Preconditions;
 
 import java.util.Collection;
@@ -8,9 +9,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SortingType implements Comparator<Island> {
+public class SortingType implements Comparator<Island>, Enumerable {
 
     private static final Map<String, SortingType> sortingTypes = new HashMap<>();
+    private static int ordinalCounter = 0;
 
     private static final Comparator<Island> ISLAND_NAMES_COMPARATOR = (o1, o2) -> {
         String firstName = o1.getName().isEmpty() ? o1.getOwner() == null ? "null" : o1.getOwner().getName() : o1.getName();
@@ -20,6 +22,7 @@ public class SortingType implements Comparator<Island> {
 
     private final String name;
     private final Comparator<Island> comparator;
+    private final int ordinal;
 
     private SortingType(String name, Comparator<Island> comparator, boolean handleEqualsIslands) {
         this.name = name;
@@ -27,6 +30,12 @@ public class SortingType implements Comparator<Island> {
             int compare = comparator.compare(o1, o2);
             return compare == 0 ? ISLAND_NAMES_COMPARATOR.compare(o1, o2) : compare;
         };
+        this.ordinal = ordinalCounter++;
+    }
+
+    @Override
+    public int ordinal() {
+        return this.ordinal;
     }
 
     /**

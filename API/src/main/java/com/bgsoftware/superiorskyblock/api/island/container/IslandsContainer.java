@@ -92,7 +92,8 @@ public interface IslandsContainer {
 
     /**
      * Sort islands for the top-islands.
-     * The islands will not get sorted if only one island exists.
+     * The islands will not get sorted if only one island exists, or no changes
+     * were tracked by {@link #notifyChange(SortingType, Island)}
      *
      * @param sortingType The type of sorting to use.
      * @param onFinish    Callback method
@@ -108,6 +109,14 @@ public interface IslandsContainer {
      * @param onFinish    Callback method
      */
     void sortIslands(SortingType sortingType, boolean forceSort, @Nullable Runnable onFinish);
+
+    /**
+     * Notify about a change of a value for a specific sorting type for an island.
+     *
+     * @param sortingType The sorting-type.
+     * @param island      The island that had its value changed.
+     */
+    void notifyChange(SortingType sortingType, Island island);
 
     /**
      * Get all islands sorted by a specific sorting-type.
