@@ -7,11 +7,11 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Location;
@@ -278,11 +278,11 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     }
 
     private void convertValuesToLevels() {
-        for (Map.Entry<Key, BigDecimal> entry : blockWorthValues.getBlockValues()) {
-            if (!blockLevels.hasBlockValue(entry.getKey())) {
-                blockLevels.setBlockValue(entry.getKey(), convertValueToLevel(entry.getValue()));
+        blockWorthValues.forEach((blockKey, blockCount) -> {
+            if (!blockLevels.hasBlockValue(blockKey)) {
+                blockLevels.setBlockValue(blockKey, convertValueToLevel(blockCount));
             }
-        }
+        });
     }
 
     private static BigDecimal fastBigDecimalFromString(String value) {

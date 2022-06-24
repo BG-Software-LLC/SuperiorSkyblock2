@@ -6,13 +6,14 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandChestPagedObjectButton;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandChestPagedObjectButton;
+import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Arrays;
@@ -42,7 +43,8 @@ public class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, IslandCh
 
     @Override
     protected List<IslandChest> requestObjects() {
-        return Arrays.asList(island.getChest());
+        return new SequentialListBuilder<IslandChest>()
+                .build(Arrays.asList(island.getChest()));
     }
 
     public static void init() {

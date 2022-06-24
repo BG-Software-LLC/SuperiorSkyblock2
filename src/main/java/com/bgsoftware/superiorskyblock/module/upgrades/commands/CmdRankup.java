@@ -12,16 +12,15 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import org.bukkit.Bukkit;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -144,7 +143,7 @@ public class CmdRankup implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getUpgrades(plugin, args[1]) : Collections.emptyList();
     }
 
 }

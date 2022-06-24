@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
+import javax.annotation.Nullable;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
@@ -13,13 +12,13 @@ public class JarFiles {
 
     }
 
-    public static List<Class<?>> getClasses(URL jar, Class<?> clazz) {
-        return getClasses(jar, clazz, clazz.getClassLoader());
+    @Nullable
+    public static Class<?> getClass(URL jar, Class<?> clazz) {
+        return getClass(jar, clazz, clazz.getClassLoader());
     }
 
-    public static List<Class<?>> getClasses(URL jar, Class<?> clazz, ClassLoader classLoader) {
-        List<Class<?>> list = new ArrayList<>();
-
+    @Nullable
+    public static Class<?> getClass(URL jar, Class<?> clazz, ClassLoader classLoader) {
         try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, classLoader); JarInputStream jis = new JarInputStream(jar.openStream())) {
             JarEntry jarEntry;
             while ((jarEntry = jis.getNextJarEntry()) != null) {
@@ -35,13 +34,13 @@ public class JarFiles {
                 Class<?> c = cl.loadClass(clazzName);
 
                 if (clazz.isAssignableFrom(c)) {
-                    list.add(c);
+                    return c;
                 }
             }
         } catch (Throwable ignored) {
         }
 
-        return list;
+        return null;
     }
 
 }

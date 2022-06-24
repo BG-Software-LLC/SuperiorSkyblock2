@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgori
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
@@ -759,7 +760,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return Collections.unmodifiableList(new ArrayList<>(completedMissions.keySet()));
+        return new SequentialListBuilder<Mission<?>>().build(completedMissions.keySet());
     }
 
     /*

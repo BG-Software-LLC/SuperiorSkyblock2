@@ -9,10 +9,10 @@ import com.bgsoftware.superiorskyblock.core.GameSound;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuGlobalWarps;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuTopIslands;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTopIslands, Island> {
@@ -90,7 +91,7 @@ public class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTopIsland
         ItemMeta itemMeta = itemBuilder.getItemMeta();
 
         if (itemMeta != null && itemMeta.hasLore()) {
-            List<String> lore = new ArrayList<>();
+            List<String> lore = new LinkedList<>();
 
             for (String line : itemMeta.getLore()) {
                 if (line.contains("{4}")) {

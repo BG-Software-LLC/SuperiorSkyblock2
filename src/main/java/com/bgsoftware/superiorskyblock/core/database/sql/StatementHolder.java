@@ -1,21 +1,21 @@
 package com.bgsoftware.superiorskyblock.core.database.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.Text;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public class StatementHolder {
 
-    private final List<Map<Integer, Object>> batches = new ArrayList<>();
+    private final List<Map<Integer, Object>> batches = new LinkedList<>();
 
     private final Map<Integer, Object> values = new HashMap<>();
     private String query;

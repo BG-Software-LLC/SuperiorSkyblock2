@@ -26,7 +26,9 @@ import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -76,7 +78,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<PlayerAttributes> deserializePlayers(String players) {
-        List<PlayerAttributes> playerAttributes = new ArrayList<>();
+        List<PlayerAttributes> playerAttributes = new LinkedList<>();
         if (databaseLoader != null) {
             JsonArray playersArray = gson.fromJson(players, JsonArray.class);
             playersArray.forEach(uuid -> {
@@ -85,7 +87,7 @@ public class JsonDeserializer implements IDeserializer {
                     playerAttributes.add(_playerAttributes);
             });
         }
-        return playerAttributes;
+        return Collections.unmodifiableList(playerAttributes);
     }
 
     public Map<UUID, PlayerPrivilegeNode> deserializePlayerPerms(String permissionNodes) {
@@ -156,7 +158,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
-        List<IslandWarpAttributes> islandWarpList = new ArrayList<>();
+        List<IslandWarpAttributes> islandWarpList = new LinkedList<>();
 
         JsonArray warpsArray = gson.fromJson(islandWarps, JsonArray.class);
         warpsArray.forEach(warpElement -> {
@@ -175,7 +177,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(IslandWarpAttributes.Field.ICON, icon));
         });
 
-        return islandWarpList;
+        return Collections.unmodifiableList(islandWarpList);
     }
 
     public KeyMap<Integer> deserializeBlockLimits(String blocks) {
@@ -252,7 +254,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<Pair<UUID, Long>> deserializeVisitors(String visitors) {
-        List<Pair<UUID, Long>> visitorsList = new ArrayList<>();
+        List<Pair<UUID, Long>> visitorsList = new LinkedList<>();
 
         JsonArray playersArray = gson.fromJson(visitors, JsonArray.class);
 
@@ -267,7 +269,7 @@ public class JsonDeserializer implements IDeserializer {
             }
         });
 
-        return visitorsList;
+        return Collections.unmodifiableList(visitorsList);
     }
 
     public KeyMap<Integer> deserializeEntityLimits(String entities) {
@@ -301,7 +303,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
-        List<IslandChestAttributes> islandChestList = new ArrayList<>();
+        List<IslandChestAttributes> islandChestList = new LinkedList<>();
 
         JsonArray islandChestsArray = gson.fromJson(islandChest, JsonArray.class);
         islandChestsArray.forEach(islandChestElement -> {
@@ -314,7 +316,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(IslandChestAttributes.Field.CONTENTS, contents));
         });
 
-        return islandChestList;
+        return Collections.unmodifiableList(islandChestList);
     }
 
     public Map<PlayerRole, Integer> deserializeRoleLimits(String roles) {
@@ -334,7 +336,7 @@ public class JsonDeserializer implements IDeserializer {
     }
 
     public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
-        List<WarpCategoryAttributes> warpCategories = new ArrayList<>();
+        List<WarpCategoryAttributes> warpCategories = new LinkedList<>();
 
         JsonArray warpCategoriesArray = gson.fromJson(categories, JsonArray.class);
         warpCategoriesArray.forEach(warpCategoryElement -> {
@@ -348,7 +350,7 @@ public class JsonDeserializer implements IDeserializer {
                     .setValue(WarpCategoryAttributes.Field.ICON, icon));
         });
 
-        return warpCategories;
+        return Collections.unmodifiableList(warpCategories);
     }
 
     @Override

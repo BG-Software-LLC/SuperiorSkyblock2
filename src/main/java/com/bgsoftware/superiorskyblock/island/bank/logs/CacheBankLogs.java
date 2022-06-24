@@ -1,11 +1,12 @@
 package com.bgsoftware.superiorskyblock.island.bank.logs;
 
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -25,7 +26,7 @@ public class CacheBankLogs implements IBankLogs {
 
     @Override
     public List<BankTransaction> getTransactions() {
-        return transactions.readAndGet(bankTransactions -> Collections.unmodifiableList(new ArrayList<>(bankTransactions)));
+        return transactions.readAndGet(bankTransactions -> new SequentialListBuilder<BankTransaction>().build(bankTransactions));
     }
 
     @Override
@@ -37,7 +38,7 @@ public class CacheBankLogs implements IBankLogs {
     @Override
     public void addTransaction(BankTransaction bankTransaction, UUID senderUUID, boolean loadFromDatabase) {
         transactions.write(transactions -> transactions.add(bankTransaction));
-        transactionsByPlayers.computeIfAbsent(senderUUID, p -> Synchronized.of(new ArrayList<>()))
+        transactionsByPlayers.computeIfAbsent(senderUUID, p -> Synchronized.of(new LinkedList<>()))
                 .write(transactions -> transactions.add(bankTransaction));
     }
 

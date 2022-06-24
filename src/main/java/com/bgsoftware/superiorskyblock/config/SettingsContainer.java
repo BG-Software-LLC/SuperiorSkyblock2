@@ -9,22 +9,22 @@ import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
-import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.NumberFormatter;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -36,8 +36,8 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -422,7 +422,7 @@ public class SettingsContainer {
             for (String container : config.getConfigurationSection("default-containers.containers").getKeys(false)) {
                 try {
                     InventoryType containerType = InventoryType.valueOf(container.toUpperCase(Locale.ENGLISH));
-                    ListTag items = new ListTag(CompoundTag.class, new ArrayList<>());
+                    ListTag items = new ListTag(CompoundTag.class, Collections.emptyList());
                     defaultContainersContents.put(containerType, items);
 
                     ConfigurationSection containerSection = config.getConfigurationSection("default-containers.containers." + container);

@@ -2,13 +2,13 @@ package com.bgsoftware.superiorskyblock.core.messages.component;
 
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -16,7 +16,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MultipleComponents implements IMessageComponent {
@@ -24,7 +24,7 @@ public class MultipleComponents implements IMessageComponent {
     private final List<IMessageComponent> messageComponents;
 
     public static IMessageComponent parseSection(ConfigurationSection section) {
-        List<IMessageComponent> messageComponents = new ArrayList<>();
+        List<IMessageComponent> messageComponents = new LinkedList<>();
 
         for (String key : section.getKeys(false)) {
             if (key.equals("action-bar")) {

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.core.IslandPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -13,8 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -138,12 +137,13 @@ public class DefaultIslandsContainer implements IslandsContainer {
     @Override
     public List<Island> getSortedIslands(SortingType sortingType) {
         ensureSortingType(sortingType);
-        return Collections.unmodifiableList(new ArrayList<>(this.sortedIslands.get(sortingType)));
+        return new SequentialListBuilder<Island>()
+                .build(this.sortedIslands.get(sortingType));
     }
 
     @Override
     public List<Island> getIslandsUnsorted() {
-        return Collections.unmodifiableList(new ArrayList<>(this.islandsByUUID.values()));
+        return new SequentialListBuilder<Island>().build(this.islandsByUUID.values());
     }
 
     @Override

@@ -24,20 +24,21 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
-import com.bgsoftware.superiorskyblock.island.persistence.EmptyPersistentDataContainer;
-import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
+import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Bukkit;
@@ -54,9 +55,9 @@ import org.bukkit.potion.PotionEffectType;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -159,7 +160,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return Collections.unmodifiableList(new ArrayList<>(playersInside));
+        return new SequentialListBuilder<SuperiorPlayer>().build(playersInside);
     }
 
     @Override
@@ -380,7 +381,7 @@ public class SpawnIsland implements Island {
         Chunk maxChunk = max.getChunk();
         World world = center.getWorld();
 
-        List<Chunk> chunks = new ArrayList<>();
+        List<Chunk> chunks = new LinkedList<>();
 
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
@@ -390,7 +391,7 @@ public class SpawnIsland implements Island {
         }
 
 
-        return chunks;
+        return Collections.unmodifiableList(chunks);
     }
 
     @Override
@@ -404,7 +405,7 @@ public class SpawnIsland implements Island {
         Location min = onlyProtected ? getMinimumProtected() : getMinimum();
         Location max = onlyProtected ? getMaximumProtected() : getMaximum();
 
-        List<Chunk> chunks = new ArrayList<>();
+        List<Chunk> chunks = new LinkedList<>();
 
         for (int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++) {
             for (int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++) {
@@ -414,7 +415,7 @@ public class SpawnIsland implements Island {
             }
         }
 
-        return chunks;
+        return Collections.unmodifiableList(chunks);
     }
 
     @Override

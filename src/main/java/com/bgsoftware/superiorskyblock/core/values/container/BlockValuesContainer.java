@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.core.values.container;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.BiConsumer;
 
 public abstract class BlockValuesContainer {
 
@@ -40,8 +40,8 @@ public abstract class BlockValuesContainer {
         return valuesMap.getKey(key, key);
     }
 
-    public Set<Map.Entry<Key, BigDecimal>> getBlockValues() {
-        return Collections.unmodifiableSet(valuesMap.entrySet());
+    public void forEach(BiConsumer<Key, BigDecimal> consumer) {
+        valuesMap.forEach(consumer);
     }
 
     public void clear() {

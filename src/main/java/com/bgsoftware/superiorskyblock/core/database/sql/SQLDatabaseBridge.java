@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 
@@ -28,13 +29,13 @@ public class SQLDatabaseBridge implements DatabaseBridge {
     private static String getColumnFilter(DatabaseFilter filter) {
         StringBuilder columnIdentifier = new StringBuilder();
         if (filter != null) {
-            for (Pair<String, Object> columnFilter : filter.getFilters()) {
+            filter.forEach((column, value) -> {
                 if (columnIdentifier.length() == 0) {
-                    columnIdentifier.append(String.format(" WHERE %s=?", columnFilter.getKey()));
+                    columnIdentifier.append(String.format(" WHERE %s=?", column));
                 } else {
-                    columnIdentifier.append(String.format(" AND %s=?", columnFilter.getKey()));
+                    columnIdentifier.append(String.format(" AND %s=?", column));
                 }
-            }
+            });
         }
         return columnIdentifier.toString();
     }
@@ -86,8 +87,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         }
 
         if (filter != null) {
-            for (Pair<String, Object> _columnFilter : filter.getFilters())
-                statementHolder.setObject(_columnFilter.getValue() + "");
+            filter.forEach((column, value) -> statementHolder.setObject(value + ""));
         }
 
         executeStatementHolder(statementHolder);
@@ -130,8 +130,7 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         StatementHolder statementHolder = buildStatementHolder(query);
 
         if (filter != null) {
-            for (Pair<String, Object> _columnFilter : filter.getFilters())
-                statementHolder.setObject(_columnFilter.getValue() + "");
+            filter.forEach((column, value) -> statementHolder.setObject(value + ""));
         }
 
         executeStatementHolder(statementHolder);
@@ -139,14 +138,14 @@ public class SQLDatabaseBridge implements DatabaseBridge {
 
     @Override
     public void loadObject(String table, DatabaseFilter filter, Consumer<Map<String, Object>> resultConsumer) {
-        String columnFilter = getColumnFilter(filter);
+        Mutable<String> columnFilter = new Mutable<>(getColumnFilter(filter));
 
-        for (Pair<String, Object> filterPair : filter.getFilters()) {
-            columnFilter = columnFilter.replaceFirst("\\?", filterPair.getValue() instanceof String ?
-                    String.format("'%s'", filterPair.getValue()) : filterPair.getValue().toString());
-        }
+        filter.forEach((column, value) -> {
+            columnFilter.setValue(columnFilter.getValue().replaceFirst("\\?", value instanceof String ?
+                    String.format("'%s'", value) : value.toString()));
+        });
 
-        SQLHelper.select(table, columnFilter, new QueryResult<ResultSet>().onSuccess(resultSet -> {
+        SQLHelper.select(table, columnFilter.getValue(), new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));

@@ -7,9 +7,15 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
 import com.bgsoftware.superiorskyblock.island.upgrade.UpgradeRequirement;
+import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminRankup;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetUpgrade;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSyncUpgrades;
@@ -22,12 +28,6 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeMobDrops;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeSpawnerRates;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.module.BuiltinModule;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.Listener;
@@ -36,9 +36,9 @@ import org.bukkit.potion.PotionEffectType;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class UpgradesModule extends BuiltinModule {
 
     private static final int MAX_UPGRADES_NAME_LENGTH = 255;
 
-    private final List<IUpgradeType> enabledUpgrades = new ArrayList<>();
+    private final List<IUpgradeType> enabledUpgrades = new LinkedList<>();
 
     public UpgradesModule() {
         super("upgrades");

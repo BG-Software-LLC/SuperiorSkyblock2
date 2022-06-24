@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import me.robin.leaderheads.datacollectors.DataCollector;
 import me.robin.leaderheads.objects.BoardType;
@@ -11,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public class LeaderHeadsHook {
@@ -80,6 +81,23 @@ public class LeaderHeadsHook {
 
     private static abstract class SuperiorDataController extends DataCollector {
 
+        private final Function<Island, Map.Entry<?, Double>> ISLAND_MAPPER = island -> new Map.Entry<UUID, Double>() {
+            @Override
+            public UUID getKey() {
+                return island.getOwner().getUniqueId();
+            }
+
+            @Override
+            public Double getValue() {
+                return SuperiorDataController.this.getValue(island);
+            }
+
+            @Override
+            public Double setValue(Double value) {
+                return null;
+            }
+        };
+
         private final SortingType sortingType;
 
         SuperiorDataController(String name, String command, SortingType sortingType) {
@@ -98,22 +116,8 @@ public class LeaderHeadsHook {
 
         @Override
         public List<Map.Entry<?, Double>> requestAll() {
-            return plugin.getGrid().getIslands(sortingType).stream().map(island -> new Map.Entry<UUID, Double>() {
-                @Override
-                public UUID getKey() {
-                    return island.getOwner().getUniqueId();
-                }
-
-                @Override
-                public Double getValue() {
-                    return SuperiorDataController.this.getValue(island);
-                }
-
-                @Override
-                public Double setValue(Double value) {
-                    return null;
-                }
-            }).collect(Collectors.toList());
+            return new SequentialListBuilder<Map.Entry<?, Double>>()
+                    .build(plugin.getGrid().getIslands(sortingType), ISLAND_MAPPER);
         }
 
         public abstract Double getValue(Island island);

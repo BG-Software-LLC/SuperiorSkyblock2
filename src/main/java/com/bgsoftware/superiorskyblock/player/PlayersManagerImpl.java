@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
@@ -17,12 +18,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("WeakerAccess")
 public class PlayersManagerImpl extends Manager implements PlayersManager {
@@ -133,10 +132,9 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
     }
 
     public List<SuperiorPlayer> matchAllPlayers(Predicate<? super SuperiorPlayer> predicate) {
-        return Collections.unmodifiableList(this.playersContainer.getAllPlayers().stream()
+        return new SequentialListBuilder<SuperiorPlayer>()
                 .filter(predicate)
-                .collect(Collectors.toList())
-        );
+                .build(this.playersContainer.getAllPlayers());
     }
 
     public void loadPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
@@ -157,12 +155,12 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
 
     // Updating last time status
     public void savePlayers() {
-        Bukkit.getOnlinePlayers().stream().map(this::getSuperiorPlayer)
-                .forEach(PlayersDatabaseBridge::saveLastTimeStatus);
+        for (Player player : Bukkit.getOnlinePlayers())
+            PlayersDatabaseBridge.saveLastTimeStatus(getSuperiorPlayer(player));
 
-        List<SuperiorPlayer> modifiedPlayers = getAllPlayers().stream()
+        List<SuperiorPlayer> modifiedPlayers = new SequentialListBuilder<SuperiorPlayer>()
                 .filter(PlayersDatabaseBridge::isModified)
-                .collect(Collectors.toList());
+                .build(getAllPlayers());
 
         if (!modifiedPlayers.isEmpty())
             modifiedPlayers.forEach(PlayersDatabaseBridge::executeFutureSaves);

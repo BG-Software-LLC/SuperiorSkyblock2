@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CmdInvite implements IPermissibleCommand {
@@ -113,7 +114,7 @@ public class CmdInvite implements IPermissibleCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayers(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(), onlinePlayer -> !island.isMember(onlinePlayer)) :
-                new ArrayList<>();
+                Collections.emptyList();
     }
 
 }

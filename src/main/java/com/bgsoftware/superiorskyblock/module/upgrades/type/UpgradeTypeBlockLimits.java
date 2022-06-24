@@ -5,13 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.Materials;
-import org.bukkit.block.BlockState;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,7 +22,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -145,12 +143,7 @@ public class UpgradeTypeBlockLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            List<BlockState> blockStates = new ArrayList<>(e.getBlocks());
-
-            blockStates.forEach(blockState -> {
-                if (island.hasReachedBlockLimit(KeyImpl.of(blockState)))
-                    e.getBlocks().remove(blockState);
-            });
+            e.getBlocks().removeIf(blockState -> island.hasReachedBlockLimit(KeyImpl.of(blockState)));
         }
 
     }

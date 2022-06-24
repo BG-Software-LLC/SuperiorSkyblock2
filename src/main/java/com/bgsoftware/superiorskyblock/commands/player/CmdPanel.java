@@ -3,15 +3,15 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CmdPanel implements ISuperiorCommand {
@@ -89,7 +89,7 @@ public class CmdPanel implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "members", "visitors", "toggle") : new ArrayList<>();
+        return args.length == 2 ? CommandTabCompletes.getCustomComplete(args[1], "members", "visitors", "toggle") : Collections.emptyList();
     }
 
 }

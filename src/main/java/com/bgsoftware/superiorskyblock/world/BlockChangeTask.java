@@ -4,11 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
-import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
@@ -17,9 +17,9 @@ import com.google.common.collect.Maps;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +43,7 @@ public class BlockChangeTask {
 
     public void setBlock(Location location, SchematicBlockData schematicBlockData) {
         Preconditions.checkArgument(!submitted, "This MultiBlockChange was already submitted.");
-        blocksCache.computeIfAbsent(ChunkPosition.of(location), pairs -> new ArrayList<>()).add(new SchematicBlock(location, schematicBlockData));
+        blocksCache.computeIfAbsent(ChunkPosition.of(location), pairs -> new LinkedList<>()).add(new SchematicBlock(location, schematicBlockData));
     }
 
     public void submitUpdate(Runnable onFinish, Consumer<Throwable> onFailure) {

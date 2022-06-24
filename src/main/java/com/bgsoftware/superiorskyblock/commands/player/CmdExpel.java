@@ -1,19 +1,18 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -108,7 +107,7 @@ public class CmdExpel implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? new ArrayList<>() : island != null ? CommandTabCompletes.getIslandVisitors(island, args[1]) :
+        return args.length != 2 ? Collections.emptyList() : island != null ? CommandTabCompletes.getIslandVisitors(island, args[1]) :
                 CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
                         onlinePlayer -> plugin.getGrid().getIslandAt(onlinePlayer.getLocation()) != null);
     }

@@ -3,14 +3,13 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
+import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
-import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class CmdRate implements ISuperiorCommand {
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null &&
-                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island))) : new ArrayList<>();
+                        (plugin.getSettings().isRateOwnIsland() || !onlineIsland.equals(island))) : Collections.emptyList();
     }
 
 }

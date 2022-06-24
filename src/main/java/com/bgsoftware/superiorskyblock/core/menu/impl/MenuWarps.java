@@ -7,7 +7,12 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.WarpPagedObjectButton;
@@ -18,10 +23,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.warp.SIslandWarp;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,7 +33,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
 
@@ -66,9 +66,9 @@ public class MenuWarps extends PagedSuperiorMenu<MenuWarps, IslandWarp> {
     @Override
     protected List<IslandWarp> requestObjects() {
         boolean isMember = warpCategory.getIsland().isMember(inventoryViewer);
-        return warpCategory.getWarps().stream()
+        return new SequentialListBuilder<IslandWarp>()
                 .filter(islandWarp -> isMember || !islandWarp.hasPrivateFlag())
-                .collect(Collectors.toList());
+                .build(warpCategory.getWarps());
     }
 
     public static void simulateClick(SuperiorPlayer superiorPlayer, Island island, String warpName) {

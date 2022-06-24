@@ -36,8 +36,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -69,7 +69,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
     private final BossBattleServer bossBattleServer;
     private final AxisAlignedBB borderArea;
 
-    private final List<Integer> gateways = new ArrayList<>();
+    private final LinkedList<Integer> gateways = new LinkedList<>();
 
     private UUID dragonUUID;
     private BlockPosition exitPortalLocation;
@@ -120,7 +120,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
         }
 
         NBTTagList nbtTagList = new NBTTagList();
-        for (Integer gateway : this.gateways)
+        for (int gateway : this.gateways)
             nbtTagList.add(new NBTTagInt(gateway));
 
         nbtTagCompound.set("Gateways", nbtTagList);
@@ -166,7 +166,7 @@ public class IslandEnderDragonBattle extends EnderDragonBattle {
         this.generateExitPortal(true);
 
         if (!gateways.isEmpty()) {
-            int i = gateways.remove(gateways.size() - 1);
+            int i = gateways.removeLast();
             int j = MathHelper.floor(96.0D * Math.cos(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
             int k = MathHelper.floor(96.0D * Math.sin(2.0D * (-3.141592653589793D + 0.15707963267948966D * (double) i)));
             BlockPosition blockPosition = new BlockPosition(j, 75, k);

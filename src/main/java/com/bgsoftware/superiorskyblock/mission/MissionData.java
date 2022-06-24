@@ -8,7 +8,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public class MissionData {
@@ -17,8 +18,8 @@ public class MissionData {
 
     private final int index;
     private final Mission<?> mission;
-    private final List<ItemStack> itemRewards = new ArrayList<>();
-    private final List<String> commandRewards = new ArrayList<>();
+    private final List<ItemStack> itemRewards = new LinkedList<>();
+    private final List<String> commandRewards = new LinkedList<>();
     private final boolean autoReward;
     private final boolean islandMission;
     private final boolean disbandReset;
@@ -67,11 +68,11 @@ public class MissionData {
     }
 
     public List<ItemStack> getItemRewards() {
-        return itemRewards;
+        return Collections.unmodifiableList(itemRewards);
     }
 
     public List<String> getCommandRewards() {
-        return commandRewards;
+        return Collections.unmodifiableList(commandRewards);
     }
 
     public int getIndex() {

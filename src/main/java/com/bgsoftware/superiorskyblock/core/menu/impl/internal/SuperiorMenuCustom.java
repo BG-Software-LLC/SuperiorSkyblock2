@@ -5,11 +5,12 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.collect.Maps;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 public class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
 
@@ -87,8 +87,8 @@ public class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
         return customMenus.containsKey(menuName.toLowerCase(Locale.ENGLISH));
     }
 
-    public static Set<String> getCustomMenus() {
-        return Collections.unmodifiableSet(customMenus.keySet());
+    public static List<String> getCustomMenus() {
+        return new SequentialListBuilder<String>().build(customMenus.keySet());
     }
 
     public static void resetMenus() {

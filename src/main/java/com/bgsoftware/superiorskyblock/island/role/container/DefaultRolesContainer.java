@@ -1,14 +1,15 @@
 package com.bgsoftware.superiorskyblock.island.role.container;
 
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class DefaultRolesContainer implements RolesContainer {
 
@@ -39,7 +40,9 @@ public class DefaultRolesContainer implements RolesContainer {
 
     @Override
     public List<PlayerRole> getRoles() {
-        return rolesById.keySet().stream().sorted().map(rolesById::get).collect(Collectors.toList());
+        return new SequentialListBuilder<PlayerRole>()
+                .sorted(Comparator.comparingInt(PlayerRole::getId))
+                .build(rolesById.values());
     }
 
     @Override

@@ -1,18 +1,18 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 public class CmdAdmin implements ISuperiorCommand {
 
@@ -92,9 +92,9 @@ public class CmdAdmin implements ISuperiorCommand {
             return;
         }
 
-        List<SuperiorCommand> subCommands = plugin.getCommands().getAdminSubCommands().stream()
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
                 .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
-                .collect(Collectors.toList());
+                .build(plugin.getCommands().getAdminSubCommands());
 
         if (subCommands.isEmpty()) {
             Message.NO_COMMAND_PERMISSION.send(sender, locale);
@@ -130,21 +130,21 @@ public class CmdAdmin implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
-
         if (args.length > 1) {
             SuperiorCommand command = plugin.getCommands().getAdminCommand(args[1]);
             if (command != null) {
                 return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                        new ArrayList<>() : command.tabComplete(plugin, sender, args);
+                        Collections.emptyList() : command.tabComplete(plugin, sender, args);
             }
         }
+
+        List<String> list = new LinkedList<>();
 
         if (args.length != 1) {
             for (SuperiorCommand subCommand : plugin.getCommands().getAdminSubCommands()) {
                 if (subCommand.displayCommand() && (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission()))) {
-                    List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), new ArrayList<>()));
+                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
                     for (String _aliases : aliases) {
                         if (_aliases.contains(args[1].toLowerCase(Locale.ENGLISH))) {
                             list.add(_aliases);
@@ -154,7 +154,7 @@ public class CmdAdmin implements ISuperiorCommand {
             }
         }
 
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
     private boolean isNumber(String str) {

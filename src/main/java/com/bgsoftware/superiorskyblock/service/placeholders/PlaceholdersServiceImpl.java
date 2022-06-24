@@ -11,10 +11,10 @@ import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersServ
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlayerPlaceholderParser;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.top.SortingTypes;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.OfflinePlayer;
@@ -22,9 +22,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -214,7 +214,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
     private final Map<String, IslandPlaceholderParser> CUSTOM_ISLAND_PARSERS = new HashMap<>();
     private final Map<String, PlayerPlaceholderParser> CUSTOM_PLAYER_PARSERS = new HashMap<>();
 
-    private final List<PlaceholdersProvider> placeholdersProviders = new ArrayList<>();
+    private final List<PlaceholdersProvider> placeholdersProviders = new LinkedList<>();
 
     public PlaceholdersServiceImpl() {
     }

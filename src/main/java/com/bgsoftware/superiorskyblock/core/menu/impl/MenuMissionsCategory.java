@@ -8,17 +8,18 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.MissionsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCategory, Mission<?>> {
 
@@ -30,19 +31,24 @@ public class MenuMissionsCategory extends PagedSuperiorMenu<MenuMissionsCategory
     private static boolean removeCompleted;
 
     private final MissionCategory missionCategory;
-    private List<Mission<?>> missions;
+    private final List<Mission<?>> missions;
 
     private MenuMissionsCategory(SuperiorPlayer superiorPlayer, MissionCategory missionCategory) {
         super(menuPattern, superiorPlayer);
 
         this.missionCategory = missionCategory;
 
-        if (superiorPlayer != null) {
-            this.missions = missionCategory.getMissions().stream()
-                    .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
-                    .collect(Collectors.toList());
+        if (superiorPlayer == null) {
+            this.missions = Collections.emptyList();
+        } else {
+            SequentialListBuilder<Mission<?>> listBuilder = new SequentialListBuilder<>();
+
             if (sortByCompletion)
-                this.missions.sort(Comparator.comparingInt(this::getCompletionStatus));
+                listBuilder.sorted(Comparator.comparingInt(this::getCompletionStatus));
+
+            this.missions = listBuilder
+                    .filter(mission -> plugin.getMissions().canDisplayMission(mission, superiorPlayer, removeCompleted))
+                    .build(missionCategory.getMissions());
         }
     }
 

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
@@ -24,8 +25,8 @@ import org.bukkit.potion.PotionEffect;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"WeakerAccess", "UnusedReturnValue"})
 public class ItemBuilder {
@@ -94,14 +95,19 @@ public class ItemBuilder {
 
     public ItemBuilder withLore(List<String> lore) {
         if (itemMeta != null && lore != null)
-            itemMeta.setLore(Formatters.formatList(lore, Formatters.COLOR_FORMATTER));
+            itemMeta.setLore(new SequentialListBuilder<String>()
+                    .build(lore, Formatters.COLOR_FORMATTER::format));
         return this;
     }
 
     public ItemBuilder appendLore(List<String> lore) {
-        List<String> currentLore = itemMeta == null || itemMeta.getLore() == null ? new ArrayList<>() : itemMeta.getLore();
-        currentLore.addAll(lore);
-        return withLore(currentLore);
+        if (itemMeta == null || itemMeta.getLore() == null) {
+            return withLore(lore);
+        } else {
+            List<String> currentLore = itemMeta.getLore();
+            currentLore.addAll(lore);
+            return withLore(currentLore);
+        }
     }
 
     public ItemBuilder withLore(String... lore) {
@@ -112,7 +118,7 @@ public class ItemBuilder {
         if (itemMeta == null)
             return this;
 
-        List<String> loreList = new ArrayList<>();
+        List<String> loreList = new LinkedList<>();
 
         firstLine = Formatters.COLOR_FORMATTER.format(firstLine);
         loreList.add(firstLine);
@@ -135,7 +141,7 @@ public class ItemBuilder {
         if (itemMeta == null || !itemMeta.hasLore())
             return this;
 
-        List<String> loreList = new ArrayList<>();
+        List<String> loreList = new ArrayList<>(itemMeta.getLore().size());
 
         for (String line : itemMeta.getLore()) {
             loreList.add(line.replace(regex, replace));
@@ -149,11 +155,13 @@ public class ItemBuilder {
         if (itemMeta == null || !itemMeta.hasLore())
             return this;
 
-        List<String> loreList = new ArrayList<>();
+        List<String> currentLore = itemMeta.getLore();
+
+        List<String> loreList = new ArrayList<>(currentLore.size());
         List<String> linesToAdd = Arrays.asList(lines);
         boolean isEmpty = linesToAdd.isEmpty() || linesToAdd.stream().allMatch(String::isEmpty);
 
-        for (String line : itemMeta.getLore()) {
+        for (String line : currentLore) {
             if (line.contains(regex)) {
                 if (!isEmpty)
                     loreList.addAll(linesToAdd);
@@ -245,9 +253,8 @@ public class ItemBuilder {
             }
 
             if (itemMeta.hasLore()) {
-                withLore(itemMeta.getLore().stream()
-                        .map(line -> placeholdersService.parsePlaceholders(offlinePlayer, line))
-                        .collect(Collectors.toList()));
+                withLore(new SequentialListBuilder<String>()
+                        .build(itemMeta.getLore(), line -> placeholdersService.parsePlaceholders(offlinePlayer, line)));
             }
         }
 

@@ -1,17 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,7 +80,7 @@ public class CmdBan implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? new ArrayList<>() : CommandTabCompletes.getOnlinePlayers(plugin, args[1], true,
+        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[1], true,
                 onlinePlayer -> !island.isBanned(onlinePlayer) && (!island.isMember(onlinePlayer) ||
                         onlinePlayer.getPlayerRole().isLessThan(superiorPlayer.getPlayerRole())));
     }

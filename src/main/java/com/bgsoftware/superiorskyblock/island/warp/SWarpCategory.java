@@ -12,7 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class SWarpCategory implements WarpCategory {
@@ -20,7 +20,7 @@ public class SWarpCategory implements WarpCategory {
     public static final ItemStack DEFAULT_WARP_ICON = new ItemBuilder(Material.BOOK)
             .withName("&6{0}").build();
 
-    private final List<IslandWarp> islandWarps = new ArrayList<>();
+    private final List<IslandWarp> islandWarps = new LinkedList<>();
     private final Island island;
 
     private String name;

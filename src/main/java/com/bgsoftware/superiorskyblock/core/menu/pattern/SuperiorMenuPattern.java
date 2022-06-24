@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import org.bukkit.Bukkit;
@@ -14,7 +15,6 @@ import org.bukkit.inventory.InventoryHolder;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -54,7 +54,7 @@ public abstract class SuperiorMenuPattern<M extends ISuperiorMenu> {
     }
 
     public Collection<SuperiorMenuButton<M>> getButtons() {
-        return Collections.unmodifiableCollection(Arrays.asList(buttons));
+        return new SequentialListBuilder<SuperiorMenuButton<M>>().build(Arrays.asList(buttons));
     }
 
     public int getRowsSize() {

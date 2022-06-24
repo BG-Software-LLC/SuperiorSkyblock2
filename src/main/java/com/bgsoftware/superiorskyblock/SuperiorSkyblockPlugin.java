@@ -91,7 +91,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.List;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -439,9 +438,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 if (generatorsFilesList != null) {
                     for (File file : generatorsFilesList) {
                         //noinspection deprecation
-                        List<Class<?>> generatorClasses = JarFiles.getClasses(file.toURL(), ChunkGenerator.class);
-                        if (!generatorClasses.isEmpty()) {
-                            Class<?> generatorClass = generatorClasses.get(0);
+                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class);
+                        if (generatorClass != null) {
                             for (Constructor<?> constructor : generatorClass.getConstructors()) {
                                 if (constructor.getParameterCount() == 0) {
                                     worldGenerator = (ChunkGenerator) generatorClass.newInstance();

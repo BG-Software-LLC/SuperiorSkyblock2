@@ -12,15 +12,18 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -29,10 +32,8 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
@@ -48,17 +49,19 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GridManagerImpl extends Manager implements GridManager {
+
+    private static final Function<Island, UUID> ISLAND_OWNERS_MAPPER = island -> island.getOwner().getUniqueId();
 
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Set<UUID> customWorlds = Sets.newHashSet();
@@ -81,7 +84,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     private boolean forceSort = false;
 
-    private final List<SortingType> pendingSortingTypes = new ArrayList<>();
+    private final List<SortingType> pendingSortingTypes = new LinkedList<>();
 
     public GridManagerImpl(SuperiorSkyblockPlugin plugin, IslandsPurger islandsPurger, IslandPreviews islandPreviews) {
         super(plugin);
@@ -468,15 +471,14 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public List<World> getRegisteredWorlds() {
-        return customWorlds.stream().map(Bukkit::getWorld).collect(Collectors.toList());
+        return new SequentialListBuilder<World>().build(customWorlds, Bukkit::getWorld);
     }
 
     @Override
+    @Deprecated
     public List<UUID> getAllIslands(SortingType sortingType) {
-        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        return Collections.unmodifiableList(this.islandsContainer.getIslandsUnsorted().stream()
-                .map(island -> island.getOwner().getUniqueId())
-                .collect(Collectors.toList()));
+        return new SequentialListBuilder<UUID>()
+                .build(getIslands(sortingType), ISLAND_OWNERS_MAPPER);
     }
 
     @Override
@@ -511,7 +513,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public List<Location> getStackedBlocks() {
-        return Collections.unmodifiableList(new ArrayList<>(plugin.getStackedBlocks().getStackedBlocks().keySet()));
+        return new SequentialListBuilder<Location>().build(plugin.getStackedBlocks().getStackedBlocks().keySet());
     }
 
     @Override
@@ -675,14 +677,13 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     public void saveIslands() {
-        List<Island> onlineIslands = Bukkit.getOnlinePlayers().stream()
-                .map(player -> plugin.getPlayers().getSuperiorPlayer(player).getIsland())
+        List<Island> onlineIslands = new SequentialListBuilder<Island>()
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .build(Bukkit.getOnlinePlayers(), player -> plugin.getPlayers().getSuperiorPlayer(player).getIsland());
 
-        List<Island> modifiedIslands = getIslands().stream()
+        List<Island> modifiedIslands = new SequentialListBuilder<Island>()
                 .filter(IslandsDatabaseBridge::isModified)
-                .collect(Collectors.toList());
+                .build(getIslands());
 
         if (!onlineIslands.isEmpty())
             onlineIslands.forEach(Island::updateLastTime);

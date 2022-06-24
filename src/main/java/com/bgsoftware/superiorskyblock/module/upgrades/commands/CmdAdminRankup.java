@@ -9,13 +9,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -102,7 +101,7 @@ public class CmdAdminRankup implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : new ArrayList<>();
+        return args.length == 4 ? CommandTabCompletes.getUpgrades(plugin, args[3]) : Collections.emptyList();
     }
 
 }

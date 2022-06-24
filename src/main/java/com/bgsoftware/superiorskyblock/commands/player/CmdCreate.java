@@ -1,16 +1,15 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandCreation;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandNames;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -115,7 +114,7 @@ public class CmdCreate implements ISuperiorCommand {
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         int argumentLength = plugin.getSettings().getIslandNames().isRequiredForCreation() ? 3 : 2;
         return plugin.getSettings().isSchematicNameArgument() && args.length == argumentLength ?
-                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : new ArrayList<>();
+                CommandTabCompletes.getSchematics(plugin, args[argumentLength - 1]) : Collections.emptyList();
     }
 
 }

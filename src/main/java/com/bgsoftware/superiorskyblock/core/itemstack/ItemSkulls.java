@@ -3,15 +3,15 @@ package com.bgsoftware.superiorskyblock.core.itemstack;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -64,7 +64,7 @@ public class ItemSkulls {
 
         CompoundTag properties = new CompoundTag();
 
-        ListTag textures = new ListTag(CompoundTag.class, new ArrayList<>());
+        ListTag textures = new ListTag(CompoundTag.class, Collections.emptyList());
         CompoundTag signature = new CompoundTag();
         signature.setString("Value", texture);
         textures.addTag(signature);

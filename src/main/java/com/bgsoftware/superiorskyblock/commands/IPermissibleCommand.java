@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -51,7 +50,7 @@ public interface IPermissibleCommand extends ISuperiorCommand {
         }
 
         return superiorPlayer == null || (island != null && superiorPlayer.hasPermission(getPrivilege())) ?
-                tabComplete(plugin, superiorPlayer, island, args) : new ArrayList<>();
+                tabComplete(plugin, superiorPlayer, island, args) : Collections.emptyList();
     }
 
     IslandPrivilege getPrivilege();

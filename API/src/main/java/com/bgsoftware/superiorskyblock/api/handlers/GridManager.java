@@ -259,7 +259,9 @@ public interface GridManager extends IDatabaseBridgeHolder {
      *
      * @param sortingType The sorting type to order the list by.
      * @return A list of uuids of the island owners.
+     * @deprecated See {@link #getIslands(SortingType)}
      */
+    @Deprecated
     List<UUID> getAllIslands(SortingType sortingType);
 
     /**

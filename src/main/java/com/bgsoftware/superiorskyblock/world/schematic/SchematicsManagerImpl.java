@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -318,7 +319,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     private List<Entity> getEntities(Location min, Location max) {
-        List<Entity> livingEntities = new ArrayList<>();
+        List<Entity> livingEntities = new LinkedList<>();
 
         Chunk minChunk = min.getChunk();
         Chunk maxChunk = max.getChunk();

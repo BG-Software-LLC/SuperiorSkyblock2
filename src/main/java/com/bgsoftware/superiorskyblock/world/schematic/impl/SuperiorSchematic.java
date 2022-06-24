@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.SchematicEntity;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -25,7 +26,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
@@ -60,7 +60,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         if (blocksList == null) {
             this.blocks = Collections.emptyList();
         } else {
-            Set<SchematicBlockData> schematicBlocks = new TreeSet<>(SchematicBlockData::compareTo);
+            LinkedList<SchematicBlockData> schematicBlocks = new LinkedList<>();
 
             for (Tag<?> tag : blocksList) {
                 SchematicBlockData schematicBlock = SuperiorSchematicDeserializer.deserializeSchematicBlock((CompoundTag) tag);
@@ -70,7 +70,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                 }
             }
 
-            this.blocks = Collections.unmodifiableList(new LinkedList<>(schematicBlocks));
+            this.blocks = new SequentialListBuilder<SchematicBlockData>()
+                    .sorted(SchematicBlockData::compareTo)
+                    .build(schematicBlocks);
         }
 
         ListTag entitiesList = compoundTag.getList("entities");

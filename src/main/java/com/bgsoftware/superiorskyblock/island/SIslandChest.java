@@ -8,13 +8,10 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SIslandChest implements IslandChest {
@@ -59,11 +56,10 @@ public class SIslandChest implements IslandChest {
             try {
                 updateFlag.set(true);
                 ItemStack[] oldContents = inventory.getContents();
-                List<HumanEntity> toUpdate = new ArrayList<>(inventory.getViewers());
                 Inventory oldInventory = inventory;
                 inventory = Bukkit.createInventory(this, 9 * rows, plugin.getSettings().getIslandChests().getChestTitle());
                 inventory.setContents(Arrays.copyOf(oldContents, 9 * rows));
-                toUpdate.forEach(humanEntity -> {
+                inventory.getViewers().forEach(humanEntity -> {
                     if (humanEntity.getOpenInventory().getTopInventory().equals(oldInventory))
                         humanEntity.openInventory(inventory);
                 });

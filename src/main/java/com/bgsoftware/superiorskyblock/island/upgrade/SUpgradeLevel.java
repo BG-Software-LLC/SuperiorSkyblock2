@@ -9,11 +9,11 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.common.base.Preconditions;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -23,7 +23,6 @@ import org.bukkit.potion.PotionEffectType;
 import javax.script.ScriptException;
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -208,7 +207,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
-        return generatorRates == null ? new HashMap<>() : generatorRates.entrySet().stream().collect(Collectors.toMap(
+        return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
     }

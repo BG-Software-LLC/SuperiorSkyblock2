@@ -6,16 +6,16 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankLogsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BankLogsSortButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTransaction> {
 
@@ -69,7 +68,9 @@ public class MenuBankLogs extends PagedSuperiorMenu<MenuBankLogs, BankTransactio
             return transactions;
         }
 
-        return transactions.stream().sorted(sorting).collect(Collectors.toList());
+        transactions.sort(sorting);
+
+        return transactions;
     }
 
     private List<BankTransaction> getTransactions() {

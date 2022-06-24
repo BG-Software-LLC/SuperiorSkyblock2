@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
@@ -36,9 +37,9 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -78,8 +79,8 @@ public class NMSUtils {
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, Runnable onFinish, Consumer<ChunkAccess> chunkConsumer,
                                          Consumer<UnloadedChunkCompound> unloadedChunkConsumer) {
-        List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
-        List<ChunkAccess> loadedChunks = new ArrayList<>();
+        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
+        List<ChunkAccess> loadedChunks = new LinkedList<>();
 
         chunksCoords.forEach(chunkCoords -> {
             ChunkAccess chunkAccess = worldServer.getChunkIfLoaded(chunkCoords.getX(), chunkCoords.getZ());
@@ -114,7 +115,7 @@ public class NMSUtils {
         PlayerChunkMap playerChunkMap = worldServer.getChunkProvider().getPlayerChunkMap();
 
         BukkitExecutor.createTask().runAsync(v -> {
-            List<Pair<ChunkCoordIntPair, NBTTagCompound>> chunkCompounds = new ArrayList<>();
+            List<Pair<ChunkCoordIntPair, NBTTagCompound>> chunkCompounds = new LinkedList<>();
 
             chunks.forEach(chunkCoords -> {
                 try {
@@ -263,7 +264,7 @@ public class NMSUtils {
     }
 
     public static List<Biome> getAllBiomes() {
-        return new ArrayList<>(biomeEnumMap.values());
+        return new SequentialListBuilder<Biome>().build(biomeEnumMap.values());
     }
 
     public record UnloadedChunkCompound(NBTTagCompound chunkCompound, ChunkCoordIntPair chunkCoords) {

@@ -15,19 +15,19 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -676,11 +676,11 @@ public class IslandsDatabaseBridge {
     }
 
     private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others) {
-        List<Pair<String, Object>> filters = new ArrayList<>();
+        List<Pair<String, Object>> filters = new LinkedList<>();
         filters.add(new Pair<>(id, island.getUniqueId().toString()));
         if (others != null)
             filters.addAll(Arrays.asList(others));
-        return new DatabaseFilter(filters);
+        return DatabaseFilter.fromFilters(filters);
     }
 
     private enum FutureSave {

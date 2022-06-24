@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level;
 
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.EntityPlayer;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public final class BossBattleServer extends MappedObject<net.minecraft.server.level.BossBattleServer> {
 
@@ -14,7 +14,7 @@ public final class BossBattleServer extends MappedObject<net.minecraft.server.le
     }
 
     public Collection<Entity> getPlayers() {
-        return handle.h().stream().map(Entity::new).collect(Collectors.toList());
+        return new SequentialListBuilder<Entity>().build(handle.h(), Entity::new);
     }
 
     public void removePlayer(Entity entity) {

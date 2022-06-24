@@ -6,22 +6,33 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.CountsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.Material;
 
 import java.math.BigInteger;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.function.Function;
 
 public class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.BlockCount> {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+
+    private static final Comparator<BlockCount> BLOCK_COUNT_COMPARATOR = (o1, o2) -> {
+        Material firstMaterial = getSafeMaterial(o1.getBlockKey().getGlobalKey());
+        Material secondMaterial = getSafeMaterial(o2.getBlockKey().getGlobalKey());
+        int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
+        return compare != 0 ? compare : o1.getBlockKey().compareTo(o2.getBlockKey());
+    };
+    private static final Function<Map.Entry<Key, BigInteger>, BlockCount> BLOCK_COUNT_MAPPER =
+            entry -> new BlockCount(entry.getKey(), entry.getValue());
 
     private static PagedMenuPattern<MenuCounts, BlockCount> menuPattern;
 
@@ -39,12 +50,9 @@ public class MenuCounts extends PagedSuperiorMenu<MenuCounts, MenuCounts.BlockCo
 
     @Override
     protected List<BlockCount> requestObjects() {
-        return island.getBlockCountsAsBigInteger().entrySet().stream().sorted((o1, o2) -> {
-            Material firstMaterial = getSafeMaterial(o1.getKey().getGlobalKey());
-            Material secondMaterial = getSafeMaterial(o2.getKey().getGlobalKey());
-            int compare = plugin.getNMSAlgorithms().compareMaterials(firstMaterial, secondMaterial);
-            return compare != 0 ? compare : o1.getKey().compareTo(o2.getKey());
-        }).map(entry -> new BlockCount(KeyImpl.of(entry.getKey().toString()), entry.getValue())).collect(Collectors.toList());
+        return new SequentialListBuilder<BlockCount>()
+                .sorted(BLOCK_COUNT_COMPARATOR)
+                .build(island.getBlockCountsAsBigInteger().entrySet(), BLOCK_COUNT_MAPPER);
     }
 
     public static void init() {

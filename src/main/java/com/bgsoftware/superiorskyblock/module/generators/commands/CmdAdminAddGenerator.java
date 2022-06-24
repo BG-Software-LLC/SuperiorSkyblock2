@@ -8,15 +8,14 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.commands.arguments.NumberArgument;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -138,7 +137,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getMaterialsForGenerators(args[3]) :
-                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : new ArrayList<>();
+                args.length == 6 ? CommandTabCompletes.getEnvironments(args[5]) : Collections.emptyList();
     }
 
 }

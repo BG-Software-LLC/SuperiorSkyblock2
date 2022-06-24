@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.purge;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class DefaultIslandsPurger implements IslandsPurger {
 
     @Override
     public List<Island> getScheduledPurgedIslands() {
-        return Collections.unmodifiableList(new ArrayList<>(this.scheduledIslands));
+        return new SequentialListBuilder<Island>().build(this.scheduledIslands);
     }
 
 }

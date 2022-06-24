@@ -13,6 +13,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuConfirmLeave;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LeaveButton extends SuperiorMenuButton<MenuConfirmLeave> {
@@ -33,7 +34,7 @@ public class LeaveButton extends SuperiorMenuButton<MenuConfirmLeave> {
         if (leaveIsland && island != null && plugin.getEventsBus().callIslandQuitEvent(clickedPlayer, island)) {
             island.kickMember(clickedPlayer);
 
-            IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, new ArrayList<>(), clickedPlayer.getName());
+            IslandUtils.sendMessage(island, Message.LEAVE_ANNOUNCEMENT, Collections.emptyList(), clickedPlayer.getName());
 
             Message.LEFT_ISLAND.send(clickedPlayer);
         }

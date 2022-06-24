@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -24,9 +24,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class CommandArguments {
     }
 
     public static IslandsListArgument getMultipleIslands(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<Island> islands = new ArrayList<>();
+        List<Island> islands = new LinkedList<>();
         SuperiorPlayer targetPlayer;
 
         if (argument.equals("*")) {
@@ -67,7 +68,7 @@ public class CommandArguments {
                 islands.add(arguments.getIsland());
         }
 
-        return new IslandsListArgument(islands, targetPlayer);
+        return new IslandsListArgument(Collections.unmodifiableList(islands), targetPlayer);
     }
 
     public static IslandArgument getSenderIsland(SuperiorSkyblockPlugin plugin, CommandSender sender) {
@@ -94,7 +95,7 @@ public class CommandArguments {
     }
 
     public static List<SuperiorPlayer> getMultiplePlayers(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<SuperiorPlayer> players = new ArrayList<>();
+        List<SuperiorPlayer> players = new LinkedList<>();
 
         if (argument.equals("*")) {
             players = plugin.getPlayers().getAllPlayers();
@@ -104,7 +105,7 @@ public class CommandArguments {
                 players.add(targetPlayer);
         }
 
-        return players;
+        return Collections.unmodifiableList(players);
     }
 
     public static IslandArgument getIslandWhereStanding(SuperiorSkyblockPlugin plugin, CommandSender sender) {
@@ -137,7 +138,7 @@ public class CommandArguments {
     }
 
     public static List<Mission<?>> getMultipleMissions(SuperiorSkyblockPlugin plugin, CommandSender sender, String argument) {
-        List<Mission<?>> missions = new ArrayList<>();
+        List<Mission<?>> missions = new LinkedList<>();
 
         if (argument.equals("*")) {
             missions = plugin.getMissions().getAllMissions();
@@ -147,7 +148,7 @@ public class CommandArguments {
                 missions.add(mission);
         }
 
-        return missions;
+        return Collections.unmodifiableList(missions);
     }
 
     public static Upgrade getUpgrade(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, String argument) {

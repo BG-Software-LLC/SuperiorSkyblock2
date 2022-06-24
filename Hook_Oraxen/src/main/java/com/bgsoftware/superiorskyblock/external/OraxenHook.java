@@ -16,8 +16,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,7 +26,7 @@ public class OraxenHook {
     private static final List<Pair<MechanicFactory, SetBlockModelFunction>> AVAILABLE_MECHANICS;
 
     static {
-        List<Pair<MechanicFactory, SetBlockModelFunction>> availableMechanics = new ArrayList<>();
+        List<Pair<MechanicFactory, SetBlockModelFunction>> availableMechanics = new LinkedList<>();
 
         try {
             Class.forName("io.th0rgal.oraxen.mechanics.provided.gameplay.block.BlockMechanicFactory");

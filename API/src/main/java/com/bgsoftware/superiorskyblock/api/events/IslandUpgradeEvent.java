@@ -11,7 +11,7 @@ import org.bukkit.event.Cancellable;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
         this.superiorPlayer = superiorPlayer;
         this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
         this.upgradeLevel = Preconditions.checkNotNull(island.getUpgradeLevel(upgrade), "upgradeLevel cannot be null");
-        this.commands = new ArrayList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.upgradeCost = upgradeCost;
     }
 
@@ -69,7 +69,7 @@ public class IslandUpgradeEvent extends IslandEvent implements Cancellable {
         this.superiorPlayer = superiorPlayer;
         this.upgrade = Preconditions.checkNotNull(upgrade, "upgrade cannot be null");
         this.upgradeLevel = Preconditions.checkNotNull(upgradeLevel, "upgradeLevel cannot be null");
-        this.commands = new ArrayList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
+        this.commands = new LinkedList<>(Preconditions.checkNotNull(commands, "commands cannot be null"));
         this.upgradeCost = upgradeCost;
     }
 

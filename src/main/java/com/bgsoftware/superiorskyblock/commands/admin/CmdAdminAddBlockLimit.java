@@ -62,7 +62,7 @@ public class CmdAdminAddBlockLimit implements IAdminIslandCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : new ArrayList<>();
+        return args.length == 4 ? CommandTabCompletes.getMaterials(args[3]) : Collections.emptyList();
     }
 
     @Override

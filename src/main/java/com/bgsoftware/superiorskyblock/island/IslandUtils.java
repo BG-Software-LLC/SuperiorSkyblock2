@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -19,16 +20,16 @@ import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class IslandUtils {
 
@@ -39,7 +40,7 @@ public class IslandUtils {
     }
 
     public static List<ChunkPosition> getChunkCoords(Island island, World world, boolean onlyProtected, boolean noEmptyChunks) {
-        List<ChunkPosition> chunkCoords = new ArrayList<>();
+        List<ChunkPosition> chunkCoords = new LinkedList<>();
 
         Location min = onlyProtected ? island.getMinimumProtected() : island.getMinimum();
         Location max = onlyProtected ? island.getMaximumProtected() : island.getMaximum();
@@ -52,7 +53,7 @@ public class IslandUtils {
             }
         }
 
-        return chunkCoords;
+        return Collections.unmodifiableList(chunkCoords);
     }
 
     public static Map<World, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
@@ -96,10 +97,11 @@ public class IslandUtils {
                                                                    boolean noEmptyChunks,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    BiConsumer<Chunk, Throwable> whenComplete) {
-        return IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks).stream().map(chunkPosition -> {
-            CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, null);
-            return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
-        }).collect(Collectors.toList());
+        return new SequentialListBuilder<CompletableFuture<Chunk>>()
+                .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition -> {
+                    CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, null);
+                    return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
+                });
     }
 
     public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
@@ -108,9 +110,9 @@ public class IslandUtils {
                                                                    boolean noEmptyChunks,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
-        return IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks).stream()
-                .map(chunkPosition -> ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad))
-                .collect(Collectors.toList());
+        return new SequentialListBuilder<CompletableFuture<Chunk>>()
+                .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition ->
+                        ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
 
     public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
@@ -118,7 +120,7 @@ public class IslandUtils {
                                                                    boolean noEmptyChunks,
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
-        List<CompletableFuture<Chunk>> chunkCoords = new ArrayList<>();
+        List<CompletableFuture<Chunk>> chunkCoords = new LinkedList<>();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
@@ -141,7 +143,7 @@ public class IslandUtils {
             chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
         }
 
-        return chunkCoords;
+        return Collections.unmodifiableList(chunkCoords);
     }
 
     public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer) {
@@ -169,8 +171,9 @@ public class IslandUtils {
     public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
         Map<World, List<ChunkPosition>> chunksToDelete = IslandUtils.getChunkCoords(island, false, false);
         chunksToDelete.values().forEach(chunkPositions -> {
-            chunkPositions.removeAll(excludedChunkPositions);
-            deleteChunks(island, chunkPositions, null);
+            List<ChunkPosition> clonedChunkPositions = new LinkedList<>(chunkPositions);
+            clonedChunkPositions.removeAll(excludedChunkPositions);
+            deleteChunks(island, clonedChunkPositions, null);
         });
     }
 
@@ -208,7 +211,7 @@ public class IslandUtils {
 
         island.kickMember(target);
 
-        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, new ArrayList<>(), target.getName(), callerName);
+        IslandUtils.sendMessage(island, Message.KICK_ANNOUNCEMENT, Collections.emptyList(), target.getName(), callerName);
 
         Message.GOT_KICKED.send(target, callerName);
     }
@@ -234,7 +237,7 @@ public class IslandUtils {
 
         island.banMember(target, caller);
 
-        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, new ArrayList<>(), target.getName(), caller.getName());
+        IslandUtils.sendMessage(island, Message.BAN_ANNOUNCEMENT, Collections.emptyList(), target.getName(), caller.getName());
 
         Message.GOT_BANNED.send(target, island.getOwner().getName());
     }

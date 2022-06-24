@@ -24,15 +24,13 @@ import org.bukkit.inventory.HorseInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.projectiles.ProjectileSource;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class BukkitEntities {
 
@@ -56,14 +54,17 @@ public class BukkitEntities {
     }
 
     public static void cacheEntityEquipment(LivingEntity livingEntity) {
-        List<ItemStack> entityEquipment = new ArrayList<>(Arrays.asList(plugin.getNMSEntities().getEquipment(livingEntity.getEquipment())));
+        List<ItemStack> entityEquipment = new LinkedList<>(Arrays.asList(plugin.getNMSEntities().getEquipment(livingEntity.getEquipment())));
 
         if (livingEntity instanceof Pig) {
             if (((Pig) livingEntity).hasSaddle())
                 entityEquipment.add(new ItemStack(Material.SADDLE));
         } else if (livingEntity instanceof Horse) {
             HorseInventory horseInventory = ((Horse) livingEntity).getInventory();
-            entityEquipment.addAll(Arrays.stream(horseInventory.getContents()).filter(Objects::nonNull).collect(Collectors.toList()));
+            horseInventory.forEach(itemStack -> {
+                if (itemStack != null)
+                    entityEquipment.add(itemStack);
+            });
 
             entityEquipment.add(new ItemStack(Material.CHEST));
 
@@ -76,7 +77,10 @@ public class BukkitEntities {
         try {
             if (livingEntity instanceof AbstractHorse) {
                 AbstractHorseInventory horseInventory = ((AbstractHorse) livingEntity).getInventory();
-                entityEquipment.addAll(Arrays.stream(horseInventory.getContents()).filter(Objects::nonNull).collect(Collectors.toList()));
+                horseInventory.forEach(itemStack -> {
+                    if (itemStack != null)
+                        entityEquipment.add(itemStack);
+                });
 
                 entityEquipment.add(new ItemStack(Material.CHEST));
 

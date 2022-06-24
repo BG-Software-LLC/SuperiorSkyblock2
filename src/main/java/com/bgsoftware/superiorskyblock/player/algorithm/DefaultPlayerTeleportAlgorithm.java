@@ -4,15 +4,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.world.WorldBlocks;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
+import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
@@ -22,13 +23,12 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
@@ -126,14 +126,15 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                          */
 
                         World world = island.getCenter(environment).getWorld();
-                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = IslandUtils.getAllChunksAsync(island, world,
-                                        true, true, ChunkLoadReason.FIND_SAFE_SPOT, (Consumer<Chunk>) null)
-                                .stream().map(future -> future.thenApply(Chunk::getChunkSnapshot)).collect(Collectors.toList());
+
+                        List<CompletableFuture<ChunkSnapshot>> chunksToLoad = new SequentialListBuilder<CompletableFuture<ChunkSnapshot>>()
+                                .build(IslandUtils.getAllChunksAsync(island, world, true, true, ChunkLoadReason.FIND_SAFE_SPOT, (Consumer<Chunk>) null),
+                                        future -> future.thenApply(Chunk::getChunkSnapshot));
 
                         World islandsWorld = plugin.getGrid().getIslandsWorld(island, environment);
 
                         BukkitExecutor.createTask().runAsync(v -> {
-                            List<Location> safeLocations = new ArrayList<>();
+                            List<Location> safeLocations = new LinkedList<>();
 
                             for (CompletableFuture<ChunkSnapshot> chunkToLoad : chunksToLoad) {
                                 ChunkSnapshot chunkSnapshot;

@@ -5,14 +5,15 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -108,7 +109,7 @@ public class CmdPermissions implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        List<String> tabVariables = new ArrayList<>();
+        List<String> tabVariables = new LinkedList<>();
 
         switch (args.length) {
             case 2:
@@ -131,7 +132,7 @@ public class CmdPermissions implements IPermissibleCommand {
                 tabVariables.add("reset");
         }
 
-        return tabVariables;
+        return Collections.unmodifiableList(tabVariables);
     }
 
 }

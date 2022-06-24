@@ -7,26 +7,26 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandFlagPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,7 +36,7 @@ public class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, MenuIsla
 
     private static PagedMenuPattern<MenuIslandFlags, IslandFlagInfo> menuPattern;
 
-    private static final List<IslandFlagInfo> islandFlags = new ArrayList<>();
+    private static final List<IslandFlagInfo> islandFlags = new LinkedList<>();
 
     private static boolean convertedFlags = false;
 
@@ -62,7 +62,7 @@ public class MenuIslandFlags extends PagedSuperiorMenu<MenuIslandFlags, MenuIsla
             convertedFlags = !islandFlags.removeIf(IslandFlagInfo::tryValidate);
         }
 
-        return islandFlags;
+        return Collections.unmodifiableList(islandFlags);
     }
 
     public static void init() {

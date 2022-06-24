@@ -1,16 +1,16 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CmdHelp implements ISuperiorCommand {
 
@@ -67,9 +67,10 @@ public class CmdHelp implements ISuperiorCommand {
             return;
         }
 
-        List<SuperiorCommand> subCommands = plugin.getCommands().getSubCommands().stream()
-                .filter(subCommand -> subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission()))
-                .collect(Collectors.toList());
+        List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
+                .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
+                        sender.hasPermission(subCommand.getPermission())))
+                .build(plugin.getCommands().getSubCommands());
 
         if (subCommands.isEmpty()) {
             Message.NO_COMMAND_PERMISSION.send(sender);
@@ -91,12 +92,10 @@ public class CmdHelp implements ISuperiorCommand {
         java.util.Locale locale = PlayerLocales.getLocale(sender);
 
         for (SuperiorCommand _subCommand : subCommands) {
-            if (_subCommand.displayCommand() && (_subCommand.getPermission().isEmpty() || sender.hasPermission(_subCommand.getPermission()))) {
-                String description = _subCommand.getDescription(locale);
-                if (description == null)
-                    new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
-                Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
-            }
+            String description = _subCommand.getDescription(locale);
+            if (description == null)
+                new NullPointerException("The description of the command " + _subCommand.getAliases().get(0) + " is null.").printStackTrace();
+            Message.ISLAND_HELP_LINE.send(sender, plugin.getCommands().getLabel() + " " + _subCommand.getUsage(locale), description == null ? "" : description);
         }
 
         if (page != lastPage)
@@ -107,12 +106,13 @@ public class CmdHelp implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> list = new ArrayList<>();
+        List<String> list = new LinkedList<>();
 
         if (args.length == 2) {
-            List<SuperiorCommand> subCommands = plugin.getCommands().getSubCommands().stream()
-                    .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() || sender.hasPermission(subCommand.getPermission())))
-                    .collect(Collectors.toList());
+            List<SuperiorCommand> subCommands = new SequentialListBuilder<SuperiorCommand>()
+                    .filter(subCommand -> subCommand.displayCommand() && (subCommand.getPermission().isEmpty() ||
+                            sender.hasPermission(subCommand.getPermission())))
+                    .build(plugin.getCommands().getSubCommands());
 
             int lastPage = subCommands.size() / 7;
             if (subCommands.size() % 7 != 0) lastPage++;
@@ -121,7 +121,7 @@ public class CmdHelp implements ISuperiorCommand {
                 list.add(i + "");
         }
 
-        return list;
+        return Collections.unmodifiableList(list);
     }
 
 }

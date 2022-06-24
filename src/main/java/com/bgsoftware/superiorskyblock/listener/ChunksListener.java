@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.world.event.WorldEventsManagerImpl;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class ChunksListener implements Listener {
@@ -54,7 +54,8 @@ public class ChunksListener implements Listener {
             // We want to update the biome for new island chunks.
             Island island = plugin.getGrid().getIslandAt(e.getChunk());
             if (island != null && !island.getBiome().name().equals(plugin.getSettings().getWorlds().getNormal().getBiome())) {
-                List<Player> playersToUpdate = island.getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
+                List<Player> playersToUpdate = new SequentialListBuilder<Player>()
+                        .build(island.getAllPlayersInside(), SuperiorPlayer::asPlayer);
                 plugin.getNMSChunks().setBiome(Collections.singletonList(ChunkPosition.of(e.getChunk())), island.getBiome(), playersToUpdate);
             }
         }

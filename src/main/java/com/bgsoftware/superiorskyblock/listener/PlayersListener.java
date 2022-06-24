@@ -161,7 +161,7 @@ public class PlayersListener implements Listener {
             if (_island.isCoop(superiorPlayer)) {
                 if (plugin.getEventsBus().callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
                     _island.removeCoop(superiorPlayer);
-                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName());
+                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
                 }
             }
         }
@@ -582,7 +582,7 @@ public class PlayersListener implements Listener {
             if (eventResult.isCancelled())
                 return;
 
-            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, new ArrayList<>(),
+            IslandUtils.sendMessage(island, Message.TEAM_CHAT_FORMAT, Collections.emptyList(),
                     superiorPlayer.getPlayerRole(), superiorPlayer.getName(), eventResult.getResult());
 
             Message.SPY_TEAM_CHAT_FORMAT.send(Bukkit.getConsoleSender(), superiorPlayer.getPlayerRole().getDisplayName(),

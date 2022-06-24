@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.commands.arguments.IslandsListArgument;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public interface IAdminIslandCommand extends ISuperiorCommand {
@@ -29,12 +29,12 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
 
     @Override
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> tabVariables = new ArrayList<>();
+        List<String> tabVariables = new LinkedList<>();
 
         if (args.length == 3) {
             if (supportMultipleIslands() && "*".contains(args[2]))
                 tabVariables.add("*");
-            tabVariables.addAll(CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2], false));
+            tabVariables.addAll(CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[2], false, null));
         } else if (args.length > 3) {
             if (supportMultipleIslands()) {
                 tabVariables = adminTabComplete(plugin, sender, null, args);
@@ -49,7 +49,7 @@ public interface IAdminIslandCommand extends ISuperiorCommand {
             }
         }
 
-        return tabVariables;
+        return Collections.unmodifiableList(tabVariables);
     }
 
     boolean supportMultipleIslands();

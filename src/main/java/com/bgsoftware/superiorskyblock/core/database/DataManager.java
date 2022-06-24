@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
@@ -16,21 +17,20 @@ import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeseri
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLDatabaseInitializer;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
 public class DataManager extends Manager {
 
-    private final List<DatabaseLoader> databaseLoaders = new ArrayList<>();
+    private final List<DatabaseLoader> databaseLoaders = new LinkedList<>();
 
     public DataManager(SuperiorSkyblockPlugin plugin) {
         super(plugin);

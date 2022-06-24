@@ -24,8 +24,8 @@ import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,8 +52,8 @@ public class NMSUtils {
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
                                          Consumer<Chunk> updateChunk) {
-        List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
-        List<Chunk> loadedChunks = new ArrayList<>();
+        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
+        List<Chunk> loadedChunks = new LinkedList<>();
 
         chunksCoords.forEach(chunkCoords -> {
             Chunk chunk = worldServer.getChunkIfLoaded(chunkCoords.x, chunkCoords.z);

@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CmdBalance implements ISuperiorCommand {
@@ -77,7 +77,7 @@ public class CmdBalance implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         return args.length == 2 ? CommandTabCompletes.getPlayerIslandsExceptSender(plugin, sender, args[1],
-                plugin.getSettings().isTabCompleteHideVanished()) : new ArrayList<>();
+                plugin.getSettings().isTabCompleteHideVanished()) : Collections.emptyList();
     }
 
 }

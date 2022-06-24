@@ -18,8 +18,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class UpgradeTypeMobDrops implements IUpgradeType {
@@ -85,8 +85,7 @@ public class UpgradeTypeMobDrops implements IUpgradeType {
             double mobDropsMultiplier = island.getMobDropsMultiplier();
 
             if (mobDropsMultiplier > 1) {
-                List<ItemStack> dropItems = new ArrayList<>(e.getDrops());
-                for (ItemStack itemStack : dropItems) {
+                for (ItemStack itemStack : new LinkedList<>(e.getDrops())) {
                     if (itemStack != null && !BukkitEntities.isEquipment(e.getEntity(), itemStack) &&
                             !plugin.getNMSTags().getNBTTag(itemStack).containsKey("WildChests")) {
                         int newAmount = (int) (itemStack.getAmount() * mobDropsMultiplier);

@@ -7,29 +7,30 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
+import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -86,7 +87,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<PlayerAttributes> deserializePlayers(String players) {
-        List<PlayerAttributes> playerAttributesList = new ArrayList<>();
+        List<PlayerAttributes> playerAttributesList = new LinkedList<>();
 
         if (players != null && databaseLoader != null) {
             for (String uuid : players.split(",")) {
@@ -100,7 +101,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return playerAttributesList;
+        return Collections.unmodifiableList(playerAttributesList);
     }
 
     @Override
@@ -195,7 +196,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<IslandWarpAttributes> deserializeWarps(String islandWarps) {
-        List<IslandWarpAttributes> warpAttributes = new ArrayList<>();
+        List<IslandWarpAttributes> warpAttributes = new LinkedList<>();
 
         if (islandWarps == null)
             return warpAttributes;
@@ -233,7 +234,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return warpAttributes;
+        return Collections.unmodifiableList(warpAttributes);
     }
 
     @Override
@@ -322,7 +323,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<Pair<UUID, Long>> deserializeVisitors(String visitorsRaw) {
-        List<Pair<UUID, Long>> visitors = new ArrayList<>();
+        List<Pair<UUID, Long>> visitors = new LinkedList<>();
 
         if (visitorsRaw != null) {
             for (String visitor : visitorsRaw.split(",")) {
@@ -336,7 +337,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return visitors;
+        return Collections.unmodifiableList(visitors);
     }
 
     @Override
@@ -375,7 +376,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<IslandChestAttributes> deserializeIslandChests(String islandChest) {
-        List<IslandChestAttributes> islandChestAttributes = new ArrayList<>();
+        List<IslandChestAttributes> islandChestAttributes = new LinkedList<>();
 
         if (Text.isBlank(islandChest))
             return islandChestAttributes;
@@ -388,7 +389,7 @@ public class RawDeserializer implements IDeserializer {
                     .setValue(IslandChestAttributes.Field.CONTENTS, islandChestsSections[i]));
         }
 
-        return islandChestAttributes;
+        return Collections.unmodifiableList(islandChestAttributes);
     }
 
     @Override
@@ -413,7 +414,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public List<WarpCategoryAttributes> deserializeWarpCategories(String categories) {
-        List<WarpCategoryAttributes> warpCategoryAttributes = new ArrayList<>();
+        List<WarpCategoryAttributes> warpCategoryAttributes = new LinkedList<>();
 
         if (categories == null)
             return warpCategoryAttributes;
@@ -434,7 +435,7 @@ public class RawDeserializer implements IDeserializer {
             }
         }
 
-        return warpCategoryAttributes;
+        return Collections.unmodifiableList(warpCategoryAttributes);
     }
 
     @Override

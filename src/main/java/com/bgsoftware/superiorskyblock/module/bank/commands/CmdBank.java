@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.commands.arguments.IslandArgument;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class CmdBank implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length != 2 ? new ArrayList<>() : CommandTabCompletes.getCustomComplete(args[1], "logs");
+        return args.length != 2 ? Collections.emptyList() : CommandTabCompletes.getCustomComplete(args[1], "logs");
     }
 
 }

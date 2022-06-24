@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class WorldDestructionListener implements Listener {
@@ -40,7 +40,7 @@ public class WorldDestructionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent e) {
-        List<Location> blockLocations = new ArrayList<>(e.getBlocks().size());
+        List<Location> blockLocations = new LinkedList<>();
         e.getBlocks().forEach(block -> blockLocations.add(block.getRelative(e.getDirection()).getLocation()));
         if (preventMultiDestruction(e.getBlock().getLocation(), blockLocations))
             e.setCancelled(true);
@@ -48,7 +48,7 @@ public class WorldDestructionListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent e) {
-        List<Location> blockLocations = new ArrayList<>(e.getBlocks().size());
+        List<Location> blockLocations = new LinkedList<>();
         e.getBlocks().forEach(block -> blockLocations.add(block.getRelative(e.getDirection()).getLocation()));
         if (preventMultiDestruction(e.getBlock().getLocation(), blockLocations))
             e.setCancelled(true);

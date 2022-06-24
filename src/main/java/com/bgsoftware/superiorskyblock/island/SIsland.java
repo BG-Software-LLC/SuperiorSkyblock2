@@ -30,8 +30,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -44,6 +44,7 @@ import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -66,7 +67,6 @@ import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
@@ -93,13 +93,13 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -360,14 +360,14 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandMembers(boolean includeOwner) {
-        List<SuperiorPlayer> members = new ArrayList<>();
+        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
+                .mutable()
+                .build(_members));
 
         if (includeOwner)
             members.add(owner);
 
-        this.members.read(members::addAll);
-
-        return members;
+        return Collections.unmodifiableList(members);
     }
 
     @Override
@@ -375,20 +375,21 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(playerRoles, "playerRoles parameter cannot be null.");
 
         List<PlayerRole> rolesToFilter = Arrays.asList(playerRoles);
-        List<SuperiorPlayer> members = new ArrayList<>();
+        List<SuperiorPlayer> members = this.members.readAndGet(_members -> new SequentialListBuilder<SuperiorPlayer>()
+                .mutable()
+                .filter(superiorPlayer -> rolesToFilter.contains(superiorPlayer.getPlayerRole()))
+                .build(_members));
+
 
         if (rolesToFilter.contains(SPlayerRole.lastRole()))
             members.add(owner);
 
-        members.addAll(this.members.readAndGet(_members -> _members.stream().filter(superiorPlayer ->
-                rolesToFilter.contains(superiorPlayer.getPlayerRole())).collect(Collectors.toList())));
-
-        return members;
+        return Collections.unmodifiableList(members);
     }
 
     @Override
     public List<SuperiorPlayer> getBannedPlayers() {
-        return Collections.unmodifiableList(new ArrayList<>(this.bannedPlayers));
+        return new SequentialListBuilder<SuperiorPlayer>().build(this.bannedPlayers);
     }
 
     @Override
@@ -398,25 +399,28 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getIslandVisitors(boolean vanishPlayers) {
-        return playersInside.readAndGet(playersInside -> playersInside.stream()
+        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
                 .filter(superiorPlayer -> !isMember(superiorPlayer) && (vanishPlayers || superiorPlayer.isShownAsOnline()))
-                .collect(Collectors.toList()));
+                .build(playersInside));
     }
 
     @Override
     public List<SuperiorPlayer> getAllPlayersInside() {
-        return playersInside.readAndGet(playersInside -> playersInside.stream().filter(SuperiorPlayer::isOnline).collect(Collectors.toList()));
+        return playersInside.readAndGet(playersInside -> new SequentialListBuilder<SuperiorPlayer>()
+                .filter(SuperiorPlayer::isOnline)
+                .build(playersInside));
     }
 
     @Override
     public List<SuperiorPlayer> getUniqueVisitors() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::getSuperiorPlayer).collect(Collectors.toList())
-        );
+        return uniqueVisitors.readAndGet(uniqueVisitors -> new SequentialListBuilder<SuperiorPlayer>()
+                .build(uniqueVisitors, UniqueVisitor::getSuperiorPlayer));
     }
 
     @Override
     public List<Pair<SuperiorPlayer, Long>> getUniqueVisitorsWithTimes() {
-        return uniqueVisitors.readAndGet(uniqueVisitors -> uniqueVisitors.stream().map(UniqueVisitor::toPair).collect(Collectors.toList()));
+        return uniqueVisitors.readAndGet(uniqueVisitors -> new SequentialListBuilder<Pair<SuperiorPlayer, Long>>()
+                .build(uniqueVisitors, UniqueVisitor::toPair));
     }
 
     @Override
@@ -445,7 +449,7 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getInvitedPlayers() {
-        return Collections.unmodifiableList(new ArrayList<>(this.invitedPlayers));
+        return new SequentialListBuilder<SuperiorPlayer>().build(this.invitedPlayers);
     }
 
     @Override
@@ -618,7 +622,7 @@ public class SIsland implements Island {
 
     @Override
     public List<SuperiorPlayer> getCoopPlayers() {
-        return Collections.unmodifiableList(new ArrayList<>(this.coopPlayers));
+        return new SequentialListBuilder<SuperiorPlayer>().build(this.coopPlayers);
     }
 
     @Override
@@ -842,7 +846,7 @@ public class SIsland implements Island {
 
     @Override
     public List<Chunk> getAllChunks(boolean onlyProtected) {
-        List<Chunk> chunks = new ArrayList<>();
+        List<Chunk> chunks = new LinkedList<>();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
@@ -851,7 +855,7 @@ public class SIsland implements Island {
             }
         }
 
-        return chunks;
+        return Collections.unmodifiableList(chunks);
     }
 
     @Override
@@ -867,13 +871,13 @@ public class SIsland implements Island {
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks).stream()
-                .map(ChunkPosition::loadChunk).collect(Collectors.toList());
+        return new SequentialListBuilder<Chunk>()
+                .build(IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks), ChunkPosition::loadChunk);
     }
 
     @Override
     public List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks) {
-        List<Chunk> chunks = new ArrayList<>();
+        List<Chunk> chunks = new LinkedList<>();
 
         for (World.Environment environment : World.Environment.values()) {
             try {
@@ -882,14 +886,14 @@ public class SIsland implements Island {
             }
         }
 
-        return chunks;
+        return Collections.unmodifiableList(chunks);
     }
 
     @Override
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks).stream()
-                .map(plugin.getNMSChunks()::getChunkIfLoaded).filter(Objects::nonNull).collect(Collectors.toList());
+        return new SequentialListBuilder<Chunk>()
+                .build(IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks), plugin.getNMSChunks()::getChunkIfLoaded);
     }
 
     @Override
@@ -931,8 +935,9 @@ public class SIsland implements Island {
 
     @Override
     public void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish) {
-        List<List<ChunkPosition>> worldsChunks = new ArrayList<>(
+        LinkedList<List<ChunkPosition>> worldsChunks = new LinkedList<>(
                 IslandUtils.getChunkCoords(this, onlyProtected, true).values());
+
 
         if (worldsChunks.isEmpty()) {
             if (onFinish != null)
@@ -940,10 +945,8 @@ public class SIsland implements Island {
             return;
         }
 
-        for (int i = 0; i < worldsChunks.size() - 1; i++)
-            IslandUtils.deleteChunks(this, worldsChunks.get(i), null);
-
-        IslandUtils.deleteChunks(this, worldsChunks.get(worldsChunks.size() - 1), onFinish);
+        for (List<ChunkPosition> chunkPositions : worldsChunks)
+            IslandUtils.deleteChunks(this, chunkPositions, chunkPositions == worldsChunks.getLast() ? onFinish : null);
     }
 
     @Override
@@ -1506,7 +1509,8 @@ public class SIsland implements Island {
 
         PluginDebugger.debug("Action: Set Biome, Island: " + owner.getName() + ", Biome: " + biome.name());
 
-        List<Player> playersToUpdate = getAllPlayersInside().stream().map(SuperiorPlayer::asPlayer).collect(Collectors.toList());
+        List<Player> playersToUpdate = new SequentialListBuilder<Player>()
+                .build(getAllPlayersInside(), SuperiorPlayer::asPlayer);
 
         {
             World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
@@ -2583,7 +2587,7 @@ public class SIsland implements Island {
             IslandsDatabaseBridge.removeWarpCategory(this, warpCategory);
             boolean shouldSaveWarps = !warpCategory.getWarps().isEmpty();
             if (shouldSaveWarps) {
-                new ArrayList<>(warpCategory.getWarps()).forEach(islandWarp -> deleteWarp(islandWarp.getName()));
+                new LinkedList<>(warpCategory.getWarps()).forEach(islandWarp -> deleteWarp(islandWarp.getName()));
                 plugin.getMenus().destroyWarps(warpCategory);
             }
 
@@ -3069,7 +3073,7 @@ public class SIsland implements Island {
         KeyMap<Value<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
 
         if (cobbleGeneratorValues == null)
-            return Collections.unmodifiableMap(new HashMap<>());
+            return Collections.emptyMap();
 
         return Collections.unmodifiableMap(cobbleGeneratorValues.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
@@ -3083,7 +3087,7 @@ public class SIsland implements Island {
         KeyMap<Value<Integer>> cobbleGeneratorValues = getCobbleGeneratorValues(environment, false);
 
         if (cobbleGeneratorValues == null)
-            return Collections.unmodifiableMap(new HashMap<>());
+            return Collections.emptyMap();
 
         return Collections.unmodifiableMap(cobbleGeneratorValues.entrySet().stream()
                 .filter(entry -> !(entry.getValue() instanceof SyncedValue))
@@ -3441,7 +3445,7 @@ public class SIsland implements Island {
 
     @Override
     public List<Mission<?>> getCompletedMissions() {
-        return Collections.unmodifiableList(new ArrayList<>(completedMissions.keySet()));
+        return new SequentialListBuilder<Mission<?>>().build(completedMissions.keySet());
     }
 
     @Override
@@ -3850,7 +3854,7 @@ public class SIsland implements Island {
     }
 
     private void updateIslandChests() {
-        List<IslandChest> islandChestList = new ArrayList<>(Arrays.asList(this.islandChests.get()));
+        List<IslandChest> islandChestList = Arrays.asList(this.islandChests.get());
         boolean updatedChests = false;
 
         while (islandChestList.size() < plugin.getSettings().getIslandChests().getDefaultPages()) {

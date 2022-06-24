@@ -2,9 +2,8 @@ package com.bgsoftware.superiorskyblock.island.preview;
 
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -31,7 +30,7 @@ public class DefaultIslandPreviews implements IslandPreviews {
 
     @Override
     public List<IslandPreview> getActivePreviews() {
-        return Collections.unmodifiableList(new ArrayList<>(this.islandPreviews.values()));
+        return new SequentialListBuilder<IslandPreview>().build(this.islandPreviews.values());
     }
 
 }

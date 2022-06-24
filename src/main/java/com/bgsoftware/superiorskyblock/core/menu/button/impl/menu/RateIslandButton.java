@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.menu.impl.MenuIslandRate;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
@@ -47,7 +48,7 @@ public class RateIslandButton extends SuperiorMenuButton<MenuIslandRate> {
 
         Message.RATE_SUCCESS.send(clickedPlayer, rating.getValue());
 
-        IslandUtils.sendMessage(island, Message.RATE_ANNOUNCEMENT, new ArrayList<>(),
+        IslandUtils.sendMessage(island, Message.RATE_ANNOUNCEMENT, Collections.emptyList(),
                 clickedPlayer.getName(), rating.getValue());
 
         BukkitExecutor.sync(superiorMenu::closePage, 1L);

@@ -6,10 +6,10 @@ import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 public class ModulesManagerImpl extends Manager implements ModulesManager {
@@ -65,12 +64,12 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         ModuleClassLoader moduleClassLoader = new ModuleClassLoader(moduleFile);
 
         //noinspection deprecation
-        Optional<Class<?>> moduleClass = JarFiles.getClasses(moduleFile.toURL(), PluginModule.class, moduleClassLoader).stream().findFirst();
+        Class<?> moduleClass = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);
 
-        if (!moduleClass.isPresent())
+        if (moduleClass == null)
             throw new IllegalArgumentException("The file " + moduleName + " is not a valid module.");
 
-        PluginModule pluginModule = createInstance(moduleClass.get());
+        PluginModule pluginModule = createInstance(moduleClass);
         pluginModule.initModuleLoader(moduleFile, moduleClassLoader);
 
         registerModule(pluginModule);

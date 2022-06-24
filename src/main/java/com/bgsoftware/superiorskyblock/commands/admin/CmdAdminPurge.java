@@ -2,16 +2,16 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CmdAdminPurge implements ISuperiorCommand {
 
@@ -59,10 +59,10 @@ public class CmdAdminPurge implements ISuperiorCommand {
             long timeToPurge = parseLongSafe(args[2]);
             long currentTime = System.currentTimeMillis() / 1000;
 
-            List<Island> islands = plugin.getGrid().getIslands().stream().filter(island -> {
+            List<Island> islands = new SequentialListBuilder<Island>().filter(island -> {
                 long lastTimeUpdate = island.getLastTimeUpdate();
                 return lastTimeUpdate != -1 && currentTime - lastTimeUpdate >= timeToPurge;
-            }).collect(Collectors.toList());
+            }).build(plugin.getGrid().getIslands());
 
             if (islands.isEmpty()) {
                 Message.NO_ISLANDS_TO_PURGE.send(sender);
@@ -75,7 +75,7 @@ public class CmdAdminPurge implements ISuperiorCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return args.length == 3 ? CommandTabCompletes.getCustomComplete(args[2], "cancel") : new ArrayList<>();
+        return args.length == 3 ? CommandTabCompletes.getCustomComplete(args[2], "cancel") : Collections.emptyList();
     }
 
     private static long parseLongSafe(String value) {

@@ -21,7 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CountsPagedObjectButton extends PagedObjectButton<MenuCounts, MenuCounts.BlockCount> {
@@ -219,7 +219,7 @@ public class CountsPagedObjectButton extends PagedObjectButton<MenuCounts, MenuC
 
         return itemBuilder
                 .withName(currentMeta.hasDisplayName() ? currentMeta.getDisplayName() : "")
-                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : new ArrayList<>())
+                .withLore(currentMeta.hasLore() ? currentMeta.getLore() : Collections.emptyList())
                 .withAmount(BigInteger.ONE.max(MAX_STACK.min(amount.toBigInteger())).intValue())
                 .replaceAll("{0}", Formatters.CAPITALIZED_FORMATTER.format(materialName))
                 .replaceAll("{1}", amount + "")

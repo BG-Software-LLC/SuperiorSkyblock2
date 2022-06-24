@@ -4,15 +4,15 @@ import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.service.message.MessagesService;
 import com.bgsoftware.superiorskyblock.core.GameSound;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.messages.component.MultipleComponents;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ActionBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.BossBarComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.RawMessageComponent;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.SoundComponent;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.TitleComponent;
 import com.google.common.base.Preconditions;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -20,7 +20,7 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -62,7 +62,7 @@ public class MessagesServiceImpl implements MessagesService {
 
     private static class BuilderImpl implements Builder {
 
-        private final List<IMessageComponent> messageComponents = new ArrayList<>();
+        private final List<IMessageComponent> messageComponents = new LinkedList<>();
 
         @Override
         public boolean addActionBar(@Nullable String message) {

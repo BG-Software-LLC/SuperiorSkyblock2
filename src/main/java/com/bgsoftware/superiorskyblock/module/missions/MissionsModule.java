@@ -4,10 +4,7 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
-import com.bgsoftware.superiorskyblock.module.missions.commands.CmdAdminMission;
-import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
-import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
@@ -15,8 +12,11 @@ import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMembers;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.mission.SMissionCategory;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.module.missions.commands.CmdAdminMission;
+import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMission;
+import com.bgsoftware.superiorskyblock.module.missions.commands.CmdMissions;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -25,9 +25,9 @@ import org.bukkit.event.Listener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public class MissionsModule extends BuiltinModule {
 
     private static final int MAX_MISSIONS_NAME_LENGTH = 255;
 
-    private final List<Mission<?>> missionsToLoad = new ArrayList<>();
+    private final List<Mission<?>> missionsToLoad = new LinkedList<>();
 
     private boolean enabled = true;
 
@@ -117,7 +117,7 @@ public class MissionsModule extends BuiltinModule {
                 if (categorySection == null)
                     continue;
 
-                List<Mission<?>> categoryMissions = new ArrayList<>();
+                List<Mission<?>> categoryMissions = new LinkedList<>();
 
                 if (!canLoadCategory(plugin, categoryName, categoryMissions))
                     continue;

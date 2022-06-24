@@ -2,10 +2,9 @@ package com.bgsoftware.superiorskyblock.player.container;
 
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -41,7 +40,7 @@ public class DefaultPlayersContainer implements PlayersContainer {
 
     @Override
     public List<SuperiorPlayer> getAllPlayers() {
-        return Collections.unmodifiableList(new ArrayList<>(this.players.values()));
+        return new SequentialListBuilder<SuperiorPlayer>().build(this.players.values());
     }
 
     @Override

@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 public interface IAdminPlayerCommand extends ISuperiorCommand {
@@ -36,7 +37,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
 
     @Override
     default List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        List<String> tabVariables = new ArrayList<>();
+        List<String> tabVariables = new LinkedList<>();
 
         if (args.length == 3) {
             if (supportMultiplePlayers() && "*".contains(args[2]))
@@ -53,7 +54,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
             }
         }
 
-        return tabVariables;
+        return Collections.unmodifiableList(tabVariables);
     }
 
     boolean supportMultiplePlayers();

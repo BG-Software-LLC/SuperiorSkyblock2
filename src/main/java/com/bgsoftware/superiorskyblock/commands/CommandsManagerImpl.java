@@ -6,12 +6,12 @@ import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -22,14 +22,14 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -183,12 +183,12 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             try {
                 //noinspection deprecation
-                Optional<Class<?>> commandClass = JarFiles.getClasses(file.toURL(), SuperiorCommand.class).stream().findFirst();
+                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class);
 
-                if (!commandClass.isPresent())
+                if (commandClass == null)
                     continue;
 
-                SuperiorCommand superiorCommand = createInstance(commandClass.get());
+                SuperiorCommand superiorCommand = createInstance(commandClass);
 
                 if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
                     registerAdminCommand(superiorCommand);
@@ -315,16 +315,16 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
                     return command.getPermission() != null && !sender.hasPermission(command.getPermission()) ?
-                            new ArrayList<>() : command.tabComplete(plugin, sender, args);
+                            Collections.emptyList() : command.tabComplete(plugin, sender, args);
                 }
             }
 
-            List<String> list = new ArrayList<>();
+            List<String> list = new LinkedList<>();
 
             for (SuperiorCommand subCommand : getSubCommands()) {
                 if (subCommand.getPermission() == null || sender.hasPermission(subCommand.getPermission())) {
-                    List<String> aliases = new ArrayList<>(subCommand.getAliases());
-                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), new ArrayList<>()));
+                    List<String> aliases = new LinkedList<>(subCommand.getAliases());
+                    aliases.addAll(plugin.getSettings().getCommandAliases().getOrDefault(aliases.get(0).toLowerCase(Locale.ENGLISH), Collections.emptyList()));
                     for (String _aliases : aliases) {
                         if (_aliases.contains(args[0].toLowerCase(Locale.ENGLISH))) {
                             list.add(_aliases);

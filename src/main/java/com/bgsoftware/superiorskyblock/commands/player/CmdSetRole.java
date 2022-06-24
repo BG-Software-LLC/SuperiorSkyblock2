@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.commands.player;
 
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -9,12 +7,13 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -151,7 +150,7 @@ public class CmdSetRole implements IPermissibleCommand {
         return args.length == 2 ? island == null ?
                 CommandTabCompletes.getOnlinePlayers(plugin, args[1], false, onlinePlayer -> onlinePlayer.getIsland() != null) :
                 CommandTabCompletes.getIslandMembers(island, args[1]) :
-                args.length == 3 ? CommandTabCompletes.getPlayerRoles(plugin, args[2], PlayerRole::isRoleLadder) : new ArrayList<>();
+                args.length == 3 ? CommandTabCompletes.getPlayerRoles(plugin, args[2], PlayerRole::isRoleLadder) : Collections.emptyList();
     }
 
 }

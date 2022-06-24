@@ -6,25 +6,30 @@ import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.RatingsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 public class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings, MenuIslandRatings.RatingInfo> {
+
+    private static final Function<Map.Entry<UUID, Rating>, RatingInfo> RATING_INFO_MAPPER =
+            entry -> new RatingInfo(entry.getKey(), entry.getValue());
 
     private static PagedMenuPattern<MenuIslandRatings, RatingInfo> menuPattern;
 
@@ -46,9 +51,8 @@ public class MenuIslandRatings extends PagedSuperiorMenu<MenuIslandRatings, Menu
 
     @Override
     protected List<RatingInfo> requestObjects() {
-        return island.getRatings().entrySet().stream()
-                .map(entry -> new RatingInfo(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        return new SequentialListBuilder<RatingInfo>()
+                .build(island.getRatings().entrySet(), RATING_INFO_MAPPER);
     }
 
     public static void init() {

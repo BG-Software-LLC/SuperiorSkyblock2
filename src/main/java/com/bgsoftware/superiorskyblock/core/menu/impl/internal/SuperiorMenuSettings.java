@@ -31,12 +31,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -77,9 +76,9 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
 
     @Override
     protected List<ItemStack> requestObjects() {
-        List<ItemStack> itemStacks = new ArrayList<>();
+        LinkedList<ItemStack> itemStacks = new LinkedList<>();
         buildFromSection(itemStacks, config.getConfigurationSection(this.configurationPath));
-        return itemStacks;
+        return Collections.unmodifiableList(itemStacks);
     }
 
     @Override

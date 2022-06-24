@@ -52,6 +52,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -60,7 +61,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
 
     private static final BigDecimal MAX_DOUBLE = BigDecimal.valueOf(Double.MAX_VALUE);
 
-    private final List<AFKProvider> AFKProvidersList = new ArrayList<>();
+    private final List<AFKProvider> AFKProvidersList = new LinkedList<>();
     private SpawnersProvider spawnersProvider = new SpawnersProvider_Default();
     private StackedBlocksProvider stackedBlocksProvider = new StackedBlocksProvider_Default();
     private EconomyProvider economyProvider = new EconomyProvider_Default();
@@ -74,9 +75,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
     private MenusProvider menusProvider;
     private boolean listenToSpawnerChanges = true;
 
-    private final List<ISkinsListener> skinsListeners = new ArrayList<>();
-    private final List<IStackedBlocksListener> stackedBlocksListeners = new ArrayList<>();
-    private final List<IWorldsListener> worldsListeners = new ArrayList<>();
+    private final List<ISkinsListener> skinsListeners = new LinkedList<>();
+    private final List<IStackedBlocksListener> stackedBlocksListeners = new LinkedList<>();
+    private final List<IWorldsListener> worldsListeners = new LinkedList<>();
 
     public ProvidersManagerImpl(SuperiorSkyblockPlugin plugin) {
         super(plugin);

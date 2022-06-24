@@ -99,7 +99,7 @@ public class CmdAdminAddEntityLimit implements IAdminIslandCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
-        return args.length == 4 ? CommandTabCompletes.getEntitiesForLimit(args[3]) : new ArrayList<>();
+        return args.length == 4 ? CommandTabCompletes.getEntitiesForLimit(args[3]) : Collections.emptyList();
     }
 
 }

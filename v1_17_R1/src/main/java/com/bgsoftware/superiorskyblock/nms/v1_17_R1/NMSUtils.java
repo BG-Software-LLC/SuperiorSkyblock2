@@ -32,8 +32,8 @@ import net.minecraft.world.level.chunk.IChunkAccess;
 import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.HeightMap;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -55,8 +55,8 @@ public class NMSUtils {
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
                                          boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
                                          BiConsumer<ChunkCoordIntPair, NBTTagCompound> unloadedChunkConsumer) {
-        List<ChunkCoordIntPair> unloadedChunks = new ArrayList<>();
-        List<Chunk> loadedChunks = new ArrayList<>();
+        List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
+        List<Chunk> loadedChunks = new LinkedList<>();
 
         chunksCoords.forEach(chunkCoords -> {
             IChunkAccess chunkAccess;

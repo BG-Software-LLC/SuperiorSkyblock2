@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
@@ -40,15 +41,14 @@ import org.bukkit.craftbukkit.v1_8_R3.util.CraftMagicNumbers;
 import org.bukkit.craftbukkit.v1_8_R3.util.UnsafeList;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class NMSChunksImpl implements NMSChunks {
 
@@ -63,9 +63,8 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
@@ -81,9 +80,8 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
 
         chunkPositions.forEach(chunkPosition -> ChunksTracker.markEmpty(island, chunkPosition, false));
 
@@ -116,11 +114,11 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
         CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
-        List<CalculatedChunk> allCalculatedChunks = new ArrayList<>();
+        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {

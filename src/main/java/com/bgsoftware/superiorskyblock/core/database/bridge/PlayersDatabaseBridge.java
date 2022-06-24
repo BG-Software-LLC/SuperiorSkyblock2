@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -185,11 +185,11 @@ public class PlayersDatabaseBridge {
     }
 
     private static DatabaseFilter createFilter(String id, SuperiorPlayer superiorPlayer, Pair<String, Object>... others) {
-        List<Pair<String, Object>> filters = new ArrayList<>();
+        List<Pair<String, Object>> filters = new LinkedList<>();
         filters.add(new Pair<>(id, superiorPlayer.getUniqueId().toString()));
         if (others != null)
             filters.addAll(Arrays.asList(others));
-        return new DatabaseFilter(filters);
+        return DatabaseFilter.fromFilters(filters);
     }
 
     private enum FutureSave {

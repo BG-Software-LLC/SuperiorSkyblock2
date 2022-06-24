@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,8 +22,8 @@ import java.util.function.Function;
 
 public abstract class Mission<V> {
 
-    private final List<String> requiredMissions = new ArrayList<>();
-    private final List<String> requiredChecks = new ArrayList<>();
+    private final List<String> requiredMissions = new LinkedList<>();
+    private final List<String> requiredChecks = new LinkedList<>();
     private final Map<SuperiorPlayer, V> missionData = new ConcurrentHashMap<>();
 
     private String name = null;
@@ -115,14 +117,14 @@ public abstract class Mission<V> {
      * Get the required missions for completing this mission.
      */
     public List<String> getRequiredMissions() {
-        return new ArrayList<>(requiredMissions);
+        return Collections.unmodifiableList(requiredMissions);
     }
 
     /**
      * Get the required checks for completing this mission.
      */
     public List<String> getRequiredChecks() {
-        return new ArrayList<>(requiredChecks);
+        return Collections.unmodifiableList(requiredChecks);
     }
 
     /**

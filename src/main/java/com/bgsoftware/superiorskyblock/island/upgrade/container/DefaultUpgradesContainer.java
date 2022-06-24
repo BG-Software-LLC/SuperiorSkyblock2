@@ -2,10 +2,10 @@ package com.bgsoftware.superiorskyblock.island.upgrade.container;
 
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class DefaultUpgradesContainer implements UpgradesContainer {
 
     @Override
     public Collection<Upgrade> getUpgrades() {
-        return Collections.unmodifiableCollection(this.upgrades.values());
+        return new SequentialListBuilder<Upgrade>().build(this.upgrades.values());
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DefaultUpgradesContainer implements UpgradesContainer {
 
     @Override
     public Collection<UpgradeCostLoader> getUpgradesCostLoaders() {
-        return Collections.unmodifiableCollection(this.upgradeCostLoaders.values());
+        return new SequentialListBuilder<UpgradeCostLoader>().build(this.upgradeCostLoaders.values());
     }
 
     @Override

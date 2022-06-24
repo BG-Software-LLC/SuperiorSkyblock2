@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.StackedBlocksDepositMenu;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.collect.ImmutableMap;
@@ -43,10 +43,10 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -152,7 +152,7 @@ public class StackedBlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onExplode(EntityExplodeEvent e) {
-        List<Block> blockList = new ArrayList<>(e.blockList());
+        List<Block> blockList = new LinkedList<>(e.blockList());
         ItemStack blockItem;
 
         for (Block block : blockList) {

@@ -7,18 +7,18 @@ import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.EventsBus;
+import com.bgsoftware.superiorskyblock.core.io.Files;
+import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
-import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.io.Files;
-import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.events.EventsBus;
-import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -445,8 +445,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
-                Class<?> missionClass = Objects.requireNonNull(JarFiles.getClasses(missionJar.toURL(), Mission.class)
-                                .stream().findFirst().orElse(null),
+                Class<?> missionClass = Objects.requireNonNull(JarFiles.getClass(missionJar.toURL(), Mission.class),
                         "The mission file " + missionJar.getName() + " is not valid.");
 
                 boolean islandMission = missionSection.getBoolean("island", false);

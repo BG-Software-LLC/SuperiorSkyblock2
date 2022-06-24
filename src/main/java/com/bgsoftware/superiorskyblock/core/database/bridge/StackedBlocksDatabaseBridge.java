@@ -29,7 +29,7 @@ public class StackedBlocksDatabaseBridge {
     }
 
     private static DatabaseFilter createFilter(Pair<String, Object>... others) {
-        return new DatabaseFilter(Arrays.asList(others));
+        return DatabaseFilter.fromFilters(Arrays.asList(others));
     }
 
 }

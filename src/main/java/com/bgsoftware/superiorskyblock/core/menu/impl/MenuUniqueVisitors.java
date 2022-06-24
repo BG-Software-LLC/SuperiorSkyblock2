@@ -3,18 +3,23 @@ package com.bgsoftware.superiorskyblock.core.menu.impl;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.UniqueVisitorPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Function;
 
 public class MenuUniqueVisitors extends PagedSuperiorMenu<MenuUniqueVisitors, MenuUniqueVisitors.UniqueVisitorInfo> {
+
+    private static final Function<Pair<SuperiorPlayer, Long>, UniqueVisitorInfo> VISITOR_INFO_MAPPER =
+            visitor -> new UniqueVisitorInfo(visitor.getKey(), visitor.getValue());
 
     private static PagedMenuPattern<MenuUniqueVisitors, UniqueVisitorInfo> menuPattern;
 
@@ -41,9 +46,8 @@ public class MenuUniqueVisitors extends PagedSuperiorMenu<MenuUniqueVisitors, Me
 
     @Override
     protected List<UniqueVisitorInfo> requestObjects() {
-        return island.getUniqueVisitorsWithTimes().stream()
-                .map(pair -> new UniqueVisitorInfo(pair.getKey(), pair.getValue()))
-                .collect(Collectors.toList());
+        return new SequentialListBuilder<UniqueVisitorInfo>()
+                .build(island.getUniqueVisitorsWithTimes(), VISITOR_INFO_MAPPER);
     }
 
     public static void init() {

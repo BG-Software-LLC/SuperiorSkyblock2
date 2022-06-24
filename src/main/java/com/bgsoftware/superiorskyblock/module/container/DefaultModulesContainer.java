@@ -2,16 +2,15 @@ package com.bgsoftware.superiorskyblock.module.container;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class DefaultModulesContainer implements ModulesContainer {
 
     @Override
     public Collection<PluginModule> getModules() {
-        return Collections.unmodifiableCollection(new ArrayList<>(modulesMap.values()));
+        return new SequentialListBuilder<PluginModule>().build(modulesMap.values());
     }
 
     @Override

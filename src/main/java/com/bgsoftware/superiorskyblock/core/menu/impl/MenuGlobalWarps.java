@@ -5,25 +5,25 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.GlobalWarpsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.function.Predicate;
 
 public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> {
 
@@ -32,6 +32,15 @@ public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> 
     private static PagedMenuPattern<MenuGlobalWarps, Island> menuPattern;
 
     public static boolean visitorWarps;
+
+    private final Predicate<Island> ISLANDS_FILTER = island -> {
+        if (visitorWarps)
+            return island.getVisitorsLocation() != null;
+        else if (island.equals(inventoryViewer.getIsland()))
+            return !island.getIslandWarps().isEmpty();
+        else
+            return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
+    };
 
     private MenuGlobalWarps(SuperiorPlayer superiorPlayer) {
         super(menuPattern, superiorPlayer);
@@ -44,19 +53,10 @@ public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> 
 
     @Override
     protected List<Island> requestObjects() {
-        return getFilteredIslands().sorted(SortingComparators.WORTH_COMPARATOR).collect(Collectors.toList());
-    }
-
-    private Stream<Island> getFilteredIslands() {
-        return plugin.getGrid().getIslands().stream()
-                .filter(island -> {
-                    if (visitorWarps)
-                        return island.getVisitorsLocation() != null;
-                    else if (island.equals(inventoryViewer.getIsland()))
-                        return !island.getIslandWarps().isEmpty();
-                    else
-                        return island.getIslandWarps().values().stream().anyMatch(islandWarp -> !islandWarp.hasPrivateFlag());
-                });
+        return new SequentialListBuilder<Island>()
+                .sorted(SortingComparators.WORTH_COMPARATOR)
+                .filter(ISLANDS_FILTER)
+                .build(plugin.getGrid().getIslands());
     }
 
     public static void init() {
@@ -74,7 +74,7 @@ public class MenuGlobalWarps extends PagedSuperiorMenu<MenuGlobalWarps, Island> 
 
         visitorWarps = cfg.getBoolean("visitor-warps", false);
 
-        List<Integer> slots = new ArrayList<>();
+        List<Integer> slots = new LinkedList<>();
 
         if (cfg.contains("warps"))
             slots.addAll(getSlots(cfg, "warps", menuPatternSlots));

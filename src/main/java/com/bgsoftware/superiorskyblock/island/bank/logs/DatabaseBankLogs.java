@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.island.bank.logs;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.google.common.cache.CacheBuilder;
@@ -11,12 +11,10 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
 public class DatabaseBankLogs implements IBankLogs {
@@ -49,14 +47,14 @@ public class DatabaseBankLogs implements IBankLogs {
 
     @Override
     public List<BankTransaction> getTransactions() {
-        return Collections.unmodifiableList(cachedBankTransactions.getUnchecked(0));
+        return new SequentialListBuilder<BankTransaction>().build(cachedBankTransactions.getUnchecked(0));
     }
 
     @Override
     public List<BankTransaction> getTransactions(UUID playerUUID) {
-        return Collections.unmodifiableList(cachedBankTransactions.getUnchecked(0).stream()
+        return new SequentialListBuilder<BankTransaction>()
                 .filter(bankTransaction -> playerUUID.equals(bankTransaction.getPlayer()))
-                .collect(Collectors.toList()));
+                .build(cachedBankTransactions.getUnchecked(0));
     }
 
     @Override
@@ -66,9 +64,9 @@ public class DatabaseBankLogs implements IBankLogs {
     }
 
     private List<BankTransaction> loadTransactionsFromDatabase() {
-        List<BankTransaction> bankTransactionsList = new ArrayList<>();
+        List<BankTransaction> bankTransactionsList = new LinkedList<>();
         island.getDatabaseBridge().loadObject("bank_transactions",
-                new DatabaseFilter(Collections.singletonList(new Pair<>("island", island.getUniqueId().toString()))),
+                DatabaseFilter.fromFilter("island", island.getUniqueId().toString()),
                 bankTransactionRow -> SBankTransaction.fromDatabase(new DatabaseResult(bankTransactionRow))
                         .ifPresent(bankTransactionsList::add));
         return bankTransactionsList;

@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.menu;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ public class MenuPatternSlots {
     }
 
     public void addSlot(char character, int slot) {
-        this.charSlots.computeIfAbsent(character, ch -> new ArrayList<>()).add(slot);
+        this.charSlots.computeIfAbsent(character, ch -> new LinkedList<>()).add(slot);
     }
 
     public List<Integer> getSlots(char character, Integer... defaultSlots) {

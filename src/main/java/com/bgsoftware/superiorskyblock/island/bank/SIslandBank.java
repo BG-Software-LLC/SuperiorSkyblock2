@@ -7,18 +7,18 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.DatabaseBankLogs;
 import com.bgsoftware.superiorskyblock.island.bank.logs.IBankLogs;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -108,7 +108,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(),
+            IslandUtils.sendMessage(island, Message.DEPOSIT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(amount));
 
             plugin.getMenus().refreshBankLogs(island);
@@ -203,7 +203,7 @@ public class SIslandBank implements IslandBank {
 
             addTransaction(bankTransaction, true);
 
-            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, new ArrayList<>(), superiorPlayer.getName(),
+            IslandUtils.sendMessage(island, Message.WITHDRAW_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName(),
                     Formatters.NUMBER_FORMATTER.format(withdrawAmount));
 
             plugin.getMenus().refreshBankLogs(island);

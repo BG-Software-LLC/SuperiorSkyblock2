@@ -4,29 +4,30 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.SectionPosition;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks.CropsTickingTileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.PlayerConnection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags.TagsBlock;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting.LightEngine;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting.LightEngineLayerEventListener;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.PlayerConnection;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags.TagsBlock;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import com.mojang.serialization.Codec;
@@ -63,15 +64,14 @@ import org.bukkit.craftbukkit.v1_18_R2.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
 public class NMSChunksImpl implements NMSChunks {
@@ -87,9 +87,8 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
 
         WorldServer worldServer = new WorldServer(((CraftWorld) chunkPositions.get(0).getWorld()).getHandle());
         IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
@@ -142,9 +141,8 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty())
             return;
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
 
         chunkPositions.forEach(chunkPosition -> ChunksTracker.markEmpty(island, chunkPosition, false));
 
@@ -253,11 +251,11 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
         CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
-        List<CalculatedChunk> allCalculatedChunks = new ArrayList<>();
+        List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
 
-        List<ChunkCoordIntPair> chunksCoords = chunkPositions.stream()
-                .map(chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()))
-                .collect(Collectors.toList());
+        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
+                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+
         WorldServer worldServer = new WorldServer(((CraftWorld) chunkPositions.get(0).getWorld()).getHandle());
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
@@ -460,7 +458,7 @@ public class NMSChunksImpl implements NMSChunks {
                 chunkWorldCoordX, minBuildHeight, chunkWorldCoordZ,
                 chunkWorldCoordX + 15, maxBuildHeight, chunkWorldCoordZ + 15);
 
-        List<net.minecraft.world.entity.Entity> worldEntities = new ArrayList<>();
+        List<net.minecraft.world.entity.Entity> worldEntities = new LinkedList<>();
         worldServer.getEntities().get(chunkBounds, worldEntities::add);
 
         worldEntities.forEach(nmsEntity -> {
