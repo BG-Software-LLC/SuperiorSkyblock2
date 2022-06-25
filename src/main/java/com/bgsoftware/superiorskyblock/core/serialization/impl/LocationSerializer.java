@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +21,7 @@ public class LocationSerializer implements ISerializer<Location, String> {
     @NotNull
     @Override
     public String serialize(@Nullable Location serializable) {
-        return serializable == null ? "" : serializable.getWorld().getName() + separator +
+        return serializable == null ? "" : getWorldName(serializable) + separator +
                 serializable.getX() + separator +
                 serializable.getY() + separator +
                 serializable.getZ() + separator +
@@ -50,6 +50,11 @@ public class LocationSerializer implements ISerializer<Location, String> {
             PluginDebugger.debug(ex);
             return null;
         }
+    }
+
+    private static String getWorldName(Location location) {
+        return location instanceof LazyWorldLocation ? ((LazyWorldLocation) location).getWorldName() :
+                location.getWorld().getName();
     }
 
 }

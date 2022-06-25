@@ -67,7 +67,9 @@ public class SBlockPosition implements BlockPosition {
 
     @Override
     public Location parse() {
-        return new Location(getWorld(), getX(), getY(), getZ());
+        World world = getWorld();
+        return world == null ? new LazyWorldLocation(this.world, getX(), getY(), getZ(), 0, 0) :
+                new Location(world, getX(), getY(), getZ());
     }
 
     @Override
