@@ -58,6 +58,7 @@ to do any additional changes to your code between updates.
     <groupId>com.bgsoftware</groupId>
     <artifactId>SuperiorSkyblockAPI</artifactId>
     <version>latest</version>
+    <scope>provided</scope>
 </dependency>
 </dependencies>
 ```
