@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core;
 
-import com.google.common.collect.ImmutableSet;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Set;
@@ -110,11 +110,11 @@ public enum Materials {
     }
 
     public static Set<Material> getBlocksNonLegacy() {
-        return ImmutableSet.copyOf(BLOCK_NON_LEGACY_MATERIALS);
+        return Collections.unmodifiableSet(BLOCK_NON_LEGACY_MATERIALS);
     }
 
     public static Set<Material> getSolids() {
-        return ImmutableSet.copyOf(SOLID_MATERIALS);
+        return Collections.unmodifiableSet(SOLID_MATERIALS);
     }
 
     public static void init() {
