@@ -95,7 +95,7 @@ public class TopIslandsPagedObjectButton extends PagedObjectButton<MenuTopIsland
 
             for (String line : itemMeta.getLore()) {
                 if (line.contains("{4}")) {
-                    List<SuperiorPlayer> members = island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader());
+                    List<SuperiorPlayer> members = new LinkedList<>(island.getIslandMembers(plugin.getSettings().isIslandTopIncludeLeader()));
                     String memberFormat = line.split("\\{4}:")[1];
                     if (members.size() == 0) {
                         lore.add(memberFormat.replace("{}", "None"));
