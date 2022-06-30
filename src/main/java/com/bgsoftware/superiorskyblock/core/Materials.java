@@ -106,7 +106,7 @@ public enum Materials {
     }
 
     public static boolean isSign(Material material) {
-        return MATERIAL_TAGS.get(material) instanceof LavaMaterialTag;
+        return MATERIAL_TAGS.get(material) instanceof SignMaterialTag;
     }
 
     public static Set<Material> getBlocksNonLegacy() {
