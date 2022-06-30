@@ -21,6 +21,7 @@ import skinsrestorer.shared.storage.SkinStorage;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.nio.file.Path;
 
 @SuppressWarnings("unused")
 public class SkinsRestorerHook {
@@ -94,14 +95,22 @@ public class SkinsRestorerHook {
             if (Config.MYSQL_ENABLED)
                 return true;
 
-            ReflectField<File> skinsFolder = new ReflectField<>(net.skinsrestorer.shared.storage.SkinStorage.class,
-                    File.class, "skinsFolder");
+            ReflectField<Object> skinsFolderMethod = new ReflectField<>(net.skinsrestorer.shared.storage.SkinStorage.class,
+                    Object.class, "skinsFolder");
 
-            if (!skinsFolder.isValid())
+            if (!skinsFolderMethod.isValid())
                 return false;
 
             net.skinsrestorer.bukkit.SkinsRestorer skinsRestorer = JavaPlugin.getPlugin(net.skinsrestorer.bukkit.SkinsRestorer.class);
-            return skinsFolder.get(skinsRestorer).exists();
+            Object skinsFolder = skinsFolderMethod.get(skinsRestorer.getSkinStorage());
+
+            if (skinsFolder instanceof File) {
+                return ((File) skinsFolder).exists();
+            } else if (skinsFolder instanceof Path) {
+                return ((Path) skinsFolder).toFile().exists();
+            }
+
+            return false;
         }
 
         @Override
