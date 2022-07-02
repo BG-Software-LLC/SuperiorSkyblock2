@@ -30,8 +30,6 @@ import java.util.function.Consumer;
 
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
-    private final CompoundTag compoundTag;
-
     private final BlockOffset offset;
     private final float yaw;
     private final float pitch;
@@ -42,7 +40,6 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     public SuperiorSchematic(String name, CompoundTag compoundTag) {
         super(name);
-        this.compoundTag = compoundTag;
 
         int xSize = compoundTag.getInt("xSize");
         int ySize = compoundTag.getInt("ySize");
@@ -147,10 +144,6 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     @Override
     public Set<ChunkPosition> getLoadedChunks() {
         return loadedChunks;
-    }
-
-    public CompoundTag getTag() {
-        return compoundTag;
     }
 
     private void readBlock(SchematicBlockData block) {
