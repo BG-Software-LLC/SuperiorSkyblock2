@@ -9,10 +9,10 @@ import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +30,24 @@ public class CachedIslandInfo {
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    public final UUID uuid;
+    public UUID owner;
+    public Location center;
+    public String name;
+    public String islandType;
+    public long creationTime;
+    public String discord;
+    public String paypal;
+    public BigDecimal bonusWorth;
+    public BigDecimal bonusLevel;
+    public boolean isLocked;
+    public boolean isTopIslandsIgnored;
+    public String description;
+    public int generatedSchematics;
+    public int unlockedWorlds;
+    public long lastTimeUpdated;
+    public String dirtyChunks;
+    public String blockCounts;
     public final Location[] islandHomes = new Location[World.Environment.values().length];
     public final List<SuperiorPlayer> members = new ArrayList<>();
     public final List<SuperiorPlayer> bannedPlayers = new ArrayList<>();
@@ -62,8 +80,8 @@ public class CachedIslandInfo {
     public List<BankTransaction> bankTransactions = new ArrayList<>();
     public byte[] persistentData = new byte[0];
 
-    public CachedIslandInfo() {
-
+    public CachedIslandInfo(UUID uuid) {
+        this.uuid = uuid;
     }
 
 }

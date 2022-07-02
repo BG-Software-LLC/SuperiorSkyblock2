@@ -32,7 +32,6 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
@@ -44,7 +43,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.bgsoftware.superiorskyblock.island.container.value.SyncedValue;
@@ -224,61 +222,57 @@ public class SIsland extends SIslandBase implements Island {
 
     private SIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location location, String islandName,
                     @Nullable String schemName, long creationTime) {
-        super(owner, uuid, location, islandName, creationTime, Value.syncedFixed(-1), 0);
+        super(owner, owner.getUniqueId(), uuid, location, islandName, creationTime, Value.syncedFixed(-1), 0);
         this.schemName = schemName;
     }
 
-    public static Optional<Island> fromDatabase(CachedIslandInfo cachedIslandInfo, DatabaseResult resultSet) {
-        Optional<UUID> uuid = resultSet.getUUID("uuid");
-        if (!uuid.isPresent()) {
+    public static Optional<Island> fromDatabase(CachedIslandInfo cachedIslandInfo) {
+        if (cachedIslandInfo.uuid == null) {
             SuperiorSkyblockPlugin.log("&cCannot load island with invalid uuid, skipping...");
             return Optional.empty();
         }
 
-        Optional<SuperiorPlayer> owner = resultSet.getUUID("owner").map(plugin.getPlayers()::getSuperiorPlayer);
+        Optional<SuperiorPlayer> owner = Optional.of(cachedIslandInfo.owner).map(plugin.getPlayers()::getSuperiorPlayer);
         if (!owner.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load island with invalid owner uuid, skipping...");
             return Optional.empty();
         }
 
-        Optional<Location> center = resultSet.getString("center").map(Serializers.LOCATION_SERIALIZER::deserialize);
-        if (!center.isPresent()) {
+        if (cachedIslandInfo.center == null) {
             SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
             return Optional.empty();
         }
 
-        PluginDebugger.debug("Action: Load Island, UUID: " + uuid.get() + ", Owner: " + owner.get().getUniqueId());
+        PluginDebugger.debug("Action: Load Island, UUID: " + cachedIslandInfo.uuid + ", Owner: " + owner.get().getUniqueId());
 
         SIsland island = new SIsland(
                 owner.get(),
-                uuid.get(),
-                center.get(),
-                resultSet.getString("name").orElse(""),
-                resultSet.getString("island_type").orElse(null),
-                resultSet.getLong("creation_time").orElse(System.currentTimeMillis() / 1000L)
+                cachedIslandInfo.uuid,
+                cachedIslandInfo.center,
+                cachedIslandInfo.name,
+                cachedIslandInfo.islandType,
+                cachedIslandInfo.creationTime
         );
 
         try {
             island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-            island.discord = resultSet.getString("discord").orElse("None");
-            island.paypal = resultSet.getString("paypal").orElse("None");
-            island.bonusWorth.set(resultSet.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO));
-            island.bonusLevel.set(resultSet.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO));
-            island.isLocked = resultSet.getBoolean("locked").orElse(false);
-            island.isTopIslandsIgnored = resultSet.getBoolean("ignored").orElse(false);
-            island.description = resultSet.getString("description").orElse("");
-            island.generatedSchematics.set(resultSet.getInt("generated_schematics").orElse(0));
-            island.unlockedWorlds.set(resultSet.getInt("unlocked_worlds").orElse(0));
-            island.lastTimeUpdate = resultSet.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L);
+            island.discord = cachedIslandInfo.discord;
+            island.paypal = cachedIslandInfo.paypal;
+            island.bonusWorth.set(cachedIslandInfo.bonusWorth);
+            island.bonusLevel.set(cachedIslandInfo.bonusLevel);
+            island.isLocked = cachedIslandInfo.isLocked;
+            island.isTopIslandsIgnored = cachedIslandInfo.isTopIslandsIgnored;
+            island.description = cachedIslandInfo.description;
+            island.generatedSchematics.set(cachedIslandInfo.generatedSchematics);
+            island.unlockedWorlds.set(cachedIslandInfo.unlockedWorlds);
+            island.lastTimeUpdate = cachedIslandInfo.lastTimeUpdated;
 
-            Optional<String> dirtyChunks = resultSet.getString("dirty_chunks");
-            if (dirtyChunks.isPresent())
-                ChunksTracker.deserialize(plugin.getGrid(), island, dirtyChunks.get());
+            if (cachedIslandInfo.dirtyChunks != null)
+                ChunksTracker.deserialize(plugin.getGrid(), island, cachedIslandInfo.dirtyChunks);
 
-            Optional<String> blockCountsString = resultSet.getString("block_counts");
-            if (blockCountsString.isPresent())
-                BukkitExecutor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
+            if (cachedIslandInfo.blockCounts != null)
+                BukkitExecutor.sync(() -> island.deserializeBlockCounts(cachedIslandInfo.blockCounts), 5L);
 
             if (cachedIslandInfo != null)
                 island.loadFromCachedInfo(cachedIslandInfo);

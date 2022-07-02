@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataInput;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
@@ -21,23 +22,23 @@ public class MemoryIslandsCache extends IslandsCache {
     private final byte[] islandsDataBytes;
 
     @SuppressWarnings("UnstableApiUsage")
-    protected static MemoryIslandsCache create(IslandsContainer islandsContainer, Collection<Island> islands) {
+    protected static MemoryIslandsCache create(IslandsContainer islandsContainer, Collection<CachedIslandInfo> islands) {
         ByteArrayOutputStream islandsDataStream = new ByteArrayOutputStream();
         ByteArrayDataOutput islandsData = ByteStreams.newDataOutput(islandsDataStream);
         ByteArrayOutputStream islandsTableStream = new ByteArrayOutputStream();
         ByteArrayDataOutput islandsTable = ByteStreams.newDataOutput(islandsTableStream);
 
         // Sort the islands by their uuids.
-        List<Island> sortedIslands = new SequentialListBuilder<Island>()
-                .sorted(Comparator.comparing(IslandBase::getUniqueId))
+        List<CachedIslandInfo> sortedIslands = new SequentialListBuilder<CachedIslandInfo>()
+                .sorted(Comparator.comparing(o -> o.uuid))
                 .build(islands);
 
         // Start serializing the islands.
         sortedIslands.forEach(island -> {
             int islandDataIndex = islandsDataStream.size();
 
-            islandsTable.writeLong(island.getUniqueId().getMostSignificantBits());
-            islandsTable.writeLong(island.getUniqueId().getLeastSignificantBits());
+            islandsTable.writeLong(island.uuid.getMostSignificantBits());
+            islandsTable.writeLong(island.uuid.getLeastSignificantBits());
             islandsTable.writeInt(islandDataIndex);
 
             islandsData.write(serializeIsland(island));

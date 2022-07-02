@@ -44,6 +44,7 @@ public class SIslandBase implements IslandBase {
      * Island Identifiers
      */
     protected final UUID uuid;
+    protected UUID ownerUUID;
     protected SuperiorPlayer owner;
     protected final BlockPosition center;
     protected final long creationTime;
@@ -57,10 +58,11 @@ public class SIslandBase implements IslandBase {
 
     protected final AtomicInteger generatedSchematics = new AtomicInteger(0);
 
-    public SIslandBase(@Nullable SuperiorPlayer owner, UUID uuid, Location location, String islandName,
+    public SIslandBase(@Nullable SuperiorPlayer owner, UUID ownerUUID, UUID uuid, Location location, String islandName,
                        long creationTime, Value<Integer> islandSize, int generatedSchematic) {
         this.uuid = uuid;
         this.owner = owner;
+        this.ownerUUID = ownerUUID;
 
         if (owner != null) {
             owner.setPlayerRole(SPlayerRole.lastRole());
@@ -78,6 +80,13 @@ public class SIslandBase implements IslandBase {
 
     @Override
     public SuperiorPlayer getOwner() {
+        if (owner == null && ownerUUID != null) {
+            owner = plugin.getPlayers().getSuperiorPlayer(ownerUUID);
+            if (owner != null) {
+                owner.setPlayerRole(SPlayerRole.lastRole());
+                owner.setIsland(this);
+            }
+        }
         return this.owner;
     }
 

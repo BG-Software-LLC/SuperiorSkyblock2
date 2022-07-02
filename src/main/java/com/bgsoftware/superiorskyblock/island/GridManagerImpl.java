@@ -131,8 +131,8 @@ public class GridManagerImpl extends Manager implements GridManager {
         });
     }
 
-    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo, DatabaseResult resultSet) {
-        return plugin.getFactory().createIsland(cachedIslandInfo, resultSet);
+    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo) {
+        return plugin.getFactory().createIsland(cachedIslandInfo);
     }
 
     @Override
@@ -720,12 +720,12 @@ public class GridManagerImpl extends Manager implements GridManager {
         return this.islandsContainer.getContainer();
     }
 
-    public void loadCache(Collection<Island> islands) {
-        List<Island> islandsToBeUnloaded = new LinkedList<>(islands);
+    public void loadCache(Collection<CachedIslandInfo> islands) {
+        List<CachedIslandInfo> islandsToBeUnloaded = new LinkedList<>(islands);
 
         long currentTime = System.currentTimeMillis() / 1000;
 
-        islandsToBeUnloaded.removeIf(island -> currentTime - island.getLastTimeUpdate() <= 604800);
+        islandsToBeUnloaded.removeIf(island -> currentTime - island.lastTimeUpdated <= 604800);
 
         if (!islandsToBeUnloaded.isEmpty() && islandsToBeUnloaded.size() > ISLANDS_LAZY_LOAD) {
             IslandsContainer islandsContainer = this.islandsContainer.getContainer();
@@ -734,9 +734,9 @@ public class GridManagerImpl extends Manager implements GridManager {
 
             // Convert islands to IslandBases.
             islandsToBeUnloaded.forEach(island -> {
-                IslandBase islandBase = new SIslandBase(island.getOwner(), island.getUniqueId(),
-                        island.getCenter(World.Environment.NORMAL), island.getRawName(), island.getCreationTime(),
-                        Value.fixed(island.getIslandSize()), island.getGeneratedSchematicsFlag());
+                IslandBase islandBase = new SIslandBase(null, island.owner, island.uuid,
+                        island.center, island.name, island.creationTime,
+                        Value.fixed(island.islandSize.get()), island.generatedSchematics);
                 this.islandsContainer.addIsland(islandBase);
             });
 
@@ -744,7 +744,7 @@ public class GridManagerImpl extends Manager implements GridManager {
             islands.removeAll(islandsToBeUnloaded);
         }
 
-        islands.forEach(this.islandsContainer::addIsland);
+        islands.forEach(plugin.getGrid()::createIsland);
     }
 
     @Override

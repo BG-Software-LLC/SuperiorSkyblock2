@@ -116,8 +116,8 @@ public class FactoriesManagerImpl implements FactoriesManager {
         return new SBlockPosition(location);
     }
 
-    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo, DatabaseResult resultSet) {
-        Optional<Island> island = SIsland.fromDatabase(cachedIslandInfo, resultSet);
+    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo) {
+        Optional<Island> island = SIsland.fromDatabase(cachedIslandInfo);
 
         if (!island.isPresent())
             return island;

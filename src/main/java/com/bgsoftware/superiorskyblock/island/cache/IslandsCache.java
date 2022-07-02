@@ -4,35 +4,27 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandBase;
-import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
-import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataInput;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataOutput;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpCategoryInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpInfo;
-import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.island.SIsland;
+import com.bgsoftware.superiorskyblock.island.container.value.SyncedValue;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -40,14 +32,10 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public abstract class IslandsCache {
@@ -111,117 +99,126 @@ public abstract class IslandsCache {
         return value;
     }
 
-    protected static byte[] serializeIsland(Island island) {
+    protected static byte[] serializeIsland(CachedIslandInfo island) {
         ByteArrayDataOutput dataOutput = new ByteArrayDataOutput();
 
-        dataOutput.writeString(island.getDescription());
-        dataOutput.writeString(island.getDiscord());
-        dataOutput.writeString(island.getPaypal());
-        dataOutput.writeBoolean(island.isLocked());
-        dataOutput.writeInt(island.getUnlockedWorldsFlag());
-        dataOutput.writeLong(island.getLastTimeUpdate());
-        dataOutput.writeString(island.getSchematicName());
-        dataOutput.writeBigDecimal(island.getBonusWorth());
-        dataOutput.writeBigDecimal(island.getBonusLevel());
-        dataOutput.writeBigDecimal(island.getBankLimitRaw());
-        dataOutput.writeInt(island.getCoopLimitRaw());
-        dataOutput.writeInt(island.getTeamLimitRaw());
-        dataOutput.writeInt(island.getWarpsLimitRaw());
-        dataOutput.writeDouble(island.getCropGrowthRaw());
-        dataOutput.writeDouble(island.getSpawnerRatesRaw());
-        dataOutput.writeDouble(island.getMobDropsRaw());
-        dataOutput.writeBigDecimal(island.getIslandBank().getBalance());
-        dataOutput.writeLong(island.getLastInterestTime());
+        dataOutput.writeString(island.description);
+        dataOutput.writeString(island.discord);
+        dataOutput.writeString(island.paypal);
+        dataOutput.writeBoolean(island.isLocked);
+        dataOutput.writeInt(island.unlockedWorlds);
+        dataOutput.writeLong(island.lastTimeUpdated);
+        dataOutput.writeString(island.islandType);
+        dataOutput.writeBigDecimal(island.bonusWorth);
+        dataOutput.writeBigDecimal(island.bonusLevel);
+        dataOutput.writeBigDecimal(island.bankLimit instanceof SyncedValue ? SYNCED_BANK_LIMIT_VALUE : island.bankLimit.get());
+        dataOutput.writeInt(island.coopLimit instanceof SyncedValue ? -1 : island.coopLimit.get());
+        dataOutput.writeInt(island.teamLimit instanceof SyncedValue ? -1 : island.teamLimit.get());
+        dataOutput.writeInt(island.warpsLimit instanceof SyncedValue ? -1 : island.warpsLimit.get());
+        dataOutput.writeDouble(island.cropGrowth instanceof SyncedValue ? -1D : island.cropGrowth.get());
+        dataOutput.writeDouble(island.spawnerRates instanceof SyncedValue ? -1D : island.spawnerRates.get());
+        dataOutput.writeDouble(island.mobDrops instanceof SyncedValue ? -1D : island.mobDrops.get());
+        dataOutput.writeBigDecimal(island.balance);
+        dataOutput.writeLong(island.lastInterestTime);
 
-        CacheSerializer.serializePlayers(island.getIslandMembers(false), dataOutput);
-        CacheSerializer.serializePlayers(island.getBannedPlayers(), dataOutput);
+        CacheSerializer.serializePlayers(island.members, dataOutput);
+        CacheSerializer.serializePlayers(island.bannedPlayers, dataOutput);
 
-        List<Pair<SuperiorPlayer, Long>> uniqueVisitors = island.getUniqueVisitorsWithTimes();
+        List<SIsland.UniqueVisitor> uniqueVisitors = island.uniqueVisitors;
         dataOutput.writeInt(uniqueVisitors.size());
-        uniqueVisitors.forEach(pair -> {
-            dataOutput.writeUUID(pair.getKey().getUniqueId());
-            dataOutput.writeLong(pair.getValue());
+        uniqueVisitors.forEach(uniqueVisitor -> {
+            dataOutput.writeUUID(uniqueVisitor.getSuperiorPlayer().getUniqueId());
+            dataOutput.writeLong(uniqueVisitor.getLastVisitTime());
         });
 
-        Map<World.Environment, Location> islandHomes = island.getIslandHomes();
-        dataOutput.writeInt(islandHomes.size());
-        islandHomes.forEach(((environment, location) -> {
-            dataOutput.writeByte((byte) environment.ordinal());
+        Location[] islandHomes = island.islandHomes;
+        dataOutput.writeInt(islandHomes.length);
+        for (Location location : islandHomes) {
             CacheSerializer.serializeLocation(location, dataOutput);
-        }));
+        }
 
-        CacheSerializer.serializeLocation(island.getVisitorsLocation(), dataOutput);
+        CacheSerializer.serializeLocation(island.visitorHomes[World.Environment.NORMAL.ordinal()], dataOutput);
 
-        Map<SuperiorPlayer, PermissionNode> playerPermissions = island.getPlayerPermissions();
+        Map<SuperiorPlayer, PlayerPrivilegeNode> playerPermissions = island.playerPermissions;
         dataOutput.writeInt(playerPermissions.size());
         playerPermissions.forEach(((superiorPlayer, permissionNode) -> {
             dataOutput.writeUUID(superiorPlayer.getUniqueId());
-            CacheSerializer.serializePermissionNode((PlayerPrivilegeNode) permissionNode, dataOutput);
+            CacheSerializer.serializePermissionNode(permissionNode, dataOutput);
         }));
 
-        Map<IslandPrivilege, PlayerRole> rolePermissions = island.getRolePermissions();
+        Map<IslandPrivilege, PlayerRole> rolePermissions = island.rolePermissions;
         dataOutput.writeInt(rolePermissions.size());
         rolePermissions.forEach(((islandPrivilege, playerRole) -> {
             dataOutput.writeString(islandPrivilege.getName());
             dataOutput.writeInt(playerRole.getId());
         }));
 
-        Map<Key, BigInteger> blockCounts = island.getBlockCountsAsBigInteger();
-        dataOutput.writeInt(blockCounts.size());
-        blockCounts.forEach(((key, bigInteger) -> {
-            dataOutput.writeString(key.toString());
-            dataOutput.writeBytes(bigInteger.toByteArray());
-        }));
+//        Map<Key, BigInteger> blockCounts = island.getBlockCountsAsBigInteger();
+//        dataOutput.writeInt(blockCounts.size());
+//        blockCounts.forEach(((key, bigInteger) -> {
+//            dataOutput.writeString(key.toString());
+//            dataOutput.writeBytes(bigInteger.toByteArray());
+//        }));
+//
+//        Set<ChunkPosition> dirtyChunks = ChunksTracker.getDirtyChunks(island);
+//        dataOutput.writeInt(dirtyChunks.size());
+//        dirtyChunks.forEach(dirtyChunkPos -> {
+//            CacheSerializer.serializeChunkPosition(dirtyChunkPos, dataOutput);
+//        });
+//        ChunksTracker.removeIsland(island);
 
-        Set<ChunkPosition> dirtyChunks = ChunksTracker.getDirtyChunks(island);
-        dataOutput.writeInt(dirtyChunks.size());
-        dirtyChunks.forEach(dirtyChunkPos -> {
-            CacheSerializer.serializeChunkPosition(dirtyChunkPos, dataOutput);
-        });
-        ChunksTracker.removeIsland(island);
-
-        Map<String, Integer> upgrades = island.getUpgrades();
+        Map<String, Integer> upgrades = island.upgrades;
         dataOutput.writeInt(upgrades.size());
         upgrades.forEach((upgradeName, level) -> {
             dataOutput.writeString(upgradeName);
             dataOutput.writeInt(level);
         });
 
-        Map<Key, Integer> blockLimits = island.getCustomBlocksLimits();
+        Map<Key, Integer> blockLimits = island.blockLimits.entrySet().stream()
+                .filter(entry -> !(entry.getValue() instanceof SyncedValue))
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get()));
         dataOutput.writeInt(blockLimits.size());
         blockLimits.forEach(((key, limit) -> {
             dataOutput.writeString(key.toString());
             dataOutput.writeInt(limit);
         }));
 
-        Map<Key, Integer> entityLimits = island.getCustomEntitiesLimits();
+        Map<Key, Integer> entityLimits = island.entityLimits.entrySet().stream()
+                .filter(entry -> !(entry.getValue() instanceof SyncedValue))
+                .collect(KeyMap.getCollector(Map.Entry::getKey, entry -> entry.getValue().get()));
         dataOutput.writeInt(entityLimits.size());
         entityLimits.forEach(((key, limit) -> {
             dataOutput.writeString(key.toString());
             dataOutput.writeInt(limit);
         }));
 
-        Map<PotionEffectType, Integer> islandEffects = island.getPotionEffects();
+        Map<PotionEffectType, Value<Integer>> islandEffects = island.islandEffects;
         dataOutput.writeInt(islandEffects.size());
         islandEffects.forEach(((potionEffectType, level) -> {
             dataOutput.writeInt(potionEffectType.getId());
-            dataOutput.writeInt(level);
+            dataOutput.writeInt(level.get());
         }));
 
-        Map<PlayerRole, Integer> roleLimits = island.getRoleLimits();
+        Map<PlayerRole, Value<Integer>> roleLimits = island.roleLimits;
         dataOutput.writeInt(roleLimits.size());
         roleLimits.forEach(((playerRole, limit) -> {
             dataOutput.writeInt(playerRole.getId());
-            dataOutput.writeInt(limit);
+            dataOutput.writeInt(limit.get());
         }));
 
-        Collection<WarpCategory> warpCategories = island.getWarpCategories().values();
+        Collection<CachedWarpCategoryInfo> warpCategories = island.cachedWarpCategoryInfoList;
         dataOutput.writeInt(warpCategories.size());
         warpCategories.forEach(warpCategory -> {
             CacheSerializer.serializeWarpCategory(warpCategory, dataOutput);
         });
 
-        Map<UUID, Rating> ratings = island.getRatings();
+        Collection<CachedWarpInfo> islandWarps = island.cachedWarpInfoList;
+        dataOutput.writeInt(islandWarps.size());
+        islandWarps.forEach(islandWarp -> {
+            CacheSerializer.serializeIslandWarp(islandWarp, dataOutput);
+        });
+
+        Map<UUID, Rating> ratings = island.ratings;
         dataOutput.writeInt(ratings.size());
         ratings.forEach((playerUUID, rating) -> {
             dataOutput.writeLong(playerUUID.getMostSignificantBits());
@@ -229,7 +226,7 @@ public abstract class IslandsCache {
             dataOutput.writeByte((byte) rating.getValue());
         });
 
-        Map<IslandFlag, Byte> islandFlags = island.getAllSettings();
+        Map<IslandFlag, Byte> islandFlags = island.islandFlags;
         dataOutput.writeInt(islandFlags.size());
         islandFlags.forEach((islandFlag, isEnabled) -> {
             dataOutput.writeString(islandFlag.getName());
@@ -237,22 +234,28 @@ public abstract class IslandsCache {
         });
 
         for (World.Environment environment : World.Environment.values()) {
-            Map<Key, Integer> generatorRates = island.getCustomGeneratorAmounts(environment);
-            dataOutput.writeInt(generatorRates.size());
-            generatorRates.forEach((block, rate) -> {
-                dataOutput.writeString(block.toString());
-                dataOutput.writeInt(rate);
-            });
+            Map<Key, Value<Integer>> generatorRates = island.cobbleGeneratorValues[environment.ordinal()];
+            if (generatorRates == null) {
+                dataOutput.writeInt(0);
+            } else {
+                dataOutput.writeInt(generatorRates.size());
+                generatorRates.forEach((block, rate) -> {
+                    dataOutput.writeString(block.toString());
+                    dataOutput.writeInt(rate.get());
+                });
+            }
         }
 
-        IslandChest[] islandChests = island.getChest();
-        dataOutput.writeInt(islandChests.length);
-        for (IslandChest islandChest : islandChests)
-            CacheSerializer.serializeIslandChest(islandChest, dataOutput);
+        List<ItemStack[]> islandChests = island.islandChests;
+        dataOutput.writeInt(islandChests.size());
+        for (int i = 0; i < islandChests.size(); ++i) {
+            dataOutput.writeInt(i);
+            CacheSerializer.serializeIslandChest(islandChests.get(i), dataOutput);
+        }
 
-        dataOutput.writeBytes(island.getPersistentDataContainer().serialize());
+        dataOutput.writeBytes(island.persistentData);
 
-        Map<Mission<?>, Integer> missions = island.getCompletedMissionsWithAmounts();
+        Map<Mission<?>, Integer> missions = island.completedMissions;
         dataOutput.writeInt(missions.size());
         missions.forEach((mission, completedAmounts) -> {
             dataOutput.writeString(mission.getName());
@@ -263,25 +266,23 @@ public abstract class IslandsCache {
     }
 
     protected static Island deserializeIsland(IslandBase islandBase, ByteArrayDataInput dataInput) {
-        CachedIslandInfo cachedIslandInfo = new CachedIslandInfo();
-        Map<String, Object> resultSet = new HashMap<>();
+        CachedIslandInfo cachedIslandInfo = new CachedIslandInfo(islandBase.getUniqueId());
+        
+        cachedIslandInfo.owner = islandBase.getOwner().getUniqueId();
+        cachedIslandInfo.center = islandBase.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
+        cachedIslandInfo.name = islandBase.getRawName();
+        cachedIslandInfo.creationTime = islandBase.getCreationTime();
+        cachedIslandInfo.generatedSchematics = islandBase.getGeneratedSchematicsFlag();
 
-        resultSet.put("uuid", islandBase.getUniqueId().toString());
-        resultSet.put("owner", islandBase.getOwner().getUniqueId().toString());
-        resultSet.put("center", Serializers.LOCATION_SERIALIZER.serialize(
-                islandBase.getCenter(plugin.getSettings().getWorlds().getDefaultWorld())));
-        resultSet.put("name", islandBase.getRawName());
-        resultSet.put("creation_time", islandBase.getCreationTime());
-        resultSet.put("description", dataInput.readString());
-        resultSet.put("discord", dataInput.readString());
-        resultSet.put("paypal", dataInput.readString());
-        resultSet.put("locked", dataInput.readBoolean());
-        resultSet.put("generated_schematics", islandBase.getGeneratedSchematicsFlag());
-        resultSet.put("unlocked_worlds", dataInput.readInt());
-        resultSet.put("last_time_updated", dataInput.readLong());
-        resultSet.put("island_type", dataInput.readString());
-        resultSet.put("worth_bonus", dataInput.readBigDecimal());
-        resultSet.put("levels_bonus", dataInput.readBigDecimal());
+        cachedIslandInfo.description = dataInput.readString();
+        cachedIslandInfo.discord = dataInput.readString();
+        cachedIslandInfo.paypal = dataInput.readString();
+        cachedIslandInfo.isLocked = dataInput.readBoolean();
+        cachedIslandInfo.unlockedWorlds = dataInput.readInt();
+        cachedIslandInfo.lastTimeUpdated = dataInput.readLong();
+        cachedIslandInfo.islandType = dataInput.readString();
+        cachedIslandInfo.bonusWorth = dataInput.readBigDecimal();
+        cachedIslandInfo.bonusLevel = dataInput.readBigDecimal();
 
         int borderSize = islandBase.getIslandSize();
         cachedIslandInfo.islandSize = borderSize < 0 ? Value.syncedFixed(borderSize) : Value.fixed(borderSize);
@@ -324,8 +325,7 @@ public abstract class IslandsCache {
 
         int islandHomesAmount = dataInput.readInt();
         for (int i = 0; i < islandHomesAmount; ++i) {
-            int islandHomeIndex = dataInput.readByte();
-            cachedIslandInfo.islandHomes[islandHomeIndex] = CacheSerializer.deserializeLocation(dataInput);
+            cachedIslandInfo.islandHomes[i] = CacheSerializer.deserializeLocation(dataInput);
         }
 
         cachedIslandInfo.visitorHomes[World.Environment.NORMAL.ordinal()] = CacheSerializer.deserializeLocation(dataInput);
@@ -343,21 +343,21 @@ public abstract class IslandsCache {
             cachedIslandInfo.rolePermissions.put(islandPrivilege, playerRole);
         }
 
-        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
-        int blockCountsAmount = dataInput.readInt();
-        for (int i = 0; i < blockCountsAmount; ++i) {
-            Key block = KeyImpl.of(dataInput.readString());
-            byte[] data = dataInput.readBytes();
-            blockCounts.put(block, new BigInteger(data));
-        }
-        resultSet.put("block_counts", IslandsSerializer.serializeBlockCounts(blockCounts));
-
-        Set<ChunkPosition> dirtyChunks = new HashSet<>();
-        int dirtyChunksAmount = dataInput.readInt();
-        for (int i = 0; i < dirtyChunksAmount; ++i) {
-            dirtyChunks.add(CacheSerializer.deserializeChunkPosition(dataInput));
-        }
-        resultSet.put("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks));
+//        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
+//        int blockCountsAmount = dataInput.readInt();
+//        for (int i = 0; i < blockCountsAmount; ++i) {
+//            Key block = KeyImpl.of(dataInput.readString());
+//            byte[] data = dataInput.readBytes();
+//            blockCounts.put(block, new BigInteger(data));
+//        }
+//        resultSet.put("block_counts", IslandsSerializer.serializeBlockCounts(blockCounts));
+//
+//        Set<ChunkPosition> dirtyChunks = new HashSet<>();
+//        int dirtyChunksAmount = dataInput.readInt();
+//        for (int i = 0; i < dirtyChunksAmount; ++i) {
+//            dirtyChunks.add(CacheSerializer.deserializeChunkPosition(dataInput));
+//        }
+//        resultSet.put("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks));
 
         int upgradesAmount = dataInput.readInt();
         for (int i = 0; i < upgradesAmount; ++i) {
@@ -459,11 +459,11 @@ public abstract class IslandsCache {
             cachedIslandInfo.completedMissions.put(mission, completedAmount);
         }
 
-        return plugin.getGrid().createIsland(cachedIslandInfo, new DatabaseResult(resultSet))
-                .orElseThrow(IllegalStateException::new);
+        return plugin.getGrid().createIsland(cachedIslandInfo).orElseThrow(IllegalStateException::new);
     }
 
-    public static IslandsCache of(SuperiorSkyblockPlugin plugin, IslandsContainer islandsContainer, Collection<Island> islands) {
+    public static IslandsCache of(SuperiorSkyblockPlugin plugin, IslandsContainer islandsContainer,
+                                  Collection<CachedIslandInfo> islands) {
         MemoryIslandsCache memoryIslandsCache = MemoryIslandsCache.create(islandsContainer, islands);
 
         if (memoryIslandsCache.getBytesLength() >= MAX_MEMORY_LENGTH) {

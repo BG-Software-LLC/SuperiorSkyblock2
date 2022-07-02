@@ -1,10 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.cache;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
-import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataInput;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataOutput;
@@ -108,13 +105,10 @@ public class CacheSerializer {
         return ChunkPosition.of(dataInput.readString(), dataInput.readInt(), dataInput.readInt());
     }
 
-    public static void serializeWarpCategory(WarpCategory warpCategory, ByteArrayDataOutput dataOutput) {
-        dataOutput.writeString(warpCategory.getName());
-        dataOutput.writeInt(warpCategory.getSlot());
-        serializeItemStack(warpCategory.getRawIcon(), dataOutput);
-        List<IslandWarp> islandWarps = warpCategory.getWarps();
-        dataOutput.writeInt(islandWarps.size());
-        islandWarps.forEach(islandWarp -> serializeIslandWarp(islandWarp, dataOutput));
+    public static void serializeWarpCategory(CachedWarpCategoryInfo warpCategory, ByteArrayDataOutput dataOutput) {
+        dataOutput.writeString(warpCategory.name);
+        dataOutput.writeInt(warpCategory.slot);
+        serializeItemStack(warpCategory.icon, dataOutput);
     }
 
     public static CachedWarpCategoryInfo deserializeWarpCategory(ByteArrayDataInput dataInput) {
@@ -125,11 +119,11 @@ public class CacheSerializer {
         return cachedWarpCategoryInfo;
     }
 
-    private static void serializeIslandWarp(IslandWarp islandWarp, ByteArrayDataOutput dataOutput) {
-        dataOutput.writeString(islandWarp.getName());
-        serializeLocation(islandWarp.getLocation(), dataOutput);
-        dataOutput.writeBoolean(islandWarp.hasPrivateFlag());
-        serializeItemStack(islandWarp.getRawIcon(), dataOutput);
+    public static void serializeIslandWarp(CachedWarpInfo islandWarp, ByteArrayDataOutput dataOutput) {
+        dataOutput.writeString(islandWarp.name);
+        serializeLocation(islandWarp.location, dataOutput);
+        dataOutput.writeBoolean(islandWarp.isPrivate);
+        serializeItemStack(islandWarp.icon, dataOutput);
     }
 
     public static CachedWarpInfo deserializeIslandWarp(ByteArrayDataInput dataInput) {
@@ -141,11 +135,7 @@ public class CacheSerializer {
         return cachedWarpInfo;
     }
 
-    public static void serializeIslandChest(IslandChest islandChest, ByteArrayDataOutput dataOutput) {
-        dataOutput.writeInt(islandChest.getIndex());
-
-        ItemStack[] contents = islandChest.getContents();
-
+    public static void serializeIslandChest(ItemStack[] contents, ByteArrayDataOutput dataOutput) {
         dataOutput.writeInt(contents.length);
         for (int i = 0; i < contents.length; ++i) {
             if (contents[i] != null && contents[i].getType() != Material.AIR) {
