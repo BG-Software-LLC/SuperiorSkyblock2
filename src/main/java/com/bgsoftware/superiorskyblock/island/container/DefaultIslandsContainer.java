@@ -91,7 +91,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public Island getIslandAtPosition(int position, SortingType sortingType) {
         ensureSortingType(sortingType);
         return this.sortedIslands.get(sortingType).readAndGet(sortedIslands -> {
-            return position < 0 || position > sortedIslands.size() ? null : sortedIslands.get(position);
+            return position < 0 || position >= sortedIslands.size() ? null : sortedIslands.get(position);
         });
     }
 
