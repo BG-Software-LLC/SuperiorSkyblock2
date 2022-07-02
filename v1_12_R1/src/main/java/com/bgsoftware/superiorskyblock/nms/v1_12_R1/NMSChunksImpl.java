@@ -139,9 +139,7 @@ public class NMSChunksImpl implements NMSChunks {
             chunk.tileEntities.clear();
 
             removeBlocks(chunk);
-        }, chunk -> {
-            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunk.locX, chunk.locZ, new PacketPlayOutMapChunk(chunk, 65535));
-        });
+        }, null);
     }
 
     @Override
@@ -216,15 +214,8 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
-                new PacketPlayOutMapChunk(chunk, 65535));
-    }
-
-    @Override
-    public void refreshLights(org.bukkit.Chunk chunk, List<SchematicBlock> blockDataList) {
-        World world = ((CraftChunk) chunk).getHandle().getWorld();
+    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
+        World world = ((CraftChunk) bukkitChunk).getHandle().getWorld();
 
         // Update lights for the blocks.
         for (SchematicBlock blockData : blockDataList) {
@@ -238,7 +229,9 @@ public class NMSChunksImpl implements NMSChunks {
                 world.a(EnumSkyBlock.SKY, blockPosition, skyLight);
         }
 
-        refreshChunk(chunk);
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
+                new PacketPlayOutMapChunk(chunk, 65535));
     }
 
     @Override

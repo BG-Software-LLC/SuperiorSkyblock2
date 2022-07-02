@@ -150,8 +150,6 @@ public final class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = new WorldServer(((CraftWorld) chunkPositions.get(0).getWorld()).getHandle());
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
-            ChunkCoordIntPair chunkCoords = chunk.getPos();
-
             IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
 
             net.minecraft.world.level.chunk.ChunkSection[] chunkSections = chunk.getSections();
@@ -166,10 +164,6 @@ public final class NMSChunksImpl implements NMSChunks {
             chunk.getTilePositions().clear();
 
             removeBlocks(chunk);
-
-            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.getX(), chunkCoords.getZ(),
-                    new ClientboundLevelChunkWithLightPacket((Chunk) chunk.getHandle(),
-                            worldServer.getLightEngine().getHandle(), null, null, true));
         }, unloadedChunkCompound -> {
             Codec<PalettedContainerRO<IBlockData>> blocksCodec = DataPaletteBlock.b(Block.CODEC, IBlockData.b,
                     DataPaletteBlock.d.d, Block.AIR.getBlockData().getHandle());
@@ -330,16 +324,6 @@ public final class NMSChunksImpl implements NMSChunks {
         ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
         return Arrays.stream(chunk.getSections()).allMatch(chunkSection ->
                 chunkSection == null || new ChunkSection(chunkSection).isEmpty());
-    }
-
-    @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
-        WorldServer worldServer = chunk.getWorld();
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
-        NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.getX(), chunkCoords.getZ(),
-                new ClientboundLevelChunkWithLightPacket((Chunk) chunk.getHandle(), worldServer.getLightEngine().getHandle(),
-                        null, null, true));
     }
 
     @Override

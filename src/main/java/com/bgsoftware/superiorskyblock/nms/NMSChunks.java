@@ -24,8 +24,6 @@ public interface NMSChunks {
 
     boolean isChunkEmpty(Chunk chunk);
 
-    void refreshChunk(Chunk chunk);
-
     void refreshLights(Chunk chunk, List<SchematicBlock> blockData);
 
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);

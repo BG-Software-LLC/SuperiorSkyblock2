@@ -113,13 +113,18 @@ public class NMSChunksImpl implements NMSChunks {
             Arrays.fill(biomeBases, biomeBase);
             chunk.markDirty();
 
+            LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) worldServer.e();
+
             PacketPlayOutUnloadChunk unloadChunkPacket = new PacketPlayOutUnloadChunk(chunkCoords.x, chunkCoords.z);
             //noinspection deprecation
             PacketPlayOutMapChunk mapChunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
 
+            PacketPlayOutLightUpdate lightUpdatePacket = new PacketPlayOutLightUpdate(chunkCoords, lightEngineThreaded, true);
+
             playersToUpdate.forEach(player -> {
                 PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().playerConnection;
                 playerConnection.sendPacket(unloadChunkPacket);
+                playerConnection.sendPacket(lightUpdatePacket);
                 playerConnection.sendPacket(mapChunkPacket);
             });
         }, (chunkCoords, unloadedChunk) -> {
@@ -142,8 +147,6 @@ public class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
-            ChunkCoordIntPair chunkCoords = chunk.getPos();
-
             Arrays.fill(chunk.getSections(), Chunk.a);
             removeEntities(chunk);
 
@@ -151,10 +154,6 @@ public class NMSChunksImpl implements NMSChunks {
             chunk.tileEntities.clear();
 
             removeBlocks(chunk);
-
-            //noinspection deprecation
-            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoords.x, chunkCoords.z,
-                    new PacketPlayOutMapChunk(chunk, 65535));
         }, (chunkCoords, levelCompound) -> {
             NBTTagList sectionsList = new NBTTagList();
             NBTTagList tileEntities = new NBTTagList();
@@ -243,23 +242,6 @@ public class NMSChunksImpl implements NMSChunks {
     public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.c());
-    }
-
-    @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        ChunkCoordIntPair chunkCoords = chunk.getPos();
-
-        PacketPlayOutMapChunk packetPlayOutMapChunk;
-
-        try {
-            packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, 65535, true);
-        } catch (Throwable ex) {
-            //noinspection deprecation
-            packetPlayOutMapChunk = new PacketPlayOutMapChunk(chunk, 65535);
-        }
-
-        NMSUtils.sendPacketToRelevantPlayers(chunk.world, chunkCoords.x, chunkCoords.z, packetPlayOutMapChunk);
     }
 
     @Override

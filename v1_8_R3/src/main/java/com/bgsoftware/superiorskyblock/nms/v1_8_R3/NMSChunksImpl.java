@@ -26,7 +26,6 @@ import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
-import net.minecraft.server.v1_8_R3.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.World;
 import net.minecraft.server.v1_8_R3.WorldServer;
@@ -105,10 +104,7 @@ public class NMSChunksImpl implements NMSChunks {
             chunk.tileEntities.clear();
 
             removeBlocks(chunk);
-        }, chunk -> {
-            NMSUtils.sendPacketToRelevantPlayers(worldServer, chunk.locX, chunk.locZ,
-                    new PacketPlayOutMapChunk(chunk, false, 65535));
-        });
+        }, null);
     }
 
     @Override
@@ -178,13 +174,6 @@ public class NMSChunksImpl implements NMSChunks {
     public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.a());
-    }
-
-    @Override
-    public void refreshChunk(org.bukkit.Chunk bukkitChunk) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        NMSUtils.sendPacketToRelevantPlayers((WorldServer) chunk.world, chunk.locX, chunk.locZ,
-                new PacketPlayOutMapChunk(chunk, false, 65535));
     }
 
     @Override

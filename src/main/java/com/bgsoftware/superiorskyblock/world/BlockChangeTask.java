@@ -79,8 +79,8 @@ public class BlockChangeTask {
                         if (island.getOwner().isOnline())
                             entry.getValue().forEach(blockData -> blockData.doPostPlace(island));
 
-                        plugin.getNMSChunks().refreshChunk(chunk);
-                        BukkitExecutor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
+                        if (plugin.getSettings().isLightsUpdate())
+                            BukkitExecutor.sync(() -> plugin.getNMSChunks().refreshLights(chunk, entry.getValue()), 10L);
                     } catch (Throwable error) {
                         failed = true;
                         if (onFailure != null)
