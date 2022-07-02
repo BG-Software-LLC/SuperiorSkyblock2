@@ -128,8 +128,9 @@ public class SIsland extends SIslandBase implements Island {
     private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
     private final IslandBlocksTrackerAlgorithm blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
     private final IslandEntitiesTrackerAlgorithm entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
-    private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
     private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
+    @Nullable
+    private PersistentDataContainer persistentDataContainer;
 
     /*
      * Island Flags
@@ -3063,6 +3064,8 @@ public class SIsland extends SIslandBase implements Island {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
+        if (persistentDataContainer == null)
+            persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
         return persistentDataContainer;
     }
 
@@ -3336,6 +3339,7 @@ public class SIsland extends SIslandBase implements Island {
         this.bankLimit.set(cachedIslandInfo.bankLimit);
 
         this.islandBank.setBalance(cachedIslandInfo.balance);
+
         this.lastInterest = cachedIslandInfo.lastInterestTime;
 
         cachedIslandInfo.cachedWarpInfoList.forEach(cachedWarpInfo -> {
@@ -3367,9 +3371,11 @@ public class SIsland extends SIslandBase implements Island {
             }
         });
 
-        cachedIslandInfo.bankTransactions.forEach(islandBank::loadTransaction);
+        if (!cachedIslandInfo.bankTransactions.isEmpty())
+            cachedIslandInfo.bankTransactions.forEach(this.islandBank::loadTransaction);
+
         if (cachedIslandInfo.persistentData.length > 0)
-            this.persistentDataContainer.load(cachedIslandInfo.persistentData);
+            getPersistentDataContainer().load(cachedIslandInfo.persistentData);
     }
 
     private void startBankInterest() {

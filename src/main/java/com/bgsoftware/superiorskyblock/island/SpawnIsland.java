@@ -34,7 +34,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
-import com.bgsoftware.superiorskyblock.island.persistence.EmptyPersistentDataContainer;
+import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;

@@ -54,7 +54,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
-    private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
+    @Nullable
+    private PersistentDataContainer persistentDataContainer; // Lazy loading
 
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
@@ -715,6 +716,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
+        if (persistentDataContainer == null)
+            persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
         return persistentDataContainer;
     }
 
@@ -805,7 +808,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
         this.completedMissions.putAll(cachedPlayerInfo.completedMissions);
         if (cachedPlayerInfo.persistentData.length > 0)
-            this.persistentDataContainer.load(cachedPlayerInfo.persistentData);
+            getPersistentDataContainer().load(cachedPlayerInfo.persistentData);
     }
 
 }
