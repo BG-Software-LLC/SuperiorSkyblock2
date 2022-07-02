@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.mojang.authlib.properties.Property;
 import net.skinsrestorer.api.SkinsRestorerAPI;
 import net.skinsrestorer.api.bukkit.events.SkinApplyBukkitEvent;
+import net.skinsrestorer.api.property.IProperty;
 import net.skinsrestorer.shared.storage.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -120,11 +121,19 @@ public class SkinsRestorerHook {
 
         @Override
         public Property getSkin(SuperiorPlayer superiorPlayer) {
+            IProperty property;
             try {
-                return (Property) SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
+                property = SkinsRestorerAPI.getApi().getSkinData(superiorPlayer.getName());
             } catch (Throwable ex) {
-                return (Property) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
+                property = (IProperty) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
             }
+
+            if (property instanceof Property)
+                return ((Property) property);
+
+            Object propertyHandle = property.getHandle();
+
+            return propertyHandle instanceof Property ? ((Property) propertyHandle) : null;
         }
 
     }
