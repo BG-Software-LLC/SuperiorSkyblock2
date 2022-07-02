@@ -15,8 +15,8 @@ import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
 import com.songoda.epicspawners.api.events.SpawnerChangeEvent;
 import com.songoda.epicspawners.api.events.SpawnerPlaceEvent;
-import com.songoda.epicspawners.spawners.spawner.PlacedSpawner;
 import com.songoda.epicspawners.spawners.spawner.SpawnerData;
+import com.songoda.epicspawners.spawners.spawner.SpawnerStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;
@@ -49,9 +49,11 @@ public class SpawnersProvider_EpicSpawners7 implements SpawnersProvider {
         String entityType = null;
 
         if (Bukkit.isPrimaryThread()) {
-            PlacedSpawner placedSpawner = instance.getSpawnerManager().getSpawnerFromWorld(location);
-            blockCount = placedSpawner.getFirstStack().getStackSize();
-            entityType = placedSpawner.getIdentifyingName();
+            SpawnerStack spawnerStack = instance.getSpawnerManager().getSpawnerFromWorld(location).getFirstStack();
+            if (spawnerStack != null) {
+                blockCount = spawnerStack.getStackSize();
+                entityType = spawnerStack.getCurrentTier().getIdentifyingName();
+            }
         }
 
         return new Pair<>(blockCount, entityType);
