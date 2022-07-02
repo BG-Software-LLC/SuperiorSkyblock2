@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.world.chunk;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -92,59 +92,75 @@ public class ChunksTracker {
         return IslandsSerializer.serializeDirtyChunks(dirtyChunks);
     }
 
-    public static void deserialize(GridManagerImpl grid, Island island, @Nullable String serialized) {
+    public static Set<ChunkPosition> deserialize(@Nullable String serialized) {
         try {
             if (Text.isBlank(serialized))
                 throw new JsonSyntaxException("");
 
             JsonObject dirtyChunksObject = gson.fromJson(serialized, JsonObject.class);
+
+            if (dirtyChunksObject.entrySet().isEmpty())
+                return Collections.emptySet();
+
+            Set<ChunkPosition> dirtyChunks = new HashSet<>();
+
             dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
                 String worldName = dirtyChunkEntry.getKey();
                 JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
 
                 dirtyChunksArray.forEach(dirtyChunkElement -> {
                     String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
-                    try {
-                        markDirty(island, ChunkPosition.of(worldName, Integer.parseInt(chunkPositionSections[0]),
-                                Integer.parseInt(chunkPositionSections[1])), false);
-                    } catch (Exception error) {
-                        PluginDebugger.debug(error);
-                    }
+                    dirtyChunks.add(ChunkPosition.of(worldName, Integer.parseInt(chunkPositionSections[0]),
+                            Integer.parseInt(chunkPositionSections[1])));
                 });
             });
+
+            return dirtyChunks;
         } catch (JsonSyntaxException ex) {
             if (serialized != null && !serialized.isEmpty()) {
                 if (serialized.contains("|")) {
-                    deserializeOldV1(island, serialized);
-                } else if (grid != null) {
-                    deserializeOldV2(grid, island, serialized);
+                    return deserializeOldV1(serialized);
+                } else {
+                    return deserializeOldV2(serialized);
                 }
             }
         }
+
+        return Collections.emptySet();
     }
 
-    private static void deserializeOldV2(GridManagerImpl grid, Island island, String serialized) {
+    private static Set<ChunkPosition> deserializeOldV2(String serialized) {
         try {
             String[] dirtyChunkSections = serialized.split(";");
+
+            if (dirtyChunkSections.length == 0)
+                return Collections.emptySet();
+
+            Set<ChunkPosition> dirtyChunks = new HashSet<>();
+
             for (String dirtyChunk : dirtyChunkSections) {
                 String[] dirtyChunkSection = dirtyChunk.split(",");
                 if (dirtyChunkSection.length == 3) {
-                    ChunkPosition chunkPosition = ChunkPosition.of(dirtyChunkSection[0],
-                            Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
-
-                    if (island == null)
-                        island = getIsland(grid, chunkPosition);
-
-                    markDirty(island, chunkPosition, false);
+                    dirtyChunks.add(ChunkPosition.of(dirtyChunkSection[0], Integer.parseInt(dirtyChunkSection[1]),
+                            Integer.parseInt(dirtyChunkSection[2])));
                 }
             }
+
+            return dirtyChunks;
         } catch (Exception error) {
             PluginDebugger.debug(error);
         }
+
+        return Collections.emptySet();
     }
 
-    private static void deserializeOldV1(Island island, String serialized) {
+    private static Set<ChunkPosition> deserializeOldV1(String serialized) {
         String[] serializedSections = serialized.split("\\|");
+
+        if (serializedSections.length == 0)
+            return Collections.emptySet();
+
+        Set<ChunkPosition> dirtyChunks = new HashSet<>();
 
         for (String section : serializedSections) {
             String[] worldSections = section.split("=");
@@ -153,12 +169,14 @@ public class ChunksTracker {
                 for (String dirtyChunk : dirtyChunkSections) {
                     String[] dirtyChunkSection = dirtyChunk.split(",");
                     if (dirtyChunkSection.length == 2) {
-                        markDirty(island, ChunkPosition.of(worldSections[0],
-                                Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1])), false);
+                        dirtyChunks.add(ChunkPosition.of(worldSections[0],
+                                Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1])));
                     }
                 }
             }
         }
+
+        return dirtyChunks;
     }
 
     private static Island getIsland(GridManagerImpl grid, ChunkPosition chunkPosition) {

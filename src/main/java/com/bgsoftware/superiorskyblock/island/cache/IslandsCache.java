@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataInput;
 import com.bgsoftware.superiorskyblock.core.ByteArrayDataOutput;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpCategoryInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpInfo;
@@ -32,10 +33,12 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public abstract class IslandsCache {
@@ -153,19 +156,18 @@ public abstract class IslandsCache {
             dataOutput.writeInt(playerRole.getId());
         }));
 
-//        Map<Key, BigInteger> blockCounts = island.getBlockCountsAsBigInteger();
-//        dataOutput.writeInt(blockCounts.size());
-//        blockCounts.forEach(((key, bigInteger) -> {
-//            dataOutput.writeString(key.toString());
-//            dataOutput.writeBytes(bigInteger.toByteArray());
-//        }));
-//
-//        Set<ChunkPosition> dirtyChunks = ChunksTracker.getDirtyChunks(island);
-//        dataOutput.writeInt(dirtyChunks.size());
-//        dirtyChunks.forEach(dirtyChunkPos -> {
-//            CacheSerializer.serializeChunkPosition(dirtyChunkPos, dataOutput);
-//        });
-//        ChunksTracker.removeIsland(island);
+        Map<Key, BigInteger> blockCounts = island.blockCounts;
+        dataOutput.writeInt(blockCounts.size());
+        blockCounts.forEach(((key, bigInteger) -> {
+            dataOutput.writeString(key.toString());
+            dataOutput.writeBytes(bigInteger.toByteArray());
+        }));
+
+        Set<ChunkPosition> dirtyChunks = island.dirtyChunks;
+        dataOutput.writeInt(dirtyChunks.size());
+        dirtyChunks.forEach(dirtyChunkPos -> {
+            CacheSerializer.serializeChunkPosition(dirtyChunkPos, dataOutput);
+        });
 
         Map<String, Integer> upgrades = island.upgrades;
         dataOutput.writeInt(upgrades.size());
@@ -267,7 +269,7 @@ public abstract class IslandsCache {
 
     protected static Island deserializeIsland(IslandBase islandBase, ByteArrayDataInput dataInput) {
         CachedIslandInfo cachedIslandInfo = new CachedIslandInfo(islandBase.getUniqueId());
-        
+
         cachedIslandInfo.owner = islandBase.getOwner().getUniqueId();
         cachedIslandInfo.center = islandBase.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
         cachedIslandInfo.name = islandBase.getRawName();
@@ -343,21 +345,17 @@ public abstract class IslandsCache {
             cachedIslandInfo.rolePermissions.put(islandPrivilege, playerRole);
         }
 
-//        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
-//        int blockCountsAmount = dataInput.readInt();
-//        for (int i = 0; i < blockCountsAmount; ++i) {
-//            Key block = KeyImpl.of(dataInput.readString());
-//            byte[] data = dataInput.readBytes();
-//            blockCounts.put(block, new BigInteger(data));
-//        }
-//        resultSet.put("block_counts", IslandsSerializer.serializeBlockCounts(blockCounts));
-//
-//        Set<ChunkPosition> dirtyChunks = new HashSet<>();
-//        int dirtyChunksAmount = dataInput.readInt();
-//        for (int i = 0; i < dirtyChunksAmount; ++i) {
-//            dirtyChunks.add(CacheSerializer.deserializeChunkPosition(dataInput));
-//        }
-//        resultSet.put("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks));
+        int blockCountsAmount = dataInput.readInt();
+        for (int i = 0; i < blockCountsAmount; ++i) {
+            Key block = KeyImpl.of(dataInput.readString());
+            byte[] data = dataInput.readBytes();
+            cachedIslandInfo.blockCounts.put(block, new BigInteger(data));
+        }
+
+        int dirtyChunksAmount = dataInput.readInt();
+        for (int i = 0; i < dirtyChunksAmount; ++i) {
+            cachedIslandInfo.dirtyChunks.add(CacheSerializer.deserializeChunkPosition(dataInput));
+        }
 
         int upgradesAmount = dataInput.readInt();
         for (int i = 0; i < upgradesAmount; ++i) {

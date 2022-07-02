@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -219,8 +220,8 @@ public class DataManager extends Manager {
             cachedIslandInfo.generatedSchematics = databaseResult.getInt("generated_schematics").orElse(0);
             cachedIslandInfo.unlockedWorlds = databaseResult.getInt("unlocked_worlds").orElse(0);
             cachedIslandInfo.lastTimeUpdated = databaseResult.getLong("last_time_updated").orElse(currentTime);
-            cachedIslandInfo.dirtyChunks = databaseResult.getString("dirty_chunks").orElse(null);
-            cachedIslandInfo.blockCounts = databaseResult.getString("block_counts").orElse(null);
+            cachedIslandInfo.dirtyChunks = ChunksTracker.deserialize(databaseResult.getString("dirty_chunks").orElse(null));
+            cachedIslandInfo.blockCounts = IslandsDeserializer.deserializeBlockCounts(databaseResult.getString("block_counts").orElse(null));
 
             islands.add(cachedIslandInfo);
         });

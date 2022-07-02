@@ -34,7 +34,6 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
-import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -268,10 +267,10 @@ public class SIsland extends SIslandBase implements Island {
             island.unlockedWorlds.set(cachedIslandInfo.unlockedWorlds);
             island.lastTimeUpdate = cachedIslandInfo.lastTimeUpdated;
 
-            if (cachedIslandInfo.dirtyChunks != null)
-                ChunksTracker.deserialize(plugin.getGrid(), island, cachedIslandInfo.dirtyChunks);
+            if (!cachedIslandInfo.dirtyChunks.isEmpty())
+                cachedIslandInfo.dirtyChunks.forEach(dirtyChunk -> ChunksTracker.markDirty(island, dirtyChunk, false));
 
-            if (cachedIslandInfo.blockCounts != null)
+            if (!cachedIslandInfo.blockCounts.isEmpty())
                 BukkitExecutor.sync(() -> island.deserializeBlockCounts(cachedIslandInfo.blockCounts), 5L);
 
             if (cachedIslandInfo != null)
@@ -3283,10 +3282,10 @@ public class SIsland extends SIslandBase implements Island {
         });
     }
 
-    private void deserializeBlockCounts(@Nullable String blockCounts) {
+    private void deserializeBlockCounts(Map<Key, BigInteger> blockCounts) {
         try {
             this.blocksTracker.setLoadingDataMode(true);
-            IslandsDeserializer.deserializeBlockCounts(blockCounts, this);
+            blockCounts.forEach((blockKey, amount) -> handleBlockPlace(blockKey, amount, false, false));
         } finally {
             this.blocksTracker.setLoadingDataMode(false);
         }

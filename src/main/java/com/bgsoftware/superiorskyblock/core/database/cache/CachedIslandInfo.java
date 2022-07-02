@@ -6,9 +6,11 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
@@ -19,10 +21,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class CachedIslandInfo {
@@ -46,8 +51,8 @@ public class CachedIslandInfo {
     public int generatedSchematics;
     public int unlockedWorlds;
     public long lastTimeUpdated;
-    public String dirtyChunks;
-    public String blockCounts;
+    public Set<ChunkPosition> dirtyChunks = new HashSet<>();
+    public Map<Key, BigInteger> blockCounts = new HashMap<>();
     public final Location[] islandHomes = new Location[World.Environment.values().length];
     public final List<SuperiorPlayer> members = new ArrayList<>();
     public final List<SuperiorPlayer> bannedPlayers = new ArrayList<>();

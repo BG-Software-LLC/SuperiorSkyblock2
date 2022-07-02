@@ -3,7 +3,6 @@ package com.bgsoftware.superiorskyblock.core.database.serialization;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -11,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpCategoryInfo;
@@ -21,18 +21,16 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.Json
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -285,24 +283,31 @@ public class IslandsDeserializer {
         });
     }
 
-    public static void deserializeBlockCounts(String blocks, Island island) {
+    public static KeyMap<BigInteger> deserializeBlockCounts(String blocks) {
         if (Text.isBlank(blocks))
-            return;
+            return KeyMapImpl.createEmptyMap();
 
-        JsonArray blockCounts;
+        JsonArray blockCountsJsonArray;
 
         try {
-            blockCounts = gson.fromJson(blocks, JsonArray.class);
+            blockCountsJsonArray = gson.fromJson(blocks, JsonArray.class);
         } catch (JsonSyntaxException error) {
-            blockCounts = gson.fromJson(oldDataDeserializer.deserializeBlockCounts(blocks), JsonArray.class);
+            blockCountsJsonArray = gson.fromJson(oldDataDeserializer.deserializeBlockCounts(blocks), JsonArray.class);
         }
 
-        blockCounts.forEach(blockCountElement -> {
+        if (blockCountsJsonArray.size() == 0)
+            return KeyMapImpl.createEmptyMap();
+
+        KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
+
+        blockCountsJsonArray.forEach(blockCountElement -> {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = KeyImpl.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            island.handleBlockPlace(blockKey, amount, false, false);
+            blockCounts.put(blockKey, blockCounts.getOrDefault(blockKey, BigInteger.ZERO).add(amount));
         });
+
+        return blockCounts;
     }
 
     public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
