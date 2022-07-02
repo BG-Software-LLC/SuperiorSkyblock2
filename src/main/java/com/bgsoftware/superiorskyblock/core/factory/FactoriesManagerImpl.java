@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.handlers.FactoriesManager;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
@@ -115,8 +116,8 @@ public class FactoriesManagerImpl implements FactoriesManager {
         return new SBlockPosition(location);
     }
 
-    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
+    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo, DatabaseResult resultSet) {
+        Optional<Island> island = SIsland.fromDatabase(cachedIslandInfo, resultSet);
 
         if (!island.isPresent())
             return island;
@@ -204,7 +205,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
         return databaseBridgeFactory != null;
     }
 
-    public DatabaseBridge createDatabaseBridge(Island island) {
+    public DatabaseBridge createDatabaseBridge(IslandBase island) {
         SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);

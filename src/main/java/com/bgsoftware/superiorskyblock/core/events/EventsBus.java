@@ -58,6 +58,7 @@ import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
+import com.bgsoftware.superiorskyblock.api.events.IslandLoadEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandLockWorldEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandOpenEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandOpenWarpEvent;
@@ -100,9 +101,11 @@ import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
 import com.bgsoftware.superiorskyblock.api.events.SendMessageEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -464,6 +467,10 @@ public class EventsBus {
                                                  IslandLeaveEvent.LeaveCause leaveCause, Location location) {
         return callEvent(() -> new IslandLeaveProtectedEvent(superiorPlayer, island, leaveCause, location),
                 "islandleaveprotectedevent");
+    }
+
+    public <T extends IslandBase> void callIslandLoadEvent(IslandBase originalIslandBase, T newIsland, IslandLoadLevel<T> loadLevel) {
+        callEvent(new IslandLoadEvent<>(originalIslandBase, newIsland, loadLevel));
     }
 
     public boolean callIslandLockWorldEvent(Island island, World.Environment environment) {

@@ -5,12 +5,13 @@ import com.google.common.base.Preconditions;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
 public class IslandPrivilege implements Enumerable {
 
-    private static final Map<String, IslandPrivilege> islandPrivileges = new HashMap<>();
+    private static final Map<String, IslandPrivilege> islandPrivileges = new LinkedHashMap<>();
     private static int ordinalCounter = 0;
 
     private final String name;

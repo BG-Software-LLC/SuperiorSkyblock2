@@ -4,8 +4,10 @@ import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import org.bukkit.Location;
@@ -242,13 +244,30 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     Island getIsland();
 
     /**
+     * Get the island of the player.
+     */
+    @Nullable
+    <T extends IslandBase> T getIsland(IslandLoadLevel<T> loadLevel);
+
+    /**
      * Set the island of the player.
      * !Can cause issues if not used properly!
      *
      * @param island The island to set the player to.
      * @throws IllegalArgumentException if island doesn't contain player as a member.
      */
-    void setIsland(Island island);
+    default void setIsland(Island island) {
+        this.setIsland((IslandBase) island);
+    }
+
+    /**
+     * Set the island of the player.
+     * !Can cause issues if not used properly!
+     *
+     * @param island The island to set the player to.
+     * @throws IllegalArgumentException if island doesn't contain player as a member.
+     */
+    void setIsland(IslandBase island);
 
     /**
      * Check if this player is a member of an island.

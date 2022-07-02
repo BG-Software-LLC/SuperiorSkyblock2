@@ -1,5 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -56,7 +58,7 @@ public class CmdAdminKick implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Island targetIsland = targetPlayer.getIsland();
+        IslandBase targetIsland = targetPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
 
         if (targetIsland == null) {
             Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
@@ -69,7 +71,7 @@ public class CmdAdminKick implements IAdminPlayerCommand {
         }
 
         IslandUtils.handleKickPlayer(sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null,
-                sender.getName(), targetIsland, targetPlayer);
+                sender.getName(), targetIsland.loadIsland(IslandLoadLevel.FULL_LOAD), targetPlayer);
     }
 
 }

@@ -3,7 +3,8 @@ package com.bgsoftware.superiorskyblock.commands;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.handlers.CommandsManager;
-import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
@@ -287,7 +288,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
                 if (superiorPlayer != null) {
-                    Island island = superiorPlayer.getIsland();
+                    IslandBase island = superiorPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
 
                     if (args.length != 0) {
                         Bukkit.dispatchCommand(sender, label + " help");

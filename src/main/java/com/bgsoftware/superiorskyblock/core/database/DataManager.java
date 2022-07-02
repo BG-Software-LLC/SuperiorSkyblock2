@@ -23,8 +23,10 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
@@ -78,7 +80,8 @@ public class DataManager extends Manager {
          */
 
         for (SuperiorPlayer superiorPlayer : plugin.getPlayers().getAllPlayers()) {
-            if (superiorPlayer.getIslandLeader().getUniqueId().equals(superiorPlayer.getUniqueId()) && superiorPlayer.getIsland() != null && !superiorPlayer.getPlayerRole().isLastRole()) {
+            if (superiorPlayer.getIslandLeader().getUniqueId().equals(superiorPlayer.getUniqueId()) &&
+                    superiorPlayer.hasIsland() && !superiorPlayer.getPlayerRole().isLastRole()) {
                 SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + " is an island leader, but have a guest role - fixing it...");
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
@@ -144,7 +147,6 @@ public class DataManager extends Manager {
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
         DatabaseCache<CachedIslandInfo> databaseCache = new DatabaseCache<>();
-        AtomicInteger islandsCount = new AtomicInteger();
         long startTime = System.currentTimeMillis();
 
         IslandsDeserializer.deserializeIslandHomes(islandsLoader, databaseCache);
@@ -171,14 +173,20 @@ public class DataManager extends Manager {
         IslandsDeserializer.deserializeBankTransactions(islandsLoader, databaseCache);
         IslandsDeserializer.deserializePersistentDataContainer(islandsLoader, databaseCache);
 
+        List<Island> islands = new ArrayList<>();
+
         islandsLoader.loadAllObjects("islands", resultSet -> {
-            plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
-            islandsCount.incrementAndGet();
+            DatabaseResult databaseResult = new DatabaseResult(resultSet);
+            Optional<Island> island = plugin.getGrid().createIsland(databaseResult.getUUID("uuid")
+                    .map(databaseCache::getCachedInfo).orElse(null), databaseResult);
+            island.ifPresent(islands::add);
         });
+
+        plugin.getGrid().loadCache(islands);
 
         long endTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
+        SuperiorSkyblockPlugin.log("Finished loading " + islands.size() + " islands (Took " + (endTime - startTime) + "ms)");
     }
 
 

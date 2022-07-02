@@ -72,7 +72,7 @@ public class CmdCreate implements ISuperiorCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if (superiorPlayer.getIsland() != null) {
+        if (superiorPlayer.hasIsland()) {
             Message.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }

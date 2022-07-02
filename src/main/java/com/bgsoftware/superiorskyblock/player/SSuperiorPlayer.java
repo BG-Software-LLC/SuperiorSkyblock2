@@ -6,8 +6,10 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
@@ -20,11 +22,11 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -37,7 +39,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +59,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
 
-    private Island playerIsland = null;
+    private IslandBase playerIsland = null;
     private String name;
     private String textureValue = "";
     private PlayerRole playerRole;
@@ -375,7 +376,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean isInsideIsland() {
         Player player = asPlayer();
-        Island island = getIsland();
+        IslandBase island = getIsland(IslandLoadLevel.BASE_LOAD);
         return player != null && island != null && island.equals(plugin.getGrid().getIslandAt(player.getLocation()));
     }
 
@@ -385,22 +386,28 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public SuperiorPlayer getIslandLeader() {
-        Island island = getIsland();
+        IslandBase island = getIsland(IslandLoadLevel.BASE_LOAD);
         return island == null ? this : island.getOwner();
     }
 
     @Override
     public void setIslandLeader(SuperiorPlayer islandLeader) {
-        setIsland(islandLeader.getIsland());
+        setIsland(islandLeader.getIsland(IslandLoadLevel.BASE_LOAD));
     }
 
     @Override
     public Island getIsland() {
-        return playerIsland;
+        return getIsland(IslandLoadLevel.FULL_LOAD);
+    }
+
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIsland(IslandLoadLevel<T> loadLevel) {
+        return playerIsland == null ? null : playerIsland.loadIsland(loadLevel);
     }
 
     @Override
-    public void setIsland(Island island) {
+    public void setIsland(IslandBase island) {
         PluginDebugger.debug("Action: Change Island, Player: " + getName() + ", New Island: " +
                 (island == null ? "None" : island.getUniqueId().toString()));
         this.playerIsland = island;
@@ -408,7 +415,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean hasIsland() {
-        return getIsland() != null;
+        return this.playerIsland != null;
     }
 
     @Override
@@ -424,7 +431,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         PluginDebugger.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
         this.playerRole = playerRole;
-        Island island = getIsland();
+        IslandBase island = getIsland(IslandLoadLevel.BASE_LOAD);
         if (island != null && island.getOwner() != this)
             IslandsDatabaseBridge.saveMemberRole(island, this);
     }
@@ -679,7 +686,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(otherPlayer, "otherPlayer parameter cannot be null.");
 
         this.name = otherPlayer.getName();
-        this.playerIsland = otherPlayer.getIsland();
+        this.playerIsland = otherPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
         this.playerRole = otherPlayer.getPlayerRole();
         this.userLocale = otherPlayer.getUserLocale();
         this.worldBorderEnabled |= otherPlayer.hasWorldBorderEnabled();

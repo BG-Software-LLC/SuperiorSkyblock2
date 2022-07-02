@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
@@ -134,7 +135,7 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
+    public void deleteChunks(IslandBase island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
         if (chunkPositions.isEmpty())
             return;
 

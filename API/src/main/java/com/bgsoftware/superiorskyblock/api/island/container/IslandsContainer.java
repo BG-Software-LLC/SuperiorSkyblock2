@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.island.container;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -17,14 +18,42 @@ public interface IslandsContainer {
      *
      * @param island The island to add.
      */
-    void addIsland(Island island);
+    default void addIsland(Island island) {
+        this.addIsland((IslandBase) island);
+    }
+
+    /**
+     * Add an island to the islands container.
+     *
+     * @param island The island to add.
+     */
+    void addIsland(IslandBase island);
 
     /**
      * Remove an island from the islands container.
      *
      * @param island The island to remove.
      */
-    void removeIsland(Island island);
+    default void removeIsland(Island island) {
+        this.removeIsland((IslandBase) island);
+    }
+
+    /**
+     * Remove an island from the islands container.
+     *
+     * @param island The island to remove.
+     */
+    void removeIsland(IslandBase island);
+
+    /**
+     * Get an island by its uuid.
+     * Warning! This method will load all the island from cache!
+     *
+     * @param uuid The uuid of the island.
+     * @deprecated See {@link #getBaseIslandByUUID(UUID)}
+     */
+    @Nullable
+    Island getIslandByUUID(UUID uuid);
 
     /**
      * Get an island by its uuid.
@@ -32,7 +61,7 @@ public interface IslandsContainer {
      * @param uuid The uuid of the island.
      */
     @Nullable
-    Island getIslandByUUID(UUID uuid);
+    IslandBase getBaseIslandByUUID(UUID uuid);
 
     /**
      * Get an island by its leader's uuid.
@@ -48,12 +77,24 @@ public interface IslandsContainer {
 
     /**
      * Get an island by its position in the top-islands.
+     * Warning! This method will load the island from cache!
+     *
+     * @param position    The position of the island.
+     * @param sortingType The sorting-type to get islands from.
+     * @deprecated See {@link #getBaseIslandAtPosition(int, SortingType)}
+     */
+    @Nullable
+    @Deprecated
+    Island getIslandAtPosition(int position, SortingType sortingType);
+
+    /**
+     * Get an island by its position in the top-islands.
      *
      * @param position    The position of the island.
      * @param sortingType The sorting-type to get islands from.
      */
     @Nullable
-    Island getIslandAtPosition(int position, SortingType sortingType);
+    IslandBase getBaseIslandAtPosition(int position, SortingType sortingType);
 
     /**
      * Get the position of an island in the top-islands.
@@ -61,7 +102,17 @@ public interface IslandsContainer {
      * @param island      The island to get position of.
      * @param sortingType The sorting-type to get islands from.
      */
-    int getIslandPosition(Island island, SortingType sortingType);
+    default int getIslandPosition(Island island, SortingType sortingType) {
+        return this.getIslandPosition((IslandBase) island, sortingType);
+    }
+
+    /**
+     * Get the position of an island in the top-islands.
+     *
+     * @param island      The island to get position of.
+     * @param sortingType The sorting-type to get islands from.
+     */
+    int getIslandPosition(IslandBase island, SortingType sortingType);
 
     /**
      * Get the amount of islands on the server.
@@ -70,11 +121,22 @@ public interface IslandsContainer {
 
     /**
      * Get an island at a location.
+     * Warning! This method will load the island from cache!
+     *
+     * @param location The location to get island in.
+     * @deprecated See {@link #getBaseIslandAt(Location)}
+     */
+    @Nullable
+    @Deprecated
+    Island getIslandAt(Location location);
+
+    /**
+     * Get an island at a location.
      *
      * @param location The location to get island in.
      */
     @Nullable
-    Island getIslandAt(Location location);
+    IslandBase getBaseIslandAt(Location location);
 
     /**
      * Transfer an island from a player to another one.
@@ -116,19 +178,48 @@ public interface IslandsContainer {
      * @param sortingType The sorting-type.
      * @param island      The island that had its value changed.
      */
-    void notifyChange(SortingType sortingType, Island island);
+    default void notifyChange(SortingType sortingType, Island island) {
+        this.notifyChange(sortingType, (IslandBase) island);
+    }
+
+    /**
+     * Notify about a change of a value for a specific sorting type for an island.
+     *
+     * @param sortingType The sorting-type.
+     * @param island      The island that had its value changed.
+     */
+    void notifyChange(SortingType sortingType, IslandBase island);
+
+    /**
+     * Get all islands sorted by a specific sorting-type.
+     * Warning! This method will load all islands from cache!
+     *
+     * @param sortingType The type of sorting to use.
+     * @deprecated See {@link #getSortedBaseIslands(SortingType)}
+     */
+    @Deprecated
+    List<Island> getSortedIslands(SortingType sortingType);
 
     /**
      * Get all islands sorted by a specific sorting-type.
      *
      * @param sortingType The type of sorting to use.
      */
-    List<Island> getSortedIslands(SortingType sortingType);
+    List<IslandBase> getSortedBaseIslands(SortingType sortingType);
+
+    /**
+     * Get all islands.
+     * Warning! This method will load all islands from cache!
+     *
+     * @deprecated See {@link #getBaseIslandsUnsorted()} ()}
+     */
+    @Deprecated
+    List<Island> getIslandsUnsorted();
 
     /**
      * Get all islands.
      */
-    List<Island> getIslandsUnsorted();
+    List<IslandBase> getBaseIslandsUnsorted();
 
     /**
      * Add a new sorting-type.

@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.listener;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Location;
@@ -29,8 +31,8 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Island playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        Island entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation());
+        IslandBase playerIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation(), IslandLoadLevel.BASE_LOAD);
+        IslandBase entityIsland = plugin.getGrid().getIslandAt(e.getRightClicked().getLocation(), IslandLoadLevel.BASE_LOAD);
 
         if (plugin.getPlayers().getSuperiorPlayer(e.getPlayer()).hasBypassModeEnabled())
             return;
@@ -46,8 +48,8 @@ public class IslandOutsideListener implements Listener {
         if (!plugin.getSettings().isStopLeaving())
             return;
 
-        Island playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation());
-        Island entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation());
+        IslandBase playerIsland = plugin.getGrid().getIslandAt(e.getEntered().getLocation(), IslandLoadLevel.BASE_LOAD);
+        IslandBase entityIsland = plugin.getGrid().getIslandAt(e.getVehicle().getLocation(), IslandLoadLevel.BASE_LOAD);
 
         if (e.getEntered() instanceof Player && plugin.getPlayers().getSuperiorPlayer(e.getEntered()).hasBypassModeEnabled())
             return;
@@ -69,8 +71,8 @@ public class IslandOutsideListener implements Listener {
         if (from.getBlockX() == to.getBlockX() && from.getBlockZ() == to.getBlockZ())
             return;
 
-        Island toIsland = plugin.getGrid().getIslandAt(e.getTo());
-        Island fromIsland = plugin.getGrid().getIslandAt(e.getFrom());
+        IslandBase toIsland = plugin.getGrid().getIslandAt(e.getTo(), IslandLoadLevel.BASE_LOAD);
+        IslandBase fromIsland = plugin.getGrid().getIslandAt(e.getFrom(), IslandLoadLevel.BASE_LOAD);
 
         if (fromIsland != null && e.getVehicle().getWorld().equals(e.getTo().getWorld()) &&
                 (toIsland == null || toIsland.equals(fromIsland)) && !fromIsland.isInsideRange(e.getTo())) {

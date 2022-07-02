@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.player;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
@@ -69,7 +71,7 @@ public class CmdRate implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland())) {
+        if (!plugin.getSettings().isRateOwnIsland() && island.equals(superiorPlayer.getIsland(IslandLoadLevel.BASE_LOAD))) {
             Message.RATE_OWN_ISLAND.send(superiorPlayer);
             return;
         }
@@ -80,7 +82,7 @@ public class CmdRate implements ISuperiorCommand {
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
-        Island island = superiorPlayer.getIsland();
+        IslandBase island = superiorPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
                 (onlinePlayer, onlineIsland) -> onlineIsland != null &&

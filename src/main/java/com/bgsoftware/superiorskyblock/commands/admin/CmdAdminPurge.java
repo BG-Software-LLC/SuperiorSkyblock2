@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -9,7 +9,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,10 +58,10 @@ public class CmdAdminPurge implements ISuperiorCommand {
             long timeToPurge = parseLongSafe(args[2]);
             long currentTime = System.currentTimeMillis() / 1000;
 
-            List<Island> islands = new SequentialListBuilder<Island>().filter(island -> {
+            List<IslandBase> islands = new SequentialListBuilder<IslandBase>().filter(island -> {
                 long lastTimeUpdate = island.getLastTimeUpdate();
                 return lastTimeUpdate != -1 && currentTime - lastTimeUpdate >= timeToPurge;
-            }).build(plugin.getGrid().getIslands());
+            }).build(plugin.getGrid().getBaseIslands());
 
             if (islands.isEmpty()) {
                 Message.NO_ISLANDS_TO_PURGE.send(sender);

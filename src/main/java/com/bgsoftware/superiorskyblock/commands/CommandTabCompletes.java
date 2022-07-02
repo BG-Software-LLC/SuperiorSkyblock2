@@ -4,9 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
@@ -50,7 +52,7 @@ public class CommandTabCompletes {
                                                             String argument, boolean hideVanish,
                                                             BiPredicate<SuperiorPlayer, Island> islandPredicate) {
         SuperiorPlayer superiorPlayer = sender instanceof Player ? plugin.getPlayers().getSuperiorPlayer(sender) : null;
-        Island island = superiorPlayer == null ? null : superiorPlayer.getIsland();
+        IslandBase island = superiorPlayer == null ? null : superiorPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
         return getOnlinePlayersWithIslands(plugin, argument, hideVanish, (onlinePlayer, onlineIsland) ->
                 onlineIsland != null && (superiorPlayer == null || island == null || !island.equals(onlineIsland)) &&
                         islandPredicate.test(onlinePlayer, onlineIsland));

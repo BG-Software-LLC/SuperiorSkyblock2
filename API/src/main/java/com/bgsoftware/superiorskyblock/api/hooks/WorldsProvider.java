@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.hooks;
 
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -21,7 +22,18 @@ public interface WorldsProvider {
      * @param island      The island to check.
      */
     @Nullable
-    World getIslandsWorld(Island island, World.Environment environment);
+    default World getIslandsWorld(Island island, World.Environment environment) {
+        return this.getIslandsWorld((IslandBase) island, environment);
+    }
+
+    /**
+     * Get the world of an island by the environment.
+     *
+     * @param environment The world environment.
+     * @param island      The island to check.
+     */
+    @Nullable
+    World getIslandsWorld(IslandBase island, World.Environment environment);
 
     /**
      * Checks if the given world is an islands world.

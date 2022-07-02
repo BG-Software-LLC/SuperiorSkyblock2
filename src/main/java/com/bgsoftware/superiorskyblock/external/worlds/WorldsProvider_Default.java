@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.worlds;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.google.common.base.Preconditions;
@@ -15,6 +16,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 import org.bukkit.block.BlockFace;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Set;
 import java.util.UUID;
@@ -43,8 +45,9 @@ public class WorldsProvider_Default implements WorldsProvider {
         }
     }
 
+    @Nullable
     @Override
-    public World getIslandsWorld(Island island, World.Environment environment) {
+    public World getIslandsWorld(IslandBase island, World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return islandWorlds.get(environment);
     }
@@ -89,7 +92,7 @@ public class WorldsProvider_Default implements WorldsProvider {
 
         BlockPosition blockPosition = new SBlockPosition(location);
 
-        if (servedPositions.contains(blockPosition) || plugin.getGrid().getIslandAt(location) != null) {
+        if (servedPositions.contains(blockPosition) || plugin.getGrid().hasIslandAt(location)) {
             return getNextLocation(location.clone(), islandsHeight, maxIslandSize, islandOwner, islandUUID);
         }
 

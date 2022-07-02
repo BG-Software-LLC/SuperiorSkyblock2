@@ -53,7 +53,7 @@ public class IslandNames {
             return false;
         }
 
-        if (plugin.getGrid().getIsland(islandName) != null) {
+        if (plugin.getGrid().hasIsland(islandName)) {
             Message.ISLAND_ALREADY_EXIST.send(sender);
             return false;
         }

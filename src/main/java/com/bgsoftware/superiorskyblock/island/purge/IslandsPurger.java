@@ -1,17 +1,17 @@
 package com.bgsoftware.superiorskyblock.island.purge;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 
 import java.util.List;
 
 public interface IslandsPurger {
 
-    void scheduleIslandPurge(Island island);
+    void scheduleIslandPurge(IslandBase island);
 
-    void unscheduleIslandPurge(Island island);
+    void unscheduleIslandPurge(IslandBase island);
 
-    boolean isIslandPurgeScheduled(Island island);
+    boolean isIslandPurgeScheduled(IslandBase island);
 
-    List<Island> getScheduledPurgedIslands();
+    List<IslandBase> getScheduledPurgedIslands();
 
 }

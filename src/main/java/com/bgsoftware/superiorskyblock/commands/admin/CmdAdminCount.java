@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
@@ -81,7 +83,8 @@ public class CmdAdminCount implements IAdminIslandCommand {
             }
         } else if (args.length == 4) {
             SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[2]);
-            Island island = targetPlayer == null ? plugin.getGrid().getIsland(args[2]) : targetPlayer.getIsland();
+            IslandBase island = targetPlayer == null ? plugin.getGrid().getIsland(args[2], IslandLoadLevel.BASE_LOAD) :
+                    targetPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
 
             if (island != null) {
                 String materialArgument = args[3].toLowerCase(Locale.ENGLISH);

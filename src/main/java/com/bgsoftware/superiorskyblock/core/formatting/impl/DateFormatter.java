@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,7 +17,7 @@ public class DateFormatter implements IFormatter<Date> {
     public static void setDateFormatter(SuperiorSkyblockPlugin plugin, String dateFormat) {
         dateFormatter = new SimpleDateFormat(dateFormat);
         try {
-            for (Island island : plugin.getGrid().getIslands()) {
+            for (IslandBase island : plugin.getGrid().getBaseIslands()) {
                 island.updateDatesFormatter();
             }
         } catch (Exception error) {

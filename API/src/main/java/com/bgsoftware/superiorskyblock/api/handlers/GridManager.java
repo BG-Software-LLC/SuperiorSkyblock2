@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.api.handlers;
 
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -157,7 +159,7 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Island getIsland(UUID uuid);
 
     /**
-     * Get an island by it's uuid.
+     * Get an island by its uuid.
      *
      * @param uuid The uuid of the island.
      * @return The island with that UUID. May be null.
@@ -166,13 +168,47 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Island getIslandByUUID(UUID uuid);
 
     /**
-     * Get an island by it's name.
+     * Get an island by its uuid.
+     *
+     * @param uuid      The uuid of the island.
+     * @param loadLevel The level of the island.
+     * @return The island with that UUID. May be null.
+     */
+    @Nullable
+    <T extends IslandBase> T getIslandByUUID(UUID uuid, IslandLoadLevel<T> loadLevel);
+
+    /**
+     * Check whether an island with a specific uuid exists.
+     *
+     * @param uuid The uuid to check.
+     */
+    boolean hasIslandWithUUID(UUID uuid);
+
+    /**
+     * Get an island by its name.
      *
      * @param islandName The name to check.
      * @return The island with that name. May be null.
      */
     @Nullable
     Island getIsland(String islandName);
+
+    /**
+     * Get an island by its name.
+     *
+     * @param islandName The name to check.
+     * @return The island with that name. May be null.
+     */
+    @Nullable
+    <T extends IslandBase> T getIsland(String islandName, IslandLoadLevel<T> loadLevel);
+
+    /**
+     * Check whether an island with a specific name exists.
+     *
+     * @param islandName The name to check.
+     * @return The island with that name. May be null.
+     */
+    boolean hasIsland(String islandName);
 
     /**
      * Get an island at an exact position in the world.
@@ -184,6 +220,16 @@ public interface GridManager extends IDatabaseBridgeHolder {
     Island getIslandAt(@Nullable Location location);
 
     /**
+     * Get an island at an exact position in the world.
+     *
+     * @param location  The position to check.
+     * @param loadLevel The level of the island.
+     * @return The island at that position. May be null.
+     */
+    @Nullable
+    <T extends IslandBase> T getIslandAt(@Nullable Location location, IslandLoadLevel<T> loadLevel);
+
+    /**
      * Get an island from a chunk.
      *
      * @param chunk The chunk to check.
@@ -191,6 +237,30 @@ public interface GridManager extends IDatabaseBridgeHolder {
      */
     @Nullable
     Island getIslandAt(@Nullable Chunk chunk);
+
+    /**
+     * Get an island from a chunk.
+     *
+     * @param chunk     The chunk to check.
+     * @param loadLevel The level of the island.
+     * @return The island at that position. May be null.
+     */
+    @Nullable
+    <T extends IslandBase> T getIslandAt(@Nullable Chunk chunk, IslandLoadLevel<T> loadLevel);
+
+    /**
+     * Check whether an island exists in a location.
+     *
+     * @param location The position to check.
+     */
+    boolean hasIslandAt(@Nullable Location location);
+
+    /**
+     * Check whether an island exists in a chunk.
+     *
+     * @param chunk The chunk to check.
+     */
+    boolean hasIslandAt(@Nullable Chunk chunk);
 
     /**
      * Transfer an island's leadership to another owner.
@@ -236,6 +306,16 @@ public interface GridManager extends IDatabaseBridgeHolder {
     World getIslandsWorld(Island island, World.Environment environment);
 
     /**
+     * Get the world of an island by the environment.
+     * If the environment is not the normal and that environment is disabled in config, null will be returned.
+     *
+     * @param environment The world environment.
+     * @param island      The island to check.
+     */
+    @Nullable
+    World getIslandsWorld(IslandBase island, World.Environment environment);
+
+    /**
      * Checks if the given world is an islands world.
      * Can be the normal world, the nether world (if enabled in config) or the end world (if enabled in config)
      */
@@ -266,8 +346,26 @@ public interface GridManager extends IDatabaseBridgeHolder {
 
     /**
      * Get all the islands unordered.
+     *
+     * @deprecated See {@link #getBaseIslands()}
      */
+    @Deprecated
     List<Island> getIslands();
+
+    /**
+     * Get all the islands unordered.
+     */
+    List<IslandBase> getBaseIslands();
+
+    /**
+     * Get all the islands ordered by a specific sorting type.
+     *
+     * @param sortingType The sorting type to order the list by.
+     * @return A list of uuids of the island owners.
+     * @deprecated See {@link #getBaseIslands(SortingType)}
+     */
+    @Deprecated
+    List<Island> getIslands(SortingType sortingType);
 
     /**
      * Get all the islands ordered by a specific sorting type.
@@ -275,7 +373,7 @@ public interface GridManager extends IDatabaseBridgeHolder {
      * @param sortingType The sorting type to order the list by.
      * @return A list of uuids of the island owners.
      */
-    List<Island> getIslands(SortingType sortingType);
+    List<IslandBase> getBaseIslands(SortingType sortingType);
 
     /**
      * Get the block amount of a specific block.
@@ -333,6 +431,13 @@ public interface GridManager extends IDatabaseBridgeHolder {
     void addIslandToPurge(Island island);
 
     /**
+     * Make the island to be deleted when server stops.
+     *
+     * @param island The island to delete.
+     */
+    void addIslandToPurge(IslandBase island);
+
+    /**
      * Remove the island from being deleted when server stops.
      *
      * @param island The island to keep.
@@ -346,8 +451,16 @@ public interface GridManager extends IDatabaseBridgeHolder {
 
     /**
      * Get all the islands that will be deleted when the server stops.
+     *
+     * @deprecated See {@link #getBaseIslandsToPurge()}
      */
+    @Deprecated
     List<Island> getIslandsToPurge();
+
+    /**
+     * Get all the islands that will be deleted when the server stops.
+     */
+    List<IslandBase> getBaseIslandsToPurge();
 
     /**
      * Add a new sorting type to the registry of islands.

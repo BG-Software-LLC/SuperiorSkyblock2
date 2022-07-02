@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.api.missions;
 
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
@@ -8,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -251,7 +252,9 @@ public abstract class Mission<V> {
     @Nullable
     protected SuperiorPlayer getDataKey(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return islandMission ? superiorPlayer.getIsland() == null ? null : superiorPlayer.getIsland().getOwner() : superiorPlayer;
+        if (!islandMission) return superiorPlayer;
+        IslandBase islandBase = superiorPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
+        return islandBase == null ? null : islandBase.getOwner();
     }
 
     /**

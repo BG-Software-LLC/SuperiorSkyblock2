@@ -4,15 +4,17 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.persistence.EmptyPersistentDataContainer;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -196,8 +198,19 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
         return null;
     }
 
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIsland(IslandLoadLevel<T> loadLevel) {
+        return null;
+    }
+
     @Override
     public void setIsland(Island island) {
+        // Do nothing.
+    }
+
+    @Override
+    public void setIsland(IslandBase island) {
         // Do nothing.
     }
 

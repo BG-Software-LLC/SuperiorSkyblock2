@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
@@ -16,7 +17,7 @@ public interface NMSChunks {
 
     void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate);
 
-    void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish);
+    void deleteChunks(IslandBase island, List<ChunkPosition> chunkPositions, Runnable onFinish);
 
     CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions);
 

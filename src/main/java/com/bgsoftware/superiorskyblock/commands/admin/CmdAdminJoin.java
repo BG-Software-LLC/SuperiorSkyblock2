@@ -60,7 +60,7 @@ public class CmdAdminJoin implements IAdminIslandCommand {
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, Island island, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        if (superiorPlayer.getIsland() != null) {
+        if (superiorPlayer.hasIsland()) {
             Message.ALREADY_IN_ISLAND.send(superiorPlayer);
             return;
         }

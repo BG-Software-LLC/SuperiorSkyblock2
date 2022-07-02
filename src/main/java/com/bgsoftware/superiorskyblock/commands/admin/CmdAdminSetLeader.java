@@ -2,6 +2,8 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminPlayerCommand;
@@ -95,7 +97,7 @@ public class CmdAdminSetLeader implements IAdminPlayerCommand {
 
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Island playerIsland = targetPlayer.getIsland();
+        IslandBase playerIsland = targetPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
         return args.length != 4 ? Collections.emptyList() : CommandTabCompletes.getOnlinePlayers(plugin, args[2], false, onlinePlayer -> {
             Island onlineIsland = onlinePlayer.getIsland();
             return !onlinePlayer.equals(targetPlayer) && onlineIsland != null && !onlineIsland.equals(playerIsland) &&

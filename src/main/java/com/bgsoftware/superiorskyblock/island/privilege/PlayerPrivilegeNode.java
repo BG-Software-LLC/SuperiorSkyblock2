@@ -33,6 +33,10 @@ public class PlayerPrivilegeNode extends PrivilegeNodeAbstract {
         this.island = island;
     }
 
+    public SuperiorPlayer getSuperiorPlayer() {
+        return superiorPlayer;
+    }
+
     public void setIsland(Island island) {
         this.island = island;
     }

@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -32,38 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
-public interface Island extends Comparable<Island>, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
-
-    /*
-     *  General methods
-     */
-
-    /**
-     * Get the owner of the island.
-     */
-    SuperiorPlayer getOwner();
-
-    /**
-     * Get the unique-id of the island.
-     */
-    UUID getUniqueId();
-
-    /**
-     * Get the creation time of the island.
-     */
-    long getCreationTime();
-
-    /**
-     * Get the creation time of the island, in a formatted string.
-     */
-    String getCreationTimeDate();
-
-    /**
-     * Re-sync the island with a new dates formatter.
-     */
-    void updateDatesFormatter();
+public interface Island extends Comparable<Island>, IslandBase, IMissionsHolder, IPersistentDataHolder, IDatabaseBridgeHolder {
 
     /*
      *  Player related methods
@@ -255,11 +224,36 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
 
     /**
-     * Get the center location of the island, depends on the world environment.
+     * Reset all the chunks of the island (will make all chunks empty).
      *
-     * @param environment The environment.
+     * @param environment   The environment to reset chunks in.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
      */
-    Location getCenter(World.Environment environment);
+    void resetChunks(World.Environment environment, boolean onlyProtected);
+
+    /**
+     * Reset all the chunks of the island (will make all chunks empty).
+     *
+     * @param environment   The environment to reset chunks in.
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @param onFinish      Callback runnable.
+     */
+    void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     */
+    void resetChunks(boolean onlyProtected);
+
+    /**
+     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
+     *
+     * @param onlyProtected Whether only chunks inside the protected area should be reset.
+     * @param onFinish      Callback runnable.
+     */
+    void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
 
     /**
      * Get the members' teleport location of the island, depends on the world environment.
@@ -334,158 +328,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
     void setVisitorsLocation(@Nullable Location visitorsLocation);
 
-    /**
-     * Get the minimum location of the island.
+    /*
+     * Worlds related methods
      */
-    Location getMinimum();
-
-    /**
-     * Get the minimum protected location of the island.
-     */
-    Location getMinimumProtected();
-
-    /**
-     * Get the maximum location of the island.
-     */
-    Location getMaximum();
-
-    /**
-     * Get the minimum protected location of the island.
-     */
-    Location getMaximumProtected();
-
-    /**
-     * Get all the chunks of the island from all the environments.
-     */
-    List<Chunk> getAllChunks();
-
-    /**
-     * Get all the chunks of the island from all the environments.
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     */
-    List<Chunk> getAllChunks(boolean onlyProtected);
-
-    /**
-     * Get all the chunks of the island.
-     *
-     * @param environment The environment to get the chunks from.
-     */
-    List<Chunk> getAllChunks(World.Environment environment);
-
-    /**
-     * Get all the chunks of the island, including empty ones.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     */
-    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected);
-
-    /**
-     * Get all the chunks of the island.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     */
-    List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     */
-    List<Chunk> getLoadedChunks(boolean onlyProtected, boolean noEmptyChunks);
-
-    /**
-     * Get all the loaded chunks of the island.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     */
-    List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks);
-
-    /**
-     * Get all the chunks of the island asynchronized, including empty chunks.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
-     */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Get all the chunks of the island asynchronized.
-     *
-     * @param environment   The environment to get the chunks from.
-     * @param onlyProtected Whether only chunks inside the protected area should be returned.
-     * @param noEmptyChunks Should empty chunks be loaded or not?
-     * @param onChunkLoad   A consumer that will be ran when the chunk is loaded. Can be null.
-     */
-    List<CompletableFuture<Chunk>> getAllChunksAsync(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks, @Nullable Consumer<Chunk> onChunkLoad);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     */
-    void resetChunks(World.Environment environment, boolean onlyProtected);
-
-    /**
-     * Reset all the chunks of the island (will make all chunks empty).
-     *
-     * @param environment   The environment to reset chunks in.
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @param onFinish      Callback runnable.
-     */
-    void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish);
-
-    /**
-     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     */
-    void resetChunks(boolean onlyProtected);
-
-    /**
-     * Reset all the chunks of the island from all the worlds (will make all chunks empty).
-     *
-     * @param onlyProtected Whether only chunks inside the protected area should be reset.
-     * @param onFinish      Callback runnable.
-     */
-    void resetChunks(boolean onlyProtected, @Nullable Runnable onFinish);
-
-    /**
-     * Check if the location is inside the island's area.
-     *
-     * @param location The location to check.
-     */
-    boolean isInside(Location location);
-
-    /**
-     * Check if the location is inside the island's protected area.
-     *
-     * @param location The location to check.
-     */
-    boolean isInsideRange(Location location);
-
-    /**
-     * Check if the location is inside the island's protected area.
-     *
-     * @param location    The location to check.
-     * @param extraRadius Add extra radius to the protected range.
-     */
-    boolean isInsideRange(Location location, int extraRadius);
-
-    /**
-     * Check if the chunk is inside the island's protected area.
-     *
-     * @param chunk The chunk to check.
-     */
-    boolean isInsideRange(Chunk chunk);
 
     /**
      * Is the normal world enabled for the island?
@@ -617,28 +462,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
 
     /**
-     * Checks whether the island is the spawn island.
-     */
-    boolean isSpawn();
-
-    /**
-     * Get the name of the island.
-     */
-    String getName();
-
-    /**
-     * Set the name of the island.
-     *
-     * @param islandName The name to set.
-     */
-    void setName(String islandName);
-
-    /**
-     * Get the name of the island, unformatted.
-     */
-    String getRawName();
-
-    /**
      * Get the description of the island.
      */
     String getDescription();
@@ -704,23 +527,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     void updateIslandFly(SuperiorPlayer superiorPlayer);
 
     /**
-     * Get the island radius of the island.
-     */
-    int getIslandSize();
-
-    /**
-     * Set the radius of the island.
-     *
-     * @param islandSize The radius for the island.
-     */
-    void setIslandSize(int islandSize);
-
-    /**
-     * Get the island radius of the island that was set with a command.
-     */
-    int getIslandSizeRaw();
-
-    /**
      * Get the discord that is associated with the island.
      */
     String getDiscord();
@@ -768,16 +574,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param locked Whether the island should be locked to visitors.
      */
     void setLocked(boolean locked);
-
-    /**
-     * Checks whether the island is ignored in the top islands.
-     */
-    boolean isIgnored();
-
-    /**
-     * Set whether the island should be ignored in the top islands.
-     */
-    void setIgnored(boolean ignored);
 
     /**
      * Send a plain message to all the members of the island.
@@ -840,11 +636,6 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * Flag the island as a currently active island.
      */
     void setCurrentlyActive();
-
-    /**
-     * Get the last time the island was updated.
-     */
-    long getLastTimeUpdate();
 
     /**
      * Set the last time the island was updated.
@@ -1797,42 +1588,9 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      */
 
     /**
-     * Checks if a schematic was generated already.
-     *
-     * @param environment The environment to check.
-     */
-    boolean wasSchematicGenerated(World.Environment environment);
-
-    /**
-     * Set schematic generated flag to true.
-     *
-     * @param environment The environment to set.
-     */
-    void setSchematicGenerate(World.Environment environment);
-
-    /**
-     * Set schematic generated flag.
-     *
-     * @param environment The environment to set.
-     * @param generated   The flag to set.
-     */
-    void setSchematicGenerate(World.Environment environment, boolean generated);
-
-    /**
-     * Get the generated schematics flag.
-     */
-    int getGeneratedSchematicsFlag();
-
-    /**
      * Get the schematic that was used to create the island.
      */
     String getSchematicName();
-
-    /*
-     *  Island top methods
-     */
-
-    int getPosition(SortingType sortingType);
 
     /*
      *  Vault related methods

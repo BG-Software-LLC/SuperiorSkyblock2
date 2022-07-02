@@ -1,13 +1,13 @@
 package com.bgsoftware.superiorskyblock.commands;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +19,7 @@ public interface IAdminPlayerCommand extends ISuperiorCommand {
         if (!supportMultiplePlayers()) {
             SuperiorPlayer targetPlayer = CommandArguments.getPlayer(plugin, sender, args[2]);
             if (targetPlayer != null) {
-                Island playerIsland = targetPlayer.getIsland();
+                IslandBase playerIsland = targetPlayer.getIsland(IslandLoadLevel.BASE_LOAD);
 
                 if (requireIsland() && playerIsland == null) {
                     Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());

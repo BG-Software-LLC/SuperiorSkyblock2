@@ -66,7 +66,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
         if (targetPlayer == null)
             return;
 
-        if (targetPlayer.getIsland() != null) {
+        if (!targetPlayer.hasIsland()) {
             Message.PLAYER_ALREADY_IN_ISLAND.send(sender);
             return;
         }
@@ -96,7 +96,7 @@ public class CmdAdminAdd implements IAdminIslandCommand {
     @Override
     public List<String> adminTabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, Island island, String[] args) {
         return args.length == 4 ? CommandTabCompletes.getOnlinePlayers(plugin, args[2], false,
-                superiorPlayer -> superiorPlayer.getIsland() == null) : Collections.emptyList();
+                superiorPlayer -> !superiorPlayer.hasIsland()) : Collections.emptyList();
     }
 
 }

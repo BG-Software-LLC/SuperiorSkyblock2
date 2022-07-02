@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.core.database.bridge;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
@@ -58,7 +59,7 @@ public class IslandsDatabaseBridge {
         );
     }
 
-    public static void saveMemberRole(Island island, SuperiorPlayer superiorPlayer) {
+    public static void saveMemberRole(IslandBase island, SuperiorPlayer superiorPlayer) {
         island.getDatabaseBridge().updateObject("islands_members",
                 createFilter("island", island, new Pair<>("player", superiorPlayer.getUniqueId().toString())),
                 new Pair<>("role", superiorPlayer.getPlayerRole().getId())
@@ -156,7 +157,7 @@ public class IslandsDatabaseBridge {
                 createFilter("island", island));
     }
 
-    public static void saveName(Island island) {
+    public static void saveName(IslandBase island) {
         island.getDatabaseBridge().updateObject("islands",
                 createFilter("uuid", island),
                 new Pair<>("name", island.getName()));
@@ -168,7 +169,7 @@ public class IslandsDatabaseBridge {
                 new Pair<>("description", island.getDescription()));
     }
 
-    public static void saveSize(Island island) {
+    public static void saveSize(IslandBase island) {
         island.getDatabaseBridge().updateObject("islands_settings",
                 createFilter("island", island),
                 new Pair<>("size", island.getIslandSize()));
@@ -439,7 +440,7 @@ public class IslandsDatabaseBridge {
         );
     }
 
-    public static void saveGeneratedSchematics(Island island) {
+    public static void saveGeneratedSchematics(IslandBase island) {
         island.getDatabaseBridge().updateObject("islands",
                 createFilter("uuid", island),
                 new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()));
@@ -451,7 +452,7 @@ public class IslandsDatabaseBridge {
                 new Pair<>("dirty_chunks", ChunksTracker.serialize(island)));
     }
 
-    public static void saveDirtyChunks(Island island, Set<ChunkPosition> dirtyChunks) {
+    public static void saveDirtyChunks(IslandBase island, Set<ChunkPosition> dirtyChunks) {
         island.getDatabaseBridge().updateObject("islands",
                 createFilter("uuid", island),
                 new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks)));
@@ -676,6 +677,14 @@ public class IslandsDatabaseBridge {
     }
 
     private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others) {
+        List<Pair<String, Object>> filters = new LinkedList<>();
+        filters.add(new Pair<>(id, island.getUniqueId().toString()));
+        if (others != null)
+            filters.addAll(Arrays.asList(others));
+        return DatabaseFilter.fromFilters(filters);
+    }
+
+    private static DatabaseFilter createFilter(String id, IslandBase island, Pair<String, Object>... others) {
         List<Pair<String, Object>> filters = new LinkedList<>();
         filters.add(new Pair<>(id, island.getUniqueId().toString()));
         if (others != null)

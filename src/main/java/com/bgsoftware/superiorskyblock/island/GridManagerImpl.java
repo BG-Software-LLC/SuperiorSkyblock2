@@ -5,9 +5,11 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -20,7 +22,6 @@ import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
@@ -28,6 +29,11 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCreationAlgorithm;
+import com.bgsoftware.superiorskyblock.island.cache.IslandsCache;
+import com.bgsoftware.superiorskyblock.island.container.ForwardingIslandsContainer;
+import com.bgsoftware.superiorskyblock.island.container.IslandsContainerAccess;
+import com.bgsoftware.superiorskyblock.island.container.LazyIslandsContainer;
+import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
@@ -35,6 +41,7 @@ import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -49,6 +56,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -61,14 +69,16 @@ import java.util.function.Function;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class GridManagerImpl extends Manager implements GridManager {
 
-    private static final Function<Island, UUID> ISLAND_OWNERS_MAPPER = island -> island.getOwner().getUniqueId();
+    private static final int ISLANDS_LAZY_LOAD = 250;
+
+    private static final Function<IslandBase, UUID> ISLAND_OWNERS_MAPPER = island -> island.getOwner().getUniqueId();
 
     private final Set<UUID> pendingCreationTasks = Sets.newHashSet();
     private final Set<UUID> customWorlds = Sets.newHashSet();
 
     private final IslandsPurger islandsPurger;
     private final IslandPreviews islandPreviews;
-    private IslandsContainer islandsContainer;
+    private IslandsContainerAccess islandsContainer;
     private DatabaseBridge databaseBridge;
     private IslandCreationAlgorithm islandCreationAlgorithm;
 
@@ -93,7 +103,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     public void setIslandsContainer(@NotNull IslandsContainer islandsContainer) {
-        this.islandsContainer = islandsContainer;
+        this.islandsContainer = new ForwardingIslandsContainer(islandsContainer);
         pendingSortingTypes.forEach(sortingType -> islandsContainer.addSortingType(sortingType, false));
         pendingSortingTypes.clear();
     }
@@ -115,12 +125,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     public void syncUpgrades() {
-        getIslands().forEach(Island::updateUpgrades);
+        getBaseIslands().forEach(islandBase -> {
+            if (islandBase instanceof Island)
+                ((Island) islandBase).updateUpgrades();
+        });
     }
 
-    public void createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        Optional<Island> island = plugin.getFactory().createIsland(cache, resultSet);
-        island.ifPresent(this.islandsContainer::addIsland);
+    public Optional<Island> createIsland(CachedIslandInfo cachedIslandInfo, DatabaseResult resultSet) {
+        return plugin.getFactory().createIsland(cachedIslandInfo, resultSet);
     }
 
     @Override
@@ -340,7 +352,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public Island getIsland(int index, SortingType sortingType) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        return this.islandsContainer.getIslandAtPosition(index, sortingType);
+        return this.islandsContainer.getIslandAtPosition(index, sortingType, IslandLoadLevel.FULL_LOAD);
     }
 
     @Override
@@ -354,57 +366,110 @@ public class GridManagerImpl extends Manager implements GridManager {
     public Island getIsland(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(uuid);
-        return superiorPlayer == null ? null : getIsland(superiorPlayer);
+        return superiorPlayer == null ? null : superiorPlayer.getIsland();
     }
 
     @Override
     public Island getIslandByUUID(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
-        return this.islandsContainer.getIslandByUUID(uuid);
+        return this.getIslandByUUID(uuid, IslandLoadLevel.FULL_LOAD);
+    }
+
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIslandByUUID(UUID uuid, IslandLoadLevel<T> loadLevel) {
+        Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
+        Preconditions.checkNotNull(loadLevel, "loadLevel parameter cannot be null.");
+        return this.islandsContainer.getIslandByUUID(uuid, loadLevel);
+    }
+
+    @Override
+    public boolean hasIslandWithUUID(UUID uuid) {
+        Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
+        return this.getIslandByUUID(uuid, IslandLoadLevel.BASE_LOAD) != null;
     }
 
     @Override
     public Island getIsland(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        return getIsland(islandName, IslandLoadLevel.FULL_LOAD);
+    }
+
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIsland(String islandName, IslandLoadLevel<T> loadLevel) {
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         String inputName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
-        return getIslands().stream().filter(island -> island.getRawName().equalsIgnoreCase(inputName)).findFirst().orElse(null);
+        return this.islandsContainer.getBaseIslandsUnsorted().stream()
+                .filter(island -> island.getRawName().equalsIgnoreCase(inputName))
+                .findFirst()
+                .map(island -> getIslandByUUID(island.getUniqueId(), loadLevel))
+                .orElse(null);
+    }
+
+    @Override
+    public boolean hasIsland(String islandName) {
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        return this.getIsland(islandName, IslandLoadLevel.BASE_LOAD) != null;
     }
 
     @Override
     public Island getIslandAt(Location location) {
+        return this.getIslandAt(location, IslandLoadLevel.FULL_LOAD);
+    }
+
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIslandAt(@Nullable Location location, IslandLoadLevel<T> loadLevel) {
         if (location == null)
             return null;
 
         if (spawnIsland != null && spawnIsland.isInside(location))
-            return spawnIsland;
+            return loadLevel.getIslandType().cast(spawnIsland);
 
-        return this.islandsContainer.getIslandAt(location);
+        return this.islandsContainer.getIslandAt(location, loadLevel);
     }
 
     @Override
     public Island getIslandAt(Chunk chunk) {
+        return this.getIslandAt(chunk, IslandLoadLevel.FULL_LOAD);
+    }
+
+    @Nullable
+    @Override
+    public <T extends IslandBase> T getIslandAt(@Nullable Chunk chunk, IslandLoadLevel<T> loadLevel) {
         if (chunk == null)
             return null;
 
-        Island island;
+        T island;
 
         Location corner = chunk.getBlock(0, 100, 0).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        if ((island = getIslandAt(corner, loadLevel)) != null)
             return island;
 
         corner = chunk.getBlock(15, 100, 0).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        if ((island = getIslandAt(corner, loadLevel)) != null)
             return island;
 
         corner = chunk.getBlock(0, 100, 15).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        if ((island = getIslandAt(corner, loadLevel)) != null)
             return island;
 
         corner = chunk.getBlock(15, 100, 15).getLocation();
-        if ((island = getIslandAt(corner)) != null)
+        if ((island = getIslandAt(corner, loadLevel)) != null)
             return island;
 
         return null;
+    }
+
+    @Override
+    public boolean hasIslandAt(@Nullable Location location) {
+        return getIslandAt(location, IslandLoadLevel.BASE_LOAD) != null;
+    }
+
+    @Override
+    public boolean hasIslandAt(@Nullable Chunk chunk) {
+        return getIslandAt(chunk, IslandLoadLevel.BASE_LOAD) != null;
     }
 
     @Override
@@ -454,6 +519,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     public World getIslandsWorld(Island island, World.Environment environment) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+        return this.getIslandsWorld((IslandBase) island, environment);
+    }
+
+    @Nullable
+    @Override
+    public World getIslandsWorld(IslandBase island, World.Environment environment) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
     }
 
@@ -478,18 +551,31 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Deprecated
     public List<UUID> getAllIslands(SortingType sortingType) {
         return new SequentialListBuilder<UUID>()
-                .build(getIslands(sortingType), ISLAND_OWNERS_MAPPER);
+                .build(getBaseIslands(sortingType), ISLAND_OWNERS_MAPPER);
     }
 
     @Override
+    @Deprecated
     public List<Island> getIslands() {
         return this.islandsContainer.getIslandsUnsorted();
     }
 
     @Override
+    public List<IslandBase> getBaseIslands() {
+        return this.islandsContainer.getBaseIslandsUnsorted();
+    }
+
+    @Override
+    @Deprecated
     public List<Island> getIslands(SortingType sortingType) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
         return this.islandsContainer.getSortedIslands(sortingType);
+    }
+
+    @Override
+    public List<IslandBase> getBaseIslands(SortingType sortingType) {
+        Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
+        return this.islandsContainer.getSortedBaseIslands(sortingType);
     }
 
     @Override
@@ -547,6 +633,14 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     @Override
+    public void addIslandToPurge(IslandBase island) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
+        PluginDebugger.debug("Action: Purge Island, Island: " + island.getOwner().getName());
+        this.islandsPurger.scheduleIslandPurge(island);
+    }
+
+    @Override
     public void removeIslandFromPurge(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
@@ -563,6 +657,11 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public List<Island> getIslandsToPurge() {
+        return Lists.transform(getBaseIslandsToPurge(), island -> island.loadIsland(IslandLoadLevel.FULL_LOAD));
+    }
+
+    @Override
+    public List<IslandBase> getBaseIslandsToPurge() {
         return this.islandsPurger.getScheduledPurgedIslands();
     }
 
@@ -618,7 +717,34 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public IslandsContainer getIslandsContainer() {
-        return this.islandsContainer;
+        return this.islandsContainer.getContainer();
+    }
+
+    public void loadCache(Collection<Island> islands) {
+        List<Island> islandsToBeUnloaded = new LinkedList<>(islands);
+
+        long currentTime = System.currentTimeMillis() / 1000;
+
+        islandsToBeUnloaded.removeIf(island -> currentTime - island.getLastTimeUpdate() <= 604800);
+
+        if (!islandsToBeUnloaded.isEmpty() && islandsToBeUnloaded.size() > ISLANDS_LAZY_LOAD) {
+            IslandsContainer islandsContainer = this.islandsContainer.getContainer();
+            IslandsCache islandsCache = IslandsCache.of(plugin, islandsContainer, islandsToBeUnloaded);
+            this.islandsContainer = new LazyIslandsContainer(plugin, islandsContainer, islandsCache);
+
+            // Convert islands to IslandBases.
+            islandsToBeUnloaded.forEach(island -> {
+                IslandBase islandBase = new SIslandBase(island.getOwner(), island.getUniqueId(),
+                        island.getCenter(World.Environment.NORMAL), island.getRawName(), island.getCreationTime(),
+                        Value.fixed(island.getIslandSize()), island.getGeneratedSchematicsFlag());
+                this.islandsContainer.addIsland(islandBase);
+            });
+
+            islands = new ArrayList<>(islands);
+            islands.removeAll(islandsToBeUnloaded);
+        }
+
+        islands.forEach(this.islandsContainer::addIsland);
     }
 
     @Override
@@ -631,7 +757,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         do {
             uuid = UUID.randomUUID();
-        } while (getIslandByUUID(uuid) != null || plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(uuid) != null);
+        } while (hasIslandWithUUID(uuid) || plugin.getPlayers().getPlayersContainer().getSuperiorPlayer(uuid) != null);
 
         return uuid;
     }
@@ -681,9 +807,13 @@ public class GridManagerImpl extends Manager implements GridManager {
                 .filter(Objects::nonNull)
                 .build(Bukkit.getOnlinePlayers(), player -> plugin.getPlayers().getSuperiorPlayer(player).getIsland());
 
+        List<Island> fullLoadedIslands = new SequentialListBuilder<IslandBase>()
+                .filter(islandBase -> islandBase instanceof Island)
+                .map(getBaseIslands(), islandBase -> (Island) islandBase);
+
         List<Island> modifiedIslands = new SequentialListBuilder<Island>()
                 .filter(IslandsDatabaseBridge::isModified)
-                .build(getIslands());
+                .build(fullLoadedIslands);
 
         if (!onlineIslands.isEmpty())
             onlineIslands.forEach(Island::updateLastTime);
@@ -691,7 +821,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (!modifiedIslands.isEmpty())
             modifiedIslands.forEach(IslandsDatabaseBridge::executeFutureSaves);
 
-        getIslands().forEach(Island::removeEffects);
+        fullLoadedIslands.forEach(Island::removeEffects);
     }
 
     private void setLastIsland(SBlockPosition lastIsland) {

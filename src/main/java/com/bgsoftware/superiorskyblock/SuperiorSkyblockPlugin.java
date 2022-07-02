@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
@@ -285,7 +286,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     SuperiorPlayer superiorPlayer = playersHandler.getSuperiorPlayer(player);
                     superiorPlayer.updateLastTimeStatus();
                     Island island = gridHandler.getIslandAt(superiorPlayer.getLocation());
-                    Island playerIsland = superiorPlayer.getIsland();
+                    Island playerIsland = superiorPlayer.getIsland(IslandLoadLevel.FULL_LOAD);
 
                     if (superiorPlayer.hasIslandFlyEnabled()) {
                         if (island != null && island.hasPermission(superiorPlayer, IslandPrivileges.FLY)) {

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
@@ -14,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTracker
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -80,7 +82,6 @@ public class SpawnIsland implements Island {
     private final Location maxLocation;
 
     private Biome biome = Biome.PLAINS;
-
 
     public SpawnIsland(SuperiorSkyblockPlugin plugin) {
         SpawnIsland.plugin = plugin;
@@ -599,6 +600,11 @@ public class SpawnIsland implements Island {
     @Override
     public String getRawName() {
         return "";
+    }
+
+    @Override
+    public <T extends IslandBase> T loadIsland(IslandLoadLevel<T> loadLevel) {
+        return (T) this;
     }
 
     @Override

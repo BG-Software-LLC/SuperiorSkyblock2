@@ -3,14 +3,13 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.command.CommandSender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +56,12 @@ public class CmdAccept implements ISuperiorCommand {
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+
+        if (superiorPlayer.hasIsland()) {
+            Message.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
+            return;
+        }
+
         SuperiorPlayer targetPlayer = plugin.getPlayers().getSuperiorPlayer(args[1]);
         Island island;
 
@@ -70,11 +75,6 @@ public class CmdAccept implements ISuperiorCommand {
                 Message.NO_ISLAND_INVITE.send(superiorPlayer);
                 return;
             }
-        }
-
-        if (superiorPlayer.getIsland() != null) {
-            Message.JOIN_WHILE_IN_ISLAND.send(superiorPlayer);
-            return;
         }
 
         if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {

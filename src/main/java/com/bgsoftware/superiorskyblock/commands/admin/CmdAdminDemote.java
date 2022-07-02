@@ -55,9 +55,7 @@ public class CmdAdminDemote implements IAdminPlayerCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, SuperiorPlayer targetPlayer, String[] args) {
-        Island island = targetPlayer.getIsland();
-
-        if (island == null) {
+        if (!targetPlayer.hasIsland()) {
             Message.INVALID_ISLAND_OTHER.send(sender, targetPlayer.getName());
             return;
         }
@@ -68,6 +66,8 @@ public class CmdAdminDemote implements IAdminPlayerCommand {
             Message.DEMOTE_LEADER.send(sender);
             return;
         }
+
+        Island island = targetPlayer.getIsland();
 
         PlayerRole previousRole = currentRole;
         int roleLimit;

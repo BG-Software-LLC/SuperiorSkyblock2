@@ -7,7 +7,9 @@ import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
 import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
+import com.bgsoftware.superiorskyblock.api.island.level.IslandLoadLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Singleton;
@@ -53,7 +55,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -96,6 +97,9 @@ public class PlayersListener implements Listener {
 
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
+
+        // We want to manually load the island.
+        superiorPlayer.getIsland(IslandLoadLevel.FULL_LOAD);
 
         // Updating the name of the player.
         if (!superiorPlayer.getName().equals(e.getPlayer().getName())) {
@@ -157,11 +161,12 @@ public class PlayersListener implements Listener {
             return;
 
         // Removing coop status from other islands.
-        for (Island _island : plugin.getGrid().getIslands()) {
-            if (_island.isCoop(superiorPlayer)) {
-                if (plugin.getEventsBus().callIslandUncoopPlayerEvent(_island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
-                    _island.removeCoop(superiorPlayer);
-                    IslandUtils.sendMessage(_island, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
+        for (IslandBase islandBase : plugin.getGrid().getBaseIslands()) {
+            if (islandBase instanceof Island && ((Island) islandBase).isCoop(superiorPlayer)) {
+                Island island = (Island) islandBase;
+                if (plugin.getEventsBus().callIslandUncoopPlayerEvent(island, null, superiorPlayer, IslandUncoopPlayerEvent.UncoopReason.SERVER_LEAVE)) {
+                    island.removeCoop(superiorPlayer);
+                    IslandUtils.sendMessage(island, Message.UNCOOP_LEFT_ANNOUNCEMENT, Collections.emptyList(), superiorPlayer.getName());
                 }
             }
         }

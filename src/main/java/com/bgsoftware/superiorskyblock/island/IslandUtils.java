@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.island;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
+import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -39,7 +40,7 @@ public class IslandUtils {
 
     }
 
-    public static List<ChunkPosition> getChunkCoords(Island island, World world, boolean onlyProtected, boolean noEmptyChunks) {
+    public static List<ChunkPosition> getChunkCoords(IslandBase island, World world, boolean onlyProtected, boolean noEmptyChunks) {
         List<ChunkPosition> chunkCoords = new LinkedList<>();
 
         Location min = onlyProtected ? island.getMinimumProtected() : island.getMinimum();
@@ -56,7 +57,7 @@ public class IslandUtils {
         return Collections.unmodifiableList(chunkCoords);
     }
 
-    public static Map<World, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
+    public static Map<World, List<ChunkPosition>> getChunkCoords(IslandBase island, boolean onlyProtected, boolean noEmptyChunks) {
         Map<World, List<ChunkPosition>> chunkCoords = new HashMap<>();
 
         {
@@ -91,7 +92,7 @@ public class IslandUtils {
         return chunkCoords;
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(IslandBase island,
                                                                    World world,
                                                                    boolean onlyProtected,
                                                                    boolean noEmptyChunks,
@@ -104,7 +105,7 @@ public class IslandUtils {
                 });
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(IslandBase island,
                                                                    World world,
                                                                    boolean onlyProtected,
                                                                    boolean noEmptyChunks,
@@ -115,7 +116,7 @@ public class IslandUtils {
                         ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
 
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
+    public static List<CompletableFuture<Chunk>> getAllChunksAsync(IslandBase island,
                                                                    boolean onlyProtected,
                                                                    boolean noEmptyChunks,
                                                                    ChunkLoadReason chunkLoadReason,
