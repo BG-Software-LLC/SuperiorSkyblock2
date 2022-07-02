@@ -239,9 +239,10 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         compoundValue.put("pitch", new FloatTag(pitch));
         compoundValue.put("version", new StringTag(ServerVersion.getBukkitVersion()));
 
-        SuperiorSchematic schematic = new SuperiorSchematic(schematicName, new CompoundTag(compoundValue));
+        CompoundTag schematicTag = new CompoundTag(compoundValue);
+        SuperiorSchematic schematic = new SuperiorSchematic(schematicName, schematicTag);
         this.schematicsContainer.addSchematic(schematic);
-        saveIntoFile(schematicName, schematic);
+        saveIntoFile(schematicName, schematicTag);
 
         if (runnable != null)
             runnable.run();
@@ -299,7 +300,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
         return schematic;
     }
 
-    private void saveIntoFile(String name, SuperiorSchematic schematic) {
+    private void saveIntoFile(String name, CompoundTag schematicTag) {
         try {
             File file = new File(plugin.getDataFolder(), "schematics/" + name + ".schematic");
 
@@ -310,7 +311,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             file.createNewFile();
 
             try (DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
-                schematic.getTag().write(writer);
+                schematicTag.write(writer);
             }
         } catch (IOException ex) {
             ex.printStackTrace();
