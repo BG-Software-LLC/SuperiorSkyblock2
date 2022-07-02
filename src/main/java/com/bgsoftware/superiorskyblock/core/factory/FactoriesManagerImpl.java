@@ -32,7 +32,7 @@ import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandBlocksTrack
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
-import com.bgsoftware.superiorskyblock.island.persistence.PersistentDataContainerImpl;
+import com.bgsoftware.superiorskyblock.core.persistence.PersistentDataContainerImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.google.common.base.Preconditions;

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.island.persistence;
+package com.bgsoftware.superiorskyblock.core.persistence;
 
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
-
 
     private final E holder;
     private final Consumer<E> saveFunction;

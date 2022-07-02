@@ -20,11 +20,11 @@ import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridg
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -37,7 +37,6 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -53,7 +52,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
     private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
-    private final PersistentDataContainer persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
+    @Nullable
+    private PersistentDataContainer persistentDataContainer; // Lazy loading
 
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final UUID uuid;
@@ -708,6 +708,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public PersistentDataContainer getPersistentDataContainer() {
+        if (persistentDataContainer == null)
+            persistentDataContainer = plugin.getFactory().createPersistentDataContainer(this);
         return persistentDataContainer;
     }
 
@@ -798,7 +800,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
         this.completedMissions.putAll(cachedPlayerInfo.completedMissions);
         if (cachedPlayerInfo.persistentData.length > 0)
-            this.persistentDataContainer.load(cachedPlayerInfo.persistentData);
+            getPersistentDataContainer().load(cachedPlayerInfo.persistentData);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.bgsoftware.superiorskyblock.island.persistence;
+package com.bgsoftware.superiorskyblock.core.persistence;
 
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataTypeContext;
