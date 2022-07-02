@@ -41,6 +41,7 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
 
     private static final Pattern ISLAND_PLACEHOLDER_PATTERN = Pattern.compile("island_(.+)");
     private static final Pattern PLAYER_PLACEHOLDER_PATTERN = Pattern.compile("player_(.+)");
+    private static final Pattern LOCATION_PLACEHOLDER_PATTERN = Pattern.compile("location_(.+)");
     private static final Pattern PERMISSION_PLACEHOLDER_PATTERN = Pattern.compile("island_permission_(.+)");
     private static final Pattern UPGRADE_PLACEHOLDER_PATTERN = Pattern.compile("island_upgrade_(.+)");
     private static final Pattern COUNT_PLACEHOLDER_PATTERN = Pattern.compile("island_count_(.+)");
@@ -236,20 +237,25 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
 
         Optional<String> placeholderResult = Optional.empty();
 
+        Matcher matcher;
+
         if (superiorPlayer != null) {
             PlayerPlaceholderParser customPlayerParser = CUSTOM_PLAYER_PARSERS.get(placeholder);
             if (customPlayerParser != null) {
                 placeholderResult = Optional.ofNullable(customPlayerParser.apply(superiorPlayer));
             } else {
-                IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(placeholder);
-                if (customIslandParser != null)
-                    placeholderResult = Optional.ofNullable(customIslandParser.apply(superiorPlayer.getIsland(), superiorPlayer));
+                boolean isLocationPlaceholder = placeholder.startsWith("location_");
+                IslandPlaceholderParser customIslandParser = CUSTOM_ISLAND_PARSERS.get(
+                        isLocationPlaceholder ? placeholder.substring(9) : placeholder);
+                if (customIslandParser != null) {
+                    Island island = isLocationPlaceholder ? plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) :
+                            superiorPlayer.getIsland();
+                    placeholderResult = Optional.ofNullable(customIslandParser.apply(island, superiorPlayer));
+                }
             }
         }
 
         if (!placeholderResult.isPresent()) {
-            Matcher matcher;
-
             if ((matcher = PLAYER_PLACEHOLDER_PATTERN.matcher(placeholder)).matches()) {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
                 placeholderResult = parsePlaceholdersForPlayer(superiorPlayer, subPlaceholder);
