@@ -6,16 +6,16 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.StackedBlocksDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.StackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -78,7 +78,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public int getStackedBlockAmount(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         StackedBlock stackedBlock = this.stackedBlocksContainer.getStackedBlock(location);
         return stackedBlock == null ? 1 : stackedBlock.getAmount();
     }
@@ -86,7 +87,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public Key getStackedBlockKey(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         StackedBlock stackedBlock = this.stackedBlocksContainer.getStackedBlock(location);
         return stackedBlock == null ? null : stackedBlock.getBlockKey();
     }
@@ -100,7 +102,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public boolean setStackedBlock(Location location, Key blockKey, int amount) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
         Preconditions.checkNotNull(blockKey, "blockKey parameter cannot be null.");
 
         PluginDebugger.debug("Action: Set Block Amount, Block: " + blockKey + ", Amount: " + amount);
@@ -133,7 +136,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public int removeStackedBlock(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
         StackedBlock oldStackedBlock = this.stackedBlocksContainer.removeStackedBlock(location);
 
@@ -196,7 +200,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void updateStackedBlockHologram(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.getStackedBlock(location);
         if (stackedBlock != null) {
@@ -219,7 +224,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void removeStackedBlockHologram(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.getStackedBlock(location);
         if (stackedBlock != null) {

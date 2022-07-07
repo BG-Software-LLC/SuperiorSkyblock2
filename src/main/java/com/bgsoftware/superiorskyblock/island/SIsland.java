@@ -29,6 +29,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -2622,7 +2623,8 @@ public class SIsland implements Island {
     public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
 
         PluginDebugger.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " +
                 Formatters.LOCATION_FORMATTER.format(location));

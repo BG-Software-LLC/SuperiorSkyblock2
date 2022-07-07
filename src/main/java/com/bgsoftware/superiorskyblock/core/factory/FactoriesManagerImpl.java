@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgori
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
@@ -27,12 +28,12 @@ import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.persistence.PersistentDataContainerImpl;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
-import com.bgsoftware.superiorskyblock.core.persistence.PersistentDataContainerImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.google.common.base.Preconditions;
@@ -111,7 +112,8 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public BlockPosition createBlockPosition(Location location) {
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         return new SBlockPosition(location);
     }
 

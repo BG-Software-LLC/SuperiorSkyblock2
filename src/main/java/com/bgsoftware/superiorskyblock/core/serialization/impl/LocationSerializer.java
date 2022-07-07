@@ -21,7 +21,7 @@ public class LocationSerializer implements ISerializer<Location, String> {
     @NotNull
     @Override
     public String serialize(@Nullable Location serializable) {
-        return serializable == null ? "" : getWorldName(serializable) + separator +
+        return serializable == null ? "" : LazyWorldLocation.getWorldName(serializable) + separator +
                 serializable.getX() + separator +
                 serializable.getY() + separator +
                 serializable.getZ() + separator +
@@ -50,11 +50,6 @@ public class LocationSerializer implements ISerializer<Location, String> {
             PluginDebugger.debug(ex);
             return null;
         }
-    }
-
-    private static String getWorldName(Location location) {
-        return location instanceof LazyWorldLocation ? ((LazyWorldLocation) location).getWorldName() :
-                location.getWorld().getName();
     }
 
 }

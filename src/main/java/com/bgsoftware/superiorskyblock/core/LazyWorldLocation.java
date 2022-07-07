@@ -28,4 +28,9 @@ public class LazyWorldLocation extends Location {
         return worldName;
     }
 
+    public static String getWorldName(Location location) {
+        return location instanceof LazyWorldLocation ? ((LazyWorldLocation) location).getWorldName() :
+                location.getWorld().getName();
+    }
+
 }

@@ -25,7 +25,7 @@ public class ChunkPosition {
     }
 
     public static ChunkPosition of(Location location) {
-        return of(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        return of(LazyWorldLocation.getWorldName(location), location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 
     public static ChunkPosition of(Chunk chunk) {
