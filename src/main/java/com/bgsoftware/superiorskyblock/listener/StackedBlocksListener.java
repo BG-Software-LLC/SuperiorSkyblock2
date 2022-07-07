@@ -108,6 +108,9 @@ public class StackedBlocksListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockStack(BlockPlaceEvent e) {
+        if (e.getBlockAgainst().equals(e.getBlock()))
+            return;
+
         if (plugin.getStackedBlocks().getStackedBlockAmount(e.getBlock()) > 1)
             plugin.getStackedBlocks().setStackedBlock(e.getBlock(), 1);
 
