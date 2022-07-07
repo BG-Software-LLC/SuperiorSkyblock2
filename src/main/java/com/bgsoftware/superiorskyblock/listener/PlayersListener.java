@@ -53,7 +53,6 @@ import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -512,7 +511,7 @@ public class PlayersListener implements Listener {
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
                         ((!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, false)) ||
-                                (!plugin.getSettings().isCoopDamage() && island.isVisitor(targetPlayer, true))))
+                                (!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer))))
                     e.setCancelled(true);
             }
 
