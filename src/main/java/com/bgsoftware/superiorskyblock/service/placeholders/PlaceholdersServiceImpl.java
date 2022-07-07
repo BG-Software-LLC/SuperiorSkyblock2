@@ -263,10 +263,9 @@ public class PlaceholdersServiceImpl implements PlaceholdersService {
                 String subPlaceholder = matcher.group(1).toLowerCase(Locale.ENGLISH);
                 Island island = superiorPlayer == null ? null : subPlaceholder.startsWith("location_") ?
                         plugin.getGrid().getIslandAt(superiorPlayer.getLocation()) : superiorPlayer.getIsland();
-
-                subPlaceholder = subPlaceholder.replace("location_", "");
-
-                placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer, placeholder, subPlaceholder);
+                placeholderResult = parsePlaceholdersForIsland(island, superiorPlayer,
+                        placeholder.replace("location_", ""),
+                        subPlaceholder.replace("location_", ""));
             }
         }
 
