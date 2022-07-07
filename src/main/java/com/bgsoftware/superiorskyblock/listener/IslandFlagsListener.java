@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.destroystokyo.paper.event.entity.PreCreatureSpawnEvent;
@@ -18,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
 import org.bukkit.entity.Ghast;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Wither;
@@ -43,6 +45,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -222,10 +225,12 @@ public class IslandFlagsListener implements Listener {
             if (!preventAction(e.getEntity().getLocation(), IslandFlags.PVP))
                 return;
 
-            e.getEntity().getNearbyEntities(2, 2, 2).forEach(entity -> {
-                if (entity instanceof Player && entity.getUniqueId().equals(shooterPlayer.getUniqueId()))
-                    ((Player) entity).removePotionEffect(PotionEffectType.POISON);
-            });
+            List<Entity> nearbyEntities = e.getEntity().getNearbyEntities(2, 2, 2);
+
+            BukkitExecutor.sync(() -> nearbyEntities.forEach(entity -> {
+                if (entity instanceof LivingEntity && !entity.getUniqueId().equals(shooterPlayer.getUniqueId()))
+                    ((LivingEntity) entity).removePotionEffect(PotionEffectType.POISON);
+            }), 1L);
         });
     }
 
