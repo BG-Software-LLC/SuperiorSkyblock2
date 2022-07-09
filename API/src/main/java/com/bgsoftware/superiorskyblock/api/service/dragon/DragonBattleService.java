@@ -1,11 +1,19 @@
 package com.bgsoftware.superiorskyblock.api.service.dragon;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
 
 import javax.annotation.Nullable;
 
 public interface DragonBattleService {
+
+    /**
+     * Prepare an end world for dragon fights.
+     *
+     * @param world The world to prepare.
+     */
+    void prepareEndWorld(World world);
 
     /**
      * Get the current active ender dragon of an island.

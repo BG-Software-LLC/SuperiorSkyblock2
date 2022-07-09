@@ -39,7 +39,7 @@ public class WorldsProvider_Default implements WorldsProvider {
         if (plugin.getSettings().getWorlds().getEnd().isEnabled()) {
             World endWorld = loadWorld(plugin.getSettings().getWorlds().getEnd().getName(), difficulty, World.Environment.THE_END);
             if (plugin.getSettings().getWorlds().getEnd().isDragonFight())
-                plugin.getNMSDragonFight().prepareEndWorld(endWorld);
+                plugin.getServices().getDragonBattleService().prepareEndWorld(endWorld);
         }
     }
 
