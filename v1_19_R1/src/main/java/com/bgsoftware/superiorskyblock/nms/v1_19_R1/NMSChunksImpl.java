@@ -54,7 +54,6 @@ import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.chunk.NibbleArray;
 import net.minecraft.world.level.chunk.PalettedContainerRO;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Biome;
@@ -428,8 +427,6 @@ public final class NMSChunksImpl implements NMSChunks {
                 }
             }
         }
-
-        Bukkit.broadcastMessage(chunkPosition + ": " + blockCounts);
 
         return new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
     }
