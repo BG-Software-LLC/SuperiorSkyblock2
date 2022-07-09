@@ -8,6 +8,7 @@ import org.bukkit.Chunk;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,6 +27,7 @@ public interface NMSChunks {
 
     void refreshLights(Chunk chunk, List<SchematicBlock> blockData);
 
+    @Nullable
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);
 
     void startTickingChunk(Island island, Chunk chunk, boolean stop);

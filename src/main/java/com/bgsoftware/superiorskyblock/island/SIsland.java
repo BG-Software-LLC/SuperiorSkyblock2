@@ -898,6 +898,7 @@ public class SIsland implements Island {
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
         return new SequentialListBuilder<Chunk>()
+                .filter(Objects::nonNull)
                 .build(IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks), plugin.getNMSChunks()::getChunkIfLoaded);
     }
 
