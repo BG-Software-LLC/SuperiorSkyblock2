@@ -3,12 +3,14 @@ package com.bgsoftware.superiorskyblock.world.event;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.listener.EntityTrackingListener;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
-import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.google.common.base.Preconditions;
 import org.bukkit.Chunk;
@@ -50,8 +52,10 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
         if (cropGrowthEnabled && island.isInsideRange(chunk))
             plugin.getNMSChunks().startTickingChunk(island, chunk, false);
 
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld(), chunk.getX(), chunk.getZ());
+
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
-            ChunksTracker.markDirty(island, chunk, true);
+            ChunksTracker.markDirty(island, chunkPosition, true);
 
         BukkitExecutor.sync(() -> {
             // We want to delete old holograms of stacked blocks + count entities for the chunk
@@ -78,6 +82,8 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                 }, 20L);
             }
         }
+
+        DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);
     }

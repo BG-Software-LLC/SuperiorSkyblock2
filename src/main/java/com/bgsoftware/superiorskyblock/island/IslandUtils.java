@@ -53,7 +53,7 @@ public class IslandUtils {
             }
         }
 
-        return Collections.unmodifiableList(chunkCoords);
+        return chunkCoords;
     }
 
     public static Map<World, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
@@ -98,6 +98,7 @@ public class IslandUtils {
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    BiConsumer<Chunk, Throwable> whenComplete) {
         return new SequentialListBuilder<CompletableFuture<Chunk>>()
+                .mutable()
                 .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition -> {
                     CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, null);
                     return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
@@ -111,6 +112,7 @@ public class IslandUtils {
                                                                    ChunkLoadReason chunkLoadReason,
                                                                    Consumer<Chunk> onChunkLoad) {
         return new SequentialListBuilder<CompletableFuture<Chunk>>()
+                .mutable()
                 .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition ->
                         ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
@@ -143,7 +145,7 @@ public class IslandUtils {
             chunkCoords.addAll(getAllChunksAsync(island, registeredWorld, onlyProtected, noEmptyChunks, chunkLoadReason, onChunkLoad));
         }
 
-        return Collections.unmodifiableList(chunkCoords);
+        return chunkCoords;
     }
 
     public static void updateIslandFly(Island island, SuperiorPlayer superiorPlayer) {

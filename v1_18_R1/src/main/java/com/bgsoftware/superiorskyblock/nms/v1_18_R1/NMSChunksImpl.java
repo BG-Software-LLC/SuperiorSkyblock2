@@ -66,8 +66,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -239,12 +241,27 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
-        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                                    Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
         List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
+        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
 
-        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
-                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+        Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
+        while (chunkPositionsIterator.hasNext()) {
+            ChunkPosition chunkPosition = chunkPositionsIterator.next();
+            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.get(chunkPosition);
+            if (cachedCalculatedChunk != null) {
+                allCalculatedChunks.add(cachedCalculatedChunk);
+                chunkPositionsIterator.remove();
+            } else {
+                chunksCoords.add(new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+            }
+        }
+
+        if (chunkPositions.isEmpty())
+            return CompletableFuture.completedFuture(allCalculatedChunks);
+
+        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
 
         WorldServer worldServer = new WorldServer(((CraftWorld) chunkPositions.get(0).getWorld()).getHandle());
 
@@ -302,7 +319,9 @@ public class NMSChunksImpl implements NMSChunks {
 
             ChunkCoordIntPair chunkCoords = unloadedChunkCompound.getChunkCoords();
             ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunkCoords.getX(), chunkCoords.getZ());
-            allCalculatedChunks.add(calculateChunk(chunkPosition, chunkSections));
+            CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
+            allCalculatedChunks.add(calculatedChunk);
+            unloadedChunksCache.put(chunkPosition, calculatedChunk);
         });
 
         return completableFuture;

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public interface NMSChunks {
@@ -19,7 +20,8 @@ public interface NMSChunks {
 
     void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish);
 
-    CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions);
+    CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                             Map<ChunkPosition, CalculatedChunk> unloadedChunksCache);
 
     void injectChunkSections(Chunk chunk);
 
