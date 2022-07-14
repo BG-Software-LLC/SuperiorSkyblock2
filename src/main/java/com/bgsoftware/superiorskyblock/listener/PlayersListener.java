@@ -458,21 +458,25 @@ public class PlayersListener implements Listener {
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
-                player.setPlayerTime(0, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
-                player.setPlayerTime(6000, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
-                player.setPlayerTime(14000, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
-                player.setPlayerTime(18000, false);
-            }
+            BukkitExecutor.sync(() -> {
+                // Update player time and player weather with a delay.
+                // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
+                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
+                    player.setPlayerTime(0, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
+                    player.setPlayerTime(6000, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
+                    player.setPlayerTime(14000, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
+                    player.setPlayerTime(18000, false);
+                }
 
-            if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
-                player.setPlayerWeather(WeatherType.CLEAR);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
-                player.setPlayerWeather(WeatherType.DOWNFALL);
-            }
+                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
+                    player.setPlayerWeather(WeatherType.CLEAR);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
+                    player.setPlayerWeather(WeatherType.DOWNFALL);
+                }
+            }, 1L);
         }
 
         toIsland.applyEffects(superiorPlayer);
