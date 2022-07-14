@@ -250,14 +250,14 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                         return false;
                     }
 
-                    String commandLabel = command.getAliases().get(0);
-
                     if (sender instanceof Player) {
                         UUID uuid = ((Player) sender).getUniqueId();
                         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid);
                         if (!superiorPlayer.hasPermission("superior.admin.bypass.cooldowns")) {
-                            Pair<Integer, String> commandCooldown = plugin.getSettings().getCommandsCooldown().get(commandLabel);
+                            Pair<Integer, String> commandCooldown = getCooldown(command);
                             if (commandCooldown != null) {
+                                String commandLabel = command.getAliases().get(0);
+
                                 Map<String, Long> playerCooldowns = commandsCooldown.get(uuid);
                                 long timeNow = System.currentTimeMillis();
 
@@ -308,7 +308,6 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return false;
         }
 
-
         @Override
         public List<String> tabComplete(CommandSender sender, String label, String[] args) {
             if (args.length > 0) {
@@ -336,6 +335,17 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             return list;
         }
 
+    }
+
+    @Nullable
+    private Pair<Integer, String> getCooldown(SuperiorCommand command) {
+        for (String alias : command.getAliases()) {
+            Pair<Integer, String> commandCooldown = plugin.getSettings().getCommandsCooldown().get(alias);
+            if (commandCooldown != null)
+                return commandCooldown;
+        }
+
+        return null;
     }
 
 }
