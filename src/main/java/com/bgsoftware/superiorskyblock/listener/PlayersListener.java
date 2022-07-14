@@ -558,15 +558,17 @@ public class PlayersListener implements Listener {
 
     /* CHAT */
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e) {
+        // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
         PlayerChat playerChat = PlayerChat.getChatListener(e.getPlayer());
-
         if (playerChat != null && playerChat.supply(e.getMessage())) {
             e.setCancelled(true);
-            return;
         }
+    }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 
