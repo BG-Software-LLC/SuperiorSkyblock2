@@ -495,7 +495,7 @@ public class PlayersListener implements Listener {
 
     /* PVP */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL /* Set to NORMAL, so it doesn't conflict with vanish plugins */, ignoreCancelled = true)
     private void onPlayerDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player))
             return;
