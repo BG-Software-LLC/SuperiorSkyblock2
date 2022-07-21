@@ -261,8 +261,7 @@ public class PlayersListener implements Listener {
         }
 
         // Check for falling out of the void
-        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5 &&
-                plugin.getGrid().isIslandsWorld(to.getWorld())) {
+        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
