@@ -5,10 +5,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
@@ -643,9 +643,6 @@ public class ProtectionListener implements Listener {
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
                                        IslandPrivilege islandPrivilege, EnumSet<Flag> flagsSet) {
-        if (superiorPlayer.hasBypassModeEnabled())
-            return false;
-
         if (flagsSet.contains(Flag.PREVENT_OUTSIDE_ISLANDS) &&
                 preventInteraction(island, location, superiorPlayer, flagsSet))
             return true;
@@ -668,6 +665,9 @@ public class ProtectionListener implements Listener {
 
     private boolean preventInteraction(@Nullable Island island, Location location, SuperiorPlayer superiorPlayer,
                                        EnumSet<Flag> flagsSet) {
+        if (superiorPlayer.hasBypassModeEnabled())
+            return false;
+
         boolean sendMessages = flagsSet.contains(Flag.SEND_MESSAGES);
 
         if (island == null) {
