@@ -793,15 +793,24 @@ public class SIsland implements Island {
 
     @Override
     public Location getVisitorsLocation() {
+        return getVisitorsLocation(null /* unused */);
+    }
+
+    @Nullable
+    @Override
+    public Location getVisitorsLocation(World.Environment unused) {
         Location visitorsLocation = this.visitorHomes.readAndGet(visitorsLocations -> visitorsLocations[0]);
 
         if (visitorsLocation == null)
             return null;
 
+        if (adjustLocationToCenterOfBlock(visitorsLocation))
+            IslandsDatabaseBridge.saveVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld(), visitorsLocation);
+
         World world = plugin.getGrid().getIslandsWorld(this, plugin.getSettings().getWorlds().getDefaultWorld());
         visitorsLocation.setWorld(world);
 
-        return visitorsLocation;
+        return visitorsLocation.clone();
     }
 
     @Override
@@ -809,12 +818,13 @@ public class SIsland implements Island {
         if (visitorsLocation == null) {
             PluginDebugger.debug("Action: Delete Visitors Location, Island: " + owner.getName());
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = null);
-            IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
+            IslandsDatabaseBridge.removeVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld());
         } else {
+            adjustLocationToCenterOfBlock(visitorsLocation);
             PluginDebugger.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " +
                     Formatters.LOCATION_FORMATTER.format(visitorsLocation));
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
-            IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
+            IslandsDatabaseBridge.saveVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld(), visitorsLocation);
         }
     }
 
@@ -3945,6 +3955,22 @@ public class SIsland implements Island {
             default:
                 return 0;
         }
+    }
+
+    private static boolean adjustLocationToCenterOfBlock(Location location) {
+        boolean changed = false;
+
+        if (location.getX() - 0.5 != location.getBlockX()) {
+            location.setX(location.getBlockX() + 0.5);
+            changed = true;
+        }
+
+        if (location.getZ() - 0.5 != location.getBlockZ()) {
+            location.setZ(location.getBlockZ() + 0.5);
+            changed = true;
+        }
+
+        return changed;
     }
 
     public static class UniqueVisitor {

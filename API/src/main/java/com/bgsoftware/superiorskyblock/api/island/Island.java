@@ -323,9 +323,21 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
     /**
      * Get the visitors' teleport location of the island.
+     *
+     * @deprecated See {@link #getVisitorsLocation(World.Environment)}
      */
     @Nullable
+    @Deprecated
     Location getVisitorsLocation();
+
+    /**
+     * Get the visitors' teleport location of the island.
+     *
+     * @param environment The environment to get the visitors-location from.
+     *                    Currently unused, it has no effect.
+     */
+    @Nullable
+    Location getVisitorsLocation(World.Environment environment);
 
     /**
      * Set the visitors' teleport location of the island.

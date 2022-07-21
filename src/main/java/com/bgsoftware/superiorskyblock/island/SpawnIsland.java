@@ -27,12 +27,12 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
-import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
@@ -325,6 +325,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getVisitorsLocation() {
+        return getVisitorsLocation(null /* unused */);
+    }
+
+    @Nullable
+    @Override
+    public Location getVisitorsLocation(World.Environment unused) {
         return getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
     }
 
