@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.api.schematic;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public interface Schematic {
@@ -39,5 +41,10 @@ public interface Schematic {
      * @return The exact same object given as a parameter.
      */
     Location adjustRotation(Location location);
+
+    /**
+     * Get the block counts of the schematic.
+     */
+    Map<Key, Integer> getBlockCounts();
 
 }
