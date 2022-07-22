@@ -44,6 +44,9 @@ BLOCK_LEVEL_WORTHLESS: '&e&lCấp Độ | &7Khối {0} vô giá trị.'
 BLOCK_VALUE: '&e&lĐáng giá | &7Khối {0} được đánh giá với {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lĐáng giá | &7Khối {0} vô giá trị.'
 BONUS_SET_SUCCESS: '&e&lĐảo | &7Cập nhật thành công phần thưởng đảo đến {0}.'
+BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
+BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
+BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
 BORDER_PLAYER_COLOR_NAME_BLUE: 'Blue'
 BORDER_PLAYER_COLOR_NAME_RED: 'Red'
 BORDER_PLAYER_COLOR_NAME_GREEN: 'Green'
@@ -252,6 +255,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Lấy thông tin của một hòn đảo.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Dịch chuyển đến vị trí trung tâm.
 COMMAND_DESCRIPTION_ADMIN_SPY: Chuyển đổi chế độ gián điệp trò chuyện
 COMMAND_DESCRIPTION_ADMIN_STATS: Coi thông kê về plugin.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Đồng bộ hóa các giá trị nâng cấp cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Dịch chuyển đến hòn đảo khác
 COMMAND_DESCRIPTION_ADMIN_TITLE: 'Gửi cho người chơi một title.'

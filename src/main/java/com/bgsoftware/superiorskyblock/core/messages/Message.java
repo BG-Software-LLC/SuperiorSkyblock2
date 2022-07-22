@@ -5,13 +5,13 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -61,6 +61,9 @@ public enum Message {
     BLOCK_VALUE,
     BLOCK_VALUE_WORTHLESS,
     BONUS_SET_SUCCESS,
+    BONUS_SYNC_ALL,
+    BONUS_SYNC_NAME,
+    BONUS_SYNC,
     BORDER_PLAYER_COLOR_NAME_BLUE,
     BORDER_PLAYER_COLOR_NAME_GREEN,
     BORDER_PLAYER_COLOR_NAME_RED,
@@ -236,6 +239,7 @@ public enum Message {
     COMMAND_DESCRIPTION_ADMIN_SPAWN,
     COMMAND_DESCRIPTION_ADMIN_SPY,
     COMMAND_DESCRIPTION_ADMIN_STATS,
+    COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS,
     COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES,
     COMMAND_DESCRIPTION_ADMIN_TELEPORT,
     COMMAND_DESCRIPTION_ADMIN_TITLE,

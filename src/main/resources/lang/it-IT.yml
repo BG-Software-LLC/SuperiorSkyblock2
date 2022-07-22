@@ -43,6 +43,9 @@ BLOCK_LEVEL_WORTHLESS: '&e&lLivello | &7Il blocco {0} non ha valore.'
 BLOCK_VALUE: '&e&lWorth | &7Il blocco {0} vale {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWorth | &7Il blocco {0} non ha valore.'
 BONUS_SET_SUCCESS: '&e&lIsola | &7Aggiornato con successo il bonus isola a {0}.'
+BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
+BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
+BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
 BORDER_PLAYER_COLOR_NAME_BLUE: 'Blue'
 BORDER_PLAYER_COLOR_NAME_RED: 'Red'
 BORDER_PLAYER_COLOR_NAME_GREEN: 'Green'
@@ -219,6 +222,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Ottieni informazioni su un'isola.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Teletrasportati nella posizione di spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Attiva/disattiva la modalità spia della chat
 COMMAND_DESCRIPTION_ADMIN_STATS: Mostra le statistiche riguardanti il plugin.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Sincronizza i valori di aggiornamento per un'isola.
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: Teletrasporto nelle altre isole.
 COMMAND_DESCRIPTION_ADMIN_TITLE: Invia un titolo al giocatore

@@ -45,6 +45,9 @@ BLOCK_LEVEL_WORTHLESS: '&e&lLevel | &7Der Block {0} ist wertlos.'
 BLOCK_VALUE: '&e&lWert | &7Der Block {0} im Wert von {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lWert | &7Der Block {0} ist wertlos.'
 BONUS_SET_SUCCESS: '&e&lInsel | &7Der Inselbonus wurde erfolgreich auf {0} aktualisiert.'
+BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
+BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
+BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
 BORDER_PLAYER_COLOR_NAME_BLUE: Blau
 BORDER_PLAYER_COLOR_NAME_RED: Rot
 BORDER_PLAYER_COLOR_NAME_GREEN: Grün

@@ -40,6 +40,9 @@ BLOCK_LEVEL_WORTHLESS: '&e&lNiveau | &7Le bloc {0} n''a pas de valeur.'
 BLOCK_VALUE: '&e&lValeur | &7La valeur du bloc {0} est de {1}.'
 BLOCK_VALUE_WORTHLESS: '&e&lValeur | &7Le bloc {0} n''a pas de valeur.'
 BONUS_SET_SUCCESS: '&e&lIle | &7Bonus de l''île mit à jour sur {0}.'
+BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
+BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
+BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
 BORDER_PLAYER_COLOR_NAME_BLUE: 'Bleue'
 BORDER_PLAYER_COLOR_NAME_RED: 'Rouge'
 BORDER_PLAYER_COLOR_NAME_GREEN: 'Verte'
@@ -219,6 +222,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: Obtenir des informations sur une île.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: Se téléporter à l'emplacement de spawn.
 COMMAND_DESCRIPTION_ADMIN_SPY: Activer/Désactiver le mode espion du chat
 COMMAND_DESCRIPTION_ADMIN_STATS: Afficher les statistiques du plugin.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: Synchroniser les valeurs des améliorations d'une île.
 COMMAND_DESCRIPTION_ADMIN_UNIGNORE: Réafficher une île dans le top des îles.
 COMMAND_DESCRIPTION_ADMIN_UNLOCK_WORLD: Dévérouiller un mode pour une île.
