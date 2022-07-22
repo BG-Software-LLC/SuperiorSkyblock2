@@ -21,6 +21,7 @@ only-natural-blocks: true
 rewards:
   commands:
     - 'eco give %player% 1000'
+    - 'is admin rankup %player% generator-rates'
     - 'is admin msg %player% &e&lMiner | &7Successfully finished the mission Miner I!'
     - 'is admin msg %player% &e&lMiner | &7Now that you are familiar with generators, mine some iron.'
     - 'is admin msg %player% &e&lMiner | &7&oFor more information about the next mission, checkout /is missions'

@@ -40,6 +40,9 @@ BLOCK_LEVEL_WORTHLESS: '&e&l岛屿等级 | &7方块 &b{0} &7一文不值.'
 BLOCK_VALUE: '&e&l岛屿价值 | &7方块 &b{0} &7的价值为 &a{1}.'
 BLOCK_VALUE_WORTHLESS: '&e&l岛屿价值 | &7方块 &b{0} &7一文不值.'
 BONUS_SET_SUCCESS: '&e&l岛屿 | &7已成功更新岛屿奖励至 &b{0}&7.'
+BONUS_SYNC_ALL: '&e&lIsland | &7Successfully synced the island bonus to all the islands'
+BONUS_SYNC_NAME: '&e&lIsland | &7Successfully synced the island bonus to {0}.'
+BONUS_SYNC: '&e&lIsland | &7Successfully synced the island bonus to {0}''s island.'
 BORDER_PLAYER_COLOR_NAME_BLUE: 'Blue'
 BORDER_PLAYER_COLOR_NAME_RED: 'Red'
 BORDER_PLAYER_COLOR_NAME_GREEN: 'Green'
@@ -216,6 +219,7 @@ COMMAND_DESCRIPTION_ADMIN_SHOW: 查看一个岛屿的详细信息.
 COMMAND_DESCRIPTION_ADMIN_SPAWN: 传送至重生点.
 COMMAND_DESCRIPTION_ADMIN_SPY: 切换聊天监视模式
 COMMAND_DESCRIPTION_ADMIN_STATS: 查看插件数据.
+COMMAND_DESCRIPTION_ADMIN_SYNC_BONUS: 'Sync the bonus of an island with the generated worlds.'
 COMMAND_DESCRIPTION_ADMIN_SYNC_UPGRADES: 'Sync upgrade values for an island.'
 COMMAND_DESCRIPTION_ADMIN_TELEPORT: 传送到其他玩家的岛屿.
 COMMAND_DESCRIPTION_ADMIN_TITLE: 'Send a player a title.'

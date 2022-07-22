@@ -13,7 +13,7 @@ public final class DragonUtils {
             Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL, 1)
             .removeFinal();
 
-    private static BlockPosition currentPodiumPosition;
+    private static BlockPosition currentPodiumPosition = BlockPosition.ZERO;
 
     private DragonUtils() {
 

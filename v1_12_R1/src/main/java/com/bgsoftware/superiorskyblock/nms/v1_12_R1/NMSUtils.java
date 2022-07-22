@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class NMSUtils {
@@ -50,7 +51,7 @@ public class NMSUtils {
     }
 
     public static void runActionOnChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunksCoords,
-                                         boolean saveChunks, Runnable onFinish, Consumer<Chunk> chunkConsumer,
+                                         boolean saveChunks, Runnable onFinish, BiConsumer<Chunk, Boolean> chunkConsumer,
                                          Consumer<Chunk> updateChunk) {
         List<ChunkCoordIntPair> unloadedChunks = new LinkedList<>();
         List<Chunk> loadedChunks = new LinkedList<>();
@@ -67,7 +68,7 @@ public class NMSUtils {
 
         boolean hasUnloadedChunks = !unloadedChunks.isEmpty();
 
-        loadedChunks.forEach(chunkConsumer);
+        loadedChunks.forEach(loadedChunk -> chunkConsumer.accept(loadedChunk, true));
 
         if (updateChunk != null)
             loadedChunks.forEach(updateChunk);
@@ -80,7 +81,7 @@ public class NMSUtils {
     }
 
     public static void runActionOnUnloadedChunks(WorldServer worldServer, Collection<ChunkCoordIntPair> chunks,
-                                                 boolean saveChunks, Consumer<Chunk> chunkConsumer,
+                                                 boolean saveChunks, BiConsumer<Chunk, Boolean> chunkConsumer,
                                                  Runnable onFinish) {
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
                 uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
@@ -94,7 +95,7 @@ public class NMSUtils {
                     Chunk loadedChunk = chunkLoader.a(worldServer, chunkCoords.x, chunkCoords.z);
 
                     if (loadedChunk != null) {
-                        chunkConsumer.accept(loadedChunk);
+                        chunkConsumer.accept(loadedChunk, false);
 
                         if (saveChunks) {
                             if (SAVE_CHUNK.isValid())

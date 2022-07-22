@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.IslandBase;
 import com.bgsoftware.superiorskyblock.api.island.Island;
@@ -70,13 +71,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
 public final class NMSChunksImpl implements NMSChunks {
+
+    private static final ReflectMethod<Codec<DataPaletteBlock<?>>> CODE_RW_METHOD = new ReflectMethod<>(
+            DataPaletteBlock.class, "a", Registry.class, Codec.class, DataPaletteBlock.d.class, Object.class);
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -245,12 +251,28 @@ public final class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
-        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                                    Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
         List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
+        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
 
-        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
-                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+        Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
+        while (chunkPositionsIterator.hasNext()) {
+            ChunkPosition chunkPosition = chunkPositionsIterator.next();
+            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.get(chunkPosition);
+            if (cachedCalculatedChunk != null) {
+                allCalculatedChunks.add(cachedCalculatedChunk);
+                chunkPositionsIterator.remove();
+            } else {
+                chunksCoords.add(new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+            }
+        }
+
+        if (chunkPositions.isEmpty())
+            return CompletableFuture.completedFuture(allCalculatedChunks);
+
+        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+
         WorldServer worldServer = new WorldServer(((CraftWorld) chunkPositions.get(0).getWorld()).getHandle());
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
@@ -263,9 +285,9 @@ public final class NMSChunksImpl implements NMSChunks {
             IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
             Registry<Holder<BiomeBase>> biomesRegistryHolder = worldServer.getBiomeRegistryHolder();
 
-            Codec<PalettedContainerRO<IBlockData>> blocksCodec = DataPaletteBlock.b(Block.CODEC, IBlockData.b,
+            Codec<DataPaletteBlock<IBlockData>> blocksCodec = makeCodecRW(Block.CODEC, IBlockData.b,
                     DataPaletteBlock.d.d, Blocks.a.m());
-            Codec<PalettedContainerRO<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.b(biomesRegistryHolder,
+            Codec<DataPaletteBlock<Holder<BiomeBase>>> biomesCodec = makeCodecRW(biomesRegistryHolder,
                     biomesRegistry.q(), DataPaletteBlock.d.e, biomesRegistry.h(Biomes.b));
 
             net.minecraft.world.level.chunk.ChunkSection[] chunkSections =
@@ -278,9 +300,9 @@ public final class NMSChunksImpl implements NMSChunks {
                 int sectionIndex = worldServer.getSectionIndexFromSectionY(yPosition);
 
                 if (sectionIndex >= 0 && sectionIndex < chunkSections.length) {
-                    PalettedContainerRO<IBlockData> blocksDataPalette;
+                    DataPaletteBlock<IBlockData> blocksDataPalette;
                     if (sectionCompound.hasKeyOfType("block_states", 10)) {
-                        DataResult<PalettedContainerRO<IBlockData>> dataResult = blocksCodec.parse(DynamicOpsNBT.a,
+                        DataResult<DataPaletteBlock<IBlockData>> dataResult = blocksCodec.parse(DynamicOpsNBT.a,
                                 sectionCompound.getCompound("block_states").getHandle()).promotePartial((sx) -> {
                         });
                         blocksDataPalette = dataResult.getOrThrow(false, error -> {
@@ -289,9 +311,9 @@ public final class NMSChunksImpl implements NMSChunks {
                         blocksDataPalette = new DataPaletteBlock<>(Block.CODEC, Blocks.a.m(), DataPaletteBlock.d.d);
                     }
 
-                    PalettedContainerRO<Holder<BiomeBase>> biomesDataPalette;
+                    DataPaletteBlock<Holder<BiomeBase>> biomesDataPalette;
                     if (sectionCompound.hasKeyOfType("biomes", 10)) {
-                        DataResult<PalettedContainerRO<Holder<BiomeBase>>> dataResult = biomesCodec.parse(DynamicOpsNBT.a,
+                        DataResult<DataPaletteBlock<Holder<BiomeBase>>> dataResult = biomesCodec.parse(DynamicOpsNBT.a,
                                 sectionCompound.getCompound("biomes").getHandle()).promotePartial((sx) -> {
                         });
                         biomesDataPalette = dataResult.getOrThrow(false, error -> {
@@ -302,14 +324,16 @@ public final class NMSChunksImpl implements NMSChunks {
                     }
 
                     chunkSections[sectionIndex] = new net.minecraft.world.level.chunk.ChunkSection(
-                            yPosition, blocksDataPalette.e(), biomesDataPalette.e());
+                            yPosition, blocksDataPalette, biomesDataPalette);
                 }
 
             }
 
             ChunkCoordIntPair chunkCoords = unloadedChunkCompound.getChunkCoords();
             ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunkCoords.getX(), chunkCoords.getZ());
-            allCalculatedChunks.add(calculateChunk(chunkPosition, chunkSections));
+            CalculatedChunk calculatedChunk = calculateChunk(chunkPosition, chunkSections);
+            allCalculatedChunks.add(calculatedChunk);
+            unloadedChunksCache.put(chunkPosition, calculatedChunk);
         });
 
         return completableFuture;
@@ -467,7 +491,22 @@ public final class NMSChunksImpl implements NMSChunks {
 
             chunkGenerator.a(region,
                     worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    worldServer.getChunkProvider().getRandomState(),
                     chunk.getHandle());
+
+            worldServer.getHandle().k().h();
+
+            chunkGenerator.a(region,
+                    worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    chunk.getHandle());
+        }
+    }
+
+    private static <E> Codec makeCodecRW(Registry<E> idMap, Codec<E> codec, DataPaletteBlock.d strategy, E object) {
+        if (CODE_RW_METHOD.isValid()) {
+            return CODE_RW_METHOD.invoke(null, idMap, codec, strategy, object);
+        } else {
+            return DataPaletteBlock.codecRW(idMap, codec, strategy, object, null);
         }
     }
 

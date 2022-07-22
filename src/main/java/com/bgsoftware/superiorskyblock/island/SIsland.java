@@ -29,6 +29,9 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
@@ -802,15 +805,24 @@ public class SIsland extends SIslandBase implements Island {
 
     @Override
     public Location getVisitorsLocation() {
+        return getVisitorsLocation(null /* unused */);
+    }
+
+    @Nullable
+    @Override
+    public Location getVisitorsLocation(World.Environment unused) {
         Location visitorsLocation = this.visitorHomes.readAndGet(visitorsLocations -> visitorsLocations[0]);
 
         if (visitorsLocation == null)
             return null;
 
+        if (adjustLocationToCenterOfBlock(visitorsLocation))
+            IslandsDatabaseBridge.saveVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld(), visitorsLocation);
+
         World world = plugin.getGrid().getIslandsWorld(this, plugin.getSettings().getWorlds().getDefaultWorld());
         visitorsLocation.setWorld(world);
 
-        return visitorsLocation;
+        return visitorsLocation.clone();
     }
 
     @Override
@@ -818,12 +830,13 @@ public class SIsland extends SIslandBase implements Island {
         if (visitorsLocation == null) {
             PluginDebugger.debug("Action: Delete Visitors Location, Island: " + owner.getName());
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = null);
-            IslandsDatabaseBridge.removeVisitorLocation(this, World.Environment.NORMAL);
+            IslandsDatabaseBridge.removeVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld());
         } else {
+            adjustLocationToCenterOfBlock(visitorsLocation);
             PluginDebugger.debug("Action: Change Visitors Location, Island: " + owner.getName() + ", Location: " +
                     Formatters.LOCATION_FORMATTER.format(visitorsLocation));
             this.visitorHomes.write(visitorsLocations -> visitorsLocations[0] = visitorsLocation.clone());
-            IslandsDatabaseBridge.saveVisitorLocation(this, World.Environment.NORMAL, visitorsLocation);
+            IslandsDatabaseBridge.saveVisitorLocation(this, plugin.getSettings().getWorlds().getDefaultWorld(), visitorsLocation);
         }
     }
 
@@ -1793,7 +1806,6 @@ public class SIsland extends SIslandBase implements Island {
         this.bonusWorth.set(bonusWorth);
 
         plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
-        plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
 
         IslandsDatabaseBridge.saveBonusWorth(this);
     }
@@ -1810,7 +1822,6 @@ public class SIsland extends SIslandBase implements Island {
 
         this.bonusLevel.set(bonusLevel);
 
-        plugin.getGrid().sortIslands(SortingTypes.BY_WORTH);
         plugin.getGrid().sortIslands(SortingTypes.BY_LEVEL);
 
         IslandsDatabaseBridge.saveBonusLevel(this);
@@ -2434,7 +2445,8 @@ public class SIsland extends SIslandBase implements Island {
     public IslandWarp createWarp(String name, Location location, @Nullable WarpCategory warpCategory) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
+        if (!(location instanceof LazyWorldLocation))
+            Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
 
         PluginDebugger.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " +
                 Formatters.LOCATION_FORMATTER.format(location));
@@ -3694,6 +3706,35 @@ public class SIsland extends SIslandBase implements Island {
 
         warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
                 location.getBlockY(), location.getBlockZ()), islandWarp);
+    }
+
+    private static int getGeneratedSchematicBitMask(World.Environment environment) {
+        switch (environment) {
+            case NORMAL:
+                return 8;
+            case NETHER:
+                return 4;
+            case THE_END:
+                return 3;
+            default:
+                return 0;
+        }
+    }
+
+    private static boolean adjustLocationToCenterOfBlock(Location location) {
+        boolean changed = false;
+
+        if (location.getX() - 0.5 != location.getBlockX()) {
+            location.setX(location.getBlockX() + 0.5);
+            changed = true;
+        }
+
+        if (location.getZ() - 0.5 != location.getBlockZ()) {
+            location.setZ(location.getBlockZ() + 0.5);
+            changed = true;
+        }
+
+        return changed;
     }
 
     public static class UniqueVisitor {

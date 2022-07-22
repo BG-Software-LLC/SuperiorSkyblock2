@@ -7,14 +7,15 @@ import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.player.SuperiorNPCPlayer;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,11 +33,14 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.math.BigDecimal;
 import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class PortalsListener implements Listener {
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<PlayersListener> playersListener;
+    private final AutoRemovalCollection<UUID> generatingSchematicsIslands = AutoRemovalCollection.newHashSet(20, TimeUnit.SECONDS);
 
     public PortalsListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
@@ -152,6 +156,11 @@ public class PortalsListener implements Listener {
                 return true;
             }
 
+            if (generatingSchematicsIslands.contains(island.getUniqueId()))
+                return true; // We want to prevent the players from being teleported in this time.
+
+            generatingSchematicsIslands.add(island.getUniqueId());
+
             String destinationEnvironmentName = destinationEnvironment.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
@@ -173,6 +182,7 @@ public class PortalsListener implements Listener {
             BigDecimal originalLevel = island.getRawLevel();
 
             schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
+                generatingSchematicsIslands.remove(island.getUniqueId());
                 island.setSchematicGenerate(destinationEnvironment);
 
                 if (shouldOffsetSchematic(destinationEnvironment)) {

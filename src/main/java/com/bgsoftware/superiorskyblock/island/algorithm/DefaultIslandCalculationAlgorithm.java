@@ -6,18 +6,18 @@ import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAl
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
-import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 
@@ -29,8 +29,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgorithm {
+
+    public static final Map<ChunkPosition, CalculatedChunk> CACHED_CALCULATED_CHUNKS = new ConcurrentHashMap<>();
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -50,13 +53,13 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
         if (!plugin.getProviders().hasSnapshotsSupport()) {
             IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
-                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks)));
+                    chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS)));
         } else {
             IslandUtils.getAllChunksAsync(island, true, true, ChunkLoadReason.BLOCKS_RECALCULATE,
                     plugin.getProviders()::takeSnapshots).forEach(completableFuture -> {
                 CompletableFuture<List<CalculatedChunk>> calculateCompletable = new CompletableFuture<>();
                 completableFuture.whenComplete((chunk, ex) -> plugin.getNMSChunks()
-                        .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk))).whenComplete(
+                        .calculateChunks(Collections.singletonList(ChunkPosition.of(chunk)), CACHED_CALCULATED_CHUNKS).whenComplete(
                                 (pair, ex2) -> calculateCompletable.complete(pair)));
                 chunksToLoad.add(calculateCompletable);
             });

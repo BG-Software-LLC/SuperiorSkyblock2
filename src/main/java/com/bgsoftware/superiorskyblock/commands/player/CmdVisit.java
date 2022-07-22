@@ -62,7 +62,7 @@ public class CmdVisit implements ISuperiorCommand {
 
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
 
-        Location visitLocation = targetIsland.getVisitorsLocation();
+        Location visitLocation = targetIsland.getVisitorsLocation(null /* unused */);
 
         if (visitLocation == null) {
             Message.INVALID_VISIT_LOCATION.send(sender);
@@ -87,7 +87,7 @@ public class CmdVisit implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
         return args.length == 2 ? CommandTabCompletes.getOnlinePlayersWithIslands(plugin, args[1],
                 plugin.getSettings().isTabCompleteHideVanished(),
-                (onlinePlayer, onlineIsland) -> onlineIsland != null && (onlineIsland.getVisitorsLocation() != null ||
+                (onlinePlayer, onlineIsland) -> onlineIsland != null && (onlineIsland.getVisitorsLocation(null /* unused */) != null ||
                         superiorPlayer.hasBypassModeEnabled()) && (!onlineIsland.isLocked() ||
                         onlineIsland.hasPermission(superiorPlayer, IslandPrivileges.CLOSE_BYPASS))) : Collections.emptyList();
     }

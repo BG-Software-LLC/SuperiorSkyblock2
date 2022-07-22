@@ -4,11 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -205,7 +205,9 @@ public class SignsListener implements Listener {
         for (int i = 1; i <= 3; i++)
             warpLines[i] = Formatters.COLOR_FORMATTER.format(warpLines[i]);
 
-        Block oldWelcomeSignBlock = island.getVisitorsLocation() == null ? null : island.getVisitorsLocation().getBlock();
+        Location islandVisitorsLocation = island.getVisitorsLocation(null /* unused */);
+        Block oldWelcomeSignBlock = islandVisitorsLocation == null ? null : islandVisitorsLocation.getBlock();
+
         if (oldWelcomeSignBlock != null && Materials.isSign(oldWelcomeSignBlock.getType())) {
             Sign oldWelcomeSign = (Sign) oldWelcomeSignBlock.getState();
             oldWelcomeSign.setLine(0, plugin.getSettings().getVisitorsSign().getInactive());

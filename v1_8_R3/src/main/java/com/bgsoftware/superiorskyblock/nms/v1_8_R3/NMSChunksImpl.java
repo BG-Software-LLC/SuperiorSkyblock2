@@ -44,6 +44,7 @@ import org.bukkit.entity.Player;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,7 @@ public class NMSChunksImpl implements NMSChunks {
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
         byte biomeBase = (byte) CraftBlock.biomeToBiomeBase(biome).id;
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, null, chunk -> {
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, null, (chunk, isLoaded) -> {
             Arrays.fill(chunk.getBiomeIndex(), biomeBase);
             chunk.e();
         }, null);
@@ -87,7 +88,7 @@ public class NMSChunksImpl implements NMSChunks {
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
-        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, chunk -> {
+        NMSUtils.runActionOnChunks(worldServer, chunksCoords, true, onFinish, (chunk, isLoaded) -> {
             Arrays.fill(chunk.getSections(), null);
 
             removeEntities(chunk);
@@ -109,18 +110,33 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions) {
-        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
+    public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
+                                                                    Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
         List<CalculatedChunk> allCalculatedChunks = new LinkedList<>();
+        List<ChunkCoordIntPair> chunksCoords = new LinkedList<>();
 
-        List<ChunkCoordIntPair> chunksCoords = new SequentialListBuilder<ChunkCoordIntPair>()
-                .build(chunkPositions, chunkPosition -> new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+        Iterator<ChunkPosition> chunkPositionsIterator = chunkPositions.iterator();
+        while (chunkPositionsIterator.hasNext()) {
+            ChunkPosition chunkPosition = chunkPositionsIterator.next();
+            CalculatedChunk cachedCalculatedChunk = unloadedChunksCache.get(chunkPosition);
+            if (cachedCalculatedChunk != null) {
+                allCalculatedChunks.add(cachedCalculatedChunk);
+                chunkPositionsIterator.remove();
+            } else {
+                chunksCoords.add(new ChunkCoordIntPair(chunkPosition.getX(), chunkPosition.getZ()));
+            }
+        }
+
+        if (chunkPositions.isEmpty())
+            return CompletableFuture.completedFuture(allCalculatedChunks);
+
+        CompletableFuture<List<CalculatedChunk>> completableFuture = new CompletableFuture<>();
 
         WorldServer worldServer = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 
         NMSUtils.runActionOnChunks(worldServer, chunksCoords, false, () -> {
             completableFuture.complete(allCalculatedChunks);
-        }, chunk -> {
+        }, (chunk, isLoaded) -> {
             ChunkPosition chunkPosition = ChunkPosition.of(worldServer.getWorld(), chunk.locX, chunk.locZ);
 
             KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
@@ -160,7 +176,11 @@ public class NMSChunksImpl implements NMSChunks {
                 }
             }
 
-            allCalculatedChunks.add(new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations));
+            CalculatedChunk calculatedChunk = new CalculatedChunk(chunkPosition, blockCounts, spawnersLocations);
+            allCalculatedChunks.add(calculatedChunk);
+
+            if (!isLoaded)
+                unloadedChunksCache.put(chunkPosition, calculatedChunk);
         }, null);
 
         return completableFuture;

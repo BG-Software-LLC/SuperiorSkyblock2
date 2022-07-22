@@ -267,8 +267,7 @@ public class PlayersListener implements Listener {
         }
 
         // Check for falling out of the void
-        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5 &&
-                plugin.getGrid().isIslandsWorld(to.getWorld())) {
+        if (from.getBlockY() != to.getBlockY() && to.getBlockY() <= plugin.getNMSWorld().getMinHeight(to.getWorld()) - 5) {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
 
             Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
@@ -464,21 +463,25 @@ public class PlayersListener implements Listener {
 
         Player player = superiorPlayer.asPlayer();
         if (player != null && (plugin.getSettings().getSpawn().isProtected() || !toIsland.isSpawn())) {
-            if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
-                player.setPlayerTime(0, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
-                player.setPlayerTime(6000, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
-                player.setPlayerTime(14000, false);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
-                player.setPlayerTime(18000, false);
-            }
+            BukkitExecutor.sync(() -> {
+                // Update player time and player weather with a delay.
+                // Fixes https://github.com/BG-Software-LLC/SuperiorSkyblock2/issues/1260
+                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_DAY)) {
+                    player.setPlayerTime(0, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_DAY)) {
+                    player.setPlayerTime(6000, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_NIGHT)) {
+                    player.setPlayerTime(14000, false);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_MIDDLE_NIGHT)) {
+                    player.setPlayerTime(18000, false);
+                }
 
-            if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
-                player.setPlayerWeather(WeatherType.CLEAR);
-            } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
-                player.setPlayerWeather(WeatherType.DOWNFALL);
-            }
+                if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_SHINY)) {
+                    player.setPlayerWeather(WeatherType.CLEAR);
+                } else if (toIsland.hasSettingsEnabled(IslandFlags.ALWAYS_RAIN)) {
+                    player.setPlayerWeather(WeatherType.DOWNFALL);
+                }
+            }, 1L);
         }
 
         toIsland.applyEffects(superiorPlayer);
@@ -497,7 +500,7 @@ public class PlayersListener implements Listener {
 
     /* PVP */
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.NORMAL /* Set to NORMAL, so it doesn't conflict with vanish plugins */, ignoreCancelled = true)
     private void onPlayerDamage(EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player))
             return;
@@ -517,7 +520,7 @@ public class PlayersListener implements Listener {
             if (island != null) {
                 if (island.isSpawn() ? (plugin.getSettings().getSpawn().isProtected() && !plugin.getSettings().getSpawn().isPlayersDamage()) :
                         ((!plugin.getSettings().isVisitorsDamage() && island.isVisitor(targetPlayer, false)) ||
-                                (!plugin.getSettings().isCoopDamage() && island.isVisitor(targetPlayer, true))))
+                                (!plugin.getSettings().isCoopDamage() && island.isCoop(targetPlayer))))
                     e.setCancelled(true);
             }
 
@@ -560,15 +563,17 @@ public class PlayersListener implements Listener {
 
     /* CHAT */
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onPlayerAsyncChatLowest(AsyncPlayerChatEvent e) {
+        // PlayerChat should be on LOWEST priority so other chat plugins don't conflict.
         PlayerChat playerChat = PlayerChat.getChatListener(e.getPlayer());
-
         if (playerChat != null && playerChat.supply(e.getMessage())) {
             e.setCancelled(true);
-            return;
         }
+    }
 
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    private void onPlayerAsyncChat(AsyncPlayerChatEvent e) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(e.getPlayer());
         Island island = superiorPlayer.getIsland();
 

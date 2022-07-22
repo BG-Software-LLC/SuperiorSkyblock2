@@ -128,6 +128,9 @@ public class SkinsRestorerHook {
                 property = (IProperty) SKINS_RESTORER_GET_SKIN.invoke(SkinsRestorerAPI.getApi(), superiorPlayer.getName());
             }
 
+            if (property == null)
+                return null;
+
             if (property instanceof Property)
                 return ((Property) property);
 

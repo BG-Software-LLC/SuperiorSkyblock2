@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleResetResult;
 import com.bgsoftware.superiorskyblock.api.service.dragon.DragonBattleService;
+import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EnderDragon;
@@ -16,6 +17,12 @@ public class DragonBattleServiceImpl implements DragonBattleService {
 
     public DragonBattleServiceImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public void prepareEndWorld(World bukkitWorld) {
+        Preconditions.checkState(bukkitWorld.getEnvironment() == World.Environment.THE_END, "world must be the_end environment.");
+        plugin.getNMSDragonFight().prepareEndWorld(bukkitWorld);
     }
 
     @Nullable
