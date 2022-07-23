@@ -13,8 +13,8 @@ import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.spawners.MobSpawnerAbstractNotifier;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import net.minecraft.server.v1_8_R3.BiomeBase;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
 import net.minecraft.server.v1_8_R3.Chunk;
@@ -22,6 +22,7 @@ import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldBorder;
@@ -35,25 +36,25 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeBase[].class, "biome");
+
+    private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
+            TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<SignsListener> signsListener;
@@ -80,19 +81,27 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getSpawnerDelay(CreatureSpawner creatureSpawner) {
+    public void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback) {
         Location location = creatureSpawner.getLocation();
-        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner) ((CraftWorld) location.getWorld())
-                .getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        return mobSpawner.getSpawner().spawnDelay;
-    }
+        org.bukkit.World world = location.getWorld();
 
-    @Override
-    public void setSpawnerDelay(CreatureSpawner creatureSpawner, int spawnDelay) {
-        Location location = creatureSpawner.getLocation();
-        TileEntityMobSpawner mobSpawner = (TileEntityMobSpawner) ((CraftWorld) location.getWorld())
-                .getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        mobSpawner.getSpawner().spawnDelay = spawnDelay;
+        if (world == null)
+            return;
+
+        WorldServer worldServer = ((CraftWorld) world).getHandle();
+        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        TileEntity mobSpawner = worldServer.getTileEntity(blockPosition);
+
+        if (!(mobSpawner instanceof TileEntityMobSpawner))
+            return;
+
+        MobSpawnerAbstract mobSpawnerAbstract = ((TileEntityMobSpawner) mobSpawner).getSpawner();
+
+        if (!(mobSpawnerAbstract instanceof MobSpawnerAbstractNotifier)) {
+            MobSpawnerAbstractNotifier mobSpawnerAbstractNotifier = new MobSpawnerAbstractNotifier(mobSpawnerAbstract, delayChangeCallback);
+            MOB_SPAWNER_ABSTRACT.set(mobSpawner, mobSpawnerAbstractNotifier);
+            mobSpawnerAbstractNotifier.updateDelay();
+        }
     }
 
     @Override
@@ -147,18 +156,6 @@ public class NMSWorldImpl implements NMSWorld {
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
         } catch (NullPointerException ignored) {
         }
-    }
-
-    @Override
-    public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(biome);
-
-        BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(biomeGrid);
-
-        if (biomeBases == null)
-            return;
-
-        Arrays.fill(biomeBases, biomeBase);
     }
 
     @Override

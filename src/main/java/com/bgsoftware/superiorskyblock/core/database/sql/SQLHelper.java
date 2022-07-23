@@ -34,23 +34,21 @@ public class SQLHelper {
         return Optional.ofNullable(isReady() ? globalSession.getMutex() : null);
     }
 
-    public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
-        SQLSession session;
-
+    public static SQLSession createSession(SuperiorSkyblockPlugin plugin, boolean logging) {
         switch (plugin.getSettings().getDatabase().getType()) {
             case "MYSQL":
-                session = new MySQLSession(plugin, true);
-                break;
+                return new MySQLSession(plugin, logging);
             case "MARIADB":
-                session = new MariaDBSession(plugin, true);
-                break;
+                return new MariaDBSession(plugin, logging);
             case "POSTGRESQL":
-                session = new PostgreSQLSession(plugin, true);
-                break;
+                return new PostgreSQLSession(plugin, logging);
             default:
-                session = new SQLiteSession(plugin, true);
-                break;
+                return new SQLiteSession(plugin, logging);
         }
+    }
+
+    public static boolean createConnection(SuperiorSkyblockPlugin plugin) {
+        SQLSession session = createSession(plugin, true);
 
         if (session.createConnection()) {
             globalSession = session;

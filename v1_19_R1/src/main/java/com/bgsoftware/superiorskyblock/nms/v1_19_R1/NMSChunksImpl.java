@@ -494,10 +494,9 @@ public final class NMSChunksImpl implements NMSChunks {
                     worldServer.getChunkProvider().getRandomState(),
                     chunk.getHandle());
 
-            worldServer.getHandle().k().h();
-
             chunkGenerator.a(region,
                     worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    worldServer.getChunkProvider().getRandomState(),
                     chunk.getHandle());
         }
     }
