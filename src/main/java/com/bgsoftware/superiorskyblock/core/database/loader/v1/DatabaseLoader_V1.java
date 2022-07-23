@@ -8,6 +8,9 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.database.DataManager;
+import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.BankTransactionsAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.GridAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandAttributes;
@@ -21,17 +24,14 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.IDes
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.database.sql.ResultSetMapBridge;
+import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.StatementHolder;
-import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.MySQLSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSession;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
@@ -192,7 +192,7 @@ public class DatabaseLoader_V1 implements DatabaseLoader {
                 return false;
         }
 
-        session = isRemoteDatabase ? new MySQLSession(plugin, false) : new SQLiteSession(plugin, false);
+        session = SQLHelper.createSession(plugin, false);
 
         if (!session.createConnection()) {
             return false;
