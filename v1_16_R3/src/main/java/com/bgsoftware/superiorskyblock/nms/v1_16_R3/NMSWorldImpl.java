@@ -23,8 +23,6 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
-import net.minecraft.server.v1_16_R3.BiomeBase;
-import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.BlockPropertySlabType;
@@ -37,13 +35,11 @@ import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.IChatBaseComponent;
-import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.LightEngine;
 import net.minecraft.server.v1_16_R3.MobSpawnerAbstract;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayOutBlockChange;
 import net.minecraft.server.v1_16_R3.PacketPlayOutWorldBorder;
-import net.minecraft.server.v1_16_R3.Registry;
 import net.minecraft.server.v1_16_R3.SoundCategory;
 import net.minecraft.server.v1_16_R3.SoundEffectType;
 import net.minecraft.server.v1_16_R3.TagsBlock;
@@ -57,7 +53,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Biome;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
@@ -71,19 +66,12 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
-            BiomeStorage.class, BiomeBase[].class, "h");
-    private static final ReflectField<Registry<BiomeBase>> BIOME_REGISTRY = new ReflectField<>(
-            BiomeStorage.class, Registry.class, "registry", "g");
-    private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectMethod<Float> SOUND_VOLUME = new ReflectMethod<>(SoundEffectType.class, "a");
     private static final ReflectMethod<Float> SOUND_PITCH = new ReflectMethod<>(SoundEffectType.class, "b");
@@ -188,19 +176,6 @@ public class NMSWorldImpl implements NMSWorld {
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packetPlayOutWorldBorder);
         } catch (NullPointerException ignored) {
         }
-    }
-
-    @Override
-    public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
-        BiomeStorage biomeStorage = BIOME_STORAGE.get(biomeGrid);
-        BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(biomeStorage);
-
-        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry<BiomeBase>) BIOME_REGISTRY.get(biomeStorage), biome);
-
-        if (biomeBases == null)
-            return;
-
-        Arrays.fill(biomeBases, biomeBase);
     }
 
     @Override

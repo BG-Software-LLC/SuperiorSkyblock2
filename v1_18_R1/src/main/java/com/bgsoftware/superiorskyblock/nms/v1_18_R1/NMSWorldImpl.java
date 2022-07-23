@@ -55,7 +55,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateEnum;
 import net.minecraft.world.level.block.state.properties.BlockStateInteger;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
-import net.minecraft.world.level.chunk.IChunkAccess;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
@@ -80,8 +79,6 @@ import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
 
-    private static final ReflectField<IChunkAccess> CHUNK_ACCESS = new ReflectField<>(
-            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", IChunkAccess.class, "biome");
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
@@ -181,17 +178,6 @@ public class NMSWorldImpl implements NMSWorld {
             entity.getPlayerConnection().sendPacket(packetPlayOutWorldBorder);
         } catch (NullPointerException ignored) {
         }
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
-        ChunkAccess chunk = ChunkAccess.ofNullable(CHUNK_ACCESS.get(biomeGrid));
-
-        if (chunk == null)
-            return;
-
-        setBiome(chunk, biome);
     }
 
     private void setBiome(ChunkAccess chunk, Biome biome) {

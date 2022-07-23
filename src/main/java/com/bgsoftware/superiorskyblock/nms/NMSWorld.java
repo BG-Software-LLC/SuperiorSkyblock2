@@ -10,7 +10,6 @@ import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.block.SignChangeEvent;
@@ -26,8 +25,6 @@ public interface NMSWorld {
     void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback);
 
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
-
-    void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome);
 
     Object getBlockData(Block block);
 

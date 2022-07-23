@@ -1,19 +1,34 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator;
 
+import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeStorage;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.Registry;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.ChunkGenerator;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings({"unused", "NullableProblems"})
 public class IslandsGeneratorImpl extends IslandsGenerator {
+
+    private static final ReflectField<BiomeBase[]> BIOME_BASE_ARRAY = new ReflectField<>(
+            BiomeStorage.class, BiomeBase[].class, "h");
+    private static final ReflectField<Registry<BiomeBase>> BIOME_REGISTRY = new ReflectField<>(
+            BiomeStorage.class, Registry.class, "registry", "g");
+    private static final ReflectField<BiomeStorage> BIOME_STORAGE = new ReflectField<>(
+            "org.bukkit.craftbukkit.VERSION.generator.CustomChunkGenerator$CustomBiomeGrid", BiomeStorage.class, "biome");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -54,7 +69,7 @@ public class IslandsGeneratorImpl extends IslandsGenerator {
             }
         }
 
-        plugin.getNMSWorld().setBiome(biomeGrid, targetBiome);
+        setBiome(biomeGrid, targetBiome);
 
         if (chunkX == 0 && chunkZ == 0 && world.getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
             chunkData.setBlock(0, 99, 0, Material.BEDROCK);
@@ -71,6 +86,18 @@ public class IslandsGeneratorImpl extends IslandsGenerator {
     @Override
     public Location getFixedSpawnLocation(World world, Random random) {
         return new Location(world, 0, 100, 0);
+    }
+
+    private static void setBiome(ChunkGenerator.BiomeGrid biomeGrid, Biome biome) {
+        BiomeStorage biomeStorage = BIOME_STORAGE.get(biomeGrid);
+        BiomeBase[] biomeBases = BIOME_BASE_ARRAY.get(biomeStorage);
+
+        BiomeBase biomeBase = CraftBlock.biomeToBiomeBase((IRegistry<BiomeBase>) BIOME_REGISTRY.get(biomeStorage), biome);
+
+        if (biomeBases == null)
+            return;
+
+        Arrays.fill(biomeBases, biomeBase);
     }
 
 }
