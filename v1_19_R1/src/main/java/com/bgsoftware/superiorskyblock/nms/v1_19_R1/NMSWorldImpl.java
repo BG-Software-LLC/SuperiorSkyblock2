@@ -27,6 +27,7 @@ import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.lighting.LightEngine;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.spawners.MobSpawnerAbstractNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.world.BlockStatesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -40,9 +41,11 @@ import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.level.EnumSkyBlock;
+import net.minecraft.world.level.MobSpawnerAbstract;
 import net.minecraft.world.level.World;
 import net.minecraft.world.level.biome.BiomeBase;
 import net.minecraft.world.level.block.BlockStepAbstract;
+import net.minecraft.world.level.block.entity.TileEntityMobSpawner;
 import net.minecraft.world.level.block.entity.TileEntitySign;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
@@ -70,8 +73,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntFunction;
 
 public final class NMSWorldImpl implements NMSWorld {
 
@@ -80,6 +85,8 @@ public final class NMSWorldImpl implements NMSWorld {
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
+    private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
+            TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<SignsListener> signsListener;
@@ -106,21 +113,7 @@ public final class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public int getSpawnerDelay(CreatureSpawner creatureSpawner) {
-        Location location = creatureSpawner.getLocation();
-        org.bukkit.World world = location.getWorld();
-
-        if (world == null)
-            return 0;
-
-        WorldServer worldServer = new WorldServer(((CraftWorld) world).getHandle());
-        BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        TileEntity mobSpawner = worldServer.getTileEntity(blockPosition);
-        return mobSpawner == null ? 0 : mobSpawner.getSpawner().c;
-    }
-
-    @Override
-    public void setSpawnerDelay(CreatureSpawner creatureSpawner, int spawnDelay) {
+    public void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback) {
         Location location = creatureSpawner.getLocation();
         org.bukkit.World world = location.getWorld();
 
@@ -130,8 +123,17 @@ public final class NMSWorldImpl implements NMSWorld {
         WorldServer worldServer = new WorldServer(((CraftWorld) world).getHandle());
         BlockPosition blockPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         TileEntity mobSpawner = worldServer.getTileEntity(blockPosition);
-        if (mobSpawner != null)
-            mobSpawner.getSpawner().c = spawnDelay;
+
+        if (!(mobSpawner.getHandle() instanceof TileEntityMobSpawner))
+            return;
+
+        MobSpawnerAbstract mobSpawnerAbstract = mobSpawner.getSpawner();
+
+        if (!(mobSpawnerAbstract instanceof MobSpawnerAbstractNotifier)) {
+            MobSpawnerAbstractNotifier mobSpawnerAbstractNotifier = new MobSpawnerAbstractNotifier(mobSpawnerAbstract, delayChangeCallback);
+            MOB_SPAWNER_ABSTRACT.set(mobSpawner.getHandle(), mobSpawnerAbstractNotifier);
+            mobSpawnerAbstractNotifier.updateDelay();
+        }
     }
 
     @Override
