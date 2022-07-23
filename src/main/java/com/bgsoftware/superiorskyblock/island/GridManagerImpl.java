@@ -744,7 +744,8 @@ public class GridManagerImpl extends Manager implements GridManager {
             islands.removeAll(islandsToBeUnloaded);
         }
 
-        islands.forEach(plugin.getGrid()::createIsland);
+        islands.forEach(cachedIslandInfo -> plugin.getGrid().createIsland(cachedIslandInfo)
+                .ifPresent(island -> this.islandsContainer.addIsland(island)));
     }
 
     @Override
