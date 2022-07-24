@@ -46,6 +46,7 @@ public class EntityTeleports {
     }
 
     private static void teleportEntity(Entity entity, Location location, @Nullable Consumer<Boolean> teleportResult) {
+        entity.eject();
         plugin.getProviders().getAsyncProvider().teleport(entity, location, teleportResult);
     }
 
