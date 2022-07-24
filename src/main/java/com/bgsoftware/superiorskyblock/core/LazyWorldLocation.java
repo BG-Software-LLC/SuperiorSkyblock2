@@ -24,6 +24,12 @@ public class LazyWorldLocation extends Location {
         return super.getWorld();
     }
 
+    @Override
+    public Location clone() {
+        return getWorld() == null ? new LazyWorldLocation(this.worldName, getX(), getY(), getZ(), getPitch(), getYaw()) :
+                super.clone();
+    }
+
     public String getWorldName() {
         return worldName;
     }
