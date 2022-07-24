@@ -205,6 +205,7 @@ public class SettingsContainer {
     public final boolean autoUncoopWhenAlone;
     public final TopIslandMembersSorting islandTopMembersSorting;
     public final int bossBarLimit;
+    public final boolean deleteUnsafeWarps;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -522,6 +523,7 @@ public class SettingsContainer {
         }
         this.islandTopMembersSorting = islandTopMembersSorting;
         bossBarLimit = config.getInt("bossbar-limit", 1);
+        deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

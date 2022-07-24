@@ -555,6 +555,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         return this.container.bossBarLimit;
     }
 
+    @Override
+    public boolean getDeleteUnsafeWarps() {
+        return this.container.deleteUnsafeWarps;
+    }
+
     public void updateValue(String path, Object value) throws IOException {
         File file = new File(plugin.getDataFolder(), "config.yml");
 

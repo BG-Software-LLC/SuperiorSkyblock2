@@ -589,8 +589,15 @@ public interface SettingsManager {
 
     /**
      * Limit of the amount of bossbar tasks each player can have at the same time.
+     * Config-path: bossbar-limit
      */
     int getBossbarLimit();
+
+    /**
+     * Whether to delete unsafe warps when players try to teleport to them automatically.
+     * Config-path: delete-unsafe-warps
+     */
+    boolean getDeleteUnsafeWarps();
 
     interface Database {
 

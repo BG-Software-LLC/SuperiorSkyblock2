@@ -773,3 +773,7 @@ island-top-members-sorting: NAMES
 # Limit of the amount of bossbar tasks each player can have at the same time.
 # Once the limit is reached, the old ones will get removed.
 bossbar-limit: 1
+
+# Delete unsafe warps when players try to teleport to them automatically.
+# If disabled, warps that are unsafe will stay until players manually delete them.
+delete-unsafe-warps: true

@@ -3393,7 +3393,8 @@ public class SIsland implements Island {
 
         if (!isInsideRange(location)) {
             Message.UNSAFE_WARP.send(superiorPlayer);
-            deleteWarp(islandWarp.getName());
+            if (plugin.getSettings().getDeleteUnsafeWarps())
+                deleteWarp(islandWarp.getName());
             return;
         }
 
