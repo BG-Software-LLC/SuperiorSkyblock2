@@ -162,6 +162,11 @@ public class SQLDatabaseBridge implements DatabaseBridge {
         this.databaseBridgeMode = databaseBridgeMode;
     }
 
+    @Override
+    public DatabaseBridgeMode getDatabaseBridgeMode() {
+        return this.databaseBridgeMode;
+    }
+
     private StatementHolder buildStatementHolder(String query) {
         if (batchStatementHolder == null) {
             return new StatementHolder(query);

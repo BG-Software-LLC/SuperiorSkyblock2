@@ -73,4 +73,9 @@ public interface DatabaseBridge {
      */
     void setDatabaseBridgeMode(DatabaseBridgeMode databaseBridgeMode);
 
+    /**
+     * Get the current mode of the database bridge.
+     */
+    DatabaseBridgeMode getDatabaseBridgeMode();
+
 }

@@ -56,4 +56,9 @@ public class EmptyDatabaseBridge implements DatabaseBridge {
         // Do nothing.
     }
 
+    @Override
+    public DatabaseBridgeMode getDatabaseBridgeMode() {
+        return DatabaseBridgeMode.IDLE;
+    }
+
 }
