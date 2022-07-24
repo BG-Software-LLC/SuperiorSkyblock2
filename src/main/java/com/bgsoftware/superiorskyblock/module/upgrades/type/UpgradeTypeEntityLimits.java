@@ -4,14 +4,14 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
-import com.bgsoftware.superiorskyblock.world.WorldBlocks;
+import com.bgsoftware.superiorskyblock.core.LocationKey;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalMap;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.bgsoftware.superiorskyblock.world.BukkitItems;
-import com.bgsoftware.superiorskyblock.core.Materials;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -60,7 +60,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
     private class EntityLimitsListener implements Listener {
 
-        private final Map<Location, UUID> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
+        private final Map<LocationKey, UUID> vehiclesOwners = AutoRemovalMap.newHashMap(2, TimeUnit.SECONDS);
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onEntitySpawn(CreatureSpawnEvent e) {
@@ -120,7 +120,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
 
             Location blockLocation = e.getClickedBlock().getLocation();
 
-            vehiclesOwners.put(blockLocation, e.getPlayer().getUniqueId());
+            vehiclesOwners.put(new LocationKey(blockLocation), e.getPlayer().getUniqueId());
         }
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -133,7 +133,7 @@ public class UpgradeTypeEntityLimits implements IUpgradeType {
             if (island == null)
                 return;
 
-            UUID placedVehicle = vehiclesOwners.remove(WorldBlocks.getBlockLocation(e.getVehicle().getLocation()));
+            UUID placedVehicle = vehiclesOwners.remove(new LocationKey(e.getVehicle().getLocation()));
 
             if (!BukkitEntities.canHaveLimit(e.getVehicle().getType()))
                 return;

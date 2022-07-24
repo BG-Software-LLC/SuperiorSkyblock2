@@ -30,6 +30,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -194,7 +195,7 @@ public class SIsland implements Island {
      * Island Warps
      */
     private final Map<String, IslandWarp> warpsByName = new ConcurrentHashMap<>();
-    private final Map<Location, IslandWarp> warpsByLocation = new ConcurrentHashMap<>();
+    private final Map<LocationKey, IslandWarp> warpsByLocation = new ConcurrentHashMap<>();
     private final Map<String, WarpCategory> warpCategories = new ConcurrentHashMap<>();
 
     /*
@@ -3940,8 +3941,7 @@ public class SIsland implements Island {
 
         Location location = islandWarp.getLocation();
 
-        warpsByLocation.put(new Location(location.getWorld(), location.getBlockX(),
-                location.getBlockY(), location.getBlockZ()), islandWarp);
+        warpsByLocation.put(new LocationKey(location), islandWarp);
     }
 
     private static int getGeneratedSchematicBitMask(World.Environment environment) {

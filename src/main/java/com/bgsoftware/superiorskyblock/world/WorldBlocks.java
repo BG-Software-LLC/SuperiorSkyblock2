@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.ChunkSnapshot;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -59,10 +58,6 @@ public class WorldBlocks {
         ChunksTracker.markEmpty(island, chunkSnapshot, true);
 
         return true;
-    }
-
-    public static Location getBlockLocation(Location location) {
-        return new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
 }
