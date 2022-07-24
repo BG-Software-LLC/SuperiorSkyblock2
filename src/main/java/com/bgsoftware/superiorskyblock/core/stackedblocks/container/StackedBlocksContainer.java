@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.function.Consumer;
 
 public interface StackedBlocksContainer {
 
@@ -16,10 +16,10 @@ public interface StackedBlocksContainer {
 
     StackedBlock removeStackedBlock(Location location);
 
-    Map<Location, StackedBlock> getStackedBlocks(ChunkPosition chunkPosition);
+    void forEach(ChunkPosition chunkPosition, Consumer<StackedBlock> consumer);
 
-    Map<Location, StackedBlock> getStackedBlocks();
+    void forEach(Consumer<StackedBlock> consumer);
 
-    Map<Location, StackedBlock> removeStackedBlocks(ChunkPosition chunkPosition);
+    void removeStackedBlocks(ChunkPosition chunkPosition, Consumer<StackedBlock> consumer);
 
 }

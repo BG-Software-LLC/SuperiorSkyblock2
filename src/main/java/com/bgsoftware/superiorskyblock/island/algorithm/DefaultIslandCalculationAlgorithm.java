@@ -14,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlock;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -106,8 +105,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                 }
 
                 // Load built-in stacked blocks
-                for (StackedBlock stackedBlock : plugin.getStackedBlocks().getRealStackedBlocks(calculatedChunk.getPosition()))
-                    blockCounts.addCounts(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1);
+                plugin.getStackedBlocks().forEach(calculatedChunk.getPosition(), stackedBlock ->
+                        blockCounts.addCounts(stackedBlock.getBlockKey(), stackedBlock.getAmount() - 1));
 
                 plugin.getProviders().releaseSnapshots(calculatedChunk.getPosition());
             }), result::completeExceptionally);

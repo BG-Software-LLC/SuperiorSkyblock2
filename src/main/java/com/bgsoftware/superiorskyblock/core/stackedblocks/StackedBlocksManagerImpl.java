@@ -22,12 +22,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 
 public class StackedBlocksManagerImpl extends Manager implements StackedBlocksManager {
 
@@ -37,13 +37,6 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     public StackedBlocksManagerImpl(SuperiorSkyblockPlugin plugin, StackedBlocksContainer stackedBlocksContainer) {
         super(plugin);
         this.stackedBlocksContainer = stackedBlocksContainer;
-    }
-
-    private static Map<Location, Integer> convertStackedBlocksMap(Map<Location, StackedBlock> stackedBlocks) {
-        return stackedBlocks.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                value -> value.getValue().getAmount()
-        ));
     }
 
     @Override
@@ -160,21 +153,20 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
 
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
-        Map<Location, StackedBlock> chunkStackedBlocks = this.stackedBlocksContainer.removeStackedBlocks(chunkPosition);
+        Map<Location, Integer> removedStackedBlocks = new LinkedHashMap<>();
 
-        if (!chunkStackedBlocks.isEmpty()) {
-            try {
-                databaseBridge.batchOperations(true);
-                chunkStackedBlocks.values().forEach(stackedBlock -> {
-                    stackedBlock.removeHologram();
-                    StackedBlocksDatabaseBridge.deleteStackedBlock(this, stackedBlock);
-                });
-            } finally {
-                databaseBridge.batchOperations(false);
-            }
+        try {
+            databaseBridge.batchOperations(true);
+            this.stackedBlocksContainer.removeStackedBlocks(chunkPosition, stackedBlock -> {
+                removedStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount());
+                stackedBlock.removeHologram();
+                StackedBlocksDatabaseBridge.deleteStackedBlock(this, stackedBlock);
+            });
+        } finally {
+            databaseBridge.batchOperations(false);
         }
 
-        return Collections.unmodifiableMap(convertStackedBlocksMap(chunkStackedBlocks));
+        return Collections.unmodifiableMap(removedStackedBlocks);
     }
 
     @Override
@@ -187,14 +179,21 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     public Map<Location, Integer> getStackedBlocks(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
-        Map<Location, StackedBlock> chunkStackedBlocks = this.stackedBlocksContainer.getStackedBlocks(chunkPosition);
-        return Collections.unmodifiableMap(convertStackedBlocksMap(chunkStackedBlocks));
+
+        Map<Location, Integer> chunkStackedBlocks = new LinkedHashMap<>();
+
+        this.stackedBlocksContainer.forEach(chunkPosition, stackedBlock ->
+                chunkStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
+
+        return Collections.unmodifiableMap(chunkStackedBlocks);
     }
 
     @Override
     public Map<Location, Integer> getStackedBlocks() {
-        Map<Location, StackedBlock> stackedBlocks = this.stackedBlocksContainer.getStackedBlocks();
-        return Collections.unmodifiableMap(convertStackedBlocksMap(stackedBlocks));
+        Map<Location, Integer> allStackedBlocks = new LinkedHashMap<>();
+        this.stackedBlocksContainer.forEach(stackedBlock ->
+                allStackedBlocks.put(stackedBlock.getLocation(), stackedBlock.getAmount()));
+        return Collections.unmodifiableMap(allStackedBlocks);
     }
 
     @Override
@@ -214,10 +213,10 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void updateStackedBlockHolograms(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
-        this.stackedBlocksContainer.getStackedBlocks(ChunkPosition.of(chunk)).forEach((location, stackedBlock) -> {
+        this.stackedBlocksContainer.forEach(ChunkPosition.of(chunk), stackedBlock -> {
             stackedBlock.updateName(plugin);
             if (stackedBlock.getAmount() <= 1)
-                removeStackedBlock(location);
+                removeStackedBlock(stackedBlock.getLocation());
         });
     }
 
@@ -236,9 +235,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public void removeStackedBlockHolograms(Chunk chunk) {
         Preconditions.checkNotNull(chunk, "chunk parameter cannot be null.");
-        this.stackedBlocksContainer.getStackedBlocks(ChunkPosition.of(chunk))
-                .values()
-                .forEach(StackedBlock::removeHologram);
+        this.stackedBlocksContainer.forEach(ChunkPosition.of(chunk), StackedBlock::removeHologram);
     }
 
     @Override
@@ -246,22 +243,20 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         return databaseBridge;
     }
 
-    public Collection<StackedBlock> getRealStackedBlocks(ChunkPosition chunkPosition) {
-        return Collections.unmodifiableCollection(this.stackedBlocksContainer.getStackedBlocks(chunkPosition).values());
+    public void forEach(ChunkPosition chunkPosition, Consumer<StackedBlock> consumer) {
+        this.stackedBlocksContainer.forEach(chunkPosition, consumer);
     }
 
     public void saveStackedBlocks() {
-        Map<Location, StackedBlock> stackedBlocks = this.stackedBlocksContainer.getStackedBlocks();
-
         StackedBlocksDatabaseBridge.deleteStackedBlocks(this);
 
         try {
             databaseBridge.batchOperations(true);
-            for (StackedBlock stackedBlock : stackedBlocks.values()) {
+            this.stackedBlocksContainer.forEach(stackedBlock -> {
                 if (stackedBlock.getAmount() > 1) {
                     StackedBlocksDatabaseBridge.saveStackedBlock(this, stackedBlock);
                 }
-            }
+            });
         } finally {
             databaseBridge.batchOperations(false);
         }
@@ -296,9 +291,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     }
 
     private void updateStackedBlockKeys() {
-        this.stackedBlocksContainer.getStackedBlocks().values().forEach(stackedBlock -> {
-            stackedBlock.setBlockKey(KeyImpl.of(stackedBlock.getLocation().getBlock()));
-        });
+        this.stackedBlocksContainer.forEach(stackedBlock ->
+                stackedBlock.setBlockKey(KeyImpl.of(stackedBlock.getLocation().getBlock())));
     }
 
     private void initializeDatabaseBridge() {
