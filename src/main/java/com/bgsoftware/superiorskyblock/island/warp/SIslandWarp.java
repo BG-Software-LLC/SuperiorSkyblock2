@@ -31,8 +31,7 @@ public class SIslandWarp implements IslandWarp {
 
     public SIslandWarp(String name, Location location, WarpCategory warpCategory) {
         this.name = name;
-        this.location = new Location(location.getWorld(), location.getBlockX() + 0.5, location.getBlockY(),
-                location.getBlockZ() + 0.5, location.getYaw(), location.getPitch());
+        this.location = location.clone().add(0.5, 0, 0.5);
         this.warpCategory = warpCategory;
         this.privateFlag = !plugin.getSettings().isPublicWarps();
     }

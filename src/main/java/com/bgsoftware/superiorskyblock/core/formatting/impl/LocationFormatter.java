@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
+import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
 import org.bukkit.Location;
-import org.bukkit.World;
 
 public class LocationFormatter implements IFormatter<Location> {
 
@@ -18,7 +18,6 @@ public class LocationFormatter implements IFormatter<Location> {
 
     @Override
     public String format(Location value) {
-        World world = value.getWorld();
-        return (world == null ? "null" : world.getName()) + ", " + value.getBlockX() + ", " + value.getBlockY() + ", " + value.getBlockZ();
+        return LazyWorldLocation.getWorldName(value) + ", " + value.getBlockX() + ", " + value.getBlockY() + ", " + value.getBlockZ();
     }
 }

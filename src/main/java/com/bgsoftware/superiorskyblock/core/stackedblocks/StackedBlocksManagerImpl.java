@@ -268,7 +268,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     }
 
     private void loadStackedBlock(DatabaseResult resultSet) {
-        Optional<Location> location = resultSet.getString("location").map(Serializers.STACKED_BLOCK_SERIALIZER::deserialize);
+        Optional<Location> location = resultSet.getString("location").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize);
         if (!location.isPresent()) {
             SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
             return;
