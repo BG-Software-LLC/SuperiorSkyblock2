@@ -193,7 +193,6 @@ upgrades:
     '3':
       price: 150000.0
       price-type: "Money"
-      permission: 'upgrade.size.donor'
       border-size: 75
       commands:
         - 'island admin setupgrade %player% border-size 4'
@@ -229,7 +228,6 @@ upgrades:
     '3':
       price: 150000.0
       price-type: "Money"
-      permission: 'upgrade.gen.donor'
       generator-rates:
         normal:
           STONE: 80
