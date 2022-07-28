@@ -53,7 +53,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
     }
 
     public GameProfile getProfile() {
-        return ((EntityHuman) handle).fz();
+        return ((EntityHuman) handle).ct;
     }
 
     public UUID getThrower() {
