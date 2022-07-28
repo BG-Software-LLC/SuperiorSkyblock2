@@ -86,9 +86,11 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
             if (!creatureSpawners.isEmpty()) {
                 // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
                 BukkitExecutor.sync(() -> {
-                    creatureSpawners.forEach(creatureSpawner -> {
-                        plugin.getNMSWorld().listenSpawner(creatureSpawner, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
-                    });
+                    if (e.getChunk().isLoaded()) {
+                        creatureSpawners.forEach(creatureSpawner -> {
+                            plugin.getNMSWorld().listenSpawner(creatureSpawner, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
+                        });
+                    }
                 }, 20L);
             }
 
