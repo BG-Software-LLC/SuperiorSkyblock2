@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.external.async.AsyncProvider;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider_Default;
 import com.bgsoftware.superiorskyblock.external.chunks.ChunksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.economy.EconomyProvider_Default;
+import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
 import com.bgsoftware.superiorskyblock.external.permissions.PermissionsProvider_Default;
 import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
 import com.bgsoftware.superiorskyblock.external.prices.PricesProvider_Default;
@@ -37,7 +38,6 @@ import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvi
 import com.bgsoftware.superiorskyblock.external.stackedblocks.StackedBlocksProvider_Default;
 import com.bgsoftware.superiorskyblock.external.worlds.WorldsProvider_Default;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
-import com.bgsoftware.superiorskyblock.external.menus.MenusProvider_Default;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -467,7 +467,12 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         Optional<PricesProvider> pricesProvider = Optional.empty();
 
         if (canRegisterHook("ShopGUIPlus")) {
-            pricesProvider = createInstance("prices.PricesProvider_ShopGUIPlus");
+            try {
+                Class.forName("net.brcdev.shopgui.shop.item.ShopItem");
+                pricesProvider = createInstance("prices.PricesProvider_ShopGUIPlus78");
+            } catch (ClassNotFoundException error) {
+                pricesProvider = createInstance("prices.PricesProvider_ShopGUIPlus");
+            }
         }
 
         pricesProvider.ifPresent(this::setPricesProvider);

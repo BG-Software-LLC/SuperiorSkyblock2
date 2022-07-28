@@ -42,4 +42,5 @@ include 'v1_18_R2'
 include 'v1_18_R2-Spigot'
 include 'v1_19_R1'
 include 'v1_19_R1-Spigot'
+include 'Hook_ShopGUIPlus78'
 
