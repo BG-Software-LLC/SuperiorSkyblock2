@@ -186,7 +186,7 @@ public class DatabaseLoader_V1 implements DatabaseLoader {
         isRemoteDatabase = isRemoteDatabase();
 
         if (!isRemoteDatabase) {
-            databaseFile = new File(plugin.getDataFolder(), "database.db");
+            databaseFile = new File(plugin.getDataFolder(), "datastore/database.db");
 
             if (!databaseFile.exists())
                 return false;
