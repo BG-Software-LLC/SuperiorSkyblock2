@@ -1112,7 +1112,7 @@ public class SIsland implements Island {
         PluginDebugger.debug("Action: Set Permission, Island: " + owner.getName() + ", Role: " + playerRole +
                 ", Permission: " + islandPrivilege.getName());
 
-        PlayerRole oldRole = rolePermissions.put(islandPrivilege, playerRole);
+        rolePermissions.put(islandPrivilege, playerRole);
 
         if (islandPrivilege == IslandPrivileges.FLY) {
             getAllPlayersInside().forEach(this::updateIslandFly);
@@ -1120,8 +1120,6 @@ public class SIsland implements Island {
             getAllPlayersInside().forEach(superiorPlayer -> IslandUtils.updateTradingMenus(this, superiorPlayer));
         }
 
-        if (oldRole != null)
-            IslandsDatabaseBridge.removeRolePermission(this, oldRole);
         IslandsDatabaseBridge.saveRolePermission(this, playerRole, islandPrivilege);
     }
 

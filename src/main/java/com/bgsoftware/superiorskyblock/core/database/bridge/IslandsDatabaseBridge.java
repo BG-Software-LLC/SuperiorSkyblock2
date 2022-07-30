@@ -149,12 +149,6 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void removeRolePermission(Island island, PlayerRole playerRole) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_role_permissions",
-                createFilter("island", island, new Pair<>("role", playerRole.getId()))
-        ));
-    }
-
     public static void clearRolePermissions(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.deleteObject("islands_role_permissions",
                 createFilter("island", island)));
