@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.data;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -33,6 +34,8 @@ public abstract class DatabaseFilter {
 
     public abstract void forEach(BiConsumer<String, Object> consumer);
 
+    public abstract Collection<Pair<String, Object>> getFilters();
+
     private static class DatabaseFilterList extends DatabaseFilter {
 
         private final Collection<Pair<String, Object>> filters;
@@ -46,6 +49,11 @@ public abstract class DatabaseFilter {
             filters.forEach(pair -> consumer.accept(pair.getKey(), pair.getValue()));
         }
 
+        @Override
+        public Collection<Pair<String, Object>> getFilters() {
+            return Collections.unmodifiableCollection(filters);
+        }
+
     }
 
     private static class DatabaseFilterEmpty extends DatabaseFilter {
@@ -53,6 +61,11 @@ public abstract class DatabaseFilter {
         @Override
         public void forEach(BiConsumer<String, Object> consumer) {
             // Do nothing.
+        }
+
+        @Override
+        public Collection<Pair<String, Object>> getFilters() {
+            return Collections.emptyList();
         }
 
     }
@@ -70,6 +83,11 @@ public abstract class DatabaseFilter {
         @Override
         public void forEach(BiConsumer<String, Object> consumer) {
             consumer.accept(filterKey, filterValue);
+        }
+
+        @Override
+        public Collection<Pair<String, Object>> getFilters() {
+            return Collections.singleton(new Pair<>(filterKey, filterValue));
         }
 
     }
