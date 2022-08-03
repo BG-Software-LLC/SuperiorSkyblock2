@@ -1,8 +1,8 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.item.ItemStack;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
@@ -29,7 +29,7 @@ import org.bukkit.entity.EntityType;
 import java.util.Set;
 
 @SuppressWarnings({"unused"})
-public class NMSTagsImpl implements NMSTags {
+public final class NMSTagsImpl implements NMSTags {
 
     @Override
     public CompoundTag getNBTTag(org.bukkit.inventory.ItemStack bukkitStack) {

@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "org.spigotmc:v1_19_R1-Paper:git-02b5ec4"
+    compileOnly "org.spigotmc:v1_19_R1-Paper:git-4a4ee79"
 
     compileOnly 'io.papermc.paper:paper-api:1.19-R0.1-SNAPSHOT'
 

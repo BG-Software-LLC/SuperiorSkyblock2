@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
@@ -32,10 +33,15 @@ public final class IslandEntityEnderDragon extends EntityEnderDragon {
         this.islandBlockPosition = islandBlockPosition;
     }
 
+    @Remap(classPath = "net.minecraft.world.entity.EntityType", name = "ENDER_DRAGON", type = Remap.Type.FIELD, remappedName = "x")
     private IslandEntityEnderDragon(World world) {
         super(EntityTypes.x, world);
     }
 
+    @Remap(classPath = "net.minecraft.world.entity.Entity",
+            name = "readAdditionalSaveData",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     @Override
     public void a(@NotNull NBTTagCompound nbtTagCompound) {
         // loadData
@@ -61,6 +67,10 @@ public final class IslandEntityEnderDragon extends EntityEnderDragon {
                 worldServer, this.islandBlockPosition, this));
     }
 
+    @Remap(classPath = "net.minecraft.world.entity.LivingEntity",
+            name = "aiStep",
+            type = Remap.Type.METHOD,
+            remappedName = "w_")
     @Override
     public void w_() {
         DragonUtils.runWithPodiumPosition(this.islandBlockPosition, super::w_);

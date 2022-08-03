@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.chunk.Chunk;
@@ -21,7 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CropsTickingTileEntity extends TileEntity {
+public final class CropsTickingTileEntity extends TileEntity {
+
+    @Remap(classPath = "net.minecraft.world.level.GameRules", name = "RULE_RANDOMTICKING", type = Remap.Type.FIELD, remappedName = "n")
+    private static final GameRules.GameRuleKey<GameRules.GameRuleInt> RANDOM_TICKING_GAME_RULE = GameRules.n;
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -35,6 +38,7 @@ public class CropsTickingTileEntity extends TileEntity {
 
     private int currentTick = 0;
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntityType", name = "COMMAND_BLOCK", type = Remap.Type.FIELD, remappedName = "v")
     private CropsTickingTileEntity(Island island, ChunkAccess chunk, BlockPosition blockPosition) {
         super(TileEntityTypes.v, blockPosition.getHandle(), chunk.getWorld().getType(blockPosition).getHandle());
         this.island = new WeakReference<>(island);
@@ -59,18 +63,34 @@ public class CropsTickingTileEntity extends TileEntity {
         return tickingChunks.remove(chunkCoords.pair());
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "remove",
+            type = Remap.Type.FIELD,
+            remappedName = "p")
     public void remove() {
         this.p = true;
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "isRemoved",
+            type = Remap.Type.METHOD,
+            remappedName = "r")
     public boolean isRemoved() {
         return super.r();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "getBlockPos",
+            type = Remap.Type.METHOD,
+            remappedName = "p")
     public net.minecraft.core.BlockPosition getPosition() {
         return super.p();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "getType",
+            type = Remap.Type.METHOD,
+            remappedName = "u")
     public TileEntityTypes<?> getTileType() {
         return super.u();
     }
@@ -90,7 +110,7 @@ public class CropsTickingTileEntity extends TileEntity {
 
         currentTick = 0;
 
-        int worldRandomTick = world.getGameRules().getInt(GameRules.n);
+        int worldRandomTick = world.getGameRules().getInt(RANDOM_TICKING_GAME_RULE);
         double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
         int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
@@ -111,37 +131,12 @@ public class CropsTickingTileEntity extends TileEntity {
                                 CraftMagicNumbers.getMaterial(block.getHandle()).name())) {
                             BlockPosition blockPosition = new BlockPosition(x + (chunkX << 4),
                                     y + chunkSection.getYPosition(), z + (chunkZ << 4));
-                            blockData.randomTick(world, blockPosition, ThreadLocalRandom.current());
+                            blockData.randomTick(world, blockPosition, world.getRandom());
                         }
                     }
                 }
             }
         }
-    }
-
-    private final record CropsTickingTileEntityTicker(
-            CropsTickingTileEntity cropsTickingTileEntity) implements TickingBlockEntity {
-
-        @Override
-        public void a() {
-            cropsTickingTileEntity.tick();
-        }
-
-        @Override
-        public boolean b() {
-            return cropsTickingTileEntity.isRemoved();
-        }
-
-        @Override
-        public net.minecraft.core.BlockPosition c() {
-            return cropsTickingTileEntity.getPosition();
-        }
-
-        @Override
-        public String d() {
-            return TileEntityTypes.a(cropsTickingTileEntity.getTileType()) + "";
-        }
-
     }
 
 }

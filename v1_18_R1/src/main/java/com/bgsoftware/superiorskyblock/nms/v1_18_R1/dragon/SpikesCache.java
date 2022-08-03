@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
+public final class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>> {
 
     private static final SpikesCache INSTANCE = new SpikesCache();
 
@@ -159,7 +159,7 @@ public class SpikesCache implements LoadingCache<Long, List<WorldGenEnder.Spike>
         this.cachedSpikes.cleanUp();
     }
 
-    private class InternalCacheLoader extends CacheLoader<net.minecraft.core.BlockPosition, List<WorldGenEnder.Spike>> {
+    private final class InternalCacheLoader extends CacheLoader<net.minecraft.core.BlockPosition, List<WorldGenEnder.Spike>> {
 
         @Override
         public @NotNull

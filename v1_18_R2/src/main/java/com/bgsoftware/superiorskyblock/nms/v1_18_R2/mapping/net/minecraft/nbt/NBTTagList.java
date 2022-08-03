@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt;
 
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import net.minecraft.nbt.NBTBase;
 
-public class NBTTagList extends MappedObject<net.minecraft.nbt.NBTTagList> {
+public final class NBTTagList extends MappedObject<net.minecraft.nbt.NBTTagList> {
 
     public NBTTagList() {
         this(new net.minecraft.nbt.NBTTagList());
@@ -21,6 +22,10 @@ public class NBTTagList extends MappedObject<net.minecraft.nbt.NBTTagList> {
         return handle.size();
     }
 
+    @Remap(classPath = "net.minecraft.nbt.ListTag",
+            name = "getCompound",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public NBTTagCompound getCompound(int index) {
         return new NBTTagCompound(handle.a(index));
     }

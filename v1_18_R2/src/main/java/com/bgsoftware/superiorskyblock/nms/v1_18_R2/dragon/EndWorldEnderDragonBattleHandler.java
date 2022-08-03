@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon;
 
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
+public final class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
 
     private final Map<UUID, IslandEnderDragonBattle> worldDragonBattlesMap = new HashMap<>();
     private final List<IslandEnderDragonBattle> worldDragonBattlesList = new LinkedList<>();
@@ -19,6 +20,10 @@ public class EndWorldEnderDragonBattleHandler extends EnderDragonBattle {
         super(worldServer.getHandle(), worldServer.getSeed(), new net.minecraft.nbt.NBTTagCompound());
     }
 
+    @Remap(classPath = "net.minecraft.world.level.dimension.end.EndDragonFight",
+            name = "tick",
+            type = Remap.Type.METHOD,
+            remappedName = "b")
     @Override
     public void b() {
         this.worldDragonBattlesList.forEach(EnderDragonBattle::b);

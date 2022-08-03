@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon.IslandEnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon.IslandEntityEnderDragon;
@@ -41,6 +42,7 @@ public final class NMSDragonFightImpl implements NMSDragonFight {
             WorldGenEnder.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)
             .removeFinal();
 
+    @Remap(classPath = "net.minecraft.world.entity.EntityType", name = "ENDER_DRAGON", type = Remap.Type.FIELD, remappedName = "x")
     private static boolean firstWorldPreparation = true;
 
     static {

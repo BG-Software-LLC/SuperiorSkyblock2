@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk;
 
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import net.minecraft.core.Holder;
@@ -19,30 +20,62 @@ public final class ChunkSection extends MappedObject<net.minecraft.world.level.c
         return handle == null ? null : new ChunkSection(handle);
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "getStates",
+            type = Remap.Type.METHOD,
+            remappedName = "i")
     public DataPaletteBlock<IBlockData> getBlocks() {
         return handle.i();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "getBiomes",
+            type = Remap.Type.METHOD,
+            remappedName = "j")
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainerRO",
+            name = "recreate",
+            type = Remap.Type.METHOD,
+            remappedName = "e")
     public DataPaletteBlock<Holder<BiomeBase>> getBiomes() {
         return handle.j().e();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "setBlockState",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public void setType(int x, int y, int z, BlockData state, boolean lock) {
         handle.a(x, y, z, state.getHandle(), lock);
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "getBlockState",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public BlockData getType(int x, int y, int z) {
         return new BlockData(handle.a(x, y, z));
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "bottomBlockY",
+            type = Remap.Type.METHOD,
+            remappedName = "g")
     public int getYPosition() {
         return handle.g();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "isRandomlyTicking",
+            type = Remap.Type.METHOD,
+            remappedName = "d")
     public boolean isRandomlyTicking() {
         return handle.d();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.LevelChunkSection",
+            name = "hasOnlyAir",
+            type = Remap.Type.METHOD,
+            remappedName = "c")
     public boolean isEmpty() {
         return handle.c();
     }

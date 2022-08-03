@@ -1,16 +1,49 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.world;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.properties.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockProperties;
 import net.minecraft.world.level.block.state.properties.IBlockState;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockStatesMapper {
+public final class BlockStatesMapper {
 
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AXIS", type = Remap.Type.FIELD, remappedName = "G")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "FACING_HOPPER", type = Remap.Type.FIELD, remappedName = "O")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "HORIZONTAL_FACING", type = Remap.Type.FIELD, remappedName = "P")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "EAST_WALL", type = Remap.Type.FIELD, remappedName = "T")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "NORTH_WALL", type = Remap.Type.FIELD, remappedName = "U")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "SOUTH_WALL", type = Remap.Type.FIELD, remappedName = "V")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "WEST_WALL", type = Remap.Type.FIELD, remappedName = "W")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "EAST_REDSTONE", type = Remap.Type.FIELD, remappedName = "X")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "NORTH_REDSTONE", type = Remap.Type.FIELD, remappedName = "Y")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "SOUTH_REDSTONE", type = Remap.Type.FIELD, remappedName = "Z")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "WEST_REDSTONE", type = Remap.Type.FIELD, remappedName = "aa")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "DOUBLE_BLOCK_HALF", type = Remap.Type.FIELD, remappedName = "ab")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "RAIL_SHAPE", type = Remap.Type.FIELD, remappedName = "ad")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "RAIL_SHAPE_STRAIGHT", type = Remap.Type.FIELD, remappedName = "ae")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_1", type = Remap.Type.FIELD, remappedName = "am")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_2", type = Remap.Type.FIELD, remappedName = "an")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_3", type = Remap.Type.FIELD, remappedName = "ao")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_5", type = Remap.Type.FIELD, remappedName = "ap")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_7", type = Remap.Type.FIELD, remappedName = "aq")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_15", type = Remap.Type.FIELD, remappedName = "ar")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "AGE_25", type = Remap.Type.FIELD, remappedName = "as")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "LEVEL_CAULDRON", type = Remap.Type.FIELD, remappedName = "aF")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "LEVEL_COMPOSTER", type = Remap.Type.FIELD, remappedName = "aG")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "LEVEL_FLOWING", type = Remap.Type.FIELD, remappedName = "aH")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "LEVEL", type = Remap.Type.FIELD, remappedName = "aK")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "DISTANCE", type = Remap.Type.FIELD, remappedName = "ax")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "STABILITY_DISTANCE", type = Remap.Type.FIELD, remappedName = "aR")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "CHEST_TYPE", type = Remap.Type.FIELD, remappedName = "aY")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "MODE_COMPARATOR", type = Remap.Type.FIELD, remappedName = "aZ")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "PISTON_TYPE", type = Remap.Type.FIELD, remappedName = "bc")
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.BlockStateProperties", name = "SLAB_TYPE", type = Remap.Type.FIELD, remappedName = "bd")
     private static final Map<String, BlockState<?>> nameToBlockState = new HashMap<>();
     private static final Map<IBlockState<?>, String> blockStateToName = new HashMap<>();
 
@@ -49,10 +82,7 @@ public class BlockStatesMapper {
         fieldNameToName.put("bd", "slab-type");
 
         try {
-            // Fixes BlockProperties being private-class in some versions of Yatopia causing illegal access errors.
-            Class<?> blockPropertiesClass = Class.forName("net.minecraft.world.level.block.state.properties.BlockProperties");
-
-            for (Field field : blockPropertiesClass.getFields()) {
+            for (Field field : BlockProperties.class.getFields()) {
                 field.setAccessible(true);
                 Object value = field.get(null);
                 if (value instanceof IBlockState) {

@@ -6,7 +6,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 
-public class NMSCachedBlock implements ICachedBlock {
+public final class NMSCachedBlock implements ICachedBlock {
 
     private final BlockData blockData;
 

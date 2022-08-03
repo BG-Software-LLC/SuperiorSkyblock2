@@ -387,7 +387,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
             nmsTags = loadNMSClass("NMSTagsImpl", version);
             nmsWorld = loadNMSClass("NMSWorldImpl", version);
-            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             new ManagerLoadException(
@@ -397,6 +396,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             PluginDebugger.debug(ex);
             return false;
         }
+
+        return true;
     }
 
     private <T> T loadNMSClass(String className, String version) throws Exception {

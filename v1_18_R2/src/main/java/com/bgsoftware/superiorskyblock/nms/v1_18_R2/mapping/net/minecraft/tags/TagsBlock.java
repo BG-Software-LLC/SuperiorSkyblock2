@@ -1,13 +1,20 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags;
 
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import net.minecraft.tags.TagKey;
 
-public class TagsBlock {
+public final class TagsBlock {
 
+    @Remap(classPath = "net.minecraft.tags.BlockTags", name = "SLABS", type = Remap.Type.FIELD, remappedName = "D")
     public static final TagKey<net.minecraft.world.level.block.Block> SLABS = net.minecraft.tags.TagsBlock.D;
+    @Remap(classPath = "net.minecraft.tags.BlockTags", name = "WOODEN_SLABS", type = Remap.Type.FIELD, remappedName = "i")
     public static final TagKey<net.minecraft.world.level.block.Block> WOODEN_SLABS = net.minecraft.tags.TagsBlock.i;
 
+    @Remap(classPath = "net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase",
+            name = "is",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public static boolean isTagged(TagKey<net.minecraft.world.level.block.Block> tag, Block value) {
         return value.getBlockData().getHandle().a(tag);
     }

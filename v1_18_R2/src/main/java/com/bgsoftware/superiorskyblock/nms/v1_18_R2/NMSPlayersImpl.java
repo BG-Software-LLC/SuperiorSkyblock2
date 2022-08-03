@@ -4,15 +4,17 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.service.bossbar.BossBar;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.service.bossbar.BossBarTask;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.entity.item.EntityItem;
@@ -32,9 +34,12 @@ import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.Optional;
 
-public class NMSPlayersImpl implements NMSPlayers {
+public final class NMSPlayersImpl implements NMSPlayers {
 
     private static final ReflectMethod<Locale> PLAYER_LOCALE = new ReflectMethod<>(Player.class, "locale");
+
+    @Remap(classPath = "net.minecraft.world.level.Level", name = "OVERWORLD", type = Remap.Type.FIELD, remappedName = "e")
+    private static final ResourceKey<World> OVERWORLD = World.e;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -55,7 +60,7 @@ public class NMSPlayersImpl implements NMSPlayers {
         GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(), offlinePlayer.getName());
 
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = WorldServer.getWorldServer(server, World.f);
+        WorldServer worldServer = WorldServer.getWorldServer(server, OVERWORLD);
         Entity entity = new Entity(new EntityPlayer(server, worldServer.getHandle(), profile));
         Player targetPlayer = (Player) entity.getBukkitEntity();
 
@@ -126,7 +131,7 @@ public class NMSPlayersImpl implements NMSPlayers {
         }
     }
 
-    private static class BossBarImpl implements BossBar {
+    private static final class BossBarImpl implements BossBar {
 
         private final org.bukkit.boss.BossBar bossBar;
         private final BossBarTask bossBarTask;

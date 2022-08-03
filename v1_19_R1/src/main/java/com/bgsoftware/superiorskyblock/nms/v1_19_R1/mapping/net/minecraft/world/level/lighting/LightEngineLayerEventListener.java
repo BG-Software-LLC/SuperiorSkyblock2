@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.lighting;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import net.minecraft.world.level.lighting.LightEngineBlock;
@@ -24,10 +25,18 @@ public final class LightEngineLayerEventListener extends
         }
     }
 
+    @Remap(classPath = "net.minecraft.world.level.lighting.LayerLightEventListener",
+            name = "getLightValue",
+            type = Remap.Type.METHOD,
+            remappedName = "b")
     public int getLightLevel(BlockPosition blockPosition) {
         return handle.b(blockPosition.getHandle());
     }
 
+    @Remap(classPath = "net.minecraft.world.level.lighting.LevelLightEngine",
+            name = "onBlockEmissionIncrease",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     private void flagBlockDirty(BlockPosition blockPosition, byte lightData) {
         try {
             handle.a(blockPosition.getHandle(), lightData);

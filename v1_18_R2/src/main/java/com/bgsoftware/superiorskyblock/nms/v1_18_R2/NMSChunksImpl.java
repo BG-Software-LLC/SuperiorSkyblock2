@@ -12,13 +12,14 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.SectionPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagList;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.PlayerConnection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.network.PlayerConnection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.tags.TagsBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.Entity;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
@@ -39,6 +40,7 @@ import net.minecraft.nbt.DynamicOpsNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.RegionLimitedWorldAccess;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.EnumSkyBlock;
@@ -48,6 +50,7 @@ import net.minecraft.world.level.block.BlockStepAbstract;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.properties.BlockPropertySlabType;
+import net.minecraft.world.level.block.state.properties.BlockStateEnum;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.DataPaletteBlock;
@@ -76,7 +79,22 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @SuppressWarnings({"ConstantConditions", "deprecation"})
-public class NMSChunksImpl implements NMSChunks {
+public final class NMSChunksImpl implements NMSChunks {
+
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainer$Strategy", name = "SECTION_BIOMES", type = Remap.Type.FIELD, remappedName = "e")
+    private static final DataPaletteBlock.e SECTION_BIOMES_STRATEGY = DataPaletteBlock.e.e;
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainer$Strategy", name = "SECTION_STATES", type = Remap.Type.FIELD, remappedName = "d")
+    private static final DataPaletteBlock.e SECTION_STATES_STRATEGY = DataPaletteBlock.e.d;
+    @Remap(classPath = "net.minecraft.world.level.biome.Biomes", name = "PLAINS", type = Remap.Type.FIELD, remappedName = "b")
+    private static final ResourceKey<BiomeBase> PLAINS_BIOME = Biomes.b;
+    @Remap(classPath = "net.minecraft.world.level.block.SlabBlock", name = "TYPE", type = Remap.Type.FIELD, remappedName = "a")
+    private static final BlockStateEnum<BlockPropertySlabType> SLAB_TYPE = BlockStepAbstract.a;
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.SlabType", name = "DOUBLE", type = Remap.Type.FIELD, remappedName = "c")
+    private static final BlockPropertySlabType SLAB_TYPE_DOUBLE = BlockPropertySlabType.c;
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.SlabType", name = "BOTTOM", type = Remap.Type.FIELD, remappedName = "b")
+    private static final BlockPropertySlabType SLAB_TYPE_BOTTOM = BlockPropertySlabType.b;
+    @Remap(classPath = "net.minecraft.world.level.chunk.ChunkStatus", name = "SURFACE", type = Remap.Type.FIELD, remappedName = "h")
+    private static final ChunkStatus SURFACE_CHUNK_STATUS = ChunkStatus.h;
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -84,6 +102,9 @@ public class NMSChunksImpl implements NMSChunks {
         this.plugin = plugin;
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainer", name = "codec", type = Remap.Type.METHOD, remappedName = "a")
+    @Remap(classPath = "net.minecraft.core.Registry", name = "holderByNameCodec", type = Remap.Type.METHOD, remappedName = "p")
+    @Remap(classPath = "net.minecraft.core.Registry", name = "getHolderOrThrow", type = Remap.Type.METHOD, remappedName = "g")
     @Override
     public void setBiome(List<ChunkPosition> chunkPositions, Biome biome, Collection<Player> playersToUpdate) {
         if (chunkPositions.isEmpty())
@@ -107,7 +128,7 @@ public class NMSChunksImpl implements NMSChunks {
                     DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.getBlocks();
                     chunkSections[i] = new net.minecraft.world.level.chunk.ChunkSection(
                             currentSection.getYPosition() >> 4, dataPaletteBlock,
-                            new DataPaletteBlock<>(biomesRegistryHolder, biomeBase, DataPaletteBlock.e.e));
+                            new DataPaletteBlock<>(biomesRegistryHolder, biomeBase, SECTION_BIOMES_STRATEGY));
                 }
             }
 
@@ -125,9 +146,9 @@ public class NMSChunksImpl implements NMSChunks {
             });
         }, unloadedChunkCompound -> {
             Codec<DataPaletteBlock<Holder<BiomeBase>>> codec = DataPaletteBlock.a(biomesRegistryHolder,
-                    biomesRegistry.p(), DataPaletteBlock.e.e, biomesRegistry.g(Biomes.b));
+                    biomesRegistry.p(), SECTION_BIOMES_STRATEGY, biomesRegistry.g(PLAINS_BIOME));
             DataResult<NBTBase> dataResult = codec.encodeStart(DynamicOpsNBT.a,
-                    new DataPaletteBlock<>(biomesRegistryHolder, biomeBase, DataPaletteBlock.e.e));
+                    new DataPaletteBlock<>(biomesRegistryHolder, biomeBase, SECTION_BIOMES_STRATEGY));
             NBTBase biomesCompound = dataResult.getOrThrow(false, error -> {
             });
 
@@ -138,6 +159,9 @@ public class NMSChunksImpl implements NMSChunks {
         });
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainer", name = "codec", type = Remap.Type.METHOD, remappedName = "a")
+    @Remap(classPath = "net.minecraft.core.Registry", name = "holderByNameCodec", type = Remap.Type.METHOD, remappedName = "p")
+    @Remap(classPath = "net.minecraft.core.Registry", name = "getHolderOrThrow", type = Remap.Type.METHOD, remappedName = "g")
     @Override
     public void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
         if (chunkPositions.isEmpty())
@@ -167,7 +191,7 @@ public class NMSChunksImpl implements NMSChunks {
             removeBlocks(chunk);
         }, unloadedChunkCompound -> {
             Codec<DataPaletteBlock<IBlockData>> blocksCodec = DataPaletteBlock.a(Block.CODEC, IBlockData.b,
-                    DataPaletteBlock.e.d, Block.AIR.getBlockData().getHandle());
+                    SECTION_STATES_STRATEGY, Block.AIR.getBlockData().getHandle());
 
             NBTTagList tileEntities = new NBTTagList();
 
@@ -176,7 +200,7 @@ public class NMSChunksImpl implements NMSChunks {
 
             if (worldServer.getBukkitGenerator() instanceof IslandsGenerator) {
                 DataResult<NBTBase> dataResult = blocksCodec.encodeStart(DynamicOpsNBT.a,
-                        new DataPaletteBlock<>(Block.CODEC, Block.AIR.getBlockData().getHandle(), DataPaletteBlock.e.d));
+                        new DataPaletteBlock<>(Block.CODEC, Block.AIR.getBlockData().getHandle(), SECTION_STATES_STRATEGY));
                 NBTBase blockStatesCompound = dataResult.getOrThrow(false, error -> {
                 });
 
@@ -198,7 +222,7 @@ public class NMSChunksImpl implements NMSChunks {
                 IRegistry<BiomeBase> biomesRegistry = worldServer.getBiomeRegistry();
                 Registry<Holder<BiomeBase>> biomesRegistryHolder = worldServer.getBiomeRegistryHolder();
                 Codec<DataPaletteBlock<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.a(biomesRegistryHolder,
-                        biomesRegistry.p(), DataPaletteBlock.e.e, biomesRegistry.g(Biomes.b));
+                        biomesRegistry.p(), SECTION_BIOMES_STRATEGY, biomesRegistry.g(PLAINS_BIOME));
 
                 LightEngine lightEngine = worldServer.getLightEngine();
                 net.minecraft.world.level.chunk.ChunkSection[] chunkSections = protoChunk.getSections();
@@ -244,6 +268,8 @@ public class NMSChunksImpl implements NMSChunks {
         });
     }
 
+    @Remap(classPath = "net.minecraft.core.Registry", name = "holderByNameCodec", type = Remap.Type.METHOD, remappedName = "p")
+    @Remap(classPath = "net.minecraft.core.Registry", name = "getHolderOrThrow", type = Remap.Type.METHOD, remappedName = "g")
     @Override
     public CompletableFuture<List<CalculatedChunk>> calculateChunks(List<ChunkPosition> chunkPositions,
                                                                     Map<ChunkPosition, CalculatedChunk> unloadedChunksCache) {
@@ -280,9 +306,9 @@ public class NMSChunksImpl implements NMSChunks {
             Registry<Holder<BiomeBase>> biomesRegistryHolder = worldServer.getBiomeRegistryHolder();
 
             Codec<DataPaletteBlock<IBlockData>> blocksCodec = DataPaletteBlock.a(Block.CODEC, IBlockData.b,
-                    DataPaletteBlock.e.d, Blocks.a.n());
+                    SECTION_STATES_STRATEGY, Block.AIR.getBlockData().getHandle());
             Codec<DataPaletteBlock<Holder<BiomeBase>>> biomesCodec = DataPaletteBlock.a(biomesRegistryHolder,
-                    biomesRegistry.p(), DataPaletteBlock.e.e, biomesRegistry.g(Biomes.b));
+                    biomesRegistry.p(), SECTION_BIOMES_STRATEGY, biomesRegistry.g(PLAINS_BIOME));
 
             net.minecraft.world.level.chunk.ChunkSection[] chunkSections =
                     new net.minecraft.world.level.chunk.ChunkSection[worldServer.getSectionsAmount()];
@@ -302,7 +328,8 @@ public class NMSChunksImpl implements NMSChunks {
                         blocksDataPalette = dataResult.getOrThrow(false, error -> {
                         });
                     } else {
-                        blocksDataPalette = new DataPaletteBlock<>(Block.CODEC, Blocks.a.n(), DataPaletteBlock.e.d);
+                        blocksDataPalette = new DataPaletteBlock<>(Block.CODEC, Block.AIR.getBlockData().getHandle(),
+                                SECTION_STATES_STRATEGY);
                     }
 
                     DataPaletteBlock<Holder<BiomeBase>> biomesDataPalette;
@@ -313,8 +340,8 @@ public class NMSChunksImpl implements NMSChunks {
                         biomesDataPalette = dataResult.getOrThrow(false, error -> {
                         });
                     } else {
-                        biomesDataPalette = new DataPaletteBlock<>(biomesRegistryHolder, biomesRegistry.g(Biomes.b),
-                                DataPaletteBlock.e.e);
+                        biomesDataPalette = new DataPaletteBlock<>(biomesRegistryHolder, biomesRegistry.g(PLAINS_BIOME),
+                                SECTION_BIOMES_STRATEGY);
                     }
 
                     chunkSections[sectionIndex] = new net.minecraft.world.level.chunk.ChunkSection(
@@ -346,8 +373,7 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshLights(org.bukkit.Chunk bukkitChunk,
-                              List<SchematicBlock> blockDataList) {
+    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
         ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
         WorldServer world = chunk.getWorld();
 
@@ -428,9 +454,9 @@ public class NMSChunksImpl implements NMSChunks {
                         int blockAmount = 1;
 
                         if ((TagsBlock.isTagged(TagsBlock.SLABS, block) || TagsBlock.isTagged(TagsBlock.WOODEN_SLABS, block)) &&
-                                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.c) {
+                                blockData.get(SLAB_TYPE) == SLAB_TYPE_DOUBLE) {
                             blockAmount = 2;
-                            blockData = blockData.set(BlockStepAbstract.a, BlockPropertySlabType.b);
+                            blockData = blockData.set(SLAB_TYPE, SLAB_TYPE_BOTTOM);
                         }
 
                         Material type = CraftMagicNumbers.getMaterial(blockData.getBlock().getHandle());
@@ -482,7 +508,11 @@ public class NMSChunksImpl implements NMSChunks {
                     bukkitGenerator);
 
             RegionLimitedWorldAccess region = new RegionLimitedWorldAccess(worldServer.getHandle(),
-                    Collections.singletonList(chunk.getHandle()), ChunkStatus.h, 0);
+                    Collections.singletonList(chunk.getHandle()), SURFACE_CHUNK_STATUS, 0);
+
+            chunkGenerator.a(region,
+                    worldServer.getStructureManager().getStructureManager(region).getHandle(),
+                    chunk.getHandle());
 
             chunkGenerator.a(region,
                     worldServer.getStructureManager().getStructureManager(region).getHandle(),

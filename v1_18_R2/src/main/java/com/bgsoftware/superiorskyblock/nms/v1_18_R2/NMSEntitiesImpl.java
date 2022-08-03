@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Modifier;
 
-public class NMSEntitiesImpl implements NMSEntities {
+public final class NMSEntitiesImpl implements NMSEntities {
 
     private static final ReflectField<Integer> PORTAL_TICKS = new ReflectField<>(
             net.minecraft.world.entity.Entity.class, int.class, Modifier.PROTECTED, 2);

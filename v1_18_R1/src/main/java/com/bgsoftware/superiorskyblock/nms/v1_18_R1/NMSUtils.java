@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.SectionPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
@@ -15,8 +16,8 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.properties.BlockState;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.world.BlockStatesMapper;
@@ -45,7 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class NMSUtils {
+public final class NMSUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -53,6 +54,14 @@ public class NMSUtils {
 
     private static final ReflectMethod<Void> SEND_PACKETS_TO_RELEVANT_PLAYERS = new ReflectMethod<>(
             PlayerChunk.class, 1, Packet.class, boolean.class);
+    @Remap(classPath = "net.minecraft.world.level.levelgen.Heightmap$Types", name = "MOTION_BLOCKING", type = Remap.Type.FIELD, remappedName = "e")
+    private static final HeightMap.Type MOTION_BLOCKING_HEIGHT_MAP = HeightMap.Type.e;
+    @Remap(classPath = "net.minecraft.world.level.levelgen.Heightmap$Types", name = "MOTION_BLOCKING_NO_LEAVES", type = Remap.Type.FIELD, remappedName = "f")
+    private static final HeightMap.Type MOTION_BLOCKING_NO_LEAVES_HEIGHT_MAP = HeightMap.Type.f;
+    @Remap(classPath = "net.minecraft.world.level.levelgen.Heightmap$Types", name = "OCEAN_FLOOR", type = Remap.Type.FIELD, remappedName = "d")
+    private static final HeightMap.Type OCEAN_FLOOR_HEIGHT_MAP = HeightMap.Type.d;
+    @Remap(classPath = "net.minecraft.world.level.levelgen.Heightmap$Types", name = "WORLD_SURFACE", type = Remap.Type.FIELD, remappedName = "b")
+    private static final HeightMap.Type WORLD_SURFACE_HEIGHT_MAP = HeightMap.Type.b;
 
     static {
         try {
@@ -119,7 +128,7 @@ public class NMSUtils {
 
             chunks.forEach(chunkCoords -> {
                 try {
-                    NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords);
+                    NBTTagCompound chunkCompound = playerChunkMap.read(chunkCoords).join();
 
                     if (chunkCompound == null)
                         return;
@@ -232,10 +241,10 @@ public class NMSUtils {
 
         chunkSection.setType(blockX, blockY & 15, blockZ, blockData, false);
 
-        chunk.getHeightmap(HeightMap.Type.e).setBlock(blockX, blockY, blockZ, blockData);
-        chunk.getHeightmap(HeightMap.Type.f).setBlock(blockX, blockY, blockZ, blockData);
-        chunk.getHeightmap(HeightMap.Type.d).setBlock(blockX, blockY, blockZ, blockData);
-        chunk.getHeightmap(HeightMap.Type.b).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(MOTION_BLOCKING_HEIGHT_MAP).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(MOTION_BLOCKING_NO_LEAVES_HEIGHT_MAP).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(OCEAN_FLOOR_HEIGHT_MAP).setBlock(blockX, blockY, blockZ, blockData);
+        chunk.getHeightmap(WORLD_SURFACE_HEIGHT_MAP).setBlock(blockX, blockY, blockZ, blockData);
 
         chunk.setNeedsSaving(true);
 

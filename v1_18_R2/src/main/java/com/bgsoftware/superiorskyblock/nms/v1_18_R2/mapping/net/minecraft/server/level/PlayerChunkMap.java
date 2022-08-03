@@ -1,9 +1,10 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.PlayerChunk;
 import net.minecraft.world.level.GeneratorAccess;
@@ -14,9 +15,10 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class PlayerChunkMap extends MappedObject<net.minecraft.server.level.PlayerChunkMap> {
+public final class PlayerChunkMap extends MappedObject<net.minecraft.server.level.PlayerChunkMap> {
 
     private static final ReflectField<Map<Long, PlayerChunk>> VISIBLE_CHUNKS = new ReflectField<>(
             net.minecraft.server.level.PlayerChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
@@ -25,8 +27,20 @@ public class PlayerChunkMap extends MappedObject<net.minecraft.server.level.Play
         super(handle);
     }
 
-    public NBTTagCompound read(ChunkCoordIntPair chunkCoordIntPair) throws IOException {
-        return NBTTagCompound.ofNullable(handle.f(chunkCoordIntPair.getHandle()));
+    @Remap(classPath = "net.minecraft.world.level.chunk.storage.ChunkStorage",
+            name = "read",
+            type = Remap.Type.METHOD,
+            remappedName = "f")
+    public CompletableFuture<NBTTagCompound> read(ChunkCoordIntPair chunkCoordIntPair) {
+        CompletableFuture<NBTTagCompound> completableFuture = new CompletableFuture<>();
+//        handle.f(chunkCoordIntPair.getHandle()).whenComplete((nbtTagCompound, throwable) -> {
+//            if (throwable != null) {
+//                completableFuture.completeExceptionally(throwable);
+//            } else {
+//                completableFuture.complete(NBTTagCompound.ofNullable(nbtTagCompound.orElse(null)));
+//            }
+//        });
+        return completableFuture;
     }
 
     public NBTTagCompound getChunkData(ResourceKey<WorldDimension> resourcekey, Supplier<WorldPersistentData> supplier,
@@ -36,10 +50,18 @@ public class PlayerChunkMap extends MappedObject<net.minecraft.server.level.Play
                 Optional.empty(), pos.getHandle(), generatoraccess));
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.storage.ChunkStorage",
+            name = "write",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public void saveChunk(ChunkCoordIntPair chunkCoords, NBTTagCompound nbtTagCompound) throws IOException {
         handle.a(chunkCoords.getHandle(), nbtTagCompound.getHandle());
     }
 
+    @Remap(classPath = "net.minecraft.server.level.ChunkMap",
+            name = "getVisibleChunkIfPresent",
+            type = Remap.Type.METHOD,
+            remappedName = "b")
     public PlayerChunk getPlayerChunk(long chunkCoordsPair) {
         try {
             return handle.b(chunkCoordsPair);

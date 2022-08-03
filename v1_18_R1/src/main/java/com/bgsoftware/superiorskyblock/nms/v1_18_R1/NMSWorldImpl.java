@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.nbt.NBTTagCompound;
@@ -23,8 +24,8 @@ import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.SoundEffectType;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.entity.TileEntity;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.properties.BlockState;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.BlockData;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.block.state.properties.BlockState;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.border.WorldBorder;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
@@ -37,6 +38,7 @@ import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
 import com.bgsoftware.superiorskyblock.tag.StringTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
+import net.minecraft.core.IRegistry;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
@@ -77,13 +79,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
 
-public class NMSWorldImpl implements NMSWorld {
+public final class NMSWorldImpl implements NMSWorld {
 
     private static final ReflectMethod<Object> LINES_SIGN_CHANGE_EVENT = new ReflectMethod<>(SignChangeEvent.class, "lines");
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(World.class,
             Object.class, "chunkPacketBlockController").removeFinal();
     private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
             TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1).removeFinal();
+    @Remap(classPath = "net.minecraft.world.level.chunk.PalettedContainer$Strategy", name = "SECTION_BIOMES", type = Remap.Type.FIELD, remappedName = "e")
+    private static final DataPaletteBlock.e SECTION_BIOMES_STRATEGY = DataPaletteBlock.e.e;
+    @Remap(classPath = "net.minecraft.world.level.block.SlabBlock", name = "TYPE", type = Remap.Type.FIELD, remappedName = "a")
+    private static final BlockStateEnum<BlockPropertySlabType> SLAB_TYPE = BlockStepAbstract.a;
+    @Remap(classPath = "net.minecraft.world.level.block.state.properties.SlabType", name = "DOUBLE", type = Remap.Type.FIELD, remappedName = "c")
+    private static final BlockPropertySlabType SLAB_TYPE_DOUBLE = BlockPropertySlabType.c;
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<SignsListener> signsListener;
@@ -182,15 +190,17 @@ public class NMSWorldImpl implements NMSWorld {
 
     private void setBiome(ChunkAccess chunk, Biome biome) {
         BiomeBase biomeBase = CraftBlock.biomeToBiomeBase(chunk.getBiomeRegistry(), biome);
+        IRegistry<BiomeBase> biomesRegistryHolder = chunk.getBiomeRegistry();
 
         net.minecraft.world.level.chunk.ChunkSection[] chunkSections = chunk.getSections();
         for (int i = 0; i < chunkSections.length; ++i) {
             ChunkSection currentSection = ChunkSection.ofNullable(chunkSections[i]);
             if (currentSection != null) {
                 DataPaletteBlock<IBlockData> dataPaletteBlock = currentSection.getBlocks();
+                DataPaletteBlock<BiomeBase> biomesDataPalette = new DataPaletteBlock<>(biomesRegistryHolder,
+                        biomeBase, SECTION_BIOMES_STRATEGY);
                 chunkSections[i] = new net.minecraft.world.level.chunk.ChunkSection(
-                        currentSection.getYPosition() >> 4, dataPaletteBlock,
-                        new DataPaletteBlock<>(chunk.getBiomeRegistry(), biomeBase, DataPaletteBlock.e.e));
+                        currentSection.getYPosition() >> 4, dataPaletteBlock, biomesDataPalette);
             }
         }
     }
@@ -201,8 +211,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk,
-                          List<SchematicBlock> blockDataList) {
+    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
         ChunkAccess chunk = new ChunkAccess(((CraftChunk) bukkitChunk).getHandle());
         blockDataList.forEach(blockData -> {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
@@ -325,7 +334,7 @@ public class NMSWorldImpl implements NMSWorld {
 
         // Checks for double slabs
         if ((TagsBlock.isTagged(TagsBlock.SLABS, nmsBlock) || TagsBlock.isTagged(TagsBlock.WOODEN_SLABS, nmsBlock)) &&
-                blockData.get(BlockStepAbstract.a) == BlockPropertySlabType.c) {
+                blockData.get(SLAB_TYPE) == SLAB_TYPE_DOUBLE) {
             return 2;
         }
 
@@ -385,7 +394,7 @@ public class NMSWorldImpl implements NMSWorld {
     public void playBreakAnimation(org.bukkit.block.Block block) {
         WorldServer world = new WorldServer(((CraftWorld) block.getWorld()).getHandle());
         BlockPosition blockPosition = new BlockPosition(block.getX(), block.getY(), block.getZ());
-        world.gameEvent(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
+        world.levelEvent(null, 2001, blockPosition, Block.getCombinedId(world.getType(blockPosition)));
     }
 
     @Override

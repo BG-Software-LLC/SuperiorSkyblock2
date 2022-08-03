@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_19_R1.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
@@ -23,6 +24,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public final class CropsTickingTileEntity extends TileEntity {
 
+    @Remap(classPath = "net.minecraft.world.level.GameRules", name = "RULE_RANDOMTICKING", type = Remap.Type.FIELD, remappedName = "n")
+    private static final GameRules.GameRuleKey<GameRules.GameRuleInt> RANDOM_TICKING_GAME_RULE = GameRules.n;
+
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private static final Map<Long, CropsTickingTileEntity> tickingChunks = new HashMap<>();
@@ -35,6 +39,7 @@ public final class CropsTickingTileEntity extends TileEntity {
 
     private int currentTick = 0;
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntityType", name = "COMMAND_BLOCK", type = Remap.Type.FIELD, remappedName = "v")
     private CropsTickingTileEntity(Island island, ChunkAccess chunk, BlockPosition blockPosition) {
         super(TileEntityTypes.v, blockPosition.getHandle(), chunk.getWorld().getType(blockPosition).getHandle());
         this.island = new WeakReference<>(island);
@@ -59,18 +64,34 @@ public final class CropsTickingTileEntity extends TileEntity {
         return tickingChunks.remove(chunkCoords.pair());
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "remove",
+            type = Remap.Type.FIELD,
+            remappedName = "p")
     public void remove() {
         this.p = true;
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "isRemoved",
+            type = Remap.Type.METHOD,
+            remappedName = "r")
     public boolean isRemoved() {
         return super.r();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "getBlockPos",
+            type = Remap.Type.METHOD,
+            remappedName = "p")
     public net.minecraft.core.BlockPosition getPosition() {
         return super.p();
     }
 
+    @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
+            name = "getType",
+            type = Remap.Type.METHOD,
+            remappedName = "v")
     public TileEntityTypes<?> getTileType() {
         return super.v();
     }
@@ -90,7 +111,7 @@ public final class CropsTickingTileEntity extends TileEntity {
 
         currentTick = 0;
 
-        int worldRandomTick = world.getGameRules().getInt(GameRules.n);
+        int worldRandomTick = world.getGameRules().getInt(RANDOM_TICKING_GAME_RULE);
         double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
         int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
@@ -117,31 +138,6 @@ public final class CropsTickingTileEntity extends TileEntity {
                 }
             }
         }
-    }
-
-    private record CropsTickingTileEntityTicker(
-            CropsTickingTileEntity cropsTickingTileEntity) implements TickingBlockEntity {
-
-        @Override
-        public void a() {
-            cropsTickingTileEntity.tick();
-        }
-
-        @Override
-        public boolean b() {
-            return cropsTickingTileEntity.isRemoved();
-        }
-
-        @Override
-        public net.minecraft.core.BlockPosition c() {
-            return cropsTickingTileEntity.getPosition();
-        }
-
-        @Override
-        public String d() {
-            return TileEntityTypes.a(cropsTickingTileEntity.getTileType()) + "";
-        }
-
     }
 
 }

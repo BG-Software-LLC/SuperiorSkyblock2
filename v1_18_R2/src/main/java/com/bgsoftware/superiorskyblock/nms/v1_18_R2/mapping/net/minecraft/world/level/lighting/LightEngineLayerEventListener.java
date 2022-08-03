@@ -1,12 +1,13 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.lighting;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.lighting.LightEngineBlock;
 import net.minecraft.world.level.lighting.LightEngineGraph;
 
-public class LightEngineLayerEventListener extends
+public final class LightEngineLayerEventListener extends
         MappedObject<net.minecraft.world.level.lighting.LightEngineLayerEventListener> {
 
     private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(
@@ -24,10 +25,18 @@ public class LightEngineLayerEventListener extends
         }
     }
 
+    @Remap(classPath = "net.minecraft.world.level.lighting.LayerLightEventListener",
+            name = "getLightValue",
+            type = Remap.Type.METHOD,
+            remappedName = "b")
     public int getLightLevel(BlockPosition blockPosition) {
         return handle.b(blockPosition.getHandle());
     }
 
+    @Remap(classPath = "net.minecraft.world.level.lighting.LevelLightEngine",
+            name = "onBlockEmissionIncrease",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     private void flagBlockDirty(BlockPosition blockPosition, byte lightData) {
         try {
             handle.a(blockPosition.getHandle(), lightData);

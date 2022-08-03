@@ -8,7 +8,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import java.util.Collections;
 import java.util.Set;
 
-public class PaperGlowEnchantment extends SpigotGlowEnchantment {
+public final class PaperGlowEnchantment extends SpigotGlowEnchantment {
 
     public PaperGlowEnchantment(String name) {
         super(name);

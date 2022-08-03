@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R2;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.dragon.IslandEntityEnderDragon;
@@ -27,7 +28,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 
 @SuppressWarnings({"unused"})
-public class NMSDragonFightImpl implements NMSDragonFight {
+public final class NMSDragonFightImpl implements NMSDragonFight {
 
     private static final ReflectField<EntityTypes.b<?>> ENTITY_TYPES_BUILDER = new ReflectField<EntityTypes.b<?>>(
             EntityTypes.class, EntityTypes.b.class, Modifier.PRIVATE | Modifier.FINAL, 1)
@@ -41,6 +42,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
             WorldGenEnder.class, LoadingCache.class, Modifier.PRIVATE | Modifier.STATIC | Modifier.FINAL, 1)
             .removeFinal();
 
+    @Remap(classPath = "net.minecraft.world.entity.EntityType", name = "ENDER_DRAGON", type = Remap.Type.FIELD, remappedName = "v")
     private static boolean firstWorldPreparation = true;
 
     static {
@@ -48,7 +50,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     }
 
     @Override
-    public void prepareEndWorld(org.bukkit.World bukkitWorld) {
+    public void prepareEndWorld(World bukkitWorld) {
         WorldServer worldServer = new WorldServer(((CraftWorld) bukkitWorld).getHandle());
         WORLD_DRAGON_BATTLE.set(worldServer.getHandle(), new EndWorldEnderDragonBattleHandler(worldServer));
 
@@ -61,7 +63,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
     @Nullable
     @Override
     public EnderDragon getEnderDragon(Island island) {
-        org.bukkit.World bukkitWorld = island.getCenter(World.Environment.THE_END).getWorld();
+        World bukkitWorld = island.getCenter(World.Environment.THE_END).getWorld();
 
         if (bukkitWorld == null)
             return null;
@@ -77,7 +79,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
     @Override
     public void startDragonBattle(Island island, Location location) {
-        org.bukkit.World bukkitWorld = location.getWorld();
+        World bukkitWorld = location.getWorld();
 
         if (bukkitWorld == null)
             return;
@@ -92,7 +94,7 @@ public class NMSDragonFightImpl implements NMSDragonFight {
 
     @Override
     public void removeDragonBattle(Island island) {
-        org.bukkit.World bukkitWorld = island.getCenter(World.Environment.THE_END).getWorld();
+        World bukkitWorld = island.getCenter(World.Environment.THE_END).getWorld();
 
         if (bukkitWorld == null)
             return;

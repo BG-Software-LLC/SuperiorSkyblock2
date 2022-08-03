@@ -7,8 +7,8 @@ import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.algorithms.GlowEnchantmentFactory;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.core.RegistryBlocks;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.network.chat.ChatSerializer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;
+import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.network.chat.ChatSerializer;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.item.ItemStack;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.Block;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.level.block.state.BlockData;
@@ -37,7 +37,7 @@ import org.bukkit.potion.PotionEffect;
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 
-public class NMSAlgorithmsImpl implements NMSAlgorithms {
+public final class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private static final EnumMap<InventoryType, MenuCreator> MENUS_HOLDER_CREATORS = new EnumMap<>(InventoryType.class);
 

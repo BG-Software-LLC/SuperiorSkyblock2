@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level;
 
 import com.bgsoftware.common.reflection.ReflectField;
+import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
@@ -26,6 +27,10 @@ public final class PlayerChunkMap extends MappedObject<net.minecraft.server.leve
         super(handle);
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.storage.ChunkStorage",
+            name = "read",
+            type = Remap.Type.METHOD,
+            remappedName = "f")
     public CompletableFuture<NBTTagCompound> read(ChunkCoordIntPair chunkCoordIntPair) {
         CompletableFuture<NBTTagCompound> completableFuture = new CompletableFuture<>();
         handle.f(chunkCoordIntPair.getHandle()).whenComplete((nbtTagCompound, throwable) -> {
@@ -45,10 +50,18 @@ public final class PlayerChunkMap extends MappedObject<net.minecraft.server.leve
                 Optional.empty(), pos.getHandle(), generatoraccess));
     }
 
+    @Remap(classPath = "net.minecraft.world.level.chunk.storage.ChunkStorage",
+            name = "write",
+            type = Remap.Type.METHOD,
+            remappedName = "a")
     public void saveChunk(ChunkCoordIntPair chunkCoords, NBTTagCompound nbtTagCompound) throws IOException {
         handle.a(chunkCoords.getHandle(), nbtTagCompound.getHandle());
     }
 
+    @Remap(classPath = "net.minecraft.server.level.ChunkMap",
+            name = "getVisibleChunkIfPresent",
+            type = Remap.Type.METHOD,
+            remappedName = "b")
     public PlayerChunk getPlayerChunk(long chunkCoordsPair) {
         try {
             return handle.b(chunkCoordsPair);
