@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.economy;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Precision;
 import com.google.common.base.Preconditions;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -11,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class EconomyProvider_Vault implements EconomyProvider {
 
@@ -30,7 +32,8 @@ public class EconomyProvider_Vault implements EconomyProvider {
     @Override
     public BigDecimal getBalance(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
-        return BigDecimal.valueOf(getMoneyInBank(superiorPlayer.asOfflinePlayer()));
+        return BigDecimal.valueOf(getMoneyInBank(superiorPlayer.asOfflinePlayer()))
+                .setScale(3, RoundingMode.HALF_DOWN);
     }
 
     @Override
@@ -39,10 +42,14 @@ public class EconomyProvider_Vault implements EconomyProvider {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
         double moneyBeforeDeposit = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.depositPlayer(offlinePlayer, amount);
-        double moneyInTransaction = getMoneyInBank(offlinePlayer) - moneyBeforeDeposit;
+        double moneyInTransaction = Precision.round(getMoneyInBank(offlinePlayer) - moneyBeforeDeposit, 3);
 
         String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
                 moneyInTransaction == 0 ? "You have exceed the limit of your bank" : "";
+
+        Bukkit.broadcastMessage("Deposit Money");
+        Bukkit.broadcastMessage("Transaction Money: " + moneyInTransaction);
+        Bukkit.broadcastMessage("New Balance: " + getMoneyInBank(offlinePlayer));
 
         return new EconomyResult(errorMessage, moneyInTransaction);
     }
@@ -53,10 +60,14 @@ public class EconomyProvider_Vault implements EconomyProvider {
         OfflinePlayer offlinePlayer = superiorPlayer.asOfflinePlayer();
         double moneyBeforeWithdraw = getMoneyInBank(offlinePlayer);
         EconomyResponse economyResponse = econ.withdrawPlayer(offlinePlayer, amount);
-        double moneyInTransaction = moneyBeforeWithdraw - getMoneyInBank(offlinePlayer);
+        double moneyInTransaction = Precision.round(moneyBeforeWithdraw - getMoneyInBank(offlinePlayer), 3);
 
         String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
                 moneyInTransaction == 0 ? "Couldn't process the transaction" : "";
+
+        Bukkit.broadcastMessage("Withdraw Money");
+        Bukkit.broadcastMessage("Transaction Money: " + moneyInTransaction);
+        Bukkit.broadcastMessage("New Balance: " + getMoneyInBank(offlinePlayer));
 
         return new EconomyResult(errorMessage, moneyInTransaction);
     }
@@ -65,7 +76,7 @@ public class EconomyProvider_Vault implements EconomyProvider {
         if (!econ.hasAccount(offlinePlayer))
             econ.createPlayerAccount(offlinePlayer);
 
-        return econ.getBalance(offlinePlayer);
+        return Precision.round(econ.getBalance(offlinePlayer), 3);
     }
 
 }
