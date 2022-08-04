@@ -381,6 +381,15 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
             nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
+
+            if (!nmsAlgorithms.isMappingsSupported()) {
+                new ManagerLoadException(
+                        "The plugin doesn't support your version mappings.\n" +
+                                "Please try a different version.",
+                        ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+                return false;
+            }
+
             nmsChunks = loadNMSClass("NMSChunksImpl", version);
             nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
             nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
