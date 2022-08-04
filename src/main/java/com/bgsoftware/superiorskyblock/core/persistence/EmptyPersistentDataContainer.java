@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core.persistence;
 
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
-import org.apache.commons.lang.IllegalClassException;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +35,7 @@ public class EmptyPersistentDataContainer implements PersistentDataContainer {
 
     @Nullable
     @Override
-    public <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalClassException, IllegalStateException {
+    public <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalArgumentException, IllegalStateException {
         return null;
     }
 
@@ -54,7 +53,7 @@ public class EmptyPersistentDataContainer implements PersistentDataContainer {
 
     @Nullable
     @Override
-    public <T> T get(String key, PersistentDataType<T> type) throws IllegalClassException {
+    public <T> T get(String key, PersistentDataType<T> type) throws IllegalArgumentException {
         return null;
     }
 
@@ -65,7 +64,7 @@ public class EmptyPersistentDataContainer implements PersistentDataContainer {
     }
 
     @Override
-    public <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalClassException {
+    public <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalArgumentException {
         return def;
     }
 

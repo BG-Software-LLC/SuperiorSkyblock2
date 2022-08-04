@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.PersistentDataTagSerialized;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang.IllegalClassException;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
@@ -52,7 +51,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     @Override
-    public <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalClassException, IllegalStateException {
+    public <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalArgumentException, IllegalStateException {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
         Preconditions.checkNotNull(value, "value parameter cannot be null");
@@ -93,7 +92,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
 
     @Nullable
     @Override
-    public <T> T get(String key, PersistentDataType<T> type) throws IllegalClassException {
+    public <T> T get(String key, PersistentDataType<T> type) throws IllegalArgumentException {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
         return _getOfType(key, type, null);
@@ -107,7 +106,7 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     }
 
     @Override
-    public <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalClassException {
+    public <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalArgumentException {
         Preconditions.checkNotNull(key, "key parameter cannot be null");
         Preconditions.checkNotNull(type, "type parameter cannot be null");
         return _getOfType(key, type, def);

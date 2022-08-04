@@ -1,7 +1,5 @@
 package com.bgsoftware.superiorskyblock.api.persistence;
 
-import org.apache.commons.lang.IllegalClassException;
-
 import javax.annotation.Nullable;
 
 public interface PersistentDataContainer {
@@ -28,11 +26,11 @@ public interface PersistentDataContainer {
      * @param type  The type of the metadata value.
      * @param value The metadata value to store.
      * @return The old metadata value that was stored matching the key, if exists.
-     * @throws IllegalClassException If the old metadata value is not of type {@param type}.
-     * @throws IllegalStateException If {@param type} doesn't have a valid serializer available.
+     * @throws IllegalArgumentException If the old metadata value is not of type {@param type}.
+     * @throws IllegalStateException    If {@param type} doesn't have a valid serializer available.
      */
     @Nullable
-    <T> T put(String key, PersistentDataType<T> type, T value) throws IllegalClassException, IllegalStateException;
+    <T> T put(String key, PersistentDataType<T> type, T value) throws IllegalArgumentException, IllegalStateException;
 
     /**
      * Store a metadata value matching the provided key and type.
@@ -42,11 +40,11 @@ public interface PersistentDataContainer {
      * @param value      The metadata value to store.
      * @param returnType The type of the old metadata value.
      * @return The old metadata value that was stored matching the key, if exists.
-     * @throws IllegalClassException If the old metadata value is not of type {@param returnType}.
-     * @throws IllegalStateException If {@param type} doesn't have a valid serializer available.
+     * @throws IllegalArgumentException If the old metadata value is not of type {@param returnType}.
+     * @throws IllegalStateException    If {@param type} doesn't have a valid serializer available.
      */
     @Nullable
-    <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalClassException, IllegalStateException;
+    <T, R> R put(String key, PersistentDataType<T> type, T value, PersistentDataType<R> returnType) throws IllegalArgumentException, IllegalStateException;
 
     /**
      * Remove a metadata value matching the provided key.
@@ -75,10 +73,10 @@ public interface PersistentDataContainer {
      * @param key  The key to fetch.
      * @param type The type of the metadata value to fetch.
      * @return The metadata value that is stored matching the key, if exists.
-     * @throws IllegalClassException If the metadata value is not of type {@param type}.
+     * @throws IllegalArgumentException If the metadata value is not of type {@param type}.
      */
     @Nullable
-    <T> T get(String key, PersistentDataType<T> type) throws IllegalClassException;
+    <T> T get(String key, PersistentDataType<T> type) throws IllegalArgumentException;
 
     /**
      * Get a metadata value matching the provided key.
@@ -96,9 +94,9 @@ public interface PersistentDataContainer {
      * @param type The type of the metadata value to fetch.
      * @param def  Value to return in case there is no metadata value matching the provided key.
      * @return The metadata value that is stored matching the key, or {@param def} otherwise.
-     * @throws IllegalClassException If the metadata value is not of type {@param type}.
+     * @throws IllegalArgumentException If the metadata value is not of type {@param type}.
      */
-    <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalClassException;
+    <T> T getOrDefault(String key, PersistentDataType<T> type, T def) throws IllegalArgumentException;
 
     /**
      * Get a metadata value matching the provided key.

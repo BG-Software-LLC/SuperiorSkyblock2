@@ -18,7 +18,6 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.tag.UUIDTag;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang.IllegalClassException;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
@@ -47,7 +46,7 @@ public class PersistenceDataTypeSerializer {
     }
 
     @Nullable
-    public static <T> T deserialize(Tag<?> tag, PersistentDataType<T> type) throws IllegalClassException {
+    public static <T> T deserialize(Tag<?> tag, PersistentDataType<T> type) throws IllegalArgumentException {
         if (tag instanceof PersistentDataTagSerialized) {
             tag = ((PersistentDataTagSerialized) tag).getPersistentDataTag(type);
         }
@@ -75,7 +74,7 @@ public class PersistenceDataTypeSerializer {
 
     private static void checkTagType(Tag<?> tag, PersistentDataType<?> type) {
         if (!isTagOfType(tag, type))
-            throw new IllegalClassException(type.getType(), tag.getValue().getClass());
+            throw new IllegalArgumentException("Expected: " + type.getType().getName() + ", actual: " + tag.getValue().getClass());
     }
 
     private static Tag<?> primitiveSerialize(Object value) {
