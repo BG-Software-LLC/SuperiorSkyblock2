@@ -207,25 +207,25 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public DatabaseBridge createDatabaseBridge(Island island) {
-        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer) {
-        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(GridManager gridManager) {
-        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
     }
 
     public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager) {
-        SQLDatabaseBridge databaseBridge = SQLDatabaseBridge.getInstance();
+        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
         return databaseBridgeFactory == null ? databaseBridge :
                 databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);
     }

@@ -14,16 +14,11 @@ import java.util.function.Consumer;
 
 public class SQLDatabaseBridge implements DatabaseBridge {
 
-    private static final SQLDatabaseBridge INSTANCE = new SQLDatabaseBridge();
     private DatabaseBridgeMode databaseBridgeMode = DatabaseBridgeMode.IDLE;
     private StatementHolder batchStatementHolder;
 
-    private SQLDatabaseBridge() {
+    public SQLDatabaseBridge() {
 
-    }
-
-    public static SQLDatabaseBridge getInstance() {
-        return INSTANCE;
     }
 
     private static String getColumnFilter(DatabaseFilter filter) {
