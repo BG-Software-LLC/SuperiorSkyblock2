@@ -51,10 +51,17 @@ public final class NMSAlgorithmsImpl implements NMSAlgorithms {
         MENUS_HOLDER_CREATORS.put(InventoryType.SMOKER, MenuTileEntityFurnace::new);
     }
 
+    private static final String BUILT_AGAINST_MAPPING = "4cc0cc97cac491651bff3af8b124a214";
+
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    @Override
+    public boolean isMappingsSupported() {
+        return ((CraftMagicNumbers) CraftMagicNumbers.INSTANCE).getMappingsVersion().equals(BUILT_AGAINST_MAPPING);
     }
 
     @Override
