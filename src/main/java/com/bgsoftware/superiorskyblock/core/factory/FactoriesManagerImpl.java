@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.factory;
 
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
+import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
 import com.bgsoftware.superiorskyblock.api.factory.DatabaseBridgeFactory;
 import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
@@ -12,6 +13,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
@@ -33,6 +35,7 @@ import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
@@ -40,6 +43,7 @@ import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -115,6 +119,14 @@ public class FactoriesManagerImpl implements FactoriesManager {
         if (!(location instanceof LazyWorldLocation))
             Preconditions.checkNotNull(location.getWorld(), "location's world cannot be null.");
         return new SBlockPosition(location);
+    }
+
+    @Override
+    public BankTransaction createTransaction(@Nullable UUID player, BankAction action, int position, long time,
+                                             String failureReason, BigDecimal amount) {
+        Preconditions.checkNotNull(action, "action parameter cannot be null");
+        Preconditions.checkNotNull(amount, "amount parameter cannot be null");
+        return new SBankTransaction(player, action, position, time, failureReason, amount);
     }
 
     public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
