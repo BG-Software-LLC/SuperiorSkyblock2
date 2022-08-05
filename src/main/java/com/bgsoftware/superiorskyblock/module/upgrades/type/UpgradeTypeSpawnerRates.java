@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetSpawnerRates;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
@@ -46,9 +47,13 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
         if (island == null)
             return;
 
+        Block block = creatureSpawner.getBlock();
+
         // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
-        BukkitExecutor.sync(() -> plugin.getNMSWorld().listenSpawner(creatureSpawner,
-                spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay)), 20L);
+        BukkitExecutor.sync(() -> {
+            if (block.getType() == Materials.SPAWNER.toBukkitType())
+                plugin.getNMSWorld().listenSpawner(creatureSpawner, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
+        }, 20L);
     }
 
     private int calculateNewSpawnerDelay(Island island, int spawnDelay) {
