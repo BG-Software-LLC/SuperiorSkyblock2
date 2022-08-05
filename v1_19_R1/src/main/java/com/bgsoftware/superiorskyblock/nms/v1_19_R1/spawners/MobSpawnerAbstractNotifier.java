@@ -18,9 +18,27 @@ public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
     private final MobSpawnerAbstract mobSpawnerAbstract;
     private final IntFunction<Integer> delayChangeCallback;
 
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "spawnPotentials", type = Remap.Type.FIELD, remappedName = "d")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "nextSpawnData", type = Remap.Type.FIELD, remappedName = "e")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "minSpawnDelay", type = Remap.Type.FIELD, remappedName = "h")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "maxSpawnDelay", type = Remap.Type.FIELD, remappedName = "i")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "spawnCount", type = Remap.Type.FIELD, remappedName = "j")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "maxNearbyEntities", type = Remap.Type.FIELD, remappedName = "l")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "requiredPlayerRange", type = Remap.Type.FIELD, remappedName = "m")
+    @Remap(classPath = "net.minecraft.world.level.BaseSpawner", name = "spawnRange", type = Remap.Type.FIELD, remappedName = "n")
     public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, IntFunction<Integer> delayChangeCallback) {
         this.mobSpawnerAbstract = mobSpawnerAbstract;
         this.delayChangeCallback = delayChangeCallback;
+
+        // Copy data from original spawner to this
+        this.d = mobSpawnerAbstract.d;
+        this.e = mobSpawnerAbstract.e;
+        this.h = mobSpawnerAbstract.h;
+        this.i = mobSpawnerAbstract.i;
+        this.j = mobSpawnerAbstract.j;
+        this.l = mobSpawnerAbstract.l;
+        this.m = mobSpawnerAbstract.m;
+        this.n = mobSpawnerAbstract.n;
     }
 
     @Remap(classPath = "net.minecraft.world.level.BaseSpawner",

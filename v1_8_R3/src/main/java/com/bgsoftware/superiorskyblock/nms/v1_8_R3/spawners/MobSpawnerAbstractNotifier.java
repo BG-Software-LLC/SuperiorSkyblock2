@@ -16,6 +16,11 @@ public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
     public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, IntFunction<Integer> delayChangeCallback) {
         this.mobSpawnerAbstract = mobSpawnerAbstract;
         this.delayChangeCallback = delayChangeCallback;
+
+        // Copy data from original spawner to this
+        NBTTagCompound spawnerCompound = new NBTTagCompound();
+        mobSpawnerAbstract.b(spawnerCompound);
+        this.a(spawnerCompound);
     }
 
     @Nullable

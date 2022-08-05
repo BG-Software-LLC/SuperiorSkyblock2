@@ -20,6 +20,16 @@ public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
     public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, IntFunction<Integer> delayChangeCallback) {
         this.mobSpawnerAbstract = mobSpawnerAbstract;
         this.delayChangeCallback = delayChangeCallback;
+
+        // Copy data from original spawner to this
+        this.e = mobSpawnerAbstract.e;
+        this.f = mobSpawnerAbstract.f;
+        this.i = mobSpawnerAbstract.i;
+        this.j = mobSpawnerAbstract.j;
+        this.k = mobSpawnerAbstract.k;
+        this.m = mobSpawnerAbstract.m;
+        this.n = mobSpawnerAbstract.n;
+        this.o = mobSpawnerAbstract.o;
     }
 
     @Nullable

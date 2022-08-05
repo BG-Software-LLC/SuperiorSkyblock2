@@ -19,6 +19,17 @@ public class MobSpawnerAbstractNotifier extends MobSpawnerAbstract {
     public MobSpawnerAbstractNotifier(MobSpawnerAbstract mobSpawnerAbstract, IntFunction<Integer> delayChangeCallback) {
         this.mobSpawnerAbstract = mobSpawnerAbstract;
         this.delayChangeCallback = delayChangeCallback;
+
+        // Copy data from original spawner to this
+        this.mobs.clear();
+        this.mobs.addAll(mobSpawnerAbstract.mobs);
+        this.spawnData = mobSpawnerAbstract.spawnData;
+        this.minSpawnDelay = mobSpawnerAbstract.minSpawnDelay;
+        this.maxSpawnDelay = mobSpawnerAbstract.maxSpawnDelay;
+        this.spawnCount = mobSpawnerAbstract.spawnCount;
+        this.maxNearbyEntities = mobSpawnerAbstract.maxNearbyEntities;
+        this.requiredPlayerRange = mobSpawnerAbstract.requiredPlayerRange;
+        this.spawnRange = mobSpawnerAbstract.spawnRange;
     }
 
     @Nullable
