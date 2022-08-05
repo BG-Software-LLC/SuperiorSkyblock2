@@ -54,6 +54,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void updateLastTimeStatus();
 
     /**
+     * Set the last time player joined or left the server.
+     *
+     * @param lastTimeStatus The time to set.
+     */
+    void setLastTimeStatus(long lastTimeStatus);
+
+    /**
      * Get the last time player joined or left the server.
      */
     long getLastTimeStatus();
@@ -63,6 +70,12 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * When the player is offline, nothing will happen.
      */
     void updateName();
+
+    /**
+     * Set the cached name with the given name.
+     * When the player will join the server, it will be synced again with his correct name.
+     */
+    void setName(String name);
 
     /**
      * Get the player object.
@@ -299,7 +312,7 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void setUserLocale(Locale locale);
 
     /**
-     * Check whether or not the world border is enabled for the player.
+     * Check whether the world border is enabled for the player.
      */
     boolean hasWorldBorderEnabled();
 
@@ -309,6 +322,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void toggleWorldBorder();
 
     /**
+     * Set whether the world border is enabled for the player.
+     *
+     * @param enabled true to enable borders.
+     */
+    void setWorldBorderEnabled(boolean enabled);
+
+    /**
      * Update world border for this player.
      *
      * @param island The island the player should see the border of.
@@ -316,17 +336,24 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void updateWorldBorder(@Nullable Island island);
 
     /**
-     * Check whether or not the blocks stacker mode is enabled for the player.
+     * Check whether the blocks-stacker mode is enabled for the player.
      */
     boolean hasBlocksStackerEnabled();
 
     /**
-     * Toggle the blocks stacker for the player.
+     * Toggle the blocks-stacker for the player.
      */
     void toggleBlocksStacker();
 
     /**
-     * Check whether or not the schematic mode is enabled for the player.
+     * Set whether the blocks-stacker mode is enabled for the player.
+     *
+     * @param enabled true to enable blocks-stacker mode.
+     */
+    void setBlocksStacker(boolean enabled);
+
+    /**
+     * Check whether the schematic mode is enabled for the player.
      */
     boolean hasSchematicModeEnabled();
 
@@ -336,7 +363,14 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void toggleSchematicMode();
 
     /**
-     * Check whether or not the team chat is enabled for the player.
+     * Set whether the schematic mode is enabled for the player.
+     *
+     * @param enabled true to enable schematic mode.
+     */
+    void setSchematicMode(boolean enabled);
+
+    /**
+     * Check whether the team chat is enabled for the player.
      */
     boolean hasTeamChatEnabled();
 
@@ -346,7 +380,14 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void toggleTeamChat();
 
     /**
-     * Check whether or not the bypass mode is enabled for the player.
+     * Set whether the schematic mode is enabled for the player.
+     *
+     * @param enabled true to enable schematic mode.
+     */
+    void setTeamChat(boolean enabled);
+
+    /**
+     * Check whether the bypass mode is enabled for the player.
      */
     boolean hasBypassModeEnabled();
 
@@ -354,6 +395,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Toggle the bypass mode for the player.
      */
     void toggleBypassMode();
+
+    /**
+     * Set whether the bypass mode is enabled for the player.
+     *
+     * @param enabled true to enable bypass mode.
+     */
+    void setBypassMode(boolean enabled);
 
     /**
      * Check whether or not the player has their panel toggled.
@@ -366,7 +414,7 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void setToggledPanel(boolean toggledPanel);
 
     /**
-     * Set whether or not the player has flying enabled.
+     * Set whether the player has flying enabled.
      */
     boolean hasIslandFlyEnabled();
 
@@ -376,7 +424,14 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
     void toggleIslandFly();
 
     /**
-     * Check whether or not the player has admin spy mode enabled.
+     * Set whether the player has flying enabled.
+     *
+     * @param enabled true to enable flying.
+     */
+    void setIslandFly(boolean enabled);
+
+    /**
+     * Check whether the player has admin spy mode enabled.
      */
     boolean hasAdminSpyEnabled();
 
@@ -384,6 +439,13 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Toggle admin spy mode.
      */
     void toggleAdminSpy();
+
+    /**
+     * Set whether the player has admin spy mode enabled.
+     *
+     * @param enabled true to enable admin spy mode.
+     */
+    void setAdminSpy(boolean enabled);
 
     /**
      * Get the border color of the player.

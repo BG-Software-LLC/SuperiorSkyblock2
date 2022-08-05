@@ -195,10 +195,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void updateLastTimeStatus() {
-        lastTimeStatus = System.currentTimeMillis() / 1000;
+        setLastTimeStatus(System.currentTimeMillis() / 1000);
+    }
 
+    @Override
+    public void setLastTimeStatus(long lastTimeStatus) {
         PluginDebugger.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
-
+        this.lastTimeStatus = lastTimeStatus;
         PlayersDatabaseBridge.saveLastTimeStatus(this);
     }
 
@@ -210,16 +213,21 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void updateName() {
         Player player = asPlayer();
-        if (player != null) {
-            String newName = player.getName();
-            if (!this.name.equals(newName)) {
-                try {
-                    plugin.getPlayers().getPlayersContainer().removePlayer(this);
-                    this.name = newName;
-                    PlayersDatabaseBridge.savePlayerName(this);
-                } finally {
-                    plugin.getPlayers().getPlayersContainer().addPlayer(this);
-                }
+        if (player != null)
+            this.setName(player.getName());
+    }
+
+    @Override
+    public void setName(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null.");
+
+        if (!this.name.equals(name)) {
+            try {
+                plugin.getPlayers().getPlayersContainer().removePlayer(this);
+                this.name = name;
+                PlayersDatabaseBridge.savePlayerName(this);
+            } finally {
+                plugin.getPlayers().getPlayersContainer().addPlayer(this);
             }
         }
     }
@@ -490,8 +498,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleWorldBorder() {
-        worldBorderEnabled = !worldBorderEnabled;
-        PluginDebugger.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + worldBorderEnabled);
+        setWorldBorderEnabled(!worldBorderEnabled);
+    }
+
+    @Override
+    public void setWorldBorderEnabled(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + enabled);
+        this.worldBorderEnabled = enabled;
         PlayersDatabaseBridge.saveToggledBorder(this);
     }
 
@@ -507,8 +520,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleBlocksStacker() {
-        blocksStackerEnabled = !blocksStackerEnabled;
-        PluginDebugger.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + blocksStackerEnabled);
+        setBlocksStacker(!blocksStackerEnabled);
+    }
+
+    @Override
+    public void setBlocksStacker(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + enabled);
+        blocksStackerEnabled = enabled;
     }
 
     @Override
@@ -518,8 +536,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleSchematicMode() {
-        schematicModeEnabled = !schematicModeEnabled;
-        PluginDebugger.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + schematicModeEnabled);
+        setSchematicMode(!schematicModeEnabled);
+    }
+
+    @Override
+    public void setSchematicMode(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + enabled);
+        schematicModeEnabled = enabled;
     }
 
     @Override
@@ -529,8 +552,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleTeamChat() {
-        teamChatEnabled = !teamChatEnabled;
-        PluginDebugger.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + teamChatEnabled);
+        setTeamChat(!teamChatEnabled);
+    }
+
+    @Override
+    public void setTeamChat(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + enabled);
+        teamChatEnabled = enabled;
     }
 
     @Override
@@ -545,8 +573,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleBypassMode() {
-        bypassModeEnabled = !bypassModeEnabled;
-        PluginDebugger.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + bypassModeEnabled);
+        setBypassMode(!bypassModeEnabled);
+    }
+
+    @Override
+    public void setBypassMode(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + enabled);
+        bypassModeEnabled = enabled;
     }
 
     @Override
@@ -578,8 +611,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleIslandFly() {
-        islandFly = !islandFly;
-        PluginDebugger.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + islandFly);
+        setIslandFly(!islandFly);
+    }
+
+    @Override
+    public void setIslandFly(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + enabled);
+        islandFly = enabled;
         PlayersDatabaseBridge.saveIslandFly(this);
     }
 
@@ -590,8 +628,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void toggleAdminSpy() {
-        adminSpyEnabled = !adminSpyEnabled;
-        PluginDebugger.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + adminSpyEnabled);
+        setAdminSpy(!adminSpyEnabled);
+    }
+
+    @Override
+    public void setAdminSpy(boolean enabled) {
+        PluginDebugger.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + enabled);
+        adminSpyEnabled = enabled;
     }
 
     @Override

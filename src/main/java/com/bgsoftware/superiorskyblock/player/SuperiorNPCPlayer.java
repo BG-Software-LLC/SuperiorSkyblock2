@@ -11,8 +11,8 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.core.persistence.EmptyPersistentDataContainer;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -64,12 +64,22 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setLastTimeStatus(long lastTimeStatus) {
+        // Do nothing.
+    }
+
+    @Override
     public long getLastTimeStatus() {
         return System.currentTimeMillis() / 1000;
     }
 
     @Override
     public void updateName() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setName(String name) {
         // Do nothing.
     }
 
@@ -252,6 +262,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setWorldBorderEnabled(boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
     public void updateWorldBorder(@Nullable Island island) {
         // Do nothing.
     }
@@ -267,12 +282,22 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setBlocksStacker(boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
     public boolean hasSchematicModeEnabled() {
         return false;
     }
 
     @Override
     public void toggleSchematicMode() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setSchematicMode(boolean enabled) {
         // Do nothing.
     }
 
@@ -287,12 +312,22 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setTeamChat(boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
     public boolean hasBypassModeEnabled() {
         return false;
     }
 
     @Override
     public void toggleBypassMode() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setBypassMode(boolean enabled) {
         // Do nothing.
     }
 
@@ -317,12 +352,22 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setIslandFly(boolean enabled) {
+        // Do nothing.
+    }
+
+    @Override
     public boolean hasAdminSpyEnabled() {
         return false;
     }
 
     @Override
     public void toggleAdminSpy() {
+        // Do nothing.
+    }
+
+    @Override
+    public void setAdminSpy(boolean enabled) {
         // Do nothing.
     }
 
