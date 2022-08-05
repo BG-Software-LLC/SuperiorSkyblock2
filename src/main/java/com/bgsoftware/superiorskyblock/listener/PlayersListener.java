@@ -98,6 +98,7 @@ public class PlayersListener implements Listener {
 
         // Updating the name of the player.
         if (!superiorPlayer.getName().equals(e.getPlayer().getName())) {
+            plugin.getEventsBus().callPlayerChangeNameEvent(superiorPlayer, e.getPlayer().getName());
             superiorPlayer.updateName();
         }
 
@@ -573,6 +574,9 @@ public class PlayersListener implements Listener {
 
         if (superiorPlayer.hasTeamChatEnabled()) {
             if (island == null) {
+                if (!plugin.getEventsBus().callPlayerToggleTeamChatEvent(superiorPlayer))
+                    return;
+
                 superiorPlayer.toggleTeamChat();
                 return;
             }

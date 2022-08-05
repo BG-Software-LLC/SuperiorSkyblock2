@@ -65,11 +65,15 @@ public class CmdTeamChat implements ISuperiorCommand {
         SuperiorPlayer superiorPlayer = arguments.getSuperiorPlayer();
 
         if (args.length == 1) {
+            if (!plugin.getEventsBus().callPlayerToggleTeamChatEvent(superiorPlayer))
+                return;
+
             if (superiorPlayer.hasTeamChatEnabled()) {
                 Message.TOGGLED_TEAM_CHAT_OFF.send(superiorPlayer);
             } else {
                 Message.TOGGLED_TEAM_CHAT_ON.send(superiorPlayer);
             }
+
             superiorPlayer.toggleTeamChat();
         } else {
             String message = CommandArguments.buildLongString(args, 1, superiorPlayer.hasPermissionWithoutOP("superior.chat.color"));

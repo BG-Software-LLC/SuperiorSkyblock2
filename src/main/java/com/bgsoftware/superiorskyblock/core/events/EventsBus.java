@@ -88,13 +88,17 @@ import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
 import com.bgsoftware.superiorskyblock.api.events.MissionResetEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeBorderColorEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeLanguageEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerChangeNameEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerChangeRoleEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerCloseMenuEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerOpenMenuEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerReplaceEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBlocksStackerEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBorderEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBypassEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerToggleFlyEvent;
 import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
+import com.bgsoftware.superiorskyblock.api.events.PlayerToggleTeamChatEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
 import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
 import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
@@ -654,6 +658,12 @@ public class EventsBus {
         return callEvent(() -> new PlayerChangeLanguageEvent(superiorPlayer, language), "playerchangelanguageevent");
     }
 
+    public void callPlayerChangeNameEvent(SuperiorPlayer superiorPlayer, String newName) {
+        if (!plugin.getSettings().getDisabledEvents().contains("playerchangenameevent")) {
+            callEvent(new PlayerChangeNameEvent(superiorPlayer, newName));
+        }
+    }
+
     public boolean callPlayerChangeRoleEvent(SuperiorPlayer superiorPlayer, PlayerRole newPlayer) {
         return callEvent(() -> new PlayerChangeRoleEvent(superiorPlayer, newPlayer), "playerchangeroleevent");
     }
@@ -682,8 +692,12 @@ public class EventsBus {
         return callEvent(() -> new PlayerToggleBorderEvent(superiorPlayer), "playertoggleborderevent");
     }
 
+    public boolean callPlayerToggleBypassEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerToggleBypassEvent(superiorPlayer), "playertogglebypassevent");
+    }
+
     public boolean callPlayerToggleFlyEvent(SuperiorPlayer superiorPlayer) {
-        return callEvent(() -> new PlayerToggleBorderEvent(superiorPlayer), "playertoggleflyevent");
+        return callEvent(() -> new PlayerToggleFlyEvent(superiorPlayer), "playertoggleflyevent");
     }
 
     public boolean callPlayerTogglePanelEvent(SuperiorPlayer superiorPlayer) {
@@ -692,6 +706,10 @@ public class EventsBus {
 
     public boolean callPlayerToggleSpyEvent(SuperiorPlayer superiorPlayer) {
         return callEvent(() -> new PlayerTogglePanelEvent(superiorPlayer), "playertogglespyevent");
+    }
+
+    public boolean callPlayerToggleTeamChatEvent(SuperiorPlayer superiorPlayer) {
+        return callEvent(() -> new PlayerToggleTeamChatEvent(superiorPlayer), "playertoggleteamchatevent");
     }
 
     public void callPluginInitializedEvent(SuperiorSkyblock plugin) {
