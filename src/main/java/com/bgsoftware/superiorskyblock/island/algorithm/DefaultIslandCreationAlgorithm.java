@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.island.algorithm;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
@@ -47,6 +48,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Island island = plugin.getFactory().createIsland(owner, islandUUID, islandLocation.add(0.5, 0, 0.5),
                 islandName, schematic.getName());
 
+        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+
         EventResult<Boolean> event = plugin.getEventsBus().callIslandCreateEvent(owner, island, schematic.getName());
 
         if (!event.isCancelled()) {
@@ -54,7 +57,9 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         owner.getUniqueId(), islandUUID);
                 completableFuture.complete(new IslandCreationResult(island, islandLocation, event.getResult()));
+                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
             }, error -> {
+                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                 plugin.getProviders().getWorldsProvider().finishIslandCreation(islandLocation,
                         owner.getUniqueId(), islandUUID);
                 completableFuture.completeExceptionally(error);

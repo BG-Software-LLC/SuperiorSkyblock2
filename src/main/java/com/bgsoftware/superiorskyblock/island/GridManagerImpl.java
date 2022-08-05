@@ -193,10 +193,13 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                         pendingCreationTasks.remove(superiorPlayer.getUniqueId());
 
+                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
                         island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
                         island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
                         island.setBiome(biome);
                         island.setIslandHome(schematic.adjustRotation(islandLocation));
+
+                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
 
                         IslandsDatabaseBridge.insertIsland(island);
 
