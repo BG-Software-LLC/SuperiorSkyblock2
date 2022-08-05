@@ -120,14 +120,20 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 PlayerLocales.getDefaultLocale()
         );
 
-        superiorPlayer.textureValue = resultSet.getString("last_used_skin").orElse("");
-        superiorPlayer.lastTimeStatus = resultSet.getLong("last_time_updated")
-                .orElse(System.currentTimeMillis() / 1000);
+        try {
+            superiorPlayer.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-        CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(uuid.get());
+            superiorPlayer.textureValue = resultSet.getString("last_used_skin").orElse("");
+            superiorPlayer.lastTimeStatus = resultSet.getLong("last_time_updated")
+                    .orElse(System.currentTimeMillis() / 1000);
 
-        if (cachedPlayerInfo != null)
-            superiorPlayer.loadFromCachedInfo(cachedPlayerInfo);
+            CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(uuid.get());
+
+            if (cachedPlayerInfo != null)
+                superiorPlayer.loadFromCachedInfo(cachedPlayerInfo);
+        } finally {
+            superiorPlayer.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
+        }
 
         return Optional.of(superiorPlayer);
     }
