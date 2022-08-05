@@ -41,6 +41,14 @@ public interface IMissionsHolder {
     int getAmountMissionCompleted(Mission<?> mission);
 
     /**
+     * Set the amount of times mission was completed.
+     *
+     * @param mission     The mission to set.
+     * @param finishCount The amount of times the mission was completed.
+     */
+    void setAmountMissionCompleted(Mission<?> mission, int finishCount);
+
+    /**
      * Get the list of the completed missions of the player.
      */
     List<Mission<?>> getCompletedMissions();

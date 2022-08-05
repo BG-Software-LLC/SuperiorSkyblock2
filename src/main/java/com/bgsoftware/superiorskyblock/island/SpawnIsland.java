@@ -1516,6 +1516,11 @@ public class SpawnIsland implements Island {
     }
 
     @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        // Do nothing.
+    }
+
+    @Override
     public List<Mission<?>> getCompletedMissions() {
         return Collections.emptyList();
     }

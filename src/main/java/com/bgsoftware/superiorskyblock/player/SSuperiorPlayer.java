@@ -724,28 +724,13 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        PluginDebugger.debug("Action: Complete Mission, Player: " + getName() + ", Mission: " + mission.getName());
-        int finishCount = completedMissions.getOrDefault(mission, 0) + 1;
-        completedMissions.put(mission, finishCount);
-        PlayersDatabaseBridge.saveMission(this, mission, finishCount);
+        this.setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);
     }
 
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        PluginDebugger.debug("Action: Reset Mission, Player: " + getName() + ", Mission: " + mission.getName());
-
-        int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
-
-        if (finishCount > 0) {
-            completedMissions.put(mission, finishCount);
-            PlayersDatabaseBridge.saveMission(this, mission, finishCount);
-        } else {
-            completedMissions.remove(mission);
-            PlayersDatabaseBridge.removeMission(this, mission);
-        }
-
-        mission.clearData(this);
+        this.setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) - 1);
     }
 
     @Override
@@ -766,6 +751,23 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.getOrDefault(mission, 0);
+    }
+
+    @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        PluginDebugger.debug("Action: Set Amount Mission Completed, Player: " + getName() +
+                ", Mission: " + mission.getName() + ", Amount: " + finishCount);
+
+        if (finishCount > 0) {
+            completedMissions.put(mission, finishCount);
+            PlayersDatabaseBridge.saveMission(this, mission, finishCount);
+        } else {
+            completedMissions.remove(mission);
+            PlayersDatabaseBridge.removeMission(this, mission);
+        }
+
+        mission.clearData(this);
     }
 
     @Override

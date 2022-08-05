@@ -438,6 +438,11 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        // Do nothing.
+    }
+
+    @Override
     public List<Mission<?>> getCompletedMissions() {
         return Collections.emptyList();
     }

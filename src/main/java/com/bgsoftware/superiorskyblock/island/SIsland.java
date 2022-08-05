@@ -3415,14 +3415,7 @@ public class SIsland implements Island {
     @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        PluginDebugger.debug("Action: Complete Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
-
-        int finishCount = completedMissions.getOrDefault(mission, 0) + 1;
-        completedMissions.put(mission, finishCount);
-
-        IslandsDatabaseBridge.saveMission(this, mission, finishCount);
-
-        plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
+        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);
     }
 
     /*
@@ -3432,20 +3425,7 @@ public class SIsland implements Island {
     @Override
     public void resetMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        PluginDebugger.debug("Action: Reset Mission, Island: " + owner.getName() + ", Mission: " + mission.getName());
-
-        int finishCount = completedMissions.getOrDefault(mission, 0) - 1;
-        if (finishCount > 0) {
-            completedMissions.put(mission, finishCount);
-            IslandsDatabaseBridge.saveMission(this, mission, finishCount);
-        } else {
-            completedMissions.remove(mission);
-            IslandsDatabaseBridge.removeMission(this, mission);
-        }
-
-        mission.clearData(getOwner());
-
-        plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
+        setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) - 1);
     }
 
     /*
@@ -3470,6 +3450,25 @@ public class SIsland implements Island {
     public int getAmountMissionCompleted(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         return completedMissions.getOrDefault(mission, 0);
+    }
+
+    @Override
+    public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
+        Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
+        PluginDebugger.debug("Action: Set Amount Mission Completed, Island: " + owner.getName() +
+                ", Mission: " + mission.getName() + ", Amount: " + finishCount);
+
+        if (finishCount > 0) {
+            completedMissions.put(mission, finishCount);
+            IslandsDatabaseBridge.saveMission(this, mission, finishCount);
+        } else {
+            completedMissions.remove(mission);
+            IslandsDatabaseBridge.removeMission(this, mission);
+        }
+
+        mission.clearData(getOwner());
+
+        plugin.getMenus().refreshMissionsCategory(mission.getMissionCategory());
     }
 
     /*
