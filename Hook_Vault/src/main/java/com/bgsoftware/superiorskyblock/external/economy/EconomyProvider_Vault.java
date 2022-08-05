@@ -47,10 +47,6 @@ public class EconomyProvider_Vault implements EconomyProvider {
         String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
                 moneyInTransaction == 0 ? "You have exceed the limit of your bank" : "";
 
-        Bukkit.broadcastMessage("Deposit Money");
-        Bukkit.broadcastMessage("Transaction Money: " + moneyInTransaction);
-        Bukkit.broadcastMessage("New Balance: " + getMoneyInBank(offlinePlayer));
-
         return new EconomyResult(errorMessage, moneyInTransaction);
     }
 
@@ -64,10 +60,6 @@ public class EconomyProvider_Vault implements EconomyProvider {
 
         String errorMessage = moneyInTransaction == amount ? economyResponse.errorMessage :
                 moneyInTransaction == 0 ? "Couldn't process the transaction" : "";
-
-        Bukkit.broadcastMessage("Withdraw Money");
-        Bukkit.broadcastMessage("Transaction Money: " + moneyInTransaction);
-        Bukkit.broadcastMessage("New Balance: " + getMoneyInBank(offlinePlayer));
 
         return new EconomyResult(errorMessage, moneyInTransaction);
     }
