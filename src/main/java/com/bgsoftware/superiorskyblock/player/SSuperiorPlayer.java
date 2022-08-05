@@ -205,8 +205,16 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public void updateName() {
         Player player = asPlayer();
         if (player != null) {
-            this.name = player.getName();
-            PlayersDatabaseBridge.savePlayerName(this);
+            String newName = player.getName();
+            if (!this.name.equals(newName)) {
+                try {
+                    plugin.getPlayers().getPlayersContainer().removePlayer(this);
+                    this.name = newName;
+                    PlayersDatabaseBridge.savePlayerName(this);
+                } finally {
+                    plugin.getPlayers().getPlayersContainer().addPlayer(this);
+                }
+            }
         }
     }
 
