@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
+import com.bgsoftware.common.mappings.MappingsChecker;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -68,6 +69,7 @@ import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.mapping.TestRemaps;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
@@ -382,11 +384,11 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         try {
             nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
 
-            if (!nmsAlgorithms.isMappingsSupported()) {
-                new ManagerLoadException(
-                        "The plugin doesn't support your version mappings.\n" +
-                                "Please try a different version.",
-                        ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+            String mappingVersionHash = nmsAlgorithms.getMappingsHash();
+
+            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version)) {
+                new ManagerLoadException("The plugin doesn't support your version mappings.\nPlease try a different version.\n" +
+                        "Mappings Hash: " + mappingVersionHash, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
                 return false;
             }
 
@@ -404,6 +406,16 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
             PluginDebugger.debug(ex);
             return false;
+        }
+
+        File mappingsFile = new File("mappings");
+        if (mappingsFile.exists()) {
+            try {
+                TestRemaps.testRemapsForClassesInPackage(mappingsFile,
+                        plugin.getClassLoader(), "com.bgsoftware.superiorskyblock.nms." + version);
+            } catch (Exception error) {
+                error.printStackTrace();
+            }
         }
 
         return true;

@@ -34,6 +34,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 
@@ -57,9 +58,10 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         this.plugin = plugin;
     }
 
+    @Nullable
     @Override
-    public boolean isMappingsSupported() {
-        return true;
+    public String getMappingsHash() {
+        return null;
     }
 
     @Override

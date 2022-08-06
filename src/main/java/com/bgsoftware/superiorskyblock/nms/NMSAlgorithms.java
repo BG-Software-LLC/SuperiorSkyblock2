@@ -18,7 +18,8 @@ import javax.annotation.Nullable;
 
 public interface NMSAlgorithms {
 
-    boolean isMappingsSupported();
+    @Nullable
+    String getMappingsHash();
 
     void registerCommand(BukkitCommand command);
 

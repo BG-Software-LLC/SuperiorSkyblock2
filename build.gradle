@@ -57,6 +57,7 @@ dependencies {
 
     implementation 'com.bgsoftware.common.config:CommentedConfiguration:1.0.3'
     implementation 'com.bgsoftware.common.updater:Updater:latest'
+    implementation 'com.bgsoftware.common.mappings:MappingsChecker:1.0.0'
     implementation 'com.bgsoftware.common.reflection:ReflectionUtils:1.0.2'
     implementation 'com.bgsoftware.common.executors:Executors:1.0.1'
 
