@@ -130,6 +130,7 @@ COMMAND_ARGUMENT_MULTIPLIER: multiplicateur
 COMMAND_ARGUMENT_NAME: nom
 COMMAND_ARGUMENT_NEW_LEADER: nouveau-chef
 COMMAND_ARGUMENT_PAGE: page
+COMMAND_ARGUMENT_PATH: 'path'
 COMMAND_ARGUMENT_PERMISSION: permission
 COMMAND_ARGUMENT_PLAYER_NAME: nom-du-joueur
 COMMAND_ARGUMENT_PRIVATE: privé
@@ -173,6 +174,7 @@ COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Réinitialiser le taux des générate
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Fermer une île au public.
 COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Executer une commande pour tous les membres d''une île.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Vérifier le nombre de blocs sur lîle spécifiée.
+COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or islands.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Dégrader un membre de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DEPOSIT: Déposer de l'argent sur le compte de l'île d'un joueur.
 COMMAND_DESCRIPTION_ADMIN_DISBAND: Supprimer l'île d'un joueur.
@@ -602,6 +604,13 @@ PANEL_TOGGLE_ON: |-
 PERMISSION_CHANGED: '&e&lIle | &7Permission {0} de l''île de {1} mise à jour.'
 PERMISSION_CHANGED_NAME: '&e&lIle | &7Permission {0} de l''île {1} mise à jour.'
 PERMISSION_CHANGED_ALL: '&e&lIle | &7Permission {0} mise à jour pour toutes les îles.'
+PERSISTENT_DATA_EMPTY: '&c&lError | &7No data was found for your query.'
+PERSISTENT_DATA_MODIFY: '&e&lData | &7Successfully set data for {0} with {1}: {2}'
+PERSISTENT_DATA_SHOW: '&e&lData | &7Data of {0}: &f{{1}}'
+PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
+PERSISTENT_DATA_SHOW_SPACER: '&f, '
+PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
+PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
 PERMISSIONS_RESET_PLAYER: '&e&lIle | &7Réinitialisation de toutes les permissions de {0} !'
 PERMISSIONS_RESET_ROLES: '&e&lIle | &7Réinitialisation de toutes les permissions de l''île !'
 PLACEHOLDER_NO: 'No'

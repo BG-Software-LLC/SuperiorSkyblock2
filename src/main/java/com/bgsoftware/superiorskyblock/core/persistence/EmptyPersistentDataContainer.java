@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataType;
 
 import javax.annotation.Nullable;
+import java.util.function.BiConsumer;
 
 public class EmptyPersistentDataContainer implements PersistentDataContainer {
 
@@ -81,6 +82,11 @@ public class EmptyPersistentDataContainer implements PersistentDataContainer {
     @Override
     public int size() {
         return 0;
+    }
+
+    @Override
+    public void forEach(BiConsumer<String, Object> action) {
+        // Do nothing.
     }
 
     @Override

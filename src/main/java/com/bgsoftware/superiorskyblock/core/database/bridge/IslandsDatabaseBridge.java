@@ -581,6 +581,11 @@ public class IslandsDatabaseBridge {
         ));
     }
 
+    public static void removePersistentDataContainer(Island island) {
+        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("players_custom_data", createFilter("island", island)));
+    }
+
     public static void insertIsland(Island island) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             databaseBridge.insertObject("islands",
@@ -697,6 +702,38 @@ public class IslandsDatabaseBridge {
         }
     }
 
+    public static void executeFutureSaves(Island island, FutureSave futureSave) {
+        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(island.getUniqueId());
+
+        if (futureSaves == null)
+            return;
+
+        Set<Object> values = futureSaves.remove(futureSave);
+
+        if (values == null)
+            return;
+
+        if (futureSaves.isEmpty())
+            SAVE_METHODS_TO_BE_EXECUTED.remove(island.getUniqueId());
+
+        switch (futureSave) {
+            case BLOCK_COUNTS:
+                saveBlockCounts(island);
+                break;
+            case ISLAND_CHESTS:
+                for (Object islandChest : values)
+                    saveIslandChest(island, (IslandChest) islandChest);
+                break;
+            case PERSISTENT_DATA: {
+                if (island.isPersistentDataContainerEmpty())
+                    removePersistentDataContainer(island);
+                else
+                    savePersistentDataContainer(island);
+                break;
+            }
+        }
+    }
+
     private static DatabaseFilter createFilter(String id, Island island, Pair<String, Object>... others) {
         List<Pair<String, Object>> filters = new LinkedList<>();
         filters.add(new Pair<>(id, island.getUniqueId().toString()));
@@ -710,7 +747,7 @@ public class IslandsDatabaseBridge {
             databaseBridgeConsumer.accept(databaseBridge);
     }
 
-    private enum FutureSave {
+    public enum FutureSave {
 
         BLOCK_COUNTS,
         ISLAND_CHESTS,

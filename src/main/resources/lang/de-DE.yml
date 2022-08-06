@@ -178,6 +178,7 @@ COMMAND_ARGUMENT_MULTIPLIER: Multiplikator
 COMMAND_ARGUMENT_NAME: name
 COMMAND_ARGUMENT_NEW_LEADER: neuer Owner
 COMMAND_ARGUMENT_PAGE: Seite
+COMMAND_ARGUMENT_PATH: 'path'
 COMMAND_ARGUMENT_PERMISSION: Berechtigung
 COMMAND_ARGUMENT_PLAYER_NAME: Spielername
 COMMAND_ARGUMENT_PRIVATE: privat
@@ -229,6 +230,7 @@ COMMAND_DESCRIPTION_ADMIN_CLOSE: Schließe eine Insel für die Öffentlichkeit.
 COMMAND_DESCRIPTION_ADMIN_CMD_ALL: Führe einen Befehl für alle Mitglieder der Inseln
   aus.
 COMMAND_DESCRIPTION_ADMIN_COUNT: Überprüfe eine Blockanzahl auf einer bestimmten Insel.
+COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or islands.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: Debug-Ausgaben umschalten.
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Lösche einen Warp für eine Insel.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Ein Mitglied auf der Insel eines anderen Spielers
@@ -767,6 +769,13 @@ PERMISSION_CHANGED_NAME: '&e&lInsel | &7Die Berechtigung {0} der Insel {1} ​�
   erfolgreich aktualisiert.'
 PERMISSION_CHANGED_ALL: '&e&lInsel | &7Die Berechtigung {0} für alle Inseln erfolgreich
   aktualisiert.'
+PERSISTENT_DATA_EMPTY: '&c&lError | &7No data was found for your query.'
+PERSISTENT_DATA_MODIFY: '&e&lData | &7Successfully set data for {0} with {1}: {2}'
+PERSISTENT_DATA_SHOW: '&e&lData | &7Data of {0}: &f{{1}}'
+PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
+PERSISTENT_DATA_SHOW_SPACER: '&f, '
+PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
+PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
 PERMISSIONS_RESET_PLAYER: '&e&lInsel | &7Alle Berechtigungen für {0} erfolgreich auf
   Standardwerte zurückgesetzt!'
 PERMISSIONS_RESET_ROLES: '&e&lInsel | &7Alle Berechtigungen der Insel erfolgreich

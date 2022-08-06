@@ -129,6 +129,7 @@ COMMAND_ARGUMENT_MULTIPLIER: moltiplicatore
 COMMAND_ARGUMENT_NAME: nome
 COMMAND_ARGUMENT_NEW_LEADER: nuovo-capo
 COMMAND_ARGUMENT_PAGE: pagina
+COMMAND_ARGUMENT_PATH: 'path'
 COMMAND_ARGUMENT_PERMISSION: permesso
 COMMAND_ARGUMENT_PLAYER_NAME: nome-giocatore
 COMMAND_ARGUMENT_PRIVATE: privato
@@ -169,6 +170,7 @@ COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Cancella i tassi del generatore per u
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Chiudi un'isola al pubblico.
 COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Controlla un conteggio dei blocchi su un'isola specifica.
+COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or islands.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: Attiva o disattiva i messaggi di Debug.
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: Elimina un warp per un'isola.
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Diminuisci il ruolo di un membro dell'isola di un giocatore.
@@ -605,6 +607,13 @@ PANEL_TOGGLE_ON: |
 PERMISSION_CHANGED: '&e&lIsola | &7Aggiornata correttamente l''autorizzazione {0} dell''isola di {1}.'
 PERMISSION_CHANGED_NAME: '&e&lIsola | &7Aggiornata correttamente l''autorizzazione {0} dell''isola {1}.'
 PERMISSION_CHANGED_ALL: '&e&lIsola | &7Aggiornata correttamente l''autorizzazione {0} di tutte le isola.'
+PERSISTENT_DATA_EMPTY: '&c&lError | &7No data was found for your query.'
+PERSISTENT_DATA_MODIFY: '&e&lData | &7Successfully set data for {0} with {1}: {2}'
+PERSISTENT_DATA_SHOW: '&e&lData | &7Data of {0}: &f{{1}}'
+PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
+PERSISTENT_DATA_SHOW_SPACER: '&f, '
+PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
+PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
 PERMISSIONS_RESET_PLAYER: '&e&lIsola | &7Successfully reset all the permissions for {0} to default values!'
 PERMISSIONS_RESET_ROLES: '&e&lIsola | &7Successfully reset all the permissions of the island to default values!'
 PLACEHOLDER_NO: 'No'

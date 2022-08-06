@@ -771,6 +771,16 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isPersistentDataContainerEmpty() {
+        return persistentDataContainer == null || persistentDataContainer.isEmpty();
+    }
+
+    @Override
+    public void savePersistentDataContainer() {
+        PlayersDatabaseBridge.executeFutureSaves(this, PlayersDatabaseBridge.FutureSave.PERSISTENT_DATA);
+    }
+
+    @Override
     public void completeMission(Mission<?> mission) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         this.setAmountMissionCompleted(mission, completedMissions.getOrDefault(mission, 0) + 1);

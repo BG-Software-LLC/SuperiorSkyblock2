@@ -3309,6 +3309,16 @@ public class SIsland implements Island {
         return persistentDataContainer;
     }
 
+    @Override
+    public boolean isPersistentDataContainerEmpty() {
+        return persistentDataContainer == null || persistentDataContainer.isEmpty();
+    }
+
+    @Override
+    public void savePersistentDataContainer() {
+        IslandsDatabaseBridge.executeFutureSaves(this, IslandsDatabaseBridge.FutureSave.PERSISTENT_DATA);
+    }
+
     private void replaceVisitor(SuperiorPlayer originalPlayer, SuperiorPlayer newPlayer) {
         uniqueVisitors.write(uniqueVisitors -> {
             for (UniqueVisitor uniqueVisitor : uniqueVisitors) {

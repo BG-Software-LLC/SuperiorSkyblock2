@@ -112,6 +112,11 @@ public class PlayersDatabaseBridge {
         ));
     }
 
+    public static void removePersistentDataContainer(SuperiorPlayer superiorPlayer) {
+        runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge ->
+                databaseBridge.deleteObject("players_custom_data", createFilter("player", superiorPlayer)));
+    }
+
     public static void insertPlayer(SuperiorPlayer superiorPlayer) {
         runOperationIfRunning(superiorPlayer.getDatabaseBridge(), databaseBridge -> {
             Locale userLocale = superiorPlayer.getUserLocale();
@@ -194,10 +199,39 @@ public class PlayersDatabaseBridge {
         if (futureSaves != null) {
             for (Map.Entry<FutureSave, Set<Object>> futureSaveEntry : futureSaves.entrySet()) {
                 switch (futureSaveEntry.getKey()) {
-                    case PERSISTENT_DATA:
-                        savePersistentDataContainer(superiorPlayer);
+                    case PERSISTENT_DATA: {
+                        if (superiorPlayer.isPersistentDataContainerEmpty())
+                            removePersistentDataContainer(superiorPlayer);
+                        else
+                            savePersistentDataContainer(superiorPlayer);
                         break;
+                    }
                 }
+            }
+        }
+    }
+
+    public static void executeFutureSaves(SuperiorPlayer superiorPlayer, FutureSave futureSave) {
+        Map<FutureSave, Set<Object>> futureSaves = SAVE_METHODS_TO_BE_EXECUTED.get(superiorPlayer.getUniqueId());
+
+        if (futureSaves == null)
+            return;
+
+        Set<Object> values = futureSaves.remove(futureSave);
+
+        if (values == null)
+            return;
+
+        if (futureSaves.isEmpty())
+            SAVE_METHODS_TO_BE_EXECUTED.remove(superiorPlayer.getUniqueId());
+
+        switch (futureSave) {
+            case PERSISTENT_DATA: {
+                if (superiorPlayer.isPersistentDataContainerEmpty())
+                    removePersistentDataContainer(superiorPlayer);
+                else
+                    savePersistentDataContainer(superiorPlayer);
+                break;
             }
         }
     }
@@ -215,7 +249,7 @@ public class PlayersDatabaseBridge {
             databaseBridgeConsumer.accept(databaseBridge);
     }
 
-    private enum FutureSave {
+    public enum FutureSave {
 
         PERSISTENT_DATA
 

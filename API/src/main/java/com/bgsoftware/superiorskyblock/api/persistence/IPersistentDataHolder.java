@@ -10,4 +10,15 @@ public interface IPersistentDataHolder {
      */
     PersistentDataContainer getPersistentDataContainer();
 
+    /**
+     * Check if the persistent data container is empty.
+     */
+    boolean isPersistentDataContainerEmpty();
+
+    /**
+     * When saving data into the container, it's not immediately saved to database.
+     * Call this method to save the persistent data container into database.
+     */
+    void savePersistentDataContainer();
+
 }

@@ -151,6 +151,7 @@ COMMAND_ARGUMENT_MULTIPLIER: he-so
 COMMAND_ARGUMENT_NAME: ten
 COMMAND_ARGUMENT_NEW_LEADER: lanh-dao-moi
 COMMAND_ARGUMENT_PAGE: trang
+COMMAND_ARGUMENT_PATH: 'path'
 COMMAND_ARGUMENT_PERMISSION: quyen
 COMMAND_ARGUMENT_PLAYER_NAME: ten-nguoi-choi
 COMMAND_ARGUMENT_PRIVATE: rieng-tu
@@ -191,6 +192,7 @@ COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: Xóa một tỷ lệ máy tạo quặ
 COMMAND_DESCRIPTION_ADMIN_CLOSE: Đóng một hòn đảo thành công cộng.
 COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Thực hiện một lệnh cho tất cả các thành viên của các hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: Kiểm tra số khối trên một hòn đảo cụ thể.
+COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or islands.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: Chuyển đổi đầu ra gỡ lỗi.
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Xóa một khu vực cho một hòn đảo.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: Hạ cấp thành viên ở đảo của người chơi khác.
@@ -681,6 +683,13 @@ PERMISSION_CHANGED_NAME: '&e&lQuyền Lợi | &7Thay đổi thành công quyền
   {1}.'
 PERMISSION_CHANGED_ALL: '&e&lNâng Cấp | &7Thay đổi thành công quyền {0} cho tất cả
   các đảo.'
+PERSISTENT_DATA_EMPTY: '&c&lError | &7No data was found for your query.'
+PERSISTENT_DATA_MODIFY: '&e&lData | &7Successfully set data for {0} with {1}: {2}'
+PERSISTENT_DATA_SHOW: '&e&lData | &7Data of {0}: &f{{1}}'
+PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
+PERSISTENT_DATA_SHOW_SPACER: '&f, '
+PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
+PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
 PERMISSIONS_RESET_PLAYER: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền cho {0} thành giá trị mặc định!'
 PERMISSIONS_RESET_ROLES: '&e&lĐảo | &7Thành công đặt lại tất cả các quyền của hòn đảo thành giá trị mặc định!'
 PLACEHOLDER_NO: 'No'

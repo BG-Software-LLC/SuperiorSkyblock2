@@ -458,6 +458,16 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public boolean isPersistentDataContainerEmpty() {
+        return true;
+    }
+
+    @Override
+    public void savePersistentDataContainer() {
+        // Do nothing.
+    }
+
+    @Override
     public void completeMission(Mission<?> mission) {
         // Do nothing.
     }

@@ -25,6 +25,7 @@ public class AdminCommandsMap extends CommandsMap {
         registerCommand(new CmdAdminClose(), false);
         registerCommand(new CmdAdminCmdAll(), false);
         registerCommand(new CmdAdminCount(), false);
+        registerCommand(new CmdAdminData(), false);
         registerCommand(new CmdAdminDebug(), false);
         registerCommand(new CmdAdminDelWarp(), false);
         registerCommand(new CmdAdminDemote(), false);

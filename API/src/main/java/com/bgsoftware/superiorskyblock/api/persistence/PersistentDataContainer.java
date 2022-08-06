@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.api.persistence;
 
 import javax.annotation.Nullable;
+import java.util.function.BiConsumer;
 
 public interface PersistentDataContainer {
 
@@ -116,6 +117,13 @@ public interface PersistentDataContainer {
      * Get the size of the container.
      */
     int size();
+
+    /**
+     * Iterate through all the data of the container.
+     *
+     * @param action The action to perform for each key and value pair.
+     */
+    void forEach(BiConsumer<String, Object> action);
 
     /**
      * Get the serialized contents of the container as a bytes array.

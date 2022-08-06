@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
@@ -126,6 +127,13 @@ public class PersistentDataContainerImpl<E> implements PersistentDataContainer {
     @Override
     public int size() {
         return innerTag.size();
+    }
+
+    @Override
+    public void forEach(BiConsumer<String, Object> action) {
+        innerTag.getValue().forEach((key, value) -> {
+            action.accept(key, value.getValue());
+        });
     }
 
     @Override

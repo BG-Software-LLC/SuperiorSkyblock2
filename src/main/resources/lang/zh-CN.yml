@@ -126,6 +126,7 @@ COMMAND_ARGUMENT_MULTIPLIER: 倍率
 COMMAND_ARGUMENT_NAME: 名字
 COMMAND_ARGUMENT_NEW_LEADER: 新领导者
 COMMAND_ARGUMENT_PAGE: 页数
+COMMAND_ARGUMENT_PATH: 'path'
 COMMAND_ARGUMENT_PERMISSION: 权限
 COMMAND_ARGUMENT_PLAYER_NAME: 玩家名
 COMMAND_ARGUMENT_PRIVATE: 私有
@@ -166,6 +167,7 @@ COMMAND_DESCRIPTION_ADMIN_CLEAR_GENERATOR: 给指定的岛屿清除矿物生成�
 COMMAND_DESCRIPTION_ADMIN_CLOSE: 将一个岛屿向公众关闭.
 COMMAND_DESCRIPTION_ADMIN_CMD_ALL: 'Execute a command for all members of islands.'
 COMMAND_DESCRIPTION_ADMIN_COUNT: 检查一个岛屿指定方块的数量.
+COMMAND_DESCRIPTION_ADMIN_DATA: 'Interact with persistent data of players or islands.'
 COMMAND_DESCRIPTION_ADMIN_DEBUG: 切换调试模式输出.
 COMMAND_DESCRIPTION_ADMIN_DEL_WARP: 'Delete a warp for an island.'
 COMMAND_DESCRIPTION_ADMIN_DEMOTE: 降级其他岛屿上的成员.
@@ -602,6 +604,13 @@ PANEL_TOGGLE_ON: |-
 PERMISSION_CHANGED: '&e&l岛屿 | &7成功更新 &b{1} &7岛屿的 &b{0} &7权限.'
 PERMISSION_CHANGED_NAME: '&e&l岛屿 | &7成功更新 &b{1} &7岛屿的 &b{0} &7权限.'
 PERMISSION_CHANGED_ALL: '&e&l岛屿 | &7成功为所有岛屿更新 &b{0} &7权限.'
+PERSISTENT_DATA_EMPTY: '&c&lError | &7No data was found for your query.'
+PERSISTENT_DATA_MODIFY: '&e&lData | &7Successfully set data for {0} with {1}: {2}'
+PERSISTENT_DATA_SHOW: '&e&lData | &7Data of {0}: &f{{1}}'
+PERSISTENT_DATA_SHOW_PATH: '&b{0}&f: '
+PERSISTENT_DATA_SHOW_SPACER: '&f, '
+PERSISTENT_DATA_SHOW_VALUE: '&6{0}&c{1}&f'
+PERSISTENT_DATA_REMOVED: '&e&lData | &7Successfully removed data for {0} from path {1}.'
 PERMISSIONS_RESET_PLAYER: '&e&lIsland | &7Successfully reset all the permissions for {0} to default values!'
 PERMISSIONS_RESET_ROLES: '&e&lIsland | &7Successfully reset all the permissions of the island to default values!'
 PLACEHOLDER_NO: 'No'
