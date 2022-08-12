@@ -293,7 +293,7 @@ public class SettingsContainer {
         stackedBlocksMenuTitle = Formatters.COLOR_FORMATTER.format(config.getString("stacked-blocks.deposit-menu.title", "&lDeposit Blocks"));
         islandLevelFormula = config.getString("island-level-formula", "{} / 2");
         roundedIslandLevel = config.getBoolean("rounded-island-level", false);
-        islandTopOrder = config.getString("island-top-order", "WORTH");
+        islandTopOrder = config.getString("island-top-order", "WORTH").toUpperCase(Locale.ENGLISH);
         coopMembers = config.getBoolean("coop-members", true);
         islandRolesSection = config.getConfigurationSection("island-roles");
         signWarpLine = config.getString("sign-warp-line", "[IslandWarp]");
@@ -517,7 +517,7 @@ public class SettingsContainer {
         autoUncoopWhenAlone = config.getBoolean("auto-uncoop-when-alone", false);
         TopIslandMembersSorting islandTopMembersSorting;
         try {
-            islandTopMembersSorting = TopIslandMembersSorting.valueOf(config.getString("island-top-members-sorting").toUpperCase());
+            islandTopMembersSorting = TopIslandMembersSorting.valueOf(config.getString("island-top-members-sorting").toUpperCase(Locale.ENGLISH));
         } catch (IllegalArgumentException error) {
             islandTopMembersSorting = TopIslandMembersSorting.NAMES;
         }
