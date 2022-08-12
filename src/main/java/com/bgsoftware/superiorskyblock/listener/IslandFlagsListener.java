@@ -169,7 +169,8 @@ public class IslandFlagsListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onBlockFlow(BlockFromToEvent e) {
-        IslandFlag islandFlag = Materials.isWater(e.getBlock().getType()) ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
+        IslandFlag islandFlag = Materials.isWater(e.getBlock().getType()) ||
+                plugin.getNMSWorld().isWaterLogged(e.getBlock()) ? IslandFlags.WATER_FLOW : IslandFlags.LAVA_FLOW;
         if (preventAction(e.getToBlock().getLocation(), islandFlag))
             e.setCancelled(true);
     }
