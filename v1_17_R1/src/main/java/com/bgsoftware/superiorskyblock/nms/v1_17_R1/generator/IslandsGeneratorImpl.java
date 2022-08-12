@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_17_R1.generator;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.IRegistry;
 import net.minecraft.world.level.biome.BiomeBase;
@@ -37,31 +38,7 @@ public class IslandsGeneratorImpl extends IslandsGenerator {
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biomeGrid) {
         ChunkData chunkData = createChunkData(world);
 
-        Biome targetBiome;
-
-        switch (world.getEnvironment()) {
-            case NETHER -> {
-                try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome());
-                } catch (IllegalArgumentException error) {
-                    targetBiome = Biome.NETHER_WASTES;
-                }
-            }
-            case THE_END -> {
-                try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome());
-                } catch (IllegalArgumentException error) {
-                    targetBiome = Biome.THE_END;
-                }
-            }
-            default -> {
-                try {
-                    targetBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome());
-                } catch (IllegalArgumentException error) {
-                    targetBiome = Biome.PLAINS;
-                }
-            }
-        }
+        Biome targetBiome = IslandUtils.getDefaultWorldBiome(world.getEnvironment());
 
         setBiome(biomeGrid, targetBiome);
 

@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -176,8 +177,10 @@ public final class NMSWorldImpl implements NMSWorld {
                 double worldBorderSize = worldBorder.getSize();
 
                 switch (superiorPlayer.getBorderColor()) {
-                    case GREEN -> worldBorder.transitionSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
-                    case RED -> worldBorder.transitionSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
+                    case GREEN ->
+                            worldBorder.transitionSizeBetween(worldBorderSize - 0.1D, worldBorderSize, Long.MAX_VALUE);
+                    case RED ->
+                            worldBorder.transitionSizeBetween(worldBorderSize, worldBorderSize - 1.0D, Long.MAX_VALUE);
                 }
             }
 
@@ -217,7 +220,7 @@ public final class NMSWorldImpl implements NMSWorld {
             NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
                     blockData.getCombinedId(), blockData.getStatesTag(), blockData.getTileEntityData());
         });
-        setBiome(chunk, NMSUtils.getWorldBiome(bukkitChunk.getWorld().getEnvironment()));
+        setBiome(chunk, IslandUtils.getDefaultWorldBiome(bukkitChunk.getWorld().getEnvironment()));
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.generator;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.nms.v1_18_R2.NMSUtils;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,13 +40,13 @@ public final class IslandsGeneratorImpl extends IslandsGenerator {
             @Override
             public @NotNull
             Biome getBiome(@NotNull WorldInfo worldInfo, int x, int y, int z) {
-                return NMSUtils.getWorldBiome(worldInfo.getEnvironment());
+                return IslandUtils.getDefaultWorldBiome(worldInfo.getEnvironment());
             }
 
             @Override
             public @NotNull
             List<Biome> getBiomes(@NotNull WorldInfo worldInfo) {
-                return NMSUtils.getAllBiomes();
+                return IslandUtils.getDefaultWorldBiomes();
             }
 
         };

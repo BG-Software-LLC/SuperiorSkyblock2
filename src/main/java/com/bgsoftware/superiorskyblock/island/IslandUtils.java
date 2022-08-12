@@ -17,15 +17,18 @@ import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Biome;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
@@ -34,6 +37,25 @@ import java.util.function.Consumer;
 public class IslandUtils {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private static final EnumMap<World.Environment, Biome> DEFAULT_WORLD_BIOMES = new EnumMap<>(World.Environment.class);
+
+    static {
+        try {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.valueOf(plugin.getSettings().getWorlds().getNormal().getBiome()));
+        } catch (IllegalArgumentException error) {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NORMAL, Biome.PLAINS);
+        }
+        try {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome()));
+        } catch (IllegalArgumentException error) {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.NETHER, getBiome("NETHER_WASTES", "NETHER", "HELL"));
+        }
+        try {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome()));
+        } catch (IllegalArgumentException error) {
+            DEFAULT_WORLD_BIOMES.put(World.Environment.THE_END, getBiome("THE_END", "SKY"));
+        }
+    }
 
     private IslandUtils() {
 
@@ -283,6 +305,25 @@ public class IslandUtils {
                 Formatters.BORDER_COLOR_FORMATTER.format(borderColor, superiorPlayer.getUserLocale()));
 
         return true;
+    }
+
+    public static Biome getDefaultWorldBiome(World.Environment environment) {
+        return Objects.requireNonNull(DEFAULT_WORLD_BIOMES.get(environment));
+    }
+
+    public static List<Biome> getDefaultWorldBiomes() {
+        return new SequentialListBuilder<Biome>().build(DEFAULT_WORLD_BIOMES.values());
+    }
+
+    private static Biome getBiome(String... biomeNames) {
+        for (String biomeName : biomeNames) {
+            try {
+                return Biome.valueOf(biomeName);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        throw new IllegalArgumentException();
     }
 
 }
