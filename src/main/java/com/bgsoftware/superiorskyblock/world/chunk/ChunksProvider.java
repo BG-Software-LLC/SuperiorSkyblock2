@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.Chunk;
 
+import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +29,8 @@ public class ChunksProvider {
 
     }
 
-    public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason, Consumer<Chunk> onLoadConsumer) {
+    public static CompletableFuture<Chunk> loadChunk(ChunkPosition chunkPosition, ChunkLoadReason chunkLoadReason,
+                                                     @Nullable Consumer<Chunk> onLoadConsumer) {
         if (stopped)
             return new CompletableFuture<>();
 

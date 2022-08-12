@@ -7,6 +7,8 @@ public enum ChunkLoadReason {
     BLOCKS_RECALCULATE,
     ENTITIES_RECALCULATE,
     FIND_SAFE_SPOT,
-    API_REQUEST
+    API_REQUEST,
+
+    BIOME_REQUEST
 
 }

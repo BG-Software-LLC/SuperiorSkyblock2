@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
@@ -71,6 +70,7 @@ import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLim
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -220,6 +220,8 @@ public class SIsland implements Island {
     private volatile String islandRawName;
     private volatile String description = "";
     private volatile Biome biome = null;
+    @Nullable
+    private Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
     private final AtomicInteger unlockedWorlds = new AtomicInteger(0);
 
@@ -1501,10 +1503,29 @@ public class SIsland implements Island {
     @Override
     public Biome getBiome() {
         if (biome == null) {
-            // Loads the chunk and gets the biome on the first block.
-            // This may be called if a placeholder is called before the island is loaded, for example.
-            biome = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock().getBiome();
+            biomeGetterTask.set(task -> {
+                if (task != null)
+                    return task;
+
+                Location centerBlock = getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
+
+                ChunkPosition centerChunkPosition = ChunkPosition.of(centerBlock);
+
+                return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
+                        .thenApply(chunk -> centerBlock.getBlock().getBiome())
+                        .whenComplete((biome, error) -> {
+                            if (error != null)
+                                error.printStackTrace();
+                            else {
+                                this.biome = biome;
+                                biomeGetterTask.set((CompletableFuture<Biome>) null);
+                            }
+                        });
+            });
+
+            return IslandUtils.getDefaultWorldBiome(plugin.getSettings().getWorlds().getDefaultWorld());
         }
+
         return biome;
     }
 
@@ -1535,29 +1556,14 @@ public class SIsland implements Island {
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
-            Biome netherBiome;
-
-            try {
-                netherBiome = Biome.valueOf(plugin.getSettings().getWorlds().getNether().getBiome());
-            } catch (IllegalArgumentException error) {
-                netherBiome = ServerVersion.isLegacy() ? Biome.HELL :
-                        ServerVersion.isAtLeast(ServerVersion.v1_16) ? Biome.valueOf("NETHER_WASTES") : Biome.valueOf("NETHER");
-            }
-
+            Biome netherBiome = IslandUtils.getDefaultWorldBiome(World.Environment.NETHER);
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
-            Biome endBiome;
-
-            try {
-                endBiome = Biome.valueOf(plugin.getSettings().getWorlds().getEnd().getBiome());
-            } catch (IllegalArgumentException error) {
-                endBiome = ServerVersion.isLegacy() ? Biome.SKY : Biome.valueOf("THE_END");
-            }
-
+            Biome endBiome = IslandUtils.getDefaultWorldBiome(World.Environment.THE_END);
             List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
         }
