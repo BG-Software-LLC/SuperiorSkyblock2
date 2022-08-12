@@ -1,9 +1,11 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.NMSUtils;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
-import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.nbt.NBTTagCompound;
+import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.network.PlayerConnection;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager;
 import com.mojang.authlib.GameProfile;
@@ -19,6 +21,32 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public final class Entity extends MappedObject<net.minecraft.world.entity.Entity> {
+
+    private static final ReflectMethod<UUID> ENTITY_ITEM_GET_THROWER;
+    private static final ReflectMethod<Float> ENTITY_GET_X_ROT;
+    private static final ReflectMethod<Float> ENTITY_GET_Y_ROT;
+    private static final ReflectMethod<GameProfile> ENTITY_HUMAN_GET_PROFILE;
+    private static final ReflectMethod<net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager> ENTITY_DRAGON_CONTROLLER_MANAGER;
+    private static final ReflectMethod<UUID> ENTITY_GET_UNIQUE_ID;
+
+    static {
+        if (NMSUtils.is119Mappings) {
+            ENTITY_ITEM_GET_THROWER = new ReflectMethod<>(EntityItem.class, "i");
+            ENTITY_GET_X_ROT = new ReflectMethod<>(net.minecraft.world.entity.Entity.class, "dt");
+            ENTITY_GET_Y_ROT = new ReflectMethod<>(net.minecraft.world.entity.Entity.class, "dr");
+            ENTITY_HUMAN_GET_PROFILE = new ReflectMethod<>(EntityHuman.class, "fz");
+            ENTITY_DRAGON_CONTROLLER_MANAGER = new ReflectMethod<>(EntityEnderDragon.class, "fH");
+            ENTITY_GET_UNIQUE_ID = new ReflectMethod<>(net.minecraft.world.entity.Entity.class, "cp");
+        } else {
+            ENTITY_ITEM_GET_THROWER = null;
+            ENTITY_GET_X_ROT = null;
+            ENTITY_GET_Y_ROT = null;
+            ENTITY_HUMAN_GET_PROFILE = null;
+            ENTITY_DRAGON_CONTROLLER_MANAGER = null;
+            ENTITY_GET_UNIQUE_ID = null;
+        }
+
+    }
 
     public Entity(net.minecraft.world.entity.Entity handle) {
         super(handle);
@@ -42,7 +70,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "ds")
     public float getXRot() {
-        return handle.ds();
+        return ENTITY_GET_X_ROT == null ? handle.ds() : ENTITY_GET_X_ROT.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -50,7 +78,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "dq")
     public float getYRot() {
-        return handle.dq();
+        return ENTITY_GET_Y_ROT == null ? handle.dq() : ENTITY_GET_Y_ROT.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -58,7 +86,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "co")
     public UUID getUniqueID() {
-        return handle.co();
+        return ENTITY_GET_UNIQUE_ID == null ? handle.co() : ENTITY_GET_UNIQUE_ID.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -82,7 +110,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "fy")
     public GameProfile getProfile() {
-        return ((EntityHuman) handle).fy();
+        return ENTITY_HUMAN_GET_PROFILE == null ? ((EntityHuman) handle).fy() : ENTITY_HUMAN_GET_PROFILE.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.item.ItemEntity",
@@ -90,7 +118,7 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "j")
     public UUID getThrower() {
-        return ((EntityItem) handle).j();
+        return ENTITY_ITEM_GET_THROWER == null ? ((EntityItem) handle).j() : ENTITY_ITEM_GET_THROWER.invoke(handle);
     }
 
     @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -106,7 +134,8 @@ public final class Entity extends MappedObject<net.minecraft.world.entity.Entity
             type = Remap.Type.METHOD,
             remappedName = "fG")
     public DragonControllerManager getDragonControllerManager() {
-        return new DragonControllerManager(((EntityEnderDragon) handle).fG());
+        return new DragonControllerManager(ENTITY_DRAGON_CONTROLLER_MANAGER == null ?
+                ((EntityEnderDragon) handle).fG() : ENTITY_DRAGON_CONTROLLER_MANAGER.invoke(handle));
     }
 
     @Remap(classPath = "net.minecraft.server.network.ServerGamePacketListenerImpl",

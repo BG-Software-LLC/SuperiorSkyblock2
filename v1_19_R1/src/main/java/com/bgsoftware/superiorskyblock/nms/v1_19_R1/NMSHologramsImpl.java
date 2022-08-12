@@ -67,7 +67,7 @@ public final class NMSHologramsImpl implements NMSHolograms {
             t(true); // Marker
             super.collides = false;
             super.n(true); // Custom name visible
-            super.a(EMPTY_BOUND);
+            super.a(EMPTY_BOUND); // setBoundingBox
         }
 
         @Remap(classPath = "net.minecraft.world.entity.Entity",
@@ -101,24 +101,6 @@ public final class NMSHologramsImpl implements NMSHolograms {
             if (this.y) {
                 this.y = false;
             }
-        }
-
-        @Remap(classPath = "net.minecraft.world.entity.Entity",
-                name = "repositionEntityAfterLoad",
-                type = Remap.Type.METHOD,
-                remappedName = "bm")
-        @Override
-        public boolean bm() {
-            return false;
-        }
-
-        @Remap(classPath = "net.minecraft.world.entity.Entity",
-                name = "getBoundingBoxForCulling",
-                type = Remap.Type.METHOD,
-                remappedName = "cz")
-        @Override
-        public AxisAlignedBB cz() {
-            return EMPTY_BOUND;
         }
 
         @Override

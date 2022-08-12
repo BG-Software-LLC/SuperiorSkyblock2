@@ -28,6 +28,7 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.google.common.base.Suppliers;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.PlayerChunk;
+import net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon;
 import net.minecraft.world.level.block.BlockBed;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.ChunkConverter;
@@ -55,6 +56,13 @@ public final class NMSUtils {
     private static final HeightMap.Type OCEAN_FLOOR_HEIGHT_MAP = HeightMap.Type.d;
     @Remap(classPath = "net.minecraft.world.level.levelgen.Heightmap$Types", name = "WORLD_SURFACE", type = Remap.Type.FIELD, remappedName = "b")
     private static final HeightMap.Type WORLD_SURFACE_HEIGHT_MAP = HeightMap.Type.b;
+
+    public static final boolean is119Mappings;
+
+    static {
+        ReflectMethod<?> method119 = new ReflectMethod<>(EntityEnderDragon.class, net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerManager.class, "fH");
+        is119Mappings = method119.isValid();
+    }
 
     private NMSUtils() {
 
