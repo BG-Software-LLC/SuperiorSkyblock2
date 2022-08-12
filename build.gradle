@@ -35,7 +35,17 @@ allprojects {
         compileOnly "com.bgsoftware.common.reflection:ReflectionUtils:1.0.2"
     }
 
+    task checkDebug() {
+        Set<File> filesWithDebug = fileTree('src/main/java').filter { file ->
+            file.text.contains('Bukkit.broadcastMessage')
+        }.getFiles()
+
+        if (!filesWithDebug.isEmpty())
+            throw new GradleException("Found debug messages: " + filesWithDebug)
+    }
+
     build {
+        dependsOn checkDebug
         dependsOn shadowJar
     }
 }
