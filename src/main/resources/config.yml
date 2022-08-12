@@ -270,6 +270,9 @@ sign-warp:
 
 # All settings related to the visitors sign.
 visitors-sign:
+  # Whether a visitors sign is required for others to visit islands.
+  # If set to false, visitors will be teleported to the regular island home when using `/is visit`
+  required-for-visit: true
   # Set the line to create the visitors sign.
   line: '[Welcome]'
   # The line that will be displayed when the sign is active.

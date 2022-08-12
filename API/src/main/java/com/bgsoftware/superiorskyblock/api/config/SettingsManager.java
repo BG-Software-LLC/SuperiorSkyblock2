@@ -837,6 +837,12 @@ public interface SettingsManager {
     interface VisitorsSign {
 
         /**
+         * Whether a visitors sign is required for others to visit islands.
+         * Config-path: visitors-sign.required-for-visit
+         */
+        boolean isRequiredForVisit();
+
+        /**
          * The line that determines if the sign is used as a visitors home location.
          * Config-path: visitors-sign.line
          */

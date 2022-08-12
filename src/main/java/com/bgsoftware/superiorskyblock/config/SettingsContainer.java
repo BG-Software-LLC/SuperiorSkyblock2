@@ -89,6 +89,7 @@ public class SettingsContainer {
     public final long calcInterval;
     public final String signWarpLine;
     public final List<String> signWarp;
+    public final boolean visitorsSignRequiredForVisit;
     public final String visitorsSignLine;
     public final String visitorsSignActive;
     public final String visitorsSignInactive;
@@ -300,6 +301,7 @@ public class SettingsContainer {
         signWarp = Formatters.formatList(config.getStringList("sign-warp"), Formatters.COLOR_FORMATTER);
         while (signWarp.size() < 4)
             signWarp.add("");
+        visitorsSignRequiredForVisit = config.getBoolean("visitors-sign.required-for-visit", true);
         visitorsSignLine = config.getString("visitors-sign.line", "[Welcome]");
         visitorsSignActive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.active", "&a[Welcome]"));
         visitorsSignInactive = Formatters.COLOR_FORMATTER.format(config.getString("visitors-sign.inactive", "&c[Welcome]"));

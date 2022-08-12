@@ -12,6 +12,11 @@ public class VisitorsSignSection implements SettingsManager.VisitorsSign {
     }
 
     @Override
+    public boolean isRequiredForVisit() {
+        return this.container.visitorsSignRequiredForVisit;
+    }
+
+    @Override
     public String getLine() {
         return this.container.visitorsSignLine;
     }
