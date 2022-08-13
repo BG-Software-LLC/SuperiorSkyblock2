@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.MariaDBSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.MySQLSession;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.PostgreSQLSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSession;
 
 import java.sql.PreparedStatement;
@@ -40,8 +39,6 @@ public class SQLHelper {
                 return new MySQLSession(plugin, logging);
             case "MARIADB":
                 return new MariaDBSession(plugin, logging);
-            case "POSTGRESQL":
-                return new PostgreSQLSession(plugin, logging);
             default:
                 return new SQLiteSession(plugin, logging);
         }
