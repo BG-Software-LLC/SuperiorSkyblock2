@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.server.level;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;

@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.nbt.NBTTagCompound;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.level.WorldServer;

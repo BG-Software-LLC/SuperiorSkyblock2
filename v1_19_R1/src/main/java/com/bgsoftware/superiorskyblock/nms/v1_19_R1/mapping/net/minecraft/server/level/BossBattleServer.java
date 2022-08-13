@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level;
 
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.entity.Entity;
 import net.minecraft.server.level.EntityPlayer;

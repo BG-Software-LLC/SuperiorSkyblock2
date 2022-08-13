@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.spawners;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.level.WorldServer;

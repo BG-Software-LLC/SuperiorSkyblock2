@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.world.entity.boss.enderdragon.phases;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonControllerPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.IDragonController;

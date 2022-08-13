@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_18_R1;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.nms.NMSDragonFight;
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.EndWorldEnderDragonBattleHandler;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.IslandEnderDragonBattle;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R1.dragon.IslandEntityEnderDragon;

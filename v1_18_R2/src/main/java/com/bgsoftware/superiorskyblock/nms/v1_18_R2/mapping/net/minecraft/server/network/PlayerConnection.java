@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.network;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.MappedObject;
 import net.minecraft.network.protocol.Packet;
 

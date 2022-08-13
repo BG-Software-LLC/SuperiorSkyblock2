@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_18_R2.mapping.net.minecraft.server.network.chat;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import net.minecraft.network.chat.IChatBaseComponent;
 
 public final class ChatSerializer {

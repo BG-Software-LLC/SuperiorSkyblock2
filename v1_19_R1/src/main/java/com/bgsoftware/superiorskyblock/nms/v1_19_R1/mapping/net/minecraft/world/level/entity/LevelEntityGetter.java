@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.entity;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.phys.AxisAlignedBB;

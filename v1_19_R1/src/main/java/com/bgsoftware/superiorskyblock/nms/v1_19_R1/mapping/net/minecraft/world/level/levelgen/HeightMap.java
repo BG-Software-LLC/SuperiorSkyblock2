@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.levelgen;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.block.state.BlockData;
 import org.jetbrains.annotations.Nullable;

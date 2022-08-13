@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.MappedObject;
 
 public final class ChunkCoordIntPair extends MappedObject<net.minecraft.world.level.ChunkCoordIntPair> {

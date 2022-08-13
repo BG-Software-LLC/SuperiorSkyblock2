@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.dragon;
 
-import com.bgsoftware.superiorskyblock.nms.mapping.Remap;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import net.minecraft.world.level.dimension.end.EnderDragonBattle;
 
