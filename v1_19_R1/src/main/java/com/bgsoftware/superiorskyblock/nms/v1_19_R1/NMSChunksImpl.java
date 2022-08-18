@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -13,7 +14,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
-import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.SectionPosition;
@@ -436,6 +436,13 @@ public final class NMSChunksImpl implements NMSChunks {
         } else {
             CropsTickingTileEntity.create(island, chunkAccess);
         }
+    }
+
+    @Override
+    public void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier) {
+        if (chunkPositions.isEmpty()) return;
+        CropsTickingTileEntity.forEachChunk(chunkPositions, cropsTickingTileEntity ->
+                cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,

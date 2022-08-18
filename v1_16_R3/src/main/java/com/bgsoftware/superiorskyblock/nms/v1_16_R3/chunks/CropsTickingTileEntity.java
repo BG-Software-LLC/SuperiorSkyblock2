@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
@@ -17,8 +18,10 @@ import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
@@ -33,6 +36,8 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     private final int chunkZ;
 
     private int currentTick = 0;
+
+    private double cachedCropGrowthMultiplier;
 
     private CropsTickingTileEntity(Island island, Chunk chunk) {
         super(TileEntityTypes.COMMAND_BLOCK);
@@ -51,6 +56,7 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         assert world != null;
 
         world.tileEntityListTick.add(this);
+        this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
     public static void create(Island island, Chunk chunk) {
@@ -62,6 +68,18 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
         return tickingChunks.remove(chunkCoords.pair());
+    }
+
+    public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsTickingTileEntity> cropsTickingTileEntityConsumer) {
+        if (tickingChunks.isEmpty())
+            return;
+
+        chunkPositions.forEach(chunkPosition -> {
+            long chunkKey = chunkPosition.asPair();
+            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkKey);
+            if (cropsTickingTileEntity != null)
+                cropsTickingTileEntityConsumer.accept(cropsTickingTileEntity);
+        });
     }
 
     @Override
@@ -82,9 +100,8 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
         currentTick = 0;
 
         int worldRandomTick = world.getGameRules().getInt(GameRules.RANDOM_TICK_SPEED);
-        double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
-        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
+        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
 
         if (chunkRandomTickSpeed > 0) {
             for (ChunkSection chunkSection : chunk.getSections()) {
@@ -110,6 +127,10 @@ public class CropsTickingTileEntity extends TileEntity implements ITickable {
     @Override
     public void w() {
         tick();
+    }
+
+    public void setCropGrowthMultiplier(double cropGrowthMultiplier) {
+        this.cachedCropGrowthMultiplier = cropGrowthMultiplier;
     }
 
 }

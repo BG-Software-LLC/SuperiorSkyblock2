@@ -433,6 +433,13 @@ public final class NMSChunksImpl implements NMSChunks {
         }
     }
 
+    @Override
+    public void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier) {
+        if (chunkPositions.isEmpty()) return;
+        CropsTickingTileEntity.forEachChunk(chunkPositions, cropsTickingTileEntity ->
+                cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
+    }
+
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition,
                                                   net.minecraft.world.level.chunk.ChunkSection[] chunkSections) {
         KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();

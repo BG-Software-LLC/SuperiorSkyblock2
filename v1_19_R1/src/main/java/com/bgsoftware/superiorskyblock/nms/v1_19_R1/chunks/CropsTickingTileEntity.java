@@ -1,8 +1,9 @@
 package com.bgsoftware.superiorskyblock.nms.v1_19_R1.chunks;
 
+import com.bgsoftware.common.remaps.Remap;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.common.remaps.Remap;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.core.BlockPosition;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.server.level.WorldServer;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.ChunkCoordIntPair;
@@ -11,7 +12,6 @@ import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkAccess;
 import com.bgsoftware.superiorskyblock.nms.v1_19_R1.mapping.net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.entity.TileEntity;
 import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.chunk.Chunk;
@@ -19,8 +19,10 @@ import org.bukkit.craftbukkit.v1_19_R1.util.CraftMagicNumbers;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 
 public final class CropsTickingTileEntity extends TileEntity {
 
@@ -39,6 +41,8 @@ public final class CropsTickingTileEntity extends TileEntity {
 
     private int currentTick = 0;
 
+    private double cachedCropGrowthMultiplier;
+
     @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntityType", name = "COMMAND_BLOCK", type = Remap.Type.FIELD, remappedName = "v")
     private CropsTickingTileEntity(Island island, ChunkAccess chunk, BlockPosition blockPosition) {
         super(TileEntityTypes.v, blockPosition.getHandle(), chunk.getWorld().getType(blockPosition).getHandle());
@@ -49,6 +53,7 @@ public final class CropsTickingTileEntity extends TileEntity {
         this.chunkZ = chunkCoords.getZ();
         a(chunk.getWorld().getHandle());
         chunk.getWorld().setTickingBlockEntity(new CropsTickingTileEntityTicker(this));
+        this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
     public static void create(Island island, ChunkAccess chunk) {
@@ -62,6 +67,18 @@ public final class CropsTickingTileEntity extends TileEntity {
 
     public static CropsTickingTileEntity remove(ChunkCoordIntPair chunkCoords) {
         return tickingChunks.remove(chunkCoords.pair());
+    }
+
+    public static void forEachChunk(List<ChunkPosition> chunkPositions, Consumer<CropsTickingTileEntity> cropsTickingTileEntityConsumer) {
+        if (tickingChunks.isEmpty())
+            return;
+
+        chunkPositions.forEach(chunkPosition -> {
+            long chunkKey = chunkPosition.asPair();
+            CropsTickingTileEntity cropsTickingTileEntity = tickingChunks.get(chunkKey);
+            if (cropsTickingTileEntity != null)
+                cropsTickingTileEntityConsumer.accept(cropsTickingTileEntity);
+        });
     }
 
     @Remap(classPath = "net.minecraft.world.level.block.entity.BlockEntity",
@@ -112,9 +129,8 @@ public final class CropsTickingTileEntity extends TileEntity {
         currentTick = 0;
 
         int worldRandomTick = world.getGameRules().getInt(RANDOM_TICKING_GAME_RULE);
-        double cropGrowth = island.getCropGrowthMultiplier() - 1;
 
-        int chunkRandomTickSpeed = (int) (worldRandomTick * cropGrowth * plugin.getSettings().getCropsInterval());
+        int chunkRandomTickSpeed = (int) (worldRandomTick * this.cachedCropGrowthMultiplier * plugin.getSettings().getCropsInterval());
 
         if (chunkRandomTickSpeed > 0) {
             for (net.minecraft.world.level.chunk.ChunkSection nmsSection : chunk.getSections()) {
@@ -140,4 +156,7 @@ public final class CropsTickingTileEntity extends TileEntity {
         }
     }
 
+    public void setCropGrowthMultiplier(double cropGrowthMultiplier) {
+        this.cachedCropGrowthMultiplier = cropGrowthMultiplier;
+    }
 }

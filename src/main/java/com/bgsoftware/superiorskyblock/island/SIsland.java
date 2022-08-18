@@ -2149,6 +2149,13 @@ public class SIsland implements Island {
         PluginDebugger.debug("Action: Set Crop Growth, Island: " + owner.getName() + ", Crop Growth: " + cropGrowth);
         this.cropGrowth.set(Value.fixed(cropGrowth));
         IslandsDatabaseBridge.saveCropGrowth(this);
+        // Update the crop growth ticking
+        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class)) {
+            World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(this, World.Environment.NORMAL);
+            plugin.getNMSChunks().updateCropsTicker(
+                    IslandUtils.getChunkCoords(this, world, true, true),
+                    cropGrowth - 1);
+        }
     }
 
     @Override

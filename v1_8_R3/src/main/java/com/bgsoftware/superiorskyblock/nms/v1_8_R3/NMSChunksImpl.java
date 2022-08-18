@@ -235,6 +235,13 @@ public class NMSChunksImpl implements NMSChunks {
         }
     }
 
+    @Override
+    public void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier) {
+        if (chunkPositions.isEmpty()) return;
+        CropsTickingTileEntity.forEachChunk(chunkPositions, cropsTickingTileEntity ->
+                cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
+    }
+
     private static void removeEntities(Chunk chunk) {
         for (int i = 0; i < chunk.entitySlices.length; i++) {
             chunk.entitySlices[i].forEach(entity -> {

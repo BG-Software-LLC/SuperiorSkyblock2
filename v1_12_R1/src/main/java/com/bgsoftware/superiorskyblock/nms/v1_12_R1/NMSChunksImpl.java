@@ -261,6 +261,13 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
+    public void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier) {
+        if (chunkPositions.isEmpty()) return;
+        CropsTickingTileEntity.forEachChunk(chunkPositions, cropsTickingTileEntity ->
+                cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
+    }
+
+    @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
         if (plugin.getSettings().getCropsInterval() <= 0)
             return;

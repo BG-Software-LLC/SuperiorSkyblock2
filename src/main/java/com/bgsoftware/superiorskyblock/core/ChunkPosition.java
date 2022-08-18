@@ -14,6 +14,8 @@ public class ChunkPosition {
     private final int x;
     private final int z;
 
+    private long pairedXZ = -1;
+
     private ChunkPosition(String worldName, int x, int z) {
         this.worldName = worldName;
         this.x = x;
@@ -62,6 +64,13 @@ public class ChunkPosition {
 
     public int getZ() {
         return z;
+    }
+
+    public long asPair() {
+        if (this.pairedXZ < 0)
+            pairedXZ = (long) this.x & 4294967295L | ((long) this.z & 4294967295L) << 32;
+
+        return pairedXZ;
     }
 
     public boolean isInsideChunk(Location location) {

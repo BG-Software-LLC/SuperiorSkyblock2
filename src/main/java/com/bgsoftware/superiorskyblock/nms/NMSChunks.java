@@ -34,4 +34,6 @@ public interface NMSChunks {
 
     void startTickingChunk(Island island, Chunk chunk, boolean stop);
 
+    void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier);
+
 }
