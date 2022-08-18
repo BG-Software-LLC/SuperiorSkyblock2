@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
@@ -78,6 +79,7 @@ public class SpawnIsland implements Island {
     private final int islandSize;
     private final Location minLocation;
     private final Location maxLocation;
+    private final IslandArea islandArea;
 
     private Biome biome = Biome.PLAINS;
 
@@ -95,6 +97,8 @@ public class SpawnIsland implements Island {
         islandSize = plugin.getSettings().getSpawn().getSize();
         minLocation = center.clone().subtract(islandSize, islandSize, islandSize);
         maxLocation = center.clone().add(islandSize, islandSize, islandSize);
+        this.islandArea = new IslandArea(minLocation.getBlockX(), minLocation.getBlockZ(),
+                maxLocation.getBlockX(), maxLocation.getBlockZ());
 
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
@@ -456,14 +460,9 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        if (!location.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
-            return false;
-
-        Location min = getMinimum();
-        Location max = getMaximum();
-
-        return min.getBlockX() <= location.getBlockX() && min.getBlockZ() <= location.getBlockZ() &&
-                max.getBlockX() >= location.getBlockX() && max.getBlockZ() >= location.getBlockZ();
+        World spawnWorld = center.getWorld();
+        return location.getWorld().equals(spawnWorld) &&
+                this.islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
 
     @Override
