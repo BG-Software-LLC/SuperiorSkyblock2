@@ -72,6 +72,7 @@ public class BlockChangesListener implements Listener {
     public BlockChangesListener(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
         this.registerSpongeListener();
+        this.registerBlockDestroyListener();
     }
 
     public enum Flag {
@@ -393,6 +394,14 @@ public class BlockChangesListener implements Listener {
         }
     }
 
+    private void registerBlockDestroyListener() {
+        try {
+            Class.forName("com.destroystokyo.paper.event.block.BlockDestroyEvent");
+            Bukkit.getPluginManager().registerEvents(new BlockDestoryListener(), plugin);
+        } catch (Throwable ignored) {
+        }
+    }
+
     private class SpongeAbsorbListener implements Listener {
 
         private final Collection<Location> alreadySpongeAbosrbCalled = AutoRemovalCollection.newArrayList(5L * 50, TimeUnit.MILLISECONDS);
@@ -406,6 +415,20 @@ public class BlockChangesListener implements Listener {
 
             onBlockPlace(ConstantKeys.WET_SPONGE, location, 1, e.getBlock().getState(), Flag.SAVE_BLOCK_COUNT);
             alreadySpongeAbosrbCalled.add(location);
+        }
+
+    }
+
+    private class BlockDestoryListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onBlockDestroy(com.destroystokyo.paper.event.block.BlockDestroyEvent e) {
+            if (e.getNewState().getMaterial() != Material.AIR)
+                return;
+
+            int blockCount = plugin.getNMSWorld().getDefaultAmount(e.getBlock());
+            onBlockBreak(Key.of(e.getBlock()), e.getBlock().getLocation(), blockCount,
+                    Flag.HANDLE_NEARBY_BLOCKS, Flag.DIRTY_CHUNK, Flag.SAVE_BLOCK_COUNT);
         }
 
     }
