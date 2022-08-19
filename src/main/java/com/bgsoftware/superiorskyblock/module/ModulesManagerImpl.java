@@ -56,7 +56,10 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
     @Override
     public PluginModule registerModule(File moduleFile) throws IOException, ReflectiveOperationException {
-        if (!moduleFile.exists() || !moduleFile.getName().endsWith(".jar"))
+        if (!moduleFile.exists())
+            throw new IllegalArgumentException("The given file does not exist.");
+
+        if (!moduleFile.getName().endsWith(".jar"))
             throw new IllegalArgumentException("The given file is not a valid jar file.");
 
         String moduleName = moduleFile.getName().replace(".jar", "");

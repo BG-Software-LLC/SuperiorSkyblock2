@@ -86,11 +86,11 @@ public class CmdAdminModules implements ISuperiorCommand {
                             File moduleFile = new File(plugin.getDataFolder(), "modules/" + args[2] + ".jar");
                             try {
                                 pluginModule = plugin.getModules().registerModule(moduleFile);
-                                Message.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
                             } catch (Exception ex) {
                                 Message.MODULE_LOADED_FAILURE.send(sender, args[2]);
                                 ex.printStackTrace();
                                 PluginDebugger.debug(ex);
+                                return;
                             }
                         } else {
                             if (pluginModule.isInitialized()) {
@@ -99,8 +99,10 @@ public class CmdAdminModules implements ISuperiorCommand {
                             }
 
                             plugin.getModules().registerModule(pluginModule);
-                            Message.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
                         }
+
+                        plugin.getModules().enableModule(pluginModule);
+                        Message.MODULE_LOADED_SUCCESS.send(sender, pluginModule.getName());
 
                         break;
                     case "unload":
