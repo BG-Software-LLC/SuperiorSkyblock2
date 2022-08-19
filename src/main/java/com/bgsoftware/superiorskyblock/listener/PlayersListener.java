@@ -109,6 +109,10 @@ public class PlayersListener implements Listener {
             notifyPlayerJoin(superiorPlayer);
 
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
+
+        // Checking if the player is in the islands world, not inside an island.
+        boolean teleportToSpawn = plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && island == null;
+
         if (island != null) {
             onPlayerEnterIsland(superiorPlayer, null, null, e.getPlayer().getLocation(), island,
                     IslandEnterEvent.EnterCause.PLAYER_JOIN);
@@ -122,8 +126,7 @@ public class PlayersListener implements Listener {
             if (!plugin.getProviders().notifySkinsListeners(superiorPlayer))
                 plugin.getNMSPlayers().setSkinTexture(superiorPlayer);
 
-            // Checking if the player is in the islands world, not inside an island.
-            if (plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && island == null) {
+            if (teleportToSpawn) {
                 superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
                 Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
             }
