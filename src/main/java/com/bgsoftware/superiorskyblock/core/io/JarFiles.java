@@ -13,11 +13,6 @@ public class JarFiles {
     }
 
     @Nullable
-    public static Class<?> getClass(URL jar, Class<?> clazz) {
-        return getClass(jar, clazz, clazz.getClassLoader());
-    }
-
-    @Nullable
     public static Class<?> getClass(URL jar, Class<?> clazz, ClassLoader classLoader) {
         try (URLClassLoader cl = new URLClassLoader(new URL[]{jar}, classLoader); JarInputStream jis = new JarInputStream(jar.openStream())) {
             JarEntry jarEntry;

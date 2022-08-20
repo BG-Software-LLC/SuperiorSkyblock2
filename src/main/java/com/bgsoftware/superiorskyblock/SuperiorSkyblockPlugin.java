@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock;
 
 import com.bgsoftware.common.mappings.MappingsChecker;
+import com.bgsoftware.common.remaps.TestRemaps;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -69,7 +70,6 @@ import com.bgsoftware.superiorskyblock.nms.NMSHolograms;
 import com.bgsoftware.superiorskyblock.nms.NMSPlayers;
 import com.bgsoftware.superiorskyblock.nms.NMSTags;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
-import com.bgsoftware.common.remaps.TestRemaps;
 import com.bgsoftware.superiorskyblock.player.PlayersManagerImpl;
 import com.bgsoftware.superiorskyblock.player.container.DefaultPlayersContainer;
 import com.bgsoftware.superiorskyblock.service.ServicesHandler;
@@ -379,6 +379,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return updater;
     }
 
+    public ClassLoader getPluginClassLoader() {
+        return super.getClassLoader();
+    }
+
     private boolean loadNMSAdapter() {
         String version = getServer().getClass().getPackage().getName().split("\\.")[3];
         try {
@@ -460,7 +464,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 if (generatorsFilesList != null) {
                     for (File file : generatorsFilesList) {
                         //noinspection deprecation
-                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class);
+                        Class<?> generatorClass = JarFiles.getClass(file.toURL(), ChunkGenerator.class, getClassLoader());
                         if (generatorClass != null) {
                             for (Constructor<?> constructor : generatorClass.getConstructors()) {
                                 if (constructor.getParameterCount() == 0) {

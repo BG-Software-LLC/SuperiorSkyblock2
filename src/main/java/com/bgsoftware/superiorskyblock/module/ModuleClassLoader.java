@@ -25,8 +25,8 @@ public class ModuleClassLoader extends URLClassLoader {
     private final Manifest manifest;
     private final URL url;
 
-    public ModuleClassLoader(File file) throws IOException {
-        super(new URL[]{file.toURI().toURL()}, PluginModule.class.getClassLoader());
+    public ModuleClassLoader(File file, ClassLoader pluginClassLoader) throws IOException {
+        super(new URL[]{file.toURI().toURL()}, pluginClassLoader);
 
         this.jar = new JarFile(file);
         this.manifest = jar.getManifest();

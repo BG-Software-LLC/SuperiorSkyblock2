@@ -445,7 +445,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
             if (mission == null) {
                 File missionJar = new File(missionsFolder, missionSection.getString("mission-file") + ".jar");
-                Class<?> missionClass = Objects.requireNonNull(JarFiles.getClass(missionJar.toURL(), Mission.class),
+                Class<?> missionClass = Objects.requireNonNull(JarFiles.getClass(missionJar.toURL(), Mission.class,
+                                plugin.getPluginClassLoader()),
                         "The mission file " + missionJar.getName() + " is not valid.");
 
                 boolean islandMission = missionSection.getBoolean("island", false);

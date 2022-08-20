@@ -64,7 +64,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         String moduleName = moduleFile.getName().replace(".jar", "");
 
-        ModuleClassLoader moduleClassLoader = new ModuleClassLoader(moduleFile);
+        ModuleClassLoader moduleClassLoader = new ModuleClassLoader(moduleFile, plugin.getPluginClassLoader());
 
         //noinspection deprecation
         Class<?> moduleClass = JarFiles.getClass(moduleFile.toURL(), PluginModule.class, moduleClassLoader);

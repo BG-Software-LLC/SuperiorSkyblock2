@@ -183,7 +183,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
             try {
                 //noinspection deprecation
-                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class);
+                Class<?> commandClass = JarFiles.getClass(file.toURL(), SuperiorCommand.class, plugin.getPluginClassLoader());
 
                 if (commandClass == null)
                     continue;
