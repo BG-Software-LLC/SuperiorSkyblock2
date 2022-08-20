@@ -186,7 +186,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                         Location islandLocation = islandCreationResult.getIslandLocation();
                         boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
-                        Set<ChunkPosition> loadedChunks = ((BaseSchematic) schematic).getLoadedChunks();
+                        Set<ChunkPosition> loadedChunks = schematic instanceof BaseSchematic ? ((BaseSchematic) schematic).getLoadedChunks() : null;
 
                         this.islandsContainer.addIsland(island);
                         setLastIsland(new SBlockPosition(islandLocation));
@@ -214,7 +214,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                                     player.setGameMode(GameMode.SURVIVAL);
                                 superiorPlayer.teleport(island, result -> {
                                     if (result) {
-                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                                        if (loadedChunks != null)
+                                            BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
                                         if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                             plugin.getNMSDragonFight().awardTheEndAchievement(player);
                                             plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
