@@ -196,6 +196,9 @@ public class PlayersListener implements Listener {
             onPlayerLeaveIsland(superiorPlayer, playerLocation, islandAtLocation, null, null,
                     IslandLeaveEvent.LeaveCause.PLAYER_QUIT);
         }
+
+        // Remove all player chat-listeners
+        PlayerChat.remove(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
