@@ -109,8 +109,8 @@ public class CommandTabCompletes {
         return filterByArgument(island.getIslandWarps().keySet(), argument.toLowerCase(Locale.ENGLISH));
     }
 
-    public static List<String> getIslandVisitors(Island island, String argument) {
-        return getPlayers(island.getIslandVisitors(), argument);
+    public static List<String> getIslandVisitors(Island island, String argument, boolean hideVanish) {
+        return getPlayers(island.getIslandVisitors(!hideVanish), argument);
     }
 
     public static List<String> getCustomComplete(String argument, String... tabVariables) {

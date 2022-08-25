@@ -107,7 +107,8 @@ public class CmdExpel implements IPermissibleCommand {
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, SuperiorPlayer superiorPlayer, Island island, String[] args) {
-        return args.length != 2 ? Collections.emptyList() : island != null ? CommandTabCompletes.getIslandVisitors(island, args[1]) :
+        return args.length != 2 ? Collections.emptyList() : island != null ?
+                CommandTabCompletes.getIslandVisitors(island, args[1], plugin.getSettings().isTabCompleteHideVanished()) :
                 CommandTabCompletes.getOnlinePlayers(plugin, args[1], plugin.getSettings().isTabCompleteHideVanished(),
                         onlinePlayer -> plugin.getGrid().getIslandAt(onlinePlayer.getLocation()) != null);
     }
