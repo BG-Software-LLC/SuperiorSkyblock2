@@ -398,7 +398,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     public boolean isInsideIsland() {
         Player player = asPlayer();
         Island island = getIsland();
-        return player != null && island != null && island.equals(plugin.getGrid().getIslandAt(player.getLocation()));
+        return player != null && island != null && island.isInside(player.getLocation());
     }
 
     /*
