@@ -3390,7 +3390,7 @@ public class SIsland implements Island {
         clearEffects();
         clearBlockLimits();
         clearEntitiesLimits();
-        clearUpgrades(true);
+        clearUpgrades(overrideCustom);
 
         // We want to sync the default upgrade first, then the actual upgrades
         syncUpgrade(DefaultUpgradeLevel.getInstance(), overrideCustom);
