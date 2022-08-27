@@ -51,7 +51,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     @Override
     public void registerModule(PluginModule pluginModule) {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
-        this.modulesContainer.registerModule(pluginModule, modulesFolder, dataFolder, plugin);
+        this.modulesContainer.registerModule(pluginModule, modulesFolder, dataFolder);
     }
 
     @Override
@@ -83,7 +83,19 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
     @Override
     public void unregisterModule(PluginModule pluginModule) {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
-        this.modulesContainer.unregisterModule(pluginModule, plugin);
+        Preconditions.checkState(getModule(pluginModule.getName()) != null, "PluginModule with the name " + pluginModule.getName() + " is not registered in the plugin anymore.");
+
+        SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
+
+        try {
+            pluginModule.onDisable(plugin);
+        } catch (Throwable error) {
+            SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
+            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
+            error.printStackTrace();
+        }
+
+        this.modulesContainer.unregisterModule(pluginModule);
     }
 
     @Override
@@ -116,13 +128,14 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             PluginDebugger.debug(ex);
 
             try {
-                // Calling onDisable so the plugin can unregister its data if needed
-                pluginModule.onDisable(plugin);
+                // Unregistering the module.
+                unregisterModule(pluginModule);
             } catch (Throwable error) {
                 SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
                 SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
                 error.printStackTrace();
             }
+
 
             return;
         }

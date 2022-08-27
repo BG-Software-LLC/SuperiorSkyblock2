@@ -124,7 +124,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final CommandsManagerImpl commandsHandler = new CommandsManagerImpl(this,
             new PlayerCommandsMap(this), new AdminCommandsMap(this));
     private final ModulesManagerImpl modulesHandler = new ModulesManagerImpl(this,
-            new DefaultModulesContainer());
+            new DefaultModulesContainer(this));
     private final ServicesHandler servicesHandler = new ServicesHandler(this);
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.

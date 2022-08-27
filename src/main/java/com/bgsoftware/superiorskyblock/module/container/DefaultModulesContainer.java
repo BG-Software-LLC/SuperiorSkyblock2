@@ -20,8 +20,14 @@ public class DefaultModulesContainer implements ModulesContainer {
     private final Map<String, PluginModule> modulesMap = new HashMap<>();
     private final Map<PluginModule, ModuleData> modulesData = new HashMap<>();
 
+    private final SuperiorSkyblockPlugin plugin;
+
+    public DefaultModulesContainer(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
-    public void registerModule(PluginModule pluginModule, File modulesFolder, File modulesDataFolder, SuperiorSkyblockPlugin plugin) {
+    public void registerModule(PluginModule pluginModule, File modulesFolder, File modulesDataFolder) {
         String moduleName = pluginModule.getName().toLowerCase(Locale.ENGLISH);
 
         Preconditions.checkState(!modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " already exists.");
@@ -42,21 +48,7 @@ public class DefaultModulesContainer implements ModulesContainer {
     }
 
     @Override
-    public void unregisterModule(PluginModule pluginModule, SuperiorSkyblockPlugin plugin) {
-        String moduleName = pluginModule.getName().toLowerCase(Locale.ENGLISH);
-
-        Preconditions.checkState(modulesMap.containsKey(moduleName), "PluginModule with the name " + moduleName + " is not registered in the plugin anymore.");
-
-        SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
-
-        try {
-            pluginModule.onDisable(plugin);
-        } catch (Throwable error) {
-            SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
-            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-            error.printStackTrace();
-        }
-
+    public void unregisterModule(PluginModule pluginModule) {
         ModuleData moduleData = modulesData.remove(pluginModule);
 
         if (moduleData != null) {
@@ -72,7 +64,7 @@ public class DefaultModulesContainer implements ModulesContainer {
 
         pluginModule.disableModule();
 
-        modulesMap.remove(moduleName);
+        modulesMap.remove(pluginModule.getName().toLowerCase(Locale.ENGLISH));
     }
 
     @Nullable
