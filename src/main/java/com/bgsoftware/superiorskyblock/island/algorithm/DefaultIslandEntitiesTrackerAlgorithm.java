@@ -4,16 +4,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.google.common.base.Preconditions;
-import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
 import java.util.Collections;
@@ -106,56 +100,43 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
             return;
 
         this.beingRecalculated = true;
-        this.lastCalculateTime = currentTime;
 
-        clearEntityCounts();
+        try {
+            this.lastCalculateTime = currentTime;
 
-        KeyMap<Integer> recalculatedEntityCounts = KeyMapImpl.createConcurrentHashMap();
-        CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
+            clearEntityCounts();
 
-        for (World.Environment environment : World.Environment.values()) {
-            try {
-                World world = island.getCenter(environment).getWorld();
-                chunks.addAll(IslandUtils.getAllChunksAsync(island, world, true, true, ChunkLoadReason.ENTITIES_RECALCULATE, chunk -> {
-                    for (Entity entity : chunk.getEntities()) {
-                        if (BukkitEntities.canBypassEntityLimit(entity))
-                            continue;
+            KeyMap<Integer> recalculatedEntityCounts = KeyMapImpl.createConcurrentHashMap();
 
-                        Key key = BukkitEntities.getLimitEntityType(entity);
+            island.getLoadedChunks(true, true).forEach(chunk -> {
+                for (Entity entity : chunk.getEntities()) {
+                    if (BukkitEntities.canBypassEntityLimit(entity))
+                        continue;
 
-                        if (!canTrackEntity(key))
-                            continue;
+                    Key key = BukkitEntities.getLimitEntityType(entity);
 
-                        int currentEntityAmount = recalculatedEntityCounts.getOrDefault(key, 0);
-                        recalculatedEntityCounts.put(key, currentEntityAmount + 1);
-                    }
-                }));
-            } catch (Exception ignored) {
+                    if (!canTrackEntity(key))
+                        continue;
+
+                    int currentEntityAmount = recalculatedEntityCounts.getOrDefault(key, 0);
+                    recalculatedEntityCounts.put(key, currentEntityAmount + 1);
+                }
+            });
+
+            if (!this.entityCounts.isEmpty()) {
+                for (Map.Entry<Key, Integer> entry : this.entityCounts.entrySet()) {
+                    Integer currentAmount = recalculatedEntityCounts.remove(entry.getKey());
+                    if (currentAmount != null)
+                        entry.setValue(entry.getValue() + currentAmount);
+                }
             }
+
+            if (!recalculatedEntityCounts.isEmpty()) {
+                this.entityCounts.putAll(recalculatedEntityCounts);
+            }
+        } finally {
+            beingRecalculated = false;
         }
-
-        BukkitExecutor.async(() -> {
-            try {
-                //Waiting for all the chunks to load
-                chunks.forEachCompleted(chunk -> {
-                }, error -> {
-                });
-
-                if (!this.entityCounts.isEmpty()) {
-                    for (Map.Entry<Key, Integer> entry : this.entityCounts.entrySet()) {
-                        Integer currentAmount = recalculatedEntityCounts.remove(entry.getKey());
-                        if (currentAmount != null)
-                            entry.setValue(entry.getValue() + currentAmount);
-                    }
-                }
-
-                if (!recalculatedEntityCounts.isEmpty()) {
-                    this.entityCounts.putAll(recalculatedEntityCounts);
-                }
-            } finally {
-                beingRecalculated = false;
-            }
-        });
     }
 
     private boolean canTrackEntity(Key key) {
