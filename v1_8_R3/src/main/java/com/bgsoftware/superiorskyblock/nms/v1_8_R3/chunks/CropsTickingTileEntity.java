@@ -43,7 +43,11 @@ public class CropsTickingTileEntity extends TileEntity implements IUpdatePlayerL
         this.chunkZ = chunk.locZ;
         a(chunk.getWorld());
         a(new BlockPosition(chunkX << 4, 1, chunkZ << 4));
-        world.tileEntityList.add(this);
+        try {
+            world.tileEntityList.add(this);
+        } catch (Throwable error) {
+            world.a(this);
+        }
         this.cachedCropGrowthMultiplier = island.getCropGrowthMultiplier() - 1;
     }
 
