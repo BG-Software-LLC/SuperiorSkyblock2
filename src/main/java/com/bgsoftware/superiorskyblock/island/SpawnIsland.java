@@ -76,6 +76,7 @@ public class SpawnIsland implements Island {
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
 
     private final Location center;
+    private final World spawnWorld;
     private final int islandSize;
     private final Location minLocation;
     private final Location maxLocation;
@@ -103,7 +104,7 @@ public class SpawnIsland implements Island {
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
 
-        if (center.getWorld() == null) {
+        if ((this.spawnWorld = center.getWorld()) == null) {
             new ManagerLoadException("The spawn location is in invalid world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
             Bukkit.shutdown();
             return;
@@ -460,8 +461,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInside(Location location) {
-        World spawnWorld = center.getWorld();
-        return location.getWorld().equals(spawnWorld) &&
+        return location.getWorld().equals(this.spawnWorld) &&
                 this.islandArea.intercepts(location.getBlockX(), location.getBlockZ());
     }
 
@@ -477,7 +477,7 @@ public class SpawnIsland implements Island {
 
     @Override
     public boolean isInsideRange(Chunk chunk) {
-        if (!chunk.getWorld().equals(getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld()))
+        if (!chunk.getWorld().equals(this.spawnWorld))
             return false;
 
         Location min = getMinimum();
