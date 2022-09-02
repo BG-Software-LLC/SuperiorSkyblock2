@@ -228,8 +228,13 @@ public class NMSChunksImpl implements NMSChunks {
         if (stop) {
             ChunkCoordIntPair chunkCoords = new ChunkCoordIntPair(chunk.getX(), chunk.getZ());
             CropsTickingTileEntity cropsTickingTileEntity = CropsTickingTileEntity.remove(chunkCoords);
-            if (cropsTickingTileEntity != null)
-                cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
+            if (cropsTickingTileEntity != null) {
+                try {
+                    cropsTickingTileEntity.getWorld().tileEntityList.remove(cropsTickingTileEntity);
+                } catch (Throwable error) {
+                    cropsTickingTileEntity.getWorld().t(cropsTickingTileEntity.getPosition());
+                }
+            }
         } else {
             CropsTickingTileEntity.create(island, ((CraftChunk) chunk).getHandle());
         }
