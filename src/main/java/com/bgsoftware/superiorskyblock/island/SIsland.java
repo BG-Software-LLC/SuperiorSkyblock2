@@ -2090,7 +2090,6 @@ public class SIsland implements Island {
 
         // Level was downgraded, we need to clear the values of that level and sync all upgrades again
         if (currentLevel > level) {
-            clearUpgrades(false);
             syncUpgrades(false);
         } else {
             syncUpgrade((SUpgradeLevel) upgradeLevel, false);
@@ -3385,15 +3384,11 @@ public class SIsland implements Island {
     }
 
     public void syncUpgrades(boolean overrideCustom) {
-        for (World.Environment environment : World.Environment.values())
-            clearGeneratorAmounts(environment);
-        clearEffects();
-        clearBlockLimits();
-        clearEntitiesLimits();
         clearUpgrades(overrideCustom);
 
         // We want to sync the default upgrade first, then the actual upgrades
         syncUpgrade(DefaultUpgradeLevel.getInstance(), overrideCustom);
+
         // Syncing all real upgrades
         plugin.getUpgrades().getUpgrades().forEach(upgrade -> syncUpgrade((SUpgradeLevel) getUpgradeLevel(upgrade), overrideCustom));
 
