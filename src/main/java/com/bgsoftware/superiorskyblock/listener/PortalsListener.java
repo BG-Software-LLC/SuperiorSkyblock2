@@ -12,6 +12,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -22,6 +23,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -137,38 +139,46 @@ public class PortalsListener implements Listener {
         if (island == null || !plugin.getGrid().isIslandsWorld(portalLocation.getWorld()))
             return false;
 
-        World.Environment destinationEnvironment = getTargetWorld(portalLocation, teleportCause);
+        World.Environment originalDestination = getTargetWorld(portalLocation, teleportCause);
 
-        if (plugin.getGrid().getIslandsWorld(island, destinationEnvironment) == null)
+        if (plugin.getGrid().getIslandsWorld(island, originalDestination) == null)
             return true;
 
-        if (!isIslandWorldEnabled(destinationEnvironment, island)) {
+        if (!isIslandWorldEnabled(originalDestination, island)) {
             if (!Message.WORLD_NOT_UNLOCKED.isEmpty(superiorPlayer.getUserLocale()))
                 Message.SCHEMATICS.send(superiorPlayer, Message.WORLD_NOT_UNLOCKED.getMessage(
-                        superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(destinationEnvironment.name())));
+                        superiorPlayer.getUserLocale(), Formatters.CAPITALIZED_FORMATTER.format(originalDestination.name())));
             return true;
         }
 
         try {
-            // If schematic was already generated, simply teleport player to destination location.
-            if (island.wasSchematicGenerated(destinationEnvironment)) {
-                superiorPlayer.teleport(island, destinationEnvironment);
-                return true;
-            }
-
             if (generatingSchematicsIslands.contains(island.getUniqueId()))
                 return true; // We want to prevent the players from being teleported in this time.
 
-            generatingSchematicsIslands.add(island.getUniqueId());
-
-            String destinationEnvironmentName = destinationEnvironment.name().toLowerCase(Locale.ENGLISH);
+            String destinationEnvironmentName = originalDestination.name().toLowerCase(Locale.ENGLISH);
             String islandSchematic = island.getSchematicName();
 
-            Schematic schematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?
-                    plugin.getSchematics().getDefaultSchematic(destinationEnvironment) :
+            Schematic originalSchematic = plugin.getSchematics().getSchematic(islandSchematic.isEmpty() ?
+                    plugin.getSchematics().getDefaultSchematic(originalDestination) :
                     islandSchematic + "_" + destinationEnvironmentName);
 
-            if (schematic == null) {
+            PortalType portalType = teleportCause == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL ?
+                    PortalType.NETHER : PortalType.ENDER;
+
+            boolean schematicGenerated = island.wasSchematicGenerated(originalDestination);
+
+            EventResult<EventsBus.PortalEventResult> eventResult = plugin.getEventsBus().callIslandEnterPortalEvent(
+                    superiorPlayer, island, portalType, originalDestination, schematicGenerated ? null : originalSchematic,
+                    schematicGenerated);
+
+            if (eventResult.isCancelled())
+                return true;
+
+            World.Environment destination = eventResult.getResult().getDestination();
+            Schematic schematic = eventResult.getResult().getSchematic();
+            boolean ignoreInvalidSchematic = eventResult.getResult().isIgnoreInvalidSchematic();
+
+            if (schematic == null && !ignoreInvalidSchematic) {
                 Message.SCHEMATICS.send(superiorPlayer, ChatColor.RED + "The server hasn't added a " +
                         destinationEnvironmentName + " schematic. Please contact administrator to solve the problem. " +
                         "The format for " + destinationEnvironmentName + " schematic is \"" +
@@ -176,35 +186,46 @@ public class PortalsListener implements Listener {
                 return true;
             }
 
-            Location schematicPlacementLocation = island.getCenter(destinationEnvironment).subtract(0, 1, 0);
+            generatingSchematicsIslands.add(island.getUniqueId());
+
+            // If schematic was already generated, or no schematic should be generated, simply
+            // teleport player to destination location.
+            if (schematic == null || island.wasSchematicGenerated(destination)) {
+                superiorPlayer.teleport(island, destination, result -> {
+                    generatingSchematicsIslands.remove(island.getUniqueId());
+                });
+                return true;
+            }
+
+            Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
 
             BigDecimal originalWorth = island.getRawWorth();
             BigDecimal originalLevel = island.getRawLevel();
 
             schematic.pasteSchematic(island, schematicPlacementLocation, () -> {
                 generatingSchematicsIslands.remove(island.getUniqueId());
-                island.setSchematicGenerate(destinationEnvironment);
+                island.setSchematicGenerate(destination);
 
-                if (shouldOffsetSchematic(destinationEnvironment)) {
+                if (shouldOffsetSchematic(destination)) {
                     {
                         BigDecimal schematicWorth = island.getRawWorth().subtract(originalWorth);
-                        EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
+                        EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeWorthBonusEvent(null, island,
                                 IslandChangeWorthBonusEvent.Reason.SCHEMATIC, island.getBonusWorth().subtract(schematicWorth));
                         if (!eventResult.isCancelled())
-                            island.setBonusWorth(eventResult.getResult());
+                            island.setBonusWorth(bonusEventResult.getResult());
                     }
                     {
                         BigDecimal schematicLevel = island.getRawLevel().subtract(originalLevel);
-                        EventResult<BigDecimal> eventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(null, island,
+                        EventResult<BigDecimal> bonusEventResult = plugin.getEventsBus().callIslandChangeLevelBonusEvent(null, island,
                                 IslandChangeLevelBonusEvent.Reason.SCHEMATIC, island.getBonusLevel().subtract(schematicLevel));
-                        if (!eventResult.isCancelled())
-                            island.setBonusLevel(island.getBonusLevel().subtract(schematicLevel));
+                        if (!bonusEventResult.isCancelled())
+                            island.setBonusLevel(bonusEventResult.getResult());
                     }
                 }
 
-                Location destinationLocation = island.getIslandHome(destinationEnvironment);
+                Location destinationLocation = island.getIslandHome(destination);
 
-                if (destinationEnvironment == World.Environment.THE_END) {
+                if (destination == World.Environment.THE_END) {
                     plugin.getNMSDragonFight().awardTheEndAchievement(player);
                     plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
                 }

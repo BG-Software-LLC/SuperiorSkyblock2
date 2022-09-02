@@ -4,105 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
-import com.bgsoftware.superiorskyblock.api.events.BlockStackEvent;
-import com.bgsoftware.superiorskyblock.api.events.BlockUnstackEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandBanEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandBankDepositEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandBankWithdrawEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandBiomeChangeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeBankLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeBlockLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeBorderSizeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeCoopLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeCropGrowthEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeDescriptionEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeDiscordEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeEffectLevelEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeEntityLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeGeneratorRateEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeLevelBonusEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeMembersLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeMobDropsEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangePaypalEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangePlayerPrivilegeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeRoleLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeRolePrivilegeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeSpawnerRatesEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpCategoryIconEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpCategorySlotEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpIconEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpLocationEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWarpsLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChangeWorthBonusEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChatEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandChunkResetEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandClearGeneratorRatesEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandClearPlayerPrivilegesEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandClearRatingsEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandClearRolesPrivilegesEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCloseEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCloseWarpEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCoopPlayerEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCreateEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCreateWarpCategoryEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandCreateWarpEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandDeleteWarpEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandDisableFlagEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandDisbandEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnableFlagEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnterEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandEnterProtectedEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandGenerateBlockEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandInviteEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandJoinEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandKickEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLeaveEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLeaveProtectedEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandLockWorldEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandOpenEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandOpenWarpEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandQuitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRateEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveBlockLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveEffectEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveGeneratorRateEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveRatingEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveRoleLimitEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRemoveVisitorHomeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRenameEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRenameWarpCategoryEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRenameWarpEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandRestrictMoveEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandSchematicPasteEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandSetHomeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandSetVisitorHomeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandTransferEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandUnbanEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandUncoopPlayerEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandUnlockWorldEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandUpgradeEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandWorldResetEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandWorthCalculatedEvent;
-import com.bgsoftware.superiorskyblock.api.events.IslandWorthUpdateEvent;
-import com.bgsoftware.superiorskyblock.api.events.MissionCompleteEvent;
-import com.bgsoftware.superiorskyblock.api.events.MissionResetEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerChangeBorderColorEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerChangeLanguageEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerChangeNameEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerChangeRoleEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerCloseMenuEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerOpenMenuEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerReplaceEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBlocksStackerEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBorderEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerToggleBypassEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerToggleFlyEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerTogglePanelEvent;
-import com.bgsoftware.superiorskyblock.api.events.PlayerToggleTeamChatEvent;
-import com.bgsoftware.superiorskyblock.api.events.PluginInitializeEvent;
-import com.bgsoftware.superiorskyblock.api.events.PluginInitializedEvent;
-import com.bgsoftware.superiorskyblock.api.events.PreIslandCreateEvent;
-import com.bgsoftware.superiorskyblock.api.events.SendMessageEvent;
+import com.bgsoftware.superiorskyblock.api.events.*;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
@@ -114,6 +16,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
+import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
@@ -122,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.PortalType;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -425,6 +329,13 @@ public class EventsBus {
             superiorPlayer.teleport(islandEnterEvent.getCancelTeleport());
 
         return !islandEnterEvent.isCancelled();
+    }
+
+    public EventResult<PortalEventResult> callIslandEnterPortalEvent(SuperiorPlayer superiorPlayer, Island island,
+                                                                     PortalType portalType, World.Environment destination,
+                                                                     @Nullable Schematic schematic, boolean ignoreInvalidSchematic) {
+        return callEvent(() -> new IslandEnterPortalEvent(island, superiorPlayer, portalType, destination, schematic, ignoreInvalidSchematic),
+                "islandenterportalevent", new PortalEventResult(destination, schematic, ignoreInvalidSchematic), PortalEventResult::new);
     }
 
     public boolean callIslandEnterProtectedEvent(SuperiorPlayer superiorPlayer, Island island, IslandEnterEvent.EnterCause enterCause) {
@@ -860,6 +771,38 @@ public class EventsBus {
         @Nullable
         public PlayersContainer getPlayersContainer() {
             return playersContainer;
+        }
+
+    }
+
+    public static class PortalEventResult {
+
+        private final World.Environment destination;
+        @Nullable
+        private final Schematic schematic;
+        private final boolean isIgnoreInvalidSchematic;
+
+        public PortalEventResult(IslandEnterPortalEvent event) {
+            this(event.getDestination(), event.getSchematic(), event.isIgnoreInvalidSchematic());
+        }
+
+        public PortalEventResult(World.Environment destination, @Nullable Schematic schematic, boolean isIgnoreInvalidSchematic) {
+            this.destination = destination;
+            this.schematic = schematic;
+            this.isIgnoreInvalidSchematic = isIgnoreInvalidSchematic;
+        }
+
+        public World.Environment getDestination() {
+            return destination;
+        }
+
+        @Nullable
+        public Schematic getSchematic() {
+            return schematic;
+        }
+
+        public boolean isIgnoreInvalidSchematic() {
+            return isIgnoreInvalidSchematic;
         }
 
     }
