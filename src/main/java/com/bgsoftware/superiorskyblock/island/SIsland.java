@@ -308,7 +308,7 @@ public class SIsland implements Island {
 
             Optional<String> blockCountsString = resultSet.getString("block_counts");
             if (blockCountsString.isPresent())
-                BukkitExecutor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 5L);
+                BukkitExecutor.sync(() -> island.deserializeBlockCounts(blockCountsString.get()), 20L);
 
             CachedIslandInfo cachedIslandInfo = cache.getCachedInfo(uuid.get());
 
