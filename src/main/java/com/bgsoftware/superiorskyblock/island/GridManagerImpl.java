@@ -182,58 +182,64 @@ public class GridManagerImpl extends Manager implements GridManager {
         this.islandCreationAlgorithm.createIsland(islandUUID, superiorPlayer, this.lastIsland, islandName, schematic)
                 .whenComplete((islandCreationResult, error) -> {
                     if (error == null) {
-                        Island island = islandCreationResult.getIsland();
-                        Location islandLocation = islandCreationResult.getIslandLocation();
-                        boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
-
-                        Set<ChunkPosition> loadedChunks = schematic instanceof BaseSchematic ? ((BaseSchematic) schematic).getLoadedChunks() : null;
-
-                        this.islandsContainer.addIsland(island);
-                        setLastIsland(new SBlockPosition(islandLocation));
-
-                        pendingCreationTasks.remove(superiorPlayer.getUniqueId());
-
                         try {
-                            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
-                            island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
-                            island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
-                            island.setBiome(biome);
-                        } finally {
-                            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-                        }
+                            Island island = islandCreationResult.getIsland();
+                            Location islandLocation = islandCreationResult.getIslandLocation();
+                            boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
-                        IslandsDatabaseBridge.insertIsland(island);
+                            Set<ChunkPosition> loadedChunks = schematic instanceof BaseSchematic ? ((BaseSchematic) schematic).getLoadedChunks() : null;
 
-                        island.setIslandHome(schematic.adjustRotation(islandLocation));
+                            this.islandsContainer.addIsland(island);
+                            setLastIsland(new SBlockPosition(islandLocation));
 
-                        BukkitExecutor.sync(() -> superiorPlayer.runIfOnline(player -> {
-                            Message.CREATE_ISLAND.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(
-                                    islandLocation), System.currentTimeMillis() - startTime);
-                            if (teleportPlayer) {
-                                if (updateGamemode)
-                                    player.setGameMode(GameMode.SURVIVAL);
-                                superiorPlayer.teleport(island, result -> {
-                                    if (result) {
-                                        if (loadedChunks != null)
-                                            BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
-                                        if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
-                                            plugin.getNMSDragonFight().awardTheEndAchievement(player);
-                                            plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
-                                        }
-                                    }
-                                });
+                            pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+
+                            try {
+                                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+                                island.setBonusWorth(offset ? island.getRawWorth().negate() : bonusWorth);
+                                island.setBonusLevel(offset ? island.getRawLevel().negate() : bonusLevel);
+                                island.setBiome(biome);
+                            } finally {
+                                island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                             }
-                        }), 1L);
-                    } else {
-                        error.printStackTrace();
-                        PluginDebugger.debug(error);
 
-                        pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+                            IslandsDatabaseBridge.insertIsland(island);
 
-                        superiorPlayer.setIsland(null);
+                            island.setIslandHome(schematic.adjustRotation(islandLocation));
 
-                        Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
+                            BukkitExecutor.sync(() -> superiorPlayer.runIfOnline(player -> {
+                                Message.CREATE_ISLAND.send(superiorPlayer, Formatters.LOCATION_FORMATTER.format(
+                                        islandLocation), System.currentTimeMillis() - startTime);
+                                if (teleportPlayer) {
+                                    if (updateGamemode)
+                                        player.setGameMode(GameMode.SURVIVAL);
+                                    superiorPlayer.teleport(island, result -> {
+                                        if (result) {
+                                            if (loadedChunks != null)
+                                                BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                                            if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
+                                                plugin.getNMSDragonFight().awardTheEndAchievement(player);
+                                                plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
+                                            }
+                                        }
+                                    });
+                                }
+                            }), 1L);
+
+                            return;
+                        } catch (Throwable runtimeError) {
+                            error = runtimeError;
+                        }
                     }
+
+                    error.printStackTrace();
+                    PluginDebugger.debug(error);
+
+                    pendingCreationTasks.remove(superiorPlayer.getUniqueId());
+
+                    superiorPlayer.setIsland(null);
+
+                    Message.CREATE_ISLAND_FAILURE.send(superiorPlayer);
                 });
     }
 
