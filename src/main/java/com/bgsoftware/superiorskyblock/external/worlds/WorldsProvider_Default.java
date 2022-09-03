@@ -116,7 +116,7 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public boolean isNormalUnlocked() {
-        return plugin.getSettings().getWorlds().getNormal().isUnlocked();
+        return isNormalEnabled() && plugin.getSettings().getWorlds().getNormal().isUnlocked();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public boolean isNetherUnlocked() {
-        return plugin.getSettings().getWorlds().getNether().isUnlocked();
+        return isNetherEnabled() && plugin.getSettings().getWorlds().getNether().isUnlocked();
     }
 
     @Override
@@ -136,7 +136,7 @@ public class WorldsProvider_Default implements WorldsProvider {
 
     @Override
     public boolean isEndUnlocked() {
-        return plugin.getSettings().getWorlds().getEnd().isUnlocked();
+        return isEndEnabled() && plugin.getSettings().getWorlds().getEnd().isUnlocked();
     }
 
     private BlockFace getIslandFace(Location location) {
