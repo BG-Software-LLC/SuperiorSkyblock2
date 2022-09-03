@@ -922,8 +922,9 @@ public enum Message {
         return isEmpty(locale) ? defaultMessage : replaceArgs(messages.get(locale).getMessage(), objects).orElse(null);
     }
 
-    public final void send(SuperiorPlayer superiorPlayer, Object... objects) {
-        superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), objects));
+    public final void send(SuperiorPlayer superiorPlayer, Object... args) {
+        if (plugin.getEventsBus().callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+            superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
     }
 
     public final void send(CommandSender sender, Object... objects) {

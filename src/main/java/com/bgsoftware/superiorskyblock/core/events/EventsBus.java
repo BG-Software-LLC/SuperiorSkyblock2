@@ -52,6 +52,11 @@ public class EventsBus {
         this.plugin = plugin;
     }
 
+
+    public boolean callAttemptPlayerSendMessageEvent(SuperiorPlayer receiver, String messageType, Object... args) {
+        return callEvent(() -> new AttemptPlayerSendMessageEvent(receiver, messageType, args), "attemptplayersendmessageevent");
+    }
+
     public boolean callBlockStackEvent(Block block, Player player, int originalAmount, int newAmount) {
         return callEvent(() -> new BlockStackEvent(block, player, originalAmount, newAmount),
                 "blockstackevent");
@@ -635,8 +640,7 @@ public class EventsBus {
         return callEvent(() -> new PreIslandCreateEvent(superiorPlayer, islandName), "preislandcreateevent");
     }
 
-    public EventResult<IMessageComponent> callSendMessageEvent(CommandSender receiver, String messageType,
-                                                               IMessageComponent messageComponent, Object... args) {
+    public EventResult<IMessageComponent> callSendMessageEvent(CommandSender receiver, String messageType, IMessageComponent messageComponent, Object... args) {
         return callEvent(() -> new SendMessageEvent(receiver, messageType, messageComponent, args),
                 "sendmessageevent", messageComponent, SendMessageEvent::getMessageComponent);
     }
