@@ -390,7 +390,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             String mappingVersionHash = nmsAlgorithms.getMappingsHash();
 
-            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version)) {
+            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version, error -> {
+                log("&cFailed to retrieve allowed mappings for your server, skipping...");
+                return true;
+            })) {
                 new ManagerLoadException("The plugin doesn't support your version mappings.\nPlease try a different version.\n" +
                         "Mappings Hash: " + mappingVersionHash, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
                 return false;
