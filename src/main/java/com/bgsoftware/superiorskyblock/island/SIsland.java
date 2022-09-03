@@ -235,9 +235,6 @@ public class SIsland implements Island {
         assignIslandChest();
         updateUpgrades();
 
-        if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class))
-            this.entitiesTracker.recalculateEntityCounts();
-
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
