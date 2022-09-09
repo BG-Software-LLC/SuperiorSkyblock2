@@ -4,11 +4,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.RolesManager;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.core.Manager;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.island.role.container.RolesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.configuration.ConfigurationSection;
 
 import javax.annotation.Nullable;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 public class RolesManagerImpl extends Manager implements RolesManager {
@@ -24,13 +27,34 @@ public class RolesManagerImpl extends Manager implements RolesManager {
     }
 
     @Override
-    public void loadData() {
+    public void loadData() throws ManagerLoadException {
         ConfigurationSection rolesSection = plugin.getSettings().getIslandRoles().getSection();
-        loadRole(rolesSection.getConfigurationSection("guest"), GUEST_ROLE_INDEX, null);
-        loadRole(rolesSection.getConfigurationSection("coop"), COOP_ROLE_INDEX, (SPlayerRole) getGuestRole());
-        SPlayerRole previousRole = (SPlayerRole) getCoopRole();
-        for (String roleSection : rolesSection.getConfigurationSection("ladder").getKeys(false))
-            previousRole = (SPlayerRole) getPlayerRole(loadRole(rolesSection.getConfigurationSection("ladder." + roleSection), 0, previousRole));
+
+        ConfigurationSection guestSection = rolesSection.getConfigurationSection("guest");
+
+        if (guestSection == null)
+            throw new ManagerLoadException("Missing \"guest\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+
+        ConfigurationSection coopSection = rolesSection.getConfigurationSection("coop");
+
+        if (coopSection == null)
+            throw new ManagerLoadException("Missing \"coop\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+
+        SPlayerRole guestsRole = loadRole(guestSection, GUEST_ROLE_INDEX, null);
+        SPlayerRole previousRole = loadRole(coopSection, COOP_ROLE_INDEX, guestsRole);
+
+        ConfigurationSection laddersSection = rolesSection.getConfigurationSection("ladder");
+
+        if (laddersSection == null)
+            throw new ManagerLoadException("Missing \"ladder\" section for island roles", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+
+        List<ConfigurationSection> rolesByWeight = new LinkedList<>();
+        for (String roleSectionName : laddersSection.getKeys(false))
+            rolesByWeight.add(laddersSection.getConfigurationSection(roleSectionName));
+        rolesByWeight.sort(Comparator.comparingInt(o -> o.getInt("weight", -1)));
+
+        for (ConfigurationSection roleSection : rolesByWeight)
+            previousRole = loadRole(roleSection, previousRole.getWeight() + 1, previousRole);
     }
 
     @Override
@@ -76,20 +100,25 @@ public class RolesManagerImpl extends Manager implements RolesManager {
         return this.rolesContainer.getRoles();
     }
 
-    private int loadRole(ConfigurationSection section, int type, SPlayerRole previousRole) {
-        int weight = section.getInt("weight", type);
+    private SPlayerRole loadRole(ConfigurationSection section, int expectedWeight, SPlayerRole previousRole) throws ManagerLoadException {
+        int weight = section.getInt("weight", expectedWeight);
+
+        if (weight != expectedWeight)
+            throw new ManagerLoadException("The role \"" + section.getName() + "\" has an unexpected weight: " +
+                    weight + ", expected: " + expectedWeight, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+
         int id = section.getInt("id", weight);
         String name = section.getString("name");
         String displayName = section.getString("display-name");
 
-        PlayerRole playerRole = new SPlayerRole(name, displayName, id, weight, section.getStringList("permissions"), previousRole);
+        SPlayerRole playerRole = new SPlayerRole(name, displayName, id, weight, section.getStringList("permissions"), previousRole);
 
         this.rolesContainer.addPlayerRole(playerRole);
 
         if (weight > lastRole)
             lastRole = weight;
 
-        return weight;
+        return playerRole;
     }
 
 }
