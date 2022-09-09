@@ -39,12 +39,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         this.plugin = plugin;
     }
 
-    @Nullable
-    @Override
-    public String getMappingsHash() {
-        return null;
-    }
-
     @Override
     public void registerCommand(BukkitCommand command) {
         ((CraftServer) plugin.getServer()).getCommandMap().register("superiorskyblock2", command);

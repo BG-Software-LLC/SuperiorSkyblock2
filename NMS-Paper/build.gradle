@@ -1,0 +1,6 @@
+dependencies {
+    compileOnly "org.spigotmc:v1_16_R3-Tuinity:latest"
+    compileOnly project(":NMS-Spigot")
+    compileOnly project(":API")
+    compileOnly parent
+}

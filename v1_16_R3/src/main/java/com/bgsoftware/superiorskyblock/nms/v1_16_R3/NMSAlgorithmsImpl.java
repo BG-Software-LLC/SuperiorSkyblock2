@@ -4,7 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.nms.NMSAlgorithms;
-import com.bgsoftware.superiorskyblock.nms.v1_16_R3.algorithms.GlowEnchantmentFactory;
+import com.bgsoftware.superiorskyblock.nms.algorithms.PaperGlowEnchantment;
+import com.bgsoftware.superiorskyblock.nms.algorithms.SpigotGlowEnchantment;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityBrewing;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityDispenser;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.menu.MenuTileEntityFurnace;
@@ -34,7 +35,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 
-import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.function.BiFunction;
 
@@ -56,12 +56,6 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    @Nullable
-    @Override
-    public String getMappingsHash() {
-        return null;
     }
 
     @Override
@@ -139,7 +133,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     @Override
     public Enchantment getGlowEnchant() {
-        return GlowEnchantmentFactory.createEnchantment();
+        try {
+            return new PaperGlowEnchantment("superior_glowing_enchant");
+        } catch (Throwable error) {
+            return new SpigotGlowEnchantment("superior_glowing_enchant");
+        }
     }
 
     @Override

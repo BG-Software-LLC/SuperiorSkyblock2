@@ -29,20 +29,12 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
 
-import javax.annotation.Nullable;
-
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
     private final SuperiorSkyblockPlugin plugin;
 
     public NMSAlgorithmsImpl(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    @Nullable
-    @Override
-    public String getMappingsHash() {
-        return null;
     }
 
     @Override

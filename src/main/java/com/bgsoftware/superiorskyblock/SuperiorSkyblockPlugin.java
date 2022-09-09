@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock;
 
-import com.bgsoftware.common.mappings.MappingsChecker;
-import com.bgsoftware.common.remaps.TestRemaps;
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.common.updater.Updater;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
@@ -9,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.handlers.MenusManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
+import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
@@ -16,6 +16,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
@@ -84,6 +85,7 @@ import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchemati
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.UnsafeValues;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -93,6 +95,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblock {
@@ -383,49 +387,59 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         return super.getClassLoader();
     }
 
+    @SuppressWarnings("deprecation")
     private boolean loadNMSAdapter() {
-        String version = getServer().getClass().getPackage().getName().split("\\.")[3];
-        try {
-            nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
+        String version = null;
 
-            String mappingVersionHash = nmsAlgorithms.getMappingsHash();
+        if (ServerVersion.isLessThan(ServerVersion.v1_18)) {
+            version = getServer().getClass().getPackage().getName().split("\\.")[3];
+        } else {
+            ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
+            int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
 
-            if (mappingVersionHash != null && !MappingsChecker.checkMappings(mappingVersionHash, version, error -> {
-                log("&cFailed to retrieve allowed mappings for your server, skipping...");
-                return true;
-            })) {
-                new ManagerLoadException("The plugin doesn't support your version mappings.\nPlease try a different version.\n" +
-                        "Mappings Hash: " + mappingVersionHash, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-                return false;
+            List<Pair<Integer, String>> versions = Arrays.asList(
+                    new Pair<>(2865, "v1181"),
+                    new Pair<>(2975, "v1182"),
+                    new Pair<>(3105, "v119"),
+                    new Pair<>(3117, "v1191"),
+                    new Pair<>(3120, "v1192")
+            );
+
+            for (Pair<Integer, String> versionData : versions) {
+                if (dataVersion <= versionData.getKey()) {
+                    version = versionData.getValue();
+                    break;
+                }
             }
 
-            nmsChunks = loadNMSClass("NMSChunksImpl", version);
-            nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
-            nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
-            nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
-            nmsTags = loadNMSClass("NMSTagsImpl", version);
-            nmsWorld = loadNMSClass("NMSWorldImpl", version);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            new ManagerLoadException(
-                    "The plugin doesn't support your minecraft version.\n" +
-                            "Please try a different version.",
-                    ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-            PluginDebugger.debug(ex);
-            return false;
+            if (version == null) {
+                log("Data version: " + dataVersion);
+            }
         }
 
-        File mappingsFile = new File("mappings");
-        if (mappingsFile.exists()) {
+        if (version != null) {
             try {
-                TestRemaps.testRemapsForClassesInPackage(mappingsFile,
-                        plugin.getClassLoader(), "com.bgsoftware.superiorskyblock.nms." + version);
+                nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
+                nmsChunks = loadNMSClass("NMSChunksImpl", version);
+                nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
+                nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
+                nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
+                nmsTags = loadNMSClass("NMSTagsImpl", version);
+                nmsWorld = loadNMSClass("NMSWorldImpl", version);
+
+                return true;
             } catch (Exception error) {
                 error.printStackTrace();
+                PluginDebugger.debug(error);
             }
         }
 
-        return true;
+        new ManagerLoadException(
+                "The plugin doesn't support your minecraft version.\n" +
+                        "Please try a different version.",
+                ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
+
+        return false;
     }
 
     private <T> T loadNMSClass(String className, String version) throws Exception {

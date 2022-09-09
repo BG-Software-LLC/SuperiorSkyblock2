@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url "https://repo.papermc.io/repository/maven-public/" }
+    }
+}
+
 rootProject.name = 'SuperiorSkyblock2'
 
 include 'API'
@@ -21,6 +28,7 @@ include 'Hook_ProtocolLib'
 include 'Hook_PvpingSpawners'
 include 'Hook_RoseStacker'
 include 'Hook_ShopGUIPlus'
+include 'Hook_ShopGUIPlus78'
 include 'Hook_SilkSpawners'
 include 'Hook_SkinsRestorer'
 include 'Hook_Slimefun'
@@ -30,17 +38,14 @@ include 'Hook_UltimateStacker'
 include 'Hook_VanishNoPacket'
 include 'Hook_Vault'
 include 'Hook_WildStacker'
+include 'NMS-Spigot'
+include 'NMS-Paper'
 include 'v1_8_R3'
 include 'v1_12_R1'
 include 'v1_16_R3'
 include 'v1_17_R1'
-include 'v1_17_R1-Spigot'
-include 'v1_18_R1'
-include 'v1_18_R1-Spigot'
-include 'v1_16_R3-Spigot'
-include 'v1_18_R2'
-include 'v1_18_R2-Spigot'
-include 'v1_19_R1'
-include 'v1_19_R1-Spigot'
-include 'Hook_ShopGUIPlus78'
-
+include 'v1181'
+include 'v1182'
+include 'v1191'
+include 'v119'
+include 'v1192'

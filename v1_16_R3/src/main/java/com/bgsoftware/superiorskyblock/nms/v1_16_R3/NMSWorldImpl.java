@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.MobSpawnerAbstractNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;

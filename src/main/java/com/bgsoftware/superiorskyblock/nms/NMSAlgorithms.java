@@ -18,9 +18,6 @@ import javax.annotation.Nullable;
 
 public interface NMSAlgorithms {
 
-    @Nullable
-    String getMappingsHash();
-
     void registerCommand(BukkitCommand command);
 
     String parseSignLine(String original);

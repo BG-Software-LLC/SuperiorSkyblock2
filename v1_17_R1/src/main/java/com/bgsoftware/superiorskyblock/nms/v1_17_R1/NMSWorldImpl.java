@@ -14,6 +14,7 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
+import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.spawners.MobSpawnerAbstractNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_17_R1.world.BlockStatesMapper;
@@ -160,8 +161,10 @@ public class NMSWorldImpl implements NMSWorld {
                 worldBorder.setCenter(center.getX(), center.getZ());
 
                 switch (superiorPlayer.getBorderColor()) {
-                    case GREEN -> worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
-                    case RED -> worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
+                    case GREEN ->
+                            worldBorder.transitionSizeBetween(worldBorder.getSize() - 0.1D, worldBorder.getSize(), Long.MAX_VALUE);
+                    case RED ->
+                            worldBorder.transitionSizeBetween(worldBorder.getSize(), worldBorder.getSize() - 1.0D, Long.MAX_VALUE);
                 }
             }
 
