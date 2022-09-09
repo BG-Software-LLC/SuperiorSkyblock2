@@ -15,8 +15,6 @@ public interface SQLSession {
 
     void waitForConnection();
 
-    Object getMutex();
-
     void createTable(String tableName, Pair<String, String>[] columns, QueryResult<Void> queryResult);
 
     void renameTable(String tableName, String newName, QueryResult<Void> queryResult);

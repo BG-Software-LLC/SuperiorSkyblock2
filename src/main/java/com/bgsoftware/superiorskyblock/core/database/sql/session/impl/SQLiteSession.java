@@ -20,7 +20,6 @@ import java.util.concurrent.CompletableFuture;
 public class SQLiteSession implements SQLSession {
 
     private final CompletableFuture<Void> ready = new CompletableFuture<>();
-    private final Object mutex = new Object();
     private final SuperiorSkyblockPlugin plugin;
 
     @Nullable
@@ -106,11 +105,6 @@ public class SQLiteSession implements SQLSession {
             ex.printStackTrace();
             PluginDebugger.debug(ex);
         }
-    }
-
-    @Override
-    public Object getMutex() {
-        return mutex;
     }
 
     @Override

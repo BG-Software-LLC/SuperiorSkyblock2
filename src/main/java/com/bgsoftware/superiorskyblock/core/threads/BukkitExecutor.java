@@ -26,7 +26,7 @@ public class BukkitExecutor {
 
     public static void init(SuperiorSkyblockPlugin plugin) {
         BukkitExecutor.plugin = plugin;
-        databaseExecutor = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread %d").build());
+        databaseExecutor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("SuperiorSkyblock Database Thread").build());
     }
 
     public static void ensureMain(Runnable runnable) {
@@ -66,7 +66,7 @@ public class BukkitExecutor {
     }
 
     public static boolean isDataThread() {
-        return syncDatabaseCalls || Thread.currentThread().getName().contains("SuperiorSkyblock Database Thread");
+        return syncDatabaseCalls || Thread.currentThread().getName().equals("SuperiorSkyblock Database Thread");
     }
 
     public static void async(Runnable runnable) {

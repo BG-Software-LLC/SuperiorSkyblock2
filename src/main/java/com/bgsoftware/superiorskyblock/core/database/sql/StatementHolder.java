@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class StatementHolder {
 
@@ -99,14 +98,7 @@ public class StatementHolder {
         SQLHelper.waitForConnection();
 
         try {
-            Optional<Object> mutex = SQLHelper.getMutex();
-
-            if (!mutex.isPresent())
-                return;
-
-            synchronized (mutex.get()) {
-                SQLHelper.customQuery(query, queryResult);
-            }
+            SQLHelper.customQuery(query, queryResult);
         } finally {
             values.clear();
         }

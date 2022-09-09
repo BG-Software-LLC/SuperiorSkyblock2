@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSess
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Optional;
 
 public class SQLHelper {
 
@@ -27,10 +26,6 @@ public class SQLHelper {
     public static void waitForConnection() {
         if (isReady())
             globalSession.waitForConnection();
-    }
-
-    public static Optional<Object> getMutex() {
-        return Optional.ofNullable(isReady() ? globalSession.getMutex() : null);
     }
 
     public static SQLSession createSession(SuperiorSkyblockPlugin plugin, boolean logging) {

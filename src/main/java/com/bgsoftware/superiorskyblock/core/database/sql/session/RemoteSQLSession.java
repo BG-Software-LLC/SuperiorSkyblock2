@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 public abstract class RemoteSQLSession implements SQLSession {
 
     protected final CompletableFuture<Void> ready = new CompletableFuture<>();
-    protected final Object mutex = new Object();
     protected final SuperiorSkyblockPlugin plugin;
 
     @Nullable
@@ -50,11 +49,6 @@ public abstract class RemoteSQLSession implements SQLSession {
             ex.printStackTrace();
             PluginDebugger.debug(ex);
         }
-    }
-
-    @Override
-    public Object getMutex() {
-        return mutex;
     }
 
     @Override
