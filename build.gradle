@@ -90,6 +90,10 @@ jar {
 
         for (File file : archiveFolder.listFiles()) {
             File reobfFile = new File(reobfFolder, file.getName());
+            if (reobfFile.exists())
+                println("Zipping reobfFile: " + reobfFile.getName());
+            else
+                println("Zipping file: " + file.getName());
             zipTree(reobfFile.exists() ? reobfFile : file)
         }
     }
@@ -135,7 +139,7 @@ task copyAPI(type: Copy) {
 }
 
 clean {
-    delete file('./archive/')
+//    delete file('./archive/')
 }
 
 build {
