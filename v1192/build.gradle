@@ -16,13 +16,17 @@ dependencies {
     compileOnly parent
 }
 
+shadowJar {
+    archiveFileName = "${project.name}-exclude.jar"
+}
+
 assemble {
     dependsOn(reobfJar)
 }
 
 tasks {
     reobfJar {
-        File outputFile = new File(parent.projectDir, "archive/reobf/${project.name}.jar")
+        File outputFile = new File(parent.projectDir, "archive/${project.name}.jar")
         outputJar.set(layout.buildDirectory.file(outputFile.getPath()))
     }
 }

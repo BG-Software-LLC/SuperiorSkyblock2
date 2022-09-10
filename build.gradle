@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'maven-publish'
 }
 
@@ -81,20 +81,8 @@ dependencies {
 
 jar {
     from {
-        File archiveFolder = new File("archive");
-
-        if (archiveFolder.exists() && !archiveFolder.isDirectory())
-            throw new GradleException("Not a directory: " + archiveFolder.getPath());
-
-        File reobfFolder = new File(archiveFolder, "reobf");
-
-        for (File file : archiveFolder.listFiles()) {
-            File reobfFile = new File(reobfFolder, file.getName());
-            if (reobfFile.exists())
-                println("Zipping reobfFile: " + reobfFile.getName());
-            else
-                println("Zipping file: " + file.getName());
-            zipTree(reobfFile.exists() ? reobfFile : file)
+        for (File file : new File("archive").listFiles()) {
+            zipTree(file)
         }
     }
 }
@@ -127,6 +115,8 @@ shadowJar {
         exclude archiveName
     }
 
+    exclude '*exclude.jar'
+
     destinationDir = file("./target/")
     from sourceSets.getByName("main").output
     configurations = [project.configurations.getByName("runtimeClasspath")]
@@ -139,7 +129,7 @@ task copyAPI(type: Copy) {
 }
 
 clean {
-//    delete file('./archive/')
+    delete file('./archive/')
 }
 
 build {
