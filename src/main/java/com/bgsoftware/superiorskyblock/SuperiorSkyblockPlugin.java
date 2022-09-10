@@ -555,6 +555,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         schematicsHandler.loadData();
         providersHandler.loadData();
         menusHandler.loadData();
+        missionsHandler.loadData();
 
         if (loadGrid) {
             dataHandler.loadData();
