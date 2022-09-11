@@ -139,6 +139,15 @@ items:
       lore:
         - '&7Change your island biome to Mesa.'
 
+biome-environment:
+  MESA: Normal
+  SWAMPLAND: Normal
+  HELL: Normal
+  DESERT: Normal
+  TAIGA: Normal
+  PLAINS: Normal
+  JUNGLE: Normal
+
 sounds:
   '!':
     access:

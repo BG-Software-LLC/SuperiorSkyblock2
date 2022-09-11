@@ -55,6 +55,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lהאיגש | &7םינקחשל ךלשמ �
 CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
 CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
+CANT_CHANGE_BIOME: "&e&lIsola | &7Impossibile applicare questo bioma in questo mondo.."
 CHANGED_BIOME: '&e&lיא | &7תרשל שדחמ רבחתהל שי ,םייונישה תא תוארל תנמ לע .{0}
   ל החלצהב הנוש יאה לש םויבה.'
 CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'

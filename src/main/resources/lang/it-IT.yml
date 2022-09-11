@@ -56,6 +56,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lErrore | &7Puoi modificare le autorizzaz
 CHANGED_BANK_LIMIT: '&e&lAggiornamenti | &7Aggiornato con successo il limite bancario dell''isola di {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lAggiornamenti | &7Aggiornato con successo il limite bancario di tutte le isole.'
 CHANGED_BANK_LIMIT_NAME: '&e&lAggiornamenti | &7Aggiornato con successo il limite bancario di {0}.'
+CANT_CHANGE_BIOME: "&e&lIsola | &7Impossibile applicare questo bioma in questo mondo.."
 CHANGED_BIOME: '&e&lIsola | &7Bioma modificato con successo in {0}. Potrebbe essere necessario riconnettersi al server per vedere le modifiche.'
 CHANGED_BIOME_ALL: '&e&lIsola | &7Aggiornato con successo il bioma su {0} per tutte le isole.'
 CHANGED_BIOME_NAME: '&e&Isola | &7Aggiornato con successo il bioma su {0} per l''isola {1}.'

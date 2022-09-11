@@ -53,6 +53,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lBlad | &7Mozesz zmienic uprawnienia tylk
 CHANGED_BANK_LIMIT: '&e&lAktualizacje | &7Pomyslnie zaktualizowano limit banku wyspy {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lAktualizacje | &7Pomyslnie zaktualizowano limit bankowy wszystkich wysp.'
 CHANGED_BANK_LIMIT_NAME: '&e&lAktualizacje | &7Pomyslnie zaktualizowano limit bankowy w wysokosci {0}.'
+CANT_CHANGE_BIOME: "&e&lIsola | &7Impossibile applicare questo bioma in questo mondo.."
 CHANGED_BIOME: '&e&lWyspa | &7Pomyslnie zmieniono biom na {0}. Aby zobaczyc zmiany, moze byc konieczne ponowne polaczenie z serwerem.'
 CHANGED_BIOME_ALL: '&e&lWyspa | &7Pomyslnie zmieniono biom na {0} dla wszystkich wysp.'
 CHANGED_BIOME_NAME: '&e&lWyspa | &7Pomyslnie zmieniono biom na {0} dla wyspy {1}.'

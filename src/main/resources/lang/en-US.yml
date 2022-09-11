@@ -53,6 +53,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lError | &7You can only change permission
 CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
 CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
+CANT_CHANGE_BIOME: "&e&lIsland | &7Cannot apply this biome in this world."
 CHANGED_BIOME: '&e&lIsland | &7Successfully changed biome to {0}. You might need to reconnect to the server to see changes.'
 CHANGED_BIOME_ALL: '&e&lIsland | &7Successfully changed biome to {0} for all the islands.'
 CHANGED_BIOME_NAME: '&e&lIsland | &7Successfully changed biome to {0} for the island {1}.'

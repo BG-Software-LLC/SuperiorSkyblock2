@@ -53,6 +53,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&l错误 | &7你只能为比你岛屿职�
 CHANGED_BANK_LIMIT: '&e&lUpgrades | &7Successfully updated the bank limit of {0}''s island.'
 CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Successfully updated the bank limit of all the islands.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Successfully updated the bank limit of {0}.'
+CANT_CHANGE_BIOME: "&e&lIsola | &7Impossibile applicare questo bioma in questo mondo.."
 CHANGED_BIOME: '&e&l岛屿 | &7岛屿生物群系已更新！你需要重新进入岛屿才能看到变化.'
 CHANGED_BIOME_ALL: '&e&l岛屿 | &7成功将所有岛屿的生物群系改变为 {0} .'
 CHANGED_BIOME_NAME: '&e&l岛屿 | &7成功将岛屿 {1} 的生物群系改变为 {0} .'

@@ -60,6 +60,7 @@ CHANGE_PERMISSION_FOR_HIGHER_ROLE: '&c&lLỗi | &7Bạn chỉ có thể thay đ�
 CHANGED_BANK_LIMIT: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng đảo của {0}.'
 CHANGED_BANK_LIMIT_ALL: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của tất cả đảo.'
 CHANGED_BANK_LIMIT_NAME: '&e&lNâng Cấp | &7Thành công nâng cấp giới hạn ngân hàng của {0}.'
+CANT_CHANGE_BIOME: "&e&lIsola | &7Impossibile applicare questo bioma in questo mondo.."
 CHANGED_BIOME: '&e&lĐảo | &7Thay đổi thành công quần xã thành {0}. Bạn có thể
   cần kết nối lại với máy chủ để xem các thay đổi.'
 CHANGED_BIOME_ALL: '&e&lĐảo | &7Thành công thay đổi quần xã thành {0} cho tất cả các đảo.'

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
@@ -13,11 +14,15 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -81,6 +86,19 @@ public class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
             if (lackPermissionSound != null)
                 lackPermissionSound.playSound(clickEvent.getWhoClicked());
             return;
+        }
+
+        File file = new File(plugin.getDataFolder(), "menus/biomes.yml");
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+
+        if(cfg.isConfigurationSection("biome-environment")) {
+            ConfigurationSection configurationSection = cfg.getConfigurationSection("biome-environment");
+            String environment = configurationSection.getString(event.getResult().name().toUpperCase(Locale.ENGLISH), "Normal");
+
+            if(clickedPlayer.getWorld() != null && clickedPlayer.getWorld().getEnvironment() != World.Environment.valueOf(environment.toUpperCase())) {
+                Message.CANT_CHANGE_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase(Locale.ENGLISH));
+                return;
+            }
         }
 
         if (accessSound != null)

@@ -63,6 +63,7 @@ CHANGED_BANK_LIMIT_ALL: '&e&lUpgrades | &7Das Banklimit aller Inseln wurde erfol
   aktualisiert.'
 CHANGED_BANK_LIMIT_NAME: '&e&lUpgrades | &7Das Banklimit von {0} wurde erfolgreich
   aktualisiert.'
+CANT_CHANGE_BIOME: "&e&lIsland | &7Kann dieses Biom nicht in dieser Welt anwenden."
 CHANGED_BIOME: '&e&lIsland | &7Biom erfolgreich in {0} geändert. Möglicherweise musst
   du dich erneut mit dem Server verbinden, um die Änderungen anzuzeigen.'
 CHANGED_BIOME_ALL: '&e&lInsel | &7Biom für alle Inseln erfolgreich auf {0} geändert.'
