@@ -20,6 +20,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -34,6 +35,8 @@ public class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
     private final TemplateItem lackPermissionItem;
     private final List<String> lackPermissionCommands;
     private final Biome biome;
+    private final YamlConfiguration cfg;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private BiomeButton(TemplateItem buttonItem, GameSound clickSound, List<String> commands,
                         String requiredPermission, GameSound lackPermissionSound,
@@ -45,6 +48,7 @@ public class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
         this.lackPermissionCommands = lackPermissionCommands == null ? Collections.emptyList() :
                 Collections.unmodifiableList(lackPermissionCommands);
         this.biome = biome;
+        this.cfg = YamlConfiguration.loadConfiguration(new File(plugin.getDataFolder(), "menus/biomes.yml"));
     }
 
     public List<String> getLackPermissionCommands() {
@@ -88,15 +92,13 @@ public class BiomeButton extends SuperiorMenuButton<MenuBiomes> {
             return;
         }
 
-        File file = new File(plugin.getDataFolder(), "menus/biomes.yml");
-        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-
         if(cfg.isConfigurationSection("biome-environment")) {
             ConfigurationSection configurationSection = cfg.getConfigurationSection("biome-environment");
-            String environment = configurationSection.getString(event.getResult().name().toUpperCase(Locale.ENGLISH), "Normal");
+            String result = event.getResult().name().toUpperCase(Locale.ENGLISH);
+            String environment = configurationSection.getString(result, "NORMAL");
 
-            if(clickedPlayer.getWorld() != null && clickedPlayer.getWorld().getEnvironment() != World.Environment.valueOf(environment.toUpperCase())) {
-                Message.CANT_CHANGE_BIOME.send(clickedPlayer, event.getResult().name().toLowerCase(Locale.ENGLISH));
+            if(clickedPlayer.getWorld() != null && clickedPlayer.getWorld().getEnvironment() != World.Environment.valueOf(environment)) {
+                Message.CANT_CHANGE_BIOME.send(clickedPlayer, result);
                 return;
             }
         }
