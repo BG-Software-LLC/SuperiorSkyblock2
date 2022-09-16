@@ -104,6 +104,36 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
+    public Island createIsland(@Nullable SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
+        SIsland island = new SIsland(superiorPlayer, uuid, location, islandName, schemName);
+        return islandsFactory == null ? island : islandsFactory.createIsland(island);
+    }
+
+    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
+        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
+
+        if (!island.isPresent())
+            return island;
+
+        return islandsFactory == null ? island : island.map(islandsFactory::createIsland);
+    }
+
+    @Override
+    public SuperiorPlayer createPlayer(UUID playerUUID) {
+        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(playerUUID);
+        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
+    }
+
+    public Optional<SuperiorPlayer> createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
+        Optional<SuperiorPlayer> superiorPlayer = SSuperiorPlayer.fromDatabase(databaseCache, resultSet);
+
+        if (!superiorPlayer.isPresent())
+            return superiorPlayer;
+
+        return playersFactory == null ? superiorPlayer : superiorPlayer.map(playersFactory::createPlayer);
+    }
+
+    @Override
     public BlockOffset createBlockOffset(int offsetX, int offsetY, int offsetZ) {
         return SBlockOffset.fromOffsets(offsetX, offsetY, offsetZ);
     }
@@ -127,34 +157,6 @@ public class FactoriesManagerImpl implements FactoriesManager {
         Preconditions.checkNotNull(action, "action parameter cannot be null");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null");
         return new SBankTransaction(player, action, position, time, failureReason, amount);
-    }
-
-    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
-
-        if (!island.isPresent())
-            return island;
-
-        return islandsFactory == null ? island : island.map(islandsFactory::createIsland);
-    }
-
-    public Island createIsland(SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
-        SIsland island = new SIsland(superiorPlayer, uuid, location, islandName, schemName);
-        return islandsFactory == null ? island : islandsFactory.createIsland(island);
-    }
-
-    public Optional<SuperiorPlayer> createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
-        Optional<SuperiorPlayer> superiorPlayer = SSuperiorPlayer.fromDatabase(databaseCache, resultSet);
-
-        if (!superiorPlayer.isPresent())
-            return superiorPlayer;
-
-        return playersFactory == null ? superiorPlayer : superiorPlayer.map(playersFactory::createPlayer);
-    }
-
-    public SuperiorPlayer createPlayer(UUID player) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(player);
-        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
 
     public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {

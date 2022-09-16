@@ -5,9 +5,11 @@ import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
 import com.bgsoftware.superiorskyblock.api.factory.DatabaseBridgeFactory;
 import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
+import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
 
 import javax.annotation.Nullable;
@@ -59,6 +61,26 @@ public interface FactoriesManager {
      */
     @Nullable
     DatabaseBridgeFactory getDatabaseBridgeFactory();
+
+    /**
+     * Create a new Island object.
+     * Warning: This island is not saved into the database unless inserting it manually!
+     *
+     * @param superiorPlayer The owner of the island.
+     * @param uuid           The uuid of the island.
+     * @param location       The location of the island.
+     * @param islandName     The name of the island.
+     * @param schemName      The schematic used to create the island.
+     */
+    Island createIsland(@Nullable SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName);
+
+    /**
+     * Create a new SuperiorPlayer object.
+     * Warning: This player is not saved into the database unless inserting it manually!
+     *
+     * @param playerUUID The uuid of the player.
+     */
+    SuperiorPlayer createPlayer(UUID playerUUID);
 
     /**
      * Create a {@link BlockOffset} object from given offsets.
