@@ -398,7 +398,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     public void convertPlayerData(SuperiorPlayer oldPlayer, SuperiorPlayer newPlayer) {
         getAllMissions().forEach(mission -> mission.transferData(oldPlayer, newPlayer));
 
-        File dataFolder = new File(BuiltinModules.MISSIONS.getDataFolder(), "data");
+        File dataFolder = BuiltinModules.MISSIONS.getDataStoreFolder();
 
         if (!dataFolder.exists())
             return;
