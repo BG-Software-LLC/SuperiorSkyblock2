@@ -70,7 +70,7 @@ public class SuperiorSkyblockAPI {
      * Everytime a change is made to the API, the version of it changes.
      */
     public static int getAPIVersion() {
-        return 3;
+        return 4;
     }
 
     /*
