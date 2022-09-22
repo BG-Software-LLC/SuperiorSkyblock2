@@ -42,6 +42,9 @@ loadbefore:
   - My_Worlds
   - Citizens
 
+libraries:
+  - org.openjdk.nashorn:nashorn-core:15.4
+
 permissions:
   superior.*:
     description: Permission for all admin & island commands

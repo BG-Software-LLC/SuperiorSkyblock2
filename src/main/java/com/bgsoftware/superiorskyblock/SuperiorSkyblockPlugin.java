@@ -20,7 +20,7 @@ import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.engine.NashornEngine;
+import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -133,7 +133,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     // The only handler that is initialized is this one, therefore it's not final.
     // This is to prevent it's fields to be non-finals.
     private SettingsManagerImpl settingsHandler = null;
-    private IScriptEngine scriptEngine = NashornEngine.getInstance();
+    private IScriptEngine scriptEngine = EnginesFactory.createDefaultEngine();
 
     private final EventsBus eventsBus = new EventsBus(this);
 
@@ -671,7 +671,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @Override
     public void setScriptEngine(@Nullable IScriptEngine scriptEngine) {
-        this.scriptEngine = scriptEngine == null ? NashornEngine.getInstance() : scriptEngine;
+        this.scriptEngine = scriptEngine == null ? EnginesFactory.createDefaultEngine() : scriptEngine;
     }
 
     @Override
