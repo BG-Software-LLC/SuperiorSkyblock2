@@ -394,7 +394,7 @@ public class NMSWorldImpl implements NMSWorld {
                 PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(
                         levelChunk.biomeRegistry.asHolderIdMap(),
                         biome,
-                        PalettedContainer.Strategy.SECTION_STATES
+                        PalettedContainer.Strategy.SECTION_BIOMES
                 );
                 chunkSections[i] = new LevelChunkSection(currentSection.bottomBlockY() >> 4, statesContainer, biomesContainer);
             }
