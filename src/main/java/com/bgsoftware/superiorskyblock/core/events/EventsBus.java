@@ -67,10 +67,8 @@ public class EventsBus {
                 "blockunstackevent");
     }
 
-    public void callIslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
-        if (!plugin.getSettings().getDisabledEvents().contains("islandbanevent")) {
-            callEvent(new IslandBanEvent(superiorPlayer, targetPlayer, island));
-        }
+    public boolean callIslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
+        return callEvent(() -> new IslandBanEvent(superiorPlayer, targetPlayer, island), "islandbanevent");
     }
 
     public EventResult<String> callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
