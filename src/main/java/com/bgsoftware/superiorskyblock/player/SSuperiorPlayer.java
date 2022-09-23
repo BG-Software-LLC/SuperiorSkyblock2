@@ -850,7 +850,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof SuperiorPlayer && uuid.equals(((SuperiorPlayer) obj).getUniqueId());
+        return obj instanceof SuperiorPlayer && (this == obj || uuid.equals(((SuperiorPlayer) obj).getUniqueId()));
     }
 
     @Override
