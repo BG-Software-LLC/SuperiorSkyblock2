@@ -428,7 +428,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
                 nmsTags = loadNMSClass("NMSTagsImpl", version);
                 nmsWorld = loadNMSClass("NMSWorldImpl", version);
-
+                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ?
+                        loadNMSClass("NMSDragonFightImpl", version) : new NMSDragonFightImpl();
                 return true;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -707,15 +708,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public NMSDragonFight getNMSDragonFight() {
-        if (nmsDragonFight == null) {
-            String version = getServer().getClass().getPackage().getName().split("\\.")[3];
-            try {
-                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ?
-                        loadNMSClass("NMSDragonFightImpl", version) : new NMSDragonFightImpl();
-            } catch (Exception ignored) {
-            }
-        }
-
         return nmsDragonFight;
     }
 
