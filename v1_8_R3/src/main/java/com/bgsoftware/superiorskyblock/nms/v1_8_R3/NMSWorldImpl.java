@@ -5,7 +5,6 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
@@ -14,6 +13,8 @@ import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_8_R3.spawners.MobSpawnerAbstractNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1_8_R3.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import net.minecraft.server.v1_8_R3.BlockDoubleStep;
 import net.minecraft.server.v1_8_R3.BlockPosition;
@@ -38,7 +39,6 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.block.CraftSign;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -47,7 +47,6 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Modifier;
-import java.util.List;
 import java.util.function.IntFunction;
 
 public class NMSWorldImpl implements NMSWorld {
@@ -162,15 +161,6 @@ public class NMSWorldImpl implements NMSWorld {
     public Object getBlockData(Block block) {
         // Doesn't exist
         return null;
-    }
-
-    @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for (SchematicBlock blockData : blockDataList) {
-            NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
-                    blockData.getCombinedId(), blockData.getTileEntityData());
-        }
     }
 
     @Override
@@ -316,6 +306,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
         return new IslandsGeneratorImpl(plugin);
+    }
+
+    @Override
+    public WorldEditSession createEditSession(World world) {
+        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
     }
 
 }

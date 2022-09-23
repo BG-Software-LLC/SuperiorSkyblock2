@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import org.bukkit.Chunk;
@@ -26,8 +25,6 @@ public interface NMSChunks {
     void injectChunkSections(Chunk chunk);
 
     boolean isChunkEmpty(Chunk chunk);
-
-    void refreshLights(Chunk chunk, List<SchematicBlock> blockData);
 
     @Nullable
     Chunk getChunkIfLoaded(ChunkPosition chunkPosition);

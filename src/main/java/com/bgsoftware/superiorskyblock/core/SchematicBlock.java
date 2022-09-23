@@ -2,9 +2,9 @@ package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.inventory.InventoryType;
@@ -104,14 +104,17 @@ public class SchematicBlock {
         }
     }
 
-    public void doPostPlace(Island island) {
-        if (this.tileEntityData == null)
-            return;
+    public boolean shouldPostPlace() {
+        return this.tileEntityData != null && (this.tileEntityData.containsKey("Text1") ||
+                this.tileEntityData.containsKey("Text2") ||
+                this.tileEntityData.containsKey("Text3") ||
+                this.tileEntityData.containsKey("Text4")
+        );
+    }
 
+    public void doPostPlace(Island island) {
         try {
-            if ((this.tileEntityData.containsKey("Text1") || this.tileEntityData.containsKey("Text2") ||
-                    this.tileEntityData.containsKey("Text3") || this.tileEntityData.containsKey("Text4")))
-                plugin.getNMSWorld().placeSign(island, location);
+            plugin.getNMSWorld().placeSign(island, location);
         } finally {
             this.tileEntityData = null;
         }

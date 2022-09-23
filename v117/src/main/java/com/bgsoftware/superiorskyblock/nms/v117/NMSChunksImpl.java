@@ -1,40 +1,31 @@
 package com.bgsoftware.superiorskyblock.nms.v117;
 
-import ca.spottedleaf.starlight.light.StarLightInterface;
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v117.chunks.CropsBlockEntity;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.game.ClientboundForgetLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacket;
 import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
-import net.minecraft.util.thread.ProcessorMailbox;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -44,13 +35,9 @@ import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.ProtoChunk;
-import net.minecraft.world.level.lighting.BlockLightEngine;
-import net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint;
-import net.minecraft.world.level.lighting.LayerLightEventListener;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
 import org.bukkit.Location;
@@ -80,12 +67,6 @@ public class NMSChunksImpl implements NMSChunks {
 
     private static final ReflectField<Biome[]> BIOME_BASE_ARRAY = new ReflectField<>(
             ChunkBiomeContainer.class, Biome[].class, "f");
-    private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(
-            DynamicGraphMinFixedPoint.class, 1, Long.class, Long.class, Integer.class, Boolean.class);
-    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(
-            ThreadedLevelLightEngine.class, Object.class, "theLightEngine");
-    private static final ReflectField<ProcessorMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
-            ThreadedLevelLightEngine.class, ProcessorMailbox.class, Modifier.PRIVATE | Modifier.FINAL, 1);
     private static final ReflectField<ChunkBiomeContainer> CHUNK_BIOME_CONTAINER = new ReflectField<>(
             LevelChunk.class, ChunkBiomeContainer.class, Modifier.PRIVATE, 1);
 
@@ -271,58 +252,6 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
-        ServerLevel serverLevel = levelChunk.level;
-
-        // Update lights for the blocks.
-        // We use a delayed task to avoid null nibbles
-        BukkitExecutor.sync(() -> {
-            boolean canSkyLight = bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL;
-            LevelLightEngine lightEngine = serverLevel.getLightEngine();
-            LayerLightEventListener blocksLightLayer = lightEngine.getLayerListener(LightLayer.BLOCK);
-            LayerLightEventListener skyLightLayer = lightEngine.getLayerListener(LightLayer.SKY);
-
-            if (plugin.getSettings().isLightsUpdate()) {
-                if (STAR_LIGHT_INTERFACE.isValid()) {
-                    ThreadedLevelLightEngine threadedLevelLightEngine = (ThreadedLevelLightEngine) lightEngine;
-                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(threadedLevelLightEngine);
-                    ServerChunkCache serverChunkCache = serverLevel.getChunkSource();
-                    LIGHT_ENGINE_EXECUTOR.get(threadedLevelLightEngine).tell(() -> {
-                        starLightInterface.relightChunks(Collections.singleton(levelChunk.getPos()), chunkPos -> {
-                            ClientboundLightUpdatePacket lightUpdatePacket = new ClientboundLightUpdatePacket(
-                                    chunkPos, lightEngine, null, null, true);
-                            serverChunkCache.mainThreadProcessor.execute(() -> NMSUtils.sendPacketToRelevantPlayers(
-                                    serverLevel, chunkPos.x, chunkPos.z, lightUpdatePacket));
-                        }, null);
-                    });
-                } else {
-                    for (SchematicBlock blockData : blockDataList) {
-                        BlockPos blockPos = new BlockPos(blockData.getX(), blockData.getY(), blockData.getZ());
-                        if (blockData.getBlockLightLevel() > 0) {
-                            flagDirty(blocksLightLayer, blockPos, blockData.getBlockLightLevel());
-                        }
-                        if (canSkyLight && blockData.getSkyLightLevel() > 0) {
-                            flagDirty(skyLightLayer, blockPos, blockData.getSkyLightLevel());
-                        }
-                    }
-                }
-            } else if (canSkyLight) {
-                int sectionsAmount = levelChunk.getSections().length;
-                ChunkPos chunkPos = levelChunk.getPos();
-
-                for (int i = 0; i < sectionsAmount; ++i) {
-                    byte[] skyLightArray = new byte[2048];
-                    for (int j = 0; j < skyLightArray.length; j += 2)
-                        skyLightArray[j] = 15;
-                    lightEngine.queueSectionData(LightLayer.SKY, SectionPos.of(chunkPos, i),
-                            new DataLayer(skyLightArray), true);
-                }
-            }
-        }, 10L);
-    }
-
-    @Override
     public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
         ServerLevel serverLevel = ((CraftWorld) chunkPosition.getWorld()).getHandle();
         ChunkAccess chunkAccess = serverLevel.getChunkSource().getChunk(chunkPosition.getX(), chunkPosition.getZ(), false);
@@ -449,18 +378,6 @@ public class NMSChunksImpl implements NMSChunks {
                 // Load tile entities from proto chunk to the actual chunk
                 protoChunk.getBlockEntities().forEach(((blockPosition, tileEntity) -> levelChunk.setBlockEntity(tileEntity)));
             }
-        }
-    }
-
-    private static void flagDirty(LayerLightEventListener lightEventListener, BlockPos blockPos, byte blockLight) {
-        try {
-            if (lightEventListener instanceof BlockLightEngine blockLightEngine) {
-                blockLightEngine.onBlockEmissionIncrease(blockPos, blockLight);
-            } else {
-                SKY_LIGHT_UPDATE.invoke(lightEventListener, 9223372036854775807L,
-                        blockPos.asLong(), 15 - blockLight, true);
-            }
-        } catch (Exception ignored) {
         }
     }
 

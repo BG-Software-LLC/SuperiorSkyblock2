@@ -1,24 +1,20 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
-import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
-import com.tuinity.tuinity.chunk.light.StarLightInterface;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -27,15 +23,11 @@ import net.minecraft.server.v1_16_R3.BlockStepAbstract;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R3.ChunkProviderServer;
 import net.minecraft.server.v1_16_R3.ChunkSection;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityHuman;
-import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.LightEngineBlock;
-import net.minecraft.server.v1_16_R3.LightEngineGraph;
 import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.NBTTagList;
@@ -45,7 +37,6 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutUnloadChunk;
 import net.minecraft.server.v1_16_R3.PlayerConnection;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.TagsBlock;
-import net.minecraft.server.v1_16_R3.ThreadedMailbox;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
@@ -63,7 +54,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -79,12 +69,6 @@ public class NMSChunksImpl implements NMSChunks {
             BiomeStorage.class, BiomeBase[].class, "h");
     private static final ReflectField<Collection<Entity>[]> ENTITY_SLICE_ARRAY = new ReflectField<>(
             Chunk.class, null, "entitySlices");
-    private static final ReflectMethod<Void> SKY_LIGHT_UPDATE = new ReflectMethod<>(
-            LightEngineGraph.class, "a", Long.class, Long.class, Integer.class, Boolean.class);
-    private static final ReflectField<Object> STAR_LIGHT_INTERFACE = new ReflectField<>(
-            LightEngineThreaded.class, Object.class, "theLightEngine");
-    private static final ReflectField<ThreadedMailbox<Runnable>> LIGHT_ENGINE_EXECUTOR = new ReflectField<>(
-            LightEngineThreaded.class, ThreadedMailbox.class, "b");
 
     private final SuperiorSkyblockPlugin plugin;
 
@@ -260,47 +244,6 @@ public class NMSChunksImpl implements NMSChunks {
     public boolean isChunkEmpty(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
         return Arrays.stream(chunk.getSections()).allMatch(chunkSection -> chunkSection == null || chunkSection.c());
-    }
-
-    @Override
-    public void refreshLights(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        WorldServer world = (WorldServer) chunk.getWorld();
-
-        if (plugin.getSettings().isLightsUpdate()) {
-            // Update lights for the blocks.
-            // We use a delayed task to avoid null nibbles
-            BukkitExecutor.sync(() -> {
-                if (STAR_LIGHT_INTERFACE.isValid()) {
-                    LightEngineThreaded lightEngineThreaded = (LightEngineThreaded) world.e();
-                    StarLightInterface starLightInterface = (StarLightInterface) STAR_LIGHT_INTERFACE.get(lightEngineThreaded);
-                    ChunkProviderServer chunkProviderServer = world.getChunkProvider();
-                    LIGHT_ENGINE_EXECUTOR.get(lightEngineThreaded).queue(() ->
-                            starLightInterface.relightChunks(Collections.singleton(chunk.getPos()), chunkPos ->
-                                    chunkProviderServer.serverThreadQueue.execute(() ->
-                                            NMSUtils.sendPacketToRelevantPlayers(world, chunkPos.x, chunkPos.z,
-                                                    new PacketPlayOutLightUpdate(chunkPos, lightEngineThreaded, true))
-                                    ), null));
-                } else {
-                    for (SchematicBlock blockData : blockDataList) {
-                        BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-                        if (blockData.getBlockLightLevel() > 0) {
-                            try {
-                                ((LightEngineBlock) world.e().a(EnumSkyBlock.BLOCK)).a(blockPosition, blockData.getBlockLightLevel());
-                            } catch (Exception ignored) {
-                            }
-                        }
-                        if (blockData.getSkyLightLevel() > 0 && bukkitChunk.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL) {
-                            try {
-                                SKY_LIGHT_UPDATE.invoke(world.e().a(EnumSkyBlock.SKY), 9223372036854775807L,
-                                        blockPosition.asLong(), 15 - blockData.getSkyLightLevel(), true);
-                            } catch (Exception ignored) {
-                            }
-                        }
-                    }
-                }
-            }, 10L);
-        }
     }
 
     @Override

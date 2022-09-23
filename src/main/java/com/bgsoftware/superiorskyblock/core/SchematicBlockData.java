@@ -2,8 +2,6 @@ package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.world.BlockChangeTask;
-import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +24,10 @@ public class SchematicBlockData implements Comparable<SchematicBlockData> {
         this.blockLightLevel = blockLightLevel;
         this.statesTag = statesTag;
         this.tileEntity = tileEntity;
+    }
+
+    public BlockOffset getBlockOffset() {
+        return blockOffset;
     }
 
     public int getCombinedId() {
@@ -57,10 +59,6 @@ public class SchematicBlockData implements Comparable<SchematicBlockData> {
             return levelCompare;
         int xCoordCompare = Integer.compare(blockOffset.getOffsetX(), o.blockOffset.getOffsetX());
         return xCoordCompare != 0 ? xCoordCompare : Integer.compare(blockOffset.getOffsetZ(), o.blockOffset.getOffsetZ());
-    }
-
-    public void applyBlock(BlockChangeTask blockChangeTask, Location location) {
-        blockChangeTask.setBlock(blockOffset.applyToLocation(location), this);
     }
 
 }

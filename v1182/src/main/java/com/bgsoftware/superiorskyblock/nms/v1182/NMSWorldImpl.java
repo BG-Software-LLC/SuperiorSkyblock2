@@ -7,11 +7,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.listener.SignsListener;
 import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
@@ -19,19 +17,18 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1182.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1182.spawners.TickingSpawnerBlockEntityNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1182.world.PropertiesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1182.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.network.protocol.game.ClientboundInitializeBorderPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -43,18 +40,15 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.border.WorldBorder;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
-import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftSign;
@@ -182,16 +176,6 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {
         return block.getBlockData();
-    }
-
-    @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
-        LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
-        blockDataList.forEach(blockData -> {
-            NMSUtils.setBlock(levelChunk, new BlockPos(blockData.getX(), blockData.getY(), blockData.getZ()),
-                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getTileEntityData());
-        });
-        setBiome(levelChunk, IslandUtils.getDefaultWorldBiome(bukkitChunk.getWorld().getEnvironment()));
     }
 
     @Override
@@ -393,22 +377,9 @@ public class NMSWorldImpl implements NMSWorld {
         return new IslandsGeneratorImpl(plugin);
     }
 
-    private void setBiome(LevelChunk levelChunk, org.bukkit.block.Biome bukkitBiome) {
-        Holder<Biome> biome = CraftBlock.biomeToBiomeBase(levelChunk.biomeRegistry, bukkitBiome);
-
-        LevelChunkSection[] chunkSections = levelChunk.getSections();
-        for (int i = 0; i < chunkSections.length; ++i) {
-            LevelChunkSection currentSection = chunkSections[i];
-            if (currentSection != null) {
-                PalettedContainer<BlockState> statesContainer = currentSection.getStates();
-                PalettedContainer<Holder<Biome>> biomesContainer = new PalettedContainer<>(
-                        levelChunk.biomeRegistry.asHolderIdMap(),
-                        biome,
-                        PalettedContainer.Strategy.SECTION_BIOMES
-                );
-                chunkSections[i] = new LevelChunkSection(currentSection.bottomBlockY() >> 4, statesContainer, biomesContainer);
-            }
-        }
+    @Override
+    public WorldEditSession createEditSession(World world) {
+        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
     }
 
 }

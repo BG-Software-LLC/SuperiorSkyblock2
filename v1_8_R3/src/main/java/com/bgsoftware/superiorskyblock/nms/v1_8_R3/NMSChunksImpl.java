@@ -197,23 +197,6 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
-    public void refreshLights(org.bukkit.Chunk chunk, List<SchematicBlock> blockDataList) {
-        World world = ((CraftChunk) chunk).getHandle().getWorld();
-
-        // Update lights for the blocks.
-        for (SchematicBlock blockData : blockDataList) {
-            BlockPosition blockPosition = new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ());
-            if (plugin.getSettings().isLightsUpdate() && blockData.getBlockLightLevel() > 0)
-                world.a(EnumSkyBlock.BLOCK, blockPosition, blockData.getBlockLightLevel());
-
-            byte skyLight = plugin.getSettings().isLightsUpdate() ? blockData.getSkyLightLevel() : 15;
-
-            if (skyLight > 0 && blockData.getWorld().getEnvironment() == org.bukkit.World.Environment.NORMAL)
-                world.a(EnumSkyBlock.SKY, blockPosition, skyLight);
-        }
-    }
-
-    @Override
     public org.bukkit.Chunk getChunkIfLoaded(ChunkPosition chunkPosition) {
         Chunk chunk = ((CraftWorld) chunkPosition.getWorld()).getHandle().chunkProviderServer
                 .getChunkIfLoaded(chunkPosition.getX(), chunkPosition.getZ());

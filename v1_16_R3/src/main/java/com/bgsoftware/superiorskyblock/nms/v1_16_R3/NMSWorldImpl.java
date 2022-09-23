@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
@@ -18,6 +17,8 @@ import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.generator.IslandsGeneratorImpl;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.spawners.TileEntityMobSpawnerNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.BlockStatesMapper;
+import com.bgsoftware.superiorskyblock.nms.v1_16_R3.world.WorldEditSessionImpl;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
@@ -31,7 +32,6 @@ import net.minecraft.server.v1_16_R3.BlockStateBoolean;
 import net.minecraft.server.v1_16_R3.BlockStateEnum;
 import net.minecraft.server.v1_16_R3.BlockStateInteger;
 import net.minecraft.server.v1_16_R3.BlockStepAbstract;
-import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.EnumSkyBlock;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
@@ -55,7 +55,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.Waterlogged;
-import org.bukkit.craftbukkit.v1_16_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_16_R3.block.CraftSign;
@@ -65,7 +64,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.IntFunction;
 
@@ -176,15 +174,6 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public Object getBlockData(org.bukkit.block.Block block) {
         return block.getBlockData();
-    }
-
-    @Override
-    public void setBlocks(org.bukkit.Chunk bukkitChunk, List<SchematicBlock> blockDataList) {
-        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
-        for (SchematicBlock blockData : blockDataList) {
-            NMSUtils.setBlock(chunk, new BlockPosition(blockData.getX(), blockData.getY(), blockData.getZ()),
-                    blockData.getCombinedId(), blockData.getStatesTag(), blockData.getTileEntityData());
-        }
     }
 
     @Override
@@ -364,6 +353,11 @@ public class NMSWorldImpl implements NMSWorld {
     @Override
     public ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin) {
         return new IslandsGeneratorImpl(plugin);
+    }
+
+    @Override
+    public WorldEditSession createEditSession(org.bukkit.World world) {
+        return new WorldEditSessionImpl(((CraftWorld) world).getHandle());
     }
 
 }

@@ -4,9 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,7 +14,6 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
-import java.util.List;
 import java.util.function.IntFunction;
 
 public interface NMSWorld {
@@ -27,8 +25,6 @@ public interface NMSWorld {
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 
     Object getBlockData(Block block);
-
-    void setBlocks(Chunk chunk, List<SchematicBlock> blockDataList);
 
     void setBlock(Location location, int combinedId);
 
@@ -59,5 +55,7 @@ public interface NMSWorld {
     void removeAntiXray(World world);
 
     ChunkGenerator createGenerator(SuperiorSkyblockPlugin plugin);
+
+    WorldEditSession createEditSession(World world);
 
 }

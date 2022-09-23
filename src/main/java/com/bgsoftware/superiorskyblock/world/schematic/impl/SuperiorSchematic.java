@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
+import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -13,19 +14,29 @@ import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
+import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
-import com.bgsoftware.superiorskyblock.world.BlockChangeTask;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class SuperiorSchematic extends BaseSchematic implements Schematic {
@@ -80,12 +91,16 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
             for (Tag<?> tag : entitiesList) {
                 CompoundTag compound = (CompoundTag) tag;
-                EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
-                CompoundTag entityTag = compound.getCompound("NBT");
-                Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset"));
-                if (offset != null)
-                    entities.add(new SchematicEntity(entityType, entityTag,
-                            SBlockOffset.fromOffsets(offset.getX(), offset.getY(), offset.getZ())));
+                try {
+                    EntityType entityType = EntityType.valueOf(compound.getString("entityType"));
+                    CompoundTag entityTag = compound.getCompound("NBT");
+                    Location offset = Serializers.LOCATION_SERIALIZER.deserialize(compound.getString("offset"));
+                    if (offset != null)
+                        entities.add(new SchematicEntity(entityType, entityTag,
+                                SBlockOffset.fromOffsets(offset.getX(), offset.getY(), offset.getZ())));
+                } catch (Exception error) {
+                    error.printStackTrace();
+                }
             }
 
             this.entities = Collections.unmodifiableList(entities);
@@ -99,39 +114,83 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
-        if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(() -> pasteSchematic(island, location, callback, onFailure));
+        if (Bukkit.isPrimaryThread()) {
+            BukkitExecutor.async(() -> pasteSchematic(island, location, callback, onFailure));
             return;
         }
 
-        try {
-            PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " +
-                    Formatters.LOCATION_FORMATTER.format(location) + ", Schematic: " + name);
+        PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " +
+                Formatters.LOCATION_FORMATTER.format(location) + ", Schematic: " + name);
 
-            Location min = this.offset.applyToLocation(location);
+        WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
+        Location min = this.offset.applyToLocation(location);
 
-            BlockChangeTask blockChangeTask = new BlockChangeTask(island);
+        List<Runnable> finishTasks = new LinkedList<>();
 
-            for (SchematicBlockData schematicBlock : this.blocks)
-                schematicBlock.applyBlock(blockChangeTask, min.clone());
+        this.blocks.forEach(schematicBlockData -> {
+            Location blockLocation = schematicBlockData.getBlockOffset().applyToLocation(min.clone());
+            SchematicBlock schematicBlock = new SchematicBlock(blockLocation, schematicBlockData);
 
-            blockChangeTask.submitUpdate(() -> {
-                for (SchematicEntity entity : this.entities) {
-                    entity.spawnEntity(min);
+            schematicBlock.doPrePlace(island);
+
+            worldEditSession.setBlock(blockLocation, schematicBlock.getCombinedId(),
+                    schematicBlock.getStatesTag(), schematicBlock.getTileEntityData());
+
+            if (schematicBlock.shouldPostPlace())
+                finishTasks.add(() -> schematicBlock.doPostPlace(island));
+        });
+
+        List<ChunkPosition> affectedChunks = worldEditSession.getAffectedChunks();
+        List<CompletableFuture<Chunk>> chunkFutures = new ArrayList<>(affectedChunks.size());
+
+        AtomicBoolean failed = new AtomicBoolean(false);
+
+        affectedChunks.forEach(chunkPosition -> {
+            chunkFutures.add(ChunksProvider.loadChunk(chunkPosition, ChunkLoadReason.SCHEMATIC_PLACE, chunk -> {
+                if (failed.get())
+                    return;
+
+                try {
+                    boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
+                    if (cropGrowthEnabled && island.isInsideRange(chunk))
+                        plugin.getNMSChunks().startTickingChunk(island, chunk, false);
+
+                    ChunksTracker.markDirty(island, chunk, false);
+
+                    worldEditSession.applyBlocks(chunk);
+                } catch (Throwable error) {
+                    failed.set(true);
+                    if (onFailure != null)
+                        onFailure.accept(error);
                 }
+            }));
+        });
 
-                island.handleBlocksPlace(cachedCounts);
+        CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
+            try {
+                if (!failed.get()) {
+                    worldEditSession.finish(island);
 
-                plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
+                    if (island.getOwner().isOnline())
+                        finishTasks.forEach(Runnable::run);
 
-                loadedChunks = blockChangeTask.getLoadedChunks();
-                callback.run();
-                loadedChunks = null;
-            }, onFailure);
-        } catch (Throwable ex) {
-            if (onFailure != null)
-                onFailure.accept(ex);
-        }
+                    for (SchematicEntity entity : this.entities) {
+                        entity.spawnEntity(min);
+                    }
+
+                    island.handleBlocksPlace(cachedCounts);
+
+                    plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
+
+                    loadedChunks = new HashSet<>(affectedChunks);
+                    callback.run();
+                    loadedChunks = null;
+                }
+            } catch (Throwable error2) {
+                if (onFailure != null)
+                    onFailure.accept(error2);
+            }
+        });
     }
 
     @Override
@@ -143,7 +202,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public Set<ChunkPosition> getLoadedChunks() {
-        return loadedChunks;
+        return Collections.unmodifiableSet(loadedChunks);
     }
 
     private void readBlock(SchematicBlockData block) {
