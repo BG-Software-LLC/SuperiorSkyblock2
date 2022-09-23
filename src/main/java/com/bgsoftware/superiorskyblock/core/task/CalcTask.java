@@ -5,14 +5,15 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 public class CalcTask extends BukkitRunnable {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
-    private static int id = -1;
+    private static BukkitTask calcTask;
 
     private CalcTask() {
-        id = runTaskTimerAsynchronously(plugin, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval()).getTaskId();
+        calcTask = runTaskTimerAsynchronously(plugin, plugin.getSettings().getCalcInterval(), plugin.getSettings().getCalcInterval());
     }
 
     public static void startTask() {
@@ -22,8 +23,10 @@ public class CalcTask extends BukkitRunnable {
     }
 
     public static void cancelTask() {
-        if (id != -1)
-            Bukkit.getScheduler().cancelTask(id);
+        if (calcTask != null) {
+            calcTask.cancel();
+            calcTask = null;
+        }
     }
 
     @Override
