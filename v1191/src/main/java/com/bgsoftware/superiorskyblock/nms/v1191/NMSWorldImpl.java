@@ -17,7 +17,7 @@ import com.bgsoftware.superiorskyblock.nms.ICachedBlock;
 import com.bgsoftware.superiorskyblock.nms.NMSWorld;
 import com.bgsoftware.superiorskyblock.nms.algorithms.NMSCachedBlock;
 import com.bgsoftware.superiorskyblock.nms.v1191.generator.IslandsGeneratorImpl;
-import com.bgsoftware.superiorskyblock.nms.v1191.spawners.BaseSpawnerNotifier;
+import com.bgsoftware.superiorskyblock.nms.v1191.spawners.TickingSpawnerBlockEntityNotifier;
 import com.bgsoftware.superiorskyblock.nms.v1191.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.destroystokyo.paper.antixray.ChunkPacketBlockController;
@@ -37,6 +37,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -64,6 +65,8 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.IntFunction;
 
@@ -73,9 +76,8 @@ public class NMSWorldImpl implements NMSWorld {
     private static final ReflectField<Object> CHUNK_PACKET_BLOCK_CONTROLLER = new ReflectField<>(Level.class,
             Object.class, "chunkPacketBlockController")
             .removeFinal();
-    private static final ReflectField<BaseSpawner> BAES_SPAWNER = new ReflectField<BaseSpawner>(
-            SpawnerBlockEntity.class, BaseSpawner.class, Modifier.PRIVATE | Modifier.FINAL, 1)
-            .removeFinal();
+    private static final ReflectField<List<TickingBlockEntity>> LEVEL_BLOCK_ENTITY_TICKERS = new ReflectField<>(
+            Level.class, List.class, Modifier.PROTECTED | Modifier.FINAL, 1);
 
     private final SuperiorSkyblockPlugin plugin;
     private final Singleton<SignsListener> signsListener;
@@ -116,13 +118,21 @@ public class NMSWorldImpl implements NMSWorld {
         if (!(blockEntity instanceof SpawnerBlockEntity spawnerBlockEntity))
             return;
 
-        BaseSpawner baseSpawner = spawnerBlockEntity.getSpawner();
+        List<TickingBlockEntity> blockEntityTickers = LEVEL_BLOCK_ENTITY_TICKERS.get(serverLevel);
+        Iterator<TickingBlockEntity> blockEntityTickersIterator = blockEntityTickers.iterator();
+        List<TickingBlockEntity> tickersToAdd = new ArrayList<>();
 
-        if (!(baseSpawner instanceof BaseSpawnerNotifier)) {
-            BaseSpawnerNotifier baseSpawnerNotifier = new BaseSpawnerNotifier(baseSpawner, delayChangeCallback);
-            BAES_SPAWNER.set(spawnerBlockEntity, baseSpawnerNotifier);
-            baseSpawnerNotifier.updateDelay();
+        while (blockEntityTickersIterator.hasNext()) {
+            TickingBlockEntity tickingBlockEntity = blockEntityTickersIterator.next();
+            if (tickingBlockEntity.getPos().equals(blockPos) &&
+                    !(tickingBlockEntity instanceof TickingSpawnerBlockEntityNotifier)) {
+                blockEntityTickersIterator.remove();
+                tickersToAdd.add(new TickingSpawnerBlockEntityNotifier(spawnerBlockEntity, tickingBlockEntity, delayChangeCallback));
+            }
         }
+
+        if (!tickersToAdd.isEmpty())
+            blockEntityTickers.addAll(tickersToAdd);
     }
 
     @Override
