@@ -608,6 +608,12 @@ public interface SettingsManager {
         String getType();
 
         /**
+         * Whether the datastore folder should be back-up on startup.
+         * Config-path: database.backup
+         */
+        boolean isBackup();
+
+        /**
          * The address used to connect to the database.
          * Used for MySQL only.
          * Config-path: database.address

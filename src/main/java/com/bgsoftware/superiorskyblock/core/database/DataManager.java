@@ -11,6 +11,7 @@ import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
+import com.bgsoftware.superiorskyblock.core.database.loader.backup.BackupDatabase;
 import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
@@ -95,7 +96,8 @@ public class DataManager extends Manager {
     private void loadDatabaseLoaders() {
         addDatabaseLoader(new CopyOldDatabase());
         addDatabaseLoader(new DatabaseLoader_V1());
-        addDatabaseLoader(new SQLDatabaseLoader());
+        addDatabaseLoader(new BackupDatabase(plugin));
+        addDatabaseLoader(new SQLDatabaseLoader(plugin));
     }
 
     private void loadPlayers() {

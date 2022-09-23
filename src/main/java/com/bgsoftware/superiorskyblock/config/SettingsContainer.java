@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
 public class SettingsContainer {
 
     public final String databaseType;
+    public final boolean databaseBackup;
     public final String databaseMySQLAddress;
     public final int databaseMySQLPort;
     public final String databaseMySQLDBName;
@@ -210,6 +211,7 @@ public class SettingsContainer {
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
+        databaseBackup = config.getBoolean("database.backup");
         databaseMySQLAddress = config.getString("database.address");
         databaseMySQLPort = config.getInt("database.port");
         databaseMySQLDBName = config.getString("database.db-name");

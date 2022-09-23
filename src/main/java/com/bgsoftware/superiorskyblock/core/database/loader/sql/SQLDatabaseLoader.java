@@ -12,7 +12,11 @@ import java.sql.ResultSet;
 
 public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
 
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
+    private final SuperiorSkyblockPlugin plugin;
+
+    public SQLDatabaseLoader(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void setState(State state) throws ManagerLoadException {

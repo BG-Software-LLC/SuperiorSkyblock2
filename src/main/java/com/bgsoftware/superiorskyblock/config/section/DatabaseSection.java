@@ -17,6 +17,11 @@ public class DatabaseSection implements SettingsManager.Database {
     }
 
     @Override
+    public boolean isBackup() {
+        return this.container.databaseBackup;
+    }
+
+    @Override
     public String getAddress() {
         return this.container.databaseMySQLAddress;
     }
