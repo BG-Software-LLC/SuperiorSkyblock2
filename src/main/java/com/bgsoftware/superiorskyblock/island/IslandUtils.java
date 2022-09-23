@@ -257,7 +257,9 @@ public class IslandUtils {
     }
 
     public static void handleBanPlayer(SuperiorPlayer caller, Island island, SuperiorPlayer target) {
-        plugin.getEventsBus().callIslandBanEvent(caller, target, island);
+        boolean isCancelled = plugin.getEventsBus().callIslandBanEvent(caller, target, island);
+        if (isCancelled)
+            return;
 
         island.banMember(target, caller);
 

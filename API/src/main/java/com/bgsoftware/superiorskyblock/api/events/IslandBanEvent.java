@@ -2,14 +2,17 @@ package com.bgsoftware.superiorskyblock.api.events;
 
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import org.bukkit.event.Cancellable;
 
 /**
  * IslandBanEvent is called when a player is banned from his island.
  */
-public class IslandBanEvent extends IslandEvent {
+public class IslandBanEvent extends IslandEvent implements Cancellable {
 
     private final SuperiorPlayer superiorPlayer;
     private final SuperiorPlayer targetPlayer;
+
+    private boolean cancelled;
 
     /**
      * The constructor of the event.
@@ -38,4 +41,13 @@ public class IslandBanEvent extends IslandEvent {
         return targetPlayer;
     }
 
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
 }
