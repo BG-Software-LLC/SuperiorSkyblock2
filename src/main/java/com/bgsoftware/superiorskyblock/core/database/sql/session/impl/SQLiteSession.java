@@ -37,12 +37,6 @@ public class SQLiteSession implements SQLSession {
         this.logging = logging;
     }
 
-    private void moveOldDatabaseFile(File newDataFile) {
-        File oldDataFile = new File(plugin.getDataFolder(), "database.db");
-        if (oldDataFile.exists())
-            oldDataFile.renameTo(newDataFile);
-    }
-
     @Override
     public boolean createConnection() {
         log("Trying to connect to local database (SQLite)...");
@@ -51,7 +45,6 @@ public class SQLiteSession implements SQLSession {
 
         if (!file.exists()) {
             file.getParentFile().mkdirs();
-            moveOldDatabaseFile(file);
             try {
                 if (!file.createNewFile()) {
                     log("&cFailed to create database file.");

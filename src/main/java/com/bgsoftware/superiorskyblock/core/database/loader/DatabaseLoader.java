@@ -1,9 +1,19 @@
 package com.bgsoftware.superiorskyblock.core.database.loader;
 
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+
 public interface DatabaseLoader {
 
-    void loadData();
+    void setState(State state) throws ManagerLoadException;
 
-    void saveData();
+    enum State {
+
+        INITIALIZE,
+        POST_INITIALIZE,
+        PRE_LOAD_DATA,
+        POST_LOAD_DATA,
+        SHUTDOWN
+
+    }
 
 }

@@ -9,8 +9,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.database.DataManager;
-import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
+import com.bgsoftware.superiorskyblock.core.database.loader.MachineStateDatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.BankTransactionsAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.GridAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandAttributes;
@@ -30,6 +29,7 @@ import com.bgsoftware.superiorskyblock.core.database.sql.StatementHolder;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSession;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
@@ -45,7 +45,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
-public class DatabaseLoader_V1 implements DatabaseLoader {
+public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
@@ -65,13 +65,19 @@ public class DatabaseLoader_V1 implements DatabaseLoader {
     );
     private GridAttributes gridAttributes;
 
-    public static void register(DataManager dataHandler) {
-        if (isDatabaseOldFormat())
-            dataHandler.addDatabaseLoader(new DatabaseLoader_V1());
+    private boolean isOldDatabaseFormat;
+
+    @Override
+    public void setState(State state) throws ManagerLoadException {
+        if (state == State.INITIALIZE)
+            isOldDatabaseFormat = isDatabaseOldFormat();
+
+        if (isOldDatabaseFormat)
+            super.setState(state);
     }
 
     @Override
-    public void loadData() {
+    protected void handleInitialize() {
         SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
 
         session.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
@@ -174,12 +180,27 @@ public class DatabaseLoader_V1 implements DatabaseLoader {
     }
 
     @Override
-    public void saveData() {
+    protected void handlePostInitialize() {
         savePlayers();
         saveIslands();
         saveStackedBlocks();
         saveBankTransactions();
         saveGrid();
+    }
+
+    @Override
+    protected void handlePreLoadData() {
+        // Do nothing.
+    }
+
+    @Override
+    protected void handlePostLoadData() {
+        // Do nothing.
+    }
+
+    @Override
+    protected void handleShutdown() {
+        // Do nothing.
     }
 
     private static boolean isDatabaseOldFormat() {

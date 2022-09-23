@@ -11,18 +11,17 @@ import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
+import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeserializer;
-import com.bgsoftware.superiorskyblock.core.database.sql.SQLDatabaseInitializer;
-import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
-import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,38 +39,17 @@ public class DataManager extends Manager {
     public void loadData() throws ManagerLoadException {
         loadDatabaseLoaders();
 
-        for (DatabaseLoader databaseLoader : databaseLoaders) {
-            try {
-                databaseLoader.loadData();
-            } catch (Exception error) {
-                throw new ManagerLoadException(error, "&cUnexpected error occurred while converting data:", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-            }
-        }
+        runState(DatabaseLoader.State.INITIALIZE);
 
-        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
-            SQLDatabaseInitializer.getInstance().init(plugin);
-        }
+        runState(DatabaseLoader.State.POST_INITIALIZE);
 
-        for (DatabaseLoader databaseLoader : databaseLoaders) {
-            try {
-                databaseLoader.saveData();
-            } catch (Exception error) {
-                throw new ManagerLoadException(error, "&cUnexpected error occurred while saving data:", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-            }
-        }
-
-        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
-            SQLDatabaseInitializer.getInstance().createIndexes();
-            SQLHelper.setJournalMode("MEMORY", QueryResult.EMPTY_QUERY_RESULT);
-        }
+        runState(DatabaseLoader.State.PRE_LOAD_DATA);
 
         loadPlayers();
         loadIslands();
         loadGrid();
 
-        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
-            SQLHelper.setJournalMode("DELETE", QueryResult.EMPTY_QUERY_RESULT);
-        }
+        runState(DatabaseLoader.State.POST_LOAD_DATA);
 
         /*
          *  Because of a bug caused leaders to be guests, I am looping through all the players and trying to fix it here.
@@ -106,13 +84,18 @@ public class DataManager extends Manager {
     }
 
     public void closeConnection() {
-        if (!plugin.getFactory().hasCustomDatabaseBridge()) {
-            SQLDatabaseInitializer.getInstance().close();
+        for (DatabaseLoader databaseLoader : databaseLoaders) {
+            try {
+                databaseLoader.setState(DatabaseLoader.State.SHUTDOWN);
+            } catch (Throwable ignored) {
+            }
         }
     }
 
     private void loadDatabaseLoaders() {
-        DatabaseLoader_V1.register(this);
+        addDatabaseLoader(new CopyOldDatabase());
+        addDatabaseLoader(new DatabaseLoader_V1());
+        addDatabaseLoader(new SQLDatabaseLoader());
     }
 
     private void loadPlayers() {
@@ -191,6 +174,29 @@ public class DataManager extends Manager {
                 resultSet -> plugin.getGrid().loadGrid(new DatabaseResult(resultSet)));
 
         SuperiorSkyblockPlugin.log("Finished grid!");
+    }
+
+    private void runState(DatabaseLoader.State state) throws ManagerLoadException {
+        for (DatabaseLoader databaseLoader : databaseLoaders) {
+            databaseLoader.setState(state);
+        }
+    }
+
+    private class CopyOldDatabase implements DatabaseLoader {
+
+        @Override
+        public void setState(State state) throws ManagerLoadException {
+            if (state == State.INITIALIZE) {
+                File oldDataFile = new File(plugin.getDataFolder(), "database.db");
+                if (oldDataFile.exists()) {
+                    File newDataFile = new File(plugin.getDataFolder(), "datastore/database.db");
+                    newDataFile.getParentFile().mkdirs();
+                    if (!oldDataFile.renameTo(newDataFile))
+                        throw new ManagerLoadException("Failed to move old database file", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+                }
+            }
+
+        }
     }
 
 }

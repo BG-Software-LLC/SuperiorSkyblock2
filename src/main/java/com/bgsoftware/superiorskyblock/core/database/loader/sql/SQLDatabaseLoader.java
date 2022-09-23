@@ -1,26 +1,26 @@
-package com.bgsoftware.superiorskyblock.core.database.sql;
+package com.bgsoftware.superiorskyblock.core.database.loader.sql;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.database.loader.MachineStateDatabaseLoader;
+import com.bgsoftware.superiorskyblock.core.database.sql.SQLHelper;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 
 import java.sql.ResultSet;
 
-public class SQLDatabaseInitializer {
+public class SQLDatabaseLoader extends MachineStateDatabaseLoader {
 
-    private static final SQLDatabaseInitializer instance = new SQLDatabaseInitializer();
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private SQLDatabaseInitializer() {
-
+    @Override
+    public void setState(State state) throws ManagerLoadException {
+        if (!plugin.getFactory().hasCustomDatabaseBridge())
+            super.setState(state);
     }
 
-    public static SQLDatabaseInitializer getInstance() {
-        return instance;
-    }
-
-    public void init(SuperiorSkyblockPlugin plugin) throws ManagerLoadException {
+    protected void handleInitialize() throws ManagerLoadException {
         if (!SQLHelper.createConnection(plugin)) {
             throw new ManagerLoadException("Couldn't connect to the database.\nMake sure all information is correct.",
                     ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
@@ -36,7 +36,8 @@ public class SQLDatabaseInitializer {
                 .onFail(error -> GridDatabaseBridge.insertGrid(plugin.getGrid())));
     }
 
-    public void createIndexes() {
+    @Override
+    protected void handlePostInitialize() {
         SQLHelper.createIndex("islands_bans_index", "islands_bans",
                 "island", "player");
 
@@ -98,7 +99,18 @@ public class SQLDatabaseInitializer {
                 "player", "name");
     }
 
-    public void close() {
+    @Override
+    protected void handlePreLoadData() {
+        SQLHelper.setJournalMode("MEMORY", QueryResult.EMPTY_QUERY_RESULT);
+    }
+
+    @Override
+    protected void handlePostLoadData() {
+        SQLHelper.setJournalMode("DELETE", QueryResult.EMPTY_QUERY_RESULT);
+    }
+
+    @Override
+    protected void handleShutdown() {
         SQLHelper.close();
     }
 
