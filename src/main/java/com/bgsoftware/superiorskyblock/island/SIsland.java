@@ -3510,7 +3510,7 @@ public class SIsland implements Island {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Island && this.uuid.equals(((Island) obj).getUniqueId());
+        return obj instanceof Island && (this == obj || this.uuid.equals(((Island) obj).getUniqueId()));
     }
 
     @Override
