@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.world.chunk;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
-import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.google.gson.Gson;
@@ -21,14 +21,16 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunksTracker {
 
-    private static final Map<Island, Set<ChunkPosition>> dirtyChunks = new ConcurrentHashMap<>();
+    private static final Map<UUID, Set<ChunkPosition>> dirtyChunks = new ConcurrentHashMap<>();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Gson gson = new GsonBuilder().create();
 
@@ -65,19 +67,17 @@ public class ChunksTracker {
     }
 
     public static boolean isMarkedDirty(Island island, World world, int x, int z) {
-        return dirtyChunks.containsKey(island) && dirtyChunks.get(island).contains(ChunkPosition.of(world, x, z));
+        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.get(island.getUniqueId());
+        return islandDirtyChunks != null && islandDirtyChunks.contains(ChunkPosition.of(world, x, z));
     }
 
     public static void removeIsland(Island island) {
-        if (dirtyChunks.containsKey(island)) {
-            dirtyChunks.get(island).clear();
-            dirtyChunks.remove(island);
-        }
+        dirtyChunks.remove(island.getUniqueId());
     }
 
     public static String serialize(Island island) {
-        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.getOrDefault(island, new HashSet<>());
-        return IslandsSerializer.serializeDirtyChunks(dirtyChunks);
+        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.getOrDefault(island.getUniqueId(), Collections.emptySet());
+        return IslandsSerializer.serializeDirtyChunks(islandDirtyChunks);
     }
 
     public static void deserialize(GridManagerImpl grid, Island island, @Nullable String serialized) {
@@ -157,20 +157,20 @@ public class ChunksTracker {
         if (island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.get(island);
+        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.get(island.getUniqueId());
 
-        if (dirtyChunks != null && dirtyChunks.remove(chunkPosition) && save)
-            IslandsDatabaseBridge.saveDirtyChunks(island, dirtyChunks);
+        if (islandDirtyChunks != null && islandDirtyChunks.remove(chunkPosition) && save)
+            IslandsDatabaseBridge.saveDirtyChunks(island, islandDirtyChunks);
     }
 
     public static void markDirty(Island island, ChunkPosition chunkPosition, boolean save) {
         if (island == null)
             island = getIsland(plugin.getGrid(), chunkPosition);
 
-        Set<ChunkPosition> dirtyChunks = ChunksTracker.dirtyChunks.computeIfAbsent(island, s -> new HashSet<>());
+        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.computeIfAbsent(island.getUniqueId(), s -> new HashSet<>());
 
-        if (dirtyChunks.add(chunkPosition) && save && !island.isSpawn())
-            IslandsDatabaseBridge.saveDirtyChunks(island, dirtyChunks);
+        if (islandDirtyChunks.add(chunkPosition) && save && !island.isSpawn())
+            IslandsDatabaseBridge.saveDirtyChunks(island, islandDirtyChunks);
     }
 
 }

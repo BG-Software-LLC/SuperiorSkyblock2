@@ -66,7 +66,6 @@ import com.bgsoftware.superiorskyblock.island.warp.SWarpCategory;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeCropGrowth;
-import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeEntityLimits;
 import com.bgsoftware.superiorskyblock.module.upgrades.type.UpgradeTypeIslandEffects;
 import com.bgsoftware.superiorskyblock.world.WorldBlocks;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -3506,12 +3505,12 @@ public class SIsland implements Island {
 
     @Override
     public int hashCode() {
-        return owner.hashCode();
+        return this.uuid.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Island && owner.equals(((Island) obj).getOwner());
+        return obj instanceof Island && this.uuid.equals(((Island) obj).getUniqueId());
     }
 
     @Override
