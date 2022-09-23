@@ -139,6 +139,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     private final BukkitListeners bukkitListeners = new BukkitListeners(this);
 
+    private String nmsPackageVersion;
     private NMSAlgorithms nmsAlgorithms;
     private NMSChunks nmsChunks;
     private NMSDragonFight nmsDragonFight;
@@ -389,10 +390,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     @SuppressWarnings("deprecation")
     private boolean loadNMSAdapter() {
-        String version = null;
-
         if (ServerVersion.isLessThan(ServerVersion.v1_17)) {
-            version = getServer().getClass().getPackage().getName().split("\\.")[3];
+            nmsPackageVersion = getServer().getClass().getPackage().getName().split("\\.")[3];
         } else {
             ReflectMethod<Integer> getDataVersion = new ReflectMethod<>(UnsafeValues.class, "getDataVersion");
             int dataVersion = getDataVersion.invoke(Bukkit.getUnsafe());
@@ -409,27 +408,25 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             for (Pair<Integer, String> versionData : versions) {
                 if (dataVersion <= versionData.getKey()) {
-                    version = versionData.getValue();
+                    nmsPackageVersion = versionData.getValue();
                     break;
                 }
             }
 
-            if (version == null) {
+            if (nmsPackageVersion == null) {
                 log("Data version: " + dataVersion);
             }
         }
 
-        if (version != null) {
+        if (nmsPackageVersion != null) {
             try {
-                nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", version);
-                nmsChunks = loadNMSClass("NMSChunksImpl", version);
-                nmsEntities = loadNMSClass("NMSEntitiesImpl", version);
-                nmsHolograms = loadNMSClass("NMSHologramsImpl", version);
-                nmsPlayers = loadNMSClass("NMSPlayersImpl", version);
-                nmsTags = loadNMSClass("NMSTagsImpl", version);
-                nmsWorld = loadNMSClass("NMSWorldImpl", version);
-                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ?
-                        loadNMSClass("NMSDragonFightImpl", version) : new NMSDragonFightImpl();
+                nmsAlgorithms = loadNMSClass("NMSAlgorithmsImpl", nmsPackageVersion);
+                nmsChunks = loadNMSClass("NMSChunksImpl", nmsPackageVersion);
+                nmsEntities = loadNMSClass("NMSEntitiesImpl", nmsPackageVersion);
+                nmsHolograms = loadNMSClass("NMSHologramsImpl", nmsPackageVersion);
+                nmsPlayers = loadNMSClass("NMSPlayersImpl", nmsPackageVersion);
+                nmsTags = loadNMSClass("NMSTagsImpl", nmsPackageVersion);
+                nmsWorld = loadNMSClass("NMSWorldImpl", nmsPackageVersion);
                 return true;
             } catch (Exception error) {
                 error.printStackTrace();
@@ -708,6 +705,15 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     }
 
     public NMSDragonFight getNMSDragonFight() {
+        if (nmsDragonFight == null) {
+            try {
+                nmsDragonFight = settingsHandler.getWorlds().getEnd().isDragonFight() ?
+                        loadNMSClass("NMSDragonFightImpl", nmsPackageVersion) : new NMSDragonFightImpl();
+            } catch (Exception error) {
+                nmsDragonFight = new NMSDragonFightImpl();
+            }
+        }
+
         return nmsDragonFight;
     }
 
