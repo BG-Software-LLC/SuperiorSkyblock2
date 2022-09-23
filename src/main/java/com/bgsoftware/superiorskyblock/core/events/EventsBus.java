@@ -68,10 +68,7 @@ public class EventsBus {
     }
 
     public boolean callIslandBanEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
-        if (!plugin.getSettings().getDisabledEvents().contains("islandbanevent")) {
-            return callEvent(() -> new IslandBanEvent(superiorPlayer, targetPlayer, island), "islandbanevent");
-        }
-        return true;
+        return callEvent(() -> new IslandBanEvent(superiorPlayer, targetPlayer, island), "islandbanevent");
     }
 
     public EventResult<String> callIslandBankDepositEvent(SuperiorPlayer superiorPlayer, Island island, BigDecimal amount) {
