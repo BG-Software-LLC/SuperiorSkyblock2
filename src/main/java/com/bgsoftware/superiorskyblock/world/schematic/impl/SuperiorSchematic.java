@@ -202,7 +202,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
     @Override
     public Set<ChunkPosition> getLoadedChunks() {
-        return Collections.unmodifiableSet(loadedChunks);
+        return loadedChunks == null ? Collections.emptySet() : Collections.unmodifiableSet(loadedChunks);
     }
 
     private void readBlock(SchematicBlockData block) {
