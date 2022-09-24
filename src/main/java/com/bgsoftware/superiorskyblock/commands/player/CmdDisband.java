@@ -77,7 +77,7 @@ public class CmdDisband implements IPermissibleCommand {
 
             Message.DISBANDED_ISLAND.send(superiorPlayer);
 
-            if (BuiltinModules.BANK.disbandRefund > 0 && island.getOwner().isOnline()) {
+            if (BuiltinModules.BANK.disbandRefund > 0) {
                 Message.DISBAND_ISLAND_BALANCE_REFUND.send(island.getOwner(), Formatters.NUMBER_FORMATTER.format(
                         island.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }

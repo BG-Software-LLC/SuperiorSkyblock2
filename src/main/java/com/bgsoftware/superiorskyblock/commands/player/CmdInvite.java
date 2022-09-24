@@ -5,13 +5,12 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
+import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -80,16 +79,13 @@ public class CmdInvite implements IPermissibleCommand {
             return;
         }
 
-        boolean isTargetOnline = targetPlayer.isOnline();
-
         java.util.Locale locale = superiorPlayer.getUserLocale();
         IMessageComponent messageComponent;
 
         if (island.isInvited(targetPlayer)) {
             island.revokeInvite(targetPlayer);
             messageComponent = Message.REVOKE_INVITE_ANNOUNCEMENT.getComponent(locale);
-            if (isTargetOnline)
-                Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
+            Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         } else {
             if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
                 Message.INVITE_TO_FULL_ISLAND.send(superiorPlayer);
@@ -102,8 +98,7 @@ public class CmdInvite implements IPermissibleCommand {
             island.inviteMember(targetPlayer);
             messageComponent = Message.INVITE_ANNOUNCEMENT.getComponent(locale);
 
-            if (isTargetOnline)
-                Message.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
+            Message.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
         }
 
         if (messageComponent != null)

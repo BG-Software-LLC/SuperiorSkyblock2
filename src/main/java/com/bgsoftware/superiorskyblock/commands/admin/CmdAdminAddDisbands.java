@@ -71,11 +71,7 @@ public class CmdAdminAddDisbands implements IAdminPlayerCommand {
         } else if (!sender.equals(targetPlayers.get(0).asPlayer()))
             Message.DISBAND_GIVE_OTHER.send(sender, targetPlayers.get(0).getName(), amount);
 
-        targetPlayers.forEach(superiorPlayer -> {
-            if (superiorPlayer.isOnline()) {
-                Message.DISBAND_GIVE.send(superiorPlayer, amount);
-            }
-        });
+        targetPlayers.forEach(superiorPlayer -> Message.DISBAND_GIVE.send(superiorPlayer, amount));
     }
 
 }

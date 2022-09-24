@@ -203,7 +203,7 @@ public class IslandUtils {
 
     public static void sendMessage(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
         island.getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()))
                 .forEach(superiorPlayer -> message.send(superiorPlayer, args));
     }
 

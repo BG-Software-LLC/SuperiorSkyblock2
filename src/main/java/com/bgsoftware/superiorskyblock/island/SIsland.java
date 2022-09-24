@@ -1615,7 +1615,7 @@ public class SIsland implements Island {
         PluginDebugger.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Message: " + message);
 
         getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
+                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()))
                 .forEach(superiorPlayer -> Message.CUSTOM.send(superiorPlayer, message, false));
     }
 

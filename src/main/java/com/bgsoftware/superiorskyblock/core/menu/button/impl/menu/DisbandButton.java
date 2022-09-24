@@ -38,7 +38,7 @@ public class DisbandButton extends SuperiorMenuButton<MenuConfirmDisband> {
 
             Message.DISBANDED_ISLAND.send(clickedPlayer);
 
-            if (BuiltinModules.BANK.disbandRefund > 0 && targetIsland.getOwner().isOnline()) {
+            if (BuiltinModules.BANK.disbandRefund > 0) {
                 Message.DISBAND_ISLAND_BALANCE_REFUND.send(targetIsland.getOwner(), Formatters.NUMBER_FORMATTER.format(
                         targetIsland.getIslandBank().getBalance().multiply(BigDecimal.valueOf(BuiltinModules.BANK.disbandRefund))));
             }
