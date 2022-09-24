@@ -21,6 +21,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import javax.annotation.Nullable;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ChunksTracker {
 
-    private static final Map<UUID, Set<ChunkPosition>> dirtyChunks = new ConcurrentHashMap<>();
+    private static final Map<UUID, BitSet[]> dirtyChunks = new ConcurrentHashMap<>();
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static final Gson gson = new GsonBuilder().create();
 
@@ -66,18 +67,62 @@ public class ChunksTracker {
         markDirty(island, ChunkPosition.of(chunk.getWorld(), chunk.getX(), chunk.getZ()), save);
     }
 
-    public static boolean isMarkedDirty(Island island, World world, int x, int z) {
-        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.get(island.getUniqueId());
-        return islandDirtyChunks != null && islandDirtyChunks.contains(ChunkPosition.of(world, x, z));
-    }
-
     public static void removeIsland(Island island) {
         dirtyChunks.remove(island.getUniqueId());
     }
 
+    public static boolean isMarkedDirty(Island island, World world, int x, int z) {
+        BitSet[] dirtyChunksWorldBitsets = dirtyChunks.get(island.getUniqueId());
+
+        if (dirtyChunksWorldBitsets == null || world.getEnvironment().ordinal() >= dirtyChunksWorldBitsets.length)
+            return false;
+
+        int chunkIndex = getChunkIndex(island, x, z);
+        BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[world.getEnvironment().ordinal()];
+
+        return !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
+    }
+
+    public static void markEmpty(@Nullable Island islandParam, ChunkPosition chunkPosition, boolean save) {
+        Island island = islandParam == null ? getIsland(plugin.getGrid(), chunkPosition) : islandParam;
+
+        BitSet[] dirtyChunksWorldBitsets = dirtyChunks.get(island.getUniqueId());
+
+        if (dirtyChunksWorldBitsets == null)
+            return;
+
+        int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
+        BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[chunkPosition.getWorld().getEnvironment().ordinal()];
+
+        boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
+
+        if (isMarkedDirty) {
+            dirtyChunksBitset.clear(chunkIndex);
+            if (save && !island.isSpawn())
+                IslandsDatabaseBridge.saveDirtyChunks(island, convertIntoChunkPositions(island, dirtyChunksWorldBitsets));
+        }
+    }
+
+    public static void markDirty(@Nullable Island islandParam, ChunkPosition chunkPosition, boolean save) {
+        Island island = islandParam == null ? getIsland(plugin.getGrid(), chunkPosition) : islandParam;
+
+        BitSet[] dirtyChunksWorldBitsets = dirtyChunks.computeIfAbsent(island.getUniqueId(), u -> createBitsets(island));
+
+        int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
+        BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[chunkPosition.getWorld().getEnvironment().ordinal()];
+
+        boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
+
+        if (!isMarkedDirty) {
+            dirtyChunksBitset.set(chunkIndex);
+            if (save && !island.isSpawn())
+                IslandsDatabaseBridge.saveDirtyChunks(island, convertIntoChunkPositions(island, dirtyChunksWorldBitsets));
+        }
+    }
+
     public static String serialize(Island island) {
-        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.getOrDefault(island.getUniqueId(), Collections.emptySet());
-        return IslandsSerializer.serializeDirtyChunks(islandDirtyChunks);
+        BitSet[] dirtyChunksWorldBitsets = dirtyChunks.get(island.getUniqueId());
+        return IslandsSerializer.serializeDirtyChunks(convertIntoChunkPositions(island, dirtyChunksWorldBitsets));
     }
 
     public static void deserialize(GridManagerImpl grid, Island island, @Nullable String serialized) {
@@ -153,24 +198,69 @@ public class ChunksTracker {
         return grid.getIslandAt(new Location(chunkPosition.getWorld(), chunkPosition.getX() << 4, 100, chunkPosition.getZ() << 4));
     }
 
-    public static void markEmpty(Island island, ChunkPosition chunkPosition, boolean save) {
-        if (island == null)
-            island = getIsland(plugin.getGrid(), chunkPosition);
+    private static int getChunkIndex(Island island, int x, int z) {
+        Location minimum = island.getMinimum();
+        Location maximum = island.getMaximum();
+        int minChunkX = minimum.getBlockX() >> 4;
+        int minChunkZ = minimum.getBlockZ() >> 4;
+        int maxChunkX = maximum.getBlockX() >> 4;
 
-        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.get(island.getUniqueId());
+        int deltaX = x - minChunkX;
+        int deltaZ = z - minChunkZ;
+        int chunksInXAxis = maxChunkX - minChunkX;
 
-        if (islandDirtyChunks != null && islandDirtyChunks.remove(chunkPosition) && save)
-            IslandsDatabaseBridge.saveDirtyChunks(island, islandDirtyChunks);
+        return deltaX * chunksInXAxis + deltaZ;
     }
 
-    public static void markDirty(Island island, ChunkPosition chunkPosition, boolean save) {
-        if (island == null)
-            island = getIsland(plugin.getGrid(), chunkPosition);
+    private static BitSet[] createBitsets(Island island) {
+        BitSet[] bitSets = new BitSet[World.Environment.values().length];
 
-        Set<ChunkPosition> islandDirtyChunks = dirtyChunks.computeIfAbsent(island.getUniqueId(), s -> new HashSet<>());
+        Location minimum = island.getMinimum();
+        Location maximum = island.getMaximum();
+        int minChunkX = minimum.getBlockX() >> 4;
+        int minChunkZ = minimum.getBlockZ() >> 4;
+        int maxChunkX = maximum.getBlockX() >> 4;
+        int maxChunkZ = maximum.getBlockZ() >> 4;
 
-        if (islandDirtyChunks.add(chunkPosition) && save && !island.isSpawn())
-            IslandsDatabaseBridge.saveDirtyChunks(island, islandDirtyChunks);
+        int chunksInXAxis = maxChunkX - minChunkX;
+        int chunksInZAxis = maxChunkZ - minChunkZ;
+        int totalChunksCount = chunksInXAxis * chunksInZAxis;
+
+        for (int i = 0; i < bitSets.length; ++i)
+            bitSets[i] = new BitSet(totalChunksCount);
+
+        return bitSets;
+    }
+
+    private static Set<ChunkPosition> convertIntoChunkPositions(Island island, BitSet[] bitSets) {
+        if (bitSets == null)
+            return Collections.emptySet();
+
+        Location minimum = island.getMinimum();
+        Location maximum = island.getMaximum();
+        int minChunkX = minimum.getBlockX() >> 4;
+        int minChunkZ = minimum.getBlockZ() >> 4;
+        int maxChunkX = maximum.getBlockX() >> 4;
+
+        int chunksInXAxis = maxChunkX - minChunkX;
+
+        Set<ChunkPosition> chunkPositions = new HashSet<>();
+
+        for (int i = 0; i < bitSets.length; ++i) {
+            BitSet bitset = bitSets[i];
+            if (!bitset.isEmpty() && i < World.Environment.values().length) {
+                World world = plugin.getGrid().getIslandsWorld(island, World.Environment.values()[i]);
+                if (world != null) {
+                    for (int j = bitset.nextSetBit(0); j >= 0; j = bitset.nextSetBit(j + 1)) {
+                        int deltaX = j / chunksInXAxis;
+                        int deltaZ = j % chunksInXAxis;
+                        chunkPositions.add(ChunkPosition.of(world, deltaX + minChunkX, deltaZ + minChunkZ));
+                    }
+                }
+            }
+        }
+
+        return chunkPositions;
     }
 
 }
