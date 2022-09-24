@@ -217,6 +217,21 @@ public class SuperiorNPCPlayer implements SuperiorPlayer {
     }
 
     @Override
+    public void addInvite(Island island) {
+        // Do nothing.
+    }
+
+    @Override
+    public void removeInvite(Island island) {
+        // Do nothing.
+    }
+
+    @Override
+    public List<Island> getInvites() {
+        return Collections.emptyList();
+    }
+
+    @Override
     public PlayerRole getPlayerRole() {
         return SPlayerRole.guestRole();
     }

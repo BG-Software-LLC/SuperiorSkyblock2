@@ -429,8 +429,8 @@ public class SIsland implements Island {
     public void inviteMember(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Invite, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
-
         invitedPlayers.add(superiorPlayer);
+        superiorPlayer.addInvite(this);
         //Revoke the invite after 5 minutes
         BukkitExecutor.sync(() -> revokeInvite(superiorPlayer), 6000L);
     }
@@ -439,8 +439,8 @@ public class SIsland implements Island {
     public void revokeInvite(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         PluginDebugger.debug("Action: Invite Revoke, Island: " + owner.getName() + ", Target: " + superiorPlayer.getName());
-
         invitedPlayers.remove(superiorPlayer);
+        superiorPlayer.removeInvite(this);
     }
 
     @Override
@@ -1270,6 +1270,8 @@ public class SIsland implements Island {
                 return missionData != null && missionData.isDisbandReset();
             }).forEach(superiorPlayer::resetMission);
         });
+
+        invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
 
         if (BuiltinModules.BANK.disbandRefund > 0)
             plugin.getProviders().depositMoney(getOwner(), islandBank.getBalance()

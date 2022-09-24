@@ -38,6 +38,7 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +57,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     private PersistentDataContainer persistentDataContainer; // Lazy loading
 
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
+    private final List<UUID> pendingInvites = new LinkedList<>();
+
     private final UUID uuid;
 
     private Island playerIsland = null;
@@ -431,6 +434,22 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public boolean hasIsland() {
         return getIsland() != null;
+    }
+
+    @Override
+    public void addInvite(Island island) {
+        this.pendingInvites.add(island.getUniqueId());
+    }
+
+    @Override
+    public void removeInvite(Island island) {
+        this.pendingInvites.remove(island.getUniqueId());
+    }
+
+    @Override
+    public List<Island> getInvites() {
+        return new SequentialListBuilder<UUID>()
+                .map(this.pendingInvites, uuid -> plugin.getGrid().getIslandByUUID(uuid));
     }
 
     @Override

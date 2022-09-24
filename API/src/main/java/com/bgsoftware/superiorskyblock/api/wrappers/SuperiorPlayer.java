@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -267,6 +268,31 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Check if this player is a member of an island.
      */
     boolean hasIsland();
+
+    /**
+     * Add an invitation to an island for the player.
+     * Do not call use this method directly unless you know what you're doing.
+     * Instead, use {@link Island#inviteMember(SuperiorPlayer)}
+     *
+     * @param island The island that invited the player.
+     */
+    void addInvite(Island island);
+
+    /**
+     * Remove an invitation from an island for the player.
+     * Do not call use this method directly unless you know what you're doing.
+     * Instead, use {@link Island#revokeInvite(SuperiorPlayer)} (SuperiorPlayer)}
+     *
+     * @param island The island to remove the invitation from.
+     */
+    void removeInvite(Island island);
+
+    /**
+     * Get all pending invites of the player.
+     *
+     * @return Pending invites, in the same order they were sent.
+     */
+    List<Island> getInvites();
 
     /**
      * Get the role of the player.
