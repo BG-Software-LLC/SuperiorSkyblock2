@@ -619,7 +619,7 @@ public class EventsBus {
     }
 
     public boolean callPlayerToggleSpyEvent(SuperiorPlayer superiorPlayer) {
-        return callEvent(() -> new PlayerTogglePanelEvent(superiorPlayer), "playertogglespyevent");
+        return callEvent(() -> new PlayerToggleSpyEvent(superiorPlayer), "playertogglespyevent");
     }
 
     public boolean callPlayerToggleTeamChatEvent(SuperiorPlayer superiorPlayer) {
