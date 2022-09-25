@@ -129,11 +129,11 @@ public class SIsland implements Island {
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static int blocksUpdateCounter = 0;
 
-    private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-    private final IslandBank islandBank = plugin.getFactory().createIslandBank(this, this::hasGiveInterestFailed);
-    private final IslandCalculationAlgorithm calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
-    private final IslandBlocksTrackerAlgorithm blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
-    private final IslandEntitiesTrackerAlgorithm entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
+    private final DatabaseBridge databaseBridge;
+    private final IslandBank islandBank;
+    private final IslandCalculationAlgorithm calculationAlgorithm;
+    private final IslandBlocksTrackerAlgorithm blocksTracker;
+    private final IslandEntitiesTrackerAlgorithm entitiesTracker;
     private final Synchronized<BukkitTask> bankInterestTask = Synchronized.of(null);
     @Nullable
     private PersistentDataContainer persistentDataContainer;
@@ -252,6 +252,12 @@ public class SIsland implements Island {
         this.islandName = islandName;
         this.islandRawName = Formatters.STRIP_COLOR_FORMATTER.format(islandName);
         this.schemName = schemName;
+
+        this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+        this.islandBank = plugin.getFactory().createIslandBank(this, this::hasGiveInterestFailed);
+        this.calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
+        this.blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
+        this.entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
     }
 
     public static Optional<Island> fromDatabase(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {

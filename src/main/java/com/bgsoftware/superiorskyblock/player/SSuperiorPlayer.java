@@ -51,8 +51,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
-    private final DatabaseBridge databaseBridge = plugin.getFactory().createDatabaseBridge(this);
-    private final PlayerTeleportAlgorithm playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+    private final DatabaseBridge databaseBridge;
+    private final PlayerTeleportAlgorithm playerTeleportAlgorithm;
     @Nullable
     private PersistentDataContainer persistentDataContainer; // Lazy loading
 
@@ -104,6 +104,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.playerRole = playerRole;
         this.disbands = disbands;
         this.userLocale = userLocale;
+
+        this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
+        this.playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
+
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
     }
 
