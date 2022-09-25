@@ -111,7 +111,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkPos chunkPos = new ChunkPos(blockPos);
 
-        if (blockState.getEmittedLight() > 0)
+        if (blockState.getLightEmission() > 0)
             lights.add(blockPos);
 
         if (blockEntityData != null)
