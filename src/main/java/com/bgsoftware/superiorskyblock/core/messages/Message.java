@@ -927,8 +927,14 @@ public enum Message {
             superiorPlayer.runIfOnline(player -> send(player, superiorPlayer.getUserLocale(), args));
     }
 
-    public final void send(CommandSender sender, Object... objects) {
-        send(sender, PlayerLocales.getLocale(sender), objects);
+    public final void send(CommandSender sender, Object... args) {
+        if (sender instanceof Player) {
+            SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(sender);
+            if (!plugin.getEventsBus().callAttemptPlayerSendMessageEvent(superiorPlayer, name(), args))
+                return;
+        }
+
+        send(sender, PlayerLocales.getLocale(sender), args);
     }
 
     public void send(CommandSender sender, Locale locale, Object... objects) {
