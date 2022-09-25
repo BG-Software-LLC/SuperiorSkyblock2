@@ -202,9 +202,10 @@ public class IslandUtils {
     }
 
     public static void sendMessage(Island island, Message message, List<UUID> ignoredMembers, Object... args) {
-        island.getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()))
-                .forEach(superiorPlayer -> message.send(superiorPlayer, args));
+        for (SuperiorPlayer islandMember : island.getIslandMembers(true)) {
+            if (!ignoredMembers.contains(islandMember.getUniqueId()))
+                message.send(islandMember, args);
+        }
     }
 
     public static double getGeneratorPercentageDecimal(Island island, Key key, World.Environment environment) {

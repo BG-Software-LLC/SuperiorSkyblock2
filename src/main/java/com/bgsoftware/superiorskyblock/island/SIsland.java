@@ -1255,20 +1255,22 @@ public class SIsland implements Island {
 
     @Override
     public void disbandIsland() {
-        getIslandMembers(true).forEach(superiorPlayer -> {
-            if (superiorPlayer.equals(owner)) {
+        forEachIslandMember(Collections.emptyList(), false, islandMember -> {
+            if (islandMember.equals(owner)) {
                 owner.setIsland(null);
             } else {
-                kickMember(superiorPlayer);
+                kickMember(islandMember);
             }
 
             if (plugin.getSettings().isDisbandInventoryClear())
-                plugin.getNMSPlayers().clearInventory(superiorPlayer.asOfflinePlayer());
+                plugin.getNMSPlayers().clearInventory(islandMember.asOfflinePlayer());
 
-            plugin.getMissions().getAllMissions().stream().filter(mission -> {
+            for (Mission<?> mission : plugin.getMissions().getAllMissions()) {
                 MissionData missionData = plugin.getMissions().getMissionData(mission).orElse(null);
-                return missionData != null && missionData.isDisbandReset();
-            }).forEach(superiorPlayer::resetMission);
+                if (missionData != null && missionData.isDisbandReset()) {
+                    islandMember.resetMission(mission);
+                }
+            }
         });
 
         invitedPlayers.forEach(invitedPlayer -> invitedPlayer.removeInvite(this));
@@ -1612,13 +1614,11 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(message, "message parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
 
         PluginDebugger.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Message: " + message);
 
-        getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()))
-                .forEach(superiorPlayer -> Message.CUSTOM.send(superiorPlayer, message, false));
+        forEachIslandMember(ignoredList, false, islandMember -> Message.CUSTOM.send(islandMember, message, false));
     }
 
     @Override
@@ -1633,9 +1633,7 @@ public class SIsland implements Island {
 
         PluginDebugger.debug("Action: Send Message, Island: " + owner.getName() + ", Ignored Members: " + ignoredMembers + ", Message: " + messageComponent.getMessage());
 
-        getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredMembers.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> messageComponent.sendMessage(superiorPlayer.asPlayer(), args));
+        forEachIslandMember(ignoredMembers, false, islandMember -> messageComponent.sendMessage(islandMember.asPlayer(), args));
     }
 
     @Override
@@ -1643,14 +1641,13 @@ public class SIsland implements Island {
                           int fadeOut, UUID... ignoredMembers) {
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
 
         PluginDebugger.debug("Action: Send Title, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Title: " + title + ", Subtitle: " + subtitle);
 
-        getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && superiorPlayer.isOnline())
-                .forEach(superiorPlayer -> plugin.getNMSPlayers().sendTitle(superiorPlayer.asPlayer(),
-                        title, subtitle, fadeIn, duration, fadeOut));
+        forEachIslandMember(ignoredList, true, islandMember ->
+                plugin.getNMSPlayers().sendTitle(islandMember.asPlayer(), title, subtitle, fadeIn, duration, fadeOut)
+        );
     }
 
     @Override
@@ -1658,13 +1655,13 @@ public class SIsland implements Island {
         Preconditions.checkNotNull(command, "command parameter cannot be null.");
         Preconditions.checkNotNull(ignoredMembers, "ignoredMembers parameter cannot be null.");
 
-        List<UUID> ignoredList = Arrays.asList(ignoredMembers);
+        List<UUID> ignoredList = ignoredMembers.length == 0 ? Collections.emptyList() : Arrays.asList(ignoredMembers);
 
         PluginDebugger.debug("Action: Execute Command, Island: " + owner.getName() + ", Ignored Members: " + ignoredList + ", Command: " + command);
 
-        getIslandMembers(true).stream()
-                .filter(superiorPlayer -> !ignoredList.contains(superiorPlayer.getUniqueId()) && (!onlyOnlineMembers || superiorPlayer.isOnline()))
-                .forEach(superiorPlayer -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", superiorPlayer.getName())));
+        forEachIslandMember(ignoredList, true, islandMember ->
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("{player-name}", islandMember.getName()))
+        );
     }
 
     @Override
@@ -3956,6 +3953,14 @@ public class SIsland implements Island {
         Location location = islandWarp.getLocation();
 
         warpsByLocation.put(new LocationKey(location), islandWarp);
+    }
+
+    private void forEachIslandMember(List<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
+        for (SuperiorPlayer islandMember : getIslandMembers(true)) {
+            if (!ignoredMembers.contains(islandMember) && (!onlyOnline || islandMember.isOnline())) {
+                islandMemberConsumer.accept(islandMember);
+            }
+        }
     }
 
     private static int getGeneratedSchematicBitMask(World.Environment environment) {
