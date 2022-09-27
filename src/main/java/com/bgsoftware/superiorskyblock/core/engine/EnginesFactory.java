@@ -22,7 +22,7 @@ public class EnginesFactory {
             try {
                 Class.forName("org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory");
                 defaultEngine = OPEN_JDK_NASHORN_ENGINE.invoke(null);
-            } catch (ClassNotFoundException error) {
+            } catch (Throwable error) {
                 defaultEngine = NashornEngine.getInstance();
             }
         }
