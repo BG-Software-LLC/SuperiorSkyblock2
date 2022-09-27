@@ -2575,13 +2575,11 @@ public class SIsland implements Island {
         if (warpCategory == null) {
             List<Integer> occupiedSlots = warpCategories.values().stream().map(WarpCategory::getSlot).collect(Collectors.toList());
 
-            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(this, name)));
-
             int slot = 0;
             while (occupiedSlots.contains(slot))
-                slot++;
+                ++slot;
 
-            warpCategory.setSlot(slot);
+            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(this, name, slot)));
 
             IslandsDatabaseBridge.saveWarpCategory(this, warpCategory);
 
