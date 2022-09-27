@@ -5,7 +5,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.NMSUtils;
+import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSection;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
@@ -16,8 +19,10 @@ import net.minecraft.server.v1_12_R1.BlockPosition;
 import net.minecraft.server.v1_12_R1.Chunk;
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_12_R1.ChunkSection;
+import net.minecraft.server.v1_12_R1.EnumSkyBlock;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
@@ -41,7 +46,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private final Map<Long, ChunkData> chunks = new HashMap<>();
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
-
+    private final List<BlockPosition> lights = new LinkedList<>();
     private final WorldServer worldServer;
 
     public WorldEditSessionImpl(WorldServer worldServer) {
@@ -69,7 +74,10 @@ public class WorldEditSessionImpl implements WorldEditSession {
         if (blockEntityData != null)
             blockEntities.add(new Pair<>(blockPosition, blockEntityData));
 
-        ChunkData chunkData = this.chunks.computeIfAbsent(ChunkCoordIntPair.asLong(chunkCoord.x, chunkCoord.z), ChunkData::new);
+        if (plugin.getSettings().isLightsUpdate() && blockData.d() > 0)
+            lights.add(blockPosition);
+
+        ChunkData chunkData = this.chunks.computeIfAbsent(ChunkCoordIntPair.a(chunkCoord.x, chunkCoord.z), ChunkData::new);
 
         ChunkSection chunkSection = chunkData.chunkSections[blockPosition.getY() >> 4];
 
@@ -93,7 +101,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     public void applyBlocks(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
 
-        ChunkData chunkData = this.chunks.remove(chunk.chunkKey);
+        ChunkData chunkData = this.chunks.get(chunk.chunkKey);
 
         if (chunkData == null)
             return;
@@ -107,8 +115,12 @@ public class WorldEditSessionImpl implements WorldEditSession {
         BiomeBase biome = CraftBlock.biomeToBiomeBase(IslandUtils.getDefaultWorldBiome(worldServer.getWorld().getEnvironment()));
         Arrays.fill(chunk.getBiomeIndex(), (byte) BiomeBase.REGISTRY_ID.a(biome));
 
-        // Update lights
-        chunk.initLighting();
+        if (plugin.getSettings().isLightsUpdate()) {
+            // initLightning calculates the light emitted from sky to the chunk.
+            chunk.initLighting();
+        }
+
+        chunk.markDirty();
     }
 
     @Override
@@ -129,6 +141,19 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     worldTileEntity.load(blockEntityCompound);
             }
         });
+
+        if (plugin.getSettings().isLightsUpdate() && !lights.isEmpty()) {
+            // For each light block, we calculate its light
+            // We only update the lights after all the chunks were loaded.
+            BukkitExecutor.sync(() -> {
+                lights.forEach(blockPosition -> worldServer.c(EnumSkyBlock.BLOCK, blockPosition));
+                this.chunks.keySet().forEach(chunkKey -> {
+                    ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair((int) (long) chunkKey, (int) (chunkKey >> 32));
+                    NMSUtils.sendPacketToRelevantPlayers(worldServer, chunkCoord.x, chunkCoord.z,
+                            new PacketPlayOutMapChunk(worldServer.getChunkAt(chunkCoord.x, chunkCoord.z), 65535));
+                });
+            }, 5L);
+        }
     }
 
     private boolean isValidPosition(BlockPosition blockPosition) {
@@ -149,7 +174,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
         private void createChunkSections() {
             for (int i = 0; i < this.chunkSections.length; ++i) {
                 int chunkSectionPos = i << 4;
-                this.chunkSections[i] = new ChunkSection(chunkSectionPos, worldServer.worldProvider.m());
+                this.chunkSections[i] = EmptyCounterChunkSection.of(new ChunkSection(chunkSectionPos, worldServer.worldProvider.m()));
             }
         }
 

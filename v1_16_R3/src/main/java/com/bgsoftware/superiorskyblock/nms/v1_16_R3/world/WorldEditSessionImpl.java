@@ -31,7 +31,7 @@ import net.minecraft.server.v1_16_R3.HeightMap;
 import net.minecraft.server.v1_16_R3.IBlockData;
 import net.minecraft.server.v1_16_R3.IBlockState;
 import net.minecraft.server.v1_16_R3.IRegistry;
-import net.minecraft.server.v1_16_R3.LightEngine;
+import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.ProtoChunk;
 import net.minecraft.server.v1_16_R3.ProtoChunkTickList;
@@ -63,9 +63,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     private final Map<Long, ChunkData> chunks = new HashMap<>();
     private final List<Pair<BlockPosition, IBlockData>> blocksToUpdate = new LinkedList<>();
-    private final List<BlockPosition> lights = new LinkedList<>();
     private final List<Pair<BlockPosition, CompoundTag>> blockEntities = new LinkedList<>();
-
     private final WorldServer worldServer;
 
     public WorldEditSessionImpl(WorldServer worldServer) {
@@ -115,13 +113,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(blockPosition);
 
-        if (blockData.f() > 0)
-            lights.add(blockPosition);
-
         if (blockEntityData != null)
             blockEntities.add(new Pair<>(blockPosition, blockEntityData));
 
         ChunkData chunkData = this.chunks.computeIfAbsent(chunkCoord.pair(), ChunkData::new);
+
+        if (plugin.getSettings().isLightsUpdate() && blockData.f() > 0)
+            chunkData.lights.add(blockPosition);
 
         ChunkSection chunkSection = chunkData.chunkSections[blockPosition.getY() >> 4];
 
@@ -149,8 +147,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
     @Override
     public void applyBlocks(org.bukkit.Chunk bukkitChunk) {
         Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        ChunkCoordIntPair chunkCoord = chunk.getPos();
 
-        ChunkData chunkData = this.chunks.remove(chunk.getPos().pair());
+        ChunkData chunkData = this.chunks.remove(chunkCoord.pair());
 
         if (chunkData == null)
             return;
@@ -172,16 +171,23 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     IslandUtils.getDefaultWorldBiome(worldServer.getWorld().getEnvironment()));
             Arrays.fill(biomes, biome);
         }
+
+        // Update lights
+        if (plugin.getSettings().isLightsUpdate() && !chunkData.lights.isEmpty()) {
+            LightEngineThreaded lightEngineThreaded = worldServer.getChunkProvider().getLightEngine();
+            chunkData.lights.forEach(lightEngineThreaded::a);
+            // Queues chunk light for this chunk.
+            lightEngineThreaded.a(chunk, false);
+        }
+
+        chunk.setNeedsSaving(true);
     }
+
 
     @Override
     public void finish(Island island) {
         // Update blocks
         blocksToUpdate.forEach(data -> worldServer.setTypeAndData(data.getKey(), data.getValue(), 3));
-
-        // Update lights
-        LightEngine lightEngine = worldServer.e();
-        lights.forEach(lightEngine::a);
 
         // Update block entities
         blockEntities.forEach(data -> {
@@ -207,6 +213,8 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private class ChunkData {
         private final ChunkSection[] chunkSections = new ChunkSection[16];
         private final Map<HeightMap.Type, HeightMap> heightmaps = new EnumMap<>(HeightMap.Type.class);
+        private final List<BlockPosition> lights = new LinkedList<>();
+
 
         public ChunkData(long chunkKey) {
             ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkKey);

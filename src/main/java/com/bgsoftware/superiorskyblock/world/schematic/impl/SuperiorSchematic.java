@@ -167,8 +167,11 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         });
 
         CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
-            try {
-                if (!failed.get()) {
+            if (failed.get())
+                return;
+
+            BukkitExecutor.ensureMain(() -> {
+                try {
                     worldEditSession.finish(island);
 
                     if (island.getOwner().isOnline())
@@ -182,14 +185,14 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
-                    loadedChunks = new HashSet<>(affectedChunks);
+                    this.loadedChunks = new HashSet<>(affectedChunks);
                     callback.run();
-                    loadedChunks = null;
+                    this.loadedChunks = null;
+                } catch (Throwable error2) {
+                    if (onFailure != null)
+                        onFailure.accept(error2);
                 }
-            } catch (Throwable error2) {
-                if (onFailure != null)
-                    onFailure.accept(error2);
-            }
+            });
         });
     }
 

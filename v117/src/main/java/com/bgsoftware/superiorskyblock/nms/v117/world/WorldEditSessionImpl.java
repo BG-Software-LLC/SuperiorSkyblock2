@@ -18,6 +18,7 @@ import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
@@ -34,7 +35,6 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.chunk.ProtoTickList;
 import net.minecraft.world.level.chunk.UpgradeData;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.bukkit.Chunk;
@@ -63,7 +63,6 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
     private final Map<Long, ChunkData> chunks = new HashMap<>();
     private final List<Pair<BlockPos, BlockState>> blocksToUpdate = new LinkedList<>();
-    private final List<BlockPos> lights = new LinkedList<>();
     private final List<Pair<BlockPos, CompoundTag>> blockEntities = new LinkedList<>();
 
     private final ServerLevel serverLevel;
@@ -115,13 +114,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
 
         ChunkPos chunkPos = new ChunkPos(blockPos);
 
-        if (blockState.getLightEmission() > 0)
-            lights.add(blockPos);
-
         if (blockEntityData != null)
             blockEntities.add(new Pair<>(blockPos, blockEntityData));
 
         ChunkData chunkData = this.chunks.computeIfAbsent(chunkPos.toLong(), ChunkData::new);
+
+        if (plugin.getSettings().isLightsUpdate() && blockState.getLightEmission() > 0)
+            chunkData.lights.add(blockPos);
 
         LevelChunkSection levelChunkSection = chunkData.chunkSections[serverLevel.getSectionIndex(blockPos.getY())];
 
@@ -149,8 +148,9 @@ public class WorldEditSessionImpl implements WorldEditSession {
     @Override
     public void applyBlocks(Chunk bukkitChunk) {
         LevelChunk levelChunk = ((CraftChunk) bukkitChunk).getHandle();
+        ChunkPos chunkPos = levelChunk.getPos();
 
-        ChunkData chunkData = this.chunks.remove(levelChunk.getPos().toLong());
+        ChunkData chunkData = this.chunks.remove(chunkPos.toLong());
 
         if (chunkData == null)
             return;
@@ -172,16 +172,22 @@ public class WorldEditSessionImpl implements WorldEditSession {
                     IslandUtils.getDefaultWorldBiome(serverLevel.getWorld().getEnvironment()));
             Arrays.fill(biomes, biome);
         }
+
+        // Update lights
+        if (plugin.getSettings().isLightsUpdate() && !chunkData.lights.isEmpty()) {
+            ThreadedLevelLightEngine threadedLevelLightEngine = serverLevel.getChunkSource().getLightEngine();
+            chunkData.lights.forEach(threadedLevelLightEngine::checkBlock);
+            // Queues chunk light for this chunk.
+            threadedLevelLightEngine.lightChunk(levelChunk, false);
+        }
+
+        levelChunk.setUnsaved(true);
     }
 
     @Override
     public void finish(Island island) {
         // Update blocks
         blocksToUpdate.forEach(data -> serverLevel.setBlock(data.getKey(), data.getValue(), 3));
-
-        // Update lights
-        LevelLightEngine levelLightEngine = serverLevel.getLightEngine();
-        lights.forEach(levelLightEngine::checkBlock);
 
         // Update block entities
         blockEntities.forEach(data -> {
@@ -207,6 +213,7 @@ public class WorldEditSessionImpl implements WorldEditSession {
     private class ChunkData {
         private final LevelChunkSection[] chunkSections = new LevelChunkSection[serverLevel.getSectionsCount()];
         private final Map<Heightmap.Types, Heightmap> heightmaps = new EnumMap<>(Heightmap.Types.class);
+        private final List<BlockPos> lights = new LinkedList<>();
 
         public ChunkData(long chunkKey) {
             ChunkPos chunkPos = new ChunkPos(chunkKey);
