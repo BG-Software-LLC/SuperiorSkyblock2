@@ -56,7 +56,7 @@ public class PortalsListener implements Listener {
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return;
 
-        if (preventPlayerPortal(e.getPlayer(), e.getFrom(), e.getCause())) {
+        if (preventPlayerPortal(e.getPlayer(), e.getFrom(), e.getCause(), false)) {
             e.setCancelled(true);
             return;
         }
@@ -117,21 +117,25 @@ public class PortalsListener implements Listener {
                 return;
         }
 
-        onPlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause);
+        onPlayerPortal((Player) e.getEntity(), e.getLocation(), teleportCause, false);
     }
 
-    public void onPlayerPortal(Player player, Location portalLocation, PlayerTeleportEvent.TeleportCause teleportCause) {
+    public void onPlayerPortal(Player player, Location portalLocation,
+                               PlayerTeleportEvent.TeleportCause teleportCause,
+                               boolean isAdminCommand) {
         /* Alias for preventPlayerPortal */
-        preventPlayerPortal(player, portalLocation, teleportCause);
+        preventPlayerPortal(player, portalLocation, teleportCause, isAdminCommand);
     }
 
-    public boolean preventPlayerPortal(Player player, Location portalLocation, PlayerTeleportEvent.TeleportCause teleportCause) {
+    public boolean preventPlayerPortal(Player player, Location portalLocation,
+                                       PlayerTeleportEvent.TeleportCause teleportCause,
+                                       boolean isAdminCommand) {
         SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(player);
 
         if (superiorPlayer instanceof SuperiorNPCPlayer)
             return false;
 
-        if (superiorPlayer.isImmunedToPortals())
+        if (!isAdminCommand && superiorPlayer.isImmunedToPortals())
             return true;
 
         Island island = plugin.getGrid().getIslandAt(portalLocation);

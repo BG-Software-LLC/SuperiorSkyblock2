@@ -84,7 +84,8 @@ public class CmdAdminTeleport implements IAdminIslandCommand {
             if (!island.wasSchematicGenerated(environment)) {
                 PlayerTeleportEvent.TeleportCause teleportCause = environment == World.Environment.NETHER ?
                         PlayerTeleportEvent.TeleportCause.NETHER_PORTAL : PlayerTeleportEvent.TeleportCause.END_PORTAL;
-                plugin.getListener(PortalsListener.class).get().onPlayerPortal((Player) sender, ((Player) sender).getLocation(), teleportCause);
+                plugin.getListener(PortalsListener.class).get()
+                        .onPlayerPortal((Player) sender, ((Player) sender).getLocation(), teleportCause, true);
                 return;
             }
         }
