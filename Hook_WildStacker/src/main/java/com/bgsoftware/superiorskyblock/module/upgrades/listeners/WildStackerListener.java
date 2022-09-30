@@ -17,7 +17,7 @@ public class WildStackerListener implements Listener {
     @EventHandler
     public void onWildStackerStackSpawn(SpawnerPlaceEvent e) {
         if (spawnerRates != null)
-            spawnerRates.handleSpawnerPlace(e.getSpawner().getSpawner());
+            spawnerRates.handleSpawnerPlace(e.getSpawner().getLocation().getBlock());
     }
 
 }

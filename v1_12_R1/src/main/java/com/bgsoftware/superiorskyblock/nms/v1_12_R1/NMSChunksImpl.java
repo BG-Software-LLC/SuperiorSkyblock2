@@ -33,6 +33,7 @@ import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_12_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
@@ -253,6 +254,19 @@ public class NMSChunksImpl implements NMSChunks {
         SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
 
         CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
+    }
+
+    @Override
+    public List<Location> getBlockEntities(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        List<Location> blockEntities = new LinkedList<>();
+
+        World bukkitWorld = bukkitChunk.getWorld();
+
+        chunk.getTileEntities().keySet().forEach(blockPosition ->
+                blockEntities.add(new Location(bukkitWorld, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ())));
+
+        return blockEntities;
     }
 
     @Override

@@ -46,7 +46,6 @@ import org.bukkit.ChunkSnapshot;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
@@ -98,8 +97,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback) {
-        Location location = creatureSpawner.getLocation();
+    public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
         org.bukkit.World world = location.getWorld();
 
         if (world == null)

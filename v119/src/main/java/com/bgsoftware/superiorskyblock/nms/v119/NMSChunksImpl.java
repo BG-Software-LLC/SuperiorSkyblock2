@@ -48,8 +48,10 @@ import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.lighting.DynamicGraphMinFixedPoint;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.phys.AABB;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.block.CraftBlock;
@@ -402,6 +404,19 @@ public class NMSChunksImpl implements NMSChunks {
         SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
 
         CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
+    }
+
+    @Override
+    public List<Location> getBlockEntities(Chunk chunk) {
+        LevelChunk levelChunk = ((CraftChunk) chunk).getHandle();
+        List<Location> blockEntities = new LinkedList<>();
+
+        World bukkitWorld = chunk.getWorld();
+
+        levelChunk.getBlockEntities().keySet().forEach(blockPos ->
+                blockEntities.add(new Location(bukkitWorld, blockPos.getX(), blockPos.getY(), blockPos.getZ())));
+
+        return blockEntities;
     }
 
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, LevelChunkSection[] chunkSections) {

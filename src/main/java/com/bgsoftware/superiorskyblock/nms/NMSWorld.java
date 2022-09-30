@@ -20,7 +20,7 @@ public interface NMSWorld {
 
     Key getBlockKey(ChunkSnapshot chunkSnapshot, int x, int y, int z);
 
-    void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback);
+    void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback);
 
     void setWorldBorder(SuperiorPlayer superiorPlayer, Island island);
 

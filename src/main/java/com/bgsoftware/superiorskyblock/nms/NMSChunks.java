@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.block.Biome;
 import org.bukkit.entity.Player;
 
@@ -34,5 +35,7 @@ public interface NMSChunks {
     void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier);
 
     void shutdown();
+
+    List<Location> getBlockEntities(Chunk chunk);
 
 }

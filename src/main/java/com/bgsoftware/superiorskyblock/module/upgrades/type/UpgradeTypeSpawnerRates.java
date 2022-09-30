@@ -7,16 +7,14 @@ import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminAddSpawnerRates;
 import com.bgsoftware.superiorskyblock.module.upgrades.commands.CmdAdminSetSpawnerRates;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,18 +39,17 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
         return commands;
     }
 
-    public void handleSpawnerPlace(CreatureSpawner creatureSpawner) {
-        Island island = plugin.getGrid().getIslandAt(creatureSpawner.getLocation());
+    public void handleSpawnerPlace(Block block) {
+        Location location = block.getLocation();
+        Island island = plugin.getGrid().getIslandAt(location);
 
         if (island == null)
             return;
 
-        Block block = creatureSpawner.getBlock();
-
         // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
         BukkitExecutor.sync(() -> {
             if (block.getType() == Materials.SPAWNER.toBukkitType())
-                plugin.getNMSWorld().listenSpawner(creatureSpawner, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
+                plugin.getNMSWorld().listenSpawner(location, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
         }, 20L);
     }
 
@@ -70,7 +67,7 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onSpawnerPlace(BlockPlaceEvent e) {
             if (e.getBlock().getType() == Materials.SPAWNER.toBukkitType())
-                handleSpawnerPlace((CreatureSpawner) e.getBlock().getState());
+                handleSpawnerPlace(e.getBlock());
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -80,25 +77,20 @@ public class UpgradeTypeSpawnerRates implements IUpgradeType {
             if (island == null)
                 return;
 
-            List<CreatureSpawner> creatureSpawners = new ArrayList<>();
+            List<Location> blockEntities = plugin.getNMSChunks().getBlockEntities(e.getChunk());
 
-            for (BlockState tileEntity : e.getChunk().getTileEntities()) {
-                if (tileEntity instanceof CreatureSpawner) {
-                    creatureSpawners.add((CreatureSpawner) tileEntity);
+            if (blockEntities.isEmpty())
+                return;
+
+            // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
+            // Block entities that are not spawners will not be touched.
+            BukkitExecutor.sync(() -> {
+                if (e.getChunk().isLoaded()) {
+                    blockEntities.forEach(blockEntity -> {
+                        plugin.getNMSWorld().listenSpawner(blockEntity, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
+                    });
                 }
-            }
-
-            if (!creatureSpawners.isEmpty()) {
-                // We want to replace the spawner in a delay so other plugins that might change the spawner will be taken in action as well.
-                BukkitExecutor.sync(() -> {
-                    if (e.getChunk().isLoaded()) {
-                        creatureSpawners.forEach(creatureSpawner -> {
-                            plugin.getNMSWorld().listenSpawner(creatureSpawner, spawnDelay -> calculateNewSpawnerDelay(island, spawnDelay));
-                        });
-                    }
-                }, 20L);
-            }
-
+            }, 20L);
         }
 
     }

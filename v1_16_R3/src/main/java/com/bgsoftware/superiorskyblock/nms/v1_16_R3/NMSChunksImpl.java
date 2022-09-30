@@ -287,6 +287,19 @@ public class NMSChunksImpl implements NMSChunks {
         CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
     }
 
+    @Override
+    public List<Location> getBlockEntities(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        List<Location> blockEntities = new LinkedList<>();
+
+        org.bukkit.World bukkitWorld = bukkitChunk.getWorld();
+
+        chunk.getTileEntities().keySet().forEach(blockPosition ->
+                blockEntities.add(new Location(bukkitWorld, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ())));
+
+        return blockEntities;
+    }
+
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();

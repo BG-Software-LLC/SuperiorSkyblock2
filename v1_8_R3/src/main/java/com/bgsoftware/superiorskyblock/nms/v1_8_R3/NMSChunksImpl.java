@@ -28,6 +28,7 @@ import net.minecraft.server.v1_8_R3.TileEntity;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_8_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
@@ -230,6 +231,19 @@ public class NMSChunksImpl implements NMSChunks {
     @Override
     public void shutdown() {
         // Do nothing. There are no tasks to wait for.
+    }
+
+    @Override
+    public List<Location> getBlockEntities(org.bukkit.Chunk bukkitChunk) {
+        Chunk chunk = ((CraftChunk) bukkitChunk).getHandle();
+        List<Location> blockEntities = new LinkedList<>();
+
+        World bukkitWorld = bukkitChunk.getWorld();
+
+        chunk.getTileEntities().keySet().forEach(blockPosition ->
+                blockEntities.add(new Location(bukkitWorld, blockPosition.getX(), blockPosition.getY(), blockPosition.getZ())));
+
+        return blockEntities;
     }
 
     private static void removeEntities(Chunk chunk) {

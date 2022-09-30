@@ -40,7 +40,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.CreatureSpawner;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.block.CraftSign;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
@@ -81,8 +80,7 @@ public class NMSWorldImpl implements NMSWorld {
     }
 
     @Override
-    public void listenSpawner(CreatureSpawner creatureSpawner, IntFunction<Integer> delayChangeCallback) {
-        Location location = creatureSpawner.getLocation();
+    public void listenSpawner(Location location, IntFunction<Integer> delayChangeCallback) {
         org.bukkit.World world = location.getWorld();
 
         if (world == null)
