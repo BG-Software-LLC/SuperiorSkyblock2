@@ -33,4 +33,6 @@ public interface NMSChunks {
 
     void updateCropsTicker(List<ChunkPosition> chunkPositions, double newCropGrowthMultiplier);
 
+    void shutdown();
+
 }

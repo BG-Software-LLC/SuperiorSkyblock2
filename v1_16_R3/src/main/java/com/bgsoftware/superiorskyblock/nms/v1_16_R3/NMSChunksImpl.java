@@ -275,6 +275,18 @@ public class NMSChunksImpl implements NMSChunks {
                 cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
     }
 
+    @Override
+    public void shutdown() {
+        List<CompletableFuture<Void>> pendingTasks = NMSUtils.getPendingChunkActions();
+
+        if (pendingTasks.isEmpty())
+            return;
+
+        SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
+
+        CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
+    }
+
     private static CalculatedChunk calculateChunk(ChunkPosition chunkPosition, ChunkSection[] chunkSections) {
         KeyMap<Integer> blockCounts = KeyMapImpl.createHashMap();
         Set<Location> spawnersLocations = new HashSet<>();

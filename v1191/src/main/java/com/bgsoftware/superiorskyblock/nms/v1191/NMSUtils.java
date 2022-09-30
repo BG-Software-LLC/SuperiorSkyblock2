@@ -40,10 +40,12 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public class NMSUtils {
@@ -54,6 +56,8 @@ public class NMSUtils {
             ChunkHolder.class, 1, Packet.class, boolean.class);
     private static final ReflectField<Map<Long, ChunkHolder>> VISIBLE_CHUNKS = new ReflectField<>(
             ChunkMap.class, Map.class, Modifier.PUBLIC | Modifier.VOLATILE, 1);
+
+    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
     private NMSUtils() {
 
@@ -104,6 +108,9 @@ public class NMSUtils {
                                                  Runnable onFinish) {
         ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
 
+        CompletableFuture<Void> pendingTask = new CompletableFuture<>();
+        PENDING_CHUNK_ACTIONS.add(pendingTask);
+
         BukkitExecutor.createTask().runAsync(v -> {
             List<Pair<ChunkPos, net.minecraft.nbt.CompoundTag>> chunkCompounds = new LinkedList<>();
 
@@ -142,7 +149,14 @@ public class NMSUtils {
 
             if (onFinish != null)
                 onFinish.run();
+
+            pendingTask.complete(null);
+            PENDING_CHUNK_ACTIONS.remove(pendingTask);
         });
+    }
+
+    public static List<CompletableFuture<Void>> getPendingChunkActions() {
+        return Collections.unmodifiableList(PENDING_CHUNK_ACTIONS);
     }
 
     public static ProtoChunk createProtoChunk(ChunkPos chunkPos, ServerLevel serverLevel) {

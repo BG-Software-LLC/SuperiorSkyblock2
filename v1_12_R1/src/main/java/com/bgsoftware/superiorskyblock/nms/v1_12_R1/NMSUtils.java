@@ -25,10 +25,12 @@ import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldServer;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -45,6 +47,7 @@ public class NMSUtils {
 
     private static final Map<UUID, IChunkLoader> chunkLoadersMap = Maps.newHashMap();
 
+    private static final List<CompletableFuture<Void>> PENDING_CHUNK_ACTIONS = new LinkedList<>();
 
     private NMSUtils() {
 
@@ -86,6 +89,9 @@ public class NMSUtils {
         IChunkLoader chunkLoader = chunkLoadersMap.computeIfAbsent(worldServer.getDataManager().getUUID(),
                 uuid -> CHUNK_LOADER.get(worldServer.getChunkProvider()));
 
+        CompletableFuture<Void> pendingTask = new CompletableFuture<>();
+        PENDING_CHUNK_ACTIONS.add(pendingTask);
+
         BukkitExecutor.createTask().runAsync(v -> {
             chunks.forEach(chunkCoords -> {
                 if (!chunkLoader.chunkExists(chunkCoords.x, chunkCoords.z))
@@ -113,7 +119,14 @@ public class NMSUtils {
         }).runSync(v -> {
             if (onFinish != null)
                 onFinish.run();
+
+            pendingTask.complete(null);
+            PENDING_CHUNK_ACTIONS.remove(pendingTask);
         });
+    }
+
+    public static List<CompletableFuture<Void>> getPendingChunkActions() {
+        return Collections.unmodifiableList(PENDING_CHUNK_ACTIONS);
     }
 
     public static void sendPacketToRelevantPlayers(WorldServer worldServer, int chunkX, int chunkZ, Packet<?> packet) {

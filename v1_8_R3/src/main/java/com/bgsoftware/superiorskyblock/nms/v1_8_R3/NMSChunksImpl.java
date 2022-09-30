@@ -6,7 +6,6 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
@@ -23,11 +22,9 @@ import net.minecraft.server.v1_8_R3.Chunk;
 import net.minecraft.server.v1_8_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_8_R3.ChunkSection;
 import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.EnumSkyBlock;
 import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
 import net.minecraft.server.v1_8_R3.TileEntity;
-import net.minecraft.server.v1_8_R3.World;
 import net.minecraft.server.v1_8_R3.WorldServer;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -228,6 +225,11 @@ public class NMSChunksImpl implements NMSChunks {
         if (chunkPositions.isEmpty()) return;
         CropsTickingTileEntity.forEachChunk(chunkPositions, cropsTickingTileEntity ->
                 cropsTickingTileEntity.setCropGrowthMultiplier(newCropGrowthMultiplier));
+    }
+
+    @Override
+    public void shutdown() {
+        // Do nothing. There are no tasks to wait for.
     }
 
     private static void removeEntities(Chunk chunk) {

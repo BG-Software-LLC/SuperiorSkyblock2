@@ -244,6 +244,18 @@ public class NMSChunksImpl implements NMSChunks {
     }
 
     @Override
+    public void shutdown() {
+        List<CompletableFuture<Void>> pendingTasks = NMSUtils.getPendingChunkActions();
+
+        if (pendingTasks.isEmpty())
+            return;
+
+        SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
+
+        CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
+    }
+
+    @Override
     public void startTickingChunk(Island island, org.bukkit.Chunk chunk, boolean stop) {
         if (plugin.getSettings().getCropsInterval() <= 0)
             return;

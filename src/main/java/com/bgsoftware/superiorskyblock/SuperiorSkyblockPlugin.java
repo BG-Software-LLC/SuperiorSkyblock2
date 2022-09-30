@@ -369,6 +369,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             SuperiorSkyblockPlugin.log("Shutting down executor");
             BukkitExecutor.close();
 
+            if (nmsChunks != null)
+                nmsChunks.shutdown();
+
             SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             //pluginDebugger.cancel();
             dataHandler.closeConnection();
