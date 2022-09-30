@@ -292,6 +292,7 @@ COOP_BANNED_PLAYER: '&c&lErreur | &7Ce joueur est banni de l''île et ne peut pa
 COOP_LIMIT_EXCEED: '&c&lErreur | &7Vous avez atteint le nombre maximal de coopérateurs d''île.'
 CREATE_ISLAND: '&e&lIle | &7Création d''une nouvelle île aux coordonnées {0} en {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lErreur | &7Une erreur est survenue ors de la création de votre île. Veuillez contacter un administrateur et le notifier de ce problème.'
+CREATE_WORLD_FAILURE: '&c&lError | &7An error occurred while generating your world. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Débogage &cDÉSACTIVÉ&7.'
 DEBUG_MODE_ENABLED: '&e&lDebug | &7Débogage &aACTIVÉ&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Filtres de débogage mis à jour !!'

@@ -294,6 +294,7 @@ COOP_BANNED_PLAYER: '&c&lBlad | &7Ten gracz jest zablokowany na wyspie i nie moz
 COOP_LIMIT_EXCEED: '&c&lBlad | &7Osiagnales maksymalna liczbe czlonków co-op na wyspie.'
 CREATE_ISLAND: '&e&lWyspa | &7Stworzono wyspe na {0} w {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lBlad | &7Wystapil blad ze stworzeniem wyspy. Skontaktuj sie z administracja.'
+CREATE_WORLD_FAILURE: '&c&lError | &7An error occurred while generating your world. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lDebug | &7Tryb debug mode &cWylaczony&7.'
 DEBUG_MODE_ENABLED: '&e&lDebug | &7Tryb debug mode &aWlaczony&7.'
 DEBUG_MODE_FILTER: '&e&lDebug | &7Pomyslnie zaktualizowano debug filter!'

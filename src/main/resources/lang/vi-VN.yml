@@ -336,6 +336,7 @@ COOP_BANNED_PLAYER: '&c&lLỗi | &7Người chơi này đang bị cấm khỏi �
 COOP_LIMIT_EXCEED: '&c&lLỗi | &7Bạn đã đạt số lượng người chơi co-op tối đa mà hòn đảo có thể có.'
 CREATE_ISLAND: '&e&lĐảo | &7Tạo một hòn đảo mới tại {0} trong {1}ms.'
 CREATE_ISLAND_FAILURE: '&c&lLỗi | &7Đã xảy ra lỗi khi tạo đảo của bạn. Vui lòng liên hệ với quản trị viên để điều tra vấn đề.'
+CREATE_WORLD_FAILURE: '&c&lError | &7An error occurred while generating your world. Please contact the administrator to investigate the issue.'
 DEBUG_MODE_DISABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &cTẮT&7.'
 DEBUG_MODE_ENABLED: '&e&lGỡ Lỗi | &7Chế độ gỡ lỗi đã được &aBẬT&7.'
 DEBUG_MODE_FILTER: '&e&lGỡ Lỗi | &7Đã cập nhật thành công bộ lọc gỡ lỗi!'

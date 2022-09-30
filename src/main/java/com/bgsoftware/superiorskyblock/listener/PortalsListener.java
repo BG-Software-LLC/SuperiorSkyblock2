@@ -231,6 +231,10 @@ public class PortalsListener implements Listener {
                 }
 
                 superiorPlayer.teleport(schematic.adjustRotation(destinationLocation));
+            }, error -> {
+                generatingSchematicsIslands.remove(island.getUniqueId());
+                error.printStackTrace();
+                Message.CREATE_WORLD_FAILURE.send(player);
             });
 
         } catch (NullPointerException ignored) {
