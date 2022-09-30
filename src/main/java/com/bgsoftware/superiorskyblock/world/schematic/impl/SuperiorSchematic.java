@@ -151,13 +151,14 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     return;
 
                 try {
+                    worldEditSession.applyBlocks(chunk);
+
                     boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
-                    if (cropGrowthEnabled && island.isInsideRange(chunk))
+                    if (cropGrowthEnabled && island.isInsideRange(chunk)) {
                         plugin.getNMSChunks().startTickingChunk(island, chunk, false);
+                    }
 
                     ChunksTracker.markDirty(island, chunk, false);
-
-                    worldEditSession.applyBlocks(chunk);
                 } catch (Throwable error) {
                     failed.set(true);
                     if (onFailure != null)
