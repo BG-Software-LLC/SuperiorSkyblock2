@@ -2,9 +2,11 @@ package com.bgsoftware.superiorskyblock.island.builder;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
+import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.key.Key;
@@ -27,6 +29,7 @@ import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class IslandBuilderImpl implements Island.Builder {
 
@@ -104,11 +108,22 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    @Nullable
+    public SuperiorPlayer getOwner() {
+        return this.owner;
+    }
+
+    @Override
     public Island.Builder setUniqueId(UUID uuid) {
         Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
         Preconditions.checkState(plugin.getGrid().getIslandByUUID(uuid) == null, "The provided uuid is not unique.");
         this.uuid = uuid;
         return this;
+    }
+
+    @Override
+    public UUID getUniqueId() {
+        return this.uuid;
     }
 
     @Override
@@ -120,10 +135,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Location getCenter() {
+        return this.center;
+    }
+
+    @Override
     public Island.Builder setName(String islandName) {
         Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
         this.islandName = islandName;
         return this;
+    }
+
+    @Override
+    public String getName() {
+        return this.islandName;
     }
 
     @Override
@@ -134,9 +159,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public String getScehmaticName() {
+        return this.islandType;
+    }
+
+    @Override
     public Island.Builder setCreationTime(long creationTime) {
         this.creationTime = creationTime;
         return this;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return this.creationTime;
     }
 
     @Override
@@ -147,10 +182,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public String getDiscord() {
+        return this.discord;
+    }
+
+    @Override
     public Island.Builder setPaypal(String paypal) {
         Preconditions.checkNotNull(paypal, "paypal parameter cannot be null.");
         this.paypal = paypal;
         return this;
+    }
+
+    @Override
+    public String getPaypal() {
+        return this.paypal;
     }
 
     @Override
@@ -161,10 +206,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public BigDecimal getBonusWorth() {
+        return this.bonusWorth;
+    }
+
+    @Override
     public Island.Builder setBonusLevel(BigDecimal bonusLevel) {
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
         this.bonusLevel = bonusLevel;
         return this;
+    }
+
+    @Override
+    public BigDecimal getBonusLevel() {
+        return this.bonusLevel;
     }
 
     @Override
@@ -174,9 +229,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public boolean isLocked() {
+        return this.isLocked;
+    }
+
+    @Override
     public Island.Builder setIgnored(boolean isIgnored) {
         this.isIgnored = isIgnored;
         return this;
+    }
+
+    @Override
+    public boolean isIgnored() {
+        return this.isIgnored;
     }
 
     @Override
@@ -187,9 +252,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public String getDescription() {
+        return this.description;
+    }
+
+    @Override
     public Island.Builder setGeneratedSchematics(int generatedSchematicsMask) {
         this.generatedSchematicsMask = generatedSchematicsMask;
         return this;
+    }
+
+    @Override
+    public int getGeneratedSchematicsMask() {
+        return this.generatedSchematicsMask;
     }
 
     @Override
@@ -199,9 +274,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public int getUnlockedWorldsMask() {
+        return this.unlockedWorldsMask;
+    }
+
+    @Override
     public Island.Builder setLastTimeUpdated(long lastTimeUpdated) {
         this.lastTimeUpdated = lastTimeUpdated;
         return this;
+    }
+
+    @Override
+    public long getLastTimeUpdated() {
+        return this.lastTimeUpdated;
     }
 
     @Override
@@ -209,6 +294,11 @@ public class IslandBuilderImpl implements Island.Builder {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
         this.dirtyChunks.add(ChunkPosition.of(worldName, chunkX, chunkZ));
         return this;
+    }
+
+    @Override
+    public boolean isDirtyChunk(String worldName, int chunkX, int chunkZ) {
+        return this.dirtyChunks.contains(ChunkPosition.of(worldName, chunkX, chunkZ));
     }
 
     @Override
@@ -220,11 +310,21 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public KeyMap<BigInteger> getBlockCounts() {
+        return KeyMapImpl.createHashMap(this.blockCounts);
+    }
+
+    @Override
     public Island.Builder setIslandHome(Location location, World.Environment environment) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         this.islandHomes.put(environment, location);
         return this;
+    }
+
+    @Override
+    public Map<World.Environment, Location> getIslandHomes() {
+        return Collections.unmodifiableMap(this.islandHomes);
     }
 
     @Override
@@ -235,10 +335,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public List<SuperiorPlayer> getIslandMembers() {
+        return Collections.unmodifiableList(this.members);
+    }
+
+    @Override
     public Island.Builder addBannedPlayer(SuperiorPlayer superiorPlayer) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         this.bannedPlayers.add(superiorPlayer);
         return this;
+    }
+
+    @Override
+    public List<SuperiorPlayer> getBannedPlayers() {
+        return Collections.unmodifiableList(this.bannedPlayers);
     }
 
     @Override
@@ -251,11 +361,21 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<SuperiorPlayer, PermissionNode> getPlayerPermissions() {
+        return Collections.unmodifiableMap(this.playerPermissions);
+    }
+
+    @Override
     public Island.Builder setRolePermission(IslandPrivilege islandPrivilege, PlayerRole requiredRole) {
         Preconditions.checkNotNull(islandPrivilege, "islandPrivilege parameter cannot be null.");
         Preconditions.checkNotNull(requiredRole, "requiredRole parameter cannot be null.");
         this.rolePermissions.put(islandPrivilege, requiredRole);
         return this;
+    }
+
+    @Override
+    public Map<IslandPrivilege, PlayerRole> getRolePermissions() {
+        return Collections.unmodifiableMap(this.rolePermissions);
     }
 
     @Override
@@ -266,10 +386,23 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<Upgrade, Integer> getUpgrades() {
+        return Collections.unmodifiableMap(this.upgrades.entrySet().stream().collect(Collectors.toMap(
+                entry -> plugin.getUpgrades().getUpgrade(entry.getKey()),
+                Map.Entry::getValue
+        )));
+    }
+
+    @Override
     public Island.Builder setBlockLimit(Key block, int limit) {
         Preconditions.checkNotNull(block, "block parameter cannot be null.");
         this.blockLimits.put(block, limit < 0 ? Value.syncedFixed(limit) : Value.fixed(limit));
         return this;
+    }
+
+    @Override
+    public KeyMap<Integer> getBlockLimits() {
+        return KeyMap.createKeyMap(convertFromValuesToRaw(this.blockLimits));
     }
 
     @Override
@@ -281,6 +414,14 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<SuperiorPlayer, Rating> getRatings() {
+        return Collections.unmodifiableMap(this.ratings.entrySet().stream().collect(Collectors.toMap(
+                entry -> plugin.getPlayers().getSuperiorPlayer(entry.getKey()),
+                Map.Entry::getValue
+        )));
+    }
+
+    @Override
     public Island.Builder setCompletedMission(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         this.completedMissions.put(mission, finishCount);
@@ -288,10 +429,23 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<Mission<?>, Integer> getCompletedMissions() {
+        return Collections.unmodifiableMap(this.completedMissions);
+    }
+
+    @Override
     public Island.Builder setIslandFlag(IslandFlag islandFlag, boolean value) {
         Preconditions.checkNotNull(islandFlag, "islandFlag parameter cannot be null.");
         this.islandFlags.put(islandFlag, (byte) (value ? 1 : 0));
         return this;
+    }
+
+    @Override
+    public Map<IslandFlag, SyncStatus> getIslandFlags() {
+        return Collections.unmodifiableMap(this.islandFlags.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue() == 1 ? SyncStatus.ENABLED : SyncStatus.DISABLED
+        )));
     }
 
     @Override
@@ -304,10 +458,28 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<World.Environment, KeyMap<Integer>> getGeneratorRates() {
+        Map<World.Environment, KeyMap<Integer>> result = new EnumMap<>(World.Environment.class);
+
+        this.cobbleGeneratorValues.forEach(((environment, generatorRates) ->
+                result.put(environment, KeyMap.createKeyMap(convertFromValuesToRaw(generatorRates)))));
+
+        return Collections.unmodifiableMap(result);
+    }
+
+    @Override
     public Island.Builder addUniqueVisitor(SuperiorPlayer superiorPlayer, long visitTime) {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         this.uniqueVisitors.add(new SIsland.UniqueVisitor(superiorPlayer, visitTime));
         return this;
+    }
+
+    @Override
+    public Map<SuperiorPlayer, Long> getUniqueVisitors() {
+        LinkedHashMap<SuperiorPlayer, Long> result = new LinkedHashMap<>();
+        this.uniqueVisitors.forEach(uniqueVisitor ->
+                result.put(uniqueVisitor.getSuperiorPlayer(), uniqueVisitor.getLastVisitTime()));
+        return Collections.unmodifiableMap(result);
     }
 
     @Override
@@ -318,10 +490,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public KeyMap<Integer> getEntityLimits() {
+        return KeyMap.createKeyMap(convertFromValuesToRaw(this.entityLimits));
+    }
+
+    @Override
     public Island.Builder setIslandEffect(PotionEffectType potionEffectType, int level) {
         Preconditions.checkNotNull(potionEffectType, "potionEffectType parameter cannot be null.");
         this.islandEffects.put(potionEffectType, level < 0 ? Value.syncedFixed(level) : Value.fixed(level));
         return this;
+    }
+
+    @Override
+    public Map<PotionEffectType, Integer> getIslandEffects() {
+        return Collections.unmodifiableMap(convertFromValuesToRaw(this.islandEffects));
     }
 
     @Override
@@ -342,10 +524,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public List<ItemStack[]> getIslandChests() {
+        return Collections.unmodifiableList(this.islandChests);
+    }
+
+    @Override
     public Island.Builder setRoleLimit(PlayerRole playerRole, int limit) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
         this.roleLimits.put(playerRole, limit < 0 ? Value.syncedFixed(limit) : Value.fixed(limit));
         return this;
+    }
+
+    @Override
+    public Map<PlayerRole, Integer> getRoleLimits() {
+        return Collections.unmodifiableMap(convertFromValuesToRaw(this.roleLimits));
     }
 
     @Override
@@ -357,9 +549,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public Map<World.Environment, Location> getVisitorHomes() {
+        return Collections.unmodifiableMap(visitorHomes);
+    }
+
+    @Override
     public Island.Builder setIslandSize(int islandSize) {
         this.islandSize = islandSize < 0 ? Value.syncedFixed(islandSize) : Value.fixed(islandSize);
         return this;
+    }
+
+    @Override
+    public int getIslandSize() {
+        return this.islandSize.get();
     }
 
     @Override
@@ -369,9 +571,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public int getTeamLimit() {
+        return this.teamLimit.get();
+    }
+
+    @Override
     public Island.Builder setWarpsLimit(int warpsLimit) {
         this.warpsLimit = warpsLimit < 0 ? Value.syncedFixed(warpsLimit) : Value.fixed(warpsLimit);
         return this;
+    }
+
+    @Override
+    public int getWarpsLimit() {
+        return this.warpsLimit.get();
     }
 
     @Override
@@ -381,9 +593,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public double getCropGrowth() {
+        return this.cropGrowth.get();
+    }
+
+    @Override
     public Island.Builder setSpawnerRates(double spawnerRates) {
         this.spawnerRates = spawnerRates < 0 ? Value.syncedFixed(spawnerRates) : Value.fixed(spawnerRates);
         return this;
+    }
+
+    @Override
+    public double getSpawnerRates() {
+        return this.spawnerRates.get();
     }
 
     @Override
@@ -393,9 +615,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public double getMobDrops() {
+        return this.mobDrops.get();
+    }
+
+    @Override
     public Island.Builder setCoopLimit(int coopLimit) {
         this.coopLimit = coopLimit < 0 ? Value.syncedFixed(coopLimit) : Value.fixed(coopLimit);
         return this;
+    }
+
+    @Override
+    public int getCoopLimit() {
+        return this.coopLimit.get();
     }
 
     @Override
@@ -406,6 +638,11 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public BigDecimal getBankLimit() {
+        return this.bankLimit.get();
+    }
+
+    @Override
     public Island.Builder setBalance(BigDecimal balance) {
         Preconditions.checkNotNull(balance, "balance parameter cannot be null.");
         this.balance = balance;
@@ -413,9 +650,19 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public BigDecimal getBalance() {
+        return this.balance;
+    }
+
+    @Override
     public Island.Builder setLastInterestTime(long lastInterestTime) {
         this.lastInterestTime = lastInterestTime;
         return this;
+    }
+
+    @Override
+    public long getLastInterestTime() {
+        return this.lastInterestTime;
     }
 
     @Override
@@ -428,11 +675,47 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public boolean hasWarp(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null");
+
+        for (WarpRecord warpRecord : this.warps) {
+            if (warpRecord.name.equals(name))
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean hasWarp(Location location) {
+        Preconditions.checkNotNull(location, "location parameter cannot be null");
+
+        for (WarpRecord warpRecord : this.warps) {
+            if (warpRecord.location.equals(location))
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public Island.Builder addWarpCategory(String name, int slot, @Nullable ItemStack icon) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         Preconditions.checkArgument(slot >= 0, "slot must be positive.");
         this.warpCategories.add(new WarpCategoryRecord(name, slot, icon));
         return this;
+    }
+
+    @Override
+    public boolean hasWarpCategory(String name) {
+        Preconditions.checkNotNull(name, "name parameter cannot be null");
+
+        for (WarpCategoryRecord warpCategoryRecord : this.warpCategories) {
+            if (warpCategoryRecord.name.equals(name))
+                return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -443,10 +726,20 @@ public class IslandBuilderImpl implements Island.Builder {
     }
 
     @Override
+    public List<BankTransaction> getBankTransactions() {
+        return Collections.unmodifiableList(this.bankTransactions);
+    }
+
+    @Override
     public Island.Builder setPersistentData(byte[] persistentData) {
         Preconditions.checkNotNull(persistentData, "persistentData parameter cannot be null.");
         this.persistentData = persistentData;
         return this;
+    }
+
+    @Override
+    public byte[] getPersistentData() {
+        return this.persistentData;
     }
 
     @Override
@@ -463,6 +756,13 @@ public class IslandBuilderImpl implements Island.Builder {
         int maxIslandSize = plugin.getSettings().getMaxIslandSize() * 3;
         return center.getBlockX() % maxIslandSize == 0 && center.getBlockZ() % maxIslandSize == 0 &&
                 plugin.getGrid().getIslandAt(center) == null;
+    }
+
+    private static <K, V extends Number> Map<K, V> convertFromValuesToRaw(Map<K, Value<V>> input) {
+        return input.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                entry -> entry.getValue().get()
+        ));
     }
 
 }

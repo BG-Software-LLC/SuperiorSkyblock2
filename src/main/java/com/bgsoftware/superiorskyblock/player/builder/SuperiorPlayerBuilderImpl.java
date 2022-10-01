@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -46,10 +47,20 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public UUID getUniqueId() {
+        return this.uuid;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
         this.name = name;
         return this;
+    }
+
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     @Override
@@ -60,10 +71,20 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public PlayerRole getPlayerRole() {
+        return this.playerRole;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setDisbands(int disbands) {
         Preconditions.checkArgument(disbands >= 0, "Cannot set negative disbands count.");
         this.disbands = disbands;
         return this;
+    }
+
+    @Override
+    public int getDisbands() {
+        return this.disbands;
     }
 
     @Override
@@ -75,10 +96,20 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setTextureValue(String textureValue) {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
         this.textureValue = textureValue;
         return this;
+    }
+
+    @Override
+    public String getTextureValue() {
+        return this.textureValue;
     }
 
     @Override
@@ -88,15 +119,30 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public long getLastTimeUpdated() {
+        return this.lastTimeUpdated;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setToggledPanel(boolean toggledPanel) {
         this.toggledPanel = toggledPanel;
         return this;
     }
 
     @Override
+    public boolean hasToggledPanel() {
+        return this.toggledPanel;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setIslandFly(boolean islandFly) {
         this.islandFly = islandFly;
         return this;
+    }
+
+    @Override
+    public boolean hasIslandFly() {
+        return this.islandFly;
     }
 
     @Override
@@ -107,9 +153,19 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public BorderColor getBorderColor() {
+        return this.borderColor;
+    }
+
+    @Override
     public SuperiorPlayer.Builder setWorldBorderEnabled(boolean worldBorderEnabled) {
         this.worldBorderEnabled = worldBorderEnabled;
         return this;
+    }
+
+    @Override
+    public boolean hasWorldBorderEnabled() {
+        return this.worldBorderEnabled;
     }
 
     @Override
@@ -120,10 +176,20 @@ public class SuperiorPlayerBuilderImpl implements SuperiorPlayer.Builder {
     }
 
     @Override
+    public Map<Mission<?>, Integer> getCompletedMissions() {
+        return Collections.unmodifiableMap(this.completedMissions);
+    }
+
+    @Override
     public SuperiorPlayer.Builder setPersistentData(byte[] persistentData) {
         Preconditions.checkNotNull(persistentData, "persistentData parameter cannot be null.");
         this.persistentData = persistentData;
         return this;
+    }
+
+    @Override
+    public byte[] getPersistentData() {
+        return this.persistentData;
     }
 
     @Override

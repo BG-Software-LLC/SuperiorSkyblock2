@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.api.island;
 import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
+import com.bgsoftware.superiorskyblock.api.enums.SyncStatus;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
@@ -11,6 +12,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -1890,101 +1892,202 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
 
         Builder setOwner(@Nullable SuperiorPlayer owner);
 
+        @Nullable
+        SuperiorPlayer getOwner();
+
         Builder setUniqueId(UUID uuid);
+
+        UUID getUniqueId();
 
         Builder setCenter(Location center);
 
+        Location getCenter();
+
         Builder setName(String islandName);
+
+        String getName();
 
         Builder setSchematicName(String schematicName);
 
+        String getScehmaticName();
+
         Builder setCreationTime(long creationTime);
+
+        long getCreationTime();
 
         Builder setDiscord(String discord);
 
+        String getDiscord();
+
         Builder setPaypal(String paypal);
+
+        String getPaypal();
 
         Builder setBonusWorth(BigDecimal bonusWorth);
 
+        BigDecimal getBonusWorth();
+
         Builder setBonusLevel(BigDecimal bonusLevel);
+
+        BigDecimal getBonusLevel();
 
         Builder setLocked(boolean isLocked);
 
+        boolean isLocked();
+
         Builder setIgnored(boolean isIgnored);
+
+        boolean isIgnored();
 
         Builder setDescription(String description);
 
+        String getDescription();
+
         Builder setGeneratedSchematics(int generatedSchematicsMask);
+
+        int getGeneratedSchematicsMask();
 
         Builder setUnlockedWorlds(int unlockedWorldsMask);
 
+        int getUnlockedWorldsMask();
+
         Builder setLastTimeUpdated(long lastTimeUpdated);
+
+        long getLastTimeUpdated();
 
         Builder setDirtyChunk(String worldName, int chunkX, int chunkZ);
 
+        boolean isDirtyChunk(String worldName, int chunkX, int chunkZ);
+
         Builder setBlockCount(Key block, BigInteger count);
+
+        KeyMap<BigInteger> getBlockCounts();
 
         Builder setIslandHome(Location location, World.Environment environment);
 
+        Map<World.Environment, Location> getIslandHomes();
+
         Builder addIslandMember(SuperiorPlayer superiorPlayer);
+
+        List<SuperiorPlayer> getIslandMembers();
 
         Builder addBannedPlayer(SuperiorPlayer superiorPlayer);
 
+        List<SuperiorPlayer> getBannedPlayers();
+
         Builder setPlayerPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value);
+
+        Map<SuperiorPlayer, PermissionNode> getPlayerPermissions();
 
         Builder setRolePermission(IslandPrivilege islandPrivilege, PlayerRole requiredRole);
 
+        Map<IslandPrivilege, PlayerRole> getRolePermissions();
+
         Builder setUpgrade(Upgrade upgrade, int level);
+
+        Map<Upgrade, Integer> getUpgrades();
 
         Builder setBlockLimit(Key block, int limit);
 
+        KeyMap<Integer> getBlockLimits();
+
         Builder setRating(SuperiorPlayer superiorPlayer, Rating rating);
+
+        Map<SuperiorPlayer, Rating> getRatings();
 
         Builder setCompletedMission(Mission<?> mission, int finishCount);
 
+        Map<Mission<?>, Integer> getCompletedMissions();
+
         Builder setIslandFlag(IslandFlag islandFlag, boolean value);
+
+        Map<IslandFlag, SyncStatus> getIslandFlags();
 
         Builder setGeneratorRate(Key block, int rate, World.Environment environment);
 
+        Map<World.Environment, KeyMap<Integer>> getGeneratorRates();
+
         Builder addUniqueVisitor(SuperiorPlayer superiorPlayer, long visitTime);
+
+        Map<SuperiorPlayer, Long> getUniqueVisitors();
 
         Builder setEntityLimit(Key entity, int limit);
 
+        KeyMap<Integer> getEntityLimits();
+
         Builder setIslandEffect(PotionEffectType potionEffectType, int level);
+
+        Map<PotionEffectType, Integer> getIslandEffects();
 
         Builder setIslandChest(int index, ItemStack[] contents);
 
+        List<ItemStack[]> getIslandChests();
+
         Builder setRoleLimit(PlayerRole playerRole, int limit);
+
+        Map<PlayerRole, Integer> getRoleLimits();
 
         Builder setVisitorHome(Location location, World.Environment environment);
 
+        Map<World.Environment, Location> getVisitorHomes();
+
         Builder setIslandSize(int islandSize);
+
+        int getIslandSize();
 
         Builder setTeamLimit(int teamLimit);
 
+        int getTeamLimit();
+
         Builder setWarpsLimit(int warpsLimit);
+
+        int getWarpsLimit();
 
         Builder setCropGrowth(double cropGrowth);
 
+        double getCropGrowth();
+
         Builder setSpawnerRates(double spawnerRates);
+
+        double getSpawnerRates();
 
         Builder setMobDrops(double mobDrops);
 
+        double getMobDrops();
+
         Builder setCoopLimit(int coopLimit);
+
+        int getCoopLimit();
 
         Builder setBankLimit(BigDecimal bankLimit);
 
+        BigDecimal getBankLimit();
+
         Builder setBalance(BigDecimal balance);
+
+        BigDecimal getBalance();
 
         Builder setLastInterestTime(long lastInterestTime);
 
+        long getLastInterestTime();
+
         Builder addWarp(String name, String category, Location location, boolean isPrivate, @Nullable ItemStack icon);
+
+        boolean hasWarp(String name);
+
+        boolean hasWarp(Location location);
 
         Builder addWarpCategory(String name, int slot, @Nullable ItemStack icon);
 
+        boolean hasWarpCategory(String name);
+
         Builder addBankTransaction(BankTransaction bankTransaction);
 
+        List<BankTransaction> getBankTransactions();
+
         Builder setPersistentData(byte[] persistentData);
+
+        byte[] getPersistentData();
 
         Island build();
 

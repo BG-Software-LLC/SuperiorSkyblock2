@@ -20,6 +20,7 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -593,29 +594,55 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
 
         Builder setUniqueId(UUID uuid);
 
+        UUID getUniqueId();
+
         Builder setName(String name);
+
+        String getName();
 
         Builder setPlayerRole(PlayerRole playerRole);
 
+        PlayerRole getPlayerRole();
+
         Builder setDisbands(int disbands);
+
+        int getDisbands();
 
         Builder setLocale(Locale locale);
 
+        Locale getLocale();
+
         Builder setTextureValue(String textureValue);
+
+        String getTextureValue();
 
         Builder setLastTimeUpdated(long lastTimeUpdated);
 
+        long getLastTimeUpdated();
+
         Builder setToggledPanel(boolean toggledPanel);
+
+        boolean hasToggledPanel();
 
         Builder setIslandFly(boolean islandFly);
 
+        boolean hasIslandFly();
+
         Builder setBorderColor(BorderColor borderColor);
+
+        BorderColor getBorderColor();
 
         Builder setWorldBorderEnabled(boolean worldBorderEnabled);
 
+        boolean hasWorldBorderEnabled();
+
         Builder setCompletedMission(Mission<?> mission, int finishCount);
 
+        Map<Mission<?>, Integer> getCompletedMissions();
+
         Builder setPersistentData(byte[] persistentData);
+
+        byte[] getPersistentData();
 
         SuperiorPlayer build();
 
