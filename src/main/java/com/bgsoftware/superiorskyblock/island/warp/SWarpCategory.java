@@ -40,7 +40,7 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public Island getIsland() {
-        return cachedIsland == null ? (cachedIsland = plugin.getGrid().getIsland(islandUUID)) : cachedIsland;
+        return cachedIsland == null ? (cachedIsland = plugin.getGrid().getIslandByUUID(islandUUID)) : cachedIsland;
     }
 
     @Override
