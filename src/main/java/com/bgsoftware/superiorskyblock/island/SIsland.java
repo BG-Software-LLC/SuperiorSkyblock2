@@ -2584,7 +2584,7 @@ public class SIsland implements Island {
             while (occupiedSlots.contains(slot))
                 ++slot;
 
-            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(this, name, slot)));
+            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(getUniqueId(), name, slot)));
 
             IslandsDatabaseBridge.saveWarpCategory(this, warpCategory);
 

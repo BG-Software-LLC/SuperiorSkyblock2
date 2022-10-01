@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.island.warp;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
@@ -14,28 +15,32 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class SWarpCategory implements WarpCategory {
+
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static final ItemStack DEFAULT_WARP_ICON = new ItemBuilder(Material.BOOK)
             .withName("&6{0}").build();
 
     private final List<IslandWarp> islandWarps = new LinkedList<>();
-    private final Island island;
+    private final UUID islandUUID;
+    private Island cachedIsland;
 
     private String name;
-    private int slot = 0;
+    private int slot;
     private ItemStack icon = DEFAULT_WARP_ICON.clone();
 
-    public SWarpCategory(Island island, String name, int slot) {
-        this.island = island;
+    public SWarpCategory(UUID islandUUID, String name, int slot) {
+        this.islandUUID = islandUUID;
         this.name = name;
         this.slot = slot;
     }
 
     @Override
     public Island getIsland() {
-        return island;
+        return cachedIsland == null ? (cachedIsland = plugin.getGrid().getIsland(islandUUID)) : cachedIsland;
     }
 
     @Override
@@ -50,8 +55,8 @@ public class SWarpCategory implements WarpCategory {
         String oldName = this.name;
         this.name = name;
         for (IslandWarp islandWarp : islandWarps)
-            IslandsDatabaseBridge.updateWarpCategory(island, islandWarp, oldName);
-        IslandsDatabaseBridge.updateWarpCategoryName(island, this, oldName);
+            IslandsDatabaseBridge.updateWarpCategory(getIsland(), islandWarp, oldName);
+        IslandsDatabaseBridge.updateWarpCategoryName(getIsland(), this, oldName);
     }
 
     @Override
@@ -68,7 +73,7 @@ public class SWarpCategory implements WarpCategory {
     public void setSlot(int slot) {
         PluginDebugger.debug("Action: Update Warp-Category Slot, Island: " + getOwnerName() + ", Category: " + this.name + ", New Slot: " + slot);
         this.slot = slot;
-        IslandsDatabaseBridge.updateWarpCategorySlot(island, this);
+        IslandsDatabaseBridge.updateWarpCategorySlot(getIsland(), this);
     }
 
     @Override
@@ -87,11 +92,11 @@ public class SWarpCategory implements WarpCategory {
     public void setIcon(@Nullable ItemStack icon) {
         PluginDebugger.debug("Action: Update Warp-Category Icon, Island: " + getOwnerName() + ", Category: " + this.name);
         this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
-        IslandsDatabaseBridge.updateWarpCategoryIcon(island, this);
+        IslandsDatabaseBridge.updateWarpCategoryIcon(getIsland(), this);
     }
 
     private String getOwnerName() {
-        SuperiorPlayer superiorPlayer = island.getOwner();
+        SuperiorPlayer superiorPlayer = getIsland().getOwner();
         return superiorPlayer == null ? "None" : superiorPlayer.getName();
     }
 
