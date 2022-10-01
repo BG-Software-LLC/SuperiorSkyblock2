@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.commands.player;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
-import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IPermissibleCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 
 import java.util.Arrays;
@@ -79,12 +79,11 @@ public class CmdInvite implements IPermissibleCommand {
             return;
         }
 
-        java.util.Locale locale = superiorPlayer.getUserLocale();
-        IMessageComponent messageComponent;
+        Message announcementMessage;
 
         if (island.isInvited(targetPlayer)) {
             island.revokeInvite(targetPlayer);
-            messageComponent = Message.REVOKE_INVITE_ANNOUNCEMENT.getComponent(locale);
+            announcementMessage = Message.REVOKE_INVITE_ANNOUNCEMENT;
             Message.GOT_REVOKED.send(targetPlayer, superiorPlayer.getName());
         } else {
             if (island.getTeamLimit() >= 0 && island.getIslandMembers(true).size() >= island.getTeamLimit()) {
@@ -96,13 +95,12 @@ public class CmdInvite implements IPermissibleCommand {
                 return;
 
             island.inviteMember(targetPlayer);
-            messageComponent = Message.INVITE_ANNOUNCEMENT.getComponent(locale);
+            announcementMessage = Message.INVITE_ANNOUNCEMENT;
 
             Message.GOT_INVITE.send(targetPlayer, superiorPlayer.getName());
         }
 
-        if (messageComponent != null)
-            island.sendMessage(messageComponent, superiorPlayer.getName(), targetPlayer.getName());
+        IslandUtils.sendMessage(island, announcementMessage, Collections.emptyList(), superiorPlayer.getName(), targetPlayer.getName());
     }
 
     @Override
