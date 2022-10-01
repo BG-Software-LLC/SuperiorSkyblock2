@@ -114,7 +114,7 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setCenter(Location center) {
         Preconditions.checkNotNull(center, "center parameter cannot be null.");
-        // TODO: Make sure center is a valid location
+        Preconditions.checkState(isValidCenter(center), "The provided center is not centered.");
         this.center = center;
         return this;
     }
@@ -459,5 +459,10 @@ public class IslandBuilderImpl implements Island.Builder {
         return plugin.getFactory().createIsland(this);
     }
 
+    private static boolean isValidCenter(Location center) {
+        int maxIslandSize = plugin.getSettings().getMaxIslandSize() * 3;
+        return center.getBlockX() % maxIslandSize == 0 && center.getBlockZ() % maxIslandSize == 0 &&
+                plugin.getGrid().getIslandAt(center) == null;
+    }
 
 }
