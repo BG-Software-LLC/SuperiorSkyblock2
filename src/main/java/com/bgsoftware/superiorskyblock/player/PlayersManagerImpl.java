@@ -8,10 +8,7 @@ import com.bgsoftware.superiorskyblock.api.player.container.PlayersContainer;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -19,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -135,11 +131,6 @@ public class PlayersManagerImpl extends Manager implements PlayersManager {
         return new SequentialListBuilder<SuperiorPlayer>()
                 .filter(predicate)
                 .build(this.playersContainer.getAllPlayers());
-    }
-
-    public void loadPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
-        Optional<SuperiorPlayer> superiorPlayer = plugin.getFactory().createPlayer(databaseCache, resultSet);
-        superiorPlayer.ifPresent(this.playersContainer::addPlayer);
     }
 
     public void replacePlayers(SuperiorPlayer originPlayer, SuperiorPlayer newPlayer) {

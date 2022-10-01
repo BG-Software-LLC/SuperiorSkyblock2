@@ -88,6 +88,11 @@ public interface FactoriesManager {
     SuperiorPlayer createPlayer(UUID playerUUID);
 
     /**
+     * Create a new builder for a {@link SuperiorPlayer} object.
+     */
+    SuperiorPlayer.Builder createPlayerBuilder();
+
+    /**
      * Create a {@link BlockOffset} object from given offsets.
      *
      * @param offsetX The x-coords offset.

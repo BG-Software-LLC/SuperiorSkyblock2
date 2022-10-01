@@ -4,10 +4,10 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.player.PlayerLocales;
+import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +20,7 @@ public class PlayersDeserializer {
 
     }
 
-    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<CachedPlayerInfo> databaseCache) {
+    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<SuperiorPlayer.Builder> databaseCache) {
         databaseBridge.loadAllObjects("players_missions", missionsRow -> {
             DatabaseResult missions = new DatabaseResult(missionsRow);
 
@@ -32,7 +32,7 @@ public class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid, CachedPlayerInfo::new);
+            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid, SuperiorPlayer::newBuilder);
 
             Optional<String> name = missions.getString("name");
 
@@ -51,11 +51,11 @@ public class PlayersDeserializer {
             Mission<?> mission = plugin.getMissions().getMission(name.get());
 
             if (mission != null)
-                cachedPlayerInfo.completedMissions.put(mission, finishCount.get());
+                builder.setCompletedMission(mission, finishCount.get());
         });
     }
 
-    public static void deserializePlayerSettings(DatabaseBridge databaseBridge, DatabaseCache<CachedPlayerInfo> databaseCache) {
+    public static void deserializePlayerSettings(DatabaseBridge databaseBridge, DatabaseCache<SuperiorPlayer.Builder> databaseCache) {
         databaseBridge.loadAllObjects("players_settings", playerSettingsRow -> {
             DatabaseResult playerSettings = new DatabaseResult(playerSettingsRow);
 
@@ -67,22 +67,16 @@ public class PlayersDeserializer {
             }
 
             UUID uuid = UUID.fromString(player.get());
-            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid, CachedPlayerInfo::new);
-
-            cachedPlayerInfo.toggledPanel = playerSettings.getBoolean("toggled_panel")
-                    .orElse(plugin.getSettings().isDefaultToggledPanel());
-            cachedPlayerInfo.islandFly = playerSettings.getBoolean("island_fly")
-                    .orElse(plugin.getSettings().isDefaultIslandFly());
-            cachedPlayerInfo.borderColor = playerSettings.getEnum("border_color", BorderColor.class)
-                    .orElse(BorderColor.BLUE);
-            cachedPlayerInfo.userLocale = playerSettings.getString("language").map(PlayerLocales::getLocale)
-                    .orElse(PlayerLocales.getDefaultLocale());
-            cachedPlayerInfo.worldBorderEnabled = playerSettings.getBoolean("toggled_border")
-                    .orElse(plugin.getSettings().isDefaultWorldBorder());
+            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid, SuperiorPlayer::newBuilder);
+            playerSettings.getBoolean("toggled_panel").ifPresent(builder::setToggledPanel);
+            playerSettings.getBoolean("island_fly").ifPresent(builder::setIslandFly);
+            playerSettings.getEnum("border_color", BorderColor.class).ifPresent(builder::setBorderColor);
+            playerSettings.getString("language").map(PlayerLocales::getLocale).ifPresent(builder::setLocale);
+            playerSettings.getBoolean("toggled_border").ifPresent(builder::setWorldBorderEnabled);
         });
     }
 
-    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<CachedPlayerInfo> databaseCache) {
+    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<SuperiorPlayer.Builder> databaseCache) {
         databaseBridge.loadAllObjects("players_custom_data", customDataRow -> {
             DatabaseResult customData = new DatabaseResult(customDataRow);
 
@@ -97,8 +91,8 @@ public class PlayersDeserializer {
             if (persistentData.length == 0)
                 return;
 
-            CachedPlayerInfo cachedPlayerInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedPlayerInfo::new);
-            cachedPlayerInfo.persistentData = persistentData;
+            SuperiorPlayer.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), SuperiorPlayer::newBuilder);
+            builder.setPersistentData(persistentData);
         });
     }
 

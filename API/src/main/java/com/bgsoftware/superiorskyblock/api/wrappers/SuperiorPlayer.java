@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.api.wrappers;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.enums.HitActionResult;
@@ -7,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
@@ -573,5 +575,50 @@ public interface SuperiorPlayer extends IMissionsHolder, IPersistentDataHolder, 
      * Merge another player into this object.
      */
     void merge(SuperiorPlayer otherPlayer);
+
+    /**
+     * Create a new builder for a {@link SuperiorPlayer} object.
+     */
+    static Builder newBuilder() {
+        return SuperiorSkyblockAPI.getFactory().createPlayerBuilder();
+    }
+
+    /**
+     * The {@link Builder} interface is used to create {@link SuperiorPlayer} objects with predefined values.
+     * All of its methods are setters for all the values possible to create a player with.
+     * Use {@link Builder#build()} to create the new {@link SuperiorPlayer} object. You must set
+     * {@link Builder#setUniqueId(UUID)} before creating a new {@link SuperiorPlayer}
+     */
+    interface Builder {
+
+        Builder setUniqueId(UUID uuid);
+
+        Builder setName(String name);
+
+        Builder setPlayerRole(PlayerRole playerRole);
+
+        Builder setDisbands(int disbands);
+
+        Builder setLocale(Locale locale);
+
+        Builder setTextureValue(String textureValue);
+
+        Builder setLastTimeUpdated(long lastTimeUpdated);
+
+        Builder setToggledPanel(boolean toggledPanel);
+
+        Builder setIslandFly(boolean islandFly);
+
+        Builder setBorderColor(BorderColor borderColor);
+
+        Builder setWorldBorderEnabled(boolean worldBorderEnabled);
+
+        Builder setCompletedMission(Mission<?> mission, int finishCount);
+
+        Builder setPersistentData(byte[] persistentData);
+
+        SuperiorPlayer build();
+
+    }
 
 }

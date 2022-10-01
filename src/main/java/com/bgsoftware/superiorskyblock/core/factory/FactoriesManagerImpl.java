@@ -24,11 +24,8 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
-import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.persistence.PersistentDataContainerImpl;
 import com.bgsoftware.superiorskyblock.island.SIsland;
@@ -40,12 +37,14 @@ import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
+import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.google.common.base.Preconditions;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -137,17 +136,25 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public SuperiorPlayer createPlayer(UUID playerUUID) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(playerUUID);
-        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
+        Preconditions.checkNotNull(playerUUID, "playerUUID parameter cannot be null.");
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerUUID);
+        SuperiorPlayer.Builder builder = createPlayerBuilder()
+                .setUniqueId(playerUUID);
+
+        if (offlinePlayer != null)
+            builder.setName(offlinePlayer.getName());
+
+        return builder.build();
     }
 
-    public Optional<SuperiorPlayer> createPlayer(DatabaseCache<CachedPlayerInfo> databaseCache, DatabaseResult resultSet) {
-        Optional<SuperiorPlayer> superiorPlayer = SSuperiorPlayer.fromDatabase(databaseCache, resultSet);
+    @Override
+    public SuperiorPlayer.Builder createPlayerBuilder() {
+        return new SuperiorPlayerBuilderImpl();
+    }
 
-        if (!superiorPlayer.isPresent())
-            return superiorPlayer;
-
-        return playersFactory == null ? superiorPlayer : superiorPlayer.map(playersFactory::createPlayer);
+    public SuperiorPlayer createPlayer(SuperiorPlayerBuilderImpl builder) {
+        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(builder);
+        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
     }
 
     @Override

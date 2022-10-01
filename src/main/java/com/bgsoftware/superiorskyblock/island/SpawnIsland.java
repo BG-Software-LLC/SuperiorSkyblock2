@@ -40,6 +40,7 @@ import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
+import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Bukkit;
@@ -69,7 +70,8 @@ import java.util.function.Consumer;
 public class SpawnIsland implements Island {
 
     private static final UUID spawnUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-    private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer(spawnUUID);
+    private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer((SuperiorPlayerBuilderImpl)
+            SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static SuperiorSkyblockPlugin plugin;
 

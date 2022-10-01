@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.backup.BackupDatabase;
@@ -110,7 +109,7 @@ public class DataManager extends Manager {
 
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
-        DatabaseCache<CachedPlayerInfo> databaseCache = new DatabaseCache<>();
+        DatabaseCache<SuperiorPlayer.Builder> databaseCache = new DatabaseCache<>();
         AtomicInteger playersCount = new AtomicInteger();
         long startTime = System.currentTimeMillis();
 
@@ -118,8 +117,23 @@ public class DataManager extends Manager {
         PlayersDeserializer.deserializePlayerSettings(playersLoader, databaseCache);
         PlayersDeserializer.deserializePersistentDataContainer(playersLoader, databaseCache);
 
-        playersLoader.loadAllObjects("players", resultSet -> {
-            plugin.getPlayers().loadPlayer(databaseCache, new DatabaseResult(resultSet));
+        playersLoader.loadAllObjects("players", resultSetRaw -> {
+            DatabaseResult databaseResult = new DatabaseResult(resultSetRaw);
+
+            Optional<UUID> uuid = databaseResult.getUUID("uuid");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load player with null uuid, skipping...");
+                return;
+            }
+
+            plugin.getPlayers().getPlayersContainer().addPlayer(databaseCache.computeIfAbsentInfo(uuid.get(), SuperiorPlayer::newBuilder)
+                    .setUniqueId(uuid.get())
+                    .setName(databaseResult.getString("last_used_name").orElse("null"))
+                    .setDisbands(databaseResult.getInt("disbands").orElse(0))
+                    .setTextureValue(databaseResult.getString("last_used_skin").orElse(""))
+                    .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000))
+                    .build());
+
             playersCount.incrementAndGet();
         });
 

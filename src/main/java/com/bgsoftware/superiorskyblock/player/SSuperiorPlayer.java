@@ -15,16 +15,14 @@ import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
+import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -40,7 +38,6 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,24 +60,24 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private Island playerIsland = null;
     private String name;
-    private String textureValue = "";
+    private String textureValue;
     private PlayerRole playerRole;
     private java.util.Locale userLocale;
 
-    private boolean worldBorderEnabled = plugin.getSettings().isDefaultWorldBorder();
+    private boolean worldBorderEnabled;
     private boolean blocksStackerEnabled = plugin.getSettings().isDefaultStackedBlocks();
     private boolean schematicModeEnabled = false;
     private boolean bypassModeEnabled = false;
     private boolean teamChatEnabled = false;
-    private boolean toggledPanel = plugin.getSettings().isDefaultToggledPanel();
-    private boolean islandFly = plugin.getSettings().isDefaultIslandFly();
+    private boolean toggledPanel;
+    private boolean islandFly;
     private boolean adminSpyEnabled = false;
 
     private SBlockPosition schematicPos1 = null;
     private SBlockPosition schematicPos2 = null;
     private int disbands;
-    private BorderColor borderColor = BorderColor.safeValue(plugin.getSettings().getDefaultBorderColor(), BorderColor.BLUE);
-    private long lastTimeStatus = -1;
+    private BorderColor borderColor;
+    private long lastTimeStatus;
 
     private boolean immuneToPvP = false;
     private boolean immuneToPortals = false;
@@ -88,61 +85,26 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     private BukkitTask teleportTask = null;
 
-    public SSuperiorPlayer(UUID player) {
-        this(player, Bukkit.getOfflinePlayer(player), SPlayerRole.guestRole(), plugin.getSettings().getDisbandCount(),
-                PlayerLocales.getDefaultLocale());
-    }
-
-    public SSuperiorPlayer(UUID uuid, @Nullable OfflinePlayer offlinePlayer, PlayerRole playerRole, int disbands,
-                           Locale userLocale) {
-        this(uuid, offlinePlayer == null ? null : offlinePlayer.getName(), playerRole, disbands, userLocale);
-    }
-
-    public SSuperiorPlayer(UUID uuid, @Nullable String name, PlayerRole playerRole, int disbands, Locale userLocale) {
-        this.uuid = uuid;
-        this.name = name == null ? "null" : name;
-        this.playerRole = playerRole;
-        this.disbands = disbands;
-        this.userLocale = userLocale;
+    public SSuperiorPlayer(SuperiorPlayerBuilderImpl builder) {
+        this.uuid = builder.uuid;
+        this.name = builder.name;
+        this.playerRole = builder.playerRole;
+        this.disbands = builder.disbands;
+        this.userLocale = builder.locale;
+        this.textureValue = builder.textureValue;
+        this.lastTimeStatus = builder.lastTimeUpdated;
+        this.toggledPanel = builder.toggledPanel;
+        this.islandFly = builder.islandFly;
+        this.borderColor = builder.borderColor;
+        this.worldBorderEnabled = builder.worldBorderEnabled;
+        this.completedMissions.putAll(builder.completedMissions);
+        if (builder.persistentData.length > 0)
+            getPersistentDataContainer().load(builder.persistentData);
 
         this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         this.playerTeleportAlgorithm = plugin.getFactory().createPlayerTeleportAlgorithm(this);
 
         databaseBridge.setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-    }
-
-    public static Optional<SuperiorPlayer> fromDatabase(DatabaseCache<CachedPlayerInfo> cache,
-                                                        DatabaseResult resultSet) {
-        Optional<UUID> uuid = resultSet.getUUID("uuid");
-        if (!uuid.isPresent()) {
-            SuperiorSkyblockPlugin.log("&cCannot load player with null uuid, skipping...");
-            return Optional.empty();
-        }
-
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(
-                uuid.get(),
-                resultSet.getString("last_used_name").orElse(null),
-                SPlayerRole.defaultRole(),
-                resultSet.getInt("disbands").orElse(0),
-                PlayerLocales.getDefaultLocale()
-        );
-
-        try {
-            superiorPlayer.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
-
-            superiorPlayer.textureValue = resultSet.getString("last_used_skin").orElse("");
-            superiorPlayer.lastTimeStatus = resultSet.getLong("last_time_updated")
-                    .orElse(System.currentTimeMillis() / 1000);
-
-            CachedPlayerInfo cachedPlayerInfo = cache.getCachedInfo(uuid.get());
-
-            if (cachedPlayerInfo != null)
-                superiorPlayer.loadFromCachedInfo(cachedPlayerInfo);
-        } finally {
-            superiorPlayer.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
-        }
-
-        return Optional.of(superiorPlayer);
     }
 
     /*
@@ -882,17 +844,6 @@ public class SSuperiorPlayer implements SuperiorPlayer {
                 "uuid=[" + uuid + "]," +
                 "name=[" + name + "]" +
                 "}";
-    }
-
-    private void loadFromCachedInfo(CachedPlayerInfo cachedPlayerInfo) {
-        this.toggledPanel = cachedPlayerInfo.toggledPanel;
-        this.islandFly = cachedPlayerInfo.islandFly;
-        this.borderColor = cachedPlayerInfo.borderColor;
-        this.userLocale = cachedPlayerInfo.userLocale;
-        this.worldBorderEnabled = cachedPlayerInfo.worldBorderEnabled;
-        this.completedMissions.putAll(cachedPlayerInfo.completedMissions);
-        if (cachedPlayerInfo.persistentData.length > 0)
-            getPersistentDataContainer().load(cachedPlayerInfo.persistentData);
     }
 
 }
