@@ -141,7 +141,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
         SuperiorPlayer.Builder builder = createPlayerBuilder()
                 .setUniqueId(playerUUID);
 
-        if (offlinePlayer != null)
+        if (offlinePlayer != null && offlinePlayer.getName() != null)
             builder.setName(offlinePlayer.getName());
 
         return builder.build();
