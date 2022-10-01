@@ -2650,7 +2650,7 @@ public class SIsland implements Island {
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
         plugin.getMenus().refreshGlobalWarps();
-        plugin.getMenus().refreshWarps(warpCategory);
+        plugin.getMenus().refreshWarps(islandWarp.getCategory());
 
         return islandWarp;
     }
