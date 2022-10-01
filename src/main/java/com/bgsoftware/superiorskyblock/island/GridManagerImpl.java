@@ -235,15 +235,18 @@ public class GridManagerImpl extends Manager implements GridManager {
 
                     island.setIslandHome(schematic.adjustRotation(islandLocation));
 
-                    Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
-                            islandLocation), System.currentTimeMillis() - startTime);
+                    BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
+                        if (updateGamemode)
+                            player.setGameMode(GameMode.SURVIVAL);
 
-                    if (teleportPlayer) {
-                        BukkitExecutor.sync(() -> builder.owner.runIfOnline(player -> {
-                            if (updateGamemode)
-                                player.setGameMode(GameMode.SURVIVAL);
-
+                        if (!teleportPlayer) {
+                            Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                                    islandLocation), System.currentTimeMillis() - startTime);
+                        } else {
                             builder.owner.teleport(island, result -> {
+                                Message.CREATE_ISLAND.send(builder.owner, Formatters.LOCATION_FORMATTER.format(
+                                        islandLocation), System.currentTimeMillis() - startTime);
+
                                 if (result) {
                                     if (loadedChunks != null)
                                         BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
@@ -253,8 +256,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                                     }
                                 }
                             });
-                        }), 1L);
-                    }
+                        }
+                    }), 1L);
 
                     return;
                 } catch (Throwable runtimeError) {
