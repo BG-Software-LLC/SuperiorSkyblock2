@@ -30,12 +30,13 @@ public class SWarpCategory implements WarpCategory {
 
     private String name;
     private int slot;
-    private ItemStack icon = DEFAULT_WARP_ICON.clone();
+    private ItemStack icon;
 
-    public SWarpCategory(UUID islandUUID, String name, int slot) {
+    public SWarpCategory(UUID islandUUID, String name, int slot, @Nullable ItemStack icon) {
         this.islandUUID = islandUUID;
         this.name = name;
         this.slot = slot;
+        this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon;
     }
 
     @Override

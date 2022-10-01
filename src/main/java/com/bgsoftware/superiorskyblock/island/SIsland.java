@@ -81,6 +81,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
@@ -245,12 +246,6 @@ public class SIsland implements Island {
         this.generatedSchematics.set(builder.generatedSchematicsMask);
         this.unlockedWorlds.set(builder.unlockedWorldsMask);
         this.lastTimeUpdate = builder.lastTimeUpdated;
-        builder.dirtyChunks.forEach(chunkPosition -> ChunksTracker.markDirty(this, chunkPosition, false));
-        if (!builder.blockCounts.isEmpty()) {
-            BukkitExecutor.sync(() -> builder.blockCounts.forEach((block, count) ->
-                    handleBlockPlace(block, count, false, false)
-            ), 20L);
-        }
         this.islandHomes.write(islandHomes -> islandHomes.putAll(builder.islandHomes));
         this.members.write(members -> {
             members.addAll(builder.members);
@@ -285,43 +280,33 @@ public class SIsland implements Island {
         this.coopLimit.set(builder.coopLimit);
         this.bankLimit.set(builder.bankLimit);
         this.lastInterest = builder.lastInterestTime;
-        builder.warpCategories.forEach(warpCategoryRecord -> {
-            WarpCategory warpCategory = getWarpCategory(warpCategoryRecord.name);
-
-            if (warpCategory != null) {
-                if (warpCategory.getWarps().isEmpty()) {
-                    deleteCategory(warpCategory);
-                    return;
-                }
-
-                warpCategory.setSlot(warpCategoryRecord.slot);
-
-                if (warpCategoryRecord.icon != null)
-                    warpCategory.setIcon(warpCategoryRecord.icon);
-            }
-        });
-        builder.warps.forEach(warpRecord -> {
-            WarpCategory warpCategory = null;
-
-            if (!warpRecord.category.isEmpty())
-                warpCategory = createWarpCategory(warpRecord.category);
-
-            IslandWarp islandWarp = createWarp(warpRecord.name, warpRecord.location, warpCategory);
-            islandWarp.setPrivateFlag(warpRecord.isPrivate);
-
-            if (warpRecord.icon != null)
-                islandWarp.setIcon(warpRecord.icon);
-        });
-
-
-        // We want to save all the limits to the custom block keys
-        plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
         this.databaseBridge = plugin.getFactory().createDatabaseBridge(this);
         this.islandBank = plugin.getFactory().createIslandBank(this, this::hasGiveInterestFailed);
         this.calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
         this.blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
         this.entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
+
+        builder.dirtyChunks.forEach(chunkPosition -> ChunksTracker.markDirty(this, chunkPosition, false));
+        if (!builder.blockCounts.isEmpty()) {
+            BukkitExecutor.sync(() -> builder.blockCounts.forEach((block, count) ->
+                    handleBlockPlace(block, count, false, false)
+            ), 20L);
+        }
+        builder.warpCategories.forEach(warpCategoryRecord -> {
+            loadWarpCategory(warpCategoryRecord.name, warpCategoryRecord.slot, warpCategoryRecord.icon);
+        });
+        builder.warps.forEach(warpRecord -> {
+            WarpCategory warpCategory = null;
+
+            if (!warpRecord.category.isEmpty())
+                warpCategory = getWarpCategory(warpRecord.category);
+
+            loadIslandWarp(warpRecord.name, warpRecord.location, warpCategory, warpRecord.isPrivate, warpRecord.icon);
+        });
+
+        // We want to save all the limits to the custom block keys
+        plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
 
         updateDatesFormatter();
         startBankInterest();
@@ -2585,13 +2570,19 @@ public class SIsland implements Island {
             while (occupiedSlots.contains(slot))
                 ++slot;
 
-            warpCategories.put(name.toLowerCase(Locale.ENGLISH), (warpCategory = new SWarpCategory(getUniqueId(), name, slot)));
+            warpCategory = loadWarpCategory(name, slot, null);
 
             IslandsDatabaseBridge.saveWarpCategory(this, warpCategory);
 
             plugin.getMenus().refreshWarpCategories(this);
         }
 
+        return warpCategory;
+    }
+
+    private WarpCategory loadWarpCategory(String name, int slot, @Nullable ItemStack icon) {
+        WarpCategory warpCategory = new SWarpCategory(getUniqueId(), name, slot, icon);
+        warpCategories.put(name.toLowerCase(Locale.ENGLISH), warpCategory);
         return warpCategory;
     }
 
@@ -2654,16 +2645,33 @@ public class SIsland implements Island {
         PluginDebugger.debug("Action: Create Warp, Island: " + owner.getName() + ", Name: " + name + ", Location: " +
                 Formatters.LOCATION_FORMATTER.format(location));
 
-        if (warpCategory == null)
-            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
-
-        IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory);
-        loadIslandWarp(islandWarp);
+        IslandWarp islandWarp = loadIslandWarp(name, location, warpCategory, !plugin.getSettings().isPublicWarps(), null);
 
         IslandsDatabaseBridge.saveWarp(this, islandWarp);
 
         plugin.getMenus().refreshGlobalWarps();
         plugin.getMenus().refreshWarps(warpCategory);
+
+        return islandWarp;
+    }
+
+    public IslandWarp loadIslandWarp(String name, Location location, @Nullable WarpCategory warpCategory,
+                                     boolean isPrivate, @Nullable ItemStack icon) {
+        if (warpCategory == null)
+            warpCategory = warpCategories.values().stream().findFirst().orElseGet(() -> createWarpCategory("Default Category"));
+
+        IslandWarp islandWarp = new SIslandWarp(name, location.clone(), warpCategory, isPrivate, icon);
+
+        islandWarp.getCategory().getWarps().add(islandWarp);
+
+        String warpName = islandWarp.getName().toLowerCase(Locale.ENGLISH);
+
+        if (warpsByName.containsKey(warpName))
+            deleteWarp(warpName);
+
+        warpsByName.put(warpName, islandWarp);
+
+        warpsByLocation.put(new LocationKey(location), islandWarp);
 
         return islandWarp;
     }
@@ -3868,21 +3876,6 @@ public class SIsland implements Island {
 
         if (callback != null)
             callback.run();
-    }
-
-    private void loadIslandWarp(IslandWarp islandWarp) {
-        islandWarp.getCategory().getWarps().add(islandWarp);
-
-        String warpName = islandWarp.getName().toLowerCase(Locale.ENGLISH);
-
-        if (warpsByName.containsKey(warpName))
-            deleteWarp(warpName);
-
-        warpsByName.put(warpName, islandWarp);
-
-        Location location = islandWarp.getLocation();
-
-        warpsByLocation.put(new LocationKey(location), islandWarp);
     }
 
     private void forEachIslandMember(List<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {

@@ -1,24 +1,22 @@
 package com.bgsoftware.superiorskyblock.island.warp;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class SIslandWarp implements IslandWarp {
-
-    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     public static TemplateItem DEFAULT_WARP_ICON;
 
@@ -26,14 +24,15 @@ public class SIslandWarp implements IslandWarp {
 
     private String name;
     private Location location;
-    private boolean privateFlag;
+    private boolean isPrivate;
     private ItemStack icon;
 
-    public SIslandWarp(String name, Location location, WarpCategory warpCategory) {
+    public SIslandWarp(String name, Location location, WarpCategory warpCategory, boolean isPrivate, @Nullable ItemStack icon) {
         this.name = name;
         this.location = location.clone().add(0.5, 0, 0.5);
         this.warpCategory = warpCategory;
-        this.privateFlag = !plugin.getSettings().isPublicWarps();
+        this.isPrivate = isPrivate;
+        this.icon = icon;
     }
 
     @Override
@@ -71,13 +70,13 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public boolean hasPrivateFlag() {
-        return privateFlag;
+        return isPrivate;
     }
 
     @Override
     public void setPrivateFlag(boolean privateFlag) {
         PluginDebugger.debug("Action: Update Warp Private, Island: " + getOwnerName() + ", Warp: " + this.name + ", Private: " + privateFlag);
-        this.privateFlag = privateFlag;
+        this.isPrivate = privateFlag;
         IslandsDatabaseBridge.updateWarpPrivateStatus(getIsland(), this);
     }
 
