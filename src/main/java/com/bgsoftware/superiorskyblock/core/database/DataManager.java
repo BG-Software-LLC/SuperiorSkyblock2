@@ -7,7 +7,6 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
@@ -18,13 +17,19 @@ import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeseri
 import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeserializer;
 import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
+import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("WeakerAccess")
@@ -128,7 +133,7 @@ public class DataManager extends Manager {
 
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
-        DatabaseCache<CachedIslandInfo> databaseCache = new DatabaseCache<>();
+        DatabaseCache<Island.Builder> databaseCache = new DatabaseCache<>();
         AtomicInteger islandsCount = new AtomicInteger();
         long startTime = System.currentTimeMillis();
 
@@ -156,8 +161,55 @@ public class DataManager extends Manager {
         IslandsDeserializer.deserializeBankTransactions(islandsLoader, databaseCache);
         IslandsDeserializer.deserializePersistentDataContainer(islandsLoader, databaseCache);
 
-        islandsLoader.loadAllObjects("islands", resultSet -> {
-            plugin.getGrid().createIsland(databaseCache, new DatabaseResult(resultSet));
+        islandsLoader.loadAllObjects("islands", resultSetRaw -> {
+            DatabaseResult databaseResult = new DatabaseResult(resultSetRaw);
+
+            Optional<UUID> uuid = databaseResult.getUUID("uuid");
+            if (!uuid.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island with invalid uuid, skipping...");
+                return;
+            }
+
+            Optional<SuperiorPlayer> owner = databaseResult.getUUID("owner").map(plugin.getPlayers()::getSuperiorPlayer);
+            if (!owner.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island with invalid owner uuid, skipping...");
+                return;
+            }
+
+            Optional<Location> center = databaseResult.getString("center").map(Serializers.LOCATION_SERIALIZER::deserialize);
+            if (!center.isPresent()) {
+                SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
+                return;
+            }
+
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new)
+                    .setOwner(owner.get())
+                    .setUniqueId(uuid.get())
+                    .setCenter(center.get())
+                    .setName(databaseResult.getString("name").orElse(""))
+                    .setSchematicName(databaseResult.getString("island_type").orElse(null))
+                    .setCreationTime(databaseResult.getLong("creation_time").orElse(System.currentTimeMillis() / 1000L))
+                    .setDiscord(databaseResult.getString("discord").orElse("None"))
+                    .setPaypal(databaseResult.getString("paypal").orElse("None"))
+                    .setBonusWorth(databaseResult.getBigDecimal("worth_bonus").orElse(BigDecimal.ZERO))
+                    .setBonusLevel(databaseResult.getBigDecimal("levels_bonus").orElse(BigDecimal.ZERO))
+                    .setLocked(databaseResult.getBoolean("locked").orElse(false))
+                    .setIgnored(databaseResult.getBoolean("ignored").orElse(false))
+                    .setDescription(databaseResult.getString("description").orElse(""))
+                    .setGeneratedSchematics(databaseResult.getInt("generated_schematics").orElse(0))
+                    .setUnlockedWorlds(databaseResult.getInt("unlocked_worlds").orElse(0))
+                    .setLastTimeUpdated(databaseResult.getLong("last_time_updated").orElse(System.currentTimeMillis() / 1000L));
+
+            databaseResult.getString("dirty_chunks").ifPresent(dirtyChunks -> {
+                IslandsDeserializer.deserializeDirtyChunks(builder, dirtyChunks);
+            });
+
+            databaseResult.getString("block_counts").ifPresent(blockCounts -> {
+                IslandsDeserializer.deserializeBlockCounts(builder, blockCounts);
+            });
+
+            plugin.getGrid().getIslandsContainer().addIsland(builder.build());
+
             islandsCount.incrementAndGet();
         });
 

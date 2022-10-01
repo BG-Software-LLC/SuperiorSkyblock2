@@ -28,7 +28,7 @@ public class SUpgrade implements Upgrade {
             Value.syncedFixed(-1),
             KeyMapImpl.createEmptyMap(),
             KeyMapImpl.createEmptyMap(),
-            new KeyMap[World.Environment.values().length],
+            Collections.emptyMap(),
             Collections.emptyMap(),
             Value.syncedFixed(new BigDecimal(-2)),
             Collections.emptyMap());

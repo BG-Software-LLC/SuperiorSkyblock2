@@ -23,6 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import javax.script.ScriptException;
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +47,7 @@ public class SUpgradeLevel implements UpgradeLevel {
     private final Value<Integer> borderSize;
     private final KeyMap<Integer> blockLimits;
     private final KeyMap<Integer> entityLimits;
-    private final KeyMap<Integer>[] generatorRates;
+    private final Map<World.Environment, Map<Key, Integer>> generatorRates;
     private final Map<PotionEffectType, Integer> islandEffects;
     private final Value<BigDecimal> bankLimit;
     private final Map<Integer, Integer> roleLimits;
@@ -57,7 +58,7 @@ public class SUpgradeLevel implements UpgradeLevel {
                          Value<Double> cropGrowth, Value<Double> spawnerRates, Value<Double> mobDrops,
                          Value<Integer> teamLimit, Value<Integer> warpsLimit, Value<Integer> coopLimit,
                          Value<Integer> borderSize, KeyMap<Integer> blockLimits,
-                         KeyMap<Integer> entityLimits, KeyMap<Integer>[] generatorRates,
+                         KeyMap<Integer> entityLimits, Map<World.Environment, Map<Key, Integer>> generatorRates,
                          Map<PotionEffectType, Integer> islandEffects, Value<BigDecimal> bankLimit,
                          Map<Integer, Integer> roleLimits) {
         this.level = level;
@@ -199,14 +200,14 @@ public class SUpgradeLevel implements UpgradeLevel {
     public int getGeneratorAmount(Key key, World.Environment environment) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
+        Map<Key, Integer> generatorRates = this.generatorRates.get(environment);
         return (generatorRates == null ? 0 : generatorRates.getOrDefault(key, 0));
     }
 
     @Override
     public Map<String, Integer> getGeneratorAmounts(World.Environment environment) {
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
-        KeyMap<Integer> generatorRates = this.generatorRates[environment.ordinal()];
+        Map<Key, Integer> generatorRates = this.generatorRates.get(environment);
         return generatorRates == null ? Collections.emptyMap() : generatorRates.entrySet().stream().collect(Collectors.toMap(
                 entry -> entry.getKey().toString(),
                 Map.Entry::getValue));
@@ -286,19 +287,17 @@ public class SUpgradeLevel implements UpgradeLevel {
         return borderSize;
     }
 
-    public Map<Key, Value<Integer>>[] getGeneratorUpgradeValue() {
-        Map<Key, Value<Integer>>[] generatorRates = new Map[this.generatorRates.length];
+    public Map<World.Environment, Map<Key, Value<Integer>>> getGeneratorUpgradeValue() {
+        EnumMap<World.Environment, Map<Key, Value<Integer>>> generatorRates = new EnumMap<>(World.Environment.class);
 
-        for (int i = 0; i < generatorRates.length; ++i) {
-            if (this.generatorRates[i] != null) {
-                generatorRates[i] = this.generatorRates[i].entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> Value.syncedFixed(entry.getValue()))
-                );
-            }
-        }
+        this.generatorRates.forEach(((environment, worldGeneratorRates) -> {
+            Map<Key, Value<Integer>> result = worldGeneratorRates.entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    entry -> Value.syncedFixed(entry.getValue())));
+            generatorRates.put(environment, result);
+        }));
 
-        return generatorRates;
+        return Collections.unmodifiableMap(generatorRates);
     }
 
     public Map<PotionEffectType, Value<Integer>> getPotionEffectsUpgradeValue() {

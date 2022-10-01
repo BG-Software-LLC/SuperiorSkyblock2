@@ -26,6 +26,16 @@ public interface IslandCreationAlgorithm {
                                                          String islandName, Schematic schematic);
 
     /**
+     * Create a new island on the server.
+     * This method should not only create the Island object itself, but also paste a schematic.
+     * Teleportation and island initialization will be handled by the plugin.
+     *
+     * @param builder    The builder of the island.
+     * @param lastIsland The location of the last generated island.
+     */
+    CompletableFuture<IslandCreationResult> createIsland(Island.Builder builder, BlockPosition lastIsland);
+
+    /**
      * Class representing result of a creation process.
      */
     class IslandCreationResult {

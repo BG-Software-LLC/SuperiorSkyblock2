@@ -2,10 +2,13 @@ package com.bgsoftware.superiorskyblock.island.upgrade;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
+import com.bgsoftware.superiorskyblock.island.upgrade.cost.EmptyUpgradeCost;
+import org.bukkit.World;
 
 import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
 
 public class DefaultUpgradeLevel extends SUpgradeLevel {
 
@@ -23,7 +26,7 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getIslandSize()),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getBlockLimits(),
                 (KeyMap<Integer>) plugin.getSettings().getDefaultValues().getEntityLimits(),
-                (KeyMap<Integer>[]) plugin.getSettings().getDefaultValues().getGenerators(),
+                convertFromArray(plugin.getSettings().getDefaultValues().getGenerators()),
                 Collections.emptyMap(),
                 Value.syncedSupplied(() -> plugin.getSettings().getDefaultValues().getBankLimit()),
                 plugin.getSettings().getDefaultValues().getRoleLimits()
@@ -32,6 +35,20 @@ public class DefaultUpgradeLevel extends SUpgradeLevel {
 
     public static DefaultUpgradeLevel getInstance() {
         return INSTANCE;
+    }
+
+    private static <V> Map<World.Environment, V> convertFromArray(V[] arr) {
+        EnumMap<World.Environment, V> result = new EnumMap<>(World.Environment.class);
+
+        int environmentLength = World.Environment.values().length;
+        for (int i = 0; i < arr.length && i < environmentLength; ++i) {
+            if (arr[i] != null) {
+                World.Environment environment = World.Environment.values()[i];
+                result.put(environment, arr[i]);
+            }
+        }
+
+        return result.isEmpty() ? Collections.emptyMap() : result;
     }
 
 }

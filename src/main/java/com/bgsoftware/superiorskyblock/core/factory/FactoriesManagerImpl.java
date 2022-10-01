@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.factory;
 
+import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
@@ -26,7 +27,6 @@ import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.CachedPlayerInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.sql.SQLDatabaseBridge;
@@ -37,6 +37,7 @@ import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculation
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.bank.SIslandBank;
+import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.algorithm.DefaultPlayerTeleportAlgorithm;
 import com.google.common.base.Preconditions;
@@ -54,6 +55,12 @@ public class FactoriesManagerImpl implements FactoriesManager {
     private PlayersFactory playersFactory;
     private BanksFactory banksFactory;
     private DatabaseBridgeFactory databaseBridgeFactory;
+
+    private final SuperiorSkyblockPlugin plugin;
+
+    public FactoriesManagerImpl(SuperiorSkyblockPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void registerIslandsFactory(IslandsFactory islandsFactory) {
@@ -104,18 +111,28 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public Island createIsland(@Nullable SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName) {
-        SIsland island = new SIsland(superiorPlayer, uuid, location, islandName, schemName);
-        return islandsFactory == null ? island : islandsFactory.createIsland(island);
+    public Island createIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location center, String islandName, String schemName) {
+        Preconditions.checkNotNull(uuid, "uuid parameter cannot be null.");
+        Preconditions.checkNotNull(center, "center parameter cannot be null.");
+        Preconditions.checkNotNull(islandName, "islandName parameter cannot be null.");
+        Preconditions.checkNotNull(schemName, "schemName parameter cannot be null.");
+        return createIslandBuilder()
+                .setOwner(owner)
+                .setUniqueId(uuid)
+                .setCenter(center)
+                .setName(islandName)
+                .setSchematicName(schemName)
+                .build();
     }
 
-    public Optional<Island> createIsland(DatabaseCache<CachedIslandInfo> cache, DatabaseResult resultSet) {
-        Optional<Island> island = SIsland.fromDatabase(cache, resultSet);
+    @Override
+    public Island.Builder createIslandBuilder() {
+        return new IslandBuilderImpl();
+    }
 
-        if (!island.isPresent())
-            return island;
-
-        return islandsFactory == null ? island : island.map(islandsFactory::createIsland);
+    public Island createIsland(IslandBuilderImpl builder) {
+        SIsland island = new SIsland(builder);
+        return islandsFactory == null ? island : islandsFactory.createIsland(island);
     }
 
     @Override

@@ -8,31 +8,25 @@ import com.bgsoftware.superiorskyblock.api.island.IslandFlag;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
-import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
+import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedIslandInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpCategoryInfo;
-import com.bgsoftware.superiorskyblock.core.database.cache.CachedWarpInfo;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.IDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.JsonDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.MultipleDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.island.SIsland;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
-import com.bgsoftware.superiorskyblock.island.container.value.Value;
-import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
-import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
+import com.bgsoftware.superiorskyblock.module.BuiltinModules;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -62,7 +56,7 @@ public class IslandsDeserializer {
 
     }
 
-    public static void deserializeMembers(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeMembers(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_members", membersRow -> {
             DatabaseResult members = new DatabaseResult(membersRow);
 
@@ -79,7 +73,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
 
             PlayerRole playerRole = members.getInt("role").map(SPlayerRole::fromId)
                     .orElse(SPlayerRole.defaultRole());
@@ -87,11 +81,11 @@ public class IslandsDeserializer {
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
             superiorPlayer.setPlayerRole(playerRole);
 
-            cachedIslandInfo.members.add(superiorPlayer);
+            builder.addIslandMember(superiorPlayer);
         });
     }
 
-    public static void deserializeBanned(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeBanned(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_bans", bansRow -> {
             DatabaseResult bans = new DatabaseResult(bansRow);
 
@@ -108,13 +102,13 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
-            cachedIslandInfo.bannedPlayers.add(superiorPlayer);
+            builder.addBannedPlayer(superiorPlayer);
         });
     }
 
-    public static void deserializeVisitors(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeVisitors(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_visitors", visitorsRow -> {
             DatabaseResult visitors = new DatabaseResult(visitorsRow);
 
@@ -131,14 +125,14 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
             SuperiorPlayer visitorPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
             long visitTime = visitors.getLong("visit_time").orElse(System.currentTimeMillis());
-            cachedIslandInfo.uniqueVisitors.add(new SIsland.UniqueVisitor(visitorPlayer, visitTime));
+            builder.addUniqueVisitor(visitorPlayer, visitTime);
         });
     }
 
-    public static void deserializePlayerPermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializePlayerPermissions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_player_permissions", playerPermissionRow -> {
             DatabaseResult playerPermissions = new DatabaseResult(playerPermissionRow);
 
@@ -175,15 +169,13 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
             SuperiorPlayer superiorPlayer = plugin.getPlayers().getSuperiorPlayer(playerUUID.get());
-            PlayerPrivilegeNode permissionNode = cachedIslandInfo.playerPermissions.computeIfAbsent(superiorPlayer,
-                    s -> new PlayerPrivilegeNode(superiorPlayer, null));
-            permissionNode.loadPrivilege(islandPrivilege.get(), status.get());
+            builder.setPlayerPermission(superiorPlayer, islandPrivilege.get(), status.get() == 1);
         });
     }
 
-    public static void deserializeRolePermissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeRolePermissions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_role_permissions", rolePermissionsRow -> {
             DatabaseResult rolePermissions = new DatabaseResult(rolePermissionsRow);
 
@@ -213,12 +205,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.rolePermissions.put(islandPrivilege.get(), playerRole.get());
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setRolePermission(islandPrivilege.get(), playerRole.get());
         });
     }
 
-    public static void deserializeUpgrades(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeUpgrades(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_upgrades", upgradesRow -> {
             DatabaseResult upgrades = new DatabaseResult(upgradesRow);
 
@@ -228,7 +220,7 @@ public class IslandsDeserializer {
                 return;
             }
 
-            Optional<String> upgrade = upgrades.getString("upgrade");
+            Optional<Upgrade> upgrade = upgrades.getString("upgrade").map(plugin.getUpgrades()::getUpgrade);
             if (!upgrade.isPresent()) {
                 SuperiorSkyblockPlugin.log(
                         String.format("&cCannot load upgrades with invalid upgrade names for %s, skipping...", uuid.get()));
@@ -242,12 +234,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.upgrades.put(upgrade.get(), level.get());
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setUpgrade(upgrade.get(), level.get());
         });
     }
 
-    public static void deserializeWarps(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeWarps(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_warps", islandWarpsRow -> {
             DatabaseResult islandWarp = new DatabaseResult(islandWarpsRow);
 
@@ -273,19 +265,18 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedWarpInfo cachedWarpInfo = new CachedWarpInfo();
-            cachedWarpInfo.name = name.get();
-            cachedWarpInfo.category = islandWarp.getString("category").orElse("");
-            cachedWarpInfo.location = location.get();
-            cachedWarpInfo.isPrivate = islandWarp.getBoolean("private").orElse(true);
-            cachedWarpInfo.icon = islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
-
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.cachedWarpInfoList.add(cachedWarpInfo);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.addWarp(name.get(), islandWarp.getString("category").orElse(""),
+                    location.get(), islandWarp.getBoolean("private").orElse(!plugin.getSettings().isPublicWarps()),
+                    islandWarp.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
     }
 
-    public static void deserializeBlockCounts(String blocks, Island island) {
+    public static void deserializeDirtyChunks(Island.Builder builder, String dirtyChunks) {
+        ChunksTracker.deserialize(builder, dirtyChunks);
+    }
+
+    public static void deserializeBlockCounts(Island.Builder builder, String blocks) {
         if (Text.isBlank(blocks))
             return;
 
@@ -301,11 +292,11 @@ public class IslandsDeserializer {
             JsonObject blockCountObject = blockCountElement.getAsJsonObject();
             Key blockKey = KeyImpl.of(blockCountObject.get("id").getAsString());
             BigInteger amount = new BigInteger(blockCountObject.get("amount").getAsString());
-            island.handleBlockPlace(blockKey, amount, false, false);
+            builder.setBlockCount(blockKey, amount);
         });
     }
 
-    public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeBlockLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_block_limits", blockLimitRow -> {
             DatabaseResult blockLimits = new DatabaseResult(blockLimitRow);
 
@@ -329,12 +320,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.blockLimits.put(block.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setBlockLimit(block.get(), limit.get());
         });
     }
 
-    public static void deserializeEntityLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeEntityLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_entity_limits", entityLimitsRow -> {
             DatabaseResult entityLimits = new DatabaseResult(entityLimitsRow);
 
@@ -358,12 +349,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.entityLimits.put(entity.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setEntityLimit(entity.get(), limit.get());
         });
     }
 
-    public static void deserializeRatings(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeRatings(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_ratings", ratingsRow -> {
             DatabaseResult ratings = new DatabaseResult(ratingsRow);
 
@@ -393,12 +384,13 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(islandUUID.get(), CachedIslandInfo::new);
-            cachedIslandInfo.ratings.put(uuid.get(), rating.get());
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(islandUUID.get(), IslandBuilderImpl::new);
+            SuperiorPlayer ratingPlayer = plugin.getPlayers().getSuperiorPlayer(uuid.get());
+            builder.setRating(ratingPlayer, rating.get());
         });
     }
 
-    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeMissions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_missions", missionsRow -> {
             DatabaseResult missions = new DatabaseResult(missionsRow);
 
@@ -429,12 +421,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.completedMissions.put(mission.get(), finishCount.get());
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setCompletedMission(mission.get(), finishCount.get());
         });
     }
 
-    public static void deserializeIslandFlags(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeIslandFlags(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_flags", islandFlagRow -> {
             DatabaseResult islandFlagResult = new DatabaseResult(islandFlagRow);
 
@@ -464,12 +456,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.islandFlags.put(islandFlag.get(), status.get());
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setIslandFlag(islandFlag.get(), status.get() == 1);
         });
     }
 
-    public static void deserializeGenerators(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeGenerators(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_generators", generatorsRow -> {
             DatabaseResult generators = new DatabaseResult(generatorsRow);
 
@@ -501,17 +493,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            KeyMap<Value<Integer>> generatorRates = cachedIslandInfo.cobbleGeneratorValues[environment.get()];
-
-            if (generatorRates == null)
-                generatorRates = cachedIslandInfo.cobbleGeneratorValues[environment.get()] = KeyMapImpl.createHashMap();
-
-            generatorRates.put(block.get(), rate.get() < 0 ? Value.syncedFixed(rate.get()) : Value.fixed(rate.get()));
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setGeneratorRate(block.get(), rate.get(), World.Environment.values()[environment.get()]);
         });
     }
 
-    public static void deserializeIslandHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeIslandHomes(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_homes", islandHomesRow -> {
             DatabaseResult islandHomes = new DatabaseResult(islandHomesRow);
 
@@ -536,12 +523,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.islandHomes[environment.get()] = location.get();
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setIslandHome(location.get(), World.Environment.values()[environment.get()]);
         });
     }
 
-    public static void deserializeVisitorHomes(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeVisitorHomes(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_visitor_homes", islandVisitorHomesRow -> {
             DatabaseResult islandVisitorHomes = new DatabaseResult(islandVisitorHomesRow);
 
@@ -566,12 +553,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.visitorHomes[environment.get()] = location.get();
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setVisitorHome(location.get(), World.Environment.values()[environment.get()]);
         });
     }
 
-    public static void deserializeEffects(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeEffects(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_effects", islandEffectRow -> {
             DatabaseResult islandEffects = new DatabaseResult(islandEffectRow);
 
@@ -596,12 +583,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.islandEffects.put(effectType.get(), level.get() < 0 ? Value.syncedFixed(level.get()) : Value.fixed(level.get()));
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setIslandEffect(effectType.get(), level.get());
         });
     }
 
-    public static void deserializeIslandChest(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeIslandChest(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_chests", islandChestsRow -> {
             DatabaseResult islandChests = new DatabaseResult(islandChestsRow);
 
@@ -643,21 +630,12 @@ public class IslandsDeserializer {
                 chestContents = contents.get();
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-
-            if (index.get() >= cachedIslandInfo.islandChests.size()) {
-                while (index.get() > cachedIslandInfo.islandChests.size()) {
-                    cachedIslandInfo.islandChests.add(new ItemStack[plugin.getSettings().getIslandChests().getDefaultSize() * 9]);
-                }
-
-                cachedIslandInfo.islandChests.add(chestContents);
-            } else {
-                cachedIslandInfo.islandChests.set(index.get(), chestContents);
-            }
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setIslandChest(index.get(), chestContents);
         });
     }
 
-    public static void deserializeRoleLimits(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeRoleLimits(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_role_limits", roleLimitRaw -> {
             DatabaseResult roleLimits = new DatabaseResult(roleLimitRaw);
 
@@ -681,12 +659,12 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.roleLimits.put(playerRole.get(), limit.get() < 0 ? Value.syncedFixed(limit.get()) : Value.fixed(limit.get()));
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setRoleLimit(playerRole.get(), limit.get());
         });
     }
 
-    public static void deserializeWarpCategories(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeWarpCategories(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_warp_categories", warpCategoryRow -> {
             DatabaseResult warpCategory = new DatabaseResult(warpCategoryRow);
 
@@ -703,17 +681,13 @@ public class IslandsDeserializer {
                 return;
             }
 
-            CachedWarpCategoryInfo cachedWarpCategoryInfo = new CachedWarpCategoryInfo();
-            cachedWarpCategoryInfo.name = name.get();
-            cachedWarpCategoryInfo.slot = warpCategory.getInt("slot").orElse(-1);
-            cachedWarpCategoryInfo.icon = warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null);
-
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.cachedWarpCategoryInfoList.add(cachedWarpCategoryInfo);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.addWarpCategory(name.get(), warpCategory.getInt("slot").orElse(-1),
+                    warpCategory.getString("icon").map(Serializers.ITEM_STACK_SERIALIZER::deserialize).orElse(null));
         });
     }
 
-    public static void deserializeIslandBank(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeIslandBank(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_banks", islandBankRow -> {
             DatabaseResult islandBank = new DatabaseResult(islandBankRow);
 
@@ -732,16 +706,14 @@ public class IslandsDeserializer {
 
             long currentTime = System.currentTimeMillis() / 1000;
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.balance = balance.get();
-            cachedIslandInfo.lastInterestTime = islandBank.getLong("last_interest_time").orElse(currentTime);
-
-            if (cachedIslandInfo.lastInterestTime > currentTime)
-                cachedIslandInfo.lastInterestTime /= 1000L;
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setBalance(balance.get());
+            long lastInterestTime = islandBank.getLong("last_interest_time").orElse(currentTime);
+            builder.setLastInterestTime(lastInterestTime > currentTime ? lastInterestTime / 1000 : lastInterestTime);
         });
     }
 
-    public static void deserializeIslandSettings(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeIslandSettings(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_settings", islandSettingsRow -> {
             DatabaseResult islandSettings = new DatabaseResult(islandSettingsRow);
 
@@ -752,35 +724,20 @@ public class IslandsDeserializer {
             }
 
             UUID uuid = UUID.fromString(island.get());
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid, CachedIslandInfo::new);
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid, IslandBuilderImpl::new);
 
-            int borderSize = islandSettings.getInt("size").orElse(-1);
-            cachedIslandInfo.islandSize = borderSize < 0 ? Value.syncedFixed(borderSize) : Value.fixed(borderSize);
-
-            int membersLimit = islandSettings.getInt("members_limit").orElse(-1);
-            cachedIslandInfo.teamLimit = membersLimit < 0 ? Value.syncedFixed(membersLimit) : Value.fixed(membersLimit);
-
-            int warpsLimit = islandSettings.getInt("warps_limit").orElse(-1);
-            cachedIslandInfo.warpsLimit = warpsLimit < 0 ? Value.syncedFixed(warpsLimit) : Value.fixed(warpsLimit);
-
-            double cropGrowth = islandSettings.getDouble("crop_growth_multiplier").orElse(-1D);
-            cachedIslandInfo.cropGrowth = cropGrowth < 0 ? Value.syncedFixed(cropGrowth) : Value.fixed(cropGrowth);
-
-            double spawnerRates = islandSettings.getDouble("spawner_rates_multiplier").orElse(-1D);
-            cachedIslandInfo.spawnerRates = spawnerRates < 0 ? Value.syncedFixed(spawnerRates) : Value.fixed(spawnerRates);
-
-            double mobDrops = islandSettings.getDouble("mob_drops_multiplier").orElse(-1D);
-            cachedIslandInfo.mobDrops = mobDrops < 0 ? Value.syncedFixed(mobDrops) : Value.fixed(mobDrops);
-
-            int coopLimit = islandSettings.getInt("coops_limit").orElse(-1);
-            cachedIslandInfo.coopLimit = coopLimit < 0 ? Value.syncedFixed(coopLimit) : Value.fixed(coopLimit);
-
-            BigDecimal bankLimit = islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE);
-            cachedIslandInfo.bankLimit = bankLimit.compareTo(SYNCED_BANK_LIMIT_VALUE) <= 0 ? Value.syncedFixed(bankLimit) : Value.fixed(bankLimit);
+            builder.setIslandSize(islandSettings.getInt("size").orElse(-1));
+            builder.setTeamLimit(islandSettings.getInt("members_limit").orElse(-1));
+            builder.setWarpsLimit(islandSettings.getInt("warps_limit").orElse(-1));
+            builder.setCropGrowth(islandSettings.getDouble("crop_growth_multiplier").orElse(-1D));
+            builder.setSpawnerRates(islandSettings.getDouble("spawner_rates_multiplier").orElse(-1D));
+            builder.setMobDrops(islandSettings.getDouble("mob_drops_multiplier").orElse(-1D));
+            builder.setCoopLimit(islandSettings.getInt("coops_limit").orElse(-1));
+            builder.setBankLimit(islandSettings.getBigDecimal("bank_limit").orElse(SYNCED_BANK_LIMIT_VALUE));
         });
     }
 
-    public static void deserializeBankTransactions(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializeBankTransactions(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         if (BuiltinModules.BANK.bankLogs && BuiltinModules.BANK.cacheAllLogs) {
             databaseBridge.loadAllObjects("bank_transactions", bankTransactionRow -> {
                 DatabaseResult bankTransaction = new DatabaseResult(bankTransactionRow);
@@ -791,13 +748,13 @@ public class IslandsDeserializer {
                     return;
                 }
 
-                CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-                SBankTransaction.fromDatabase(bankTransaction).ifPresent(cachedIslandInfo.bankTransactions::add);
+                Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+                SBankTransaction.fromDatabase(bankTransaction).ifPresent(builder::addBankTransaction);
             });
         }
     }
 
-    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<CachedIslandInfo> databaseCache) {
+    public static void deserializePersistentDataContainer(DatabaseBridge databaseBridge, DatabaseCache<Island.Builder> databaseCache) {
         databaseBridge.loadAllObjects("islands_custom_data", customDataRow -> {
             DatabaseResult customData = new DatabaseResult(customDataRow);
 
@@ -812,9 +769,8 @@ public class IslandsDeserializer {
             if (persistentData.length == 0)
                 return;
 
-            CachedIslandInfo cachedIslandInfo = databaseCache.computeIfAbsentInfo(uuid.get(), CachedIslandInfo::new);
-            cachedIslandInfo.persistentData = persistentData;
+            Island.Builder builder = databaseCache.computeIfAbsentInfo(uuid.get(), IslandBuilderImpl::new);
+            builder.setPersistentData(persistentData);
         });
     }
-
 }

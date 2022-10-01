@@ -58,6 +58,15 @@ public interface GridManager extends IDatabaseBridgeHolder {
                       Biome biome, String islandName, boolean offset);
 
     /**
+     * Create a new island.
+     *
+     * @param builder The builder for the island.
+     * @param biome   A starting biome for the island.
+     * @param offset  Should the island have an offset for its values? If disabled, the bonus will be given.
+     */
+    void createIsland(Island.Builder builder, Biome biome, boolean offset);
+
+    /**
      * Set the creation algorithm of islands.
      *
      * @param islandCreationAlgorithm The new algorithm to set.

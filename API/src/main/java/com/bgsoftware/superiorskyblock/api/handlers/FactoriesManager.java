@@ -66,13 +66,18 @@ public interface FactoriesManager {
      * Create a new Island object.
      * Warning: This island is not saved into the database unless inserting it manually!
      *
-     * @param superiorPlayer The owner of the island.
-     * @param uuid           The uuid of the island.
-     * @param location       The location of the island.
-     * @param islandName     The name of the island.
-     * @param schemName      The schematic used to create the island.
+     * @param owner      The owner of the island.
+     * @param uuid       The uuid of the island.
+     * @param center     The location of the island.
+     * @param islandName The name of the island.
+     * @param schemName  The schematic used to create the island.
      */
-    Island createIsland(@Nullable SuperiorPlayer superiorPlayer, UUID uuid, Location location, String islandName, String schemName);
+    Island createIsland(@Nullable SuperiorPlayer owner, UUID uuid, Location center, String islandName, String schemName);
+
+    /**
+     * Create a new builder for a {@link Island} object.
+     */
+    Island.Builder createIslandBuilder();
 
     /**
      * Create a new SuperiorPlayer object.

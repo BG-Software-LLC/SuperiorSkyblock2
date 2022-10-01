@@ -1,15 +1,18 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
+import com.bgsoftware.superiorskyblock.api.SuperiorSkyblockAPI;
 import com.bgsoftware.superiorskyblock.api.data.IDatabaseBridgeHolder;
 import com.bgsoftware.superiorskyblock.api.enums.Rating;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.missions.IMissionsHolder;
+import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
@@ -23,6 +26,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
@@ -1867,5 +1871,124 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param rows  The amount of rows for that page.
      */
     void setChestRows(int index, int rows);
+
+    /**
+     * Create a new builder for a {@link Island} object.
+     */
+    static Builder newBuilder() {
+        return SuperiorSkyblockAPI.getFactory().createIslandBuilder();
+    }
+
+    /**
+     * The {@link Builder} interface is used to create {@link Island} objects with predefined values.
+     * All of its methods are setters for all the values possible to create an island with.
+     * Use {@link Builder#build()} to create the new {@link Island} object. You must set
+     * {@link Builder#setOwner(SuperiorPlayer)}, {@link Builder#setUniqueId(UUID)} and
+     * {@link Builder#setCenter(Location)} before creating a new {@link Island}
+     */
+    interface Builder {
+
+        Builder setOwner(@Nullable SuperiorPlayer owner);
+
+        Builder setUniqueId(UUID uuid);
+
+        Builder setCenter(Location center);
+
+        Builder setName(String islandName);
+
+        Builder setSchematicName(String schematicName);
+
+        Builder setCreationTime(long creationTime);
+
+        Builder setDiscord(String discord);
+
+        Builder setPaypal(String paypal);
+
+        Builder setBonusWorth(BigDecimal bonusWorth);
+
+        Builder setBonusLevel(BigDecimal bonusLevel);
+
+        Builder setLocked(boolean isLocked);
+
+        Builder setIgnored(boolean isIgnored);
+
+        Builder setDescription(String description);
+
+        Builder setGeneratedSchematics(int generatedSchematicsMask);
+
+        Builder setUnlockedWorlds(int unlockedWorldsMask);
+
+        Builder setLastTimeUpdated(long lastTimeUpdated);
+
+        Builder setDirtyChunk(String worldName, int chunkX, int chunkZ);
+
+        Builder setBlockCount(Key block, BigInteger count);
+
+        Builder setIslandHome(Location location, World.Environment environment);
+
+        Builder addIslandMember(SuperiorPlayer superiorPlayer);
+
+        Builder addBannedPlayer(SuperiorPlayer superiorPlayer);
+
+        Builder setPlayerPermission(SuperiorPlayer superiorPlayer, IslandPrivilege islandPrivilege, boolean value);
+
+        Builder setRolePermission(IslandPrivilege islandPrivilege, PlayerRole requiredRole);
+
+        Builder setUpgrade(Upgrade upgrade, int level);
+
+        Builder setBlockLimit(Key block, int limit);
+
+        Builder setRating(SuperiorPlayer superiorPlayer, Rating rating);
+
+        Builder setCompletedMission(Mission<?> mission, int finishCount);
+
+        Builder setIslandFlag(IslandFlag islandFlag, boolean value);
+
+        Builder setGeneratorRate(Key block, int rate, World.Environment environment);
+
+        Builder addUniqueVisitor(SuperiorPlayer superiorPlayer, long visitTime);
+
+        Builder setEntityLimit(Key entity, int limit);
+
+        Builder setIslandEffect(PotionEffectType potionEffectType, int level);
+
+        Builder setIslandChest(int index, ItemStack[] contents);
+
+        Builder setRoleLimit(PlayerRole playerRole, int limit);
+
+        Builder setVisitorHome(Location location, World.Environment environment);
+
+        Builder setIslandSize(int islandSize);
+
+        Builder setTeamLimit(int teamLimit);
+
+        Builder setWarpsLimit(int warpsLimit);
+
+        Builder setCropGrowth(double cropGrowth);
+
+        Builder setSpawnerRates(double spawnerRates);
+
+        Builder setMobDrops(double mobDrops);
+
+        Builder setCoopLimit(int coopLimit);
+
+        Builder setBankLimit(BigDecimal bankLimit);
+
+        Builder setBalance(BigDecimal balance);
+
+        Builder setLastInterestTime(long lastInterestTime);
+
+        Builder addWarp(String name, String category, Location location, boolean isPrivate, @Nullable ItemStack icon);
+
+        Builder addWarpCategory(String name, int slot, @Nullable ItemStack icon);
+
+        Builder addBankTransaction(BankTransaction bankTransaction);
+
+        Builder setPersistentData(byte[] persistentData);
+
+        Island build();
+
+
+    }
 
 }

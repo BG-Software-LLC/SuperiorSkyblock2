@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.module.upgrades;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
@@ -36,6 +37,7 @@ import org.bukkit.potion.PotionEffectType;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.math.BigDecimal;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -217,20 +219,18 @@ public class UpgradesModule extends BuiltinModule {
             for (String entity : levelSection.getConfigurationSection("entity-limits").getKeys(false))
                 entityLimits.put(KeyImpl.of(entity), levelSection.getInt("entity-limits." + entity));
         }
-        KeyMap<Integer>[] generatorRates = new KeyMap[World.Environment.values().length];
+        EnumMap<World.Environment, Map<Key, Integer>> generatorRates = new EnumMap<>(World.Environment.class);
         if (levelSection.contains("generator-rates")) {
             for (String blockOrEnv : levelSection.getConfigurationSection("generator-rates").getKeys(false)) {
                 try {
-                    int index = World.Environment.valueOf(blockOrEnv.toUpperCase(Locale.ENGLISH)).ordinal();
+                    World.Environment environment = World.Environment.valueOf(blockOrEnv.toUpperCase(Locale.ENGLISH));
                     for (String block : levelSection.getConfigurationSection("generator-rates." + blockOrEnv).getKeys(false)) {
-                        if (generatorRates[index] == null)
-                            generatorRates[index] = KeyMapImpl.createHashMap();
-                        generatorRates[index].put(KeyImpl.of(block), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
+                        generatorRates.computeIfAbsent(environment, e -> KeyMapImpl.createHashMap()).put(
+                                KeyImpl.of(block), levelSection.getInt("generator-rates." + blockOrEnv + "." + block));
                     }
                 } catch (Exception ex) {
-                    if (generatorRates[0] == null)
-                        generatorRates[0] = KeyMapImpl.createHashMap();
-                    generatorRates[0].put(KeyImpl.of(blockOrEnv), levelSection.getInt("generator-rates." + blockOrEnv));
+                    generatorRates.computeIfAbsent(plugin.getSettings().getWorlds().getDefaultWorld(), e -> KeyMapImpl.createHashMap())
+                            .put(KeyImpl.of(blockOrEnv), levelSection.getInt("generator-rates." + blockOrEnv));
                 }
             }
         }
