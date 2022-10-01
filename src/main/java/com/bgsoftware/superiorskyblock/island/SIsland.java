@@ -313,12 +313,6 @@ public class SIsland implements Island {
                 islandWarp.setIcon(warpRecord.icon);
         });
 
-        updateDatesFormatter();
-        startBankInterest();
-        checkMembersDuplication();
-        updateOldUpgradeValues();
-        updateUpgrades();
-        updateIslandChests();
 
         // We want to save all the limits to the custom block keys
         plugin.getBlockValues().addCustomBlockKeys(builder.blockLimits.keySet());
@@ -328,6 +322,13 @@ public class SIsland implements Island {
         this.calculationAlgorithm = plugin.getFactory().createIslandCalculationAlgorithm(this);
         this.blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
         this.entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
+
+        updateDatesFormatter();
+        startBankInterest();
+        checkMembersDuplication();
+        updateOldUpgradeValues();
+        updateUpgrades();
+        updateIslandChests();
 
         this.islandBank.setBalance(builder.balance);
         builder.bankTransactions.forEach(this.islandBank::loadTransaction);

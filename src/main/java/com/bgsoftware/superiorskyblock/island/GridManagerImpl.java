@@ -172,10 +172,17 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         Preconditions.checkArgument(schematic != null, "Cannot create an island with an invalid schematic.");
 
-        if (!Bukkit.isPrimaryThread()) {
-            BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic));
-        } else {
-            createIslandInternalAsync(builder, biome, offset, schematic);
+        try {
+            if (!Bukkit.isPrimaryThread()) {
+                BukkitExecutor.sync(() -> createIslandInternalAsync(builder, biome, offset, schematic));
+            } else {
+                createIslandInternalAsync(builder, biome, offset, schematic);
+            }
+        } catch (Throwable error) {
+            error.printStackTrace();
+            PluginDebugger.debug(error);
+            builder.owner.setIsland(null);
+            Message.CREATE_ISLAND_FAILURE.send(builder.owner);
         }
     }
 
@@ -192,7 +199,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         if (!plugin.getEventsBus().callPreIslandCreateEvent(builder.owner, builder.islandName))
             return;
 
-        UUID islandUUID = generateIslandUUID();
+        builder.setUniqueId(generateIslandUUID());
 
         long startTime = System.currentTimeMillis();
 
