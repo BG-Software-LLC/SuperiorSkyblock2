@@ -3,12 +3,12 @@ package com.bgsoftware.superiorskyblock.module.generators;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminAddGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminClearGenerator;
 import com.bgsoftware.superiorskyblock.module.generators.commands.CmdAdminSetGenerator;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
 import com.bgsoftware.superiorskyblock.module.generators.listeners.GeneratorsListener;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.event.Listener;
 
 import java.io.File;
@@ -38,9 +38,9 @@ public class GeneratorsModule extends BuiltinModule {
             try {
                 super.config.save(moduleConfigFile);
                 config.save(configFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.entering("GeneratorsModule", "onPluginInit", "ENTER");
+                Log.error(error, "An error occurred while saving config file:");
             }
         }
 

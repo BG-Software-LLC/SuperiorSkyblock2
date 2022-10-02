@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.menu.pattern.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
@@ -62,9 +61,8 @@ public class PagedMenuPattern<M extends PagedSuperiorMenu<M, T>, T> extends Supe
             try {
                 buttonItem = button.getButtonItem(superiorMenu);
             } catch (Exception error) {
-                SuperiorSkyblockPlugin.log("Failed to load menu because due to an error with slot #" + slot);
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.entering(getClass().getName(), "setupInventory", "ENTER", slot);
+                Log.error(error, "An unexpected error occurred while setting up menu:");
                 return;
             }
 

@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.external.vanish;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.listener.PlayersListener;
 import com.earth2me.essentials.Essentials;
 import net.ess3.api.events.VanishStatusChangeEvent;
@@ -31,7 +32,7 @@ public class VanishProvider_Essentials implements VanishProvider, Listener {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
 
-        SuperiorSkyblockPlugin.log("Hooked into Essentials for support of vanish status of players.");
+        Log.info("Hooked into Essentials for support of vanish status of players.");
     }
 
     @Override

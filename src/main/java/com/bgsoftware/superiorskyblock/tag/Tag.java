@@ -36,7 +36,7 @@ import com.bgsoftware.common.reflection.ReflectConstructor;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
 
 import java.io.DataInputStream;
@@ -141,9 +141,8 @@ public abstract class Tag<E> {
                 String version = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
                 return Class.forName("net.minecraft.server." + version + "." + nbtType);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error while loading nbt class ", nbtType, ":");
             return null;
         }
     }

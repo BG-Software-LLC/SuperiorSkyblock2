@@ -7,9 +7,9 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
-import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProvider_AutoDetect;
 import com.google.common.base.Preconditions;
 import com.songoda.epicspawners.EpicSpawners;
 import com.songoda.epicspawners.api.events.SpawnerBreakEvent;
@@ -36,7 +36,7 @@ public class SpawnersProvider_EpicSpawners6 implements SpawnersProvider_AutoDete
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using EpicSpawners as a spawners provider.");
+            Log.info("Using EpicSpawners as a spawners provider.");
         }
     }
 

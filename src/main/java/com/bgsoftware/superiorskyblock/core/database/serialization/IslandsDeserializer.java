@@ -20,10 +20,11 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.Mult
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.deserializer.RawDeserializer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
+import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
@@ -62,14 +63,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = members.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island members for null islands, skipping...");
+                Log.warn("Cannot load island members for null islands, skipping...");
                 return;
             }
 
             Optional<UUID> playerUUID = members.getUUID("player");
             if (!playerUUID.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island members with invalid uuids for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island members with invalid uuids for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -91,14 +91,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = bans.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load banned players for null islands, skipping...");
+                Log.warn("Cannot load banned players for null islands, skipping...");
                 return;
             }
 
             Optional<UUID> playerUUID = bans.getUUID("player");
             if (!playerUUID.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load banned players with invalid uuids for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load banned players with invalid uuids for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -114,14 +113,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> islandUUID = visitors.getUUID("island");
             if (!islandUUID.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island visitors for null islands, skipping...");
+                Log.warn("Cannot load island visitors for null islands, skipping...");
                 return;
             }
 
             Optional<UUID> uuid = visitors.getUUID("player");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island visitors with invalid uuids for %s, skipping...", islandUUID.get()));
+                Log.warn("Cannot load island visitors with invalid uuids for ", islandUUID.get(), ", skipping...");
                 return;
             }
 
@@ -138,14 +136,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = playerPermissions.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player permissions for null islands, skipping...");
+                Log.warn("Cannot load player permissions for null islands, skipping...");
                 return;
             }
 
             Optional<UUID> playerUUID = playerPermissions.getUUID("player");
             if (!playerUUID.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load player permissions for invalid players on %s, skipping...", uuid.get()));
+                Log.warn("Cannot load player permissions for invalid players on ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -157,15 +154,13 @@ public class IslandsDeserializer {
                 }
             });
             if (!islandPrivilege.isPresent()) {
-                SuperiorSkyblockPlugin.log(String.format("&cCannot load player permissions with invalid permission " +
-                        "for player %s, skipping...", playerUUID.get()));
+                Log.warn("Cannot load player permissions with invalid permission for player ", playerUUID.get(), ", skipping...");
                 return;
             }
 
             Optional<Byte> status = playerPermissions.getByte("status");
             if (!status.isPresent()) {
-                SuperiorSkyblockPlugin.log(String.format("&cCannot load player permissions with invalid status " +
-                        "for player %s, skipping...", playerUUID.get()));
+                Log.warn("Cannot load player permissions with invalid status for player ", playerUUID.get(), ", skipping...");
                 return;
             }
 
@@ -181,14 +176,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = rolePermissions.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load role permissions for null islands, skipping...");
+                Log.warn("Cannot load role permissions for null islands, skipping...");
                 return;
             }
 
             Optional<PlayerRole> playerRole = rolePermissions.getInt("role").map(SPlayerRole::fromId);
             if (!playerRole.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load role permissions with invalid role for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load role permissions with invalid role for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -200,8 +194,7 @@ public class IslandsDeserializer {
                 }
             });
             if (!islandPrivilege.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load role permissions with invalid permission for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load role permissions with invalid permission for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -216,21 +209,19 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = upgrades.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load upgrades for null islands, skipping...");
+                Log.warn("Cannot load upgrades for null islands, skipping...");
                 return;
             }
 
             Optional<Upgrade> upgrade = upgrades.getString("upgrade").map(plugin.getUpgrades()::getUpgrade);
             if (!upgrade.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load upgrades with invalid upgrade names for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load upgrades with invalid upgrade names for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> level = upgrades.getInt("level");
             if (!level.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load upgrades with invalid levels for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load upgrades with invalid levels for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -245,7 +236,7 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandWarp.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load warps for null islands, skipping...");
+                Log.warn("Cannot load warps for null islands, skipping...");
                 return;
             }
 
@@ -253,15 +244,13 @@ public class IslandsDeserializer {
                 return IslandUtils.isWarpNameLengthValid(_name) ? _name : _name.substring(0, IslandUtils.getMaxWarpNameLength());
             });
             if (!name.isPresent() || name.get().isEmpty()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load warps with invalid names for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load warps with invalid names for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Location> location = islandWarp.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load warps with invalid locations for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load warps with invalid locations for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -302,21 +291,19 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = blockLimits.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load block limits for null islands, skipping...");
+                Log.warn("Cannot load block limits for null islands, skipping...");
                 return;
             }
 
             Optional<Key> block = blockLimits.getString("block").map(KeyImpl::of);
             if (!block.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load block limits for invalid blocks for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load block limits for invalid blocks for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> limit = blockLimits.getInt("limit");
             if (!limit.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load block limits with invalid limits for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load block limits with invalid limits for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -331,21 +318,19 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = entityLimits.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load entity limits for null islands, skipping...");
+                Log.warn("Cannot load entity limits for null islands, skipping...");
                 return;
             }
 
             Optional<Key> entity = entityLimits.getString("entity").map(KeyImpl::of);
             if (!entity.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load entity limits for invalid entities on %s, skipping...", uuid.get()));
+                Log.warn("Cannot load entity limits for invalid entities on ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> limit = entityLimits.getInt("limit");
             if (!limit.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load entity limits with invalid limits for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load entity limits with invalid limits for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -360,14 +345,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> islandUUID = ratings.getUUID("island");
             if (!islandUUID.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load ratings for null islands, skipping...");
+                Log.warn("Cannot load ratings for null islands, skipping...");
                 return;
             }
 
             Optional<UUID> uuid = ratings.getUUID("player");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load ratings with invalid players for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load ratings with invalid players for ", islandUUID.get(), ", skipping...");
                 return;
             }
 
@@ -379,8 +363,7 @@ public class IslandsDeserializer {
                 }
             });
             if (!rating.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load ratings with invalid rating value for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load ratings with invalid rating value for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -396,7 +379,7 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = missions.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island missions for null islands, skipping...");
+                Log.warn("Cannot load island missions for null islands, skipping...");
                 return;
             }
 
@@ -404,20 +387,17 @@ public class IslandsDeserializer {
             Optional<Mission<?>> mission = missionName.map(plugin.getMissions()::getMission);
             if (!mission.isPresent()) {
                 if (!missionName.isPresent()) {
-                    SuperiorSkyblockPlugin.log(
-                            String.format("&cCannot load island missions with invalid missions for %s, skipping...", uuid.get()));
+                    Log.warn("Cannot load island missions with invalid missions for ", uuid.get(), ", skipping...");
                 } else {
-                    SuperiorSkyblockPlugin.log(
-                            String.format("&cCannot load island missions with invalid mission %s for %s, skipping...",
-                                    missionName.get(), uuid.get()));
+                    Log.warn("Cannot load island missions with invalid mission ",
+                            missionName.get(), " for ", uuid.get(), ", skipping...");
                 }
                 return;
             }
 
             Optional<Integer> finishCount = missions.getInt("finish_count");
             if (!finishCount.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island missions with invalid finish count for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island missions with invalid finish count for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -432,7 +412,7 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandFlagResult.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island flags for null islands, skipping...");
+                Log.warn("Cannot load island flags for null islands, skipping...");
                 return;
             }
 
@@ -444,15 +424,13 @@ public class IslandsDeserializer {
                 }
             });
             if (!islandFlag.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island flags with invalid flags for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island flags with invalid flags for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Byte> status = islandFlagResult.getByte("status");
             if (!status.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island flags with invalid status for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island flags with invalid status for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -467,29 +445,26 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = generators.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load generator rates for null islands, skipping...");
+                Log.warn("Cannot load generator rates for null islands, skipping...");
                 return;
             }
 
             Optional<Integer> environment = generators.getEnum("environment", World.Environment.class)
                     .map(Enum::ordinal);
             if (!environment.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load generator rates with invalid environment for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load generator rates with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Key> block = generators.getString("block").map(KeyImpl::of);
             if (!block.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load generator rates with invalid block for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load generator rates with invalid block for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> rate = generators.getInt("rate");
             if (!rate.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load generator rates with invalid rate for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load generator rates with invalid rate for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -504,22 +479,20 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandHomes.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island homes for null islands, skipping...");
+                Log.warn("Cannot load island homes for null islands, skipping...");
                 return;
             }
 
             Optional<Integer> environment = islandHomes.getEnum("environment", World.Environment.class)
                     .map(Enum::ordinal);
             if (!environment.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid environment for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Location> location = islandHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -534,22 +507,20 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandVisitorHomes.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island homes for null islands, skipping...");
+                Log.warn("Cannot load island homes for null islands, skipping...");
                 return;
             }
 
             Optional<Integer> environment = islandVisitorHomes.getEnum("environment", World.Environment.class)
                     .map(Enum::ordinal);
             if (!environment.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid environment for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island homes with invalid environment for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Location> location = islandVisitorHomes.getString("location").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!location.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island homes with invalid location for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island homes with invalid location for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -564,22 +535,20 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandEffects.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island effects for null islands, skipping...");
+                Log.warn("Cannot load island effects for null islands, skipping...");
                 return;
             }
 
             Optional<PotionEffectType> effectType = islandEffects.getString("effect_type")
                     .map(PotionEffectType::getByName);
             if (!effectType.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island effects with invalid effect for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island effects with invalid effect for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> level = islandEffects.getInt("level");
             if (!level.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island effects with invalid level for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island effects with invalid level for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -594,21 +563,19 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandChests.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island chests for null islands, skipping...");
+                Log.warn("Cannot load island chests for null islands, skipping...");
                 return;
             }
 
             Optional<Integer> index = islandChests.getInt("index");
             if (!index.isPresent() || index.get() < 0) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island chest with invalid index for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island chest with invalid index for ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<ItemStack[]> contents = islandChests.getString("contents").map(Serializers.INVENTORY_SERIALIZER::deserialize);
             if (!contents.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island chest with invalid contents for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island chest with invalid contents for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -641,21 +608,19 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = roleLimits.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load role limits for null islands, skipping...");
+                Log.warn("Cannot load role limits for null islands, skipping...");
                 return;
             }
 
             Optional<PlayerRole> playerRole = roleLimits.getInt("role").map(SPlayerRole::fromId);
             if (!playerRole.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load role limit for invalid role on %s, skipping...", uuid.get()));
+                Log.warn("Cannot load role limit for invalid role on ", uuid.get(), ", skipping...");
                 return;
             }
 
             Optional<Integer> limit = roleLimits.getInt("limit");
             if (!limit.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load role limit for invalid limit on %s, skipping...", uuid.get()));
+                Log.warn("Cannot load role limit for invalid limit on ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -670,14 +635,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = warpCategory.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load warp categories for null islands, skipping...");
+                Log.warn("Cannot load warp categories for null islands, skipping...");
                 return;
             }
 
             Optional<String> name = warpCategory.getString("name").map(Formatters.STRIP_COLOR_FORMATTER::format);
             if (!name.isPresent() || name.get().isEmpty()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load warp categories with invalid name for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load warp categories with invalid name for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -693,14 +657,13 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = islandBank.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island banks for null islands, skipping...");
+                Log.warn("Cannot load island banks for null islands, skipping...");
                 return;
             }
 
             Optional<BigDecimal> balance = islandBank.getBigDecimal("balance");
             if (!balance.isPresent()) {
-                SuperiorSkyblockPlugin.log(
-                        String.format("&cCannot load island banks with invalid balance for %s, skipping...", uuid.get()));
+                Log.warn("Cannot load island banks with invalid balance for ", uuid.get(), ", skipping...");
                 return;
             }
 
@@ -719,7 +682,7 @@ public class IslandsDeserializer {
 
             Optional<String> island = islandSettings.getString("island");
             if (!island.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island settings of null island, skipping ");
+                Log.warn("Cannot load island settings of null island, skipping ");
                 return;
             }
 
@@ -744,7 +707,7 @@ public class IslandsDeserializer {
 
                 Optional<UUID> uuid = bankTransaction.getUUID("island");
                 if (!uuid.isPresent()) {
-                    SuperiorSkyblockPlugin.log("&cCannot load bank transaction for null islands, skipping...");
+                    Log.warn("Cannot load bank transaction for null islands, skipping...");
                     return;
                 }
 
@@ -760,7 +723,7 @@ public class IslandsDeserializer {
 
             Optional<UUID> uuid = customData.getUUID("island");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load custom data for null islands, skipping...");
+                Log.warn("Cannot load custom data for null islands, skipping...");
                 return;
             }
 

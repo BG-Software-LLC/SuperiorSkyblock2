@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.engine;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -25,19 +25,18 @@ public class NashornEngineDownloader {
 
     public static boolean downloadEngine(SuperiorSkyblockPlugin plugin) {
         try {
-            SuperiorSkyblockPlugin.log("&cSeems like you are missing a nashorn engine. Attempting to download one remotely...");
+            Log.info("Seems like you are missing a nashorn engine. Attempting to download one remotely...");
             deleteExistingModule(plugin);
             JsonObject apiResponse = readJenkinsJsonAPI();
             JsonObject artifact = apiResponse.getAsJsonArray("artifacts").get(0).getAsJsonObject();
             String fileName = artifact.get("fileName").getAsString();
             File engineFile = downloadEngine(plugin, fileName);
-            SuperiorSkyblockPlugin.log("&aSuccessfully downloaded the nashorn engine file, enabling it...");
+            Log.info("Successfully downloaded the nashorn engine file, enabling it...");
             PluginModule pluginModule = plugin.getModules().registerModule(engineFile);
             plugin.getModules().enableModule(pluginModule);
             return true;
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.log("&cFailed to download the nashorn engine.");
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while downloading nashorn engine:");
             return false;
         }
     }

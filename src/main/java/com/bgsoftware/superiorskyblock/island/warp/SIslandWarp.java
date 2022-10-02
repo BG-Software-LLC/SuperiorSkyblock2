@@ -5,9 +5,9 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -48,9 +48,12 @@ public class SIslandWarp implements IslandWarp {
     @Override
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        PluginDebugger.debug("Action: Update Warp Name, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Name: " + name);
+
+        Log.debug(Debug.SET_WARP_NAME, "SIslandWarp", "setName", getOwnerName(), this.name, name);
+
         String oldName = this.name;
         this.name = name;
+
         IslandsDatabaseBridge.updateWarpName(getIsland(), this, oldName);
     }
 
@@ -62,9 +65,11 @@ public class SIslandWarp implements IslandWarp {
     @Override
     public void setLocation(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        PluginDebugger.debug("Action: Update Warp Location, Island: " + getOwnerName() + ", Warp: " + this.name + ", New Location: " +
-                Formatters.LOCATION_FORMATTER.format(location));
+
+        Log.debug(Debug.SET_WARP_LOCATION, "SIslandWarp", "setLocation", getOwnerName(), this.name, location);
+
         this.location = location.clone();
+
         IslandsDatabaseBridge.updateWarpLocation(getIsland(), this);
     }
 
@@ -75,8 +80,10 @@ public class SIslandWarp implements IslandWarp {
 
     @Override
     public void setPrivateFlag(boolean privateFlag) {
-        PluginDebugger.debug("Action: Update Warp Private, Island: " + getOwnerName() + ", Warp: " + this.name + ", Private: " + privateFlag);
+        Log.debug(Debug.SET_WARP_PRIVATE, "SIslandWarp", "setPrivateFlag", getOwnerName(), this.name, privateFlag);
+
         this.isPrivate = privateFlag;
+
         IslandsDatabaseBridge.updateWarpPrivateStatus(getIsland(), this);
     }
 
@@ -94,17 +101,18 @@ public class SIslandWarp implements IslandWarp {
             ItemBuilder itemBuilder = new ItemBuilder(icon)
                     .replaceAll("{0}", name);
             return superiorPlayer == null ? itemBuilder.build() : itemBuilder.build(superiorPlayer);
-        } catch (Exception ex) {
+        } catch (Exception error) {
             setIcon(null);
-            PluginDebugger.debug(ex);
             return null;
         }
     }
 
     @Override
     public void setIcon(ItemStack icon) {
-        PluginDebugger.debug("Action: Update Warp Icon, Island: " + getOwnerName() + ", Warp: " + this.name);
+        Log.debug(Debug.SET_WARP_ICON, "SIslandWarp", "setIcon", getOwnerName(), this.name, icon);
+
         this.icon = icon == null ? null : icon.clone();
+
         IslandsDatabaseBridge.updateWarpIcon(getIsland(), this);
     }
 

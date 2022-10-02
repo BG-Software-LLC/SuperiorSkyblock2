@@ -6,6 +6,7 @@ import com.Zrips.CMI.events.CMIPlayerVanishEvent;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.VanishProvider;
 import com.bgsoftware.superiorskyblock.core.Singleton;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.listener.PlayersListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -29,7 +30,7 @@ public class VanishProvider_CMI implements VanishProvider, Listener {
             Bukkit.getPluginManager().registerEvents(this, plugin);
         }
 
-        SuperiorSkyblockPlugin.log("Hooked into CMI for support of vanish status of players.");
+        Log.info("Hooked into CMI for support of vanish status of players.");
     }
 
     @Override

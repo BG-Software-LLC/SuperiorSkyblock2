@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.nms.v1_12_R1.chunks.EmptyCounterChunkSection;
@@ -251,7 +252,7 @@ public class NMSChunksImpl implements NMSChunks {
         if (pendingTasks.isEmpty())
             return;
 
-        SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
+        Log.info("Waiting for chunk tasks to complete.");
 
         CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
     }

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.database.loader.DatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.ZipFiles;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -39,7 +40,7 @@ public class BackupDatabase implements DatabaseLoader {
         if (backupFile == null)
             throw new ManagerLoadException("Could not create a backup file as file already exists", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
 
-        SuperiorSkyblockPlugin.log("Creating a backup file...");
+        Log.info("Creating a backup file...");
 
         backupFile.getParentFile().mkdirs();
 
@@ -50,7 +51,7 @@ public class BackupDatabase implements DatabaseLoader {
             throw new ManagerLoadException(error, ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
         }
 
-        SuperiorSkyblockPlugin.log("Backup done!");
+        Log.info("Backup done!");
     }
 
     @Nullable

@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import dev.rosewood.rosestacker.api.RoseStackerAPI;
 import dev.rosewood.rosestacker.event.SpawnerStackEvent;
@@ -34,7 +35,7 @@ public class SpawnersProvider_RoseStacker implements SpawnersProvider_AutoDetect
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using RoseStacker as a spawners provider.");
+            Log.info("Using RoseStacker as a spawners provider.");
         }
     }
 

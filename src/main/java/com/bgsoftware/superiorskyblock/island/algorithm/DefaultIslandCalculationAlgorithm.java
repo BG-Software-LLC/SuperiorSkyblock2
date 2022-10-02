@@ -10,10 +10,11 @@ import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
@@ -50,6 +51,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
     public CompletableFuture<IslandCalculationResult> calculateIsland(Island island) {
         CompletableFutureList<List<CalculatedChunk>> chunksToLoad = new CompletableFutureList<>();
 
+        Log.debug(Debug.CHUNK_CALCULATION, "DefaultIslandCalculationAlgorithm", "calculateIsland", island.getOwner().getName());
+
         if (!plugin.getProviders().hasSnapshotsSupport()) {
             IslandUtils.getChunkCoords(island, true, true).values().forEach(worldChunks ->
                     chunksToLoad.add(plugin.getNMSChunks().calculateChunks(worldChunks, CACHED_CALCULATED_CHUNKS)));
@@ -72,7 +75,8 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
 
         BukkitExecutor.createTask().runAsync(v -> {
             chunksToLoad.forEachCompleted(worldCalculatedChunks -> worldCalculatedChunks.forEach(calculatedChunk -> {
-                PluginDebugger.debug("Action: Chunk Calculation, Island: " + island.getOwner().getName() + ", Chunk: " + calculatedChunk.getPosition());
+                Log.debugResult(Debug.CHUNK_CALCULATION, "DefaultIslandCalculationAlgorithm", "calculateIsland",
+                        "Chunk Finished", calculatedChunk.getPosition());
 
                 // We want to remove spawners from the chunkInfo, as it will be used later
                 calculatedChunk.getBlockCounts().removeIf(key ->
@@ -134,8 +138,7 @@ public class DefaultIslandCalculationAlgorithm implements IslandCalculationAlgor
                     }
 
                     blockCounts.addCounts(blockKey, blockCount);
-                } catch (Throwable error) {
-                    PluginDebugger.debug(error);
+                } catch (Throwable ignored) {
                 }
             }
             spawnersToCheck.clear();

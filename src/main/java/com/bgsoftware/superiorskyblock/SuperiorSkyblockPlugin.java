@@ -16,16 +16,15 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.engine.EnginesFactory;
 import com.bgsoftware.superiorskyblock.core.engine.NashornEngineDownloader;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.factory.FactoriesManagerImpl;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
@@ -84,9 +83,7 @@ import com.bgsoftware.superiorskyblock.world.schematic.SchematicsManagerImpl;
 import com.bgsoftware.superiorskyblock.world.schematic.container.DefaultSchematicsContainer;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.UnsafeValues;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -153,14 +150,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
     private boolean shouldEnable = true;
 
-    public static void log(String message) {
-        //plugin.pluginDebugger.debug(ChatColor.stripColor(message));
-        message = Formatters.COLOR_FORMATTER.format(message);
-        if (message.contains(ChatColor.COLOR_CHAR + ""))
-            Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
-        else
-            plugin.getLogger().info(message);
-    }
+//    public static void log(String message) {
+//        message = Formatters.COLOR_FORMATTER.format(message);
+//        if (message.contains(ChatColor.COLOR_CHAR + ""))
+//            Bukkit.getConsoleSender().sendMessage(ChatColor.getLastColors(message.substring(0, 2)) + "[" + plugin.getDescription().getName() + "] " + message);
+//        else
+//            plugin.getLogger().info(message);
+//    }
 
     public static SuperiorSkyblockPlugin getPlugin() {
         return plugin;
@@ -177,8 +173,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         try {
             SuperiorSkyblockAPI.setPluginInstance(this);
         } catch (UnsupportedOperationException error) {
-            log("&cThe API instance was already initialized. " +
-                    "This can be caused by a reload or another plugin initializing it.");
+            Log.error("The API instance was already initialized. This can be caused by a reload or another plugin initializing it.");
             shouldEnable = false;
         }
 
@@ -196,8 +191,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             SortingComparators.initializeTopIslandMembersSorting();
         } catch (IllegalArgumentException error) {
             shouldEnable = false;
-            log("&cThe TopIslandMembersSorting was already initialized. " +
-                    "This can be caused by a reload or another plugin initializing it.");
+            Log.error("The TopIslandMembersSorting was already initialized. This can be caused by a reload or another plugin initializing it.");
         }
 
         this.servicesHandler.registerPlaceholdersService(new PlaceholdersServiceImpl());
@@ -248,10 +242,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             try {
                 providersHandler.getWorldsProvider().prepareWorlds();
             } catch (RuntimeException ex) {
-                ManagerLoadException handlerError = new ManagerLoadException(ex.getMessage(), ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
                 shouldEnable = false;
-                handlerError.printStackTrace();
-                PluginDebugger.debug(handlerError);
+                ManagerLoadException handlerError = new ManagerLoadException(ex.getMessage(), ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+                Log.error("An error occurred while preparing worlds:", handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -267,11 +260,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             try {
                 bukkitListeners.register();
             } catch (RuntimeException ex) {
+                shouldEnable = false;
                 ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
                         ManagerLoadException.ErrorLevel.CONTINUE);
-                shouldEnable = false;
-                handlerError.printStackTrace();
-                PluginDebugger.debug(handlerError);
+                Log.error("An error occurred while registering listeners:", handlerError);
                 Bukkit.shutdown();
                 return;
             }
@@ -279,10 +271,10 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
 
             if (updater.isOutdated()) {
-                log("");
-                log("A new version is available (v" + updater.getLatestVersion() + ")!");
-                log("Version's description: \"" + updater.getVersionDescription() + "\"");
-                log("");
+                Log.warn("");
+                Log.warn(new StringBuilder("A new version is available (v").append(updater.getLatestVersion()).append(")!"));
+                Log.warn(new StringBuilder("Version's description: \"").append(updater.getVersionDescription()).append("\""));
+                Log.warn("");
             }
 
             ChunksProvider.start();
@@ -313,10 +305,9 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
             eventsBus.callPluginInitializedEvent(this);
 
-        } catch (Throwable ex) {
+        } catch (Throwable error) {
             shouldEnable = false;
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+            Log.error("An unexpected error occurred while enabling the plugin:", error);
             Bukkit.shutdown();
         }
     }
@@ -356,24 +347,19 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     }
                 });
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error("An unexpected error occurred while disabling the plugin:", error);
         } finally {
-            // SuperiorSkyblockPlugin.log("Unloading worlds...");
-            // unloadIslandWorlds();
-
-            SuperiorSkyblockPlugin.log("Shutting down calculation task...");
+            Log.info("Shutting down calculation task...");
             CalcTask.cancelTask();
 
-            SuperiorSkyblockPlugin.log("Shutting down executor");
+            Log.info("Shutting down executor");
             BukkitExecutor.close();
 
             if (nmsChunks != null)
                 nmsChunks.shutdown();
 
-            SuperiorSkyblockPlugin.log("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
-            //pluginDebugger.cancel();
+            Log.info("Closing database. This may hang the server. Do not shut it down, or data may get lost.");
             dataHandler.closeConnection();
         }
     }
@@ -417,7 +403,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             if (nmsPackageVersion == null) {
-                log("Data version: " + dataVersion);
+                Log.error("Data version: " + dataVersion);
             }
         }
 
@@ -432,8 +418,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 nmsWorld = loadNMSClass("NMSWorldImpl", nmsPackageVersion);
                 return true;
             } catch (Exception error) {
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.error("An unexpected error occurred while loading nms support:", error);
             }
         }
 
@@ -499,10 +484,8 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                         }
                     }
                 }
-            } catch (Exception ex) {
-                log("An error occurred while loading the generator:");
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.error("An unexpected error occurred while loading the generator:", error);
             }
         }
     }
@@ -581,13 +564,6 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
         });
 
         CalcTask.startTask();
-    }
-
-    private void unloadIslandWorlds() {
-        for (World world : Bukkit.getWorlds()) {
-            if (providersHandler.getWorldsProvider().isIslandsWorld(world))
-                Bukkit.unloadWorld(world, true);
-        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 
 import java.util.Optional;
@@ -27,7 +28,7 @@ public class PlayersDeserializer {
             Optional<String> player = missions.getString("player");
 
             if (!player.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player mission of null player, skipping...");
+                Log.warn("Cannot load player mission of null player, skipping...");
                 return;
             }
 
@@ -37,14 +38,14 @@ public class PlayersDeserializer {
             Optional<String> name = missions.getString("name");
 
             if (!name.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player mission of null mission, skipping...");
+                Log.warn("Cannot load player mission of null mission for ", uuid, ", skipping...");
                 return;
             }
 
             Optional<Integer> finishCount = missions.getInt("finish_count");
 
             if (!finishCount.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player mission of invalid finish count, skipping...");
+                Log.warn("Cannot load player mission of invalid finish count for ", uuid, ", skipping...");
                 return;
             }
 
@@ -62,7 +63,7 @@ public class PlayersDeserializer {
             Optional<String> player = playerSettings.getString("player");
 
             if (!player.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player settings of null player, skipping...");
+                Log.warn("&cCannot load player settings of null player, skipping...");
                 return;
             }
 
@@ -82,7 +83,7 @@ public class PlayersDeserializer {
 
             Optional<UUID> uuid = customData.getUUID("player");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load custom data for null players, skipping...");
+                Log.warn("&cCannot load custom data for null players, skipping...");
                 return;
             }
 

@@ -8,10 +8,10 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoadException;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCostLoader;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgrade;
 import com.bgsoftware.superiorskyblock.island.upgrade.SUpgradeLevel;
@@ -176,7 +176,7 @@ public class UpgradesModule extends BuiltinModule {
         UpgradeCostLoader costLoader = plugin.getUpgrades().getUpgradeCostLoader(priceType);
 
         if (costLoader == null) {
-            SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") has invalid price-type. Skipping...");
+            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has invalid price-type. Skipping...");
             return;
         }
 
@@ -184,10 +184,8 @@ public class UpgradesModule extends BuiltinModule {
 
         try {
             upgradeCost = costLoader.loadCost(levelSection);
-        } catch (UpgradeCostLoadException ex) {
-            SuperiorSkyblockPlugin.log("&cUpgrade by name " + upgrade.getName() + " (level " + level + ") failed to initialize because: "
-                    + ex.getMessage() + ". Skipping...");
-            PluginDebugger.debug(ex);
+        } catch (UpgradeCostLoadException error) {
+            Log.error(error, "Upgrade by name ", upgrade.getName(), " (level ", level, ") failed to initialize:");
             return;
         }
 
@@ -247,8 +245,7 @@ public class UpgradesModule extends BuiltinModule {
             for (String roleId : levelSection.getConfigurationSection("role-limits").getKeys(false)) {
                 try {
                     rolesLimits.put(Integer.parseInt(roleId), levelSection.getInt("role-limits." + roleId));
-                } catch (NumberFormatException error) {
-                    PluginDebugger.debug(error);
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -271,9 +268,9 @@ public class UpgradesModule extends BuiltinModule {
             try {
                 super.config.save(moduleConfigFile);
                 config.save(upgradesFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.entering("UpgradesModule", "convertOldUpgradesFile", "ENTER");
+                Log.error(error, "An error occurred while saving config file:");
             }
 
             upgradesFile.delete();

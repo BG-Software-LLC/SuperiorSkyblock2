@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.GridManagerImpl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -98,8 +98,8 @@ public class ChunksTracker {
         int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
 
         if (chunkIndex < 0) {
-            SuperiorSkyblockPlugin.log("Failed to mark chunk empty: " + chunkPosition + ", index: " + chunkIndex);
-            SuperiorSkyblockPlugin.log("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
+            Log.error("Failed to mark chunk empty: " + chunkPosition + ", index: " + chunkIndex);
+            Log.error("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
             return;
         }
 
@@ -122,8 +122,8 @@ public class ChunksTracker {
         int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
 
         if (chunkIndex < 0) {
-            SuperiorSkyblockPlugin.log("Failed to mark chunk dirty: " + chunkPosition + ", index: " + chunkIndex);
-            SuperiorSkyblockPlugin.log("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
+            Log.error("Failed to mark chunk dirty: " + chunkPosition + ", index: " + chunkIndex);
+            Log.error("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
             return;
         }
 
@@ -180,8 +180,7 @@ public class ChunksTracker {
                             Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
                 }
             }
-        } catch (Exception error) {
-            PluginDebugger.debug(error);
+        } catch (Exception ignored) {
         }
     }
 

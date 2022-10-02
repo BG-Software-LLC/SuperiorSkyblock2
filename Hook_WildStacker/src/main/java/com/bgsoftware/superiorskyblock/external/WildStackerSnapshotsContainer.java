@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.external;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
 import com.bgsoftware.wildstacker.api.objects.StackedSnapshot;
@@ -36,8 +35,7 @@ public class WildStackerSnapshotsContainer {
             if (stackedSnapshot != null) {
                 cachedSnapshots.put(chunkPosition, stackedSnapshot);
             }
-        } catch (Throwable error) {
-            PluginDebugger.debug(error);
+        } catch (Throwable ignored) {
         }
     }
 

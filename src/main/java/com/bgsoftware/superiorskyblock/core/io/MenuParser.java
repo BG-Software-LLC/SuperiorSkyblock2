@@ -4,17 +4,17 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.BackButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.DummyButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -68,22 +68,18 @@ public class MenuParser {
         try {
             cfg.load(file);
         } catch (InvalidConfigurationException error) {
-            SuperiorSkyblockPlugin.log("&c[" + fileName + "] There is an issue with the format of the file.");
-            PluginDebugger.debug(error);
+            Log.error(error, file, "There is an issue with the format of the file:");
             return null;
         } catch (IOException error) {
-            SuperiorSkyblockPlugin.log("&c[" + fileName + "] An unexpected error occurred while parsing the file:");
-            PluginDebugger.debug(error);
-            error.printStackTrace();
+            Log.error(error, file, "An unexpected error occurred while parsing file:");
             return null;
         }
 
         if (convertOldMenu != null && convertOldMenu.apply(plugin, cfg)) {
             try {
                 cfg.save(file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.error(error, file, "An unexpected error occurred while saving file:");
             }
         }
 
@@ -128,7 +124,7 @@ public class MenuParser {
         }
 
         if (plugin.getSettings().isOnlyBackButton() && !backButtonFound) {
-            SuperiorSkyblockPlugin.log("&c[" + fileName + "] Menu doesn't have a back button, it's impossible to close it.");
+            Log.error(file, "Menu doesn't have a back button, it's impossible to close it.");
             return null;
         }
 
@@ -158,9 +154,8 @@ public class MenuParser {
             try {
                 type = Material.valueOf(section.getString("type"));
                 data = (short) section.getInt("data");
-            } catch (IllegalArgumentException ex) {
-                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + " into an itemstack. Check type & data sections!");
-                PluginDebugger.debug(ex);
+            } catch (IllegalArgumentException error) {
+                Log.error(new File(fileName), "Couldn't convert ", section.getCurrentPath(), " into an itemstack. Check type & data sections!");
                 return null;
             }
 
@@ -182,8 +177,8 @@ public class MenuParser {
                 try {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + section.getCurrentPath() + ".enchants." + _enchantment + " into an enchantment, skipping...");
-                    PluginDebugger.debug(ex);
+                    Log.warn(new File(fileName), "Couldn't convert ", section.getCurrentPath(),
+                            ".enchants.", _enchantment, " into an enchantment, skipping...");
                     continue;
                 }
 
@@ -214,7 +209,8 @@ public class MenuParser {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(_effect);
 
                 if (potionEffectType == null) {
-                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + effectsSection.getCurrentPath() + "." + _effect + " into a potion effect, skipping...");
+                    Log.warn(new File(fileName), "Couldn't convert ", effectsSection.getCurrentPath(),
+                            ".", _effect, " into a potion effect, skipping...");
                     continue;
                 }
 
@@ -222,7 +218,8 @@ public class MenuParser {
                 int amplifier = effectsSection.getInt(_effect + ".amplifier", 0);
 
                 if (duration == -1) {
-                    SuperiorSkyblockPlugin.log("&c[" + fileName + "] Potion effect " + effectsSection.getCurrentPath() + "." + _effect + " is missing duration, skipping...");
+                    Log.warn(new File(fileName), "Potion effect ", effectsSection.getCurrentPath(),
+                            ".", _effect, " is missing duration, skipping...");
                     continue;
                 }
 
@@ -235,8 +232,7 @@ public class MenuParser {
             try {
                 itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
-                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + entity + " into an entity type, skipping...");
-                PluginDebugger.debug(ex);
+                Log.warn(new File(fileName), "Couldn't convert ", entity, " into an entity type, skipping...");
             }
         }
 
@@ -252,8 +248,7 @@ public class MenuParser {
             try {
                 itemBuilder.withLeatherColor(Integer.parseInt(leatherColor, 16));
             } catch (IllegalArgumentException error) {
-                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Couldn't convert " + leatherColor + " into a color, skipping...");
-                PluginDebugger.debug(error);
+                Log.warn(new File(fileName), "Couldn't convert ", leatherColor, " into a color, skipping...");
             }
         }
 
@@ -270,16 +265,13 @@ public class MenuParser {
         if (soundType == null)
             return null;
 
-        Sound sound = null;
+        Sound sound;
 
         try {
             sound = Sound.valueOf(soundType);
-        } catch (Exception error) {
-            PluginDebugger.debug(error);
-        }
-
-        if (sound == null)
+        } catch (Exception ignored) {
             return null;
+        }
 
         return new GameSound(sound, (float) section.getDouble("volume", 1),
                 (float) section.getDouble("pitch", 1));

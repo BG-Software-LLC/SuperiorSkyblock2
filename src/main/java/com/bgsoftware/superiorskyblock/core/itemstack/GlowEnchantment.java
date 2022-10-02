@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core.itemstack;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.enchantments.Enchantment;
 
 public class GlowEnchantment {
@@ -21,8 +20,9 @@ public class GlowEnchantment {
         ACCEPTING_NEW.set(null, true);
         try {
             Enchantment.registerEnchantment(glowEnchant);
-        } catch (Exception error) {
-            PluginDebugger.debug(error);
+        } catch (Exception ignored) {
+        } finally {
+            ACCEPTING_NEW.set(null, false);
         }
     }
 

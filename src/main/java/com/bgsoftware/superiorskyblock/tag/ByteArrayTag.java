@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 package com.bgsoftware.superiorskyblock.tag;
 
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -66,9 +66,8 @@ public class ByteArrayTag extends Tag<byte[]> {
         try {
             byte[] value = plugin.getNMSTags().getNBTByteArrayValue(tag);
             return new ByteArrayTag(value);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag byte-array from NMS:");
             return null;
         }
     }

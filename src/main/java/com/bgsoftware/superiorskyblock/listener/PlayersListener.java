@@ -12,9 +12,10 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
@@ -82,7 +83,7 @@ public class PlayersListener implements Listener {
         List<SuperiorPlayer> duplicatedPlayers = plugin.getPlayers().matchAllPlayers(_superiorPlayer ->
                 _superiorPlayer != superiorPlayer && _superiorPlayer.getName().equalsIgnoreCase(e.getPlayer().getName()));
         if (!duplicatedPlayers.isEmpty()) {
-            SuperiorSkyblockPlugin.log("Changing UUID of " + superiorPlayer.getName() + " to " + superiorPlayer.getUniqueId());
+            Log.info("Changing UUID of " + superiorPlayer.getName() + " to " + superiorPlayer.getUniqueId());
             for (SuperiorPlayer duplicatePlayer : duplicatedPlayers) {
                 plugin.getPlayers().replacePlayers(duplicatePlayer, superiorPlayer);
             }
@@ -277,7 +278,7 @@ public class PlayersListener implements Listener {
                     !plugin.getSettings().getVoidTeleport().isVisitors() : !plugin.getSettings().getVoidTeleport().isMembers()))
                 return;
 
-            PluginDebugger.debug("Action: Void Teleport, Player: " + superiorPlayer.getName());
+            Log.debug(Debug.VOID_TELEPORT, "PlayersListener", "onPlayerMove", superiorPlayer.getName());
 
             noFallDamage.add(e.getPlayer().getUniqueId());
             superiorPlayer.teleport(island, result -> {

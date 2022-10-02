@@ -4,10 +4,10 @@ import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuMembers;
@@ -95,9 +95,9 @@ public class MissionsModule extends BuiltinModule {
 
         try {
             config.syncWithConfig(file, Resources.getResource("modules/missions/config.yml"), getIgnoredSections());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("MissionsModule", "onPluginInit", "ENTER");
+            Log.error(error, "An error occurred while saving config file:");
         }
 
         updateConfig(plugin);
@@ -181,12 +181,12 @@ public class MissionsModule extends BuiltinModule {
         File categoryFolder = new File(getModuleFolder(), "categories/" + categoryName);
 
         if (!categoryFolder.exists()) {
-            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " doesn't exist, skipping...");
+            Log.warn("The directory of the mission category ", categoryName, " doesn't exist, skipping...");
             return false;
         }
 
         if (!categoryFolder.isDirectory()) {
-            SuperiorSkyblockPlugin.log("&cThe directory of the mission category " + categoryName + " is not valid, skipping...");
+            Log.warn("The directory of the mission category ", categoryName, " is not valid, skipping...");
             return false;
         }
 
@@ -194,7 +194,7 @@ public class MissionsModule extends BuiltinModule {
                 file.isFile() && file.getName().endsWith(".yml"));
 
         if (missionFiles == null || missionFiles.length == 0) {
-            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
+            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
             return false;
         }
 
@@ -210,15 +210,11 @@ public class MissionsModule extends BuiltinModule {
 
             try {
                 missionConfigFile.load(missionFile);
-            } catch (InvalidConfigurationException ex) {
-                SuperiorSkyblockPlugin.log("&cError occurred while parsing mission file " + missionFile.getName() + ":");
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (InvalidConfigurationException error) {
+                Log.error(error, "A format-error occurred while parsing the mission file ", missionFile.getName() + ":");
                 continue;
-            } catch (IOException ex) {
-                SuperiorSkyblockPlugin.log("&cError occurred while opening mission file " + missionFile.getName() + ":");
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (IOException error) {
+                Log.error(error, "An unexpected error occurred while parsing the mission file ", missionFile.getName() + ":");
                 continue;
             }
 
@@ -233,7 +229,7 @@ public class MissionsModule extends BuiltinModule {
         }
 
         if (categoryMissions.isEmpty()) {
-            SuperiorSkyblockPlugin.log("&cThe mission category " + categoryName + " doesn't have missions, skipping...");
+            Log.warn("The mission category ", categoryName, " doesn't have missions, skipping...");
             return false;
         }
 
@@ -292,8 +288,7 @@ public class MissionsModule extends BuiltinModule {
             try {
                 missionFile.createNewFile();
             } catch (IOException error) {
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.error(error, "An unexpected error occurred while converting non-categorized mission ", missionName, ":");
                 continue;
             }
 
@@ -303,8 +298,7 @@ public class MissionsModule extends BuiltinModule {
             try {
                 missionConfigFile.save(missionFile);
             } catch (Exception error) {
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.error(error, "An unexpected error occurred while saving non-categorized mission ", missionName, ":");
             }
         }
 
@@ -313,8 +307,7 @@ public class MissionsModule extends BuiltinModule {
         try {
             config.save(file);
         } catch (Exception error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while saving missions file:");
         }
 
         copyOldMissionsMenuFile(plugin);
@@ -332,9 +325,8 @@ public class MissionsModule extends BuiltinModule {
 
                 try {
                     config.save(file);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while saving old missions file ", file.getName(), ":");
                 }
 
                 oldMissionsFile.delete();
@@ -364,8 +356,7 @@ public class MissionsModule extends BuiltinModule {
         try {
             java.nio.file.Files.copy(Paths.get(oldMissionsMenuFile.toURI()), Paths.get(newMissionsCategoryMenuFile.toURI()));
         } catch (IOException error) {
-            SuperiorSkyblockPlugin.log("&cError occurred while copying old missions-menu to the new format, skipping...");
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while copying old missions-menu to the new format:");
             return;
         }
 
@@ -374,8 +365,7 @@ public class MissionsModule extends BuiltinModule {
 
         try {
             newMissionsCategoryMenuConfig.save(newMissionsCategoryMenuFile);
-        } catch (IOException error) {
-            PluginDebugger.debug(error);
+        } catch (IOException ignored) {
         }
     }
 

@@ -6,9 +6,8 @@ import com.bgsoftware.superiorskyblock.api.handlers.ModulesManager;
 import com.bgsoftware.superiorskyblock.api.modules.ModuleLoadTime;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.container.ModulesContainer;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
@@ -85,14 +84,13 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
         Preconditions.checkState(getModule(pluginModule.getName()) != null, "PluginModule with the name " + pluginModule.getName() + " is not registered in the plugin anymore.");
 
-        SuperiorSkyblockPlugin.log("&cDisabling the module " + pluginModule.getName() + "...");
+        Log.info(new StringBuilder("Disabling the module ").append(pluginModule.getName()).append("..."));
 
         try {
             pluginModule.onDisable(plugin);
         } catch (Throwable error) {
-            SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
-            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-            error.printStackTrace();
+            Log.error(new StringBuilder("An unexpected error occurred while disabling the module ").append(pluginModule.getName()).append("."));
+            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
         }
 
         this.modulesContainer.unregisterModule(pluginModule);
@@ -116,26 +114,21 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         long startTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("&aEnabling the module " + pluginModule.getName() + "...");
+        Log.info(new StringBuilder("Enabling the module ").append(pluginModule.getName()).append("..."));
 
         try {
             pluginModule.onEnable(plugin);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("&cAn error occurred while enabling the module " + pluginModule.getName() + ":");
-            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(new StringBuilder("An unexpected error occurred while enabling the module ").append(pluginModule.getName()).append("."));
+            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
 
             try {
                 // Unregistering the module.
                 unregisterModule(pluginModule);
-            } catch (Throwable error) {
-                SuperiorSkyblockPlugin.log("&cAn error occurred while disabling the module " + pluginModule.getName() + ":");
-                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-                error.printStackTrace();
+            } catch (Throwable error2) {
+                Log.error(new StringBuilder("An unexpected error occurred while disabling the module ").append(pluginModule.getName()).append("."));
+                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error2);
             }
-
 
             return;
         }
@@ -156,8 +149,9 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         if (adminCommands != null)
             Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
 
-        SuperiorSkyblockPlugin.log("&eFinished enabling the module " + pluginModule.getName() +
-                " (Took " + (System.currentTimeMillis() - startTime) + "ms)");
+        Log.info(new StringBuilder("Finished enabling the module ")
+                .append(pluginModule.getName())
+                .append(" (Took ").append(System.currentTimeMillis() - startTime).append("ms)"));
     }
 
     @Override
@@ -171,9 +165,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             try {
                 pluginModule.onReload(plugin);
             } catch (Throwable error) {
-                SuperiorSkyblockPlugin.log("&cAn error occurred while reloading the module " + pluginModule.getName() + ":");
-                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-                error.printStackTrace();
+                Log.error(new StringBuilder("An unexpected error occurred while reloading the module ").append(pluginModule.getName()).append("."));
+                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
             }
         });
     }
@@ -183,9 +176,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             try {
                 pluginModule.loadData(plugin);
             } catch (Throwable error) {
-                SuperiorSkyblockPlugin.log("&cAn error occurred while loading data for the module " + pluginModule.getName() + ":");
-                SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-                error.printStackTrace();
+                Log.error(new StringBuilder("An unexpected error occurred while loading data for the module ").append(pluginModule.getName()).append("."));
+                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
             }
         });
     }
@@ -198,12 +190,9 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
                 if (!file.isDirectory() && file.getName().endsWith(".jar")) {
                     try {
                         registerModule(file);
-                    } catch (Exception ex) {
-                        SuperiorSkyblockPlugin.log("Couldn't register module " + file.getName() + ": ");
-                        ManagerLoadException handlerError = new ManagerLoadException(ex, "Couldn't register module " + file.getName() + ".",
-                                ManagerLoadException.ErrorLevel.CONTINUE);
-                        handlerError.printStackTrace();
-                        PluginDebugger.debug(handlerError);
+                    } catch (Exception error) {
+                        Log.error(new StringBuilder("An unexpected error occurred while registering module ")
+                                .append(file.getName()).append(":"), error);
                     }
                 }
             }

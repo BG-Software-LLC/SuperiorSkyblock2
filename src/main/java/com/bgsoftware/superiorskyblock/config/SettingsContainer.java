@@ -10,7 +10,6 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.formatting.impl.DateFormatter;
@@ -20,6 +19,7 @@ import com.bgsoftware.superiorskyblock.core.io.Resources;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.values.BlockValuesManagerImpl;
@@ -232,7 +232,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                SuperiorSkyblockPlugin.log("&cCouldn't parse block limit '" + line + "', skipping...");
+                Log.warn("Cannot parse block limit '", line, "', skipping...");
                 continue;
             }
 
@@ -248,7 +248,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                SuperiorSkyblockPlugin.log("&cCouldn't parse entity limit '" + line + "', skipping...");
+                Log.warn("Cannot parse entity limit '", line, "', skipping...");
                 continue;
             }
 
@@ -287,8 +287,8 @@ public class SettingsContainer {
                     stackedBlocksLimits.put(KeyImpl.of(sections[0], ""), Integer.parseInt(sections[1]));
                 else if (sections.length == 3)
                     stackedBlocksLimits.put(KeyImpl.of(sections[0], sections[1]), Integer.parseInt(sections[2]));
-            } catch (Exception ex) {
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.error(error, "An unexpected error occurred while parsing stacked block limit for '", line, "':");
             }
         });
         stackedBlocksAutoPickup = config.getBoolean("stacked-blocks.auto-collect", false);
@@ -327,9 +327,10 @@ public class SettingsContainer {
         endDragonFightEnabled = endWorldEnabled && config.getBoolean("worlds.end.dragon-fight.enabled", false) && ServerVersion.isAtLeast(ServerVersion.v1_9);
         BlockOffset endDragonFightPortalOffset = null;
         if (endDragonFightEnabled) {
-            endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(config.getString("worlds.end.dragon-fight.portal-offset"));
+            String portalOffset = config.getString("worlds.end.dragon-fight.portal-offset");
+            endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(portalOffset);
             if (endDragonFightPortalOffset == null) {
-                SuperiorSkyblockPlugin.log("&c[config.yml] Cannot parse portal-offset to a valid offset, skipping...");
+                Log.warn("Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
             }
         }
         this.endDragonFightPortalOffset = endDragonFightPortalOffset == null ? SBlockOffset.ZERO : endDragonFightPortalOffset;
@@ -396,8 +397,8 @@ public class SettingsContainer {
                 try {
                     World.Environment environment = World.Environment.valueOf(env.toUpperCase(Locale.ENGLISH));
                     loadGenerator(config.getStringList("default-values.generator." + env), environment.ordinal());
-                } catch (Exception ex) {
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while loading default generator values for ", env + ":");
                 }
             }
         } else {
@@ -447,13 +448,12 @@ public class SettingsContainer {
                             itemCompound.setByte("Slot", Byte.parseByte(slot));
 
                             items.addTag(itemCompound);
-                        } catch (Exception ex) {
-                            PluginDebugger.debug(ex);
+                        } catch (Exception error) {
+                            Log.error(error, "An unexpected error occurred while loading container item for ", slot + ":");
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    SuperiorSkyblockPlugin.log("&cInvalid container type: " + container + ".");
-                    PluginDebugger.debug(ex);
+                    Log.warn("Invalid container type ", container + ", skipping...");
                 }
             }
         }
@@ -552,7 +552,7 @@ public class SettingsContainer {
         List<String> safeBlocks = cfg.getStringList("safe-blocks");
 
         if (safeBlocks.isEmpty()) {
-            SuperiorSkyblockPlugin.log("&c[safe_blocks.yml] There are no valid safe blocks! Generating default ones...");
+            Log.warn(file, "There are no valid safe blocks! Generating default ones...");
             safeBlocks.addAll(Arrays.stream(Material.values())
                     .filter(Material::isSolid)
                     .map(Material::name)
@@ -563,7 +563,7 @@ public class SettingsContainer {
                 cfg.set("safe-blocks", safeBlocks);
                 cfg.save(file);
             } catch (IOException error) {
-                PluginDebugger.debug(error);
+                Log.error(error, "An unexpected error occurred while saving safe blocks into file:");
             }
         }
 

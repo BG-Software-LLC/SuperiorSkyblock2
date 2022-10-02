@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.module.container;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.ModuleData;
 import com.google.common.base.Preconditions;
 import org.bukkit.event.HandlerList;
@@ -38,9 +39,8 @@ public class DefaultModulesContainer implements ModulesContainer {
         try {
             pluginModule.initModule(plugin, moduleFolder, dataFolder);
         } catch (Throwable error) {
-            SuperiorSkyblockPlugin.log("&cAn error occurred while initializing the module " + pluginModule.getName() + ":");
-            SuperiorSkyblockPlugin.log("&cContact " + pluginModule.getAuthor() + " regarding this, this has nothing to do with the plugin.");
-            error.printStackTrace();
+            Log.error(new StringBuilder("An unexpected error occurred while initializing the module ").append(pluginModule.getName()).append("."));
+            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
             return;
         }
 

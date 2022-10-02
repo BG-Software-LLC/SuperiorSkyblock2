@@ -9,8 +9,8 @@ import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.upgrades.cost.UpgradeCost;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
@@ -119,7 +119,9 @@ public class SUpgradeLevel implements UpgradeLevel {
                     if (!Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + ""))
                         return requirement.getErrorMessage();
                 } catch (ScriptException error) {
-                    PluginDebugger.debug(error);
+                    Log.entering("SUpgradeLevel", "checkRequirements", "ENTER",
+                            level, superiorPlayer.getName(), requirement.getPlaceholder());
+                    Log.error(error, "An unexpected error occurred while checking for upgrade requirement:");
                 }
             }
         }

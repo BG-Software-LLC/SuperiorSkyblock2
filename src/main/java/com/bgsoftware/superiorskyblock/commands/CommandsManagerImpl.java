@@ -7,9 +7,10 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import com.google.common.base.Preconditions;
@@ -168,7 +169,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
         playerCommandsMap.registerCommand(superiorCommand, sort);
     }
 
-    @SuppressWarnings({"ResultOfMethodCallIgnored", "ConstantConditions"})
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void loadCommands() {
         File commandsFolder = new File(plugin.getDataFolder(), "commands");
 
@@ -192,15 +193,17 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                 if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
                     registerAdminCommand(superiorCommand);
-                    SuperiorSkyblockPlugin.log("Successfully loaded external admin command: " + file.getName().split("\\.")[0]);
+                    Log.info(new StringBuilder("Successfully loaded external admin command: ")
+                            .append(file.getName().split("\\.")[0]));
                 } else {
                     registerCommand(superiorCommand);
-                    SuperiorSkyblockPlugin.log("Successfully loaded external command: " + file.getName().split("\\.")[0]);
+                    Log.info(new StringBuilder("Successfully loaded external command: ")
+                            .append(file.getName().split("\\.")[0]));
                 }
 
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.error(new StringBuilder("An unexpected error occurred while loading an external command ")
+                        .append(file.getName()).append(":"), error);
             }
         }
 
@@ -232,6 +235,9 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
             java.util.Locale locale = PlayerLocales.getLocale(sender);
 
             if (args.length > 0) {
+                Log.debug(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
+                        sender.getName(), args[0]);
+
                 SuperiorCommand command = playerCommandsMap.getCommand(args[0]);
                 if (command != null) {
                     if (!(sender instanceof Player) && !command.canBeExecutedByConsole()) {
@@ -240,12 +246,15 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                     }
 
                     if (!command.getPermission().isEmpty() && !sender.hasPermission(command.getPermission())) {
-                        PluginDebugger.debug("Action: Execute Command, Player: " + sender.getName() + ", Command: " + args[0] + ", Missing Permission: " + command.getPermission());
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
+                                "Return Missing Permission", command.getPermission());
                         Message.NO_COMMAND_PERMISSION.send(sender, locale);
                         return false;
                     }
 
                     if (args.length < command.getMinArgs() || args.length > command.getMaxArgs()) {
+                        Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
+                                "Return Incorrect Usage", command.getUsage(locale));
                         Message.COMMAND_USAGE.send(sender, locale, getLabel() + " " + command.getUsage(locale));
                         return false;
                     }
@@ -266,6 +275,8 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                                     if (timeToExecute != null) {
                                         if (timeNow < timeToExecute) {
                                             String formattedTime = Formatters.TIME_FORMATTER.format(Duration.ofMillis(timeToExecute - timeNow), locale);
+                                            Log.debugResult(Debug.EXECUTE_COMMAND, "CommandsManagerImpl#PluginCommand", "execute",
+                                                    "Return Cooldown", formattedTime);
                                             Message.COMMAND_COOLDOWN_FORMAT.send(sender, locale, formattedTime);
                                             return false;
                                         }

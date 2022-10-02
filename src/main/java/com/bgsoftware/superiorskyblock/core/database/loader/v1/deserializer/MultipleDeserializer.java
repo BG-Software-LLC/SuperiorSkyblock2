@@ -11,7 +11,6 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.Island
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
@@ -32,8 +31,7 @@ public class MultipleDeserializer implements IDeserializer {
         for (IDeserializer deserializer : deserializers) {
             try {
                 return function.apply(deserializer);
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 

@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
 import com.bgsoftware.superiorskyblock.module.upgrades.listeners.WildStackerListener;
@@ -40,7 +41,7 @@ public class SpawnersProvider_WildStacker implements SpawnersProviderItemMetaSpa
             Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             Bukkit.getPluginManager().registerEvents(new WildStackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using WildStacker as a spawners provider.");
+            Log.info("Using WildStacker as a spawners provider.");
         }
     }
 

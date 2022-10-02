@@ -8,8 +8,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
@@ -100,7 +101,8 @@ public class SlimefunHook {
 
         @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
         public void onAndroidMiner(AndroidMineEvent e) {
-            PluginDebugger.debug("Action: Android Break, Block: " + e.getBlock().getLocation() + ", Type: " + e.getBlock().getType());
+            Log.debug(Debug.BLOCK_BREAK, "SlimefunHook#Slimefun4Listener", "onAndroidMiner",
+                    e.getBlock().getLocation(), e.getBlock().getType());
             if (stackedBlocksListener.get().tryUnstack(null, e.getBlock())) {
                 e.setCancelled(true);
             } else {

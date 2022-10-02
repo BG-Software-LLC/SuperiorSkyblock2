@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.SuperiorSkyblock;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.event.Listener;
 
 import java.io.File;
@@ -66,9 +66,9 @@ public abstract class BuiltinModule extends PluginModule {
             config.syncWithConfig(configFile,
                     Resources.getResource("modules/" + getName() + "/config.yml"),
                     getIgnoredSections());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering(getClass().getName(), "onPluginInit", "ENTER", "");
+            Log.error(error, "An error occurred while loading config file:");
         }
 
         updateConfig(plugin);

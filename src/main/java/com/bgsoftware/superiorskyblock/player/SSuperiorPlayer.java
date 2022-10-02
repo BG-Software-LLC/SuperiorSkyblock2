@@ -17,8 +17,8 @@ import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.PlayersDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.flag.IslandFlags;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.mission.MissionData;
@@ -157,8 +157,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setTextureValue(@Nonnull String textureValue) {
         Preconditions.checkNotNull(textureValue, "textureValue parameter cannot be null.");
-        PluginDebugger.debug("Action: Set Texture Value, Player: " + getName() + ", Texture: " + textureValue);
+
+        Log.debug(Debug.SET_TEXTURE_VALUE, "SSuperiorPlayer", "setTextureValue", getName(), textureValue);
+
         this.textureValue = textureValue;
+
         PlayersDatabaseBridge.saveTextureValue(this);
     }
 
@@ -169,8 +172,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setLastTimeStatus(long lastTimeStatus) {
-        PluginDebugger.debug("Action: Update Last Time, Player: " + getName() + ", Last Time: " + lastTimeStatus);
+        Log.debug(Debug.SET_PLAYER_LAST_TIME_UPDATED, "SSuperiorPlayer", "setLastTimeStatus", getName(), lastTimeStatus);
+
         this.lastTimeStatus = lastTimeStatus;
+
         PlayersDatabaseBridge.saveLastTimeStatus(this);
     }
 
@@ -392,8 +397,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setIsland(Island island) {
-        PluginDebugger.debug("Action: Change Island, Player: " + getName() + ", New Island: " +
-                (island == null ? "None" : island.getUniqueId().toString()));
+        Log.debug(Debug.SET_PLAYER_ISLAND, "SSuperiorPlayer", "setIsland", getName(),
+                island == null ? "null" : island.getOwner().getName());
+
         this.playerIsland = island;
     }
 
@@ -429,8 +435,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setPlayerRole(PlayerRole playerRole) {
         Preconditions.checkNotNull(playerRole, "playerRole parameter cannot be null.");
-        PluginDebugger.debug("Action: Change Role, Player: " + getName() + ", Role: " + playerRole);
+
+        Log.debug(Debug.SET_PLAYER_ROLE, "SSuperiorPlayer", "setPlayerRole", getName(), playerRole.getName());
+
         this.playerRole = playerRole;
+
         Island island = getIsland();
         if (island != null && island.getOwner() != this)
             IslandsDatabaseBridge.saveMemberRole(island, this);
@@ -443,8 +452,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setDisbands(int disbands) {
-        PluginDebugger.debug("Action: Set Disbands, Player: " + getName() + ", Amount: " + disbands);
         this.disbands = Math.max(disbands, 0);
+
+        Log.debug(Debug.SET_DISBANDS, "SSuperiorPlayer", "setDisbands", getName(), this.disbands);
+
         PlayersDatabaseBridge.saveDisbands(this);
     }
 
@@ -469,7 +480,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         Preconditions.checkNotNull(userLocale, "userLocale parameter cannot be null.");
         Preconditions.checkArgument(PlayerLocales.isValidLocale(userLocale), "Locale " + userLocale + " is not a valid locale.");
 
-        PluginDebugger.debug("Action: Set User Locale, Player: " + getName() + ", Locale: " + userLocale.getLanguage() + "-" + userLocale.getCountry());
+        Log.debug(Debug.SET_LANGUAGE, "SSuperiorPlayer", "setUserLocale", getName(),
+                userLocale.getLanguage() + "-" + userLocale.getCountry());
 
         this.userLocale = userLocale;
 
@@ -488,7 +500,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setWorldBorderEnabled(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Border, Player: " + getName() + ", Border: " + enabled);
+        Log.debug(Debug.SET_TOGGLED_BORDER, "SSuperiorPlayer", "setWorldBorderEnabled", getName(), enabled);
         this.worldBorderEnabled = enabled;
         PlayersDatabaseBridge.saveToggledBorder(this);
     }
@@ -510,7 +522,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setBlocksStacker(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Stacker, Player: " + getName() + ", Stacker: " + enabled);
+        Log.debug(Debug.SET_TOGGLED_STACKER, "SSuperiorPlayer", "setBlocksStacker", getName(), enabled);
         blocksStackerEnabled = enabled;
     }
 
@@ -526,7 +538,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setSchematicMode(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Schematic, Player: " + getName() + ", Schematic: " + enabled);
+        Log.debug(Debug.SET_TOGGLED_SCHEMATIC, "SSuperiorPlayer", "setSchematicMode", getName(), enabled);
         schematicModeEnabled = enabled;
     }
 
@@ -542,7 +554,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setTeamChat(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Chat, Player: " + getName() + ", Chat: " + enabled);
+        Log.debug(Debug.SET_TEAM_CHAT, "SSuperiorPlayer", "setTeamChat", getName(), enabled);
         teamChatEnabled = enabled;
     }
 
@@ -563,7 +575,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setBypassMode(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Bypass, Player: " + getName() + ", Bypass: " + enabled);
+        Log.debug(Debug.SET_ADMIN_BYPASS, "SSuperiorPlayer", "setBypassMode", getName(), enabled);
         bypassModeEnabled = enabled;
     }
 
@@ -574,8 +586,8 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setToggledPanel(boolean toggledPanel) {
+        Log.debug(Debug.SET_TOGGLED_PANEL, "SSuperiorPlayer", "setToggledPanel", getName(), toggledPanel);
         this.toggledPanel = toggledPanel;
-        PluginDebugger.debug("Action: Toggle Panel, Player: " + getName() + ", Panel: " + toggledPanel);
         PlayersDatabaseBridge.saveToggledPanel(this);
     }
 
@@ -601,7 +613,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setIslandFly(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Fly, Player: " + getName() + ", Fly: " + enabled);
+        Log.debug(Debug.SET_ISLAND_FLY, "SSuperiorPlayer", "setIslandFly", getName(), enabled);
         islandFly = enabled;
         PlayersDatabaseBridge.saveIslandFly(this);
     }
@@ -618,7 +630,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setAdminSpy(boolean enabled) {
-        PluginDebugger.debug("Action: Toggle Spy, Player: " + getName() + ", Spy: " + enabled);
+        Log.debug(Debug.SET_ADMIN_SPY, "SSuperiorPlayer", "setAdminSpy", getName(), enabled);
         adminSpyEnabled = enabled;
     }
 
@@ -630,8 +642,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setBorderColor(BorderColor borderColor) {
         Preconditions.checkNotNull(borderColor, "borderColor parameter cannot be null.");
-        PluginDebugger.debug("Action: Set Border Color, Player: " + getName() + ", Border Color: " + borderColor);
+
+        Log.debug(Debug.SET_BORDER_COLOR, "SSuperiorPlayer", "setBorderColor", getName(), borderColor);
+
         this.borderColor = borderColor;
+
         PlayersDatabaseBridge.saveBorderColor(this);
     }
 
@@ -645,10 +660,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setSchematicPos1(Block block) {
+    public void setSchematicPos1(@Nullable Block block) {
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, "SSuperiorPlayer", "setSchematicPos1", getName(),
+                block == null ? "null" : block.getLocation());
         this.schematicPos1 = block == null ? null : new SBlockPosition(block.getLocation());
-        PluginDebugger.debug("Action: Schematic Position #1, Player: " + getName() + ", Pos: " +
-                (block == null ? "None" : Formatters.LOCATION_FORMATTER.format(block.getLocation())));
     }
 
     @Override
@@ -657,10 +672,10 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     }
 
     @Override
-    public void setSchematicPos2(Block block) {
+    public void setSchematicPos2(@Nullable Block block) {
+        Log.debug(Debug.SET_SCHEMATIC_POSITION, "SSuperiorPlayer", "setSchematicPos2", getName(),
+                block == null ? "null" : block.getLocation());
         this.schematicPos2 = block == null ? null : new SBlockPosition(block.getLocation());
-        PluginDebugger.debug("Action: Schematic Position #2, Player: " + getName() + ", Pos: " +
-                (block == null ? "None" : Formatters.LOCATION_FORMATTER.format(block.getLocation())));
     }
 
     /*
@@ -674,7 +689,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPvP(boolean immunedToPvP) {
-        PluginDebugger.debug("Action: Set PvP Immune, Player: " + getName() + ", Immune: " + immunedToPvP);
+        Log.debug(Debug.SET_PVP_IMMUNED, "SSuperiorPlayer", "setImmunedToPvP", getName(), immunedToPvP);
         this.immuneToPvP = immunedToPvP;
     }
 
@@ -685,7 +700,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setLeavingFlag(boolean leavingFlag) {
-        PluginDebugger.debug("Action: Set Leaving Flag, Player: " + getName() + ", Flag: " + leavingFlag);
+        Log.debug(Debug.SET_LEAVING_FLAG, "SSuperiorPlayer", "setLeavingFlag", getName(), leavingFlag);
         this.leavingFlag = leavingFlag;
     }
 
@@ -712,7 +727,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
 
     @Override
     public void setImmunedToPortals(boolean immuneToTeleport) {
-        PluginDebugger.debug("Action: Set Portals Immune, Player: " + getName() + ", Immune: " + immuneToTeleport);
+        Log.debug(Debug.SET_PORTALS_IMMUNED, "SSuperiorPlayer", "setImmunedToPortals", getName(), immuneToTeleport);
         this.immuneToPortals = immuneToTeleport;
     }
 
@@ -800,8 +815,9 @@ public class SSuperiorPlayer implements SuperiorPlayer {
     @Override
     public void setAmountMissionCompleted(Mission<?> mission, int finishCount) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
-        PluginDebugger.debug("Action: Set Amount Mission Completed, Player: " + getName() +
-                ", Mission: " + mission.getName() + ", Amount: " + finishCount);
+
+        Log.debug(Debug.SET_PLAYER_MISSION_COMPLETED, "SSuperiorPlayer", "setAmountMissionCompleted",
+                getName(), mission.getName(), finishCount);
 
         if (finishCount > 0) {
             completedMissions.put(mission, finishCount);

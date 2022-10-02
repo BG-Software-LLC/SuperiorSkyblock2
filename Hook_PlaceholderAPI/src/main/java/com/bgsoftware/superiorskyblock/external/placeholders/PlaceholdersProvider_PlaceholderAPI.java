@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.external.placeholders;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.external.placeholders.PlaceholdersProvider;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.service.placeholders.PlaceholdersServiceImpl;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -17,7 +17,7 @@ public class PlaceholdersProvider_PlaceholderAPI implements PlaceholdersProvider
         this.plugin = plugin;
         new EZPlaceholder((PlaceholdersServiceImpl) plugin.getServices().getPlaceholdersService()).register();
 
-        SuperiorSkyblockPlugin.log("Using PlaceholderAPI for placeholders support.");
+        Log.info("Using PlaceholderAPI for placeholders support.");
     }
 
     @Override

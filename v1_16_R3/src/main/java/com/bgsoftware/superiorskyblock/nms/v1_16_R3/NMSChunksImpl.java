@@ -8,9 +8,9 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.CalculatedChunk;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v1_16_R3.chunks.CropsTickingTileEntity;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
@@ -282,7 +282,7 @@ public class NMSChunksImpl implements NMSChunks {
         if (pendingTasks.isEmpty())
             return;
 
-        SuperiorSkyblockPlugin.log("Waiting for chunk tasks to complete.");
+        Log.info("Waiting for chunk tasks to complete.");
 
         CompletableFuture.allOf(pendingTasks.toArray(new CompletableFuture[0])).join();
     }
@@ -347,9 +347,8 @@ public class NMSChunksImpl implements NMSChunks {
             try {
                 entitySlices = ENTITY_SLICE_ARRAY.get(chunk);
                 entitySliceCreationFunction = v -> new net.minecraft.server.v1_16_R3.EntitySlice<>(Entity.class);
-            } catch (Exception ex2) {
-                ex2.printStackTrace();
-                PluginDebugger.debug(ex2);
+            } catch (Exception error) {
+                Log.error(error, "An unexpected error occurred while removing entities from chunk ", chunk.getPos(), ":");
             }
         }
 

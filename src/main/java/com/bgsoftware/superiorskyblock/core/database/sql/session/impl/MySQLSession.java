@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.database.sql.session.impl;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.RemoteSQLSession;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -14,7 +14,7 @@ public class MySQLSession extends RemoteSQLSession {
 
     @Override
     public boolean createConnection() {
-        log("Trying to connect to remote database (MySQL)...");
+        if (logging) Log.info("Trying to connect to remote database (MySQL)...");
 
         try {
             HikariConfig config = new HikariConfig();
@@ -47,15 +47,13 @@ public class MySQLSession extends RemoteSQLSession {
 
             dataSource = new HikariDataSource(config);
 
-            log("Successfully established connection with remote database!");
+            if (logging) Log.info("Successfully established connection with remote database!");
 
             ready.complete(null);
 
             return true;
         } catch (Throwable error) {
-            log("&cFailed to connect to the remote database:");
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while connecting to MySQL database:");
         }
 
         return false;

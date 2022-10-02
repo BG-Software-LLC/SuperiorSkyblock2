@@ -1,9 +1,9 @@
 package com.bgsoftware.superiorskyblock.external.economy;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.EconomyProvider;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Precision;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -24,7 +24,7 @@ public class EconomyProvider_Vault implements EconomyProvider {
             econ = rsp.getProvider();
 
         if (econ != null)
-            SuperiorSkyblockPlugin.log("Using Vault as an economy provider.");
+            Log.info("Using Vault as an economy provider.");
 
         return econ != null;
     }

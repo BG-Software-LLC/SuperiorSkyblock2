@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandChestPag
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -68,12 +70,12 @@ public class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, IslandCh
                 ConfigurationSection invalidPageSection = cfg.getConfigurationSection("items." + slotChar + ".invalid-page");
 
                 if (validPageSection == null) {
-                    SuperiorSkyblockPlugin.log("&cThe slot char " + slotChar + " is missing the valid-page section.");
+                    Log.warn(new File("island-chest.yml"), "The slot char ", slotChar, " is missing the valid-page section.");
                     continue;
                 }
 
                 if (invalidPageSection == null) {
-                    SuperiorSkyblockPlugin.log("&cThe slot char " + slotChar + " is missing the invalid-page section.");
+                    Log.warn(new File("island-chest.yml"), "&cThe slot char ", slotChar, " is missing the invalid-page section.");
                     continue;
                 }
 

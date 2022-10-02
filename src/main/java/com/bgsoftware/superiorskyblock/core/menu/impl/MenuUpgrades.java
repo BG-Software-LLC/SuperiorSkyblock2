@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
@@ -87,7 +88,8 @@ public class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                         }
 
                         if (slot == -1) {
-                            SuperiorSkyblockPlugin.log("&cThe item of the upgrade " + upgrade.getName() + " (level " + level + ") is not inside the pattern, skipping...");
+                            Log.warn(new File("upgrades.yml"), "The item of the upgrade ", upgrade.getName(),
+                                    " (level ", level, ") is not inside the pattern, skipping...");
                             continue;
                         }
 
@@ -96,12 +98,14 @@ public class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                         if (upgradeLevel != null) {
                             TemplateItem hasNextLevel = MenuParser.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level"));
                             if (hasNextLevel == null) {
-                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing has-next-level item.");
+                                Log.warn(new File("upgrades.yml"), "The upgrade ", upgrade.getName(),
+                                        " (level ", level, ") is missing has-next-level item.");
                             }
 
                             TemplateItem noNextLevel = MenuParser.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
                             if (noNextLevel == null) {
-                                SuperiorSkyblockPlugin.log("&cThe upgrade " + upgrade.getName() + " (level " + level + ") is missing no-next-level item.");
+                                Log.warn(new File("upgrades.yml"), "&cThe upgrade ", upgrade.getName(),
+                                        " (level ", level, ") is missing no-next-level item.");
                             }
 
                             GameSound hasNextLevelSound = MenuParser.getSound(upgradeSection.getConfigurationSection(level + ".has-next-level.sound"));

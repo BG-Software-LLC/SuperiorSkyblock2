@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.threads;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -108,11 +108,10 @@ public class BukkitExecutor {
     public static void close() {
         try {
             shutdown = true;
-            SuperiorSkyblockPlugin.log("Shutting down database executor");
+            Log.info("Shutting down database executor");
             shutdownAndAwaitTermination();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while shutting down database executor:");
         }
     }
 

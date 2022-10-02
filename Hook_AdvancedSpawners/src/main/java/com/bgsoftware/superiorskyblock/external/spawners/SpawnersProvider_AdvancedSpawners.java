@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import gcspawners.ASAPI;
 import gcspawners.AdvancedSpawnerPlaceEvent;
@@ -29,7 +30,7 @@ public class SpawnersProvider_AdvancedSpawners implements SpawnersProvider_AutoD
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new SpawnersProvider_AdvancedSpawners.StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using AdvancedSpawners as a spawners provider.");
+            Log.info("Using AdvancedSpawners as a spawners provider.");
         }
     }
 

@@ -2,8 +2,9 @@ package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.Singleton;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.listener.BlockChangesListener;
 import com.bgsoftware.superiorskyblock.listener.StackedBlocksListener;
 import me.jet315.minions.events.MinerBlockBreakEvent;
@@ -32,7 +33,8 @@ public class JetsMinionsHook implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMinionBreak(MinerBlockBreakEvent e) {
-        PluginDebugger.debug("Action: Jets Minion Break, Block: " + e.getBlock().getLocation() + ", Type: " + e.getBlock().getType());
+        Log.debug(Debug.BLOCK_BREAK, "JetsMinionsHook", "onMinionBreak", e.getBlock().getLocation(),
+                e.getBlock().getType());
         if (stackedBlocksListener.get().tryUnstack(null, e.getBlock())) {
             e.setCancelled(true);
         } else {

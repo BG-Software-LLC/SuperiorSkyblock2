@@ -9,6 +9,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
@@ -103,7 +104,7 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
                     try {
                         updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                     } catch (NullPointerException error) {
-                        SuperiorSkyblockPlugin.log("&cThe island-privilege '" + permission + "' is not a valid privilege, skipping...");
+                        Log.warn(new File("permissions.yml"), "The island-privilege '", permission, "' is not a valid privilege, skipping...");
                     }
                 }
             }

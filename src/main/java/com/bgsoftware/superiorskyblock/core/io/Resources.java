@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.io;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.io.File;
 import java.io.InputStream;
@@ -55,9 +55,9 @@ public class Resources {
                 //noinspection ResultOfMethodCallIgnored
                 file.renameTo(dest);
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("Resources", "saveResource", "ENTER", destination, resourcePath);
+            Log.error(error, "An unexpected error occurred while saving resource:");
         }
     }
 
@@ -75,9 +75,9 @@ public class Resources {
             }
 
             return plugin.getResource(resourcePath);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("Resources", "getResource", "ENTER", resourcePath);
+            Log.error(error, "An unexpected error occurred while retrieving resource:");
             return null;
         }
     }

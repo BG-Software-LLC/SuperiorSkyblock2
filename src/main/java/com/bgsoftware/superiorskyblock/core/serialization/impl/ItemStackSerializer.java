@@ -1,11 +1,11 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
-import com.bgsoftware.superiorskyblock.tag.CompoundTag;
-import com.bgsoftware.superiorskyblock.tag.Tag;
+import com.bgsoftware.superiorskyblock.core.Text;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.tag.CompoundTag;
+import com.bgsoftware.superiorskyblock.tag.Tag;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,9 +38,9 @@ public class ItemStackSerializer implements ISerializer<ItemStack, String> {
 
         try {
             Serializers.ITEM_STACK_TO_TAG_SERIALIZER.serialize(serializable).write(dataOutput);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("ItemStackSerializer", "serialize", "ENTER", serializable);
+            Log.error(error, "An unexpected error occurred while serializing item:");
             return "";
         }
 
@@ -58,9 +58,9 @@ public class ItemStackSerializer implements ISerializer<ItemStack, String> {
         try {
             CompoundTag compoundTag = (CompoundTag) Tag.fromStream(new DataInputStream(inputStream), 0);
             return Serializers.ITEM_STACK_TO_TAG_SERIALIZER.deserialize(compoundTag);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("ItemStackSerializer", "deserialize", "ENTER", deserializable);
+            Log.error(error, "An unexpected error occurred while deserializing item:");
             return null;
         }
     }

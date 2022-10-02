@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -64,9 +64,8 @@ public class FloatTag extends NumberTag<Float> {
         try {
             float value = plugin.getNMSTags().getNBTFloatValue(tag);
             return new FloatTag(value);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag float from NMS:");
             return null;
         }
     }

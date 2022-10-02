@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.PagedSuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.TemplateItem;
 import com.bgsoftware.superiorskyblock.core.menu.button.PagedObjectButton;
@@ -207,18 +207,16 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
         try {
             config.save(new File(plugin.getDataFolder(), "config.yml"));
             plugin.setSettings(new SettingsManagerImpl(plugin));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while saving config file:");
         }
     }
 
     private static void reloadConfiguration() {
         try {
             config.load(new File(plugin.getDataFolder(), "config.yml"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while reloading config file:");
         }
     }
 
@@ -331,8 +329,7 @@ public class SuperiorMenuSettings extends PagedSuperiorMenu<SuperiorMenuSettings
                         player.sendMessage("" + ChatColor.YELLOW + ChatColor.BOLD + "SuperiorSkyblock" + ChatColor.GRAY + " If you enter a value that is already in the list, it will be removed.");
                     }
                 }
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 

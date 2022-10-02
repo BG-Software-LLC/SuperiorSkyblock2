@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -62,9 +62,9 @@ public class CmdAdminSetSpawn implements ISuperiorCommand {
         try {
             plugin.getSettings().updateValue("spawn.location", newSpawnLocation);
             plugin.getGrid().updateSpawn();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("CmdAdminSetSpawn", "execute", "ENTER", spawnLocation);
+            Log.error(error, "An unexpected error occurred while setting spawn:");
         }
 
         Message.SPAWN_SET_SUCCESS.send(sender, newSpawnLocation);

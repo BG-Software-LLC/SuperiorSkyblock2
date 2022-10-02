@@ -4,11 +4,11 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import org.bukkit.World;
@@ -84,8 +84,10 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
 
             try {
                 world = island.getCenter(environment).getWorld();
-            } catch (NullPointerException ex) {
-                PluginDebugger.debug(ex);
+            } catch (NullPointerException error) {
+                Log.entering("CmdAdminResetWorld", "execute", "ENTER",
+                        island.getOwner().getName(), environment);
+                Log.error(error, "An unexpected error occurred while resetting world:");
                 return;
             }
 

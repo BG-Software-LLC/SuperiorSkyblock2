@@ -1,9 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.serialization.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.Text;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.ISerializer;
 import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
@@ -45,9 +44,9 @@ public class LocationSerializer implements ISerializer<Location, String> {
             float pitch = sections.length > 4 ? Float.parseFloat(sections[5]) : 0;
 
             return new LazyWorldLocation(sections[0], x, y, z, yaw, pitch);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Error while parsing location: `" + element + "`");
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("LocationSerializer", "deserialize", "ENTER", element);
+            Log.error(error, "An unexpected error occurred while deserializing location:");
             return null;
         }
     }

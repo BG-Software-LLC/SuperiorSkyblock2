@@ -2,7 +2,6 @@ package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
 import org.bukkit.Location;
@@ -97,8 +96,7 @@ public class SchematicBlock {
                     ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
                     if (items != null)
                         this.tileEntityData.setTag("Items", items.copy());
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }

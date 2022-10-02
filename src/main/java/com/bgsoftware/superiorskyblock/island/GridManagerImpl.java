@@ -19,8 +19,9 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -179,8 +180,9 @@ public class GridManagerImpl extends Manager implements GridManager {
                 createIslandInternalAsync(builder, biome, offset, schematic);
             }
         } catch (Throwable error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.entering("GridManagerImpl", "createIsland", "ENTER", builder.owner.getName(),
+                    builder.islandType, biome, offset);
+            Log.error("An unexepcted error occurred while creating an island:", error);
             builder.owner.setIsland(null);
             Message.CREATE_ISLAND_FAILURE.send(builder.owner);
         }
@@ -189,9 +191,9 @@ public class GridManagerImpl extends Manager implements GridManager {
     private void createIslandInternalAsync(IslandBuilderImpl builder, Biome biome, boolean offset, Schematic schematic) {
         assert builder.owner != null;
 
-        PluginDebugger.debug("Action: Create Island, Target: " + builder.owner.getName() + ", Schematic: " +
-                builder.islandType + ", Bonus Worth: " + builder.bonusWorth + ", Bonus Level: " + builder.bonusLevel + ", Biome: " + biome +
-                ", Name: " + builder.islandName + ", Offset: " + offset);
+        Log.debug(Debug.CREATE_ISLAND, "GridManagerImpl", "createIslandInternalAsync",
+                builder.owner.getName(), builder.bonusWorth, builder.bonusLevel, builder.islandName,
+                offset, biome, schematic.getName());
 
         // Removing any active previews for the player.
         boolean updateGamemode = this.islandPreviews.endIslandPreview(builder.owner) != null;
@@ -265,8 +267,9 @@ public class GridManagerImpl extends Manager implements GridManager {
                 }
             }
 
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.entering("GridManagerImpl", "createIslandInternalAsync", builder.owner.getName(),
+                    builder.bonusWorth, builder.bonusLevel, builder.islandName, offset, biome, schematic.getName());
+            Log.error("An unexpected error occurred while creating an island:", error);
 
             builder.owner.setIsland(null);
 
@@ -353,7 +356,8 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void deleteIsland(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
-        PluginDebugger.debug("Action: Disband Island, Island: " + island.getOwner().getName());
+
+        Log.debug(Debug.DELETE_ISLAND, "GridManagerImpl", "deleteIsland", island.getOwner().getName());
 
         island.getAllPlayersInside().forEach(superiorPlayer -> {
             SuperiorMenu.killMenu(superiorPlayer);
@@ -471,7 +475,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void sortIslands(SortingType sortingType, Runnable onFinish) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
 
-        PluginDebugger.debug("Action: Sort Islands, Sorting Type: " + sortingType.getName());
+        Log.debug(Debug.SORT_ISLANDS, "GridManagerImpl", "sortIslands", sortingType.getName());
 
         this.islandsContainer.sortIslands(sortingType, forceSort, () -> {
             plugin.getMenus().refreshTopIslands(sortingType);
@@ -567,7 +571,8 @@ public class GridManagerImpl extends Manager implements GridManager {
 
     @Override
     public void calcAllIslands(Runnable callback) {
-        PluginDebugger.debug("Action: Calculate All Islands");
+        Log.debug(Debug.CALCULATE_ALL_ISLANDS, "GridManagerImpl", "calcAllIslands");
+
         List<Island> islands = new ArrayList<>();
 
         {
@@ -586,7 +591,9 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void addIslandToPurge(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
-        PluginDebugger.debug("Action: Purge Island, Island: " + island.getOwner().getName());
+
+        Log.debug(Debug.PURGE_ISLAND, "GridManagerImpl", "addIslandToPurge", island.getOwner().getName());
+
         this.islandsPurger.scheduleIslandPurge(island);
     }
 
@@ -594,7 +601,9 @@ public class GridManagerImpl extends Manager implements GridManager {
     public void removeIslandFromPurge(Island island) {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(island.getOwner(), "island's owner cannot be null.");
-        PluginDebugger.debug("Action: Remove From Purge, Island: " + island.getOwner().getName());
+
+        Log.debug(Debug.UNPURGE_ISLAND, "GridManagerImpl", "removeIslandFromPurge", island.getOwner().getName());
+
         this.islandsPurger.unscheduleIslandPurge(island);
     }
 
@@ -613,7 +622,8 @@ public class GridManagerImpl extends Manager implements GridManager {
     @Override
     public void registerSortingType(SortingType sortingType) {
         Preconditions.checkNotNull(sortingType, "sortingType parameter cannot be null.");
-        PluginDebugger.debug("Action: Register Sorting Type, Sorting Type: " + sortingType.getName());
+
+        Log.debug(Debug.REGISTER_SORTING_TYPE, "GridManagerImpl", "registerSortingType", sortingType.getName());
 
         if (this.islandsContainer == null) {
             pendingSortingTypes.add(sortingType);
@@ -703,19 +713,18 @@ public class GridManagerImpl extends Manager implements GridManager {
 
         try {
             if (plugin.getSettings().getMaxIslandSize() != maxIslandSize) {
-                SuperiorSkyblockPlugin.log("&cYou have changed the max-island-size value without deleting database.");
-                SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
+                Log.warn("You have changed the max-island-size value without deleting database.");
+                Log.warn("Restoring it to the old value...");
                 plugin.getSettings().updateValue("max-island-size", maxIslandSize);
             }
 
             if (!plugin.getSettings().getWorlds().getDefaultWorldName().equals(world)) {
-                SuperiorSkyblockPlugin.log("&cYou have changed the island-world value without deleting database.");
-                SuperiorSkyblockPlugin.log("&cRestoring it to the old value...");
+                Log.warn("You have changed the island-world value without deleting database.");
+                Log.warn("Restoring it to the old value...");
                 plugin.getSettings().updateValue("worlds.normal-world", world);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (IOException error) {
+            Log.error("An unexpected error occurred while loading grid:", error);
             Bukkit.shutdown();
         }
     }
@@ -739,7 +748,7 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     private void setLastIsland(SBlockPosition lastIsland) {
-        PluginDebugger.debug("Action: Set Last Island, Location: " + lastIsland);
+        Log.debug(Debug.SET_LAST_ISLAND, "GridManagerImpl", "setLastIsland", lastIsland);
         this.lastIsland = lastIsland;
         GridDatabaseBridge.saveLastIsland(this, lastIsland);
     }

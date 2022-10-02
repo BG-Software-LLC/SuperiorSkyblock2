@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.core.itemstack;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.IntArrayTag;
@@ -38,9 +38,9 @@ public class ItemSkulls {
 
         try {
             cfg.syncWithConfig(file, plugin.getResource("heads.yml"));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.entering("ItemSkulls", "readTextures", "ENTER");
+            Log.error(error, "An unexpected error occurred while syncing heads file:");
         }
 
         for (String entityType : cfg.getConfigurationSection("").getKeys(false))

@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.MachineStateDatabaseLoader;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.BankTransactionsAttributes;
@@ -30,6 +31,7 @@ import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.impl.SQLiteSession;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import org.bukkit.World;
@@ -78,7 +80,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
 
     @Override
     protected void handleInitialize() {
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Detected old database - starting to convert data...");
+        Log.info("[Database-Converter] Detected old database - starting to convert data...");
 
         session.select("players", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
@@ -86,7 +88,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
             }
         }).onFail(QueryResult.PRINT_ERROR));
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedPlayers.size() + " players in the database.");
+        Log.info("[Database-Converter] Found ", loadedPlayers.size(), " players in the database.");
 
         session.select("islands", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
@@ -94,7 +96,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
             }
         }).onFail(QueryResult.PRINT_ERROR));
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedIslands.size() + " islands in the database.");
+        Log.info("[Database-Converter] Found ", loadedIslands.size(), " islands in the database.");
 
         session.select("stackedBlocks", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
             while (resultSet.next()) {
@@ -102,7 +104,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
             }
         }).onFail(QueryResult.PRINT_ERROR));
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBlocks.size() + " stacked blocks in the database.");
+        Log.info("[Database-Converter] Found ", loadedBlocks.size(), " stacked blocks in the database.");
 
         // Ignoring errors as the bankTransactions table may not exist.
         AtomicBoolean foundBankTransaction = new AtomicBoolean(false);
@@ -114,7 +116,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         }));
 
         if (foundBankTransaction.get()) {
-            SuperiorSkyblockPlugin.log("&a[Database-Converter] Found " + loadedBankTransactions.size() + " bank transactions in the database.");
+            Log.info("[Database-Converter] Found ", loadedBankTransactions.size(), " bank transactions in the database.");
         }
 
         session.select("grid", "", new QueryResult<ResultSet>().onSuccess(resultSet -> {
@@ -126,56 +128,46 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
             }
         }).onFail(QueryResult.PRINT_ERROR));
 
-        AtomicBoolean failedBackup = new AtomicBoolean(true);
+        Mutable<Throwable> failedBackupError = new Mutable<>(null);
 
         if (!isRemoteDatabase) {
             session.closeConnection();
             if (databaseFile.renameTo(new File(databaseFile.getParentFile(), "database-bkp.db"))) {
-                failedBackup.set(false);
+                failedBackupError.setValue(new RuntimeException("Failed to rename file to database-bkp.db"));
             }
         }
 
-        if (failedBackup.get()) {
+        if (failedBackupError.getValue() != null) {
             if (!isRemoteDatabase) {
                 session = new SQLiteSession(plugin, false);
                 session.createConnection();
             }
 
-            failedBackup.set(false);
+            failedBackupError.setValue(null);
 
-            session.renameTable("islands", "bkp_islands", new QueryResult<Void>().onFail(error -> {
-                error.printStackTrace();
-                failedBackup.set(true);
-            }));
+            session.renameTable("islands", "bkp_islands", new QueryResult<Void>()
+                    .onFail(failedBackupError::setValue));
 
-            session.renameTable("players", "bkp_players", new QueryResult<Void>().onFail(error -> {
-                error.printStackTrace();
-                failedBackup.set(true);
-            }));
+            session.renameTable("players", "bkp_players", new QueryResult<Void>()
+                    .onFail(failedBackupError::setValue));
 
-            session.renameTable("grid", "bkp_grid", new QueryResult<Void>().onFail(error -> {
-                error.printStackTrace();
-                failedBackup.set(true);
-            }));
+            session.renameTable("grid", "bkp_grid", new QueryResult<Void>()
+                    .onFail(failedBackupError::setValue));
 
-            session.renameTable("stackedBlocks", "bkp_stackedBlocks", new QueryResult<Void>().onFail(error -> {
-                error.printStackTrace();
-                failedBackup.set(true);
-            }));
+            session.renameTable("stackedBlocks", "bkp_stackedBlocks", new QueryResult<Void>()
+                    .onFail(failedBackupError::setValue));
 
-            session.renameTable("bankTransactions", "bkp_bankTransactions", new QueryResult<Void>().onFail(error -> {
-                error.printStackTrace();
-                failedBackup.set(true);
-            }));
+            session.renameTable("bankTransactions", "bkp_bankTransactions", new QueryResult<Void>()
+                    .onFail(failedBackupError::setValue));
         }
 
         if (isRemoteDatabase)
             session.closeConnection();
 
-        if (failedBackup.get()) {
-            SuperiorSkyblockPlugin.log("&c[Database-Converter] Failed to create a backup for the database file.");
+        if (failedBackupError.getValue() != null) {
+            Log.error(failedBackupError.getValue(), "[Database-Converter] Failed to create a backup for the database file:");
         } else {
-            SuperiorSkyblockPlugin.log("&a[Database-Converter] Successfully created a backup for the database.");
+            Log.info("[Database-Converter] Successfully created a backup for the database.");
         }
     }
 
@@ -241,7 +233,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     }
 
     private void savePlayers() {
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting players...");
+        Log.info("[Database-Converter] Converting players...");
 
         StatementHolder playersQuery = new StatementHolder("REPLACE INTO {prefix}players VALUES(?,?,?,?,?)");
         StatementHolder playersMissionsQuery = new StatementHolder("REPLACE INTO {prefix}players_missions VALUES(?,?,?)");
@@ -259,7 +251,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     private void saveIslands() {
         long currentTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting islands...");
+        Log.info("[Database-Converter] Converting islands...");
 
         StatementHolder islandsQuery = new StatementHolder("REPLACE INTO {prefix}islands VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         StatementHolder islandsBanksQuery = new StatementHolder("REPLACE INTO {prefix}islands_banks VALUES(?,?,?)");
@@ -318,7 +310,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     }
 
     private void saveStackedBlocks() {
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting stacked blocks...");
+        Log.info("[Database-Converter] Converting stacked blocks...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}stacked_blocks VALUES(?,?,?)");
 
@@ -334,7 +326,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
     }
 
     private void saveBankTransactions() {
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting bank transactions...");
+        Log.info("[Database-Converter] Converting bank transactions...");
 
         StatementHolder insertQuery = new StatementHolder("REPLACE INTO {prefix}bank_transactions VALUES(?,?,?,?,?,?,?)");
 
@@ -357,7 +349,7 @@ public class DatabaseLoader_V1 extends MachineStateDatabaseLoader {
         if (gridAttributes == null)
             return;
 
-        SuperiorSkyblockPlugin.log("&a[Database-Converter] Converting grid data...");
+        Log.info("[Database-Converter] Converting grid data...");
 
         new StatementHolder("DELETE FROM {prefix}grid;").execute(false);
         new StatementHolder("REPLACE INTO {prefix}grid VALUES(?,?,?)")

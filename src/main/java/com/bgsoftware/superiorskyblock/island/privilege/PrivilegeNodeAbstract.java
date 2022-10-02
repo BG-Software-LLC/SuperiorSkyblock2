@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.island.privilege;
 import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PermissionNode;
 import com.bgsoftware.superiorskyblock.core.collections.EnumerateMap;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.util.Map;
@@ -37,7 +37,7 @@ public abstract class PrivilegeNodeAbstract implements PermissionNode {
                 } catch (NullPointerException ignored) {
                     // Ignored - invalid privilege.
                 } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                    Log.error(error, "An unexpected error while loading permissions for '", perm, "':");
                 }
             }
         }

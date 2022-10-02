@@ -4,11 +4,11 @@ import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
-import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.boydti.fawe.object.clipboard.FaweClipboard;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -64,8 +64,8 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     @Override
     public void pasteSchematic(Island island, Location location, Runnable callback, Consumer<Throwable> onFailure) {
         try {
-            PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " +
-                    Formatters.LOCATION_FORMATTER.format(location) + ", Schematic: " + name);
+            Log.debug(Debug.PASTE_SCHEMATIC, "WorldEditSchematic", "pasteSchematic",
+                    this.name, island.getOwner().getName(), location);
 
             Object _point = AT.invoke(null, location.getBlockX(), location.getBlockY(), location.getBlockZ());
             EditSession editSession = PASTE.invoke(schematic, new BukkitWorld(location.getWorld()), _point, false, true, null);
@@ -76,6 +76,9 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
             }
 
             editSession.addNotifyTask(() -> {
+                Log.debugResult(Debug.PASTE_SCHEMATIC, "WorldEditSchematic", "pasteSchematic",
+                        "Task Finished", "");
+
                 try {
                     island.handleBlocksPlace(cachedCounts);
 

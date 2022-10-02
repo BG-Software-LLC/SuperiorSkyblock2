@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.MemberRoleButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
@@ -66,13 +67,13 @@ public class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
                     try {
                         playerRole = SPlayerRole.of((String) roleObject);
                     } catch (IllegalArgumentException error) {
-                        SuperiorSkyblockPlugin.log("&cInvalid role name in members-role menu: " + roleObject);
+                        Log.warn(new File("member-role.yml"), "Invalid role name: ", roleObject);
                         continue;
                     }
                 } else if (roleObject instanceof Integer) {
                     playerRole = SPlayerRole.of((Integer) roleObject);
                     if (playerRole == null) {
-                        SuperiorSkyblockPlugin.log("&cInvalid role id in members-role menu: " + roleObject);
+                        Log.warn(new File("member-role.yml"), "&cInvalid role id: ", roleObject);
                         continue;
                     }
                 }

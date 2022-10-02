@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.island.bank;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,13 +35,13 @@ public class SBankTransaction implements BankTransaction {
     public static Optional<BankTransaction> fromDatabase(DatabaseResult resultSet) {
         Optional<BankAction> bankAction = resultSet.getEnum("bank_action", BankAction.class);
         if (!bankAction.isPresent()) {
-            SuperiorSkyblockPlugin.log("&cCannot load bank transaction with invalid bank action, skipping...");
+            Log.warn("Cannot load bank transaction with invalid bank action, skipping...");
             return Optional.empty();
         }
 
         Optional<BigDecimal> amount = resultSet.getBigDecimal("amount");
         if (!amount.isPresent()) {
-            SuperiorSkyblockPlugin.log("&cCannot load bank transaction with null amount, skipping...");
+            Log.warn("Cannot load bank transaction with null amount, skipping...");
             return Optional.empty();
         }
 

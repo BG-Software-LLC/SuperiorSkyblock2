@@ -2,7 +2,8 @@ package com.bgsoftware.superiorskyblock.core.database.sql.session;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -45,9 +46,8 @@ public abstract class RemoteSQLSession implements SQLSession {
     public void waitForConnection() {
         try {
             ready.get();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while waiting for connection:");
         }
     }
 
@@ -117,7 +117,7 @@ public abstract class RemoteSQLSession implements SQLSession {
         String prefix = plugin.getSettings().getDatabase().getPrefix();
         String query = statement.replace("{prefix}", prefix);
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "customQuery", query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
@@ -125,11 +125,6 @@ public abstract class RemoteSQLSession implements SQLSession {
         } catch (SQLException error) {
             queryResult.fail(error);
         }
-    }
-
-    protected void log(String message) {
-        if (logging)
-            SuperiorSkyblockPlugin.log(message);
     }
 
     private void executeUpdate(String statement, QueryResult<Void> queryResult) {
@@ -142,7 +137,7 @@ public abstract class RemoteSQLSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "executeUpdate", query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query)) {
@@ -156,7 +151,7 @@ public abstract class RemoteSQLSession implements SQLSession {
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.dataSource, "Session was not initialized.");
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "RemoteSQLSession", "executeQuery", query);
 
         try (Connection conn = this.dataSource.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement(query);

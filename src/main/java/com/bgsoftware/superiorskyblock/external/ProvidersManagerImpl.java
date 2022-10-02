@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.external;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.handlers.ProvidersManager;
 import com.bgsoftware.superiorskyblock.api.hooks.AFKProvider;
@@ -22,7 +23,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.Materials;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider;
 import com.bgsoftware.superiorskyblock.external.async.AsyncProvider_Default;
@@ -551,11 +552,9 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             chunksProviderOptional.ifPresent(chunksProvider -> {
                 try {
                     setChunksProvider(chunksProvider);
-                    SuperiorSkyblockPlugin.log("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
-                } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.log("Detected PaperSpigot but failed to load async chunk-loading support...");
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                    Log.info("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
+                } catch (Exception error) {
+                    Log.error("Detected PaperSpigot but failed to load async chunk-loading support due to an unexpected error:", error);
                 }
             });
         }
@@ -567,30 +566,22 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
-            SuperiorSkyblockPlugin.log("&cAn error occurred while registering " + className + ":");
-            error.printStackTrace();
+            Log.error(new StringBuilder("An unexpected error occurred while registering hook ")
+                    .append(className).append(":"), error);
         }
     }
 
     private static boolean hasPaperAsyncSupport() {
-        try {
-            //noinspection JavaReflectionMemberAccess
-            World.class.getMethod("getChunkAtAsync", int.class, int.class);
-            return true;
-        } catch (Throwable ex) {
-            return false;
-        }
+        return new ReflectMethod<>(World.class, "getChunkAtAsync", int.class, int.class).isValid();
     }
 
     private <T> Optional<T> createInstance(String className) {
         try {
             Class<?> clazz = Class.forName("com.bgsoftware.superiorskyblock.external." + className);
-            try {
-                Method compatibleMethod = clazz.getDeclaredMethod("isCompatible");
-                if (!(boolean) compatibleMethod.invoke(null))
-                    return Optional.empty();
-            } catch (Exception ignored) {
-            }
+            ReflectMethod<Boolean> compatibleMethod = new ReflectMethod<>(clazz, "isCompatible");
+
+            if (compatibleMethod.isValid() && !compatibleMethod.invoke(null))
+                return Optional.empty();
 
             try {
                 Constructor<?> constructor = clazz.getConstructor(SuperiorSkyblockPlugin.class);
@@ -603,8 +594,8 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
         } catch (ClassNotFoundException ignored) {
             return Optional.empty();
         } catch (Exception error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.entering("ProvidersManagerImpl", "createInstance", "ENTER", className);
+            Log.error("An unexpected error occurred while creating hook instance:", error);
             return Optional.empty();
         }
     }

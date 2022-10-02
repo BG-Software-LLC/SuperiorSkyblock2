@@ -1,6 +1,6 @@
 package com.bgsoftware.superiorskyblock.core.io;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,9 +44,9 @@ public class Files {
                         writer.write(stringBuilder.substring(1).replace(str, replace));
                     }
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.entering("Files", "replaceString", "ENTER", file.getName(), str, replace);
+                Log.error(error, "An unexpected error occurred while replacing strings in file:");
             }
         }
     }

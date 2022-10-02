@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.PricesProvider;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.brcdev.shopgui.ShopGuiPlugin;
 import net.brcdev.shopgui.shop.Shop;
 import net.brcdev.shopgui.shop.ShopItem;
@@ -25,7 +26,7 @@ public class PricesProvider_ShopGUIPlus implements PricesProvider {
 
     public PricesProvider_ShopGUIPlus(SuperiorSkyblockPlugin plugin) {
         this.plugin = plugin;
-        SuperiorSkyblockPlugin.log("Using ShopGUIPlus as a prices provider.");
+        Log.info("Using ShopGUIPlus as a prices provider.");
     }
 
     @Override

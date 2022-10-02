@@ -6,9 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.player.algorithm.PlayerTeleportAlgorithm;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.world.EntityTeleports;
@@ -74,11 +74,14 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         Preconditions.checkNotNull(homeLocation, "Cannot find a suitable home location for island " +
                 island.getUniqueId());
 
+        Log.debug(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
+                player.getName(), island.getOwner().getName(), environment);
+
         Block islandTeleportBlock = homeLocation.getBlock();
 
         if (island.isSpawn()) {
-            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
-                    Formatters.LOCATION_FORMATTER.format(homeLocation));
+            Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleport",
+                    "Result Location", homeLocation);
             return teleport(player, homeLocation.add(0, 0.5, 0));
         }
 
@@ -141,9 +144,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
                                 try {
                                     chunkSnapshot = chunkToLoad.get();
-                                } catch (Exception ex) {
-                                    SuperiorSkyblockPlugin.log("&cCouldn't load chunk!");
-                                    PluginDebugger.debug(ex);
+                                } catch (Exception error) {
+                                    Log.error(error, "An unexpected error occurred while loading chunk:");
                                     continue;
                                 }
 
@@ -198,9 +200,8 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
         homeLocation.setYaw(yaw);
         homeLocation.setPitch(pitch);
 
-
-        PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
-                Formatters.LOCATION_FORMATTER.format(location));
+        Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "adjustAndTeleportPlayerToLocation",
+                "Result Location", homeLocation);
 
         Location teleportLocation = changeIslandHome(island, homeLocation).add(0, 1.5, 0);
         teleport(player, teleportLocation);
@@ -228,8 +229,9 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                 toTeleport = changeIslandHome(island, toTeleport);
             }
 
-            PluginDebugger.debug("Action: Teleport Player, Player: " + player.getName() + ", Location: " +
-                    Formatters.LOCATION_FORMATTER.format(toTeleport));
+            Log.debugResult(Debug.TELEPORT_PLAYER, "DefaultPlayerTeleportAlgorithm", "teleportIfSafe",
+                    "Result Location", toTeleport);
+
             teleport(player, toTeleport.add(0, 1.5, 0));
 
             if (teleportResult != null)

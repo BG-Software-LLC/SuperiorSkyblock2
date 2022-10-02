@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1181.world;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 
@@ -59,16 +58,16 @@ public class PropertiesMapper {
                     register(fieldsToNames.getOrDefault(field.get(null), property.getName()), field.getName(), property);
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while loading properties mapper:");
+
         }
 
     }
 
     private static void register(String key, String fieldName, Property<?> property) {
         if (nameToProperty.containsKey(key)) {
-            SuperiorSkyblockPlugin.log("&cWarning: block state " + key + "(" + fieldName + ") already exists. Contact Ome_R!");
+            Log.error("Block state ", key, "(", fieldName, ") already exists. Contact Ome_R!");
         } else {
             nameToProperty.put(key, property);
             propertyToName.put(property, key);

@@ -10,8 +10,8 @@ import com.bgsoftware.superiorskyblock.core.SchematicBlock;
 import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
 import com.bgsoftware.superiorskyblock.core.SchematicEntity;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -119,8 +119,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
             return;
         }
 
-        PluginDebugger.debug("Action: Paste Schematic, Island: " + island.getOwner().getName() + ", Location: " +
-                Formatters.LOCATION_FORMATTER.format(location) + ", Schematic: " + name);
+        Log.debug(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
+                this.name, island.getOwner().getName(), location);
 
         WorldEditSession worldEditSession = plugin.getNMSWorld().createEditSession(location.getWorld());
         Location min = this.offset.applyToLocation(location);
@@ -159,7 +159,12 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     }
 
                     ChunksTracker.markDirty(island, chunk, false);
+
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
+                            "Loaded Chunk", chunkPosition);
                 } catch (Throwable error) {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
+                            "Failed Loading Chunk", error);
                     failed.set(true);
                     if (onFailure != null)
                         onFailure.accept(error);
@@ -170,6 +175,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
         CompletableFuture.allOf(chunkFutures.toArray(new CompletableFuture[0])).whenComplete((v, error) -> {
             if (failed.get())
                 return;
+
+            Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
+                    "Finished Chunks Loading", "");
 
             BukkitExecutor.ensureMain(() -> {
                 try {
@@ -190,6 +198,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                     callback.run();
                     this.loadedChunks = null;
                 } catch (Throwable error2) {
+                    Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
+                            "Failed Finishing Placement", error2);
                     if (onFailure != null)
                         onFailure.accept(error2);
                 }

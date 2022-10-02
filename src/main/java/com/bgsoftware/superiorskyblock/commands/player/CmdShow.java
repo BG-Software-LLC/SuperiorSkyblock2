@@ -8,6 +8,7 @@ import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
@@ -116,7 +117,8 @@ public class CmdShow implements ISuperiorCommand {
                         rolesStrings.get(superiorPlayer.getPlayerRole())
                                 .append(Message.ISLAND_INFO_PLAYER_LINE.getMessage(locale, superiorPlayer.getName())).append("\n");
                     } catch (NullPointerException ex) {
-                        SuperiorSkyblockPlugin.log("[Warn] It seems like " + superiorPlayer.getName() + " isn't part of the island of " + island.getOwner().getName() + ".");
+                        Log.warn("It seems like ", superiorPlayer.getName(), " isn't part of the island of "
+                                , island.getOwner().getName(), ".");
                     }
                 });
             }

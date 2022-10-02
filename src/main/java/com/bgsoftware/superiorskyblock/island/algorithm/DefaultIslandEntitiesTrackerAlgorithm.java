@@ -4,8 +4,9 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.algorithms.IslandEntitiesTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
 import com.google.common.base.Preconditions;
 import org.bukkit.entity.Entity;
@@ -33,17 +34,26 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     public boolean trackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (amount <= 0)
-            return false;
+        Log.debug(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
+                island.getOwner().getName(), key, amount);
 
-        if (!canTrackEntity(key))
+        if (amount <= 0) {
+            Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
+                    "Return", "Negative Amount");
             return false;
+        }
 
-        PluginDebugger.debug("Action: Entity Spawn, Island: " + island.getOwner().getName() +
-                ", Entity: " + key + ", Amount: " + amount);
+        if (!canTrackEntity(key)) {
+            Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
+                    "Return", "Cannot Track Entity");
+            return false;
+        }
 
         int currentAmount = entityCounts.getOrDefault(key, 0);
         entityCounts.put(key, currentAmount + amount);
+
+        Log.debugResult(Debug.ENTITY_SPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "trackEntity",
+                "Return", "Success");
 
         return true;
     }
@@ -52,14 +62,20 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
     public boolean untrackEntity(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        if (amount <= 0)
-            return false;
+        Log.debug(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
+                island.getOwner().getName(), key, amount);
 
-        if (!canTrackEntity(key))
+        if (amount <= 0) {
+            Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
+                    "Return", "Negative Amount");
             return false;
+        }
 
-        PluginDebugger.debug("Action: Entity Despawn, Island: " + island.getOwner().getName() +
-                ", Entity: " + key + ", Amount: " + amount);
+        if (!canTrackEntity(key)) {
+            Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
+                    "Return", "Cannot Untrack Entity");
+            return false;
+        }
 
         int currentAmount = entityCounts.getOrDefault(key, -1);
 
@@ -70,6 +86,9 @@ public class DefaultIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrac
                 entityCounts.remove(key);
             }
         }
+
+        Log.debugResult(Debug.ENTITY_DESPAWN, "DefaultIslandEntitiesTrackerAlgorithm", "untrackEntity",
+                "Return", "Success");
 
         return true;
     }

@@ -5,8 +5,9 @@ import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.service.placeholders.PlaceholdersService;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.GameSound;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
@@ -105,8 +106,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
                     T superiorMenu = (T) inventoryHolder;
                     callback.accept(player, superiorMenu);
                 }
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
     }
@@ -197,9 +197,11 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
 
         menuButton.getCommands().forEach(command -> runCommand(plugin, command, clickEvent, Bukkit.getConsoleSender()));
 
-        PluginDebugger.debug("Action: Menu Click, Target: " + inventoryViewer.getName() + ", Item: " +
-                (clickEvent.getCurrentItem() == null ? "AIR" : clickEvent.getCurrentItem().getType()) +
-                ", Slot: " + clickEvent.getRawSlot());
+        Log.debug(Debug.MENU_CLICK, getClass().getName(), "onClick",
+                inventoryViewer.getName(),
+                clickEvent.getCurrentItem() == null ? "AIR" : clickEvent.getCurrentItem().getType(),
+                clickEvent.getRawSlot()
+        );
 
         if (preButtonClick(menuButton, clickEvent))
             // noinspection unchecked
@@ -291,7 +293,7 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
         if (!plugin.getEventsBus().callPlayerOpenMenuEvent(inventoryViewer, this))
             return;
 
-        PluginDebugger.debug("Action: Open Menu, Target: " + inventoryViewer.getName() + ", Menu: " + getClass().getName());
+        Log.debug(Debug.OPEN_MENU, getClass().getName(), "open", inventoryViewer.getName());
 
         if (menuPattern == null) {
             if (!(this instanceof SuperiorMenuBlank))
@@ -303,14 +305,14 @@ public abstract class SuperiorMenu<M extends ISuperiorMenu> implements ISuperior
 
         try {
             inventory = getInventory();
-        } catch (Exception ex) {
+        } catch (Exception error) {
             if (!(this instanceof SuperiorMenuBlank)) {
                 completed = false;
                 SuperiorMenuBlank.openInventory(inventoryViewer, previousMenu);
             }
 
-            PluginDebugger.debug(ex);
-            ex.printStackTrace();
+            Log.entering(getClass().getName(), "open", "ENTER", inventoryViewer.getName());
+            Log.error(error, "An unexpected error occurred while building menu:");
             return;
         }
 

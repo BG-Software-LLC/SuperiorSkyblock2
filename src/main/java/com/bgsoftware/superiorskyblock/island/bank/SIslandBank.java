@@ -9,9 +9,10 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.island.bank.logs.CacheBankLogs;
@@ -70,6 +71,9 @@ public class SIslandBank implements IslandBank {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
+        Log.debug(Debug.DEPOSIT_MONEY, "SIslandBank", "depositMoney", island.getOwner().getName(),
+                superiorPlayer.getName(), amount);
+
         BankTransaction bankTransaction;
         String failureReason;
 
@@ -78,9 +82,6 @@ public class SIslandBank implements IslandBank {
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
         } else {
-            PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " +
-                    superiorPlayer.getName() + ", Money: " + amount);
-
             BigDecimal playerBalance = plugin.getProviders().getBankEconomyProvider().getBalance(superiorPlayer);
 
             EventResult<String> eventResult = plugin.getEventsBus().callIslandBankDepositEvent(superiorPlayer, island, amount);
@@ -102,6 +103,7 @@ public class SIslandBank implements IslandBank {
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         if (Text.isBlank(failureReason)) {
+            Log.debugResult(Debug.DEPOSIT_MONEY, "SIslandBank", "depositMoney", "Return Success", amount);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_COMPLETED,
                     position, System.currentTimeMillis(), "", amount);
             increaseBalance(amount);
@@ -114,6 +116,7 @@ public class SIslandBank implements IslandBank {
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
         } else {
+            Log.debugResult(Debug.DEPOSIT_MONEY, "SIslandBank", "depositMoney", "Return Failure", failureReason);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.DEPOSIT_FAILED, position,
                     System.currentTimeMillis(), failureReason, MONEY_FAILURE);
         }
@@ -125,8 +128,9 @@ public class SIslandBank implements IslandBank {
     public BankTransaction depositAdminMoney(CommandSender commandSender, BigDecimal amount) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        PluginDebugger.debug("Action: Deposit Money, Island: " + island.getOwner().getName() + ", Player: " +
-                commandSender.getName() + ", Money: " + amount);
+
+        Log.debug(Debug.DEPOSIT_MONEY, "SIslandBank", "depositAdminMoney", island.getOwner().getName(),
+                commandSender.getName(), amount);
 
         EventResult<String> eventResult = plugin.getEventsBus().callIslandBankDepositEvent(commandSender instanceof Player ?
                 plugin.getPlayers().getSuperiorPlayer(commandSender) : null, island, amount);
@@ -135,7 +139,14 @@ public class SIslandBank implements IslandBank {
 
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
-        BankAction bankAction = eventResult.isCancelled() ? BankAction.DEPOSIT_FAILED : BankAction.DEPOSIT_COMPLETED;
+        BankAction bankAction;
+        if (eventResult.isCancelled()) {
+            bankAction = BankAction.DEPOSIT_FAILED;
+            Log.debugResult(Debug.DEPOSIT_MONEY, "SIslandBank", "depositAdminMoney", "Return Failure", "Event Cancelled");
+        } else {
+            bankAction = BankAction.DEPOSIT_COMPLETED;
+            Log.debugResult(Debug.DEPOSIT_MONEY, "SIslandBank", "depositAdminMoney", "Return Success", amount);
+        }
 
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, bankAction, position,
                 System.currentTimeMillis(), eventResult.getResult(), amount);
@@ -163,6 +174,9 @@ public class SIslandBank implements IslandBank {
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
 
+        Log.debug(Debug.WITHDRAW_MONEY, "SIslandBank", "withdrawMoney", island.getOwner().getName(),
+                superiorPlayer.getName(), amount, commandsToExecute);
+
         BigDecimal withdrawAmount = balance.get().min(amount);
 
         BankTransaction bankTransaction;
@@ -175,8 +189,6 @@ public class SIslandBank implements IslandBank {
         } else if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             failureReason = "Invalid amount";
         } else {
-            PluginDebugger.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + superiorPlayer.getName() + ", Money: " + withdrawAmount);
-
             EventResult<String> eventResult = plugin.getEventsBus().callIslandBankWithdrawEvent(superiorPlayer, island, withdrawAmount);
 
             if (eventResult.isCancelled()) {
@@ -198,6 +210,7 @@ public class SIslandBank implements IslandBank {
         int position = this.bankLogs.getLastTransactionPosition() + 1;
 
         if (Text.isBlank(failureReason)) {
+            Log.debugResult(Debug.WITHDRAW_MONEY, "SIslandBank", "withdrawMoney", "Return Success", amount);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_COMPLETED, position, System.currentTimeMillis(), "", withdrawAmount);
             decreaseBalance(withdrawAmount);
 
@@ -209,6 +222,7 @@ public class SIslandBank implements IslandBank {
             plugin.getMenus().refreshBankLogs(island);
             plugin.getMenus().refreshBankLogs(island);
         } else {
+            Log.debugResult(Debug.DEPOSIT_MONEY, "SIslandBank", "withdrawMoney", "Return Failure", failureReason);
             bankTransaction = new SBankTransaction(superiorPlayer.getUniqueId(), BankAction.WITHDRAW_FAILED, position, System.currentTimeMillis(), failureReason, MONEY_FAILURE);
         }
 
@@ -219,7 +233,9 @@ public class SIslandBank implements IslandBank {
     public BankTransaction withdrawAdminMoney(CommandSender commandSender, BigDecimal amount) {
         Preconditions.checkNotNull(commandSender, "commandSender parameter cannot be null.");
         Preconditions.checkNotNull(amount, "amount parameter cannot be null.");
-        PluginDebugger.debug("Action: Withdraw Money, Island: " + island.getOwner().getName() + ", Player: " + commandSender.getName() + ", Money: " + amount);
+
+        Log.debug(Debug.WITHDRAW_MONEY, "SIslandBank", "withdrawAdminMoney", island.getOwner().getName(),
+                commandSender.getName(), amount);
 
         UUID senderUUID = commandSender instanceof Player ? ((Player) commandSender).getUniqueId() : null;
 
@@ -228,8 +244,14 @@ public class SIslandBank implements IslandBank {
         EventResult<String> eventResult = plugin.getEventsBus().callIslandBankWithdrawEvent(commandSender instanceof Player ?
                 plugin.getPlayers().getSuperiorPlayer(commandSender) : null, island, amount);
 
-        BankAction bankAction = eventResult.isCancelled() ? BankAction.WITHDRAW_FAILED : BankAction.WITHDRAW_COMPLETED;
-
+        BankAction bankAction;
+        if (eventResult.isCancelled()) {
+            bankAction = BankAction.DEPOSIT_FAILED;
+            Log.debugResult(Debug.WITHDRAW_MONEY, "SIslandBank", "withdrawAdminMoney", "Return Failure", "Event Cancelled");
+        } else {
+            bankAction = BankAction.DEPOSIT_COMPLETED;
+            Log.debugResult(Debug.WITHDRAW_MONEY, "SIslandBank", "withdrawAdminMoney", "Return Success", amount);
+        }
         BankTransaction bankTransaction = new SBankTransaction(senderUUID, bankAction, position,
                 System.currentTimeMillis(), eventResult.getResult(), amount);
 

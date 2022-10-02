@@ -4,7 +4,7 @@ import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v1191.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -130,9 +130,8 @@ public class NMSUtils {
 
                     if (saveChunks)
                         chunkCompounds.add(new Pair<>(chunkCoords, chunkDataCompound));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
                 }
             });
 
@@ -142,8 +141,7 @@ public class NMSUtils {
                 try {
                     chunkMap.write(chunkCompoundPair.getKey(), chunkCompoundPair.getValue());
                 } catch (IOException error) {
-                    error.printStackTrace();
-                    PluginDebugger.debug(error);
+                    Log.error(error, "An unexpected error occurred while saving unloaded chunk ", chunkCompoundPair.getKey(), ":");
                 }
             });
 
@@ -211,8 +209,7 @@ public class NMSUtils {
                             blockState = blockState.setValue(property, Enum.valueOf(property.getValueClass(), data));
                         }
                     }
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }

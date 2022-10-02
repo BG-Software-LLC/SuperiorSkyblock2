@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.external;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.grinderwolf.swm.api.SlimePlugin;
 import com.grinderwolf.swm.plugin.config.ConfigManager;
 import com.grinderwolf.swm.plugin.config.WorldData;
@@ -28,8 +27,7 @@ public class SlimeWorldManagerHook {
 
         try {
             slimePlugin.getLoader(worldData.getDataSource()).loadWorld(worldName, false);
-        } catch (Exception error) {
-            PluginDebugger.debug(error);
+        } catch (Exception ignored) {
         }
     }
 

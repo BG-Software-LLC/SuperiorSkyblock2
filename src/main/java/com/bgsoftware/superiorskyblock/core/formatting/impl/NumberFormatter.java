@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.formatting.impl;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.formatting.IFormatter;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -24,7 +24,7 @@ public class NumberFormatter implements IFormatter<Number> {
         numberFormat = numberFormat.replace("_", "-");
 
         if (!NUMBER_PATTERN.matcher(numberFormat).matches()) {
-            SuperiorSkyblockPlugin.log("&cThe number format \"" + numberFormat + "\" is invalid. Using default one: en-US.");
+            Log.warn("&cThe number format \"", numberFormat, "\" is invalid. Using default one: en-US.");
             numberFormat = "en-US";
         }
 

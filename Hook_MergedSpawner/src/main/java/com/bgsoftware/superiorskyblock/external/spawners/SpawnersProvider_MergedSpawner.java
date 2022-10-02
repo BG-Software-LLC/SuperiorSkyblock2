@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import com.vk2gpz.mergedspawner.api.MergedSpawnerAPI;
 import com.vk2gpz.mergedspawner.event.MergedSpawnerBreakEvent;
@@ -27,7 +28,7 @@ public class SpawnersProvider_MergedSpawner implements SpawnersProvider_AutoDete
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new SpawnersProvider_MergedSpawner.StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using MergedSpawner as a spawners provider.");
+            Log.info("Using MergedSpawner as a spawners provider.");
         }
     }
 

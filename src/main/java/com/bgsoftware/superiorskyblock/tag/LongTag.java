@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -59,9 +59,8 @@ public class LongTag extends NumberTag<Long> {
         try {
             long value = plugin.getNMSTags().getNBTLongValue(tag);
             return new LongTag(value);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag long from NMS:");
             return null;
         }
     }

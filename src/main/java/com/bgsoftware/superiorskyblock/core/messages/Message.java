@@ -7,9 +7,9 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.component.impl.ComplexMessageComponent;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -315,7 +315,9 @@ public enum Message {
     CREATE_WORLD_FAILURE,
     DEBUG_MODE_DISABLED,
     DEBUG_MODE_ENABLED,
-    DEBUG_MODE_FILTER,
+    DEBUG_MODE_FILTER_ADD,
+    DEBUG_MODE_FILTER_CLEAR,
+    DEBUG_MODE_FILTER_REMOVE,
     DELETE_WARP,
     DELETE_WARP_SIGN_BROKE,
     DEMOTED_MEMBER,
@@ -838,7 +840,7 @@ public enum Message {
     }
 
     public static void reload() {
-        SuperiorSkyblockPlugin.log("Loading messages started...");
+        Log.info("Loading messages started...");
         long startTime = System.currentTimeMillis();
 
         convertOldFile();
@@ -868,8 +870,7 @@ public enum Message {
             try {
                 fileLocale = PlayerLocales.getLocale(fileName);
             } catch (IllegalArgumentException ex) {
-                SuperiorSkyblockPlugin.log("&cThe language \"" + fileName + "\" is invalid. Please correct the file name.");
-                PluginDebugger.debug(ex);
+                Log.warn("The language ", fileName, " is invalid, skipping...");
                 continue;
             }
 
@@ -883,9 +884,8 @@ public enum Message {
 
             try {
                 cfg.syncWithConfig(langFile, inputStream == null ? plugin.getResource("lang/en-US.yml") : inputStream, "lang/en-US.yml");
-            } catch (Exception ex) {
-                PluginDebugger.debug(ex);
-                ex.printStackTrace();
+            } catch (Exception error) {
+                Log.error(error, "An unexpected error occurred while saving lang file ", langFile.getName(), ":");
             }
 
             for (Message locale : values()) {
@@ -899,8 +899,8 @@ public enum Message {
             countMessages = false;
         }
 
-        SuperiorSkyblockPlugin.log(" - Found " + messagesAmount + " messages in the language files.");
-        SuperiorSkyblockPlugin.log("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
+        Log.info(" - Found " + messagesAmount + " messages in the language files.");
+        Log.info("Loading messages done (Took " + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
     public boolean isCustom() {

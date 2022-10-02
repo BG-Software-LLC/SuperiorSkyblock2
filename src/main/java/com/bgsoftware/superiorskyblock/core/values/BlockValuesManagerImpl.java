@@ -7,10 +7,11 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeySetImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.values.container.BlockValuesContainer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -92,9 +93,12 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public BigDecimal getBlockWorth(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
+        Log.debug(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth", key);
+
         BigDecimal customBlockValue = customBlockWorthValues.getBlockValue(key);
         if (customBlockValue != null) {
-            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Custom Block Worth, Worth: " + customBlockValue);
+            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
+                    "Return Custom Block Worth", customBlockValue);
             return customBlockValue;
         }
 
@@ -102,25 +106,29 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
             BigDecimal value = blockWorthValues.getBlockValue(key);
 
             if (value != null) {
-                PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
+                Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
+                        "Return Worth File", value);
                 return value;
             }
         }
 
         if (plugin.getSettings().getSyncWorth() != SyncWorthStatus.NONE) {
             BigDecimal price = plugin.getProviders().getPricesProvider().getPrice(key);
-            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Price, Worth: " + price);
+            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
+                    "Return Price", price);
             return price;
         }
 
         BigDecimal value = blockWorthValues.getBlockValue(key);
 
         if (value != null) {
-            PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: " + value);
+            Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
+                    "Return Worth File", value);
             return value;
         }
 
-        PluginDebugger.debug("Action: Get Worth, Block: " + key + " - Worth File, Worth: 0");
+        Log.debugResult(Debug.GET_WORTH, "BlockValuesManagerImpl", "getBlockWorth",
+                "Return Worth File", 0);
 
         return BigDecimal.ZERO;
     }
@@ -129,9 +137,12 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
     public BigDecimal getBlockLevel(Key key) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
+        Log.debug(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel", key);
+
         BigDecimal customBlockLevel = customBlockLevels.getBlockValue(key);
         if (customBlockLevel != null) {
-            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Custom Block Level, Level: " + customBlockLevel);
+            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
+                    "Return Custom Block Level", customBlockLevel);
             return customBlockLevel;
         }
 
@@ -140,9 +151,11 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
         if (level == null) {
             level = convertValueToLevel(getBlockWorth(key));
             blockLevels.setBlockValue(key, level);
-            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Converted From Worth, Level: " + level);
+            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
+                    "Return Converted From Worth", level);
         } else {
-            PluginDebugger.debug("Action: Get Level, Block: " + key + " - Levels File, Level: " + level);
+            Log.debugResult(Debug.GET_LEVEL, "BlockValuesManagerImpl", "getBlockLevel",
+                    "Return Levels File", level);
         }
 
         return level;
@@ -270,9 +283,9 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
                 return BigDecimal.ZERO;
 
             return fastBigDecimalFromString(evaluated.toString());
-        } catch (ScriptException ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (ScriptException error) {
+            Log.entering("BlockValuesManagerImpl", "convertValueToLevel", "ENTER", value);
+            Log.error("An unexpected error occurred while converting level from worth:", error);
             return value;
         }
     }

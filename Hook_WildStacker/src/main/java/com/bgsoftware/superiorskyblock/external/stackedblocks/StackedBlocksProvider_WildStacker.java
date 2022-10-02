@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.ConstantKeys;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.external.WildStackerSnapshotsContainer;
 import com.bgsoftware.wildstacker.api.WildStackerAPI;
@@ -60,7 +61,7 @@ public class StackedBlocksProvider_WildStacker implements StackedBlocksProvider_
 
             }, ConstantKeys.CAULDRON);
 
-            SuperiorSkyblockPlugin.log("Using WildStacker as a stacked-blocks provider.");
+            Log.info("Using WildStacker as a stacked-blocks provider.");
         }
     }
 

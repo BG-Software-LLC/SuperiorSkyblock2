@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.io.DataInputStream;
@@ -58,9 +58,8 @@ public class IntTag extends NumberTag<Integer> {
         try {
             int value = plugin.getNMSTags().getNBTIntValue(tag);
             return new IntTag(value);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag int from NMS:");
             return null;
         }
     }

@@ -15,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.Island
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
@@ -77,8 +76,7 @@ public class RawDeserializer implements IDeserializer {
                 String[] locationSection = worldSection.split("=");
                 String environment = locationSection[0].toUpperCase(Locale.ENGLISH);
                 islandHomes[World.Environment.valueOf(environment).ordinal()] = locationSection[1];
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 
@@ -95,8 +93,7 @@ public class RawDeserializer implements IDeserializer {
                     PlayerAttributes playerAttributes = databaseLoader.getPlayerAttributes(uuid);
                     if (playerAttributes != null)
                         playerAttributesList.add(playerAttributes);
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -126,8 +123,7 @@ public class RawDeserializer implements IDeserializer {
                     playerPermissions.put(UUID.fromString(sections[0]), new PlayerPrivilegeNode(null,
                             null, sections.length == 1 ? "" : sections[1]));
                 }
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 
@@ -163,13 +159,11 @@ public class RawDeserializer implements IDeserializer {
                             if (permissionSections.length == 2 && permissionSections[1].equals("1")) {
                                 rolePermissions.put(islandPrivilege, playerRole);
                             }
-                        } catch (Exception error) {
-                            PluginDebugger.debug(error);
+                        } catch (Exception ignored) {
                         }
                     }
                 }
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 
@@ -185,8 +179,7 @@ public class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = entry.split("=");
                     upgradesMap.put(sections[0], Integer.parseInt(sections[1]));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -229,8 +222,7 @@ public class RawDeserializer implements IDeserializer {
                         .setValue(IslandWarpAttributes.Field.LOCATION, sections[1])
                         .setValue(IslandWarpAttributes.Field.PRIVATE_STATUS, privateFlag)
                         .setValue(IslandWarpAttributes.Field.ICON, sections[3]));
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 
@@ -246,8 +238,7 @@ public class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = limit.split("=");
                     blockLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -264,8 +255,7 @@ public class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = entry.split("=");
                     ratingsMap.put(UUID.fromString(sections[0]), Rating.valueOf(Integer.parseInt(sections[1])));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -287,8 +277,7 @@ public class RawDeserializer implements IDeserializer {
                         if (!plugin.getSettings().getDefaultSettings().contains(setting))
                             islandSettings.put(IslandFlag.getByName(setting), (byte) 1);
                     }
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -310,8 +299,7 @@ public class RawDeserializer implements IDeserializer {
                 try {
                     World.Environment environment = World.Environment.valueOf(sections[0]);
                     deserializeGenerators(sections[1], cobbleGenerator[environment.ordinal()] = KeyMapImpl.createHashMap());
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         } else {
@@ -331,8 +319,7 @@ public class RawDeserializer implements IDeserializer {
                     String[] visitorSections = visitor.split(";");
                     long lastTimeJoined = visitorSections.length == 2 ? Long.parseLong(visitorSections[1]) : System.currentTimeMillis();
                     visitors.add(new Pair<>(UUID.fromString(visitorSections[0]), lastTimeJoined));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -349,8 +336,7 @@ public class RawDeserializer implements IDeserializer {
                 try {
                     String[] sections = limit.split("=");
                     entityLimits.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -403,8 +389,7 @@ public class RawDeserializer implements IDeserializer {
                     PlayerRole playerRole = SPlayerRole.fromId(Integer.parseInt(sections[0]));
                     if (playerRole != null)
                         roleLimits.put(playerRole, Integer.parseInt(sections[1]));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -430,8 +415,7 @@ public class RawDeserializer implements IDeserializer {
                         .setValue(WarpCategoryAttributes.Field.NAME, name)
                         .setValue(WarpCategoryAttributes.Field.SLOT, slot)
                         .setValue(WarpCategoryAttributes.Field.ICON, icon));
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
 
@@ -447,8 +431,7 @@ public class RawDeserializer implements IDeserializer {
                 String[] blockCountSections = blockCountSection.split("=");
                 try {
                     blockCounts.put(KeyImpl.of(blockCountSections[0]), new BigInteger(blockCountSections[1]));
-                } catch (NumberFormatException error) {
-                    PluginDebugger.debug(error);
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -469,8 +452,7 @@ public class RawDeserializer implements IDeserializer {
                     try {
                         dirtyChunks.add(ChunkPosition.of(worldName, Integer.parseInt(chunkCoordsSections[0]),
                                 Integer.parseInt(chunkCoordsSections[1])));
-                    } catch (NumberFormatException error) {
-                        PluginDebugger.debug(error);
+                    } catch (NumberFormatException ignored) {
                     }
                 }
             }
@@ -484,8 +466,7 @@ public class RawDeserializer implements IDeserializer {
             try {
                 String[] sections = limit.split("=");
                 cobbleGenerator.put(KeyImpl.of(sections[0]), Integer.parseInt(sections[1]));
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         }
     }

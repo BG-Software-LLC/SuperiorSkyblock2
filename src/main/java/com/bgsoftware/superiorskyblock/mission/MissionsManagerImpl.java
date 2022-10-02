@@ -8,13 +8,13 @@ import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
-import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
 import com.bgsoftware.superiorskyblock.core.io.Files;
 import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.mission.container.MissionsContainer;
@@ -174,8 +174,10 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             check = plugin.getServices().getPlaceholdersService().parsePlaceholders(offlinePlayer, check);
             try {
                 return Boolean.parseBoolean(plugin.getScriptEngine().eval(check) + "");
-            } catch (ScriptException ex) {
-                PluginDebugger.debug(ex);
+            } catch (ScriptException error) {
+                Log.entering("MissionsManagerImpl", "canPassAllChecks", "ENTER",
+                        superiorPlayer.getName(), mission.getName());
+                Log.error("An unexpected error occurred while checking mission requirements:", error);
                 return false;
             }
         });
@@ -196,7 +198,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
     }
 
     @Override
-    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer, boolean checkAutoReward, boolean forceReward, @Nullable Consumer<Boolean> result) {
+    public void rewardMission(Mission<?> mission, SuperiorPlayer superiorPlayer,
+                              boolean checkAutoReward, boolean forceReward, @Nullable Consumer<Boolean> result) {
         Preconditions.checkNotNull(mission, "mission parameter cannot be null.");
         Preconditions.checkNotNull(superiorPlayer, "superiorPlayer parameter cannot be null.");
 
@@ -213,7 +216,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             return;
         }
 
-        PluginDebugger.debug("Action: Reward Mission, Mission: " + mission.getName() + ", Target: " + superiorPlayer.getName() + ", Auto Reward: " + checkAutoReward + ", Force Reward: " + forceReward);
+        Log.debug(Debug.REWARD_MISSION, "MissionsManagerImpl", "rewardMission", mission.getName(),
+                superiorPlayer.getName(), checkAutoReward, forceReward);
 
         synchronized (superiorPlayer) {
             MissionData missionData = missionDataOptional.get();
@@ -335,9 +339,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             try {
                 mission.saveProgress(data);
             } catch (Throwable error) {
-                SuperiorSkyblockPlugin.log("&cFailed saving mission data for " + mission.getName() + ":");
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.error(new StringBuilder("An unexpected error while saving mission data for ")
+                        .append(mission.getName()).append(":"), error);
                 continue;
             }
 
@@ -353,8 +356,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     data.save(dataFile);
                 }
             } catch (IOException error) {
-                error.printStackTrace();
-                PluginDebugger.debug(error);
+                Log.error(new StringBuilder("An unexpected error occurred while saving missions data to file ")
+                        .append(dataFile.getName()).append(":"), error);
             }
         }
     }
@@ -387,9 +390,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                         mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
                     }
                 } catch (Throwable error) {
-                    SuperiorSkyblockPlugin.log("&cFailed loading mission data for " + mission.getName() + ":");
-                    error.printStackTrace();
-                    PluginDebugger.debug(error);
+                    Log.error(new StringBuilder("An unexpected error occurred while loading mission data for ")
+                            .append(mission.getName()).append(":"), error);
                 }
             }
         }
@@ -464,13 +466,9 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
             this.missionsContainer.addMissionData(new MissionData(mission, missionSection));
 
-            SuperiorSkyblockPlugin.log("Registered mission " + missionName);
-        } catch (Exception ex) {
-            SuperiorSkyblockPlugin.log("Couldn't register mission " + missionName + ": ");
-            ManagerLoadException handlerError = new ManagerLoadException(ex, "Couldn't register mission " + missionName + ".",
-                    ManagerLoadException.ErrorLevel.CONTINUE);
-            PluginDebugger.debug(handlerError);
-            handlerError.printStackTrace();
+            Log.info("Registered mission " + missionName);
+        } catch (Exception error) {
+            Log.error(new StringBuilder("An unexpected error occurred while registering mission ").append(missionName).append(":"), error);
         }
 
         return newMission;
@@ -545,8 +543,8 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     }
                     data.save(dataFile);
                 } catch (IOException error) {
-                    error.printStackTrace();
-                    PluginDebugger.debug(error);
+                    Log.error(new StringBuilder("An unexpected error occurred while saving old mission file ")
+                            .append(mission.getName()).append(":"), error);
                 }
             }
         }

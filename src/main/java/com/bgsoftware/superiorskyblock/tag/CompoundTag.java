@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -258,9 +258,8 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
             }
 
             return nbtTagCompound;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag compound to NMS:");
             return null;
         }
     }
@@ -278,9 +277,8 @@ public class CompoundTag extends Tag<Map<String, Tag<?>>> implements Iterable<Ta
             }
 
             return new CompoundTag(map);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag compound from NMS:");
             return null;
         }
     }

@@ -12,8 +12,8 @@ import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.missions.MissionCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.impl.MenuBiomes;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuBlank;
 import com.bgsoftware.superiorskyblock.core.menu.impl.internal.SuperiorMenuCustom;
@@ -70,8 +70,7 @@ public class MenusProvider_Default implements MenusProvider {
             runnable.run();
         } catch (Exception ex) {
             ManagerLoadException handlerError = new ManagerLoadException(ex, ManagerLoadException.ErrorLevel.CONTINUE);
-            handlerError.printStackTrace();
-            PluginDebugger.debug(handlerError);
+            Log.error(handlerError, "An unexpected error occurred while loading menu:");
         }
     }
 

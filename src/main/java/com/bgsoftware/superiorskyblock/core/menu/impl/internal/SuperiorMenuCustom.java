@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
@@ -58,7 +59,7 @@ public class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
             ConfigurationSection commandsSection = cfg.getConfigurationSection("command");
 
             if (commandsSection == null) {
-                SuperiorSkyblockPlugin.log("&c[" + fileName + "] Custom menu doesn't have it's command section configured correctly, skipping...");
+                Log.warn(new File(fileName), "Custom menu doesn't have it's command section configured correctly, skipping...");
                 return;
             }
 

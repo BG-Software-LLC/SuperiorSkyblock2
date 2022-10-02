@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import de.candc.events.SpawnerBreakEvent;
 import de.candc.events.SpawnerPlaceEvent;
@@ -26,7 +27,7 @@ public class SpawnersProvider_SilkSpawners implements SpawnersProvider_AutoDetec
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new SpawnersProvider_SilkSpawners.StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using SilkSpawners as a spawners provider.");
+            Log.info("Using SilkSpawners as a spawners provider.");
         }
     }
 

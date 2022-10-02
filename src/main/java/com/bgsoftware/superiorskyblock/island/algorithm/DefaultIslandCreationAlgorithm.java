@@ -7,9 +7,9 @@ import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.google.common.base.Preconditions;
 import org.bukkit.Location;
@@ -62,8 +62,10 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
         Preconditions.checkArgument(builder.owner != null, "Cannot create an island from builder with no valid owner.");
         Preconditions.checkArgument(schematic != null, "Cannot create an island from builder with invalid schematic name.");
 
-        CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
+        Log.debug(Debug.CREATE_ISLAND, "DefaultIslandCreationAlgorithm", "createIsland",
+                builder.owner.getName(), schematic.getName(), lastIsland);
 
+        CompletableFuture<IslandCreationResult> completableFuture = new CompletableFuture<>();
 
         Location islandLocation = plugin.getProviders().getWorldsProvider().getNextLocation(
                 lastIsland.parse().clone(),
@@ -73,7 +75,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
                 builder.uuid
         );
 
-        PluginDebugger.debug("Action: Calculate Next Island, Location: " + Formatters.LOCATION_FORMATTER.format(islandLocation));
+        Log.debugResult(Debug.CREATE_ISLAND, "DefaultIslandCreationAlgorithm", "createIsland",
+                "Next Island Position", islandLocation);
 
         Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
 

@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.nms.v117;
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.nms.v117.world.PropertiesMapper;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -123,9 +123,8 @@ public class NMSUtils {
                         if (saveChunks)
                             chunkMap.write(chunkCoords, chunkDataCompound);
                     }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
                 }
             });
         }).runSync(v -> {
@@ -198,8 +197,7 @@ public class NMSUtils {
                             blockState = blockState.setValue(property, Enum.valueOf(property.getValueClass(), data));
                         }
                     }
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }

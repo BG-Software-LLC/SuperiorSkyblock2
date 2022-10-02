@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.cache.DatabaseCache;
@@ -14,7 +15,6 @@ import com.bgsoftware.superiorskyblock.core.database.loader.sql.SQLDatabaseLoade
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsDeserializer;
 import com.bgsoftware.superiorskyblock.core.database.serialization.PlayersDeserializer;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -62,7 +62,10 @@ public class DataManager extends Manager {
 
         for (SuperiorPlayer superiorPlayer : plugin.getPlayers().getAllPlayers()) {
             if (superiorPlayer.getIslandLeader().getUniqueId().equals(superiorPlayer.getUniqueId()) && superiorPlayer.getIsland() != null && !superiorPlayer.getPlayerRole().isLastRole()) {
-                SuperiorSkyblockPlugin.log("[WARN] Seems like " + superiorPlayer.getName() + " is an island leader, but have a guest role - fixing it...");
+                Log.warn(new StringBuilder("Seems like ")
+                        .append(superiorPlayer.getName())
+                        .append(" is an island leader, but have a guest role - fixing it...")
+                );
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
         }
@@ -82,9 +85,8 @@ public class DataManager extends Manager {
             //Saving grid
             GridDatabaseBridge.deleteGrid(plugin.getGrid());
             GridDatabaseBridge.insertGrid(plugin.getGrid());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error("An unexpected error occurred while saving database:", error);
         }
     }
 
@@ -105,7 +107,7 @@ public class DataManager extends Manager {
     }
 
     private void loadPlayers() {
-        SuperiorSkyblockPlugin.log("Starting to load players...");
+        Log.info("Starting to load players...");
 
         DatabaseBridge playersLoader = plugin.getFactory().createDatabaseBridge((SuperiorPlayer) null);
 
@@ -122,7 +124,7 @@ public class DataManager extends Manager {
 
             Optional<UUID> uuid = databaseResult.getUUID("uuid");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load player with null uuid, skipping...");
+                Log.warn("Cannot load player with null uuid, skipping...");
                 return;
             }
 
@@ -139,11 +141,11 @@ public class DataManager extends Manager {
 
         long endTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("Finished loading " + playersCount.get() + " players (Took " + (endTime - startTime) + "ms)");
+        Log.info("Finished loading " + playersCount.get() + " players (Took " + (endTime - startTime) + "ms)");
     }
 
     private void loadIslands() {
-        SuperiorSkyblockPlugin.log("Starting to load islands...");
+        Log.info("Starting to load islands...");
 
         DatabaseBridge islandsLoader = plugin.getFactory().createDatabaseBridge((Island) null);
 
@@ -180,19 +182,19 @@ public class DataManager extends Manager {
 
             Optional<UUID> uuid = databaseResult.getUUID("uuid");
             if (!uuid.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island with invalid uuid, skipping...");
+                Log.warn("Cannot load island with invalid uuid, skipping...");
                 return;
             }
 
             Optional<SuperiorPlayer> owner = databaseResult.getUUID("owner").map(plugin.getPlayers()::getSuperiorPlayer);
             if (!owner.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island with invalid owner uuid, skipping...");
+                Log.warn("Cannot load island with invalid owner uuid, skipping...");
                 return;
             }
 
             Optional<Location> center = databaseResult.getString("center").map(Serializers.LOCATION_SERIALIZER::deserialize);
             if (!center.isPresent()) {
-                SuperiorSkyblockPlugin.log("&cCannot load island with invalid center, skipping...");
+                Log.warn("Cannot load island with invalid center, skipping...");
                 return;
             }
 
@@ -229,19 +231,19 @@ public class DataManager extends Manager {
 
         long endTime = System.currentTimeMillis();
 
-        SuperiorSkyblockPlugin.log("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
+        Log.info("Finished loading " + islandsCount.get() + " islands (Took " + (endTime - startTime) + "ms)");
     }
 
 
     private void loadGrid() {
-        SuperiorSkyblockPlugin.log("Starting to load grid...");
+        Log.info("Starting to load grid...");
 
         DatabaseBridge gridLoader = plugin.getFactory().createDatabaseBridge((GridManager) null);
 
         gridLoader.loadAllObjects("grid",
                 resultSet -> plugin.getGrid().loadGrid(new DatabaseResult(resultSet)));
 
-        SuperiorSkyblockPlugin.log("Finished grid!");
+        Log.info("Finished grid!");
     }
 
     private void runState(DatabaseLoader.State state) throws ManagerLoadException {

@@ -5,15 +5,16 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
-import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
 import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.BiomeButton;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
+import com.bgsoftware.superiorskyblock.core.menu.pattern.SuperiorMenuPattern;
+import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Biome;
 import org.bukkit.configuration.ConfigurationSection;
@@ -85,7 +86,7 @@ public class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 try {
                     biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                 } catch (IllegalArgumentException error) {
-                    SuperiorSkyblockPlugin.log("&cBiome '" + biomeName + "' is not valid, skipping...");
+                    Log.warn(new File("biomes.yml"), "Biome '", biomeName, "' is not valid, skipping...");
                     continue;
                 }
 

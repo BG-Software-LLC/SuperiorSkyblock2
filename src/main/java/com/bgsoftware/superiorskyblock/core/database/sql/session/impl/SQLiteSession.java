@@ -4,7 +4,8 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.SQLSession;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.Nullable;
@@ -39,7 +40,7 @@ public class SQLiteSession implements SQLSession {
 
     @Override
     public boolean createConnection() {
-        log("Trying to connect to local database (SQLite)...");
+        if (logging) Log.info("Trying to connect to local database (SQLite)...");
 
         File file = new File(plugin.getDataFolder(), "datastore/database.db");
 
@@ -47,12 +48,11 @@ public class SQLiteSession implements SQLSession {
             file.getParentFile().mkdirs();
             try {
                 if (!file.createNewFile()) {
-                    log("&cFailed to create database file.");
+                    Log.error("Failed to create SQLite database file.");
                     return false;
                 }
             } catch (IOException error) {
-                log("&cAn unexpected error occurred while creating the database file:");
-                error.printStackTrace();
+                Log.error(error, "An unexpected error occurred while creating the database file:");
                 return false;
             }
         }
@@ -64,15 +64,13 @@ public class SQLiteSession implements SQLSession {
 
             conn = DriverManager.getConnection(jdbcUrl);
 
-            log("Successfully established connection with local database!");
+            if (logging) Log.info("Successfully established connection with local database!");
 
             ready.complete(null);
 
             return true;
         } catch (Exception error) {
-            log("&cFailed to connect to the local database:");
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while connecting to SQLite database:");
         }
 
         return false;
@@ -85,8 +83,7 @@ public class SQLiteSession implements SQLSession {
         try {
             conn.close();
         } catch (SQLException error) {
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.error(error, "An unexpected error occurred while closing connection to SQLite database:");
         }
     }
 
@@ -94,9 +91,8 @@ public class SQLiteSession implements SQLSession {
     public void waitForConnection() {
         try {
             ready.get();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while waiting for connection:");
         }
     }
 
@@ -164,7 +160,7 @@ public class SQLiteSession implements SQLSession {
     public void customQuery(String query, QueryResult<PreparedStatement> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "customQuery", query);
 
         try (PreparedStatement preparedStatement =
                      this.conn.prepareStatement(query.replace("{prefix}", ""))) {
@@ -172,11 +168,6 @@ public class SQLiteSession implements SQLSession {
         } catch (SQLException error) {
             queryResult.fail(error);
         }
-    }
-
-    private void log(String message) {
-        if (logging)
-            SuperiorSkyblockPlugin.log(message);
     }
 
     private void executeUpdate(String statement, QueryResult<Void> queryResult) {
@@ -188,7 +179,7 @@ public class SQLiteSession implements SQLSession {
                 .replace("LONG_UNIQUE_TEXT", "VARCHAR(255)")
                 .replace("UNIQUE_TEXT", "VARCHAR(30)");
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "executeUpdate", query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query)) {
             preparedStatement.executeUpdate();
@@ -201,7 +192,7 @@ public class SQLiteSession implements SQLSession {
     private void executeQuery(String query, QueryResult<ResultSet> queryResult) {
         Preconditions.checkNotNull(this.conn, "Session was not initialized.");
 
-        PluginDebugger.debug("Action: Database Execute, Query: " + query);
+        Log.debug(Debug.DATABASE_QUERY, "SQLiteSession", "executeQuery", query);
 
         try (PreparedStatement preparedStatement = this.conn.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {

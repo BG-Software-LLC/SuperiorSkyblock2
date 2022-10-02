@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.nms.v1_8_R3;
 
 import com.bgsoftware.common.reflection.ReflectField;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.google.common.collect.Maps;
 import net.minecraft.server.v1_8_R3.Block;
@@ -95,18 +95,16 @@ public class NMSUtils {
                     if (saveChunks) {
                         try {
                             chunkLoader.a(worldServer, loadedChunk);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                            PluginDebugger.debug(ex);
+                        } catch (Exception error) {
+                            Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
                         }
                     }
                 }
 
                 if (onFinish != null)
                     onFinish.run();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.error(error, "An unexpected error occurred while interacting with unloaded chunk ", chunkCoords, ":");
             }
         });
     }

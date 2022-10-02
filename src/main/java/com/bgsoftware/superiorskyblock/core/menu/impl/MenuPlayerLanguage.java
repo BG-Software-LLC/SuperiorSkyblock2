@@ -1,17 +1,19 @@
 package com.bgsoftware.superiorskyblock.core.menu.impl;
 
 import com.bgsoftware.common.config.CommentedConfiguration;
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.io.MenuParser;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
+import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
+import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.LanguageButton;
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
-import com.bgsoftware.superiorskyblock.core.menu.MenuParseResult;
-import com.bgsoftware.superiorskyblock.core.menu.SuperiorMenu;
-import com.bgsoftware.superiorskyblock.core.menu.MenuPatternSlots;
-import com.bgsoftware.superiorskyblock.core.io.MenuParser;
 import org.bukkit.configuration.ConfigurationSection;
+
+import java.io.File;
 
 public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
 
@@ -58,7 +60,7 @@ public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
                 }
 
                 if (locale == null) {
-                    SuperiorSkyblockPlugin.log("&c[player-language.yml] The language " + languageName + " is not valid.");
+                    Log.warn(new File("player-language.yml"), "The language ", languageName, " is not valid.");
                     continue;
                 }
 

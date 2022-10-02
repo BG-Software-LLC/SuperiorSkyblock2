@@ -12,11 +12,10 @@ import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.Island
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandWarpAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.PlayerAttributes;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.WarpCategoryAttributes;
-import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
-import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
+import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,7 +24,6 @@ import org.bukkit.World;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -69,8 +67,7 @@ public class JsonDeserializer implements IDeserializer {
             try {
                 int i = World.Environment.valueOf(locationObject.get("env").getAsString()).ordinal();
                 locations[i] = locationObject.get("location").getAsString();
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 
@@ -109,12 +106,10 @@ public class JsonDeserializer implements IDeserializer {
                         JsonObject permObject = permElement.getAsJsonObject();
                         IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permObject.get("name").getAsString());
                         playerPermissionNode.setPermission(islandPrivilege, permObject.get("status").getAsString().equals("1"));
-                    } catch (Exception error) {
-                        PluginDebugger.debug(error);
+                    } catch (Exception ignored) {
                     }
                 }
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 
@@ -134,8 +129,7 @@ public class JsonDeserializer implements IDeserializer {
                 try {
                     IslandPrivilege islandPrivilege = IslandPrivilege.getByName(permElement.getAsString());
                     rolePermissions.put(islandPrivilege, playerRole);
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             });
         });
@@ -204,8 +198,7 @@ public class JsonDeserializer implements IDeserializer {
                 UUID uuid = UUID.fromString(ratingObject.get("player").getAsString());
                 Rating rating = Rating.valueOf(ratingObject.get("rating").getAsInt());
                 ratingsMap.put(uuid, rating);
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 
@@ -222,8 +215,7 @@ public class JsonDeserializer implements IDeserializer {
                 IslandFlag islandFlag = IslandFlag.getByName(islandFlagObject.get("name").getAsString());
                 byte status = islandFlagObject.get("status").getAsByte();
                 islandFlags.put(islandFlag, status);
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 
@@ -245,8 +237,7 @@ public class JsonDeserializer implements IDeserializer {
                     int rate = generatorObject.get("rate").getAsInt();
                     (cobbleGenerator[i] = KeyMapImpl.createHashMap()).put(blockKey, rate);
                 });
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 
@@ -264,8 +255,7 @@ public class JsonDeserializer implements IDeserializer {
                 UUID uuid = UUID.fromString(playerObject.get("uuid").getAsString());
                 long lastTimeRecorded = playerObject.get("lastTimeRecorded").getAsLong();
                 visitorsList.add(new Pair<>(uuid, lastTimeRecorded));
-            } catch (Exception error) {
-                PluginDebugger.debug(error);
+            } catch (Exception ignored) {
             }
         });
 

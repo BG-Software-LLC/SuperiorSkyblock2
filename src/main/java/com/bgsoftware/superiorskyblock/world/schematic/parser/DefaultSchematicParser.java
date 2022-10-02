@@ -1,10 +1,10 @@
 package com.bgsoftware.superiorskyblock.world.schematic.parser;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParseException;
 import com.bgsoftware.superiorskyblock.api.schematic.parser.SchematicParser;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.schematic.impl.SuperiorSchematic;
@@ -31,7 +31,7 @@ public class DefaultSchematicParser implements SchematicParser {
 
             if (ServerVersion.isLegacy() && compoundTag.containsKey("version") &&
                     !ServerVersion.getBukkitVersion().equals(compoundTag.getString("version")))
-                SuperiorSkyblockPlugin.log("&cSchematic " + schematicName + " was created in a different version, may cause issues.");
+                Log.warn("Schematic ", schematicName, " was created in a different version, may cause issues.");
 
             if (!compoundTag.isEmpty())
                 return new SuperiorSchematic(schematicName, compoundTag);

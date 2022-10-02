@@ -6,8 +6,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
-import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProviderItemMetaSpawnerType;
 import com.google.common.base.Preconditions;
 import com.songoda.ultimatestacker.UltimateStacker;
 import com.songoda.ultimatestacker.events.SpawnerBreakEvent;
@@ -31,7 +31,7 @@ public class SpawnersProvider_UltimateStacker implements SpawnersProviderItemMet
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using UltimateStacker as a spawners provider.");
+            Log.info("Using UltimateStacker as a spawners provider.");
         }
     }
 

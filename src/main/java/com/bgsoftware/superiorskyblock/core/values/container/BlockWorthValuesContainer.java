@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.values.container;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -18,7 +18,7 @@ public class BlockWorthValuesContainer extends BlockValuesContainer {
         File blockValuesFile = new File(plugin.getDataFolder(), "blockvalues.yml");
         if (blockValuesFile.exists()) {
             if (!worthFile.getParentFile().mkdirs() || !blockValuesFile.renameTo(worthFile))
-                SuperiorSkyblockPlugin.log("&cFailed to convert old block values to the new format.");
+                Log.error("Failed to convert old block values to the new format.");
         }
 
         if (!worthFile.exists())
@@ -32,8 +32,7 @@ public class BlockWorthValuesContainer extends BlockValuesContainer {
             try {
                 setBlockValue(KeyImpl.of(key), new BigDecimal(value));
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.log("&cInvalid worth value: " + value);
-                PluginDebugger.debug(ex);
+                Log.warn("Cannot parse worth value for ", key + ", skipping...");
             }
         }
     }

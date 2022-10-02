@@ -1,7 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_16_R3.world;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.minecraft.server.v1_16_R3.IBlockState;
 
 import javax.annotation.Nullable;
@@ -60,16 +59,15 @@ public class BlockStatesMapper {
                             field.getName(), (IBlockState<?>) value);
                 }
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while loading block states mapper:");
         }
 
     }
 
     private static void register(String key, String fieldName, IBlockState<?> blockState) {
         if (nameToBlockState.containsKey(key)) {
-            SuperiorSkyblockPlugin.log("&cWarning: block state " + key + "(" + fieldName + ") already exists. Contact Ome_R!");
+            Log.error("Block state ", key, "(", fieldName, ") already exists. Contact Ome_R!");
         } else {
             nameToBlockState.put(key, blockState);
             blockStateToName.put(blockState, key);

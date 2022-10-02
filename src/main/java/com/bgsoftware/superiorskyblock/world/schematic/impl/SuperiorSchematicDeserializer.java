@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.world.schematic.impl;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SchematicBlockData;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.ListTag;
@@ -88,8 +88,7 @@ public class SuperiorSchematicDeserializer {
                             CompoundTag itemCompound = plugin.getNMSTags().convertToNBT(itemStack);
                             itemCompound.setByte("Slot", Byte.parseByte(item.getKey()));
                             items.addTag(itemCompound);
-                        } catch (Exception error) {
-                            PluginDebugger.debug(error);
+                        } catch (Exception ignored) {
                         }
                     }
                 }
@@ -108,8 +107,7 @@ public class SuperiorSchematicDeserializer {
                     String[] flowerSections = flower.split(":");
                     tileEntity.setString("Item", plugin.getNMSAlgorithms().getMinecraftKey(new ItemStack(Material.valueOf(flowerSections[0]))));
                     tileEntity.setInt("Data", Integer.parseInt(flowerSections[1]));
-                } catch (Exception error) {
-                    PluginDebugger.debug(error);
+                } catch (Exception ignored) {
                 }
             }
         }
@@ -198,7 +196,7 @@ public class SuperiorSchematicDeserializer {
 
             combinedId = plugin.getNMSAlgorithms().getCombinedId(type, (byte) data);
         } else {
-            SuperiorSkyblockPlugin.log("&cCouldn't find combinedId for the block " + compoundTag.getString("blockPosition") + " - skipping...");
+            Log.warn("Couldn't find combinedId for the block ", compoundTag.getString("blockPosition"), " - skipping...");
             return null;
         }
 

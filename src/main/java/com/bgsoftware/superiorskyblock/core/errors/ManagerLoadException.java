@@ -1,10 +1,8 @@
 package com.bgsoftware.superiorskyblock.core.errors;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -33,11 +31,10 @@ public class ManagerLoadException extends Exception {
         this.errorLevel = errorLevel;
     }
 
-    public static boolean handle(ManagerLoadException ex) {
-        PluginDebugger.debug(ex);
-        ex.printStackTrace();
+    public static boolean handle(ManagerLoadException error) {
+        error.printStackTrace();
 
-        if (ex.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN) {
+        if (error.getErrorLevel() == ErrorLevel.SERVER_SHUTDOWN) {
             Bukkit.shutdown();
             return false;
         }
@@ -61,32 +58,28 @@ public class ManagerLoadException extends Exception {
 
         List<String> messageLines = Arrays.asList(getMessage().split("\n"));
 
-        ConsoleCommandSender sender = Bukkit.getConsoleSender();
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "##                                            ##");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "## An error occured while loading the plugin! ##");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "##                                            ##");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
-        sender.sendMessage("[SuperiorSkyblock2] ");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "Error:");
-        messageLines.forEach(line -> sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + line));
-        sender.sendMessage("[SuperiorSkyblock2] ");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "StackTrace:");
+        Log.error("################################################");
+        Log.error("##                                            ##");
+        Log.error("## An error occured while loading the plugin! ##");
+        Log.error("##                                            ##");
+        Log.error("################################################");
+        Log.error(" ");
+        Log.error("Stack Trace:");
 
         int linesCounter = 0;
 
         for (String stackTraceLine : stackTrace.toString().split("\n")) {
             if (linesCounter > messageLines.size()) {
                 if (!messageLines.contains(stackTraceLine)) {
-                    sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + stackTraceLine);
+                    Log.error(stackTraceLine);
                 }
             } else {
                 linesCounter++;
             }
         }
 
-        sender.sendMessage("[SuperiorSkyblock2] ");
-        sender.sendMessage("[SuperiorSkyblock2] " + ChatColor.RED + "################################################");
+        Log.error(" ");
+        Log.error("################################################");
     }
 
     public enum ErrorLevel {

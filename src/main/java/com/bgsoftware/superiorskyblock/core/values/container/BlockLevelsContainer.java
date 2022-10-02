@@ -2,7 +2,7 @@ package com.bgsoftware.superiorskyblock.core.values.container;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -26,8 +26,7 @@ public class BlockLevelsContainer extends BlockValuesContainer {
             try {
                 setBlockValue(KeyImpl.of(key), new BigDecimal(value));
             } catch (Exception ex) {
-                SuperiorSkyblockPlugin.log("&cInvalid level value: " + value);
-                PluginDebugger.debug(ex);
+                Log.warn("Cannot parse level value for ", key + ", skipping...");
             }
         }
     }

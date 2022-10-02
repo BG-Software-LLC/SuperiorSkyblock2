@@ -3,6 +3,7 @@ package com.bgsoftware.superiorskyblock.module.bank;
 import com.bgsoftware.common.config.CommentedConfiguration;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.commands.SuperiorCommand;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminDeposit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdAdminWithdraw;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBalance;
@@ -10,7 +11,6 @@ import com.bgsoftware.superiorskyblock.module.bank.commands.CmdBank;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdDeposit;
 import com.bgsoftware.superiorskyblock.module.bank.commands.CmdWithdraw;
 import com.bgsoftware.superiorskyblock.module.BuiltinModule;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 
@@ -62,9 +62,9 @@ public class BankModule extends BuiltinModule {
             try {
                 super.config.save(moduleConfigFile);
                 config.save(configFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                PluginDebugger.debug(ex);
+            } catch (Exception error) {
+                Log.entering("BankModule", "onPluginInit", "ENTER");
+                Log.error(error, "An error occurred while saving config file:");
             }
         }
     }

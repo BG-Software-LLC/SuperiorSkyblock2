@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.SuperiorMenuButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandCreationButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
@@ -83,7 +84,7 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 Schematic schematic = plugin.getSchematics().getSchematic(itemSection.getString("schematic"));
 
                 if (schematic == null) {
-                    SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid schematic for item " + itemSectionName);
+                    Log.warn(new File("island-creation.yml"), "Invalid schematic for item ", itemSectionName);
                     continue;
                 }
 
@@ -95,7 +96,8 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                         Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                         buttonBuilder.setBiome(biome);
                     } catch (IllegalArgumentException error) {
-                        SuperiorSkyblockPlugin.log("&c[island-creation.yml] Invalid biome name for item " + itemSectionName + ": " + biomeName);
+                        Log.warn(new File("island-creation.yml"), "Invalid biome name for item ",
+                                itemSectionName, ": ", biomeName);
                     }
                 }
 

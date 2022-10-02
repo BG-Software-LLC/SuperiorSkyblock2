@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.external.permissions;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.hooks.PermissionsProvider;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedDataManager;
 import net.luckperms.api.model.user.User;
@@ -19,11 +19,10 @@ public class PermissionsProvider_LuckPerms implements PermissionsProvider {
         try {
             CachedDataManager.class.getMethod("getPermissionData");
             luckPerms = Bukkit.getServicesManager().getRegistration(LuckPerms.class).getProvider();
-            SuperiorSkyblockPlugin.log("Using LuckPerms as a permissions provider.");
+            Log.info("Using LuckPerms as a permissions provider.");
             return true;
         } catch (Throwable ex) {
-            SuperiorSkyblockPlugin.log("&cYou are using an outdated version of LuckPerms. " +
-                    "It's recommended to update for a more optimized experience (v5.1+).");
+            Log.warn("You are using an outdated version of LuckPerms. It's recommended to update for a more optimized experience (v5.1+).");
             return false;
         }
     }

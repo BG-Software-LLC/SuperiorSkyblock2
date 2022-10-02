@@ -20,8 +20,8 @@ import com.bgsoftware.superiorskyblock.config.section.VisitorsSignSection;
 import com.bgsoftware.superiorskyblock.config.section.VoidTeleportSection;
 import com.bgsoftware.superiorskyblock.config.section.WorldsSection;
 import com.bgsoftware.superiorskyblock.core.Manager;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -65,9 +65,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         try {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
                     "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error("An unexpected error occurred while loading config file:", error);
         }
 
         this.container = new SettingsContainer(plugin, cfg);
@@ -681,9 +680,8 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
 
         try {
             commentedConfig.save(file);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error("An unexpected error occurred while saving new interactables file:", error);
         }
 
 

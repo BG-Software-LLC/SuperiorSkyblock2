@@ -3,7 +3,7 @@ package com.bgsoftware.superiorskyblock.external.spawners;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.external.spawners.SpawnersProviderItemMetaSpawnerType;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -29,7 +29,7 @@ public class SpawnersProvider_PvpingSpawners implements SpawnersProviderItemMeta
         if (!registered) {
             Bukkit.getPluginManager().registerEvents(new StackerListener(), plugin);
             registered = true;
-            SuperiorSkyblockPlugin.log("Using PvpingSpawners as a spawners provider.");
+            Log.info("Using PvpingSpawners as a spawners provider.");
         }
     }
 

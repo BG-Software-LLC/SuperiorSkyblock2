@@ -1,13 +1,18 @@
 package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
+import com.bgsoftware.superiorskyblock.core.messages.Message;
+import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class CmdAdminDebug implements ISuperiorCommand {
 
@@ -38,7 +43,7 @@ public class CmdAdminDebug implements ISuperiorCommand {
 
     @Override
     public int getMaxArgs() {
-        return Integer.MAX_VALUE;
+        return 3;
     }
 
     @Override
@@ -53,30 +58,49 @@ public class CmdAdminDebug implements ISuperiorCommand {
 
     @Override
     public void execute(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        if (PluginDebugger.isDebugMode() && args.length == 2) {
-            Message.DEBUG_MODE_DISABLED.send(sender);
-            PluginDebugger.toggleDebugMode();
-            PluginDebugger.setDebugFilter("");
-            return;
+        boolean originalDebugMode = Log.isDebugMode();
+        Debug debugFilter;
+
+        if (args.length == 2) {
+            if (originalDebugMode) {
+                debugFilter = null;
+            } else {
+                Message.COMMAND_USAGE.send(sender, plugin.getCommands().getLabel() + " " + getUsage(PlayerLocales.getLocale(sender)));
+                return;
+            }
+        } else try {
+            debugFilter = Debug.valueOf(args[2].toUpperCase(Locale.ENGLISH));
+        } catch (IllegalArgumentException error) {
+            debugFilter = null;
         }
 
-        if (!PluginDebugger.isDebugMode()) {
-            Message.DEBUG_MODE_ENABLED.send(sender);
-            PluginDebugger.toggleDebugMode();
+        boolean newDebugMode = debugFilter != null;
+
+        if (originalDebugMode != newDebugMode) {
+            Log.toggleDebugMode();
+            if (newDebugMode) {
+                Message.DEBUG_MODE_ENABLED.send(sender);
+            } else {
+                Message.DEBUG_MODE_DISABLED.send(sender);
+            }
         }
 
-        if (args.length > 2) {
-            StringBuilder debugFilter = new StringBuilder();
-            for (int i = 2; i < args.length; i++)
-                debugFilter.append(" ").append(args[i]);
-            PluginDebugger.setDebugFilter(debugFilter.length() == 0 ? "" : debugFilter.substring(1));
-            Message.DEBUG_MODE_FILTER.send(sender);
+        if (debugFilter != null) {
+            if (Log.isDebugged(debugFilter)) {
+                Message.DEBUG_MODE_FILTER_REMOVE.send(sender, Formatters.CAPITALIZED_FORMATTER.format(debugFilter.name()));
+            } else {
+                Message.DEBUG_MODE_FILTER_ADD.send(sender, Formatters.CAPITALIZED_FORMATTER.format(debugFilter.name()));
+            }
+        } else {
+            Message.DEBUG_MODE_FILTER_CLEAR.send(sender);
         }
+
+        Log.setDebugFilter(debugFilter);
     }
 
     @Override
     public List<String> tabComplete(SuperiorSkyblockPlugin plugin, CommandSender sender, String[] args) {
-        return Collections.emptyList();
+        return args.length <= 2 ? Collections.emptyList() : CommandTabCompletes.getCustomComplete(args[2], Debug.getDebugNames());
     }
 
 }

@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
  */
 package com.bgsoftware.superiorskyblock.tag;
 
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;
 
@@ -86,9 +86,8 @@ public class ListTag extends Tag<List<Tag<?>>> implements Iterable<Tag<?>> {
                 list.add(Tag.fromNBT(plugin.getNMSTags().getNBTListIndexValue(tag, i)));
 
             return new ListTag(size == 0 ? EndTag.class : list.get(0).getClass(), list);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (Exception error) {
+            Log.error(error, "An unexpected error occurred while converting tag list from NMS:");
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.task;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 public class ShutdownTask extends Thread {
 
@@ -13,7 +14,7 @@ public class ShutdownTask extends Thread {
     @Override
     public void run() {
         if (!plugin.getGrid().wasPluginDisabled()) {
-            SuperiorSkyblockPlugin.log("&cDetected crash. SuperiorSkyblock will attempt to save data...");
+            Log.error("Detected crash. SuperiorSkyblock will attempt to save data...");
             plugin.onDisable();
         }
     }

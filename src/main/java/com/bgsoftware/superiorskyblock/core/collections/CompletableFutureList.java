@@ -1,7 +1,7 @@
 package com.bgsoftware.superiorskyblock.core.collections;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
@@ -32,8 +32,7 @@ public class CompletableFutureList<E> extends ArrayList<CompletableFuture<E>> {
         } else try {
             allTasks.get(plugin.getSettings().getRecalcTaskTimeout(), TimeUnit.SECONDS);
         } catch (Throwable error) {
-            PluginDebugger.debug(error);
-            onFailure.accept(error);
+            Log.error(error, "An unexpected error occurred while waiting for tasks to complete:");
         }
     }
 

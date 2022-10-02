@@ -6,8 +6,9 @@ import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.island.warps.WarpCategory;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemBuilder;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -52,11 +53,15 @@ public class SWarpCategory implements WarpCategory {
     @Override
     public void setName(String name) {
         Preconditions.checkNotNull(name, "name parameter cannot be null.");
-        PluginDebugger.debug("Action: Update Warp-Category Name, Island: " + getOwnerName() + ", Category: " + this.name + ", New Name: " + name);
+
+        Log.debug(Debug.SET_WARP_CATEGORY_NAME, "SWarpCategory", "setName", getOwnerName(), this.name, name);
+
         String oldName = this.name;
         this.name = name;
+
         for (IslandWarp islandWarp : islandWarps)
             IslandsDatabaseBridge.updateWarpCategory(getIsland(), islandWarp, oldName);
+
         IslandsDatabaseBridge.updateWarpCategoryName(getIsland(), this, oldName);
     }
 
@@ -72,8 +77,10 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public void setSlot(int slot) {
-        PluginDebugger.debug("Action: Update Warp-Category Slot, Island: " + getOwnerName() + ", Category: " + this.name + ", New Slot: " + slot);
+        Log.debug(Debug.SET_WARP_CATEGORY_SLOT, "SWarpCategory", "setSlot", getOwnerName(), this.name, slot);
+
         this.slot = slot;
+
         IslandsDatabaseBridge.updateWarpCategorySlot(getIsland(), this);
     }
 
@@ -91,8 +98,10 @@ public class SWarpCategory implements WarpCategory {
 
     @Override
     public void setIcon(@Nullable ItemStack icon) {
-        PluginDebugger.debug("Action: Update Warp-Category Icon, Island: " + getOwnerName() + ", Category: " + this.name);
+        Log.debug(Debug.SET_WARP_CATEGORY_ICON, "SWarpCategory", "setSlot", getOwnerName(), this.name, icon);
+
         this.icon = icon == null ? DEFAULT_WARP_ICON.clone() : icon.clone();
+
         IslandsDatabaseBridge.updateWarpCategoryIcon(getIsland(), this);
     }
 

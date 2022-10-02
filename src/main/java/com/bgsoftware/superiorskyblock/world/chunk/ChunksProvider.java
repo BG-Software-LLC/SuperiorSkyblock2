@@ -4,7 +4,8 @@ import com.bgsoftware.common.executors.IWorker;
 import com.bgsoftware.common.executors.WorkerExecutor;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import org.bukkit.Chunk;
 
 import javax.annotation.Nullable;
@@ -34,7 +35,7 @@ public class ChunksProvider {
         if (stopped)
             return new CompletableFuture<>();
 
-        PluginDebugger.debug("Action: Chunk Load Attempt, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
+        Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "loadChunk", chunkPosition, chunkLoadReason);
 
         PendingChunkLoadRequest pendingRequest = pendingRequests.get(chunkPosition);
 
@@ -49,7 +50,7 @@ public class ChunksProvider {
             if (onLoadConsumer != null)
                 chunkConsumers.add(onLoadConsumer);
 
-            pendingRequests.put(chunkPosition, new PendingChunkLoadRequest(completableFuture, chunkConsumers, chunkLoadReason));
+            pendingRequests.put(chunkPosition, new PendingChunkLoadRequest(completableFuture, chunkConsumers));
             chunksExecutor.addWorker(new ChunkLoadWorker(chunkPosition, chunkLoadReason));
 
             if (!chunksExecutor.isRunning())
@@ -84,18 +85,21 @@ public class ChunksProvider {
             if (stopped)
                 return;
 
-            PluginDebugger.debug("Action: Chunk Load, Chunk: " + chunkPosition.toString() + ", Reason: " + chunkLoadReason);
+            Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "work", chunkPosition, chunkLoadReason);
+
             plugin.getProviders().getChunksProvider().loadChunk(chunkPosition.getWorld(),
                     chunkPosition.getX(), chunkPosition.getZ()).whenComplete((chunk, error) -> {
                 if (error != null) {
+                    Log.entering("ChunksProvider", "work", "ENTER", chunkPosition, chunkLoadReason);
+                    Log.error(error, "An unexpected error occurred while loading chunk:");
                     error.printStackTrace();
                 }
 
                 try {
                     finishLoad(chunk);
-                } catch (Exception ex) {
-                    SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading chunk " + chunkPosition + ":");
-                    ex.printStackTrace();
+                } catch (Exception error2) {
+                    Log.entering("ChunksProvider", "work", "ENTER", chunkPosition, chunkLoadReason);
+                    Log.error(error2, "An unexpected error occurred while finishing chunk loading:");
                 }
             });
         }
@@ -103,10 +107,7 @@ public class ChunksProvider {
         private void finishLoad(Chunk chunk) {
             PendingChunkLoadRequest pendingRequest = pendingRequests.remove(chunkPosition);
 
-
-            PluginDebugger.debug("Action: Chunk Load Finish, Chunk: " + chunkPosition.toString() +
-                    (pendingRequest == null ? "" : ", Reason: " + pendingRequest.chunkLoadReason));
-
+            Log.debug(Debug.LOAD_CHUNK, "ChunksProvider", "finishLoad", chunkPosition, chunkLoadReason);
 
             if (pendingRequest != null) {
                 pendingRequest.callbacks.forEach(chunkConsumer -> chunkConsumer.accept(chunk));
@@ -120,13 +121,10 @@ public class ChunksProvider {
 
         private final CompletableFuture<Chunk> completableFuture;
         private final Set<Consumer<Chunk>> callbacks;
-        private final ChunkLoadReason chunkLoadReason;
 
-        public PendingChunkLoadRequest(CompletableFuture<Chunk> completableFuture, Set<Consumer<Chunk>> callbacks,
-                                       ChunkLoadReason chunkLoadReason) {
+        public PendingChunkLoadRequest(CompletableFuture<Chunk> completableFuture, Set<Consumer<Chunk>> callbacks) {
             this.completableFuture = completableFuture;
             this.callbacks = callbacks;
-            this.chunkLoadReason = chunkLoadReason;
         }
 
     }

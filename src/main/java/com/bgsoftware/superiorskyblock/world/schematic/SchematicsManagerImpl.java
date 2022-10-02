@@ -9,10 +9,10 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
-import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.io.Resources;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.tag.CompoundTag;
 import com.bgsoftware.superiorskyblock.tag.FloatTag;
@@ -38,9 +38,8 @@ import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -79,7 +78,6 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         loadDefaultSchematicParsers();
 
-        //noinspection ConstantConditions
         for (File schemFile : schematicsFolder.listFiles()) {
             String schemName = schemFile.getName().replace(".schematic", "").replace(".schem", "").toLowerCase(Locale.ENGLISH);
             Schematic schematic = loadFromFile(schemName, schemFile);
@@ -176,18 +174,26 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
     }
 
     @Override
-    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ, float yaw, float pitch, String schematicName, @Nullable Runnable runnable) {
+    public void saveSchematic(Location pos1, Location pos2, int offsetX, int offsetY, int offsetZ,
+                              float yaw, float pitch, String schematicName, @Nullable Runnable runnable) {
         Preconditions.checkNotNull(pos1, "pos1 parameter cannot be null.");
         Preconditions.checkNotNull(pos2, "pos2 parameter cannot be null.");
         Preconditions.checkNotNull(schematicName, "schematicName parameter cannot be null.");
 
-        PluginDebugger.debug("Action: Save Schematic, Pos #1: " + Formatters.LOCATION_FORMATTER.format(pos1) +
-                ", Pos #2: " + Formatters.LOCATION_FORMATTER.format(pos2) + ", OffsetX: " + offsetX + ", OffsetY: " + offsetY +
-                ", OffsetZ: " + offsetZ + ", Yaw: " + yaw + ", Pitch: " + pitch + ", Name: " + schematicName);
+        Log.debug(Debug.SAVE_SCHEMATIC, "SchematicsManagerImpl", "saveSchematic",
+                pos1, pos2, offsetX, offsetY, offsetZ, yaw, pitch, schematicName);
 
         World world = pos1.getWorld();
-        Location min = new Location(world, Math.min(pos1.getX(), pos2.getX()), Math.min(pos1.getY(), pos2.getY()), Math.min(pos1.getZ(), pos2.getZ()));
-        Location max = new Location(world, Math.max(pos1.getX(), pos2.getX()), Math.max(pos1.getY(), pos2.getY()), Math.max(pos1.getZ(), pos2.getZ()));
+        Location min = new Location(world,
+                Math.min(pos1.getX(), pos2.getX()),
+                Math.min(pos1.getY(), pos2.getY()),
+                Math.min(pos1.getZ(), pos2.getZ())
+        );
+        Location max = new Location(world,
+                Math.max(pos1.getX(), pos2.getX()),
+                Math.max(pos1.getY(), pos2.getY()),
+                Math.max(pos1.getZ(), pos2.getZ())
+        );
 
         int xSize = max.getBlockX() - min.getBlockX();
         int ySize = max.getBlockY() - min.getBlockY();
@@ -260,14 +266,13 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
     private Schematic parseSchematic(File file, String schemName, SchematicParser schematicParser,
                                      Consumer<SchematicParseException> onSchematicParseError) {
-        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+        try (DataInputStream reader = new DataInputStream(new GZIPInputStream(Files.newInputStream(file.toPath())))) {
             return schematicParser.parseSchematic(reader, schemName);
         } catch (SchematicParseException error) {
             onSchematicParseError.accept(error);
         } catch (Exception error) {
-            SuperiorSkyblockPlugin.log("&cAn unexpected error occurred while loading schematic " + file.getName() + ":");
-            error.printStackTrace();
-            PluginDebugger.debug(error);
+            Log.entering("SchematicsManagerImpl", "parseSchematic", "ENTER", file.getName(), schemName);
+            Log.error("An unexpected error occurred while loading schematic:", error);
         }
 
         return null;
@@ -288,13 +293,16 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         if (schematic == null) {
             schematic = parseSchematic(file, schemName, DefaultSchematicParser.getInstance(), error ->
-                    SuperiorSkyblockPlugin.log("&cSchematic " + file.getName() + " is not a valid schematic, ignoring..."));
+                    Log.warn(new StringBuilder("Schematic ").append(file.getName()).append(" is not a valid schematic, ignoring..."))
+            );
             if (schematic != null)
                 usedParser = DefaultSchematicParser.getInstance();
         }
 
         if (schematic != null && usedParser != null) {
-            SuperiorSkyblockPlugin.log("Successfully loaded schematic " + file.getName() + " (" + usedParser.getClass().getSimpleName() + ")");
+            Log.info(new StringBuilder("Successfully loaded schematic ")
+                    .append(file.getName())
+                    .append(" (").append(usedParser.getClass().getSimpleName()).append(")"));
         }
 
         return schematic;
@@ -310,12 +318,12 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             file.getParentFile().mkdirs();
             file.createNewFile();
 
-            try (DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
+            try (DataOutputStream writer = new DataOutputStream(new GZIPOutputStream(Files.newOutputStream(file.toPath())))) {
                 schematicTag.write(writer);
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            PluginDebugger.debug(ex);
+        } catch (IOException error) {
+            Log.entering("SchematicsManagerImpl", "saveIntoFile", "ENTER", name);
+            Log.error("An unexpected error occurred while saving schematic into file:", error);
         }
     }
 

@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseFilter;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.database.sql.session.QueryResult;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 
 import java.sql.ResultSet;
 import java.util.Map;
@@ -41,9 +41,9 @@ public class SQLDatabaseBridge implements DatabaseBridge {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.entering("SQLDatabaseBridge", "loadAllObjects", "ENTER", table);
+                    Log.error(error, "An unexpected error occurred while loading data from database:");
                 }
             }
         }).onFail(QueryResult.PRINT_ERROR));
@@ -144,9 +144,9 @@ public class SQLDatabaseBridge implements DatabaseBridge {
             while (resultSet.next()) {
                 try {
                     resultConsumer.accept(new ResultSetMapBridge(resultSet));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    PluginDebugger.debug(ex);
+                } catch (Exception error) {
+                    Log.entering("SQLDatabaseBridge", "loadObject", "ENTER", table, columnFilter);
+                    Log.error(error, "An unexpected error occurred while loading data from database:");
                 }
             }
         }).onFail(QueryResult.PRINT_ERROR));

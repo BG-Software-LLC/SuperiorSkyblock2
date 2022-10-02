@@ -7,10 +7,11 @@ import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.StackedBlocksDatabaseBridge;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
@@ -43,7 +44,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     public void loadData() {
         initializeDatabaseBridge();
 
-        SuperiorSkyblockPlugin.log("Starting to load stacked blocks...");
+        Log.info("Starting to load stacked blocks...");
 
         AtomicBoolean updateBlockKeys = new AtomicBoolean(false);
 
@@ -59,7 +60,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             BukkitExecutor.sync(this::updateStackedBlockKeys);
         }
 
-        SuperiorSkyblockPlugin.log("Finished stacked blocks!");
+        Log.info("Finished stacked blocks!");
     }
 
     @Override
@@ -99,14 +100,17 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
             Preconditions.checkNotNull(location.getWorld(), "location's world parameter cannot be null.");
         Preconditions.checkNotNull(blockKey, "blockKey parameter cannot be null.");
 
-        PluginDebugger.debug("Action: Set Block Amount, Block: " + blockKey + ", Amount: " + amount);
+        Log.debug(Debug.SET_BLOCK_AMOUNT, "StackedBlocksManagerImpl", "setStackedBlock",
+                location, blockKey, amount);
 
         StackedBlock stackedBlock = this.stackedBlocksContainer.createStackedBlock(location);
 
         boolean succeed = true;
 
         if (stackedBlock.getBlockKey() != null && !blockKey.equals(stackedBlock.getBlockKey())) {
-            SuperiorSkyblockPlugin.log("Found a glitched stacked-block at " + Formatters.LOCATION_FORMATTER.format(location) + " - fixing it...");
+            Log.warn(new StringBuilder("Found a glitched stacked-block at ")
+                    .append(Formatters.LOCATION_FORMATTER.format(location))
+                    .append(" - fixing it..."));
             amount = 0;
             succeed = false;
         }
@@ -265,19 +269,20 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     private void loadStackedBlock(DatabaseResult resultSet) {
         Optional<Location> location = resultSet.getString("location").map(Serializers.LOCATION_SPACED_SERIALIZER::deserialize);
         if (!location.isPresent()) {
-            SuperiorSkyblockPlugin.log("&cCannot load stacked block from null location, skipping...");
+            Log.warn("Cannot load stacked block from null location, skipping...");
             return;
         }
 
         if (location.get().getWorld() == null) {
-            SuperiorSkyblockPlugin.log(String.format("&cCannot load stacked block with invalid world %s, skipping...",
-                    ((LazyWorldLocation) location.get()).getWorldName()));
+            Log.warn(new StringBuilder("Cannot load stacked block with invalid world ")
+                    .append(((LazyWorldLocation) location.get()).getWorldName())
+                    .append(", skipping..."));
             return;
         }
 
         Optional<Integer> amount = resultSet.getInt("amount");
         if (!amount.isPresent()) {
-            SuperiorSkyblockPlugin.log("&cCannot load stacked block from null amount, skipping...");
+            Log.warn("Cannot load stacked block from null amount, skipping...");
             return;
         }
 

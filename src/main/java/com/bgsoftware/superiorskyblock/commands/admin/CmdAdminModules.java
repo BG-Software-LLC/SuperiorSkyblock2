@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.modules.PluginModule;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.ISuperiorCommand;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
@@ -86,10 +86,9 @@ public class CmdAdminModules implements ISuperiorCommand {
                             File moduleFile = new File(plugin.getDataFolder(), "modules/" + args[2] + ".jar");
                             try {
                                 pluginModule = plugin.getModules().registerModule(moduleFile);
-                            } catch (Exception ex) {
+                            } catch (Exception error) {
+                                Log.error(error, "An unexpected error occurred while loading the module ", args[2], ":");
                                 Message.MODULE_LOADED_FAILURE.send(sender, args[2]);
-                                ex.printStackTrace();
-                                PluginDebugger.debug(ex);
                                 return;
                             }
                         } else {

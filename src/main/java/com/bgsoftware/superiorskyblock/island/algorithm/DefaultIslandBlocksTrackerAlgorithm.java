@@ -7,7 +7,8 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
-import com.bgsoftware.superiorskyblock.core.debug.PluginDebugger;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.google.common.base.Preconditions;
 
 import java.math.BigDecimal;
@@ -51,8 +52,8 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (increaseAmount || hasBlockLimit || valuesMenu) {
-            PluginDebugger.debug("Action: Block Place, Island: " + island.getOwner().getName() +
-                    ", Block: " + key + ", Amount: " + amount);
+            Log.debug(Debug.BLOCK_PLACE, "DefaultIslandBlocksTrackerAlgorithm", "trackBlock",
+                    island.getOwner().getName(), key, amount);
 
             addCounts(key, amount);
 
@@ -87,7 +88,8 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean valuesMenu = plugin.getBlockValues().isValuesMenu(key);
 
         if (decreaseAmount || hasBlockLimit || valuesMenu) {
-            PluginDebugger.debug("Action: Block Break, Island: " + island.getOwner().getName() + ", Block: " + key);
+            Log.debug(Debug.BLOCK_BREAK, "DefaultIslandBlocksTrackerAlgorithm", "untrackBlock",
+                    island.getOwner().getName(), key, amount);
 
             Key valueKey = plugin.getBlockValues().getBlockKey(key);
             removeCounts(valueKey, amount);
@@ -143,7 +145,8 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
     private void addCounts(Key key, BigInteger amount) {
         Key valueKey = plugin.getBlockValues().getBlockKey(key);
 
-        PluginDebugger.debug("Action: Count Increase, Block: " + valueKey + ", Amount: " + amount);
+        Log.debug(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm", "addCounts",
+                island.getOwner().getName(), key, amount);
 
         BigInteger currentAmount = blockCounts.getRaw(valueKey, BigInteger.ZERO);
         blockCounts.put(valueKey, currentAmount.add(amount));
@@ -156,7 +159,8 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         boolean limitCount = false;
 
         if (!limitKey.equals(valueKey)) {
-            PluginDebugger.debug("Action: Count Increase, Block: " + limitKey + ", Amount: " + amount + " - Limit Key");
+            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm",
+                    "addCounts", "Limit Key", limitKey);
             currentAmount = blockCounts.getRaw(limitKey, BigInteger.ZERO);
             blockCounts.put(limitKey, currentAmount.add(amount));
             limitCount = true;
@@ -165,14 +169,16 @@ public class DefaultIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerA
         if (!globalKey.equals(valueKey) && (!limitCount || !globalKey.equals(limitKey)) &&
                 (plugin.getBlockValues().getBlockWorth(globalKey).doubleValue() != 0 ||
                         plugin.getBlockValues().getBlockLevel(globalKey).doubleValue() != 0)) {
-            PluginDebugger.debug("Action: Count Increase, Block: " + globalKey + ", Amount: " + amount + " - Global Key");
+            Log.debugResult(Debug.BLOCK_COUNT_INCREASE, "DefaultIslandBlocksTrackerAlgorithm",
+                    "addCounts", "Global Key", globalKey);
             currentAmount = blockCounts.getRaw(globalKey, BigInteger.ZERO);
             blockCounts.put(globalKey, currentAmount.add(amount));
         }
     }
 
     private void removeCounts(Key key, BigInteger amount) {
-        PluginDebugger.debug("Action: Count Decrease, Block: " + key + ", Amount: " + amount);
+        Log.debug(Debug.BLOCK_COUNT_DECREASE, "DefaultIslandBlocksTrackerAlgorithm", "removeCounts",
+                island.getOwner().getName(), key, amount);
         BigInteger currentAmount = blockCounts.getRaw(key, BigInteger.ZERO);
         if (currentAmount.compareTo(amount) <= 0)
             blockCounts.remove(key);

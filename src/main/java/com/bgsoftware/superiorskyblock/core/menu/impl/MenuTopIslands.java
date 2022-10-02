@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.menu.ISuperiorMenu;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.ChangeSortingTypeButton;
 import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.TopIslandsPagedObjectButton;
 import com.bgsoftware.superiorskyblock.core.menu.converter.MenuConverter;
@@ -99,7 +100,7 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
                 SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
 
                 if (sortingType == null) {
-                    SuperiorSkyblockPlugin.log("&c[top-islands.yml] The sorting type is invalid for the item " + itemSectionName);
+                    Log.warn(new File("top-islands.yml"), "The sorting type is invalid for the item ", itemSectionName);
                     continue;
                 }
 
