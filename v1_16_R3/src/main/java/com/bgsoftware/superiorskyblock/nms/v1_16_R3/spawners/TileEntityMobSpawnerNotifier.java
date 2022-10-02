@@ -9,9 +9,23 @@ import java.util.function.IntFunction;
 
 public class TileEntityMobSpawnerNotifier extends TileEntityMobSpawner {
 
-    private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT = new ReflectField<MobSpawnerAbstract>(
-            TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1)
-            .removeFinal();
+    private static final ReflectField<MobSpawnerAbstract> MOB_SPAWNER_ABSTRACT;
+
+    static {
+        // In Airplane, the modifiers of the field is `public final` instead of `private final`
+        // as it is in Paper and Spigot. We want to make sure we support all jars.
+        ReflectField<MobSpawnerAbstract> mobSpawnerAbstract = new ReflectField<>(
+                TileEntityMobSpawner.class, MobSpawnerAbstract.class, Modifier.PRIVATE | Modifier.FINAL, 1);
+
+        if (mobSpawnerAbstract.isValid()) {
+            MOB_SPAWNER_ABSTRACT = mobSpawnerAbstract;
+        } else {
+            MOB_SPAWNER_ABSTRACT = new ReflectField<>(TileEntityMobSpawner.class, MobSpawnerAbstract.class,
+                    Modifier.PUBLIC | Modifier.FINAL, 1);
+        }
+
+        MOB_SPAWNER_ABSTRACT.removeFinal();
+    }
 
     private final TileEntityMobSpawner tileEntityMobSpawner;
     private final IntFunction<Integer> delayChangeCallback;
