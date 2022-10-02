@@ -5,12 +5,6 @@ import com.bgsoftware.superiorskyblock.api.scripts.IScriptEngine;
 
 public class EnginesFactory {
 
-    private static final ReflectMethod<IScriptEngine> OPEN_JDK_NASHORN_ENGINE = new ReflectMethod<>(
-            "com.bgsoftware.superiorskyblock.core.engine.OpenJdkNashornEngine",
-            "getInstance",
-            new Class[0]
-    );
-
     private static IScriptEngine defaultEngine;
 
     private EnginesFactory() {
@@ -20,8 +14,13 @@ public class EnginesFactory {
     public static IScriptEngine createDefaultEngine() {
         if (defaultEngine == null) {
             try {
+                ReflectMethod<IScriptEngine> nashornEngineGetInstance = new ReflectMethod<>(
+                        "com.bgsoftware.superiorskyblock.core.engine.OpenJdkNashornEngine",
+                        "getInstance",
+                        new Class[0]
+                );
                 Class.forName("org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory");
-                defaultEngine = OPEN_JDK_NASHORN_ENGINE.invoke(null);
+                defaultEngine = nashornEngineGetInstance.invoke(null);
             } catch (Throwable error) {
                 defaultEngine = NashornEngine.getInstance();
             }
