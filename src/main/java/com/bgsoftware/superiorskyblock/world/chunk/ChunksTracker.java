@@ -78,6 +78,10 @@ public class ChunksTracker {
             return false;
 
         int chunkIndex = getChunkIndex(island, x, z);
+
+        if (chunkIndex < 0)
+            return false;
+
         BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[world.getEnvironment().ordinal()];
 
         return !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
@@ -92,6 +96,13 @@ public class ChunksTracker {
             return;
 
         int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
+
+        if (chunkIndex < 0) {
+            SuperiorSkyblockPlugin.log("Failed to mark chunk empty: " + chunkPosition + ", index: " + chunkIndex);
+            SuperiorSkyblockPlugin.log("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
+            return;
+        }
+
         BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[chunkPosition.getWorld().getEnvironment().ordinal()];
 
         boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
@@ -109,6 +120,13 @@ public class ChunksTracker {
         BitSet[] dirtyChunksWorldBitsets = dirtyChunks.computeIfAbsent(island.getUniqueId(), u -> createBitsets(island));
 
         int chunkIndex = getChunkIndex(island, chunkPosition.getX(), chunkPosition.getZ());
+
+        if (chunkIndex < 0) {
+            SuperiorSkyblockPlugin.log("Failed to mark chunk dirty: " + chunkPosition + ", index: " + chunkIndex);
+            SuperiorSkyblockPlugin.log("Minimum of Island: " + ChunkPosition.of(island.getMinimum()));
+            return;
+        }
+
         BitSet dirtyChunksBitset = dirtyChunksWorldBitsets[chunkPosition.getWorld().getEnvironment().ordinal()];
 
         boolean isMarkedDirty = !dirtyChunksBitset.isEmpty() && dirtyChunksBitset.get(chunkIndex);
