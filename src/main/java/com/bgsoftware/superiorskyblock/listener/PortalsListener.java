@@ -202,6 +202,7 @@ public class PortalsListener implements Listener {
             }
 
             Location schematicPlacementLocation = island.getCenter(destination).subtract(0, 1, 0);
+            schematicPlacementLocation.setY(plugin.getSettings().getIslandHeight());
 
             BigDecimal originalWorth = island.getRawWorth();
             BigDecimal originalLevel = island.getRawLevel();
