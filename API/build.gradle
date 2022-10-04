@@ -36,3 +36,8 @@ publishing {
     }
 
 }
+
+task generateAPIDocs(type: Javadoc) {
+    source = sourceSets.main.allJava
+    println destinationDir.getAbsoluteFile().getPath()
+}
