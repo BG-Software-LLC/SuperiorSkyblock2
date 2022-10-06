@@ -3913,18 +3913,21 @@ public class SIsland implements Island {
                     if (worldGeneratorRates != null && !upgradeLevelGeneratorRates.isEmpty())
                         worldGeneratorRates.entrySet().removeIf(entry -> entry.getValue() instanceof SyncedValue);
 
-                    upgradeLevelGeneratorRates.forEach((block, rate) -> {
+                    for (Map.Entry<Key, Value<Integer>> entry : upgradeLevelGeneratorRates.entrySet()) {
+                        Key block = entry.getKey();
+                        Value<Integer> rate = entry.getValue();
+
                         Value<Integer> currentValue = worldGeneratorRates == null ? null : worldGeneratorRates.get(block);
-                        if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) && currentValue.get() < rate.get())) {
+                        if (currentValue == null || ((overrideCustom || currentValue instanceof SyncedValue) &&
+                                currentValue.get() < rate.get())) {
                             if (worldGeneratorRates == null) {
-                                KeyMap<Value<Integer>> newWorldGeneratorRates = KeyMapImpl.createConcurrentHashMap();
-                                cobbleGeneratorValues.put(environment, newWorldGeneratorRates);
-                                newWorldGeneratorRates.put(block, rate);
-                            } else {
-                                worldGeneratorRates.put(block, rate);
+                                worldGeneratorRates = KeyMapImpl.createConcurrentHashMap();
+                                cobbleGeneratorValues.put(environment, worldGeneratorRates);
                             }
+
+                            worldGeneratorRates.put(block, rate);
                         }
-                    });
+                    }
                 }
             });
         }
