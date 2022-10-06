@@ -210,13 +210,13 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
     private final Synchronized<IslandChest[]> islandChests = Synchronized.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
-    private volatile String discord = "None";
-    private volatile String paypal = "None";
-    private volatile boolean isLocked = false;
-    private volatile boolean isTopIslandsIgnored = false;
+    private volatile String discord;
+    private volatile String paypal;
+    private volatile boolean isLocked;
+    private volatile boolean isTopIslandsIgnored;
     private volatile String islandName;
     private volatile String islandRawName;
-    private volatile String description = "";
+    private volatile String description;
     private volatile Biome biome = null;
     private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
@@ -243,6 +243,7 @@ public class SIsland implements Island {
         this.isLocked = builder.isLocked;
         this.isTopIslandsIgnored = builder.isIgnored;
         this.description = builder.description;
+        this.generatedSchematics.set(builder.generatedSchematicsMask);
         this.unlockedWorlds.set(builder.unlockedWorldsMask);
         this.lastTimeUpdate = builder.lastTimeUpdated;
         this.islandHomes.write(islandHomes -> islandHomes.putAll(builder.islandHomes));
@@ -286,10 +287,9 @@ public class SIsland implements Island {
         this.blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
         this.entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
 
-        if (builder.generatedSchematicsMask == 0) {
+        // We make sure the default world is always marked as generated.
+        if (!wasSchematicGenerated(plugin.getSettings().getWorlds().getDefaultWorld())) {
             setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
-        } else {
-            this.generatedSchematics.set(builder.generatedSchematicsMask);
         }
 
         builder.dirtyChunks.forEach(chunkPosition -> ChunksTracker.markDirty(this, chunkPosition, false));
