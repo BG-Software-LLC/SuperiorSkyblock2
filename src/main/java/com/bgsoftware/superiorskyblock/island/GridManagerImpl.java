@@ -235,7 +235,6 @@ public class GridManagerImpl extends Manager implements GridManager {
                         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                     }
 
-
                     IslandsDatabaseBridge.insertIsland(island);
 
                     island.setIslandHome(schematic.adjustRotation(islandLocation));

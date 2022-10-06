@@ -218,8 +218,7 @@ public class SIsland implements Island {
     private volatile String islandRawName;
     private volatile String description = "";
     private volatile Biome biome = null;
-    @Nullable
-    private Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
+    private final Synchronized<CompletableFuture<Biome>> biomeGetterTask = Synchronized.of(null);
     private final AtomicInteger generatedSchematics = new AtomicInteger(0);
     private final AtomicInteger unlockedWorlds = new AtomicInteger(0);
 
