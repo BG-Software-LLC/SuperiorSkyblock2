@@ -221,17 +221,20 @@ public class GridManagerImpl extends Manager implements GridManager {
                     this.islandsContainer.addIsland(island);
                     setLastIsland(new SBlockPosition(islandLocation));
 
-                    island.setBiome(biome);
+                    try {
+                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
 
-                    if (offset) {
-                        try {
-                            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+                        island.setBiome(biome);
+                        island.setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
+
+                        if (offset) {
                             island.setBonusWorth(island.getRawWorth().negate());
                             island.setBonusLevel(island.getRawLevel().negate());
-                        } finally {
-                            island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                         }
+                    } finally {
+                        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                     }
+
 
                     IslandsDatabaseBridge.insertIsland(island);
 

@@ -91,7 +91,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public Value<Double> mobDrops = Value.syncedFixed(-1D);
     public Value<BigDecimal> bankLimit = Value.syncedFixed(SYNCED_BANK_LIMIT_VALUE);
     public BigDecimal balance = BigDecimal.ZERO;
-    public long lastInterestTime = 0L;
+    public long lastInterestTime = System.currentTimeMillis() / 1000;
     public List<WarpRecord> warps = new LinkedList<>();
     public List<WarpCategoryRecord> warpCategories = new LinkedList<>();
     public List<BankTransaction> bankTransactions = new LinkedList<>();

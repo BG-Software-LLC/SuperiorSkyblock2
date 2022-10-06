@@ -244,7 +244,6 @@ public class SIsland implements Island {
         this.isLocked = builder.isLocked;
         this.isTopIslandsIgnored = builder.isIgnored;
         this.description = builder.description;
-        this.generatedSchematics.set(builder.generatedSchematicsMask);
         this.unlockedWorlds.set(builder.unlockedWorldsMask);
         this.lastTimeUpdate = builder.lastTimeUpdated;
         this.islandHomes.write(islandHomes -> islandHomes.putAll(builder.islandHomes));
@@ -288,15 +287,23 @@ public class SIsland implements Island {
         this.blocksTracker = plugin.getFactory().createIslandBlocksTrackerAlgorithm(this);
         this.entitiesTracker = plugin.getFactory().createIslandEntitiesTrackerAlgorithm(this);
 
+        if (builder.generatedSchematicsMask == 0) {
+            setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
+        } else {
+            this.generatedSchematics.set(builder.generatedSchematicsMask);
+        }
+
         builder.dirtyChunks.forEach(chunkPosition -> ChunksTracker.markDirty(this, chunkPosition, false));
         if (!builder.blockCounts.isEmpty()) {
             BukkitExecutor.sync(() -> builder.blockCounts.forEach((block, count) ->
                     handleBlockPlace(block, count, false, false)
             ), 20L);
         }
+
         builder.warpCategories.forEach(warpCategoryRecord -> {
             loadWarpCategory(warpCategoryRecord.name, warpCategoryRecord.slot, warpCategoryRecord.icon);
         });
+
         builder.warps.forEach(warpRecord -> {
             WarpCategory warpCategory = null;
 
