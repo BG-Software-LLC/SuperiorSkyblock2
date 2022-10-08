@@ -3965,7 +3965,7 @@ public class SIsland implements Island {
 
     private void forEachIslandMember(List<UUID> ignoredMembers, boolean onlyOnline, Consumer<SuperiorPlayer> islandMemberConsumer) {
         for (SuperiorPlayer islandMember : getIslandMembers(true)) {
-            if (!ignoredMembers.contains(islandMember) && (!onlyOnline || islandMember.isOnline())) {
+            if (!ignoredMembers.contains(islandMember.getUniqueId()) && (!onlyOnline || islandMember.isOnline())) {
                 islandMemberConsumer.accept(islandMember);
             }
         }
