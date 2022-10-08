@@ -202,8 +202,7 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
                 }
 
             } catch (Exception error) {
-                Log.error(new StringBuilder("An unexpected error occurred while loading an external command ")
-                        .append(file.getName()).append(":"), error);
+                Log.error(error, "An unexpected error occurred while loading an external command ", file.getName(), ":");
             }
         }
 

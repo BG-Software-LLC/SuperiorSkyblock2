@@ -43,7 +43,6 @@ public class Log {
         logInternal(Level.SEVERE, file, first, parts);
     }
 
-
     public static void error(Throwable error, File file, Object first, Object... parts) {
         error(file, first, parts);
         error.printStackTrace();

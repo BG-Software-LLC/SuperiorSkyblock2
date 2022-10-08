@@ -16,7 +16,6 @@ import com.bgsoftware.superiorskyblock.commands.CommandsManagerImpl;
 import com.bgsoftware.superiorskyblock.commands.admin.AdminCommandsMap;
 import com.bgsoftware.superiorskyblock.commands.player.PlayerCommandsMap;
 import com.bgsoftware.superiorskyblock.config.SettingsManagerImpl;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.database.DataManager;
@@ -29,6 +28,7 @@ import com.bgsoftware.superiorskyblock.core.io.JarFiles;
 import com.bgsoftware.superiorskyblock.core.itemstack.GlowEnchantment;
 import com.bgsoftware.superiorskyblock.core.itemstack.ItemSkulls;
 import com.bgsoftware.superiorskyblock.core.key.KeysManagerImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.menu.MenusManagerImpl;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.StackedBlocksManagerImpl;
@@ -244,7 +244,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             } catch (RuntimeException ex) {
                 shouldEnable = false;
                 ManagerLoadException handlerError = new ManagerLoadException(ex.getMessage(), ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
-                Log.error("An error occurred while preparing worlds:", handlerError);
+                Log.error(handlerError, "An error occurred while preparing worlds:");
                 Bukkit.shutdown();
                 return;
             }
@@ -263,7 +263,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 shouldEnable = false;
                 ManagerLoadException handlerError = new ManagerLoadException("Cannot load plugin due to a missing event: " + ex.getMessage() + " - contact @Ome_R!",
                         ManagerLoadException.ErrorLevel.CONTINUE);
-                Log.error("An error occurred while registering listeners:", handlerError);
+                Log.error(handlerError, "An error occurred while registering listeners:");
                 Bukkit.shutdown();
                 return;
             }
@@ -307,7 +307,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
 
         } catch (Throwable error) {
             shouldEnable = false;
-            Log.error("An unexpected error occurred while enabling the plugin:", error);
+            Log.error(error, "An unexpected error occurred while enabling the plugin:");
             Bukkit.shutdown();
         }
     }
@@ -348,7 +348,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 });
             }
         } catch (Exception error) {
-            Log.error("An unexpected error occurred while disabling the plugin:", error);
+            Log.error(error, "An unexpected error occurred while disabling the plugin:");
         } finally {
             Log.info("Shutting down calculation task...");
             CalcTask.cancelTask();
@@ -403,7 +403,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             }
 
             if (nmsPackageVersion == null) {
-                Log.error("Data version: " + dataVersion);
+                Log.error("Data version: ", dataVersion);
             }
         }
 
@@ -418,7 +418,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                 nmsWorld = loadNMSClass("NMSWorldImpl", nmsPackageVersion);
                 return true;
             } catch (Exception error) {
-                Log.error("An unexpected error occurred while loading nms support:", error);
+                Log.error(error, "An unexpected error occurred while loading nms support:");
             }
         }
 
@@ -485,7 +485,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
                     }
                 }
             } catch (Exception error) {
-                Log.error("An unexpected error occurred while loading the generator:", error);
+                Log.error(error, "An unexpected error occurred while loading the generator:");
             }
         }
     }

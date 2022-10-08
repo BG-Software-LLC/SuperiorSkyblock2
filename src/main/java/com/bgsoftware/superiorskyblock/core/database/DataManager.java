@@ -86,7 +86,7 @@ public class DataManager extends Manager {
             GridDatabaseBridge.deleteGrid(plugin.getGrid());
             GridDatabaseBridge.insertGrid(plugin.getGrid());
         } catch (Exception error) {
-            Log.error("An unexpected error occurred while saving database:", error);
+            Log.error(error, "An unexpected error occurred while saving database:");
         }
     }
 

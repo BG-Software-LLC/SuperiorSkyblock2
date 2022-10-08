@@ -272,7 +272,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             onSchematicParseError.accept(error);
         } catch (Exception error) {
             Log.entering("SchematicsManagerImpl", "parseSchematic", "ENTER", file.getName(), schemName);
-            Log.error("An unexpected error occurred while loading schematic:", error);
+            Log.error(error, "An unexpected error occurred while loading schematic:");
         }
 
         return null;
@@ -323,7 +323,7 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
             }
         } catch (IOException error) {
             Log.entering("SchematicsManagerImpl", "saveIntoFile", "ENTER", name);
-            Log.error("An unexpected error occurred while saving schematic into file:", error);
+            Log.error(error, "An unexpected error occurred while saving schematic into file:");
         }
     }
 

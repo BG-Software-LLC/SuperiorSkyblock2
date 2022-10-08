@@ -285,7 +285,7 @@ public class BlockValuesManagerImpl extends Manager implements BlockValuesManage
             return fastBigDecimalFromString(evaluated.toString());
         } catch (ScriptException error) {
             Log.entering("BlockValuesManagerImpl", "convertValueToLevel", "ENTER", value);
-            Log.error("An unexpected error occurred while converting level from worth:", error);
+            Log.error(error, "An unexpected error occurred while converting level from worth:");
             return value;
         }
     }

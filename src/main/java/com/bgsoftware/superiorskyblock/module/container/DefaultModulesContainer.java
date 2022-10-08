@@ -39,8 +39,8 @@ public class DefaultModulesContainer implements ModulesContainer {
         try {
             pluginModule.initModule(plugin, moduleFolder, dataFolder);
         } catch (Throwable error) {
-            Log.error(new StringBuilder("An unexpected error occurred while initializing the module ").append(pluginModule.getName()).append("."));
-            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
+            Log.error("An unexpected error occurred while initializing the module ", pluginModule.getName(), ".");
+            Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
             return;
         }
 

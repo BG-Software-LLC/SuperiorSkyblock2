@@ -14,9 +14,7 @@ public enum Debug {
     SET_LAST_ISLAND,
     SET_BLOCK_AMOUNT,
     GET_WORTH,
-
     GET_LEVEL,
-
     SAVE_SCHEMATIC,
     REWARD_MISSION,
     EXECUTE_COMMAND,

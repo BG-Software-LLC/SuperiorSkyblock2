@@ -177,7 +177,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             } catch (ScriptException error) {
                 Log.entering("MissionsManagerImpl", "canPassAllChecks", "ENTER",
                         superiorPlayer.getName(), mission.getName());
-                Log.error("An unexpected error occurred while checking mission requirements:", error);
+                Log.error(error, "An unexpected error occurred while checking mission requirements:");
                 return false;
             }
         });
@@ -339,8 +339,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
             try {
                 mission.saveProgress(data);
             } catch (Throwable error) {
-                Log.error(new StringBuilder("An unexpected error while saving mission data for ")
-                        .append(mission.getName()).append(":"), error);
+                Log.error(error, "An unexpected error while saving mission data for ", mission.getName(), ":");
                 continue;
             }
 
@@ -356,8 +355,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     data.save(dataFile);
                 }
             } catch (IOException error) {
-                Log.error(new StringBuilder("An unexpected error occurred while saving missions data to file ")
-                        .append(dataFile.getName()).append(":"), error);
+                Log.error(error, "An unexpected error occurred while saving missions data to file ", dataFile.getName(), ":");
             }
         }
     }
@@ -390,8 +388,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                         mission.loadProgress(YamlConfiguration.loadConfiguration(dataFile));
                     }
                 } catch (Throwable error) {
-                    Log.error(new StringBuilder("An unexpected error occurred while loading mission data for ")
-                            .append(mission.getName()).append(":"), error);
+                    Log.error(error, "An unexpected error occurred while loading mission data for ", mission.getName(), ":");
                 }
             }
         }
@@ -468,7 +465,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
 
             Log.info("Registered mission " + missionName);
         } catch (Exception error) {
-            Log.error(new StringBuilder("An unexpected error occurred while registering mission ").append(missionName).append(":"), error);
+            Log.error(error, "An unexpected error occurred while registering mission ", missionName, ":");
         }
 
         return newMission;
@@ -543,8 +540,7 @@ public class MissionsManagerImpl extends Manager implements MissionsManager {
                     }
                     data.save(dataFile);
                 } catch (IOException error) {
-                    Log.error(new StringBuilder("An unexpected error occurred while saving old mission file ")
-                            .append(mission.getName()).append(":"), error);
+                    Log.error(error, "An unexpected error occurred while saving old mission file ", mission.getName(), ":");
                 }
             }
         }

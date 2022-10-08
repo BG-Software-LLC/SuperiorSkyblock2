@@ -181,7 +181,7 @@ public class GridManagerImpl extends Manager implements GridManager {
         } catch (Throwable error) {
             Log.entering("GridManagerImpl", "createIsland", "ENTER", builder.owner.getName(),
                     builder.islandType, biome, offset);
-            Log.error("An unexepcted error occurred while creating an island:", error);
+            Log.error(error, "An unexpected error occurred while creating an island:");
             builder.owner.setIsland(null);
             Message.CREATE_ISLAND_FAILURE.send(builder.owner);
         }
@@ -271,7 +271,7 @@ public class GridManagerImpl extends Manager implements GridManager {
 
             Log.entering("GridManagerImpl", "createIslandInternalAsync", builder.owner.getName(),
                     builder.bonusWorth, builder.bonusLevel, builder.islandName, offset, biome, schematic.getName());
-            Log.error("An unexpected error occurred while creating an island:", error);
+            Log.error(error, "An unexpected error occurred while creating an island:");
 
             builder.owner.setIsland(null);
 
@@ -724,7 +724,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                 plugin.getSettings().updateValue("worlds.normal-world", world);
             }
         } catch (IOException error) {
-            Log.error("An unexpected error occurred while loading grid:", error);
+            Log.error(error, "An unexpected error occurred while loading grid:");
             Bukkit.shutdown();
         }
     }

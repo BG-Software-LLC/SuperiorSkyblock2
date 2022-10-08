@@ -66,7 +66,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
             cfg.syncWithConfig(file, plugin.getResource("config.yml"), "config.yml",
                     "ladder", "commands-cooldown", "containers", "event-commands", "command-aliases", "preview-islands");
         } catch (Exception error) {
-            Log.error("An unexpected error occurred while loading config file:", error);
+            Log.error(error, file, "An unexpected error occurred while loading config file:");
         }
 
         this.container = new SettingsContainer(plugin, cfg);
@@ -681,7 +681,7 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
         try {
             commentedConfig.save(file);
         } catch (Exception error) {
-            Log.error("An unexpected error occurred while saving new interactables file:", error);
+            Log.error(error, file, "An unexpected error occurred while saving new interactables file:");
         }
 
 

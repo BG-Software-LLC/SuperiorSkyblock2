@@ -554,7 +554,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
                     setChunksProvider(chunksProvider);
                     Log.info("Detected PaperSpigot - Using async chunk-loading support with PaperMC.");
                 } catch (Exception error) {
-                    Log.error("Detected PaperSpigot but failed to load async chunk-loading support due to an unexpected error:", error);
+                    Log.error(error, "Detected PaperSpigot but failed to load async chunk-loading support due to an unexpected error:");
                 }
             });
         }
@@ -566,8 +566,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             Method registerMethod = clazz.getMethod("register", SuperiorSkyblockPlugin.class);
             registerMethod.invoke(null, plugin);
         } catch (Throwable error) {
-            Log.error(new StringBuilder("An unexpected error occurred while registering hook ")
-                    .append(className).append(":"), error);
+            Log.error(error, "An unexpected error occurred while registering hook ", className, ":");
         }
     }
 
@@ -595,7 +594,7 @@ public class ProvidersManagerImpl extends Manager implements ProvidersManager {
             return Optional.empty();
         } catch (Exception error) {
             Log.entering("ProvidersManagerImpl", "createInstance", "ENTER", className);
-            Log.error("An unexpected error occurred while creating hook instance:", error);
+            Log.error(error, "An unexpected error occurred while creating hook instance:");
             return Optional.empty();
         }
     }

@@ -89,8 +89,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         try {
             pluginModule.onDisable(plugin);
         } catch (Throwable error) {
-            Log.error(new StringBuilder("An unexpected error occurred while disabling the module ").append(pluginModule.getName()).append("."));
-            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
+            Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
+            Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
         }
 
         this.modulesContainer.unregisterModule(pluginModule);
@@ -119,15 +119,15 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         try {
             pluginModule.onEnable(plugin);
         } catch (Exception error) {
-            Log.error(new StringBuilder("An unexpected error occurred while enabling the module ").append(pluginModule.getName()).append("."));
-            Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
+            Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
+            Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
 
             try {
                 // Unregistering the module.
                 unregisterModule(pluginModule);
             } catch (Throwable error2) {
-                Log.error(new StringBuilder("An unexpected error occurred while disabling the module ").append(pluginModule.getName()).append("."));
-                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error2);
+                Log.error("An unexpected error occurred while disabling the module ", pluginModule.getName(), ".");
+                Log.error(error2, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
             }
 
             return;
@@ -165,8 +165,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             try {
                 pluginModule.onReload(plugin);
             } catch (Throwable error) {
-                Log.error(new StringBuilder("An unexpected error occurred while reloading the module ").append(pluginModule.getName()).append("."));
-                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
+                Log.error("An unexpected error occurred while reloading the module ", pluginModule.getName(), ".");
+                Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
             }
         });
     }
@@ -176,8 +176,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
             try {
                 pluginModule.loadData(plugin);
             } catch (Throwable error) {
-                Log.error(new StringBuilder("An unexpected error occurred while loading data for the module ").append(pluginModule.getName()).append("."));
-                Log.error(new StringBuilder("Contact ").append(pluginModule.getAuthor()).append(" regarding this, this has nothing to do with the plugin."), error);
+                Log.error("An unexpected error occurred while loading data for the module ", pluginModule.getName(), ".");
+                Log.error(error, "Contact ", pluginModule.getAuthor(), " regarding this, this has nothing to do with the plugin.");
             }
         });
     }
@@ -191,8 +191,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
                     try {
                         registerModule(file);
                     } catch (Exception error) {
-                        Log.error(new StringBuilder("An unexpected error occurred while registering module ")
-                                .append(file.getName()).append(":"), error);
+                        Log.error(error, "An unexpected error occurred while registering module ", file.getName(), ":");
                     }
                 }
             }
