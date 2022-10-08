@@ -207,7 +207,7 @@ public class SIsland implements Island {
     private final AtomicReference<BigDecimal> bonusWorth = new AtomicReference<>(BigDecimal.ZERO);
     private final AtomicReference<BigDecimal> bonusLevel = new AtomicReference<>(BigDecimal.ZERO);
     private final Map<Mission<?>, Integer> completedMissions = new ConcurrentHashMap<>();
-    private final Synchronized<IslandChest[]> islandChests = Synchronized.of(new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()]);
+    private final Synchronized<IslandChest[]> islandChests = Synchronized.of(createDefaultIslandChests());
     private volatile String discord;
     private volatile String paypal;
     private volatile boolean isLocked;
@@ -3640,13 +3640,15 @@ public class SIsland implements Island {
      *  Private methods
      */
 
-    private void assignIslandChest() {
-        islandChests.write(islandChests -> {
-            for (int i = 0; i < islandChests.length; i++) {
+    private IslandChest[] createDefaultIslandChests() {
+        IslandChest[] islandChests = new IslandChest[plugin.getSettings().getIslandChests().getDefaultPages()];
+        for (int i = 0; i < islandChests.length; i++) {
+            if (islandChests[i] == null) {
                 islandChests[i] = new SIslandChest(this, i);
                 islandChests[i].setRows(plugin.getSettings().getIslandChests().getDefaultSize());
             }
-        });
+        }
+        return islandChests;
     }
 
     private void startBankInterest() {
