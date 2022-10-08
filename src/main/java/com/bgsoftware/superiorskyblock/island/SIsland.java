@@ -2750,8 +2750,7 @@ public class SIsland implements Island {
     @Override
     public IslandWarp getWarp(Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
-        Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        return warpsByLocation.get(blockLocation);
+        return warpsByLocation.get(new LocationKey(location));
     }
 
     @Override
@@ -2787,8 +2786,7 @@ public class SIsland implements Island {
     public void deleteWarp(@Nullable SuperiorPlayer superiorPlayer, Location location) {
         Preconditions.checkNotNull(location, "location parameter cannot be null.");
 
-        Location blockLocation = new Location(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        IslandWarp islandWarp = warpsByLocation.remove(blockLocation);
+        IslandWarp islandWarp = warpsByLocation.remove(new LocationKey(location));
         if (islandWarp != null) {
             deleteWarp(islandWarp.getName());
             if (superiorPlayer != null)
@@ -2806,7 +2804,7 @@ public class SIsland implements Island {
         WarpCategory warpCategory = islandWarp == null ? null : islandWarp.getCategory();
 
         if (islandWarp != null) {
-            warpsByLocation.remove(islandWarp.getLocation());
+            warpsByLocation.remove(new LocationKey(islandWarp.getLocation()));
             warpCategory.getWarps().remove(islandWarp);
 
             IslandsDatabaseBridge.removeWarp(this, islandWarp);
