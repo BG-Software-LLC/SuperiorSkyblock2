@@ -33,7 +33,6 @@ import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
 import com.bgsoftware.superiorskyblock.core.LocationKey;
 import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
-import com.bgsoftware.superiorskyblock.core.collections.CompletableFutureList;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
 import com.bgsoftware.superiorskyblock.core.events.EventsBus;
@@ -122,7 +121,6 @@ import java.util.stream.Collectors;
 public class SIsland implements Island {
 
     private static final UUID CONSOLE_UUID = new UUID(0, 0);
-    private static final BigInteger MAX_INT = BigInteger.valueOf(Integer.MAX_VALUE);
     private static final BigDecimal SYNCED_BANK_LIMIT_VALUE = BigDecimal.valueOf(-2);
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
     private static int blocksUpdateCounter = 0;
@@ -155,8 +153,8 @@ public class SIsland implements Island {
     /*
      * Island Time-Trackers
      */
-    private volatile long lastTimeUpdate = -1;
-    private volatile long lastInterest = -1L;
+    private volatile long lastTimeUpdate;
+    private volatile long lastInterest;
     private volatile long lastUpgradeTime = -1L;
     private volatile boolean giveInterestFailed = false;
 
@@ -643,7 +641,7 @@ public class SIsland implements Island {
 
     @Override
     public int getCoopLimit() {
-        return this.coopLimit.readAndGet(coopLimit -> coopLimit.get());
+        return this.coopLimit.readAndGet(Value::get);
     }
 
     @Override
@@ -774,7 +772,7 @@ public class SIsland implements Island {
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
-        return islandHomes.readAndGet(islandHomes -> Collections.unmodifiableMap(islandHomes));
+        return islandHomes.readAndGet(Collections::unmodifiableMap);
     }
 
     @Override
@@ -1449,7 +1447,7 @@ public class SIsland implements Island {
         if (plugin.getSettings().isBuildOutsideIsland())
             return (int) Math.round(plugin.getSettings().getMaxIslandSize() * 1.5);
 
-        return this.islandSize.readAndGet(islandSize -> islandSize.get());
+        return this.islandSize.readAndGet(Value::get);
     }
 
     @Override
@@ -1721,7 +1719,7 @@ public class SIsland implements Island {
 
     @Override
     public BigDecimal getBankLimit() {
-        return this.bankLimit.readAndGet(bankLimit -> bankLimit.get());
+        return this.bankLimit.readAndGet(Value::get);
     }
 
     @Override
@@ -1970,9 +1968,6 @@ public class SIsland implements Island {
                 plugin.getGrid().getIslandsContainer().notifyChange(SortingTypes.BY_LEVEL, this);
         }
 
-        boolean hasBlockLimit = blockLimits.containsKey(key),
-                valuesMenu = plugin.getBlockValues().isValuesMenu(key);
-
         updateLastTime();
 
         if (save)
@@ -2167,7 +2162,7 @@ public class SIsland implements Island {
 
     @Override
     public double getCropGrowthMultiplier() {
-        return this.cropGrowth.readAndGet(cropGrowth -> cropGrowth.get());
+        return this.cropGrowth.readAndGet(Value::get);
     }
 
     @Override
@@ -2196,7 +2191,7 @@ public class SIsland implements Island {
 
     @Override
     public double getSpawnerRatesMultiplier() {
-        return this.spawnerRates.readAndGet(spawnerRates -> spawnerRates.get());
+        return this.spawnerRates.readAndGet(Value::get);
     }
 
     @Override
@@ -2216,7 +2211,7 @@ public class SIsland implements Island {
 
     @Override
     public double getMobDropsMultiplier() {
-        return this.mobDrops.readAndGet(mobDrops -> mobDrops.get());
+        return this.mobDrops.readAndGet(Value::get);
     }
 
     @Override
@@ -2397,7 +2392,6 @@ public class SIsland implements Island {
     public CompletableFuture<Boolean> hasReachedEntityLimit(Key key, int amount) {
         Preconditions.checkNotNull(key, "key parameter cannot be null.");
 
-        CompletableFutureList<Chunk> chunks = new CompletableFutureList<>();
         int entityLimit = getEntityLimit(key);
 
         if (entityLimit < 0)
@@ -2413,7 +2407,7 @@ public class SIsland implements Island {
 
     @Override
     public int getTeamLimit() {
-        return this.teamLimit.readAndGet(teamLimit -> teamLimit.get());
+        return this.teamLimit.readAndGet(Value::get);
     }
 
     @Override
@@ -2433,7 +2427,7 @@ public class SIsland implements Island {
 
     @Override
     public int getWarpsLimit() {
-        return this.warpsLimit.readAndGet(warpsLimit -> warpsLimit.get());
+        return this.warpsLimit.readAndGet(Value::get);
     }
 
     @Override
