@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.nms.NMSChunks;
 import com.bgsoftware.superiorskyblock.nms.v117.chunks.CropsBlockEntity;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -129,7 +128,8 @@ public class NMSChunksImpl implements NMSChunks {
         List<ChunkPos> chunksCoords = new SequentialListBuilder<ChunkPos>()
                 .build(chunkPositions, chunkPosition -> new ChunkPos(chunkPosition.getX(), chunkPosition.getZ()));
 
-        chunkPositions.forEach(chunkPosition -> ChunksTracker.markEmpty(island, chunkPosition, false));
+        chunkPositions.forEach(chunkPosition -> island.markChunkEmpty(chunkPosition.getWorld(),
+                chunkPosition.getX(), chunkPosition.getZ(), false));
 
         ServerLevel serverLevel = ((CraftWorld) chunkPositions.get(0).getWorld()).getHandle();
 

@@ -22,7 +22,6 @@ import com.bgsoftware.superiorskyblock.tag.ListTag;
 import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -31,10 +30,8 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -47,7 +44,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     private final List<SchematicBlockData> blocks;
     private final List<SchematicEntity> entities;
 
-    private Set<ChunkPosition> loadedChunks = null;
+    private List<ChunkPosition> affectedChunks = null;
 
     public SuperiorSchematic(String name, CompoundTag compoundTag) {
         super(name);
@@ -158,7 +155,7 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
                         plugin.getNMSChunks().startTickingChunk(island, chunk, false);
                     }
 
-                    ChunksTracker.markDirty(island, chunk, false);
+                    island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
                             "Loaded Chunk", chunkPosition);
@@ -194,9 +191,9 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
 
                     plugin.getEventsBus().callIslandSchematicPasteEvent(island, name, location);
 
-                    this.loadedChunks = new HashSet<>(affectedChunks);
+                    this.affectedChunks = new LinkedList<>(affectedChunks);
                     callback.run();
-                    this.loadedChunks = null;
+                    this.affectedChunks = null;
                 } catch (Throwable error2) {
                     Log.debugResult(Debug.PASTE_SCHEMATIC, "SuperiorSchematic", "pasteSchematic",
                             "Failed Finishing Placement", error2);
@@ -215,8 +212,8 @@ public class SuperiorSchematic extends BaseSchematic implements Schematic {
     }
 
     @Override
-    public Set<ChunkPosition> getLoadedChunks() {
-        return loadedChunks == null ? Collections.emptySet() : Collections.unmodifiableSet(loadedChunks);
+    public List<ChunkPosition> getAffectedChunks() {
+        return affectedChunks == null ? Collections.emptyList() : Collections.unmodifiableList(affectedChunks);
     }
 
     private void readBlock(SchematicBlockData block) {

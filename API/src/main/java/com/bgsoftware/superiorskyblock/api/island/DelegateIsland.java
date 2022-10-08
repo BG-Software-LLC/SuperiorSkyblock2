@@ -363,6 +363,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isInside(World world, int chunkX, int chunkZ) {
+        return this.handle.isInside(world, chunkX, chunkZ);
+    }
+
+    @Override
     public boolean isInsideRange(Location location) {
         return this.handle.isInsideRange(location);
     }
@@ -771,6 +776,21 @@ public class DelegateIsland implements Island {
     @Override
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         this.handle.handleBlockBreak(key, amount, save);
+    }
+
+    @Override
+    public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
+        return this.handle.isChunkDirty(world, chunkX, chunkZ);
+    }
+
+    @Override
+    public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
+        this.handle.markChunkDirty(world, chunkX, chunkZ, save);
+    }
+
+    @Override
+    public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
+        this.handle.markChunkEmpty(world, chunkX, chunkZ, save);
     }
 
     @Override

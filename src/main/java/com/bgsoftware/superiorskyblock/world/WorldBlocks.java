@@ -4,7 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
+import org.bukkit.Bukkit;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -55,7 +55,8 @@ public class WorldBlocks {
             }
         }
 
-        ChunksTracker.markEmpty(island, chunkSnapshot, true);
+        island.markChunkEmpty(Bukkit.getWorld(chunkSnapshot.getWorldName()),
+                chunkSnapshot.getX(), chunkSnapshot.getZ(), true);
 
         return true;
     }

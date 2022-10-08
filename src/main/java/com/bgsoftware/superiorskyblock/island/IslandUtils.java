@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class IslandUtils {
@@ -69,7 +67,7 @@ public class IslandUtils {
 
         for (int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++) {
             for (int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++) {
-                if (!noEmptyChunks || ChunksTracker.isMarkedDirty(island, world, x, z)) {
+                if (!noEmptyChunks || island.isChunkDirty(world, x, z)) {
                     chunkCoords.add(ChunkPosition.of(world, x, z));
                 }
             }
@@ -111,20 +109,6 @@ public class IslandUtils {
         }
 
         return chunkCoords;
-    }
-
-    public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,
-                                                                   World world,
-                                                                   boolean onlyProtected,
-                                                                   boolean noEmptyChunks,
-                                                                   ChunkLoadReason chunkLoadReason,
-                                                                   BiConsumer<Chunk, Throwable> whenComplete) {
-        return new SequentialListBuilder<CompletableFuture<Chunk>>()
-                .mutable()
-                .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition -> {
-                    CompletableFuture<Chunk> completableFuture = ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, null);
-                    return whenComplete == null ? completableFuture : completableFuture.whenComplete(whenComplete);
-                });
     }
 
     public static List<CompletableFuture<Chunk>> getAllChunksAsync(Island island,

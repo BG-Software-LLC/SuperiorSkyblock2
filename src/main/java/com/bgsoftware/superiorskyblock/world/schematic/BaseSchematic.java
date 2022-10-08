@@ -8,8 +8,8 @@ import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class BaseSchematic implements Schematic {
@@ -34,6 +34,6 @@ public abstract class BaseSchematic implements Schematic {
         return Collections.unmodifiableMap(cachedCounts);
     }
 
-    public abstract Set<ChunkPosition> getLoadedChunks();
+    public abstract List<ChunkPosition> getAffectedChunks();
 
 }

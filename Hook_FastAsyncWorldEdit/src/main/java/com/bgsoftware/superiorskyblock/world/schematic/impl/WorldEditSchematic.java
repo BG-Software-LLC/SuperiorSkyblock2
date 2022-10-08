@@ -21,7 +21,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class WorldEditSchematic extends BaseSchematic implements Schematic {
@@ -102,8 +102,8 @@ public class WorldEditSchematic extends BaseSchematic implements Schematic {
     }
 
     @Override
-    public Set<ChunkPosition> getLoadedChunks() {
-        return Collections.emptySet();
+    public List<ChunkPosition> getAffectedChunks() {
+        return Collections.emptyList();
     }
 
     private void readBlocks() {

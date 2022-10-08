@@ -32,7 +32,6 @@ import com.bgsoftware.superiorskyblock.island.preview.IslandPreviews;
 import com.bgsoftware.superiorskyblock.island.preview.SIslandPreview;
 import com.bgsoftware.superiorskyblock.island.purge.IslandsPurger;
 import com.bgsoftware.superiorskyblock.player.chat.PlayerChat;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.bgsoftware.superiorskyblock.world.schematic.BaseSchematic;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -216,7 +215,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                     Location islandLocation = islandCreationResult.getIslandLocation();
                     boolean teleportPlayer = islandCreationResult.shouldTeleportPlayer();
 
-                    Set<ChunkPosition> loadedChunks = schematic instanceof BaseSchematic ? ((BaseSchematic) schematic).getLoadedChunks() : null;
+                    List<ChunkPosition> affectedChunks = schematic instanceof BaseSchematic ?
+                            ((BaseSchematic) schematic).getAffectedChunks() : null;
 
                     this.islandsContainer.addIsland(island);
                     setLastIsland(new SBlockPosition(islandLocation));
@@ -235,7 +235,7 @@ public class GridManagerImpl extends Manager implements GridManager {
                         island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.SAVE_DATA);
                     }
 
-                    IslandsDatabaseBridge.insertIsland(island);
+                    IslandsDatabaseBridge.insertIsland(island, affectedChunks);
 
                     island.setIslandHome(schematic.adjustRotation(islandLocation));
 
@@ -252,8 +252,8 @@ public class GridManagerImpl extends Manager implements GridManager {
                                         islandLocation), System.currentTimeMillis() - startTime);
 
                                 if (result) {
-                                    if (loadedChunks != null)
-                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, loadedChunks), 10L);
+                                    if (affectedChunks != null)
+                                        BukkitExecutor.sync(() -> IslandUtils.resetChunksExcludedFromList(island, affectedChunks), 10L);
                                     if (plugin.getSettings().getWorlds().getDefaultWorld() == World.Environment.THE_END) {
                                         plugin.getNMSDragonFight().awardTheEndAchievement(player);
                                         plugin.getServices().getDragonBattleService().resetEnderDragonBattle(island);
@@ -377,8 +377,6 @@ public class GridManagerImpl extends Manager implements GridManager {
         }
 
         plugin.getServices().getDragonBattleService().stopEnderDragonBattle(island);
-
-        ChunksTracker.removeIsland(island);
     }
 
     @Override

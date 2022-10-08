@@ -27,7 +27,6 @@ import com.bgsoftware.superiorskyblock.island.bank.SBankTransaction;
 import com.bgsoftware.superiorskyblock.island.builder.IslandBuilderImpl;
 import com.bgsoftware.superiorskyblock.island.role.SPlayerRole;
 import com.bgsoftware.superiorskyblock.module.BuiltinModules;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -262,7 +261,49 @@ public class IslandsDeserializer {
     }
 
     public static void deserializeDirtyChunks(Island.Builder builder, String dirtyChunks) {
-        ChunksTracker.deserialize(builder, dirtyChunks);
+        if (Text.isBlank(dirtyChunks))
+            return;
+
+        try {
+            JsonObject dirtyChunksObject = gson.fromJson(dirtyChunks, JsonObject.class);
+            dirtyChunksObject.entrySet().forEach(dirtyChunkEntry -> {
+                String worldName = dirtyChunkEntry.getKey();
+                JsonArray dirtyChunksArray = dirtyChunkEntry.getValue().getAsJsonArray();
+
+                dirtyChunksArray.forEach(dirtyChunkElement -> {
+                    String[] chunkPositionSections = dirtyChunkElement.getAsString().split(",");
+                    builder.setDirtyChunk(worldName, Integer.parseInt(chunkPositionSections[0]),
+                            Integer.parseInt(chunkPositionSections[1]));
+                });
+            });
+        } catch (JsonSyntaxException ex) {
+            if (dirtyChunks.contains("|")) {
+                String[] serializedSections = dirtyChunks.split("\\|");
+
+                for (String section : serializedSections) {
+                    String[] worldSections = section.split("=");
+                    if (worldSections.length == 2) {
+                        String[] dirtyChunkSections = worldSections[1].split(";");
+                        for (String dirtyChunk : dirtyChunkSections) {
+                            String[] dirtyChunkSection = dirtyChunk.split(",");
+                            if (dirtyChunkSection.length == 2) {
+                                builder.setDirtyChunk(worldSections[0],
+                                        Integer.parseInt(dirtyChunkSection[0]), Integer.parseInt(dirtyChunkSection[1]));
+                            }
+                        }
+                    }
+                }
+            } else {
+                String[] dirtyChunkSections = dirtyChunks.split(";");
+                for (String dirtyChunk : dirtyChunkSections) {
+                    String[] dirtyChunkSection = dirtyChunk.split(",");
+                    if (dirtyChunkSection.length == 3) {
+                        builder.setDirtyChunk(dirtyChunkSection[0],
+                                Integer.parseInt(dirtyChunkSection[1]), Integer.parseInt(dirtyChunkSection[2]));
+                    }
+                }
+            }
+        }
     }
 
     public static void deserializeBlockCounts(Island.Builder builder, String blocks) {

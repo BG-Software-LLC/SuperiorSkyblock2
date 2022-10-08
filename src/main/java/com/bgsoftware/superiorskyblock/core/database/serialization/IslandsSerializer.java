@@ -9,8 +9,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class IslandsSerializer {
 
@@ -31,7 +31,7 @@ public class IslandsSerializer {
         return gson.toJson(blockCountsArray);
     }
 
-    public static String serializeDirtyChunks(Set<ChunkPosition> dirtyChunks) {
+    public static String serializeDirtyChunks(List<ChunkPosition> dirtyChunks) {
         JsonObject dirtyChunksObject = new JsonObject();
         dirtyChunks.forEach(chunkPosition -> {
             JsonArray dirtyChunksArray;

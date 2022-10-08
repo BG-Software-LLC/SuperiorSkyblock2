@@ -28,12 +28,10 @@ import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class RawDeserializer implements IDeserializer {
@@ -441,7 +439,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeDirtyChunks(String dirtyChunksParam) {
-        Set<ChunkPosition> dirtyChunks = new HashSet<>();
+        List<ChunkPosition> dirtyChunks = new LinkedList<>();
 
         if (dirtyChunksParam != null) {
             for (String dirtyChunkSection : dirtyChunksParam.split("\\|")) {

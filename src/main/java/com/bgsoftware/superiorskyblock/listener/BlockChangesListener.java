@@ -13,7 +13,6 @@ import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.world.BukkitEntities;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -211,8 +210,10 @@ public class BlockChangesListener implements Listener {
         if (!blockKey.getGlobalKey().contains("SPAWNER") || plugin.getProviders().shouldListenToSpawnerChanges())
             island.handleBlockPlace(blockKey, blockCount, flagsSet.contains(Flag.SAVE_BLOCK_COUNT));
 
-        if (flagsSet.contains(Flag.DIRTY_CHUNK))
-            ChunksTracker.markDirty(island, blockLocation, true);
+        if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
+            island.markChunkDirty(blockLocation.getWorld(), blockLocation.getBlockX() >> 4,
+                    blockLocation.getBlockZ() >> 4, true);
+        }
     }
 
     public void onMultiBlockPlace(KeyMap<Integer> blockCounts, Location location, Flag... flags) {
@@ -221,8 +222,10 @@ public class BlockChangesListener implements Listener {
             if (island != null) {
                 island.handleBlocksPlace(blockCounts);
                 EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
-                if (flagsSet.contains(Flag.DIRTY_CHUNK))
-                    ChunksTracker.markDirty(island, location, true);
+                if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
+                    island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
+                            location.getBlockZ() >> 4, true);
+                }
             }
         }
     }
@@ -355,8 +358,10 @@ public class BlockChangesListener implements Listener {
 
             BukkitExecutor.sync(() -> {
                 if (dirtyChunk) {
-                    if (plugin.getNMSChunks().isChunkEmpty(block.getChunk()))
-                        ChunksTracker.markEmpty(island, block, true);
+                    if (plugin.getNMSChunks().isChunkEmpty(block.getChunk())) {
+                        island.markChunkEmpty(block.getWorld(), block.getX() >> 4,
+                                block.getZ() >> 4, true);
+                    }
                 }
                 if (handleNearbyBlocks) {
                     for (BlockFace nearbyFace : NEARBY_BLOCKS) {
@@ -378,8 +383,10 @@ public class BlockChangesListener implements Listener {
                 EnumSet<Flag> flagsSet = flags.length == 0 ? EnumSet.noneOf(Flag.class) : EnumSet.copyOf(Arrays.asList(flags));
                 boolean saveBlockCounts = flagsSet.contains(Flag.SAVE_BLOCK_COUNT);
                 blockCounts.forEach((blockKey, blockCount) -> island.handleBlockBreak(blockKey, blockCount, saveBlockCounts));
-                if (flagsSet.contains(Flag.DIRTY_CHUNK))
-                    ChunksTracker.markDirty(island, location, true);
+                if (flagsSet.contains(Flag.DIRTY_CHUNK)) {
+                    island.markChunkDirty(location.getWorld(), location.getBlockX() >> 4,
+                            location.getBlockZ() >> 4, true);
+                }
             }
         }
     }

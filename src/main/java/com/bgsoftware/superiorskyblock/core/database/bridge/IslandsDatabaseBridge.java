@@ -20,7 +20,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.database.serialization.IslandsSerializer;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
+import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
@@ -460,17 +460,10 @@ public class IslandsDatabaseBridge {
         ));
     }
 
-    public static void saveDirtyChunks(Island island) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
-                createFilter("uuid", island),
-                new Pair<>("dirty_chunks", ChunksTracker.serialize(island))
-        ));
-    }
-
-    public static void saveDirtyChunks(Island island, Set<ChunkPosition> dirtyChunks) {
-        runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
-                createFilter("uuid", island),
-                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks))
+    public static void saveDirtyChunks(DirtyChunksContainer dirtyChunksContainer) {
+        runOperationIfRunning(dirtyChunksContainer.getIsland().getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
+                createFilter("uuid", dirtyChunksContainer.getIsland()),
+                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunksContainer.getDirtyChunks()))
         ));
     }
 
@@ -586,7 +579,7 @@ public class IslandsDatabaseBridge {
                 databaseBridge.deleteObject("players_custom_data", createFilter("island", island)));
     }
 
-    public static void insertIsland(Island island) {
+    public static void insertIsland(Island island, List<ChunkPosition> dirtyChunks) {
         runOperationIfRunning(island.getDatabaseBridge(), databaseBridge -> {
             databaseBridge.insertObject("islands",
                     new Pair<>("uuid", island.getUniqueId().toString()),
@@ -605,7 +598,7 @@ public class IslandsDatabaseBridge {
                     new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()),
                     new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
-                    new Pair<>("dirty_chunks", ChunksTracker.serialize(island)),
+                    new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks)),
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
             );
 

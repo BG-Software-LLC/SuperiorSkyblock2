@@ -24,6 +24,7 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
@@ -34,6 +35,7 @@ import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandBlocksTrackerAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandCalculationAlgorithm;
 import com.bgsoftware.superiorskyblock.island.algorithm.SpawnIslandEntitiesTrackerAlgorithm;
+import com.bgsoftware.superiorskyblock.island.chunk.DirtyChunksContainer;
 import com.bgsoftware.superiorskyblock.island.privilege.IslandPrivileges;
 import com.bgsoftware.superiorskyblock.island.privilege.PlayerPrivilegeNode;
 import com.bgsoftware.superiorskyblock.island.privilege.PrivilegeNodeAbstract;
@@ -42,7 +44,7 @@ import com.bgsoftware.superiorskyblock.island.top.SortingComparators;
 import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
-import com.bgsoftware.superiorskyblock.world.chunk.ChunksTracker;
+import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -69,13 +71,14 @@ import java.util.function.Consumer;
 
 public class SpawnIsland implements Island {
 
-    private static final UUID spawnUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    private static final UUID spawnUUID = new UUID(0, 0);
     private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer((SuperiorPlayerBuilderImpl)
             SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
     private static SuperiorSkyblockPlugin plugin;
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
+    private final DirtyChunksContainer dirtyChunksContainer;
 
     private final Location center;
     private final World spawnWorld;
@@ -102,6 +105,8 @@ public class SpawnIsland implements Island {
         maxLocation = center.clone().add(islandSize, islandSize, islandSize);
         this.islandArea = new IslandArea(minLocation.getBlockX(), minLocation.getBlockZ(),
                 maxLocation.getBlockX(), maxLocation.getBlockZ());
+
+        this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
         if (center.getWorld() == null)
             plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
@@ -266,11 +271,6 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public int getCoopLimitRaw() {
-        return -1;
-    }
-
-    @Override
     public void setPlayerInside(SuperiorPlayer superiorPlayer, boolean inside) {
         if (inside)
             playersInside.add(superiorPlayer);
@@ -398,7 +398,7 @@ public class SpawnIsland implements Island {
 
         for (int x = minChunk.getX(); x <= maxChunk.getX(); x++) {
             for (int z = minChunk.getZ(); z <= maxChunk.getZ(); z++) {
-                if (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, x, z))
+                if (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(world, x, z)))
                     chunks.add(minChunk.getWorld().getChunkAt(x, z));
             }
         }
@@ -422,7 +422,8 @@ public class SpawnIsland implements Island {
 
         for (int chunkX = min.getBlockX() >> 4; chunkX <= max.getBlockX() >> 4; chunkX++) {
             for (int chunkZ = min.getBlockZ() >> 4; chunkZ <= max.getBlockZ() >> 4; chunkZ++) {
-                if (world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || ChunksTracker.isMarkedDirty(this, world, chunkX, chunkZ))) {
+                if (world.isChunkLoaded(chunkX, chunkZ) && (!noEmptyChunks || this.dirtyChunksContainer.isMarkedDirty(
+                        ChunkPosition.of(world, chunkX, chunkZ)))) {
                     chunks.add(world.getChunkAt(chunkX, chunkZ));
                 }
             }
@@ -465,6 +466,11 @@ public class SpawnIsland implements Island {
     public boolean isInside(Location location) {
         return location.getWorld().equals(this.spawnWorld) &&
                 this.islandArea.intercepts(location.getBlockX(), location.getBlockZ());
+    }
+
+    @Override
+    public boolean isInside(World world, int chunkX, int chunkZ) {
+        return world.equals(this.spawnWorld) && this.islandArea.intercepts(chunkX << 4, chunkZ << 4);
     }
 
     @Override
@@ -886,6 +892,27 @@ public class SpawnIsland implements Island {
     @Override
     public void handleBlockBreak(Key key, BigInteger amount, boolean save) {
         // Do nothing.
+    }
+
+    @Override
+    public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(world, chunkX, chunkZ));
+    }
+
+    @Override
+    public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        this.dirtyChunksContainer.markDirty(ChunkPosition.of(world, chunkX, chunkZ), save);
+    }
+
+    @Override
+    public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
+        Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
+        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(world, chunkX, chunkZ), save);
     }
 
     @Override
@@ -1426,13 +1453,13 @@ public class SpawnIsland implements Island {
 
     @Nullable
     @Override
-    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, boolean optimizeCobblestone) {
         return null;
     }
 
     @Nullable
     @Override
-    public Key generateBlock(Location location, boolean optimizeCobblestone) {
+    public Key generateBlock(Location location, World.Environment environment, boolean optimizeCobblestone) {
         return null;
     }
 
@@ -1479,6 +1506,11 @@ public class SpawnIsland implements Island {
     @Override
     public void setChestRows(int index, int rows) {
         // Do nothing.
+    }
+
+    @Override
+    public int getCoopLimitRaw() {
+        return -1;
     }
 
     @Override

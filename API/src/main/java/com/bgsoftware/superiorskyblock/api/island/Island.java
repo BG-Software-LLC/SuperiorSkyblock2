@@ -484,6 +484,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isInside(Location location);
 
     /**
+     * Check if a chunk location is inside the island's area.
+     *
+     * @param world  The world of the chunk.
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     */
+    boolean isInside(World world, int chunkX, int chunkZ);
+
+    /**
      * Check if the location is inside the island's protected area.
      *
      * @param location The location to check.
@@ -1042,6 +1051,35 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
      * @param save   Whether the block counts should be saved into the database.
      */
     void handleBlockBreak(Key key, BigInteger amount, boolean save);
+
+    /**
+     * Check whether a chunk has blocks inside it.
+     *
+     * @param world  The world of the chunk.
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     */
+    boolean isChunkDirty(World world, int chunkX, int chunkZ);
+
+    /**
+     * Mark a chunk as it has blocks inside it.
+     *
+     * @param world  The world of the chunk.
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     * @param save   Whether to save the changes to database.
+     */
+    void markChunkDirty(World world, int chunkX, int chunkZ, boolean save);
+
+    /**
+     * Mark a chunk as it has no blocks inside it.
+     *
+     * @param world  The world of the chunk.
+     * @param chunkX The x-coords of the chunk.
+     * @param chunkZ The z-coords of the chunk.
+     * @param save   Whether to save the changes to database.
+     */
+    void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save);
 
     /**
      * Get the amount of blocks that are on the island.
