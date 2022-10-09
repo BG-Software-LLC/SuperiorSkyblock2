@@ -1026,8 +1026,9 @@ public class SIsland implements Island {
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
                 (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
         IslandArea islandArea = new IslandArea(this.center, islandDistance);
+        islandArea.rshift(4);
 
-        return islandArea.intercepts(chunkX << 4, chunkZ << 4);
+        return islandArea.intercepts(chunkX, chunkZ);
     }
 
     @Override
