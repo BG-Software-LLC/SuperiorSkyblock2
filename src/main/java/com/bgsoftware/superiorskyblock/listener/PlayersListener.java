@@ -10,6 +10,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.Materials;
+import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.collections.AutoRemovalCollection;
 import com.bgsoftware.superiorskyblock.core.events.EventResult;
@@ -109,10 +110,12 @@ public class PlayersListener implements Listener {
         if (superiorPlayer.isShownAsOnline())
             notifyPlayerJoin(superiorPlayer);
 
+        Mutable<Boolean> teleportToSpawn = new Mutable<>(false);
+
         Island island = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
-        if (island != null) {
-            onPlayerEnterIsland(superiorPlayer, null, null, e.getPlayer().getLocation(), island,
-                    IslandEnterEvent.EnterCause.PLAYER_JOIN);
+        if (island != null && preventPlayerEnterIsland(superiorPlayer, null, null,
+                e.getPlayer().getLocation(), island, IslandEnterEvent.EnterCause.PLAYER_JOIN)) {
+            teleportToSpawn.setValue(true);
         }
 
         BukkitExecutor.sync(() -> {
@@ -126,9 +129,11 @@ public class PlayersListener implements Listener {
             if (!superiorPlayer.hasBypassModeEnabled()) {
                 Island delayedIsland = plugin.getGrid().getIslandAt(e.getPlayer().getLocation());
                 // Checking if the player is in the islands world, not inside an island.
-                if (plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && delayedIsland == null) {
+                if ((delayedIsland == island && teleportToSpawn.getValue()) ||
+                        (plugin.getGrid().isIslandsWorld(superiorPlayer.getWorld()) && delayedIsland == null)) {
                     superiorPlayer.teleport(plugin.getGrid().getSpawnIsland());
-                    Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
+                    if (!teleportToSpawn.getValue())
+                        Message.ISLAND_GOT_DELETED_WHILE_INSIDE.send(superiorPlayer);
                 }
             }
 
@@ -386,16 +391,6 @@ public class PlayersListener implements Listener {
             plugin.getNMSWorld().setWorldBorder(superiorPlayer, null);
 
         return false;
-    }
-
-    public void onPlayerEnterIsland(SuperiorPlayer superiorPlayer,
-                                    @Nullable Location fromLocation,
-                                    @Nullable Island fromIsland,
-                                    @NotNull Location toLocation,
-                                    @NotNull Island toIsland,
-                                    IslandEnterEvent.EnterCause enterCause) {
-        /* Alias for preventPlayerEnterIsland */
-        this.preventPlayerEnterIsland(superiorPlayer, fromLocation, fromIsland, toLocation, toIsland, enterCause);
     }
 
     public boolean preventPlayerEnterIsland(SuperiorPlayer superiorPlayer,
