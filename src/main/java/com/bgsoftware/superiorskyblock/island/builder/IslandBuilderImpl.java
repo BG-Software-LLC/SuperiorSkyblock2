@@ -129,7 +129,8 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setCenter(Location center) {
         Preconditions.checkNotNull(center, "center parameter cannot be null.");
-        Preconditions.checkState(isValidCenter(center), "The provided center is not centered.");
+        Preconditions.checkState(isValidCenter(center), "The provided center is not centered. center: " + center +
+                ", maxIslandSize: " + plugin.getSettings().getMaxIslandSize());
         this.center = center;
         return this;
     }
