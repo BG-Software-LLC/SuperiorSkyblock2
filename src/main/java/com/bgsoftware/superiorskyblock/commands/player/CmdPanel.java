@@ -64,10 +64,10 @@ public class CmdPanel implements ISuperiorCommand {
 
         if (args.length > 1) {
             if (args[1].equalsIgnoreCase("members")) {
-                plugin.getMenus().openMembers(superiorPlayer, null, island);
+                plugin.getCommands().dispatchSubCommand(sender, "members");
                 return;
             } else if (args[1].equalsIgnoreCase("visitors")) {
-                plugin.getMenus().openVisitors(superiorPlayer, null, island);
+                plugin.getCommands().dispatchSubCommand(sender, "visitors");
                 return;
             } else if (args[1].equalsIgnoreCase("toggle")) {
                 if (!plugin.getEventsBus().callPlayerTogglePanelEvent(superiorPlayer))
