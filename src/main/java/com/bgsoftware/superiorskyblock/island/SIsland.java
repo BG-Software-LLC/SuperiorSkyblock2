@@ -2058,7 +2058,7 @@ public class SIsland implements Island {
     public void setBonusLevel(BigDecimal bonusLevel) {
         Preconditions.checkNotNull(bonusLevel, "bonusLevel parameter cannot be null.");
 
-        Log.debug(Debug.SET_BONUS_LEVEL, "SIsland", "setBonusWorth", owner.getName(), bonusLevel);
+        Log.debug(Debug.SET_BONUS_LEVEL, "SIsland", "setBonusLevel", owner.getName(), bonusLevel);
 
         this.bonusLevel.set(bonusLevel);
 
