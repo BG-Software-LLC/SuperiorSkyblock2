@@ -1,6 +1,5 @@
 package com.bgsoftware.superiorskyblock.core.factory;
 
-import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.enums.BankAction;
 import com.bgsoftware.superiorskyblock.api.factory.BanksFactory;
@@ -50,23 +49,16 @@ import java.util.function.Supplier;
 
 public class FactoriesManagerImpl implements FactoriesManager {
 
-    private IslandsFactory islandsFactory;
-    private PlayersFactory playersFactory;
-    private BanksFactory banksFactory;
-    private DatabaseBridgeFactory databaseBridgeFactory;
-
-    private final SuperiorSkyblockPlugin plugin;
-
-    public FactoriesManagerImpl(SuperiorSkyblockPlugin plugin) {
-        this.plugin = plugin;
-    }
+    private IslandsFactory islandsFactory = DefaultIslandsFactory.getInstance();
+    private PlayersFactory playersFactory = DefaultPlayersFactory.getInstance();
+    private BanksFactory banksFactory = DefaultBanksFactory.getInstance();
+    private DatabaseBridgeFactory databaseBridgeFactory = DefaultDatabaseBridgeFactory.getInstance();
 
     @Override
     public void registerIslandsFactory(@Nullable IslandsFactory islandsFactory) {
-        this.islandsFactory = islandsFactory;
+        this.islandsFactory = islandsFactory == null ? DefaultIslandsFactory.getInstance() : islandsFactory;
     }
 
-    @Nullable
     @Override
     public IslandsFactory getIslandsFactory() {
         return islandsFactory;
@@ -74,10 +66,9 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public void registerPlayersFactory(@Nullable PlayersFactory playersFactory) {
-        this.playersFactory = playersFactory;
+        this.playersFactory = playersFactory == null ? DefaultPlayersFactory.getInstance() : playersFactory;
     }
 
-    @Nullable
     @Override
     public PlayersFactory getPlayersFactory() {
         return playersFactory;
@@ -85,10 +76,9 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public void registerBanksFactory(@Nullable BanksFactory banksFactory) {
-        this.banksFactory = banksFactory;
+        this.banksFactory = banksFactory == null ? DefaultBanksFactory.getInstance() : banksFactory;
     }
 
-    @Nullable
     @Override
     public BanksFactory getBanksFactory() {
         return banksFactory;
@@ -96,10 +86,9 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public void registerDatabaseBridgeFactory(@Nullable DatabaseBridgeFactory databaseBridgeFactory) {
-        this.databaseBridgeFactory = databaseBridgeFactory;
+        this.databaseBridgeFactory = databaseBridgeFactory == null ? DefaultDatabaseBridgeFactory.getInstance() : null;
     }
 
-    @Nullable
     @Override
     public DatabaseBridgeFactory getDatabaseBridgeFactory() {
         return databaseBridgeFactory;
@@ -126,8 +115,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public Island createIsland(IslandBuilderImpl builder) {
-        SIsland island = new SIsland(builder);
-        return islandsFactory == null ? island : islandsFactory.createIsland(island);
+        return islandsFactory.createIsland(new SIsland(builder));
     }
 
     @Override
@@ -149,8 +137,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public SuperiorPlayer createPlayer(SuperiorPlayerBuilderImpl builder) {
-        SSuperiorPlayer superiorPlayer = new SSuperiorPlayer(builder);
-        return playersFactory == null ? superiorPlayer : playersFactory.createPlayer(superiorPlayer);
+        return playersFactory.createPlayer(new SSuperiorPlayer(builder));
     }
 
     @Override
@@ -180,59 +167,42 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public IslandBank createIslandBank(Island island, Supplier<Boolean> isGiveInterestFailed) {
-        SIslandBank islandBank = new SIslandBank(island, isGiveInterestFailed);
-        return banksFactory == null ? islandBank : banksFactory.createIslandBank(island, islandBank);
+        return banksFactory.createIslandBank(island, new SIslandBank(island, isGiveInterestFailed));
     }
 
     public IslandCalculationAlgorithm createIslandCalculationAlgorithm(Island island) {
-        IslandCalculationAlgorithm original = DefaultIslandCalculationAlgorithm.getInstance();
-        if (islandsFactory == null)
-            return original;
-
         try {
             // noinspection deprecation
             return islandsFactory.createIslandCalculationAlgorithm(island);
         } catch (UnsupportedOperationException error) {
-            return islandsFactory.createIslandCalculationAlgorithm(island, original);
+            return islandsFactory.createIslandCalculationAlgorithm(island, DefaultIslandCalculationAlgorithm.getInstance());
         }
     }
 
     public IslandBlocksTrackerAlgorithm createIslandBlocksTrackerAlgorithm(Island island) {
-        IslandBlocksTrackerAlgorithm original = new DefaultIslandBlocksTrackerAlgorithm(island);
-        if (islandsFactory == null)
-            return original;
-
         try {
             // noinspection deprecation
             return islandsFactory.createIslandBlocksTrackerAlgorithm(island);
         } catch (UnsupportedOperationException error) {
-            return islandsFactory.createIslandBlocksTrackerAlgorithm(island, original);
+            return islandsFactory.createIslandBlocksTrackerAlgorithm(island, new DefaultIslandBlocksTrackerAlgorithm(island));
         }
     }
 
     public IslandEntitiesTrackerAlgorithm createIslandEntitiesTrackerAlgorithm(Island island) {
-        IslandEntitiesTrackerAlgorithm original = new DefaultIslandEntitiesTrackerAlgorithm(island);
-        if (islandsFactory == null)
-            return original;
-
         try {
             // noinspection deprecation
             return islandsFactory.createIslandEntitiesTrackerAlgorithm(island);
         } catch (UnsupportedOperationException error) {
-            return islandsFactory.createIslandEntitiesTrackerAlgorithm(island, original);
+            return islandsFactory.createIslandEntitiesTrackerAlgorithm(island, new DefaultIslandEntitiesTrackerAlgorithm(island));
         }
     }
 
     public PlayerTeleportAlgorithm createPlayerTeleportAlgorithm(SuperiorPlayer superiorPlayer) {
-        PlayerTeleportAlgorithm original = DefaultPlayerTeleportAlgorithm.getInstance();
-        if (playersFactory == null)
-            return original;
-
         try {
             // noinspection deprecation
             return playersFactory.createPlayerTeleportAlgorithm(superiorPlayer);
         } catch (UnsupportedOperationException error) {
-            return playersFactory.createPlayerTeleportAlgorithm(superiorPlayer, original);
+            return playersFactory.createPlayerTeleportAlgorithm(superiorPlayer, DefaultPlayerTeleportAlgorithm.getInstance());
         }
     }
 
@@ -241,41 +211,29 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public DatabaseBridge createDatabaseBridge(Island island) {
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
-        return databaseBridgeFactory == null ? databaseBridge :
-                databaseBridgeFactory.createIslandsDatabaseBridge(island, databaseBridge);
+        return databaseBridgeFactory.createIslandsDatabaseBridge(island, new SQLDatabaseBridge());
     }
 
     public DatabaseBridge createDatabaseBridge(SuperiorPlayer superiorPlayer) {
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
-        return databaseBridgeFactory == null ? databaseBridge :
-                databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, databaseBridge);
+        return databaseBridgeFactory.createPlayersDatabaseBridge(superiorPlayer, new SQLDatabaseBridge());
     }
 
     public DatabaseBridge createDatabaseBridge(GridManager gridManager) {
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
-        return databaseBridgeFactory == null ? databaseBridge :
-                databaseBridgeFactory.createGridDatabaseBridge(gridManager, databaseBridge);
+        return databaseBridgeFactory.createGridDatabaseBridge(gridManager, new SQLDatabaseBridge());
     }
 
     public DatabaseBridge createDatabaseBridge(StackedBlocksManager stackedBlocksManager) {
-        SQLDatabaseBridge databaseBridge = new SQLDatabaseBridge();
-        return databaseBridgeFactory == null ? databaseBridge :
-                databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, databaseBridge);
+        return databaseBridgeFactory.createStackedBlocksDatabaseBridge(stackedBlocksManager, new SQLDatabaseBridge());
     }
 
     public PersistentDataContainer createPersistentDataContainer(Island island) {
-        PersistentDataContainerImpl<Island> persistentDataContainer = new PersistentDataContainerImpl<>(
-                island, IslandsDatabaseBridge::markPersistentDataContainerToBeSaved);
-        return islandsFactory == null ? persistentDataContainer :
-                islandsFactory.createPersistentDataContainer(island, persistentDataContainer);
+        return islandsFactory.createPersistentDataContainer(island, new PersistentDataContainerImpl<>(
+                island, IslandsDatabaseBridge::markPersistentDataContainerToBeSaved));
     }
 
     public PersistentDataContainer createPersistentDataContainer(SuperiorPlayer superiorPlayer) {
-        PersistentDataContainerImpl<SuperiorPlayer> persistentDataContainer = new PersistentDataContainerImpl<>(
-                superiorPlayer, PlayersDatabaseBridge::markPersistentDataContainerToBeSaved);
-        return playersFactory == null ? persistentDataContainer :
-                playersFactory.createPersistentDataContainer(superiorPlayer, persistentDataContainer);
+        return playersFactory.createPersistentDataContainer(superiorPlayer, new PersistentDataContainerImpl<>(
+                superiorPlayer, PlayersDatabaseBridge::markPersistentDataContainerToBeSaved));
     }
 
 }

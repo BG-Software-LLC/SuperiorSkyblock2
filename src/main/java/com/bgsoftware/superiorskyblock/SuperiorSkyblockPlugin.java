@@ -102,7 +102,7 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private final Updater updater = new Updater(this, "superiorskyblock2");
 
     private final DataManager dataHandler = new DataManager(this);
-    private final FactoriesManagerImpl factoriesHandler = new FactoriesManagerImpl(this);
+    private final FactoriesManagerImpl factoriesHandler = new FactoriesManagerImpl();
     private final GridManagerImpl gridHandler = new GridManagerImpl(this,
             new DefaultIslandsPurger(), new DefaultIslandPreviews());
     private final StackedBlocksManagerImpl stackedBlocksHandler = new StackedBlocksManagerImpl(this,

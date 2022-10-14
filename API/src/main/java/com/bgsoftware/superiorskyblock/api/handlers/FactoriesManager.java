@@ -29,7 +29,6 @@ public interface FactoriesManager {
     /**
      * Get the current islands factory.
      */
-    @Nullable
     IslandsFactory getIslandsFactory();
 
     /**
@@ -43,7 +42,6 @@ public interface FactoriesManager {
     /**
      * Get the current players factory.
      */
-    @Nullable
     PlayersFactory getPlayersFactory();
 
     /**
@@ -57,7 +55,6 @@ public interface FactoriesManager {
     /**
      * Get the current banks factory.
      */
-    @Nullable
     BanksFactory getBanksFactory();
 
     /**
@@ -71,7 +68,6 @@ public interface FactoriesManager {
     /**
      * Get the database bridge factory.
      */
-    @Nullable
     DatabaseBridgeFactory getDatabaseBridgeFactory();
 
     /**
