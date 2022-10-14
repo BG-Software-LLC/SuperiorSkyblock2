@@ -204,6 +204,12 @@ public class UpgradesModule extends BuiltinModule {
         Value<Integer> warpsLimit = Value.syncedFixed(levelSection.getInt("warps-limit", -1));
         Value<Integer> coopLimit = Value.syncedFixed(levelSection.getInt("coop-limit", -1));
         Value<Integer> borderSize = Value.syncedFixed(levelSection.getInt("border-size", -1));
+
+        if (borderSize.get() > plugin.getSettings().getMaxIslandSize()) {
+            Log.warn("Upgrade by name ", upgrade.getName(), " (level ", level, ") has illegal border-size, skipping...");
+            return;
+        }
+
         Value<BigDecimal> bankLimit = Value.syncedFixed(new BigDecimal(levelSection.getString("bank-limit", "-1")));
         KeyMap<Integer> blockLimits = KeyMapImpl.createHashMap();
         if (levelSection.contains("block-limits")) {

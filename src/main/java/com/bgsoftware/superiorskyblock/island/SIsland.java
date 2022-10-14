@@ -1443,6 +1443,8 @@ public class SIsland implements Island {
     public void setIslandSize(int islandSize) {
         islandSize = Math.max(1, islandSize);
 
+        Preconditions.checkArgument(islandSize <= plugin.getSettings().getMaxIslandSize(), "Border size " + islandSize + " cannot be larger than max island size: " + plugin.getSettings().getMaxIslandSize());
+
         Log.debug(Debug.SET_SIZE, "SIsland", "setIslandSize", owner.getName(), islandSize);
 
         boolean cropGrowthEnabled = BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class);
