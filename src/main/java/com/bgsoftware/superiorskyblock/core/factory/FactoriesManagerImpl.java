@@ -86,7 +86,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
 
     @Override
     public void registerDatabaseBridgeFactory(@Nullable DatabaseBridgeFactory databaseBridgeFactory) {
-        this.databaseBridgeFactory = databaseBridgeFactory == null ? DefaultDatabaseBridgeFactory.getInstance() : null;
+        this.databaseBridgeFactory = databaseBridgeFactory == null ? DefaultDatabaseBridgeFactory.getInstance() : databaseBridgeFactory;
     }
 
     @Override
@@ -207,7 +207,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     public boolean hasCustomDatabaseBridge() {
-        return databaseBridgeFactory != null;
+        return databaseBridgeFactory != DefaultDatabaseBridgeFactory.getInstance();
     }
 
     public DatabaseBridge createDatabaseBridge(Island island) {
