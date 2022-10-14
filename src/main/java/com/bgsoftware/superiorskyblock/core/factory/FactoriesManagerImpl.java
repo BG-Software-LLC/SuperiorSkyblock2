@@ -62,8 +62,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public void registerIslandsFactory(IslandsFactory islandsFactory) {
-        Preconditions.checkNotNull(islandsFactory, "islandsFactory parameter cannot be null.");
+    public void registerIslandsFactory(@Nullable IslandsFactory islandsFactory) {
         this.islandsFactory = islandsFactory;
     }
 
@@ -74,8 +73,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public void registerPlayersFactory(PlayersFactory playersFactory) {
-        Preconditions.checkNotNull(playersFactory, "playersFactory parameter cannot be null.");
+    public void registerPlayersFactory(@Nullable PlayersFactory playersFactory) {
         this.playersFactory = playersFactory;
     }
 
@@ -86,8 +84,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public void registerBanksFactory(BanksFactory banksFactory) {
-        Preconditions.checkNotNull(banksFactory, "banksFactory parameter cannot be null.");
+    public void registerBanksFactory(@Nullable BanksFactory banksFactory) {
         this.banksFactory = banksFactory;
     }
 
@@ -98,8 +95,7 @@ public class FactoriesManagerImpl implements FactoriesManager {
     }
 
     @Override
-    public void registerDatabaseBridgeFactory(DatabaseBridgeFactory databaseBridgeFactory) {
-        Preconditions.checkNotNull(databaseBridgeFactory, "databaseBridgeFactory parameter cannot be null.");
+    public void registerDatabaseBridgeFactory(@Nullable DatabaseBridgeFactory databaseBridgeFactory) {
         this.databaseBridgeFactory = databaseBridgeFactory;
     }
 

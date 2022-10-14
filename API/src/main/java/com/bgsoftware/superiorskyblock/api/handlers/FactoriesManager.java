@@ -20,8 +20,11 @@ public interface FactoriesManager {
 
     /**
      * Register a custom islands factory.
+     *
+     * @param islandsFactory The new factory to set.
+     *                       If set to null, the default factory will be used.
      */
-    void registerIslandsFactory(IslandsFactory islandsFactory);
+    void registerIslandsFactory(@Nullable IslandsFactory islandsFactory);
 
     /**
      * Get the current islands factory.
@@ -31,8 +34,11 @@ public interface FactoriesManager {
 
     /**
      * Register a custom players factory.
+     *
+     * @param playersFactory The new factory to set.
+     *                       If set to null, the default factory will be used.
      */
-    void registerPlayersFactory(PlayersFactory playersFactory);
+    void registerPlayersFactory(@Nullable PlayersFactory playersFactory);
 
     /**
      * Get the current players factory.
@@ -42,8 +48,11 @@ public interface FactoriesManager {
 
     /**
      * Register a custom banks factory.
+     *
+     * @param banksFactory The new factory to set.
+     *                     If set to null, the default factory will be used.
      */
-    void registerBanksFactory(BanksFactory banksFactory);
+    void registerBanksFactory(@Nullable BanksFactory banksFactory);
 
     /**
      * Get the current banks factory.
@@ -53,8 +62,11 @@ public interface FactoriesManager {
 
     /**
      * Register a custom database-bridge factory.
+     *
+     * @param databaseBridgeFactory The new factory to set.
+     *                              If set to null, the default factory will be used.
      */
-    void registerDatabaseBridgeFactory(DatabaseBridgeFactory databaseBridgeFactory);
+    void registerDatabaseBridgeFactory(@Nullable DatabaseBridgeFactory databaseBridgeFactory);
 
     /**
      * Get the database bridge factory.
