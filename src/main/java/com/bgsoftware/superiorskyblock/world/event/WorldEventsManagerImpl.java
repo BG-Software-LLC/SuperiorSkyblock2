@@ -55,13 +55,15 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
         BukkitExecutor.sync(() -> {
-            // We want to delete old holograms of stacked blocks + count entities for the chunk
-            for (Entity entity : chunk.getEntities()) {
-                if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
-                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
-                    entity.remove();
+            if (chunk.isLoaded()) {
+                // We want to delete old holograms of stacked blocks + count entities for the chunk
+                for (Entity entity : chunk.getEntities()) {
+                    if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
+                            plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+                        entity.remove();
 
-                entityTrackingListener.get().onEntityDespawn(entity);
+                    entityTrackingListener.get().onEntityDespawn(entity);
+                }
             }
         }, 2L);
 
