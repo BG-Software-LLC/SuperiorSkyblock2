@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.google.common.base.Objects;
 import org.bukkit.Location;
 
 public class IslandPosition {
@@ -28,10 +29,7 @@ public class IslandPosition {
 
     @Override
     public int hashCode() {
-        int hash = 19 * 3 + (int) (Double.doubleToLongBits(this.x) ^ Double.doubleToLongBits(this.x) >>> 32);
-        hash = 19 * hash + (int) (Double.doubleToLongBits(this.z) ^ Double.doubleToLongBits(this.z) >>> 32);
-        hash = 19 * hash + worldName.hashCode();
-        return hash;
+        return Objects.hashCode(this.x, this.z);
     }
 
     @Override
