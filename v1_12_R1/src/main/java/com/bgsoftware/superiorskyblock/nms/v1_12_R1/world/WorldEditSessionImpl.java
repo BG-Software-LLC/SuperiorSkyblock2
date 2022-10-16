@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.nms.v1_12_R1.world;
 
+import com.bgsoftware.common.reflection.ReflectMethod;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
@@ -40,6 +41,8 @@ import java.util.List;
 import java.util.Map;
 
 public class WorldEditSessionImpl implements WorldEditSession {
+
+    private static final ReflectMethod<Void> TILE_ENTITY_LOAD = new ReflectMethod<>(TileEntity.class, "a", NBTTagCompound.class);
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
@@ -137,8 +140,13 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 blockEntityCompound.setInt("y", blockPosition.getY());
                 blockEntityCompound.setInt("z", blockPosition.getZ());
                 TileEntity worldTileEntity = worldServer.getTileEntity(blockPosition);
-                if (worldTileEntity != null)
-                    worldTileEntity.load(blockEntityCompound);
+                if (worldTileEntity != null) {
+                    if (TILE_ENTITY_LOAD.isValid()) {
+                        TILE_ENTITY_LOAD.invoke(worldTileEntity, blockEntityCompound);
+                    } else {
+                        worldTileEntity.load(blockEntityCompound);
+                    }
+                }
             }
         });
 
