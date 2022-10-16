@@ -23,11 +23,6 @@ public class SchematicBlock {
         this.schematicBlockData = schematicBlockData;
     }
 
-    private static String getSignLine(int index, String def) {
-        return index >= plugin.getSettings().getDefaultSign().size() ? def :
-                plugin.getSettings().getDefaultSign().get(index);
-    }
-
     public int getX() {
         return location.getBlockX();
     }
@@ -79,24 +74,44 @@ public class SchematicBlock {
             return;
 
         this.tileEntityData = new CompoundTag(originalTileEntity);
-        for (int i = 1; i <= 4; i++) {
-            String line = getSignLine(i - 1, this.tileEntityData.getString("Text" + i));
-            if (line != null)
-                this.tileEntityData.setString("Text" + i, line
-                        .replace("{player}", island.getOwner().getName())
-                        .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
-                );
-        }
+        String id = this.tileEntityData.getString("id");
 
-        if (plugin.getSettings().getDefaultContainers().isEnabled()) {
-            String inventoryType = this.tileEntityData.getString("inventoryType");
-            if (inventoryType != null) {
-                try {
-                    InventoryType containerType = InventoryType.valueOf(inventoryType);
-                    ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
-                    if (items != null)
-                        this.tileEntityData.setTag("Items", items.copy());
-                } catch (Exception ignored) {
+        if (id.equalsIgnoreCase(ServerVersion.isEquals(ServerVersion.v1_8) ? "Sign" : "minecraft:sign")) {
+            boolean needSignFormat = false;
+            for (int i = 1; i <= 4; i++) {
+                boolean isDefaultSignLine = false;
+                String line;
+
+                if ((i - 1) >= plugin.getSettings().getDefaultSign().size()) {
+                    line = this.tileEntityData.getString("Text" + i);
+                } else {
+                    line = plugin.getSettings().getDefaultSign().get(i - 1);
+                    if (ServerVersion.isAtLeast(ServerVersion.v1_17)) {
+                        isDefaultSignLine = true;
+                        needSignFormat = true;
+                    }
+                }
+
+                if (line != null) {
+                    this.tileEntityData.setString((isDefaultSignLine ? "SSB.Text" : "Text") + i, line
+                            .replace("{player}", island.getOwner().getName())
+                            .replace("{island}", island.getName().isEmpty() ? island.getOwner().getName() : island.getName())
+                    );
+                }
+            }
+            if (needSignFormat)
+                this.tileEntityData.setByte("SSB.HasSignLines", (byte) 1);
+        } else if (id.equalsIgnoreCase(ServerVersion.isEquals(ServerVersion.v1_8) ? "Chest" : "minecraft:chest")) {
+            if (plugin.getSettings().getDefaultContainers().isEnabled()) {
+                String inventoryType = this.tileEntityData.getString("inventoryType");
+                if (inventoryType != null) {
+                    try {
+                        InventoryType containerType = InventoryType.valueOf(inventoryType);
+                        ListTag items = plugin.getSettings().getDefaultContainers().getContents(containerType);
+                        if (items != null)
+                            this.tileEntityData.setTag("Items", items.copy());
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }

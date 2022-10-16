@@ -6,6 +6,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
+import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.island.IslandUtils;
 import com.bgsoftware.superiorskyblock.nms.world.WorldEditSession;
 import com.bgsoftware.superiorskyblock.tag.ByteTag;
@@ -16,6 +17,7 @@ import com.bgsoftware.superiorskyblock.tag.Tag;
 import com.bgsoftware.superiorskyblock.world.generator.IslandsGenerator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.WorldGenRegion;
@@ -42,6 +44,7 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_17_R1.util.CraftChatMessage;
 import org.bukkit.generator.ChunkGenerator;
 
 import javax.annotation.Nullable;
@@ -195,6 +198,18 @@ public class WorldEditSessionImpl implements WorldEditSession {
                 blockEntityCompound.putInt("x", blockPos.getX());
                 blockEntityCompound.putInt("y", blockPos.getY());
                 blockEntityCompound.putInt("z", blockPos.getZ());
+
+                if (blockEntityCompound.getByte("SSB.HasSignLines") == 1) {
+                    // We want to convert the sign lines from raw string to json
+                    for (int i = 1; i <= 4; ++i) {
+                        String line = blockEntityCompound.getString("SSB.Text" + i);
+                        if (!Text.isBlank(line)) {
+                            Component newLine = CraftChatMessage.fromString(line)[0];
+                            blockEntityCompound.putString("Text" + i, Component.Serializer.toJson(newLine));
+                        }
+                    }
+                }
+
                 BlockEntity worldBlockEntity = serverLevel.getBlockEntity(blockPos);
                 if (worldBlockEntity != null)
                     worldBlockEntity.load(blockEntityCompound);
