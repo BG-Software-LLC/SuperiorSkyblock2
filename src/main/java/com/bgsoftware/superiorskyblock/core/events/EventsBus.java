@@ -634,6 +634,10 @@ public class EventsBus {
         return new PluginInitializeResult(callEvent(new PluginInitializeEvent(plugin)));
     }
 
+    public boolean callPluginLoadDataEvent(SuperiorSkyblock plugin) {
+        return !callEvent(new PluginLoadDataEvent(plugin)).isCancelled();
+    }
+
     public boolean callPreIslandCreateEvent(SuperiorPlayer superiorPlayer, String islandName) {
         return callEvent(() -> new PreIslandCreateEvent(superiorPlayer, islandName), "preislandcreateevent");
     }
