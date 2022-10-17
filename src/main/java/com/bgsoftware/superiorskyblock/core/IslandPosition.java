@@ -29,7 +29,7 @@ public class IslandPosition {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(this.x, this.z);
+        return Long.hashCode(((long) this.x << 32) | this.z);
     }
 
     @Override
