@@ -13,8 +13,6 @@ import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.RegularMenuPattern
 import com.bgsoftware.superiorskyblock.player.PlayerLocales;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.io.File;
-
 public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
 
     private static RegularMenuPattern<MenuPlayerLanguage> menuPattern;
@@ -60,7 +58,7 @@ public class MenuPlayerLanguage extends SuperiorMenu<MenuPlayerLanguage> {
                 }
 
                 if (locale == null) {
-                    Log.warn(new File("player-language.yml"), "The language ", languageName, " is not valid.");
+                    Log.warnFromFile("player-language.yml", "The language ", languageName, " is not valid.");
                     continue;
                 }
 

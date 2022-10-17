@@ -67,13 +67,13 @@ public class MenuMemberRole extends SuperiorMenu<MenuMemberRole> {
                     try {
                         playerRole = SPlayerRole.of((String) roleObject);
                     } catch (IllegalArgumentException error) {
-                        Log.warn(new File("member-role.yml"), "Invalid role name: ", roleObject);
+                        Log.warnFromFile("member-role.yml", "Invalid role name: ", roleObject);
                         continue;
                     }
                 } else if (roleObject instanceof Integer) {
                     playerRole = SPlayerRole.of((Integer) roleObject);
                     if (playerRole == null) {
-                        Log.warn(new File("member-role.yml"), "&cInvalid role id: ", roleObject);
+                        Log.warnFromFile("member-role.yml", "&cInvalid role id: ", roleObject);
                         continue;
                     }
                 }

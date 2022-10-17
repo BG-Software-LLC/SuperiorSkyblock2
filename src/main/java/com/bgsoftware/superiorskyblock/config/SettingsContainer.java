@@ -232,7 +232,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                Log.warn("Cannot parse block limit '", line, "', skipping...");
+                Log.warnFromFile("Cannot parse block limit '", line, "', skipping...");
                 continue;
             }
 
@@ -248,7 +248,7 @@ public class SettingsContainer {
             String[] sections = line.split(":");
 
             if (sections.length < 2) {
-                Log.warn("Cannot parse entity limit '", line, "', skipping...");
+                Log.warnFromFile("Cannot parse entity limit '", line, "', skipping...");
                 continue;
             }
 
@@ -330,7 +330,7 @@ public class SettingsContainer {
             String portalOffset = config.getString("worlds.end.dragon-fight.portal-offset");
             endDragonFightPortalOffset = Serializers.OFFSET_SPACED_SERIALIZER.deserialize(portalOffset);
             if (endDragonFightPortalOffset == null) {
-                Log.warn("Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
+                Log.warnFromFile("Cannot parse portal-offset '", portalOffset, "' to a valid offset, skipping...");
             }
         }
         this.endDragonFightPortalOffset = endDragonFightPortalOffset == null ? SBlockOffset.ZERO : endDragonFightPortalOffset;
@@ -453,7 +453,7 @@ public class SettingsContainer {
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    Log.warn("Invalid container type ", container + ", skipping...");
+                    Log.warnFromFile("Invalid container type ", container + ", skipping...");
                 }
             }
         }
@@ -552,7 +552,7 @@ public class SettingsContainer {
         List<String> safeBlocks = cfg.getStringList("safe-blocks");
 
         if (safeBlocks.isEmpty()) {
-            Log.warn(file, "There are no valid safe blocks! Generating default ones...");
+            Log.warnFromFile(file.getName(), "There are no valid safe blocks! Generating default ones...");
             safeBlocks.addAll(Arrays.stream(Material.values())
                     .filter(Material::isSolid)
                     .map(Material::name)

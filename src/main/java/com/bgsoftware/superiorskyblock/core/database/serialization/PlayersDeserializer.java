@@ -38,14 +38,14 @@ public class PlayersDeserializer {
             Optional<String> name = missions.getString("name");
 
             if (!name.isPresent()) {
-                Log.warn("Cannot load player mission of null mission for ", uuid, ", skipping...");
+                Log.warnFromFile("Cannot load player mission of null mission for ", uuid, ", skipping...");
                 return;
             }
 
             Optional<Integer> finishCount = missions.getInt("finish_count");
 
             if (!finishCount.isPresent()) {
-                Log.warn("Cannot load player mission of invalid finish count for ", uuid, ", skipping...");
+                Log.warnFromFile("Cannot load player mission of invalid finish count for ", uuid, ", skipping...");
                 return;
             }
 

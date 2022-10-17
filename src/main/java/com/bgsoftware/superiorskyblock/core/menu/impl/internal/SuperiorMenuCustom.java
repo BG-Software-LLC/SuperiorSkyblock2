@@ -59,7 +59,7 @@ public class SuperiorMenuCustom extends SuperiorMenu<SuperiorMenuCustom> {
             ConfigurationSection commandsSection = cfg.getConfigurationSection("command");
 
             if (commandsSection == null) {
-                Log.warn(new File(fileName), "Custom menu doesn't have it's command section configured correctly, skipping...");
+                Log.warnFromFile(fileName, "Custom menu doesn't have it's command section configured correctly, skipping...");
                 return;
             }
 

@@ -100,7 +100,7 @@ public class MenuTopIslands extends PagedSuperiorMenu<MenuTopIslands, Island> {
                 SortingType sortingType = SortingType.getByName(itemSection.getString("sorting-type"));
 
                 if (sortingType == null) {
-                    Log.warn(new File("top-islands.yml"), "The sorting type is invalid for the item ", itemSectionName);
+                    Log.warnFromFile("top-islands.yml", "The sorting type is invalid for the item ", itemSectionName);
                     continue;
                 }
 

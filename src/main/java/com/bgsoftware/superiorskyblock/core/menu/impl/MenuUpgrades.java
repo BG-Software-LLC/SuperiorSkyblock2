@@ -88,7 +88,7 @@ public class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                         }
 
                         if (slot == -1) {
-                            Log.warn(new File("upgrades.yml"), "The item of the upgrade ", upgrade.getName(),
+                            Log.warnFromFile("upgrades.yml", "The item of the upgrade ", upgrade.getName(),
                                     " (level ", level, ") is not inside the pattern, skipping...");
                             continue;
                         }
@@ -98,13 +98,13 @@ public class MenuUpgrades extends SuperiorMenu<MenuUpgrades> {
                         if (upgradeLevel != null) {
                             TemplateItem hasNextLevel = MenuParser.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".has-next-level"));
                             if (hasNextLevel == null) {
-                                Log.warn(new File("upgrades.yml"), "The upgrade ", upgrade.getName(),
+                                Log.warnFromFile("upgrades.yml", "The upgrade ", upgrade.getName(),
                                         " (level ", level, ") is missing has-next-level item.");
                             }
 
                             TemplateItem noNextLevel = MenuParser.getItemStack("upgrades.yml", upgradeSection.getConfigurationSection(level + ".no-next-level"));
                             if (noNextLevel == null) {
-                                Log.warn(new File("upgrades.yml"), "&cThe upgrade ", upgrade.getName(),
+                                Log.warnFromFile("upgrades.yml", "&cThe upgrade ", upgrade.getName(),
                                         " (level ", level, ") is missing no-next-level item.");
                             }
 

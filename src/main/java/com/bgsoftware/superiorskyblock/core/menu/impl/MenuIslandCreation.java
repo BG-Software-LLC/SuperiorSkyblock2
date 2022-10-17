@@ -84,7 +84,7 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                 Schematic schematic = plugin.getSchematics().getSchematic(itemSection.getString("schematic"));
 
                 if (schematic == null) {
-                    Log.warn(new File("island-creation.yml"), "Invalid schematic for item ", itemSectionName);
+                    Log.warnFromFile("island-creation.yml", "Invalid schematic for item ", itemSectionName);
                     continue;
                 }
 
@@ -96,7 +96,7 @@ public class MenuIslandCreation extends SuperiorMenu<MenuIslandCreation> {
                         Biome biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                         buttonBuilder.setBiome(biome);
                     } catch (IllegalArgumentException error) {
-                        Log.warn(new File("island-creation.yml"), "Invalid biome name for item ",
+                        Log.warnFromFile("island-creation.yml", "Invalid biome name for item ",
                                 itemSectionName, ": ", biomeName);
                     }
                 }

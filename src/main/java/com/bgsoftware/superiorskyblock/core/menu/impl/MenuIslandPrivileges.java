@@ -104,7 +104,7 @@ public class MenuIslandPrivileges extends PagedSuperiorMenu<MenuIslandPrivileges
                     try {
                         updatePermission(IslandPrivilege.getByName(permission), cfg, position++);
                     } catch (NullPointerException error) {
-                        Log.warn(new File("permissions.yml"), "The island-privilege '", permission, "' is not a valid privilege, skipping...");
+                        Log.warnFromFile("permissions.yml", "The island-privilege '", permission, "' is not a valid privilege, skipping...");
                     }
                 }
             }

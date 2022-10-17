@@ -86,7 +86,7 @@ public class MenuBiomes extends SuperiorMenu<MenuBiomes> {
                 try {
                     biome = Biome.valueOf(biomeName.toUpperCase(Locale.ENGLISH));
                 } catch (IllegalArgumentException error) {
-                    Log.warn(new File("biomes.yml"), "Biome '", biomeName, "' is not valid, skipping...");
+                    Log.warnFromFile("biomes.yml", "Biome '", biomeName, "' is not valid, skipping...");
                     continue;
                 }
 

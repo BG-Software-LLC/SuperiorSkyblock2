@@ -17,7 +17,6 @@ import com.bgsoftware.superiorskyblock.core.menu.button.impl.menu.IslandChestPag
 import com.bgsoftware.superiorskyblock.core.menu.pattern.impl.PagedMenuPattern;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,12 +69,12 @@ public class MenuIslandChest extends PagedSuperiorMenu<MenuIslandChest, IslandCh
                 ConfigurationSection invalidPageSection = cfg.getConfigurationSection("items." + slotChar + ".invalid-page");
 
                 if (validPageSection == null) {
-                    Log.warn(new File("island-chest.yml"), "The slot char ", slotChar, " is missing the valid-page section.");
+                    Log.warnFromFile("island-chest.yml", "The slot char ", slotChar, " is missing the valid-page section.");
                     continue;
                 }
 
                 if (invalidPageSection == null) {
-                    Log.warn(new File("island-chest.yml"), "&cThe slot char ", slotChar, " is missing the invalid-page section.");
+                    Log.warnFromFile("island-chest.yml", "&cThe slot char ", slotChar, " is missing the invalid-page section.");
                     continue;
                 }
 

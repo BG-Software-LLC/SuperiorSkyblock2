@@ -177,7 +177,7 @@ public class MenuParser {
                 try {
                     enchantment = Enchantment.getByName(_enchantment);
                 } catch (Exception ex) {
-                    Log.warn(new File(fileName), "Couldn't convert ", section.getCurrentPath(),
+                    Log.warnFromFile(fileName, "Couldn't convert ", section.getCurrentPath(),
                             ".enchants.", _enchantment, " into an enchantment, skipping...");
                     continue;
                 }
@@ -209,7 +209,7 @@ public class MenuParser {
                 PotionEffectType potionEffectType = PotionEffectType.getByName(_effect);
 
                 if (potionEffectType == null) {
-                    Log.warn(new File(fileName), "Couldn't convert ", effectsSection.getCurrentPath(),
+                    Log.warnFromFile(fileName, "Couldn't convert ", effectsSection.getCurrentPath(),
                             ".", _effect, " into a potion effect, skipping...");
                     continue;
                 }
@@ -218,7 +218,7 @@ public class MenuParser {
                 int amplifier = effectsSection.getInt(_effect + ".amplifier", 0);
 
                 if (duration == -1) {
-                    Log.warn(new File(fileName), "Potion effect ", effectsSection.getCurrentPath(),
+                    Log.warnFromFile(fileName, "Potion effect ", effectsSection.getCurrentPath(),
                             ".", _effect, " is missing duration, skipping...");
                     continue;
                 }
@@ -232,7 +232,7 @@ public class MenuParser {
             try {
                 itemBuilder.withEntityType(EntityType.valueOf(entity.toUpperCase(Locale.ENGLISH)));
             } catch (IllegalArgumentException ex) {
-                Log.warn(new File(fileName), "Couldn't convert ", entity, " into an entity type, skipping...");
+                Log.warnFromFile(fileName, "Couldn't convert ", entity, " into an entity type, skipping...");
             }
         }
 
@@ -248,7 +248,7 @@ public class MenuParser {
             try {
                 itemBuilder.withLeatherColor(Integer.parseInt(leatherColor, 16));
             } catch (IllegalArgumentException error) {
-                Log.warn(new File(fileName), "Couldn't convert ", leatherColor, " into a color, skipping...");
+                Log.warnFromFile(fileName, "Couldn't convert ", leatherColor, " into a color, skipping...");
             }
         }
 
