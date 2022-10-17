@@ -17,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -152,6 +153,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         MenuCreator menuCreator = MENUS_HOLDER_CREATORS.get(inventoryType);
         return menuCreator == null ? null : menuCreator.apply(defaultHolder, title);
+    }
+
+    @Override
+    public int getMaxWorldSize() {
+        return Bukkit.getMaxWorldSize();
     }
 
     private interface MenuCreator extends BiFunction<InventoryHolder, String, Container> {

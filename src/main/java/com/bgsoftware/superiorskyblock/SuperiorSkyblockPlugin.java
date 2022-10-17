@@ -271,13 +271,21 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
             modulesHandler.enableModules(ModuleLoadTime.AFTER_HANDLERS_LOADING);
 
             if (updater.isOutdated()) {
-                Log.warn("");
-                Log.warn(new StringBuilder("A new version is available (v").append(updater.getLatestVersion()).append(")!"));
-                Log.warn(new StringBuilder("Version's description: \"").append(updater.getVersionDescription()).append("\""));
-                Log.warn("");
+                Log.info("");
+                Log.info("A new version is available (v", updater.getLatestVersion(), ")!");
+                Log.info("Version's description: \"", updater.getVersionDescription(), "\"");
+                Log.info("");
             }
 
             ChunksProvider.start();
+
+            // Calculate the maximum amount of islands that fit into the world.
+            if (calculateMaxPossibleIslands() < 1000) {
+                Log.warn("It seems like you configured your max-world-size in server.properties to be a small number (",
+                        nmsAlgorithms.getMaxWorldSize(), ").");
+                Log.warn("This can lead to weird behaviors when new islands are generated beyond this limit.");
+                Log.warn("Increase the value to for better experience (Default: 29999984)");
+            }
 
             BukkitExecutor.sync(() -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
@@ -727,6 +735,13 @@ public class SuperiorSkyblockPlugin extends JavaPlugin implements SuperiorSkyblo
     private void loadUpgradeCostLoaders() {
         upgradesHandler.registerUpgradeCostLoader("money", new VaultUpgradeCostLoader());
         upgradesHandler.registerUpgradeCostLoader("placeholders", new PlaceholdersUpgradeCostLoader());
+    }
+
+    private long calculateMaxPossibleIslands() {
+        int islandDistance = settingsHandler.getMaxIslandSize() * 3;
+        long worldDistance = nmsAlgorithms.getMaxWorldSize() * 2L;
+        long islandsPerSide = worldDistance / islandDistance;
+        return islandsPerSide * islandsPerSide;
     }
 
 }

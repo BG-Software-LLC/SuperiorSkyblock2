@@ -11,7 +11,9 @@ import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.IChatBaseComponent;
 import net.minecraft.server.v1_12_R1.Item;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
+import net.minecraft.server.v1_12_R1.MinecraftServer;
 import net.minecraft.server.v1_12_R1.World;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -28,8 +30,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
-
-import javax.annotation.Nullable;
 
 public class NMSAlgorithmsImpl implements NMSAlgorithms {
 
@@ -110,6 +110,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Enchantment getGlowEnchant() {
         return GlowEnchantment.createEnchantment();
+    }
+
+    @Override
+    public int getMaxWorldSize() {
+        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        return server.getPropertyManager().getInt("max-world-size", 29999984);
     }
 
     @Override

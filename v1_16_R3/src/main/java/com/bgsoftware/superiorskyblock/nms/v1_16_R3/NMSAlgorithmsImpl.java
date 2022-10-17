@@ -17,6 +17,7 @@ import net.minecraft.server.v1_16_R3.IChatBaseComponent;
 import net.minecraft.server.v1_16_R3.IInventory;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.World;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -138,6 +139,11 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
         } catch (Throwable error) {
             return new SpigotGlowEnchantment("superior_glowing_enchant");
         }
+    }
+
+    @Override
+    public int getMaxWorldSize() {
+        return Bukkit.getMaxWorldSize();
     }
 
     @Override

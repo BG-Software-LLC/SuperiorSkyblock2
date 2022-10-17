@@ -45,4 +45,6 @@ public interface NMSAlgorithms {
     @Nullable
     Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title);
 
+    int getMaxWorldSize();
+
 }

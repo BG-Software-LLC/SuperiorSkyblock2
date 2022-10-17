@@ -11,7 +11,9 @@ import net.minecraft.server.v1_8_R3.IBlockData;
 import net.minecraft.server.v1_8_R3.IChatBaseComponent;
 import net.minecraft.server.v1_8_R3.Item;
 import net.minecraft.server.v1_8_R3.MinecraftKey;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.World;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.defaults.BukkitCommand;
@@ -110,6 +112,12 @@ public class NMSAlgorithmsImpl implements NMSAlgorithms {
     @Override
     public Object createMenuInventoryHolder(InventoryType inventoryType, InventoryHolder defaultHolder, String title) {
         return defaultHolder;
+    }
+
+    @Override
+    public int getMaxWorldSize() {
+        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        return server.getPropertyManager().getInt("max-world-size", 29999984);
     }
 
 }
