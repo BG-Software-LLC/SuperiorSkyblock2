@@ -193,12 +193,10 @@ public class CommandsManagerImpl extends Manager implements CommandsManager {
 
                 if (file.getName().toLowerCase(Locale.ENGLISH).contains("admin")) {
                     registerAdminCommand(superiorCommand);
-                    Log.info(new StringBuilder("Successfully loaded external admin command: ")
-                            .append(file.getName().split("\\.")[0]));
+                    Log.info("Successfully loaded external admin command: ", file.getName().split("\\.")[0]);
                 } else {
                     registerCommand(superiorCommand);
-                    Log.info(new StringBuilder("Successfully loaded external command: ")
-                            .append(file.getName().split("\\.")[0]));
+                    Log.info("Successfully loaded external command: ", file.getName().split("\\.")[0]);
                 }
 
             } catch (Exception error) {

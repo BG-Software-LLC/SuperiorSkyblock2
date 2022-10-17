@@ -84,7 +84,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         Preconditions.checkNotNull(pluginModule, "pluginModule parameter cannot be null.");
         Preconditions.checkState(getModule(pluginModule.getName()) != null, "PluginModule with the name " + pluginModule.getName() + " is not registered in the plugin anymore.");
 
-        Log.info(new StringBuilder("Disabling the module ").append(pluginModule.getName()).append("..."));
+        Log.info("Disabling the module ", pluginModule.getName(), "...");
 
         try {
             pluginModule.onDisable(plugin);
@@ -114,7 +114,7 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
 
         long startTime = System.currentTimeMillis();
 
-        Log.info(new StringBuilder("Enabling the module ").append(pluginModule.getName()).append("..."));
+        Log.info("Enabling the module ", pluginModule.getName(), "...");
 
         try {
             pluginModule.onEnable(plugin);
@@ -149,9 +149,8 @@ public class ModulesManagerImpl extends Manager implements ModulesManager {
         if (adminCommands != null)
             Arrays.stream(adminCommands).forEach(plugin.getCommands()::registerAdminCommand);
 
-        Log.info(new StringBuilder("Finished enabling the module ")
-                .append(pluginModule.getName())
-                .append(" (Took ").append(System.currentTimeMillis() - startTime).append("ms)"));
+        Log.info("Finished enabling the module ", pluginModule.getName(), " (Took ",
+                System.currentTimeMillis() - startTime, "ms)");
     }
 
     @Override

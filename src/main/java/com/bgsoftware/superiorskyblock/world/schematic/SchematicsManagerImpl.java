@@ -293,16 +293,14 @@ public class SchematicsManagerImpl extends Manager implements SchematicManager {
 
         if (schematic == null) {
             schematic = parseSchematic(file, schemName, DefaultSchematicParser.getInstance(), error ->
-                    Log.warn(new StringBuilder("Schematic ").append(file.getName()).append(" is not a valid schematic, ignoring..."))
+                    Log.warn("Schematic ", file.getName(), " is not a valid schematic, ignoring...")
             );
             if (schematic != null)
                 usedParser = DefaultSchematicParser.getInstance();
         }
 
         if (schematic != null && usedParser != null) {
-            Log.info(new StringBuilder("Successfully loaded schematic ")
-                    .append(file.getName())
-                    .append(" (").append(usedParser.getClass().getSimpleName()).append(")"));
+            Log.info("Successfully loaded schematic ", file.getName(), " (", usedParser.getClass().getSimpleName(), ")");
         }
 
         return schematic;

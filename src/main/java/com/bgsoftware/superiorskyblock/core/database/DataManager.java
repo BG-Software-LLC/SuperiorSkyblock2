@@ -62,10 +62,7 @@ public class DataManager extends Manager {
 
         for (SuperiorPlayer superiorPlayer : plugin.getPlayers().getAllPlayers()) {
             if (superiorPlayer.getIslandLeader().getUniqueId().equals(superiorPlayer.getUniqueId()) && superiorPlayer.getIsland() != null && !superiorPlayer.getPlayerRole().isLastRole()) {
-                Log.warn(new StringBuilder("Seems like ")
-                        .append(superiorPlayer.getName())
-                        .append(" is an island leader, but have a guest role - fixing it...")
-                );
+                Log.warn("Seems like ", superiorPlayer.getName(), " is an island leader, but have a guest role - fixing it...");
                 superiorPlayer.setPlayerRole(SPlayerRole.lastRole());
             }
         }

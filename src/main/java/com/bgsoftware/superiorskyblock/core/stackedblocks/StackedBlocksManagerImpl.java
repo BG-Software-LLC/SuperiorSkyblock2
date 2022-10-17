@@ -109,9 +109,7 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         boolean succeed = true;
 
         if (stackedBlock.getBlockKey() != null && !blockKey.equals(stackedBlock.getBlockKey())) {
-            Log.warn(new StringBuilder("Found a glitched stacked-block at ")
-                    .append(Formatters.LOCATION_FORMATTER.format(location))
-                    .append(" - fixing it..."));
+            Log.warn("Found a glitched stacked-block at ", Formatters.LOCATION_FORMATTER.format(location), " - fixing it...");
             amount = 0;
             succeed = false;
         }
@@ -279,9 +277,8 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
         }
 
         if (location.get().getWorld() == null) {
-            Log.warn(new StringBuilder("Cannot load stacked block with invalid world ")
-                    .append(((LazyWorldLocation) location.get()).getWorldName())
-                    .append(", skipping..."));
+            Log.warn("Cannot load stacked block with invalid world ",
+                    LazyWorldLocation.getWorldName(location.get()), ", skipping...");
             return;
         }
 
