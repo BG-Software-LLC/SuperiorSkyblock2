@@ -16,6 +16,7 @@ public interface WorldsProvider {
 
     /**
      * Get the world of an island by the environment.
+     * If the world is not loaded, this method should load the world before returning.
      *
      * @param environment The world environment.
      * @param island      The island to check.

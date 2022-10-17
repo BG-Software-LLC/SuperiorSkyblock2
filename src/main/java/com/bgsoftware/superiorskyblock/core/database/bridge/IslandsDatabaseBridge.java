@@ -463,7 +463,7 @@ public class IslandsDatabaseBridge {
     public static void saveDirtyChunks(DirtyChunksContainer dirtyChunksContainer) {
         runOperationIfRunning(dirtyChunksContainer.getIsland().getDatabaseBridge(), databaseBridge -> databaseBridge.updateObject("islands",
                 createFilter("uuid", dirtyChunksContainer.getIsland()),
-                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunksContainer.getDirtyChunks()))
+                new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunksContainer.getDirtyChunks()))
         ));
     }
 
@@ -598,7 +598,7 @@ public class IslandsDatabaseBridge {
                     new Pair<>("generated_schematics", island.getGeneratedSchematicsFlag()),
                     new Pair<>("unlocked_worlds", island.getUnlockedWorldsFlag()),
                     new Pair<>("last_time_updated", System.currentTimeMillis() / 1000L),
-                    new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunks(dirtyChunks)),
+                    new Pair<>("dirty_chunks", IslandsSerializer.serializeDirtyChunkPositions(dirtyChunks)),
                     new Pair<>("block_counts", IslandsSerializer.serializeBlockCounts(island.getBlockCountsAsBigInteger()))
             );
 

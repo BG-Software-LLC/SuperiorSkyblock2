@@ -82,7 +82,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
             }
         }
 
-        ChunkPosition chunkPosition = ChunkPosition.of(chunk.getWorld(), chunk.getX(), chunk.getZ());
+        ChunkPosition chunkPosition = ChunkPosition.of(chunk);
         DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
 
         plugin.getStackedBlocks().updateStackedBlockHolograms(chunk);

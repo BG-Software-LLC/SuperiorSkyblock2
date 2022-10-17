@@ -5,15 +5,16 @@ import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.StackedBlocksManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.LazyWorldLocation;
-import com.bgsoftware.superiorskyblock.core.logging.Debug;
-import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.Manager;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.StackedBlocksDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.key.KeyImpl;
+import com.bgsoftware.superiorskyblock.core.logging.Debug;
+import com.bgsoftware.superiorskyblock.core.logging.Log;
 import com.bgsoftware.superiorskyblock.core.serialization.Serializers;
 import com.bgsoftware.superiorskyblock.core.stackedblocks.container.StackedBlocksContainer;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
@@ -155,8 +156,12 @@ public class StackedBlocksManagerImpl extends Manager implements StackedBlocksMa
     @Override
     public Map<Location, Integer> removeStackedBlocks(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
+        return removeStackedBlocks(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ));
+    }
 
-        ChunkPosition chunkPosition = ChunkPosition.of(world, chunkX, chunkZ);
+    public Map<Location, Integer> removeStackedBlocks(ChunkPosition chunkPosition) {
+        Preconditions.checkNotNull(chunkPosition, "chunkPosition parameter cannot be null.");
+
         Map<Location, Integer> removedStackedBlocks = new LinkedHashMap<>();
 
         try {

@@ -7,7 +7,7 @@ import com.bgsoftware.superiorskyblock.api.island.IslandPrivilege;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.Text;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.DatabaseLoader_V1;
 import com.bgsoftware.superiorskyblock.core.database.loader.v1.attributes.IslandChestAttributes;
@@ -439,7 +439,7 @@ public class RawDeserializer implements IDeserializer {
 
     @Override
     public String deserializeDirtyChunks(String dirtyChunksParam) {
-        List<ChunkPosition> dirtyChunks = new LinkedList<>();
+        List<DirtyChunk> dirtyChunks = new LinkedList<>();
 
         if (dirtyChunksParam != null) {
             for (String dirtyChunkSection : dirtyChunksParam.split("\\|")) {
@@ -448,7 +448,7 @@ public class RawDeserializer implements IDeserializer {
                 for (String chunkCoords : dirtyChunkSections[1].split(";")) {
                     String[] chunkCoordsSections = chunkCoords.split(",");
                     try {
-                        dirtyChunks.add(ChunkPosition.of(worldName, Integer.parseInt(chunkCoordsSections[0]),
+                        dirtyChunks.add(new DirtyChunk(worldName, Integer.parseInt(chunkCoordsSections[0]),
                                 Integer.parseInt(chunkCoordsSections[1])));
                     } catch (NumberFormatException ignored) {
                     }

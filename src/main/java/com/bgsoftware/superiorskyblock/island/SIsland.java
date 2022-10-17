@@ -25,6 +25,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -285,9 +286,11 @@ public class SIsland implements Island {
             setSchematicGenerate(plugin.getSettings().getWorlds().getDefaultWorld());
         }
 
-        builder.dirtyChunks.forEach(chunkPosition -> {
+        builder.dirtyChunks.forEach(dirtyChunk -> {
             try {
-                this.dirtyChunksContainer.markDirty(chunkPosition, false);
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, dirtyChunk.getWorldName());
+                if (worldInfo != null)
+                    this.dirtyChunksContainer.markDirty(ChunkPosition.of(worldInfo, dirtyChunk.getX(), dirtyChunk.getZ()), false);
             } catch (IllegalStateException ignored) {
             }
         });
@@ -923,8 +926,9 @@ public class SIsland implements Island {
     @Override
     public List<Chunk> getAllChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return new SequentialListBuilder<Chunk>()
-                .build(IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks), ChunkPosition::loadChunk);
+        return new SequentialListBuilder<Chunk>().build(IslandUtils.getChunkCoords(
+                        this, WorldInfo.of(world), onlyProtected, noEmptyChunks),
+                chunkPosition -> world.getChunkAt(chunkPosition.getX(), chunkPosition.getZ()));
     }
 
     @Override
@@ -944,9 +948,9 @@ public class SIsland implements Island {
     @Override
     public List<Chunk> getLoadedChunks(World.Environment environment, boolean onlyProtected, boolean noEmptyChunks) {
         World world = getCenter(environment).getWorld();
-        return new SequentialListBuilder<Chunk>()
-                .filter(Objects::nonNull)
-                .build(IslandUtils.getChunkCoords(this, world, onlyProtected, noEmptyChunks), plugin.getNMSChunks()::getChunkIfLoaded);
+        return new SequentialListBuilder<Chunk>().filter(Objects::nonNull)
+                .build(IslandUtils.getChunkCoords(this, WorldInfo.of(world), onlyProtected, noEmptyChunks),
+                        plugin.getNMSChunks()::getChunkIfLoaded);
     }
 
     @Override
@@ -970,7 +974,7 @@ public class SIsland implements Island {
     @Override
     public void resetChunks(World.Environment environment, boolean onlyProtected, @Nullable Runnable onFinish) {
         World world = getCenter(environment).getWorld();
-        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, world, onlyProtected, true);
+        List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(world), onlyProtected, true);
 
         if (chunkPositions.isEmpty()) {
             if (onFinish != null)
@@ -1022,6 +1026,17 @@ public class SIsland implements Island {
 
         if (!plugin.getGrid().isIslandsWorld(world))
             return false;
+
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        IslandArea islandArea = new IslandArea(this.center, islandDistance);
+        islandArea.rshift(4);
+
+        return islandArea.intercepts(chunkX, chunkZ);
+    }
+
+    public boolean isInside(WorldInfo worldInfo, int chunkX, int chunkZ) {
+        Preconditions.checkNotNull(worldInfo, "world parameter cannot be null.");
 
         int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
                 (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
@@ -1510,7 +1525,8 @@ public class SIsland implements Island {
 
                 Location centerBlock = getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
 
-                ChunkPosition centerChunkPosition = ChunkPosition.of(centerBlock);
+                ChunkPosition centerChunkPosition = ChunkPosition.of(WorldInfo.of(centerBlock.getWorld()),
+                        centerBlock.getBlockX() >> 4, centerBlock.getBlockZ() >> 4);
 
                 return ChunksProvider.loadChunk(centerChunkPosition, ChunkLoadReason.BIOME_REQUEST, null)
                         .thenApply(chunk -> centerBlock.getBlock().getBiome())
@@ -1551,26 +1567,26 @@ public class SIsland implements Island {
 
         {
             World normalWorld = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getWorld();
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, normalWorld, false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(normalWorld), false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && wasSchematicGenerated(World.Environment.NETHER)) {
             World netherWorld = getCenter(World.Environment.NETHER).getWorld();
             Biome netherBiome = IslandUtils.getDefaultWorldBiome(World.Environment.NETHER);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, netherWorld, false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(netherWorld), false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, netherBiome, playersToUpdate);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && wasSchematicGenerated(World.Environment.THE_END)) {
             World endWorld = getCenter(World.Environment.THE_END).getWorld();
             Biome endBiome = IslandUtils.getDefaultWorldBiome(World.Environment.THE_END);
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, endWorld, false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(endWorld), false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, endBiome, playersToUpdate);
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, registeredWorld, false, false);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(this, WorldInfo.of(registeredWorld), false, false);
             plugin.getNMSChunks().setBiome(chunkPositions, biome, playersToUpdate);
         }
     }
@@ -1964,21 +1980,30 @@ public class SIsland implements Island {
     public boolean isChunkDirty(World world, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(world, chunkX, chunkZ));
+        return this.isChunkDirty(world.getName(), chunkX, chunkZ);
+    }
+
+    @Override
+    public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
+        Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
+        WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(this, worldName);
+        Preconditions.checkArgument(worldInfo == null || isInside(worldInfo, chunkX, chunkZ),
+                "Chunk must be within the island boundaries.");
+        return this.dirtyChunksContainer.isMarkedDirty(ChunkPosition.of(worldInfo, chunkX, chunkZ));
     }
 
     @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markDirty(ChunkPosition.of(world, chunkX, chunkZ), save);
+        this.dirtyChunksContainer.markDirty(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ), save);
     }
 
     @Override
     public void markChunkEmpty(World world, int chunkX, int chunkZ, boolean save) {
         Preconditions.checkNotNull(world, "world parameter cannot be null.");
         Preconditions.checkArgument(isInside(world, chunkX, chunkZ), "Chunk must be within the island boundaries.");
-        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(world, chunkX, chunkZ), save);
+        this.dirtyChunksContainer.markEmpty(ChunkPosition.of(WorldInfo.of(world), chunkX, chunkZ), save);
     }
 
     @Override
@@ -2184,10 +2209,9 @@ public class SIsland implements Island {
 
         // Update the crop growth ticking
         if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeCropGrowth.class)) {
-            World world = plugin.getProviders().getWorldsProvider().getIslandsWorld(this, World.Environment.NORMAL);
-            plugin.getNMSChunks().updateCropsTicker(
-                    IslandUtils.getChunkCoords(this, world, true, true),
-                    cropGrowth - 1);
+            double newCropGrowthMultiplier = cropGrowth - 1;
+            IslandUtils.getChunkCoords(this, true, true).values()
+                    .forEach(chunkPositions -> plugin.getNMSChunks().updateCropsTicker(chunkPositions, newCropGrowthMultiplier));
         }
     }
 

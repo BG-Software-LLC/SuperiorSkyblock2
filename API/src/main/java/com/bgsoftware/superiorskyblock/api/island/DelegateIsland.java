@@ -784,6 +784,11 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public boolean isChunkDirty(String worldName, int chunkX, int chunkZ) {
+        return this.handle.isChunkDirty(worldName, chunkX, chunkZ);
+    }
+
+    @Override
     public void markChunkDirty(World world, int chunkX, int chunkZ, boolean save) {
         this.handle.markChunkDirty(world, chunkX, chunkZ, save);
     }

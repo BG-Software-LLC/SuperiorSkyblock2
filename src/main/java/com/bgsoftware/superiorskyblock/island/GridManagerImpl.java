@@ -4,11 +4,14 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridge;
 import com.bgsoftware.superiorskyblock.api.data.DatabaseBridgeMode;
 import com.bgsoftware.superiorskyblock.api.handlers.GridManager;
+import com.bgsoftware.superiorskyblock.api.hooks.LazyWorldsProvider;
+import com.bgsoftware.superiorskyblock.api.hooks.WorldsProvider;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
 import com.bgsoftware.superiorskyblock.api.schematic.Schematic;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
@@ -503,6 +506,35 @@ public class GridManagerImpl extends Manager implements GridManager {
         Preconditions.checkNotNull(island, "island parameter cannot be null.");
         Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
         return plugin.getProviders().getWorldsProvider().getIslandsWorld(island, environment);
+    }
+
+    @Override
+    public WorldInfo getIslandsWorldInfo(Island island, World.Environment environment) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(environment, "environment parameter cannot be null.");
+
+        WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
+
+        if (worldsProvider instanceof LazyWorldsProvider)
+            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, environment);
+
+        World world = this.getIslandsWorld(island, environment);
+        return world == null ? null : WorldInfo.of(world);
+    }
+
+    @Nullable
+    @Override
+    public WorldInfo getIslandsWorldInfo(Island island, String worldName) {
+        Preconditions.checkNotNull(island, "island parameter cannot be null.");
+        Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
+
+        WorldsProvider worldsProvider = plugin.getProviders().getWorldsProvider();
+
+        if (worldsProvider instanceof LazyWorldsProvider)
+            return ((LazyWorldsProvider) worldsProvider).getIslandsWorldInfo(island, worldName);
+
+        World world = Bukkit.getWorld(worldName);
+        return world == null || !isIslandsWorld(world) ? null : WorldInfo.of(world);
     }
 
     @Override

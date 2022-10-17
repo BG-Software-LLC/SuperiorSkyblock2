@@ -14,7 +14,7 @@ import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.missions.Mission;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
-import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.DirtyChunk;
 import com.bgsoftware.superiorskyblock.core.key.KeyMapImpl;
 import com.bgsoftware.superiorskyblock.island.SIsland;
 import com.bgsoftware.superiorskyblock.island.container.value.Value;
@@ -63,7 +63,7 @@ public class IslandBuilderImpl implements Island.Builder {
     public int generatedSchematicsMask = 0;
     public int unlockedWorldsMask = 0;
     public long lastTimeUpdated = System.currentTimeMillis() / 1000;
-    public final Set<ChunkPosition> dirtyChunks = new LinkedHashSet<>();
+    public final Set<DirtyChunk> dirtyChunks = new LinkedHashSet<>();
     public final KeyMap<BigInteger> blockCounts = KeyMapImpl.createHashMap();
     public final EnumMap<World.Environment, Location> islandHomes = new EnumMap<>(World.Environment.class);
     public final List<SuperiorPlayer> members = new LinkedList<>();
@@ -293,13 +293,13 @@ public class IslandBuilderImpl implements Island.Builder {
     @Override
     public Island.Builder setDirtyChunk(String worldName, int chunkX, int chunkZ) {
         Preconditions.checkNotNull(worldName, "worldName parameter cannot be null.");
-        this.dirtyChunks.add(ChunkPosition.of(worldName, chunkX, chunkZ));
+        this.dirtyChunks.add(new DirtyChunk(worldName, chunkX, chunkZ));
         return this;
     }
 
     @Override
     public boolean isDirtyChunk(String worldName, int chunkX, int chunkZ) {
-        return this.dirtyChunks.contains(ChunkPosition.of(worldName, chunkX, chunkZ));
+        return this.dirtyChunks.contains(new DirtyChunk(worldName, chunkX, chunkZ));
     }
 
     @Override

@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.IslandPreview;
 import com.bgsoftware.superiorskyblock.api.island.SortingType;
 import com.bgsoftware.superiorskyblock.api.island.container.IslandsContainer;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.world.algorithm.IslandCreationAlgorithm;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
@@ -243,6 +244,28 @@ public interface GridManager extends IDatabaseBridgeHolder {
      */
     @Nullable
     World getIslandsWorld(Island island, World.Environment environment);
+
+    /**
+     * Get the {@link WorldInfo} of the world of an island by the environment.
+     * The world might not be loaded at the time of calling this method.
+     *
+     * @param island      The island to check.
+     * @param environment The world environment.
+     * @return The world info for the given environment, or null if this environment is not enabled.
+     */
+    @Nullable
+    WorldInfo getIslandsWorldInfo(Island island, World.Environment environment);
+
+    /**
+     * Get the {@link WorldInfo} of the world of an island by its name.
+     * The world might not be loaded at the time of calling this method.
+     *
+     * @param island    The island to check.
+     * @param worldName The name of the world.
+     * @return The world info for the given name, or null if this name is not an islands world.
+     */
+    @Nullable
+    WorldInfo getIslandsWorldInfo(Island island, String worldName);
 
     /**
      * Checks if the given world is an islands world.

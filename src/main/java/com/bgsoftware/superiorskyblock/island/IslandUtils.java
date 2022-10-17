@@ -5,6 +5,7 @@ import com.bgsoftware.superiorskyblock.api.enums.BorderColor;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.PlayerRole;
 import com.bgsoftware.superiorskyblock.api.key.Key;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
@@ -59,7 +60,7 @@ public class IslandUtils {
 
     }
 
-    public static List<ChunkPosition> getChunkCoords(Island island, World world, boolean onlyProtected, boolean noEmptyChunks) {
+    public static List<ChunkPosition> getChunkCoords(Island island, WorldInfo worldInfo, boolean onlyProtected, boolean noEmptyChunks) {
         List<ChunkPosition> chunkCoords = new LinkedList<>();
 
         Location min = onlyProtected ? island.getMinimumProtected() : island.getMinimum();
@@ -67,8 +68,8 @@ public class IslandUtils {
 
         for (int x = min.getBlockX() >> 4; x <= max.getBlockX() >> 4; x++) {
             for (int z = min.getBlockZ() >> 4; z <= max.getBlockZ() >> 4; z++) {
-                if (!noEmptyChunks || island.isChunkDirty(world, x, z)) {
-                    chunkCoords.add(ChunkPosition.of(world, x, z));
+                if (!noEmptyChunks || island.isChunkDirty(worldInfo.getName(), x, z)) {
+                    chunkCoords.add(ChunkPosition.of(worldInfo, x, z));
                 }
             }
         }
@@ -76,36 +77,37 @@ public class IslandUtils {
         return chunkCoords;
     }
 
-    public static Map<World, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
-        Map<World, List<ChunkPosition>> chunkCoords = new HashMap<>();
+    public static Map<WorldInfo, List<ChunkPosition>> getChunkCoords(Island island, boolean onlyProtected, boolean noEmptyChunks) {
+        Map<WorldInfo, List<ChunkPosition>> chunkCoords = new HashMap<>();
 
         {
             if (plugin.getProviders().getWorldsProvider().isNormalEnabled() && island.wasSchematicGenerated(World.Environment.NORMAL)) {
-                World normalWorld = island.getCenter(World.Environment.NORMAL).getWorld();
-                List<ChunkPosition> chunkPositions = getChunkCoords(island, normalWorld, onlyProtected, noEmptyChunks);
+                WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.NORMAL);
+                List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
                 if (!chunkPositions.isEmpty())
-                    chunkCoords.put(normalWorld, chunkPositions);
+                    chunkCoords.put(worldInfo, chunkPositions);
             }
         }
 
         if (plugin.getProviders().getWorldsProvider().isNetherEnabled() && island.wasSchematicGenerated(World.Environment.NETHER)) {
-            World netherWorld = island.getCenter(World.Environment.NETHER).getWorld();
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, netherWorld, onlyProtected, noEmptyChunks);
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.NETHER);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
-                chunkCoords.put(netherWorld, chunkPositions);
+                chunkCoords.put(worldInfo, chunkPositions);
         }
 
         if (plugin.getProviders().getWorldsProvider().isEndEnabled() && island.wasSchematicGenerated(World.Environment.THE_END)) {
-            World endWorld = island.getCenter(World.Environment.THE_END).getWorld();
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, endWorld, onlyProtected, noEmptyChunks);
+            WorldInfo worldInfo = plugin.getGrid().getIslandsWorldInfo(island, World.Environment.THE_END);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
-                chunkCoords.put(endWorld, chunkPositions);
+                chunkCoords.put(worldInfo, chunkPositions);
         }
 
         for (World registeredWorld : plugin.getGrid().getRegisteredWorlds()) {
-            List<ChunkPosition> chunkPositions = getChunkCoords(island, registeredWorld, onlyProtected, noEmptyChunks);
+            WorldInfo worldInfo = WorldInfo.of(registeredWorld);
+            List<ChunkPosition> chunkPositions = getChunkCoords(island, worldInfo, onlyProtected, noEmptyChunks);
             if (!chunkPositions.isEmpty())
-                chunkCoords.put(registeredWorld, chunkPositions);
+                chunkCoords.put(worldInfo, chunkPositions);
         }
 
         return chunkCoords;
@@ -119,7 +121,7 @@ public class IslandUtils {
                                                                    Consumer<Chunk> onChunkLoad) {
         return new SequentialListBuilder<CompletableFuture<Chunk>>()
                 .mutable()
-                .build(IslandUtils.getChunkCoords(island, world, onlyProtected, noEmptyChunks), chunkPosition ->
+                .build(IslandUtils.getChunkCoords(island, WorldInfo.of(world), onlyProtected, noEmptyChunks), chunkPosition ->
                         ChunksProvider.loadChunk(chunkPosition, chunkLoadReason, onChunkLoad));
     }
 
@@ -177,7 +179,7 @@ public class IslandUtils {
     }
 
     public static void resetChunksExcludedFromList(Island island, Collection<ChunkPosition> excludedChunkPositions) {
-        Map<World, List<ChunkPosition>> chunksToDelete = IslandUtils.getChunkCoords(island, false, false);
+        Map<WorldInfo, List<ChunkPosition>> chunksToDelete = IslandUtils.getChunkCoords(island, false, false);
         chunksToDelete.values().forEach(chunkPositions -> {
             List<ChunkPosition> clonedChunkPositions = new LinkedList<>(chunkPositions);
             clonedChunkPositions.removeAll(excludedChunkPositions);
@@ -255,7 +257,7 @@ public class IslandUtils {
     public static void deleteChunks(Island island, List<ChunkPosition> chunkPositions, Runnable onFinish) {
         plugin.getNMSChunks().deleteChunks(island, chunkPositions, onFinish);
         chunkPositions.forEach(chunkPosition -> {
-            plugin.getStackedBlocks().removeStackedBlocks(chunkPosition.getWorld(), chunkPosition.getX(), chunkPosition.getZ());
+            plugin.getStackedBlocks().removeStackedBlocks(chunkPosition);
             plugin.getEventsBus().callIslandChunkResetEvent(island, chunkPosition);
         });
     }

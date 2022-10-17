@@ -2,6 +2,7 @@ package com.bgsoftware.superiorskyblock.commands.admin;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -105,7 +106,7 @@ public class CmdAdminResetWorld implements IAdminIslandCommand {
             }
 
             // Resetting the chunks
-            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(island, world, true, true);
+            List<ChunkPosition> chunkPositions = IslandUtils.getChunkCoords(island, WorldInfo.of(world), true, true);
             IslandUtils.deleteChunks(island, chunkPositions, () -> island.calcIslandWorth(null));
 
             island.setSchematicGenerate(environment, false);

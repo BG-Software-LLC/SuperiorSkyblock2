@@ -7,10 +7,12 @@ import com.bgsoftware.superiorskyblock.api.factory.IslandsFactory;
 import com.bgsoftware.superiorskyblock.api.factory.PlayersFactory;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.bank.BankTransaction;
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
@@ -140,5 +142,13 @@ public interface FactoriesManager {
      */
     BankTransaction createTransaction(@Nullable UUID player, BankAction action, int position,
                                       long time, String failureReason, BigDecimal amount);
+
+    /**
+     * Create a new world info.
+     *
+     * @param worldName   The name of the world.
+     * @param environment The environment of the world.
+     */
+    WorldInfo createWorldInfo(String worldName, World.Environment environment);
 
 }

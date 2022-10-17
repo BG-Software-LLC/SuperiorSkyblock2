@@ -1,5 +1,6 @@
 package com.bgsoftware.superiorskyblock.core;
 
+import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -10,52 +11,48 @@ import java.util.Objects;
 
 public class ChunkPosition {
 
-    private final String worldName;
+    private final WorldInfo worldInfo;
     private final int x;
     private final int z;
 
     private long pairedXZ = -1;
 
-    private ChunkPosition(String worldName, int x, int z) {
-        this.worldName = worldName;
+    private ChunkPosition(WorldInfo worldInfo, int x, int z) {
+        this.worldInfo = worldInfo;
         this.x = x;
         this.z = z;
     }
 
     public static ChunkPosition of(Block block) {
-        return of(block.getLocation());
+        return of(WorldInfo.of(block.getWorld()), block.getX() >> 4, block.getZ() >> 4);
     }
 
     public static ChunkPosition of(Location location) {
-        return of(LazyWorldLocation.getWorldName(location), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        return of(WorldInfo.of(location.getWorld()), location.getBlockX() >> 4, location.getBlockZ() >> 4);
     }
 
     public static ChunkPosition of(Chunk chunk) {
-        return of(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
-    }
-
-    public static ChunkPosition of(SBlockPosition blockPosition) {
-        return of(blockPosition.getWorldName(), blockPosition.getX() >> 4, blockPosition.getZ() >> 4);
+        return of(WorldInfo.of(chunk.getWorld()), chunk.getX(), chunk.getZ());
     }
 
     public static ChunkPosition of(World world, int x, int z) {
-        return of(world.getName(), x, z);
+        return of(WorldInfo.of(world), x, z);
     }
 
-    public static ChunkPosition of(String worldName, int x, int z) {
-        return new ChunkPosition(worldName, x, z);
-    }
-
-    public Chunk loadChunk() {
-        return getWorld().getChunkAt(x, z);
+    public static ChunkPosition of(WorldInfo worldInfo, int x, int z) {
+        return new ChunkPosition(worldInfo, x, z);
     }
 
     public World getWorld() {
-        return Bukkit.getWorld(worldName);
+        return Bukkit.getWorld(getWorldName());
+    }
+
+    public WorldInfo getWorldsInfo() {
+        return this.worldInfo;
     }
 
     public String getWorldName() {
-        return worldName;
+        return this.worldInfo.getName();
     }
 
     public int getX() {
@@ -74,12 +71,13 @@ public class ChunkPosition {
     }
 
     public boolean isInsideChunk(Location location) {
-        return location.getWorld().getName().equals(worldName) && location.getBlockX() >> 4 == x && location.getBlockZ() >> 4 == z;
+        return location.getWorld().getName().equals(worldInfo.getName()) &&
+                location.getBlockX() >> 4 == x && location.getBlockZ() >> 4 == z;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(worldName, x, z);
+        return Objects.hash(worldInfo.getName(), x, z);
     }
 
     @Override
@@ -89,12 +87,12 @@ public class ChunkPosition {
         ChunkPosition that = (ChunkPosition) o;
         return x == that.x &&
                 z == that.z &&
-                worldName.equals(that.worldName);
+                worldInfo.equals(that.worldInfo);
     }
 
     @Override
     public String toString() {
-        return worldName + ", " + x + ", " + z;
+        return worldInfo.getName() + ", " + x + ", " + z;
     }
 
 }

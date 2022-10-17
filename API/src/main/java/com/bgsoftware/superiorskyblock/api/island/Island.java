@@ -1062,6 +1062,15 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     boolean isChunkDirty(World world, int chunkX, int chunkZ);
 
     /**
+     * Check whether a chunk has blocks inside it.
+     *
+     * @param worldName The name of the world of the chunk.
+     * @param chunkX    The x-coords of the chunk.
+     * @param chunkZ    The z-coords of the chunk.
+     */
+    boolean isChunkDirty(String worldName, int chunkX, int chunkZ);
+
+    /**
      * Mark a chunk as it has blocks inside it.
      *
      * @param world  The world of the chunk.
