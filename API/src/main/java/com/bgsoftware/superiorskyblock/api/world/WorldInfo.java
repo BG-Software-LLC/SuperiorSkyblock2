@@ -23,7 +23,6 @@ public interface WorldInfo {
      */
     static WorldInfo of(World world) {
         Preconditions.checkNotNull(world, "world parameter cannot be null");
-        Preconditions.checkArgument(SuperiorSkyblockAPI.getGrid().isIslandsWorld(world), "World must be an islands world.");
         return of(world.getName(), world.getEnvironment());
     }
 
