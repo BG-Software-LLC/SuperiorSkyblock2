@@ -76,8 +76,10 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
 
             if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
                 BukkitExecutor.sync(() -> {
-                    if (chunk.isLoaded())
+                    if (chunk.isLoaded()) {
+                        Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntitySpawn);
                         island.getEntitiesTracker().recalculateEntityCounts();
+                    }
                 }, 20L);
             }
         }
@@ -108,8 +110,7 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
         if (!island.isSpawn() && !plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
-        Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntitySpawn);
-
+        Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntityDespawn);
     }
 
 }
