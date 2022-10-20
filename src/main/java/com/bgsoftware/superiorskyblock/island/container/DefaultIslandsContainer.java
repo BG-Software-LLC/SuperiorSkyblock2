@@ -12,7 +12,6 @@ import com.bgsoftware.superiorskyblock.core.threads.Synchronized;
 import com.google.common.base.Preconditions;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
 
 public class DefaultIslandsContainer implements IslandsContainer {
 
@@ -60,15 +58,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
         sortedIslands.values().forEach(sortedIslands -> {
             sortedIslands.write(_sortedIslands -> _sortedIslands.remove(island));
         });
-
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
-                    location -> islandsByPositions.remove(IslandPosition.of(location)));
-            runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
-                    location -> islandsByPositions.remove(IslandPosition.of(location)));
-            runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
-                    location -> islandsByPositions.remove(IslandPosition.of(location)));
-        }
     }
 
     @Nullable
@@ -151,15 +140,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
     public void addSortingType(SortingType sortingType, boolean sort) {
         Preconditions.checkArgument(!sortedIslands.containsKey(sortingType), "You cannot register an existing sorting type to the database.");
         sortIslandsInternal(sortingType, null);
-    }
-
-    private void runWithCustomWorld(Location islandLocation, Island island, World.Environment environment, Consumer<Location> onSuccess) {
-        try {
-            Location location = island.getCenter(environment);
-            if (!location.getWorld().equals(islandLocation.getWorld()))
-                onSuccess.accept(location);
-        } catch (Exception ignored) {
-        }
     }
 
     private void ensureSortingType(SortingType sortingType) {
