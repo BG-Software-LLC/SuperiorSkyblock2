@@ -363,8 +363,8 @@ public class EventsBus {
     }
 
     @SuppressWarnings("all")
-    public boolean callIslandJoinEvent(SuperiorPlayer superiorPlayer, Island island) {
-        return callEvent(() -> new IslandJoinEvent(superiorPlayer, island), "islandjoinevent");
+    public boolean callIslandJoinEvent(SuperiorPlayer superiorPlayer, Island island, IslandJoinEvent.Cause cause) {
+        return callEvent(() -> new IslandJoinEvent(superiorPlayer, island, cause), "islandjoinevent");
     }
 
     public void callIslandKickEvent(SuperiorPlayer superiorPlayer, SuperiorPlayer targetPlayer, Island island) {
