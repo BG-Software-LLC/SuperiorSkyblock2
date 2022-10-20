@@ -1,6 +1,8 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
+import com.bgsoftware.superiorskyblock.api.island.Island;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import org.bukkit.Location;
 
 public class IslandPosition {
@@ -16,10 +18,19 @@ public class IslandPosition {
     }
 
     public static IslandPosition of(Location location) {
+        return fromXZ(location.getBlockX(), location.getBlockZ());
+    }
+
+    public static IslandPosition of(Island island) {
+        BlockPosition center = island.getCenterPosition();
+        return fromXZ(center.getX(), center.getZ());
+    }
+
+    private static IslandPosition fromXZ(int locX, int locZ) {
         int radius = plugin.getSettings().getMaxIslandSize() * 3;
-        int x = (Math.abs(location.getBlockX()) + (radius / 2)) / radius;
-        int z = (Math.abs(location.getBlockZ()) + (radius / 2)) / radius;
-        return new IslandPosition(location.getBlockX() < 0 ? -x : x, location.getBlockZ() < 0 ? -z : z);
+        int x = (Math.abs(locX) + (radius / 2)) / radius;
+        int z = (Math.abs(locZ) + (radius / 2)) / radius;
+        return new IslandPosition(locX < 0 ? -x : x, locZ < 0 ? -z : z);
     }
 
     @Override

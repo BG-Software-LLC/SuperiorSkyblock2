@@ -22,6 +22,7 @@ import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.database.DatabaseResult;
 import com.bgsoftware.superiorskyblock.core.database.bridge.GridDatabaseBridge;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
+import com.bgsoftware.superiorskyblock.core.errors.ManagerLoadException;
 import com.bgsoftware.superiorskyblock.core.formatting.Formatters;
 import com.bgsoftware.superiorskyblock.core.logging.Debug;
 import com.bgsoftware.superiorskyblock.core.logging.Log;
@@ -112,7 +113,11 @@ public class GridManagerImpl extends Manager implements GridManager {
     }
 
     public void updateSpawn() {
-        spawnIsland = new SpawnIsland(plugin);
+        try {
+            this.spawnIsland = new SpawnIsland();
+        } catch (ManagerLoadException error) {
+            ManagerLoadException.handle(error);
+        }
     }
 
     public void syncUpgrades() {

@@ -15,6 +15,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -212,6 +213,11 @@ public class DelegateIsland implements Island {
         return this.handle.getCenter(environment);
     }
 
+    @Override
+    public BlockPosition getCenterPosition() {
+        return this.handle.getCenterPosition();
+    }
+
     @Nullable
     @Override
     public Location getTeleportLocation(World.Environment environment) {
@@ -278,8 +284,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public BlockPosition getMinimumPosition() {
+        return this.handle.getMinimumPosition();
+    }
+
+    @Override
     public Location getMinimumProtected() {
         return this.handle.getMinimumProtected();
+    }
+
+    @Override
+    public BlockPosition getMinimumProtectedPosition() {
+        return this.handle.getMinimumProtectedPosition();
     }
 
     @Override
@@ -288,8 +304,18 @@ public class DelegateIsland implements Island {
     }
 
     @Override
+    public BlockPosition getMaximumPosition() {
+        return this.handle.getMaximumPosition();
+    }
+
+    @Override
     public Location getMaximumProtected() {
         return this.handle.getMaximumProtected();
+    }
+
+    @Override
+    public BlockPosition getMaximumProtectedPosition() {
+        return this.handle.getMaximumProtectedPosition();
     }
 
     @Override

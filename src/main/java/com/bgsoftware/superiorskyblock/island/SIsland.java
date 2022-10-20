@@ -759,7 +759,13 @@ public class SIsland implements Island {
 
         Preconditions.checkNotNull(world, "Couldn't find world for environment " + environment + ".");
 
+        // noinspection deprecation
         return center.parse(world).add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public BlockPosition getCenterPosition() {
+        return center;
     }
 
     @Override
@@ -876,9 +882,22 @@ public class SIsland implements Island {
     }
 
     @Override
+    public BlockPosition getMinimumPosition() {
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        return getCenterPosition().offset(-islandDistance, 0, -islandDistance);
+    }
+
+    @Override
     public Location getMinimumProtected() {
         int islandSize = getIslandSize();
         return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).subtract(islandSize, 0, islandSize);
+    }
+
+    @Override
+    public BlockPosition getMinimumProtectedPosition() {
+        int islandSize = getIslandSize();
+        return getCenterPosition().offset(-islandSize, 0, -islandSize);
     }
 
     @Override
@@ -889,9 +908,23 @@ public class SIsland implements Island {
     }
 
     @Override
+    public BlockPosition getMaximumPosition() {
+        int islandDistance = (int) Math.round(plugin.getSettings().getMaxIslandSize() *
+                (plugin.getSettings().isBuildOutsideIsland() ? 1.5 : 1D));
+        return getCenterPosition().offset(islandDistance, 0, islandDistance);
+    }
+
+    @Override
     public Location getMaximumProtected() {
         int islandSize = getIslandSize();
         return getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).add(islandSize, 0, islandSize);
+    }
+
+    @Override
+    public BlockPosition getMaximumProtectedPosition() {
+        int islandSize = getIslandSize();
+        BlockPosition centerPosition = getCenterPosition();
+        return getCenterPosition().offset(islandSize, 0, islandSize);
     }
 
     @Override

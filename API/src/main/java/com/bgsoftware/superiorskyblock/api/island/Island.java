@@ -20,6 +20,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.IPersistentDataHolder;
 import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -268,6 +269,11 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getCenter(World.Environment environment);
 
     /**
+     * Get the center position of the island.
+     */
+    BlockPosition getCenterPosition();
+
+    /**
      * Get the members' teleport location of the island, depends on the world environment.
      * Similar to {@link #getIslandHome(World.Environment)}
      *
@@ -358,9 +364,19 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getMinimum();
 
     /**
+     * Get the minimum location of the island.
+     */
+    BlockPosition getMinimumPosition();
+
+    /**
      * Get the minimum protected location of the island.
      */
     Location getMinimumProtected();
+
+    /**
+     * Get the minimum location of the island.
+     */
+    BlockPosition getMinimumProtectedPosition();
 
     /**
      * Get the maximum location of the island.
@@ -368,9 +384,19 @@ public interface Island extends Comparable<Island>, IMissionsHolder, IPersistent
     Location getMaximum();
 
     /**
+     * Get the maximum location of the island.
+     */
+    BlockPosition getMaximumPosition();
+
+    /**
      * Get the minimum protected location of the island.
      */
     Location getMaximumProtected();
+
+    /**
+     * Get the minimum protected location of the island.
+     */
+    BlockPosition getMaximumProtectedPosition();
 
     /**
      * Get all the chunks of the island from all the environments.

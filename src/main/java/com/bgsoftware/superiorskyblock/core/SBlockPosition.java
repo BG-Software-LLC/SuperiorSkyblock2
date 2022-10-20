@@ -31,11 +31,13 @@ public class SBlockPosition implements BlockPosition {
     }
 
     @Override
+    @Deprecated
     public String getWorldName() {
         return world;
     }
 
     @Override
+    @Deprecated
     public World getWorld() {
         return Bukkit.getWorld(world);
     }
@@ -56,16 +58,24 @@ public class SBlockPosition implements BlockPosition {
     }
 
     @Override
+    public BlockPosition offset(int x, int y, int z) {
+        return new SBlockPosition(this.world, this.x + x, this.y + y, this.z + z);
+    }
+
+    @Override
+    @Deprecated
     public Block getBlock() {
         return parse().getBlock();
     }
 
     @Override
+    @Deprecated
     public Location parse(World world) {
         return new Location(world, getX(), getY(), getZ());
     }
 
     @Override
+    @Deprecated
     public Location parse() {
         World world = getWorld();
         return world == null ? new LazyWorldLocation(this.world, getX(), getY(), getZ(), 0, 0) :

@@ -24,9 +24,11 @@ import com.bgsoftware.superiorskyblock.api.service.message.IMessageComponent;
 import com.bgsoftware.superiorskyblock.api.upgrades.Upgrade;
 import com.bgsoftware.superiorskyblock.api.upgrades.UpgradeLevel;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.IslandArea;
+import com.bgsoftware.superiorskyblock.core.SBlockPosition;
 import com.bgsoftware.superiorskyblock.core.SequentialListBuilder;
 import com.bgsoftware.superiorskyblock.core.WorldInfoImpl;
 import com.bgsoftware.superiorskyblock.core.database.bridge.EmptyDatabaseBridge;
@@ -47,7 +49,6 @@ import com.bgsoftware.superiorskyblock.player.SSuperiorPlayer;
 import com.bgsoftware.superiorskyblock.player.builder.SuperiorPlayerBuilderImpl;
 import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
 import com.google.common.base.Preconditions;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -77,53 +78,44 @@ public class SpawnIsland implements Island {
     private static final SSuperiorPlayer ownerPlayer = new SSuperiorPlayer((SuperiorPlayerBuilderImpl)
             SuperiorPlayer.newBuilder().setUniqueId(spawnUUID));
     private static final IslandChest[] EMPTY_ISLAND_CHESTS = new IslandChest[0];
-    private static SuperiorSkyblockPlugin plugin;
+    private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
     private final PriorityQueue<SuperiorPlayer> playersInside = new PriorityQueue<>(SortingComparators.PLAYER_NAMES_COMPARATOR);
     private final DirtyChunksContainer dirtyChunksContainer;
 
-    private final Location center;
+    private final BlockPosition center;
     private final World spawnWorld;
     private final WorldInfo spawnWorldInfo;
-    private final int islandSize;
-    private final Location minLocation;
-    private final Location maxLocation;
     private final IslandArea islandArea;
+    private final int islandSize;
 
     private Biome biome = Biome.PLAINS;
 
 
-    public SpawnIsland(SuperiorSkyblockPlugin plugin) {
-        SpawnIsland.plugin = plugin;
-
+    public SpawnIsland() throws ManagerLoadException {
         String spawnLocation = plugin.getSettings().getSpawn().getLocation();
-
         Location smartCenter = Serializers.LOCATION_SPACED_SERIALIZER.deserialize(spawnLocation);
-
         assert smartCenter != null;
 
-        center = smartCenter.add(0.5, 0, 0.5);
-        islandSize = plugin.getSettings().getSpawn().getSize();
-        minLocation = center.clone().subtract(islandSize, islandSize, islandSize);
-        maxLocation = center.clone().add(islandSize, islandSize, islandSize);
-        this.islandArea = new IslandArea(minLocation.getBlockX(), minLocation.getBlockZ(),
-                maxLocation.getBlockX(), maxLocation.getBlockZ());
+        String worldName = spawnLocation.split(", ")[0];
+
+        if (smartCenter.getWorld() == null)
+            plugin.getProviders().runWorldsListeners(worldName);
+
+        this.spawnWorld = smartCenter.getWorld();
+
+        if (this.spawnWorld == null)
+            throw new ManagerLoadException("The spawn location is in invalid world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN);
+
+        this.islandSize = plugin.getSettings().getSpawn().getSize();
+
+        this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
+        this.islandArea = new IslandArea(this.center, this.islandSize);
+        this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), this.spawnWorld.getEnvironment());
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
-        if (center.getWorld() == null)
-            plugin.getProviders().runWorldsListeners(spawnLocation.split(", ")[0]);
-
-        this.spawnWorld = center.getWorld();
-        this.spawnWorldInfo = this.spawnWorld == null ? null : new WorldInfoImpl(this.spawnWorld.getName(), this.spawnWorld.getEnvironment());
-
-        if (this.spawnWorld == null) {
-            new ManagerLoadException("The spawn location is in invalid world.", ManagerLoadException.ErrorLevel.SERVER_SHUTDOWN).printStackTrace();
-            Bukkit.shutdown();
-            return;
-        }
-
-        BukkitExecutor.sync(() -> biome = getCenter(plugin.getSettings().getWorlds().getDefaultWorld()).getBlock().getBiome());
+        BukkitExecutor.sync(() -> biome = getCenter(null /* unused */).getBlock().getBiome());
     }
 
     @Override
@@ -291,7 +283,12 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getCenter(World.Environment environment) {
-        return center.clone();
+        return center.parse(this.spawnWorld).add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public BlockPosition getCenterPosition() {
+        return this.center;
     }
 
     @Override
@@ -322,7 +319,7 @@ public class SpawnIsland implements Island {
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
         Map<World.Environment, Location> map = new HashMap<>();
-        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), center);
+        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), getCenter(null /*unused*/));
         return map;
     }
 
@@ -354,22 +351,42 @@ public class SpawnIsland implements Island {
 
     @Override
     public Location getMinimum() {
-        return this.minLocation.clone();
+        return this.getMinimumPosition().parse(this.spawnWorld).add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public BlockPosition getMinimumPosition() {
+        return this.center.offset(-this.islandSize, 0, -this.islandSize);
     }
 
     @Override
     public Location getMinimumProtected() {
-        return getMinimum();
+        return this.getMinimum();
+    }
+
+    @Override
+    public BlockPosition getMinimumProtectedPosition() {
+        return this.getMinimumPosition();
     }
 
     @Override
     public Location getMaximum() {
-        return this.maxLocation.clone();
+        return this.getMaximumPosition().parse(this.spawnWorld).add(0.5, 0, 0.5);
+    }
+
+    @Override
+    public BlockPosition getMaximumPosition() {
+        return this.center.offset(this.islandSize, 0, this.islandSize);
     }
 
     @Override
     public Location getMaximumProtected() {
-        return getMaximum();
+        return this.getMaximum();
+    }
+
+    @Override
+    public BlockPosition getMaximumProtectedPosition() {
+        return this.getMaximumPosition();
     }
 
     @Override
