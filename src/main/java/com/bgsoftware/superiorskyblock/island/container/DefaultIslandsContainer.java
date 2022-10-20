@@ -43,15 +43,6 @@ public class DefaultIslandsContainer implements IslandsContainer {
         Location islandLocation = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
         this.islandsByPositions.put(IslandPosition.of(islandLocation), island);
 
-        if (plugin.getProviders().hasCustomWorldsSupport()) {
-            runWithCustomWorld(islandLocation, island, World.Environment.NORMAL,
-                    location -> this.islandsByPositions.put(IslandPosition.of(location), island));
-            runWithCustomWorld(islandLocation, island, World.Environment.NETHER,
-                    location -> this.islandsByPositions.put(IslandPosition.of(location), island));
-            runWithCustomWorld(islandLocation, island, World.Environment.THE_END,
-                    location -> this.islandsByPositions.put(IslandPosition.of(location), island));
-        }
-
         this.islandsByUUID.put(island.getUniqueId(), island);
 
         sortedIslands.values().forEach(sortedIslands -> {
