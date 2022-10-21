@@ -38,8 +38,7 @@ public class DefaultIslandsContainer implements IslandsContainer {
 
     @Override
     public void addIsland(Island island) {
-        Location islandLocation = island.getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
-        this.islandsByPositions.put(IslandPosition.of(islandLocation), island);
+        this.islandsByPositions.put(IslandPosition.of(island), island);
 
         this.islandsByUUID.put(island.getUniqueId(), island);
 
