@@ -100,7 +100,7 @@ public class CropsBlockEntity extends BlockEntity {
 
         if (chunkRandomTickSpeed > 0) {
             for (LevelChunkSection levelChunkSection : levelChunk.getSections()) {
-                if (levelChunkSection != LevelChunk.EMPTY_SECTION && levelChunkSection.isEmpty()) {
+                if (levelChunkSection != LevelChunk.EMPTY_SECTION && levelChunkSection.isRandomlyTicking()) {
                     for (int i = 0; i < chunkRandomTickSpeed; i++) {
                         random = random * 3 + 1013904223;
                         int factor = random >> 2;
