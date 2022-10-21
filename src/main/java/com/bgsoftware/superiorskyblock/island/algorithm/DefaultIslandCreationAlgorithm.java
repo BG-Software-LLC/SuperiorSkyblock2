@@ -80,6 +80,8 @@ public class DefaultIslandCreationAlgorithm implements IslandCreationAlgorithm {
 
         Island island = builder.setCenter(islandLocation.add(0.5, 0, 0.5)).build();
 
+        island.getDatabaseBridge().setDatabaseBridgeMode(DatabaseBridgeMode.IDLE);
+
         EventResult<Boolean> event = plugin.getEventsBus().callIslandCreateEvent(builder.owner, island, builder.islandType);
 
         if (!event.isCancelled()) {
