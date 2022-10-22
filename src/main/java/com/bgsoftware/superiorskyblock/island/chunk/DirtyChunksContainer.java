@@ -3,9 +3,9 @@ package com.bgsoftware.superiorskyblock.island.chunk;
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.WorldInfo;
+import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.database.bridge.IslandsDatabaseBridge;
-import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.BitSet;
@@ -30,13 +30,13 @@ public class DirtyChunksContainer {
     public DirtyChunksContainer(Island island) {
         this.island = island;
 
-        Location minimum = island.getMinimum();
-        this.minChunkX = minimum.getBlockX() >> 4;
-        this.minChunkZ = minimum.getBlockZ() >> 4;
+        BlockPosition minimum = island.getMinimumPosition();
+        this.minChunkX = minimum.getX() >> 4;
+        this.minChunkZ = minimum.getZ() >> 4;
 
-        Location maximum = island.getMaximum();
-        int maxChunkX = maximum.getBlockX() >> 4;
-        int maxChunkZ = maximum.getBlockZ() >> 4;
+        BlockPosition maximum = island.getMaximumPosition();
+        int maxChunkX = maximum.getX() >> 4;
+        int maxChunkZ = maximum.getZ() >> 4;
         int chunksInZAxis = maxChunkZ - this.minChunkZ;
 
         this.chunksInXAxis = maxChunkX - this.minChunkX;
