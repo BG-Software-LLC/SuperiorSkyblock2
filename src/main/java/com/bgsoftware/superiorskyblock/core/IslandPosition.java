@@ -1,46 +1,46 @@
 package com.bgsoftware.superiorskyblock.core;
 
 import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.wrappers.BlockPosition;
 import org.bukkit.Location;
+
+import java.util.Objects;
 
 public class IslandPosition {
 
     private static final SuperiorSkyblockPlugin plugin = SuperiorSkyblockPlugin.getPlugin();
 
+    private final String worldName;
     private final int x;
     private final int z;
 
-    private IslandPosition(int x, int z) {
+    private IslandPosition(String worldName, int x, int z) {
+        this.worldName = worldName;
         this.x = x;
         this.z = z;
     }
 
     public static IslandPosition of(Location location) {
-        return fromXZ(location.getBlockX(), location.getBlockZ());
+        return of(LazyWorldLocation.getWorldName(location), location.getBlockX(), location.getBlockZ());
     }
 
-    public static IslandPosition of(Island island) {
-        BlockPosition center = island.getCenterPosition();
-        return fromXZ(center.getX(), center.getZ());
-    }
-
-    private static IslandPosition fromXZ(int locX, int locZ) {
+    public static IslandPosition of(String worldName, int locX, int locZ) {
         int radius = plugin.getSettings().getMaxIslandSize() * 3;
         int x = (Math.abs(locX) + (radius / 2)) / radius;
         int z = (Math.abs(locZ) + (radius / 2)) / radius;
-        return new IslandPosition(locX < 0 ? -x : x, locZ < 0 ? -z : z);
+        return new IslandPosition(worldName, locX < 0 ? -x : x, locZ < 0 ? -z : z);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IslandPosition that = (IslandPosition) o;
+        return x == that.x && z == that.z && worldName.equals(that.worldName);
     }
 
     @Override
     public int hashCode() {
-        return Long.hashCode(((long) this.x << 32) | this.z);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof IslandPosition && x == ((IslandPosition) obj).x && z == ((IslandPosition) obj).z;
+        return Objects.hash(worldName, x, z);
     }
 
     @Override
