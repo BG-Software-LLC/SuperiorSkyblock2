@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class DelegateIslandsContainer implements IslandsContainer {
 
-    private final IslandsContainer handle;
+    protected final IslandsContainer handle;
 
     protected DelegateIslandsContainer(IslandsContainer handle) {
         this.handle = handle;

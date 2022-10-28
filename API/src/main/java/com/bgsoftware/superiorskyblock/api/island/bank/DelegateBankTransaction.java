@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class DelegateBankTransaction implements BankTransaction {
 
-    private final BankTransaction handle;
+    protected final BankTransaction handle;
 
     protected DelegateBankTransaction(BankTransaction handle) {
         this.handle = handle;

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class DelegatePlayersContainer implements PlayersContainer {
 
-    private final PlayersContainer handle;
+    protected final PlayersContainer handle;
 
     protected DelegatePlayersContainer(PlayersContainer handle) {
         this.handle = handle;

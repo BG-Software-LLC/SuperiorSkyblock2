@@ -26,7 +26,7 @@ import java.util.function.Consumer;
 
 public class DelegateSuperiorPlayer implements SuperiorPlayer {
 
-    private final SuperiorPlayer handle;
+    protected final SuperiorPlayer handle;
 
     protected DelegateSuperiorPlayer(SuperiorPlayer handle) {
         this.handle = handle;

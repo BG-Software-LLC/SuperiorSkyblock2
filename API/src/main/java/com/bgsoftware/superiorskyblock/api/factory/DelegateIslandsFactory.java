@@ -8,7 +8,7 @@ import com.bgsoftware.superiorskyblock.api.persistence.PersistentDataContainer;
 
 public class DelegateIslandsFactory implements IslandsFactory {
 
-    private final IslandsFactory handle;
+    protected final IslandsFactory handle;
 
     protected DelegateIslandsFactory(IslandsFactory handle) {
         this.handle = handle;

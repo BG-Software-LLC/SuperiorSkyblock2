@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class DelegatePermissionNode implements PermissionNode {
 
-    private final PermissionNode handle;
+    protected final PermissionNode handle;
 
     protected DelegatePermissionNode(PermissionNode handle) {
         this.handle = handle;

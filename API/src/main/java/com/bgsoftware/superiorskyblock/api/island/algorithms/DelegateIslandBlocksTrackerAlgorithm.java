@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class DelegateIslandBlocksTrackerAlgorithm implements IslandBlocksTrackerAlgorithm {
 
-    private final IslandBlocksTrackerAlgorithm handle;
+    protected final IslandBlocksTrackerAlgorithm handle;
 
     protected DelegateIslandBlocksTrackerAlgorithm(IslandBlocksTrackerAlgorithm handle) {
         this.handle = handle;

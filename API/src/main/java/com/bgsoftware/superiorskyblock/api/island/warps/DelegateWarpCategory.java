@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DelegateWarpCategory implements WarpCategory {
 
-    private final WarpCategory handle;
+    protected final WarpCategory handle;
 
     protected DelegateWarpCategory(WarpCategory handle) {
         this.handle = handle;

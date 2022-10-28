@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 
 public class DelegateIslandWarp implements IslandWarp {
 
-    private final IslandWarp handle;
+    protected final IslandWarp handle;
 
     protected DelegateIslandWarp(IslandWarp handle) {
         this.handle = handle;

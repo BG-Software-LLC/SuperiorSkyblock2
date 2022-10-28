@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 
 public class DelegateIsland implements Island {
 
-    private final Island handle;
+    protected final Island handle;
 
     protected DelegateIsland(Island handle) {
         this.handle = handle;

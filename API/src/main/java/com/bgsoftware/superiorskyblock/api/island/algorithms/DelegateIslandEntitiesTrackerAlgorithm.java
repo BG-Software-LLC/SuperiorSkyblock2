@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class DelegateIslandEntitiesTrackerAlgorithm implements IslandEntitiesTrackerAlgorithm {
 
-    private final IslandEntitiesTrackerAlgorithm handle;
+    protected final IslandEntitiesTrackerAlgorithm handle;
 
     protected DelegateIslandEntitiesTrackerAlgorithm(IslandEntitiesTrackerAlgorithm handle) {
         this.handle = handle;

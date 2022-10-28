@@ -9,7 +9,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DelegatePlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
 
-    private final PlayerTeleportAlgorithm handle;
+    protected final PlayerTeleportAlgorithm handle;
 
     protected DelegatePlayerTeleportAlgorithm(PlayerTeleportAlgorithm handle) {
         this.handle = handle;

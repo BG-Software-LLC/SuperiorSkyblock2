@@ -5,7 +5,7 @@ import java.util.function.BiConsumer;
 
 public class DelegatePersistentDataContainer implements PersistentDataContainer {
 
-    private final PersistentDataContainer handle;
+    protected final PersistentDataContainer handle;
 
     protected DelegatePersistentDataContainer(PersistentDataContainer handle) {
         this.handle = handle;

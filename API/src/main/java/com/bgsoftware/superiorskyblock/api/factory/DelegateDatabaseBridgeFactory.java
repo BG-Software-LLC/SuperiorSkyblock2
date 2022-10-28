@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 public class DelegateDatabaseBridgeFactory implements DatabaseBridgeFactory {
 
-    private final DatabaseBridgeFactory handle;
+    protected final DatabaseBridgeFactory handle;
 
     protected DelegateDatabaseBridgeFactory(DatabaseBridgeFactory handle) {
         this.handle = handle;

@@ -5,7 +5,7 @@ import com.bgsoftware.superiorskyblock.api.island.bank.IslandBank;
 
 public class DelegateBanksFactory implements BanksFactory {
 
-    private final BanksFactory handle;
+    protected final BanksFactory handle;
 
     protected DelegateBanksFactory(BanksFactory handle) {
         this.handle = handle;

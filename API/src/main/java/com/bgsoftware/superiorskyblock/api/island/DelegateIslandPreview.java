@@ -5,7 +5,7 @@ import org.bukkit.Location;
 
 public class DelegateIslandPreview implements IslandPreview {
 
-    private final IslandPreview handle;
+    protected final IslandPreview handle;
 
     protected DelegateIslandPreview(IslandPreview handle) {
         this.handle = handle;

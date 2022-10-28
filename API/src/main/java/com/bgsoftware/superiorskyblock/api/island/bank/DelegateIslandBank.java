@@ -9,7 +9,7 @@ import java.util.List;
 
 public class DelegateIslandBank implements IslandBank {
 
-    private final IslandBank handle;
+    protected final IslandBank handle;
 
     public DelegateIslandBank(IslandBank handle) {
         this.handle = handle;

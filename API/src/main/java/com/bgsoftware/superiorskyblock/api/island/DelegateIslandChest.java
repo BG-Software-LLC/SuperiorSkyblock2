@@ -1,14 +1,12 @@
 package com.bgsoftware.superiorskyblock.api.island;
 
-import com.bgsoftware.superiorskyblock.api.island.Island;
-import com.bgsoftware.superiorskyblock.api.island.IslandChest;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class DelegateIslandChest implements IslandChest {
 
-    private final IslandChest handle;
+    protected final IslandChest handle;
 
     protected DelegateIslandChest(IslandChest handle) {
         this.handle = handle;

@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class DelegateIslandCalculationAlgorithm implements IslandCalculationAlgorithm {
 
-    private final IslandCalculationAlgorithm handle;
+    protected final IslandCalculationAlgorithm handle;
 
     protected DelegateIslandCalculationAlgorithm(IslandCalculationAlgorithm handle) {
         this.handle = handle;

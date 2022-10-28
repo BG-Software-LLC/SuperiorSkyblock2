@@ -6,7 +6,7 @@ import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 
 public class DelegatePlayersFactory implements PlayersFactory {
 
-    private final PlayersFactory handle;
+    protected final PlayersFactory handle;
 
     protected DelegatePlayersFactory(PlayersFactory handle) {
         this.handle = handle;
