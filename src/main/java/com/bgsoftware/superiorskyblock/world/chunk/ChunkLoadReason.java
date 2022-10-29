@@ -8,7 +8,7 @@ public enum ChunkLoadReason {
     ENTITIES_RECALCULATE,
     FIND_SAFE_SPOT,
     API_REQUEST,
-
-    BIOME_REQUEST
+    BIOME_REQUEST,
+    WARP_SIGN_BREAK
 
 }
