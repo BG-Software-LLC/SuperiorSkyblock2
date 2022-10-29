@@ -751,6 +751,11 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
 
+        if (!otherPlayer.isPersistentDataContainerEmpty()) {
+            byte[] data = otherPlayer.getPersistentDataContainer().serialize();
+            getPersistentDataContainer().load(data);
+        }
+
         // Convert data for missions
         plugin.getMissions().convertPlayerData(otherPlayer, this);
 
