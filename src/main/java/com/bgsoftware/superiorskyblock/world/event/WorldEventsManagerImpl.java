@@ -61,8 +61,6 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
                     if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
                             plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
                         entity.remove();
-
-                    entityTrackingListener.get().onEntityDespawn(entity);
                 }
             }
         }, 2L);
