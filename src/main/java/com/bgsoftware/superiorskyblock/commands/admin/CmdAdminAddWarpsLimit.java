@@ -67,7 +67,7 @@ public class CmdAdminAddWarpsLimit implements IAdminIslandCommand {
 
         int limit = arguments.getNumber();
 
-        if (limit < 0) {
+        if (limit <= 0) {
             Message.INVALID_AMOUNT.send(sender);
             return;
         }

@@ -82,7 +82,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
 
         int amount = arguments.getNumber();
 
-        if (percentage && (amount < 0 || amount > 100)) {
+        if (amount == 0 || (percentage && (amount < 0 || amount > 100))) {
             Message.INVALID_PERCENTAGE.send(sender);
             return;
         }
@@ -105,7 +105,7 @@ public class CmdAdminAddGenerator implements IAdminIslandCommand {
             } else {
                 int generatorRate = island.getGeneratorAmount(material, environment) + amount;
 
-                if (generatorRate < 0) {
+                if (generatorRate <= 0) {
                     if (!plugin.getEventsBus().callIslandRemoveGeneratorRateEvent(sender, island, material, environment))
                         continue;
 

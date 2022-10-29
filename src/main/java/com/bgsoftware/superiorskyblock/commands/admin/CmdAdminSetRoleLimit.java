@@ -86,7 +86,7 @@ public class CmdAdminSetRoleLimit implements IAdminIslandCommand {
         boolean anyIslandChanged = false;
 
         for (Island island : islands) {
-            if (limit < 0) {
+            if (limit <= 0) {
                 if (plugin.getEventsBus().callIslandRemoveRoleLimitEvent(sender, island, playerRole)) {
                     anyIslandChanged = true;
                     island.removeRoleLimit(playerRole);

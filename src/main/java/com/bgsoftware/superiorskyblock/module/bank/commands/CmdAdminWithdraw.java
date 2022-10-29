@@ -68,7 +68,7 @@ public class CmdAdminWithdraw implements IAdminIslandCommand {
         } catch (IllegalArgumentException ignored) {
         }
 
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             Message.INVALID_AMOUNT.send(sender, args[3]);
             return;
         }
