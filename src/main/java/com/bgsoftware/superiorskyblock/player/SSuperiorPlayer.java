@@ -750,6 +750,7 @@ public class SSuperiorPlayer implements SuperiorPlayer {
         this.disbands = otherPlayer.getDisbands();
         this.borderColor = otherPlayer.getBorderColor();
         this.lastTimeStatus = otherPlayer.getLastTimeStatus();
+        this.completedMissions.putAll(otherPlayer.getCompletedMissionsWithAmounts());
 
         if (!otherPlayer.isPersistentDataContainerEmpty()) {
             byte[] data = otherPlayer.getPersistentDataContainer().serialize();
