@@ -5,9 +5,13 @@ import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.island.warps.IslandWarp;
 import com.bgsoftware.superiorskyblock.api.wrappers.SuperiorPlayer;
 import com.bgsoftware.superiorskyblock.commands.arguments.CommandArguments;
+import com.bgsoftware.superiorskyblock.core.ChunkPosition;
 import com.bgsoftware.superiorskyblock.core.messages.Message;
 import com.bgsoftware.superiorskyblock.commands.CommandTabCompletes;
 import com.bgsoftware.superiorskyblock.commands.IAdminIslandCommand;
+import com.bgsoftware.superiorskyblock.island.warp.SignWarp;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunkLoadReason;
+import com.bgsoftware.superiorskyblock.world.chunk.ChunksProvider;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
@@ -73,22 +77,12 @@ public class CmdAdminDelWarp implements IAdminIslandCommand {
         if (!plugin.getEventsBus().callIslandDeleteWarpEvent(sender, islandWarp.getIsland(), islandWarp))
             return;
 
-        boolean breakSign = false;
-
-        Block signBlock = islandWarp.getLocation().getBlock();
-        if (signBlock.getState() instanceof Sign) {
-            signBlock.setType(Material.AIR);
-            signBlock.getWorld().dropItemNaturally(signBlock.getLocation(), new ItemStack(Material.SIGN));
-            breakSign = true;
-        }
-
         island.deleteWarp(islandWarp.getName());
-
         Message.DELETE_WARP.send(sender, islandWarp.getName());
 
-        if (breakSign) {
-            Message.DELETE_WARP_SIGN_BROKE.send(sender);
-        }
+        ChunksProvider.loadChunk(ChunkPosition.of(islandWarp.getLocation()), ChunkLoadReason.WARP_SIGN_BREAK, chunk -> {
+            SignWarp.trySignWarpBreak(islandWarp, sender);
+        });
     }
 
     @Override
