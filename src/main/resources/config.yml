@@ -170,6 +170,7 @@ island-roles:
     permissions:
       - ANIMAL_BREED
       - ANIMAL_DAMAGE
+      - ANIMAL_SHEAR
       - BREAK
       - BUILD
       - CLOSE_BYPASS
