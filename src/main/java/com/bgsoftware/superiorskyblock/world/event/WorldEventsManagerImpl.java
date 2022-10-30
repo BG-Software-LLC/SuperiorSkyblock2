@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.SuperiorSkyblockPlugin;
 import com.bgsoftware.superiorskyblock.api.island.Island;
 import com.bgsoftware.superiorskyblock.api.world.event.WorldEventsManager;
 import com.bgsoftware.superiorskyblock.core.ChunkPosition;
+import com.bgsoftware.superiorskyblock.core.Mutable;
 import com.bgsoftware.superiorskyblock.core.Singleton;
 import com.bgsoftware.superiorskyblock.core.threads.BukkitExecutor;
 import com.bgsoftware.superiorskyblock.island.algorithm.DefaultIslandCalculationAlgorithm;
@@ -54,33 +55,36 @@ public class WorldEventsManagerImpl implements WorldEventsManager {
         if (!plugin.getNMSChunks().isChunkEmpty(chunk))
             island.markChunkDirty(chunk.getWorld(), chunk.getX(), chunk.getZ(), true);
 
-        BukkitExecutor.sync(() -> {
-            if (chunk.isLoaded()) {
-                // We want to delete old holograms of stacked blocks + count entities for the chunk
-                for (Entity entity : chunk.getEntities()) {
-                    if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
-                            plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
-                        entity.remove();
-                }
-            }
-        }, 2L);
-
         Location islandCenter = island.getCenter(chunk.getWorld().getEnvironment());
+
+        Mutable<Boolean> recalculateEntities = new Mutable<>(false);
 
         if (chunk.getX() == (islandCenter.getBlockX() >> 4) && chunk.getZ() == (islandCenter.getBlockZ() >> 4)) {
             if (chunk.getWorld().getEnvironment() == plugin.getSettings().getWorlds().getDefaultWorld()) {
                 island.setBiome(firstBlock.getWorld().getBiome(firstBlock.getBlockX(), firstBlock.getBlockZ()), false);
             }
 
-            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
-                BukkitExecutor.sync(() -> {
-                    if (chunk.isLoaded()) {
-                        Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntitySpawn);
-                        island.getEntitiesTracker().recalculateEntityCounts();
-                    }
-                }, 20L);
-            }
+            recalculateEntities.setValue(true);
         }
+
+        BukkitExecutor.sync(() -> {
+            if (!chunk.isLoaded())
+                return;
+
+            // We want to delete old holograms of stacked blocks + count entities for the chunk
+            for (Entity entity : chunk.getEntities()) {
+                if (entity instanceof ArmorStand && isHologram((ArmorStand) entity) &&
+                        plugin.getStackedBlocks().getStackedBlockAmount(entity.getLocation().subtract(0, 1, 0)) > 1)
+                    entity.remove();
+            }
+
+            // We want to recalculate entities
+            if (BuiltinModules.UPGRADES.isUpgradeTypeEnabled(UpgradeTypeEntityLimits.class)) {
+                Arrays.stream(chunk.getEntities()).forEach(entityTrackingListener.get()::onEntitySpawn);
+                if (recalculateEntities.getValue())
+                    island.getEntitiesTracker().recalculateEntityCounts();
+            }
+        }, 2L);
 
         ChunkPosition chunkPosition = ChunkPosition.of(chunk);
         DefaultIslandCalculationAlgorithm.CACHED_CALCULATED_CHUNKS.remove(chunkPosition);
