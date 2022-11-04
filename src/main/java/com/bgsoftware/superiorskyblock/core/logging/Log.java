@@ -49,13 +49,19 @@ public class Log {
     }
 
     public static void debug(Debug debug, String clazz, String method, Object... params) {
-        if (isDebugged(debug))
+        if (isDebugged(debug)) {
             entering(clazz, method, null, params);
+            if (isDebugged(Debug.SHOW_STACKTRACE))
+                printStackTrace();
+        }
     }
 
     public static void debugResult(Debug debug, String clazz, String method, @Nullable String message, Object result) {
-        if (isDebugged(debug))
+        if (isDebugged(debug)) {
             entering(clazz, method, message, result);
+            if (isDebugged(Debug.SHOW_STACKTRACE))
+                printStackTrace();
+        }
     }
 
     public static void debugResult(Debug debug, String clazz, String method, @Nullable String message, Throwable error) {
@@ -63,6 +69,10 @@ public class Log {
             enteringInternal(Level.SEVERE, clazz, method, message);
             error.printStackTrace();
         }
+    }
+
+    private static void printStackTrace() {
+        new Exception().printStackTrace();
     }
 
     public static void entering(String clazz, String method, @Nullable String message, Object... params) {

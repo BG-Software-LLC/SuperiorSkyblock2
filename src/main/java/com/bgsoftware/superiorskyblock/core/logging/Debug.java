@@ -129,7 +129,9 @@ public enum Debug {
     VOID_TELEPORT,
     TELEPORT_PLAYER,
     LOAD_CHUNK,
-    PASTE_SCHEMATIC;
+    PASTE_SCHEMATIC,
+
+    SHOW_STACKTRACE;
 
     private static String[] DEBUG_NAMES = null;
 
