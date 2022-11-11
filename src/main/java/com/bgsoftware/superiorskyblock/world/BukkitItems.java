@@ -1,6 +1,7 @@
 package com.bgsoftware.superiorskyblock.world;
 
 import com.bgsoftware.common.reflection.ReflectMethod;
+import com.bgsoftware.superiorskyblock.core.Materials;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +23,8 @@ public class BukkitItems {
     private static final ReflectMethod<EquipmentSlot> GET_HAND_PLAYER_INTERACT = new ReflectMethod<>(PlayerInteractEvent.class, "getHand");
     private static final ReflectMethod<ItemStack> GET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "getItemInOffHand");
     private static final ReflectMethod<ItemStack> SET_ITEM_IN_OFF_HAND = new ReflectMethod<>(PlayerInventory.class, "setItemInOffHand", ItemStack.class);
+
+    private static final Material END_CRYSTAL_ITEM_TYPE = Materials.getMaterialSafe("END_CRYSTAL");
 
     private BukkitItems() {
 
@@ -86,8 +89,17 @@ public class BukkitItems {
 
     @SuppressWarnings("deprecation")
     public static EntityType getEntityType(ItemStack itemStack) {
-        if (!isValidAndSpawnEgg(itemStack))
-            return itemStack.getType() == Material.ARMOR_STAND ? EntityType.ARMOR_STAND : EntityType.UNKNOWN;
+        if (!isValidAndSpawnEgg(itemStack)) {
+            Material itemType = itemStack.getType();
+
+            if (itemType == Material.ARMOR_STAND) {
+                return EntityType.ARMOR_STAND;
+            } else if (itemType == END_CRYSTAL_ITEM_TYPE) {
+                return EntityType.ENDER_CRYSTAL;
+            }
+
+            return EntityType.UNKNOWN;
+        }
 
         if (ServerVersion.isLegacy()) {
             try {
