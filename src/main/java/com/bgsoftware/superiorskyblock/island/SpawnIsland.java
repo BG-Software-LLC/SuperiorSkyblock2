@@ -89,6 +89,9 @@ public class SpawnIsland implements Island {
     private final IslandArea islandArea;
     private final int islandSize;
 
+    private final float homeYaw;
+    private final float homePitch;
+
     private Biome biome = Biome.PLAINS;
 
 
@@ -112,6 +115,9 @@ public class SpawnIsland implements Island {
         this.center = new SBlockPosition(worldName, smartCenter.getBlockX(), smartCenter.getBlockY(), smartCenter.getBlockZ());
         this.islandArea = new IslandArea(this.center, this.islandSize);
         this.spawnWorldInfo = new WorldInfoImpl(this.spawnWorld.getName(), this.spawnWorld.getEnvironment());
+
+        this.homeYaw = smartCenter.getYaw();
+        this.homePitch = smartCenter.getPitch();
 
         this.dirtyChunksContainer = new DirtyChunksContainer(this);
 
@@ -282,7 +288,7 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public Location getCenter(World.Environment environment) {
+    public Location getCenter(World.Environment unused) {
         return center.parse(this.spawnWorld).add(0.5, 0, 0.5);
     }
 
@@ -312,14 +318,17 @@ public class SpawnIsland implements Island {
     }
 
     @Override
-    public Location getIslandHome(World.Environment environment) {
-        return getCenter(environment);
+    public Location getIslandHome(World.Environment unused) {
+        Location center = getCenter(null /*unused*/);
+        center.setYaw(this.homeYaw);
+        center.setPitch(this.homePitch);
+        return center;
     }
 
     @Override
     public Map<World.Environment, Location> getIslandHomes() {
         Map<World.Environment, Location> map = new HashMap<>();
-        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), getCenter(null /*unused*/));
+        map.put(plugin.getSettings().getWorlds().getDefaultWorld(), getIslandHome(null /*unused*/));
         return map;
     }
 
@@ -341,7 +350,7 @@ public class SpawnIsland implements Island {
     @Nullable
     @Override
     public Location getVisitorsLocation(World.Environment unused) {
-        return getCenter(plugin.getSettings().getWorlds().getDefaultWorld());
+        return this.getIslandHome(null /* unused */);
     }
 
     @Override
