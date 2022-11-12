@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.config.section.AFKIntegrationsSection;
 import com.bgsoftware.superiorskyblock.config.section.DatabaseSection;
 import com.bgsoftware.superiorskyblock.config.section.DefaultContainersSection;
@@ -557,6 +558,11 @@ public class SettingsManagerImpl extends Manager implements SettingsManager {
     @Override
     public boolean getDeleteUnsafeWarps() {
         return this.container.deleteUnsafeWarps;
+    }
+
+    @Override
+    public List<RespawnAction> getPlayerRespawn() {
+        return this.container.playerRespawnActions;
     }
 
     public void updateValue(String path, Object value) throws IOException {

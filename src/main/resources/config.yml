@@ -783,3 +783,15 @@ bossbar-limit: 1
 # Delete unsafe warps when players try to teleport to them automatically.
 # If disabled, warps that are unsafe will stay until players manually delete them.
 delete-unsafe-warps: true
+
+# List of actions to perform when a player respawns.
+# The plugin will try to perform the actions in the order they are entered here, from top to bottom,
+# until one action succeeds. Custom respawn actions can be registered using the API.
+# The default available actions:
+# BED_TELEPORT - Teleport the player to his bed spawn, if exists.
+# ISLAND_TELEPORT - Teleport the player to his own island, if exists.
+# SPAWN_TELEPORT - Teleport the player to spawn when he spawns.
+# VANILLA - Respawn the player in his vanilla spawn point (bed location or world spawn point).
+player-respawn:
+  - ISLAND_TELEPORT
+  - SPAWN_TELEPORT

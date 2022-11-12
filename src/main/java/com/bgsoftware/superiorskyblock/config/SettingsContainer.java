@@ -7,6 +7,7 @@ import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.key.KeyMap;
 import com.bgsoftware.superiorskyblock.api.key.KeySet;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import com.bgsoftware.superiorskyblock.core.SBlockOffset;
 import com.bgsoftware.superiorskyblock.core.ServerVersion;
@@ -39,6 +40,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -208,6 +210,7 @@ public class SettingsContainer {
     public final TopIslandMembersSorting islandTopMembersSorting;
     public final int bossBarLimit;
     public final boolean deleteUnsafeWarps;
+    public final List<RespawnAction> playerRespawnActions;
 
     public SettingsContainer(SuperiorSkyblockPlugin plugin, YamlConfiguration config) throws ManagerLoadException {
         databaseType = config.getString("database.type").toUpperCase(Locale.ENGLISH);
@@ -453,7 +456,7 @@ public class SettingsContainer {
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    Log.warnFromFile("Invalid container type ", container + ", skipping...");
+                    Log.warn("Invalid container type ", container + ", skipping...");
                 }
             }
         }
@@ -528,6 +531,14 @@ public class SettingsContainer {
         this.islandTopMembersSorting = islandTopMembersSorting;
         bossBarLimit = config.getInt("bossbar-limit", 1);
         deleteUnsafeWarps = config.getBoolean("delete-unsafe-warps", true);
+        playerRespawnActions = new LinkedList<>();
+        config.getStringList("player-respawn").forEach(respawnAction -> {
+            try {
+                playerRespawnActions.add(RespawnAction.getByName(respawnAction));
+            } catch (NullPointerException error) {
+                Log.warn("Invalid respawn action ", respawnAction + ", skipping...");
+            }
+        });
     }
 
     private List<String> loadInteractables(SuperiorSkyblockPlugin plugin) {

@@ -4,6 +4,7 @@ import com.bgsoftware.superiorskyblock.api.enums.TopIslandMembersSorting;
 import com.bgsoftware.superiorskyblock.api.handlers.BlockValuesManager;
 import com.bgsoftware.superiorskyblock.api.key.Key;
 import com.bgsoftware.superiorskyblock.api.objects.Pair;
+import com.bgsoftware.superiorskyblock.api.player.respawn.RespawnAction;
 import com.bgsoftware.superiorskyblock.api.wrappers.BlockOffset;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -598,6 +599,12 @@ public interface SettingsManager {
      * Config-path: delete-unsafe-warps
      */
     boolean getDeleteUnsafeWarps();
+
+    /**
+     * Get the list of actions to perform when a player respawns.
+     * Config-path: player-respawn
+     */
+    List<RespawnAction> getPlayerRespawn();
 
     interface Database {
 
