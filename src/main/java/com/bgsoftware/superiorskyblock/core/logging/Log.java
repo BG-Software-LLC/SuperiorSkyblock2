@@ -27,7 +27,7 @@ public class Log {
     }
 
     public static void warnFromFile(String fileName, Object first, Object... parts) {
-        logInternal(Level.WARNING, fileName, first, parts);
+        logInternalWithFile(Level.WARNING, fileName, first, parts);
     }
 
     public static void error(Object first, Object... parts) {
@@ -108,8 +108,8 @@ public class Log {
         logInternal(level, clazz, "::", method, message == null ? "" : " " + message, paramsMessage.toString());
     }
 
-    private static void logInternal(Level level, String fileName, Object first, Object... parts) {
-        plugin.getLogger().log(level, buildFromParts(fileName, first, parts));
+    private static void logInternalWithFile(Level level, String fileName, Object first, Object... parts) {
+        plugin.getLogger().log(level, buildFromPartsWithFile(fileName, first, parts));
     }
 
     private static void logInternal(Level level, Object first, Object... parts) {
@@ -123,7 +123,7 @@ public class Log {
         return builder.toString();
     }
 
-    private static String buildFromParts(String prefixFile, Object first, Object... parts) {
+    private static String buildFromPartsWithFile(String prefixFile, Object first, Object... parts) {
         StringBuilder builder = new StringBuilder("[").append(prefixFile).append("] ").append(first);
         for (Object part : parts)
             builder.append(part);
