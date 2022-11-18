@@ -26,7 +26,7 @@ events:
   - IslandSchematicPasteEvent
 
 # Requirement of the event to complete the mission.
-success-check: 'event.getSchematic().endsWith("_nether")'
+success-check: 'event.getSchematic().endsWith("_the_end")'
 
 # List of required missions that must be completed before completing this one.
 required-missions:
