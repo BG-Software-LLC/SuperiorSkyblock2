@@ -3321,7 +3321,7 @@ public class SIsland implements Island {
 
         Key generatedBlock = eventResult.getResult().getBlock();
 
-        if (optimizeCobblestone && generatedBlock.getGlobalKey().contains("COBBLESTONE")) {
+        if (optimizeCobblestone && generatedBlock.getGlobalKey().equals("COBBLESTONE")) {
             Log.debugResult(Debug.GENERATE_BLOCK, "SIsland", "generateBlock",
                     "Return Cobblestone", generatedBlock);
             /* Block is being counted in BlocksListener#onBlockFromToMonitor */
