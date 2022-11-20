@@ -923,7 +923,6 @@ public class SIsland implements Island {
     @Override
     public BlockPosition getMaximumProtectedPosition() {
         int islandSize = getIslandSize();
-        BlockPosition centerPosition = getCenterPosition();
         return getCenterPosition().offset(islandSize, 0, islandSize);
     }
 
@@ -3013,22 +3012,21 @@ public class SIsland implements Island {
         }
 
         if (disableTime) {
-            //Disabling settings without saving to database.
-            if (settings != IslandFlags.ALWAYS_DAY)
-                islandFlags.remove(IslandFlags.ALWAYS_DAY);
-            if (settings != IslandFlags.ALWAYS_MIDDLE_DAY)
-                islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_DAY);
-            if (settings != IslandFlags.ALWAYS_NIGHT)
-                islandFlags.remove(IslandFlags.ALWAYS_NIGHT);
-            if (settings != IslandFlags.ALWAYS_MIDDLE_NIGHT)
-                islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT);
+            if (settings != IslandFlags.ALWAYS_DAY && islandFlags.remove(IslandFlags.ALWAYS_DAY) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_DAY);
+            if (settings != IslandFlags.ALWAYS_MIDDLE_DAY && islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_DAY) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_MIDDLE_DAY);
+            if (settings != IslandFlags.ALWAYS_NIGHT && islandFlags.remove(IslandFlags.ALWAYS_NIGHT) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_NIGHT);
+            if (settings != IslandFlags.ALWAYS_MIDDLE_NIGHT && islandFlags.remove(IslandFlags.ALWAYS_MIDDLE_NIGHT) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_MIDDLE_NIGHT);
         }
 
         if (disableWeather) {
-            if (settings != IslandFlags.ALWAYS_RAIN)
-                islandFlags.remove(IslandFlags.ALWAYS_RAIN);
-            if (settings != IslandFlags.ALWAYS_SHINY)
-                islandFlags.remove(IslandFlags.ALWAYS_SHINY);
+            if (settings != IslandFlags.ALWAYS_RAIN && islandFlags.remove(IslandFlags.ALWAYS_RAIN) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_RAIN);
+            if (settings != IslandFlags.ALWAYS_SHINY && islandFlags.remove(IslandFlags.ALWAYS_SHINY) != null)
+                IslandsDatabaseBridge.removeIslandFlag(this, IslandFlags.ALWAYS_SHINY);
         }
 
         IslandsDatabaseBridge.saveIslandFlag(this, settings, 1);
