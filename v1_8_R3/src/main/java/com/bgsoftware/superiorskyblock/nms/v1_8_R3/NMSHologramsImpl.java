@@ -33,7 +33,7 @@ public class NMSHologramsImpl implements NMSHolograms {
         return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
-    private static class EntityHologram extends EntityArmorStand implements Hologram {
+    public static class EntityHologram extends EntityArmorStand implements Hologram {
 
         EntityHologram(World world, double x, double y, double z) {
             super(world, x, y, z);

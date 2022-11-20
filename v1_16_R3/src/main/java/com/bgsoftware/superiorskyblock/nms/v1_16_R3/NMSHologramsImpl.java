@@ -42,7 +42,7 @@ public class NMSHologramsImpl implements NMSHolograms {
         return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
-    private static class EntityHologram extends EntityArmorStand implements Hologram {
+    public static class EntityHologram extends EntityArmorStand implements Hologram {
 
         private CraftEntity bukkitEntity;
 
