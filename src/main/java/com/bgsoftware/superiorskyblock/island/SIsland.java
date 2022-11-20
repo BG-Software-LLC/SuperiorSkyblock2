@@ -1238,7 +1238,7 @@ public class SIsland implements Island {
 
         playerPermissions.get(superiorPlayer).setPermission(islandPrivilege, value);
 
-        if (superiorPlayer.isOnline()) {
+        if (superiorPlayer.isOnline() && isInside(superiorPlayer.getLocation())) {
             if (islandPrivilege == IslandPrivileges.FLY) {
                 updateIslandFly(superiorPlayer);
             } else if (islandPrivilege == IslandPrivileges.VILLAGER_TRADING) {
