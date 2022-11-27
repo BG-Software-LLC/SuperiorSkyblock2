@@ -149,7 +149,7 @@ public class DefaultPlayerTeleportAlgorithm implements PlayerTeleportAlgorithm {
                                     continue;
                                 }
 
-                                if (WorldBlocks.isChunkEmpty(null, chunkSnapshot))
+                                if (WorldBlocks.isChunkEmpty(island, chunkSnapshot))
                                     continue;
 
                                 int worldBuildLimit = islandsWorld.getMaxHeight() - 1;

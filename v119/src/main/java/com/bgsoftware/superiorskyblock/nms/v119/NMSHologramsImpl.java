@@ -42,7 +42,7 @@ public class NMSHologramsImpl implements NMSHolograms {
         return ((CraftEntity) entity).getHandle() instanceof Hologram;
     }
 
-    private static class EntityHologram extends ArmorStand implements Hologram {
+    public static class EntityHologram extends ArmorStand implements Hologram {
 
         private static final AABB EMPTY_BOUND = new AABB(0D, 0D, 0D, 0D, 0D, 0D);
 
